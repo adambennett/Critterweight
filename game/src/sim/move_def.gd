@@ -30,7 +30,17 @@ var invuln: Array = []        ## [[t0, t1]] evasion windows
 var element := ""
 var buildup := 0.0
 var knockdown := false
-var multi_hit := false        ## may hit the same target once per window instead of once per move
+var multi_hit := false        ## may hit the same target again (each window, or every `rehit` s)
+var rehit := 9.0              ## with multi_hit: seconds before the same window may hit again
+var kb_dir := "auto"          ## auto (contact normal + forward) | side | up | radial
+var kb_side := 1.0            ## side knockback: +1 toward the attacker's left, -1 right
+var pull := 0.0               ## pulls the target this many metres toward the attacker on hit
+var turn_target := 0.0        ## degrees the target is spun on hit
+var splat := {}               ## wall-splat bonus if the target hits a wall shortly after {damage, stun, knockdown}
+var on_hit: Array = []        ## inline hooks evaluated on this move's hits ({"if": {...}, "do": [...]})
+var armor_level := "all"      ## all | lights | all_but_heavy (what the armor windows ignore)
+var channel := false          ## an interruptible channel (Jolted micro-flinches cancel it)
+var move_class := ""          ## overrides the slot-derived class (light|heavy|ability|juice|grab)
 var unblockable := false
 var guard_break := 1.0        ## multiplier on stamina drained from a guarding target
 var speed := 1.0              ## muscle speed multiplier for animated segments
@@ -69,6 +79,23 @@ static func parse(d: Dictionary, body: BodyDef, errors: PackedStringArray) -> Mo
 	m.buildup = float(d.get("buildup", 0.0))
 	m.knockdown = bool(d.get("knockdown", false))
 	m.multi_hit = bool(d.get("multi_hit", false))
+	m.rehit = float(d.get("rehit", 9.0))
+	m.kb_dir = str(d.get("kb_dir", "auto"))
+	m.kb_side = float(d.get("kb_side", 1.0))
+	m.pull = float(d.get("pull", 0.0))
+	m.turn_target = float(d.get("turn_target", 0.0))
+	m.splat = d.get("splat", {})
+	m.on_hit = d.get("on_hit", [])
+	m.armor_level = str(d.get("armor_level", "all"))
+	m.channel = bool(d.get("channel", false))
+	m.move_class = str(d.get("class", ""))
+	for oh in m.on_hit:
+		if typeof(oh) != TYPE_DICTIONARY:
+			errors.append("move '%s': on_hit entries must be objects" % m.id)
+	for ef in m.effects:
+		var ve := EffectsSystem.validate(ef) if typeof(ef) == TYPE_DICTIONARY else "effect is not an object"
+		if ve != "":
+			errors.append("move '%s': %s" % [m.id, ve])
 	m.unblockable = bool(d.get("unblockable", false))
 	m.guard_break = float(d.get("guard_break", 1.0))
 	m.speed = float(d.get("speed", 1.0))

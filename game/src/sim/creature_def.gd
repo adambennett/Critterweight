@@ -3,7 +3,7 @@ extends RefCounted
 ## A playable (or NPC) creature: its body, base stats, moveset slots, abilities, element and
 ## presentation references. Loaded from content JSON (schema: content/schemas/creature.schema.json).
 
-const MOVE_SLOTS := ["l1", "l2", "l3", "heavy", "finisher", "dash_attack", "grab", "throw", "pummel", "taunt", "getup_attack"]
+const MOVE_SLOTS := ["l1", "l2", "l3", "heavy", "heavy_charged", "finisher", "dash_attack", "grab", "pummel", "taunt"]
 const ABILITY_SLOTS := ["ability1", "ability2", "juice"]
 
 var id := ""
@@ -12,14 +12,18 @@ var title := ""                 ## short epithet shown in menus
 var element := ""
 var body: BodyDef
 var stats := {
-	"health": 100.0, "walk_speed": 3.4, "accel": 26.0, "turn_rate": 9.0,
-	"stamina": 100.0, "stamina_regen": 24.0, "poise": 100.0, "poise_regen": 35.0,
-	"dodge_speed": 7.5, "dodge_time": 0.26, "power": 1.0, "defense": 1.0, "weight": 1.0,
+	"health": 100.0, "walk_speed": 3.4, "side_speed": 0.0, "accel": 26.0, "turn_rate": 9.0,
+	"stamina": 100.0, "stamina_regen": 12.0, "poise": 60.0, "poise_regen": 15.0,
+	"dodge_distance": 2.8, "dodge_time": 0.3, "power": 1.0, "defense": 1.0, "weight": 1.0,
 }
 var moves := {}                 ## slot -> MoveDef (plus any extra ids used by abilities)
 var abilities := {}             ## slot -> MoveDef (kind "ability") with cooldown
 var cooldowns := {}             ## slot -> seconds
 var juice := {}                 ## JUICE ultimate parameters (duration, buffs, move)
+var light_string: Array = ["l1", "l2", "l3"]   ## Light presses walk this list (techniques may lengthen it)
+var ability_charges := {}       ## slot -> max charges (default 1)
+var passives: Array = []        ## always-on Hooks (kit traits, techniques)
+var throws := {}                ## throw_fwd / throw_side / throw_back -> {distance, damage, up, knockdown, buildup}
 var art := {}                   ## model path, palette, gore piece
 var audio := {}                 ## voice/impact palette
 var ai := {}                    ## bot personality weights
@@ -80,6 +84,19 @@ static func from_dict(d: Dictionary, body_lookup: Callable = Callable(), src := 
 		c.abilities[str(slot)] = MoveDef.parse(adict, c.body, c.errors)
 		c.cooldowns[str(slot)] = float(av.get("cooldown", 6.0))
 	c.juice = d.get("juice", {})
+	if d.has("string"):
+		c.light_string = d["string"]
+	for slot2 in c.light_string:
+		if not c.moves.has(str(slot2)):
+			c.errors.append("%s: light string references missing move '%s'" % [c.id, slot2])
+	for slot3 in ad:
+		if typeof(ad[slot3]) == TYPE_DICTIONARY:
+			c.ability_charges[str(slot3)] = int(ad[slot3].get("charges", 1))
+	c.passives = d.get("passives", [])
+	for ph in c.passives:
+		for e in Hooks.validate(ph):
+			c.errors.append("%s: %s" % [c.id, e])
+	c.throws = d.get("throws", {})
 	c.art = d.get("art", {})
 	c.audio = d.get("audio", {})
 	c.ai = d.get("ai", {})
