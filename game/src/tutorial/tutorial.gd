@@ -33,9 +33,7 @@ static func start(index := 0, creature_id := "", on_exit: Callable = Callable())
 	var cid := creature_id if creature_id != "" and Content.creature(creature_id) != null else DEFAULT_FIGHTER
 	if Content.creature(cid) == null:
 		cid = str(Content.playable_creatures()[0])
-	var partner_id := PARTNER if Content.creature(PARTNER) != null else ("f_gusto" if cid != "f_gusto" else "f_stoke")
-	if Content.creature(partner_id) == null:
-		partner_id = cid
+	var partner_id := partner_for(cid)
 	_exit_override = on_exit
 	var t: Dictionary = Profiles.current.get("tutorial", {})
 	t["times_offered"] = int(t.get("times_offered", 0)) + 1
@@ -48,6 +46,36 @@ static func start(index := 0, creature_id := "", on_exit: Callable = Callable())
 		"fighters": [
 			{"creature": cid, "team": 0, "kind": "player", "name": Profiles.player_name()},
 			{"creature": partner_id, "team": 1, "kind": "scripted", "name": "Kid Lamprey"}]})
+
+
+## The creature Kid Lamprey spars in: his own kit (`npc_kid_lamprey`) when it exists, else a
+## roster stand-in, else the player's own fighter. The stand-in is the first of STAND_INS that
+## isn't the player's fighter and stands at most MAX_HEIGHT_RATIO times the player's height:
+## Gusto's wing and kick strikes are authored at a 1.84 m bird's neck height, and size matching
+## can't bring them down onto a body under ~1.15 m (Jitters, or Dredge behind his raised claws),
+## so short fighters spar with Stoke, whose straight punches reach them. If no stand-in fits, the
+## closest in height. The tests use this too, so they always run the pairing the game launches.
+const STAND_INS := ["f_gusto", "f_stoke"]
+const MAX_HEIGHT_RATIO := 1.6
+
+
+static func partner_for(player_id: String) -> String:
+	if Content.creature(PARTNER) != null:
+		return PARTNER
+	var me := Content.creature(player_id)
+	var best := ""
+	var best_ratio := INF
+	for stand_in in STAND_INS:
+		var c := Content.creature(stand_in)
+		if stand_in == player_id or c == null:
+			continue
+		var ratio := c.body.height / maxf(0.3, me.body.height) if me else 1.0
+		if ratio <= MAX_HEIGHT_RATIO:
+			return stand_in
+		if ratio < best_ratio:
+			best_ratio = ratio
+			best = stand_in
+	return best if best != "" else player_id
 
 
 ## TutorialHook launcher (the tutorial menu): lesson 1 runs the whole course in order, any other
@@ -97,7 +125,7 @@ static func fill(text: String, c: CreatureDef) -> String:
 	out = out.replace("{move}", mv)
 	if c:
 		var names := []
-		for slot in c.light_string.slice(0, 3):
+		for slot in TutorialMode.string_slots(c):     # the string the Hands drill checks
 			if c.moves.has(slot):
 				names.append((c.moves[slot] as MoveDef).display_name)
 		out = out.replace("{l_names}", " – ".join(names) if not names.is_empty() else "jab, cross, hook")

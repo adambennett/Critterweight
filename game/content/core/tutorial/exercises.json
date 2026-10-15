@@ -46,7 +46,8 @@
       "highlight": "",
       "intro": "{light}. Three taps, three hits. {l_names} — or whatever your body calls them. Don't think. Tap.",
       "success": "That's a string. It'll work on a lot of people. Not on the good ones. We'll fix that.",
-      "hint": "Tap {light} three times in a row. Don't hold it. The third hit's the one with the shove.",
+      "hint": "Tap {light}, let it land, tap again. Three times. Mash it and they trip over each other. The third hit's the one with the shove.",
+      "rush": "Easy. One at a time: tap, let it land, tap again. Rush it and the next one cancels the last before it lands.",
       "barnaby": "ann_tut_string"
     },
     {
@@ -62,6 +63,14 @@
       "intro": "{heavy}. It's slower, it hurts more, and it shrugs off little hits while it's coming. Now hold it. Feel that? That's a charge. Let it go.",
       "success": "That's the one that ends arguments. It's also the one you'll miss most. Don't fall in love with it.",
       "hint": "Hold {heavy} until your fighter's whole body winds up. Then let go near him.",
+      "adapt": {
+        "no_charge": {
+          "intro": "{heavy}. It's slower, it hurts more, and it shrugs off little hits while it's coming. Yours doesn't charge, so holding it buys you nothing. Land one clean.",
+          "goal": "Land a Heavy ({heavy_name}). Yours doesn't charge: one clean one does it.",
+          "hint": "Press {heavy} when he's in front of you. It's slow, so start it before you're on top of him.",
+          "success": "That's the one that ends arguments. Yours doesn't charge, so don't stand there holding it."
+        }
+      },
       "barnaby": "ann_tut_heavy"
     },
     {
@@ -95,6 +104,14 @@
       "intro": "{dodge} plus a direction. Short, quick, and for a split second nothing can touch you. Now — press {light} while you're dodging. That's a dash attack. It closes distance.",
       "success": "Nothing hits what isn't there. And when you come back, come back swinging.",
       "hint": "Wait for his big wind-up, then {dodge} sideways. For the dash attack, press {light} while you're still sliding.",
+      "adapt": {
+        "no_dash": {
+          "intro": "{dodge} plus a direction. Short, quick, and for a split second nothing can touch you. Your fighter's got no dash attack, so the dodge is the whole lesson.",
+          "goal": "Dodge the Kid's Heavy without getting hit. (No dash attack in your kit.)",
+          "hint": "Wait for his big wind-up, then {dodge} sideways.",
+          "success": "Nothing hits what isn't there. No dash attack for you, so come back with your hands."
+        }
+      },
       "barnaby": "ann_tut_dodge"
     },
     {
@@ -113,6 +130,12 @@
       "intro": "{ability1}. That's yours. Every critter's got two tricks, and that's the first one — {ability1_name}. It's got a cooldown — see the ring? Use it, watch the ring, use it again.",
       "success": "That's what makes you you. Everything else, everyone's got.",
       "hint": "Press {ability1} when he's in front of you. Watch the little ring on the HUD — when it's full, it's ready.",
+      "adapt": {
+        "skip": {
+          "goal": "Use your first ability ({ability1}). Your fighter hasn't got one.",
+          "success": "Your fighter has no trick in that slot. Nothing to practise. Moving on."
+        }
+      },
       "barnaby": "ann_tut_ability"
     },
     {
@@ -128,6 +151,12 @@
       "intro": "He's guarding. Guard beats hands. Grab beats guard. {grab}, then push a direction to throw him. Toward the wall if you're feeling mean.",
       "success": "Strikes beat grabs. Grabs beat guard. Guard beats strikes. There's your triangle. Everything in this cage is three things.",
       "hint": "Walk right up to him while his guard's up, press {grab}, then push the stick toward the wall.",
+      "adapt": {
+        "skip": {
+          "goal": "Grab the Kid through his guard ({grab}). Your fighter can't grab.",
+          "success": "No grab in your kit. Guard beats hands, and you've got nothing that beats guard. Work around him. Moving on."
+        }
+      },
       "barnaby": "ann_tut_grab"
     },
     {
@@ -162,6 +191,23 @@
       "intro": "Two lights, then {heavy} in the middle of the string. That's your finisher. Now the fun part: see the meter? That's Hype. Hits fill it. Getting hit fills it. Taunting fills it — {taunt} — if you've got the nerve. Full meter, {juice}. That's the JUICE. Yours is called {juice_name}. Don't ask what's in it.",
       "success": "That's the whole kit. Hands, heavy, guard, dodge, grab, two tricks, and the JUICE. Everything after this is timing.",
       "hint": "{light}, {light}, then {heavy} quickly. For the JUICE: fill the meter — taunt with {taunt} when he's far away — then press {juice}.",
+      "adapt": {
+        "no_finisher": {
+          "intro": "No finisher in your kit: two lights and {heavy} just gets you a Heavy. So, the fun part: see the meter? That's Hype. Hits fill it. Getting hit fills it. Taunting fills it — {taunt} — if you've got the nerve. Full meter, {juice}. That's the JUICE. Yours is called {juice_name}. Don't ask what's in it.",
+          "goal": "Fill Hype and pop {juice_name} ({juice}). (No finisher in your kit.)",
+          "hint": "Fill the meter: hit him, or taunt with {taunt} when he's far away. Then press {juice}."
+        },
+        "no_juice": {
+          "intro": "Two lights, then {heavy} in the middle of the string. That's your finisher. Your kit's got no JUICE, so that's the whole lesson.",
+          "goal": "Land a Finisher ({light} {light} then {heavy}). (No JUICE in your kit.)",
+          "hint": "{light}, {light}, then {heavy} quickly.",
+          "success": "That's the whole kit. Hands, heavy, guard, dodge, grab, your tricks. No JUICE for you. Everything after this is timing."
+        },
+        "skip": {
+          "goal": "Land a Finisher, then pop the JUICE. Your fighter has neither.",
+          "success": "No finisher and no JUICE in your kit. Nothing to close with but your hands. Moving on."
+        }
+      },
       "barnaby": "ann_tut_juice"
     },
     {
