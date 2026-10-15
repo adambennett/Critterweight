@@ -2,22 +2,44 @@ class_name BotBrain
 extends InputSource
 ## Scripted NPC opponent. Plays by the same rules as a human: it only writes FighterInput,
 ## perceives opponents through a reaction-time delay (no omniscience), and makes deliberate,
-## tunable mistakes. Difficulty profiles differ in reaction time, defence, combo discipline,
-## spacing, ability use and error rate (docs/DESIGN.md "Bots").
+## tunable mistakes. Difficulty profiles differ in reaction time, defence, punishing, reads,
+## combo discipline, spacing, ability use and error rate (docs/BOTS.md).
+##
+## Perception: every tick the bot records what it can see of its target (position, body extent,
+## state, the move being performed and how far into it the target is) and decides only on the
+## record that is `reaction` seconds old. Beyond that it uses what a practised player knows: the
+## timing of a move it has SEEN begin (its animation), its own state, blocks, parries and hits,
+## the pattern of the attacks it has seen, and how its own moves connected so far this fight. It
+## never reads the opponent's input or anything not yet visible.
+##
+## Each attack the bot sees begin gets ONE answer (block, parry tap, dodge, counter-poke, armored
+## blow-through, or none), rolled once with the tier's chances; a mistake leaves it unanswered.
+## Openings it has seen (a blocked, dodged or whiffed move that cannot be cancelled, a parried
+## attacker) are punished with the strongest own move whose start-up fits the opening.
 
 const PROFILES := {
-	"rookie": {"reaction": 0.45, "think": 0.2, "aggression": 0.4, "block": 0.12, "parry": 0.0, "dodge": 0.04,
-		"combo": 0.2, "ability": 0.2, "grab": 0.08, "mistake": 0.35, "spacing": 0.25, "juice": 0.4, "wake": 0.9, "mash_escape": 0.35},
-	"regular": {"reaction": 0.32, "think": 0.14, "aggression": 0.55, "block": 0.32, "parry": 0.04, "dodge": 0.12,
-		"combo": 0.5, "ability": 0.45, "grab": 0.18, "mistake": 0.18, "spacing": 0.5, "juice": 0.75, "wake": 0.6, "mash_escape": 0.6},
-	"pro": {"reaction": 0.23, "think": 0.1, "aggression": 0.62, "block": 0.5, "parry": 0.14, "dodge": 0.22,
-		"combo": 0.75, "ability": 0.65, "grab": 0.28, "mistake": 0.09, "spacing": 0.75, "juice": 0.9, "wake": 0.4, "mash_escape": 0.85},
-	"champion": {"reaction": 0.17, "think": 0.07, "aggression": 0.68, "block": 0.62, "parry": 0.3, "dodge": 0.32,
-		"combo": 0.9, "ability": 0.8, "grab": 0.35, "mistake": 0.04, "spacing": 0.92, "juice": 1.0, "wake": 0.25, "mash_escape": 1.0},
-	# Hall-of-Famer (CAMPAIGN.md difficulty tiers): 0.14 s reactions, 2% mistakes, reads charge-ups
-	"hall_of_famer": {"reaction": 0.14, "think": 0.06, "aggression": 0.7, "block": 0.68, "parry": 0.4, "dodge": 0.38,
-		"combo": 0.95, "ability": 0.85, "grab": 0.38, "mistake": 0.02, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0},
+	"rookie": {"reaction": 0.5, "think": 0.2, "aggression": 0.4, "block": 0.12, "parry": 0.0, "dodge": 0.04,
+		"combo": 0.2, "ability": 0.2, "grab": 0.08, "mistake": 0.35, "spacing": 0.25, "juice": 0.4, "wake": 0.9, "mash_escape": 0.35,
+		"punish": 0.0, "read": 0.0, "heavy": 0.2},
+	"regular": {"reaction": 0.36, "think": 0.14, "aggression": 0.55, "block": 0.35, "parry": 0.05, "dodge": 0.12,
+		"combo": 0.5, "ability": 0.45, "grab": 0.18, "mistake": 0.18, "spacing": 0.5, "juice": 0.75, "wake": 0.6, "mash_escape": 0.6,
+		"punish": 0.25, "read": 0.3, "heavy": 0.28},
+	"pro": {"reaction": 0.26, "think": 0.1, "aggression": 0.62, "block": 0.55, "parry": 0.25, "dodge": 0.22,
+		"combo": 0.75, "ability": 0.65, "grab": 0.28, "mistake": 0.1, "spacing": 0.75, "juice": 0.9, "wake": 0.4, "mash_escape": 0.85,
+		"punish": 0.5, "read": 0.45, "heavy": 0.28},
+	"champion": {"reaction": 0.16, "think": 0.07, "aggression": 0.66, "block": 0.75, "parry": 0.4, "dodge": 0.3,
+		"combo": 0.9, "ability": 0.8, "grab": 0.35, "mistake": 0.05, "spacing": 0.92, "juice": 1.0, "wake": 0.25, "mash_escape": 1.0,
+		"punish": 0.75, "read": 0.65, "heavy": 0.28},
+	# Hall-of-Famer (CAMPAIGN.md difficulty tiers): the quickest reads, near-flawless, reads charge-ups
+	"hall_of_famer": {"reaction": 0.1, "think": 0.04, "aggression": 0.75, "block": 1.0, "parry": 0.55, "dodge": 0.36,
+		"combo": 1.0, "ability": 0.85, "grab": 0.38, "mistake": 0.01, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0,
+		"punish": 1.0, "read": 1.0, "heavy": 0.28},
 }
+## Profile keys: reaction (s, perception delay), think (s between decisions), aggression, block /
+## parry / dodge (chances to answer a seen attack that way), punish (chance to use a seen opening),
+## read (spotting habits: button-mashing, attack rhythm, armored blow-throughs), combo, heavy
+## (share of Heavies in neutral offence), ability, grab, mistake (per decision / per seen attack),
+## spacing, juice, wake (s of wake-up hesitation), mash_escape.
 
 var difficulty := "regular"
 var p := {}
@@ -25,10 +47,12 @@ var rng := RandomNumberGenerator.new()
 var personality := {}            ## creature ai block: {"aggression": +0.1, "prefers": "ranged", ...}
 var _t := 0.0
 var _next_think := 0.0
-var _history: Array = []          ## [{t, pos, state, slot, st, first_active, guarding}]
+var _history: Array = []          ## [{t, pos, state, slot, st, first, dur, bulk}]
 var _move := Vector3.ZERO
 var _guard := false
+var _guard_from := 0.0            ## the guard hold starts here (a parry tap from neutral waits for the tap)
 var _guard_until := 0.0
+var _tap_at := -1.0               ## a parry tap: the guard is let go for a tick just before, then pressed
 var _strafe := 1.0
 var _strafe_until := 0.0
 var _wake_at := -1.0
@@ -39,6 +63,29 @@ var objective_override := {}      ## set by modes / autobattler
 var label_text := ""
 var _hold_until := 0.0
 var _heavy_hold_until := 0.0      ## kit hint "charge_heavy": Heavy held into the charged version
+var _kit_hold_until := 0.0        ## kit hint ability "stick": the stick is committed, skip thinking
+# ---- reading the opponent (all from the reaction-delayed record) ----
+var _seen: Array = []             ## attacks seen begin, newest last: [{id, slot, start (bot clock), info}]
+var _seen_id := 0
+var _per_atk := false             ## last perceived record: attacking, its slot and move time
+var _per_slot := ""
+var _per_st := 0.0
+var _per_t := 0.0
+var _per_frozen := 0.0            ## how long the perceived move time has stood still (a held charge)
+var _answer := {}                 ## {id, kind, punished, charge} for the newest seen attack
+var _busy_until := -1.0           ## a queued answer (punish, armored attack) owns the next moments
+var _armor_next := 0.0
+var _info_cache := {}
+var _own_cache := {}
+# ---- own feedback ----
+var _parries_seen := -1
+var _contact := {}                ## seen slot -> learned delay from its first hit frame to contact with this bot
+var _contacts_pending: Array = [] ## contact times (bot clock) not yet matched to a seen attack
+var _c_counts: Array = [-1, -1, -1]   ## own blocks, own parries, the target's hits at the last poll
+var tally := {}                    ## decisions taken, by kind (tests and tuning read it)
+var _tap_track := -1.0            ## a parry tap whose outcome is tallied (parried / blocked / hit)
+var _tap_check := -1.0
+var _tap_counts: Array = [0, 0, 0.0]
 
 
 func _init(diff := "regular", seed_value := 0) -> void:
@@ -58,6 +105,15 @@ func set_personality(ai: Dictionary) -> void:
 			p[k] = clampf(float(p[k]) + float(ai[k]), 0.0, 1.0)
 
 
+func _tally(k: String) -> void:
+	tally[k] = int(tally.get(k, 0)) + 1
+
+
+## Profile value with a default (campaign overrides may replace a profile with fewer keys).
+func _pv(k: String, def := 0.0) -> float:
+	return float(p.get(k, def))
+
+
 func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 	_t += dt
 	if _kit_pre_poll(f):
@@ -65,12 +121,38 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 	var tgt := f.target
 	if tgt != _last_target:
 		_history.clear()
+		_seen.clear()
+		_answer = {}
+		_per_atk = false
 		_last_target = tgt
 	if tgt:
 		_history.append({"t": _t, "pos": tgt.pos(), "state": tgt.state, "slot": tgt.move_slot, "st": tgt.state_time,
-			"first": tgt.move.first_active() if tgt.move else 0.0, "dur": tgt.move.duration if tgt.move else 0.0})
+			"first": tgt.move.first_active() if tgt.move else 0.0, "dur": tgt.move.duration if tgt.move else 0.0,
+			"bulk": _surface_depth(f.pos(), tgt)})
 		while _history.size() > 2 and _t - float(_history[1]["t"]) > float(p["reaction"]):
 			_history.pop_front()
+		_note_seen(tgt)
+	_note_own(f)
+	if _own_src != "" and (f.state != Fighter.State.ATTACK or f.move_slot != _own_slot or f.state_time < _own_st):
+		var how := "hit" if (_own_hit or f.state == Fighter.State.GRABBING) else ("intr" if f.state in [Fighter.State.HITSTUN, Fighter.State.GUARD_BREAK, Fighter.State.KNOCKDOWN, Fighter.State.HELD] else "miss")
+		_tally("%s_%s" % [_own_src, how])
+		if how != "intr" and _own_band >= 0:
+			_learn_range(_own_slot.split("@")[0], _own_band, how == "hit")
+		_own_src = ""
+	if f.state == Fighter.State.ATTACK and (f.move_slot != _own_slot or f.state_time < _own_st):
+		_own_id += 1
+		_own_tgt_blocks = int(tgt.stats_record.get("blocks", 0)) if tgt else 0
+		_own_src = _next_src if _t - _next_src_t < 0.3 else "other"
+		_own_hit = false
+		var per0 := _perceived()
+		_own_band = -1
+		if tgt and not per0.is_empty():
+			var tp0: Vector3 = per0["pos"]
+			_own_band = _band(Vector2(tp0.x - f.pos().x, tp0.z - f.pos().z).length() - _bulk)
+	if f.state == Fighter.State.ATTACK and f.move_hit_any:
+		_own_hit = true
+	_own_slot = f.move_slot if f.state == Fighter.State.ATTACK else ""
+	_own_st = f.state_time
 	# pending timed presses
 	for q in _press_queue.duplicate():
 		if _t >= float(q["at"]):
@@ -80,12 +162,18 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 		_next_think = _t + float(p["think"]) * rng.randf_range(0.7, 1.3)
 		_think(f, sim)
 	f.input.move = _edge_safe(f, sim, _move)
-	f.input.set_held(FighterInput.GUARD, _guard and _t < _guard_until)
+	f.input.set_held(FighterInput.GUARD, _guard_held_now())
 	f.input.set_held(FighterInput.GRAB, _t < _hold_until)
 	f.input.set_held(FighterInput.HEAVY, _t < _heavy_hold_until)
 	if f.state == Fighter.State.HELD:
 		if rng.randf() < float(p["mash_escape"]) * 0.5:
 			f.input.press(FighterInput.LIGHT if rng.randf() < 0.5 else FighterInput.HEAVY)
+
+
+func _guard_held_now() -> bool:
+	if not _guard or _t < _guard_from or _t >= _guard_until:
+		return false
+	return not (_tap_at > 0.0 and _t >= _tap_at - 0.012 and _t < _tap_at)
 
 
 ## Ring-out arenas: a ring-out costs health and time, so bots keep off open edges. Within
@@ -212,37 +300,28 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	to.y = 0.0
 	var dist := to.length()
 	var dir := to / maxf(dist, 0.01)
-	var my_reach := float(personality.get("attack_range", reach_of(c, "l1"))) + _kit_target_bulk(f, tgt)
-	var their_reach := reach_of(tgt.creature, "heavy") if tgt else 1.0
+	if _t < _kit_hold_until:
+		return   # kit hint "stick": an ability committed the stick (e.g. a dive away)
+	# reach is judged to the body, not the root: a long body (Dozer's head, a boss) is in range
+	# sooner and sticks out into the opponent's reach sooner. Kit distances were authored root to
+	# root against ordinary bodies, so they only grow by what this body adds beyond one.
+	_bulk = float(per.get("bulk", 0.0))
+	_my_bulk = _surface_depth(tpos, f)
+	var extra := maxf(_kit_target_bulk(f, tgt), _bulk - REF_BULK)
+	var my_reach := float(personality.get("attack_range", reach_of(c, "l1"))) + maxf(extra, 0.0)
+	var their_reach := reach_of(tgt.creature, "heavy") + _my_bulk
 	var mistake := rng.randf() < float(p["mistake"])
-	# ---- defence: react to a perceived windup ----
+	# ---- defence and punishes: answer each attack seen begin (perceived, reaction-delayed) ----
 	var per_state := int(per.get("state", Fighter.State.NEUTRAL))
 	var attacking := (per_state == Fighter.State.ATTACK or per_state == Fighter.State.ABILITY) and not _kit_opening(per, tgt)
-	var winding := attacking and float(per.get("st", 0.0)) < float(per.get("first", 0.0))
-	if attacking and dist < their_reach + 0.6 and not mistake and f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD]:
-		if _kit_ability(f, tgt, dist, dir, per, true):   # kit hint: reactive abilities (counters, armor)
-			return
-		if _kit_defend(f, tgt, per, winding, dir):      # kit hints: parry_heavy / dodge_for_guard
-			return
-		var roll := rng.randf()
-		if winding and roll < float(p["parry"]):
-			# time the tap for the expected active frame
-			var eta := maxf(0.0, float(per["first"]) - float(per["st"]) - float(p["reaction"]))
-			_queue(FighterInput.GUARD, maxf(0.0, eta - 0.06))
-			_guard = true
-			_guard_until = _t + eta + 0.25
-		elif roll < float(p["parry"]) + float(p["dodge"]):
-			var side := dir.cross(Vector3.UP) * (1.0 if rng.randf() < 0.5 else -1.0)
-			_move = (side - dir * 0.5).normalized()
-			f.input.press(FighterInput.DODGE)
-			return
-		elif roll < float(p["parry"]) + float(p["dodge"]) + float(p["block"]):
-			_guard = true
-			_guard_until = _t + minf(rng.randf_range(0.3, 0.7), float(personality.get("guard_max", 9.0)))
-			if not f.input.is_held(FighterInput.GUARD):
-				f.input.press(FighterInput.GUARD)
-			_move = -dir * 0.3
-			return
+	if _t < _busy_until:
+		return   # a queued punish / armored attack is on its way
+	# answers are also prepared while stunned or recovering (a guard held through hitstun is up
+	# the moment it ends, like a player holding block through a combo)
+	var can_answer := f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD, Fighter.State.HITSTUN, Fighter.State.DODGE, Fighter.State.GETUP] \
+			or (f.state in [Fighter.State.ATTACK, Fighter.State.ABILITY] and f.move != null and f.state_time > _kit_last_threat(f.move))
+	if can_answer and _react(f, tgt, per, attacking, dist, dir):
+		return
 	if _t >= _guard_until:
 		_guard = false
 	# ---- objective modes may pull the bot elsewhere ----
@@ -258,44 +337,85 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	# ---- abilities ----
 	if _kit_ability(f, tgt, dist, dir, per, false):   # kit hints from the creature "ai" block
 		return
+	if _kit_heavy_vs_windup(f, dist, per):   # kit hint: Heavy into a perceived long windup
+		return
 	for slot in ["ability1", "ability2"]:
 		if _kit_hint_for(c, slot).is_empty() and c.abilities.has(slot) and float(f.cooldown_left.get(slot, 0.0)) <= 0.0 and rng.randf() < float(p["ability"]) * 0.35:
 			var ar := reach_of(c, slot, true)
 			if dist <= ar and dist >= minf(1.2, ar * 0.3):
 				f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
 				return
+	if dist > my_reach + 0.4 and _kit_avoid_zone(f, sim, dir):
+		return   # kit hint "avoid_zones": step out of an enemy puddle / patch before closing in
 	# ---- offence ----
-	var stamina_ok := f.stamina > 18.0 or rng.randf() < 0.2
-	var aggression := float(p["aggression"]) * (1.25 if f.health_frac() > tgt.health_frac() else 0.9)
-	if dist <= my_reach + 0.1 and stamina_ok and rng.randf() < aggression + 0.2:
-		var t_guarding := per_state == Fighter.State.GUARD
-		if (t_guarding or _kit_grab_target(tgt)) and rng.randf() < float(p["grab"]) * 2.0:
-			f.input.press(FighterInput.GRAB)
-		elif _kit_commit(f, tgt, dist, dir, per):
-			pass
-		elif f.state == Fighter.State.ATTACK and f.move_slot in ["l1", "l2"] and rng.randf() < float(p["combo"]):
-			if f.move_slot == "l2" and rng.randf() < 0.4:
-				f.input.press(FighterInput.HEAVY)
-			else:
-				f.input.press(FighterInput.LIGHT)
-		elif rng.randf() < 0.28:
-			f.input.press(FighterInput.HEAVY)
-			_kit_maybe_charge()
-		elif rng.randf() < float(p["grab"]) * 0.4:
-			f.input.press(FighterInput.GRAB)
-		else:
-			f.input.press(FighterInput.LIGHT)
+	# a Light string in progress: decided once per move, after seeing whether it landed
+	if f.state == Fighter.State.ATTACK and _string_step(f, tgt, dist, dir, per):
 		_move = dir * 0.4
 		return
-	if f.state == Fighter.State.ATTACK and f.move_hit_any and rng.randf() < float(p["combo"]):
-		f.input.press(FighterInput.LIGHT)
+	var stamina_ok := f.stamina > 18.0 or rng.randf() < 0.2
+	var aggression := float(p["aggression"]) * (1.25 if f.health_frac() > tgt.health_frac() else 0.9)
+	# attacks start at a rate per second, so a quicker thinker is not a more aggressive one
+	var p_attack := 1.0 - exp(-aggression * ATTACK_RATE * float(p["think"]) * (2.5 if f._armor_covers("light") else 1.0))
+	if dist <= my_reach + 0.1 and stamina_ok and f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD] and rng.randf() < p_attack:
+		var t_guarding := per_state == Fighter.State.GUARD
+		var first_light := str(c.light_string[0]) if not c.light_string.is_empty() else "l1"
+		# better players pick a move that connects from here (worse ones jab regardless: visible whiffs)
+		var careless := rng.randf() >= _pv("read")
+		if (t_guarding or _kit_grab_target(tgt)) and rng.randf() < float(p["grab"]) * 2.0:
+			f.input.press(FighterInput.GRAB)
+			_tally("off_grab_guard")
+		elif rng.randf() < _pv("heavy", 0.28) and _lands(f, "heavy", dist, dir):
+			f.input.press(FighterInput.HEAVY)
+			_tally("off_heavy")
+			_kit_maybe_charge()
+		elif rng.randf() < float(p["grab"]) * 0.4 and _lands(f, "grab", dist, dir):
+			f.input.press(FighterInput.GRAB)
+			_tally("off_grab")
+		elif careless or _lands(f, first_light, dist, dir) or _second_light_lands(f, dist, dir):
+			f.input.press(FighterInput.LIGHT)
+			_tally("off_light")
+		elif _lands(f, "heavy", dist, dir):
+			f.input.press(FighterInput.HEAVY)
+			_tally("off_heavy2")
+		elif _lands(f, "grab", dist, dir):
+			f.input.press(FighterInput.GRAB)
+			_tally("off_grab2")
+		elif _too_close(f, dist):
+			# too close for anything it has: make room (a back-step, or a dodge out when pressed)
+			_tally("off_backoff")
+			_move = -dir
+			if rng.randf() < float(p["spacing"]) * 0.5 and f.stamina > 30.0:
+				f.input.press(FighterInput.DODGE)
+			return
+		else:
+			# nothing it has connects from this far: step in instead of whiffing
+			_tally("off_stepin")
+			_move = dir
+			return
+		_guard_until = minf(_guard_until, _t)
+		_next_src = "of"
+		_next_src_t = _t
+		_move = dir * 0.4
+		return
+	# ---- guard up inside the opponent's reach: a strike from neutral comes out faster than any
+	# reaction, so a careful player keeps the guard up while he can be hit and is not attacking ----
+	if not attacking and f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD] and _t >= _guard_until \
+			and dist < _threat_reach(tgt) + 0.2 and per_state != Fighter.State.GUARD \
+			and (f.stamina > 30.0 or rng.randf() >= _pv("read")):
+		if rng.randf() < 1.0 - exp(-float(p["block"]) * GUARD_RATE * float(p["think"])):
+			_hold_guard(f, _t + rng.randf_range(0.25, 0.55))
+			_tally("guard_up")
 	if _kit_movement(f, dist, dir):   # kit hints: dash_in / dash_out
 		return
 	# ---- footwork ----
 	var want := my_reach * lerpf(0.7, 0.95, float(p["spacing"]))
 	var kit_range := _kit_range()
-	if not kit_range.is_empty():
-		want = lerpf(float(kit_range[1]), float(kit_range[0]), float(p["spacing"]))
+	if not kit_range.is_empty() and _kit_range_ready(f):
+		want = lerpf(float(kit_range[1]), float(kit_range[0]), float(p["spacing"])) + maxf(extra, 0.0)
+	# a spaced player stands where his own strikes can still travel into the target (a long head
+	# or a held-out claw needs room), not pressed up against it
+	if float(p["spacing"]) >= 0.5:
+		want = maxf(want, _strike_floor(c) + _bulk + 0.15)
 	if f.stamina < 15.0 and rng.randf() < float(p["spacing"]):
 		want = their_reach + 0.8
 	if _t >= _strafe_until:
@@ -316,6 +436,641 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		_kit_taunt(f, tgt, dist, dir, per)
 	elif rng.randf() < 0.01 and f.hype < 100.0 and dist > 3.0:
 		f.input.press(FighterInput.TAUNT)
+
+
+# =====================================================================================
+# Own offence: strings and range
+# =====================================================================================
+
+## Attacks started per second at aggression 1.0 while in range (scaled by the profile).
+const ATTACK_RATE := 3.0
+## Body surface depth (m, root to front) of an ordinary roster body: kit distances assume it.
+const REF_BULK := 0.45
+## Guards raised per second at block 1.0 while inside the opponent's reach and not attacking.
+const GUARD_RATE := 2.0
+## Share of a move's animated reach (reach_of) at which it still connects with closing speed.
+const EFFECTIVE_REACH := 0.78
+
+
+## How far the target's quickest strike reaches toward this bot (its first Light, to my body).
+func _threat_reach(tgt: Fighter) -> float:
+	var c := tgt.creature
+	var first_light := str(c.light_string[0]) if not c.light_string.is_empty() else "l1"
+	return reach_of(c, first_light) + _my_bulk
+
+var _bulk := 0.0                     ## target's nearest body part is this much closer than its root
+var _my_bulk := 0.0                  ## and mine toward it
+var _own_band := -1                  ## distance band (to the target's body) the own attack began at
+var _conn := {}                      ## own connects by "slot|band": [hits, tries] (learned this fight)
+var _own_src := ""                   ## what started the current own attack (tuning tally)
+var _own_hit := false
+var _next_src := ""
+var _next_src_t := -1.0
+var _own_id := 0                     ## counts own attacks begun (string decisions are per attack)
+var _own_slot := ""
+var _own_st := 0.0
+var _own_tgt_blocks := 0             ## the target's blocks when the own attack began
+var _string_done_for := -1
+
+
+## Goes on with a Light string (next Light, or Heavy for the Finisher) once per own move, when
+## its hit window has passed: better players continue what lands and stop a blocked or whiffed
+## string; worse ones press on regardless. Returns true when it pressed.
+func _string_step(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary) -> bool:
+	if f.move == null:
+		return false
+	var slot := f.move_slot.split("@")[0]
+	var step := f.creature.light_string.find(slot)
+	if step < 0:
+		return false
+	if _own_id == _string_done_for:
+		return false
+	var m := f.move
+	var decide_at := minf(maxf(m.cancel_t0 - 0.1, _kit_last_threat(m) + 0.02), m.duration - 0.05)
+	if f.state_time < decide_at and not f.move_hit_any:
+		return false
+	_string_done_for = _own_id
+	var blocked := tgt != null and int(tgt.stats_record.get("blocks", 0)) > _own_tgt_blocks
+	var landed := f.move_hit_any and not blocked
+	# a whiffed opener is still worth following when the next hit of the string connects from
+	# here (Dozer's Hoof Stomp after a Light that sails past at point blank)
+	var next_lands := step + 1 < f.creature.light_string.size() and not blocked \
+			and _lands(f, str(f.creature.light_string[step + 1]), dist, dir)
+	var go := float(p["combo"])
+	if not landed and not next_lands:
+		go *= (1.0 - _pv("read")) * (0.6 if blocked else 0.5)
+	if rng.randf() >= go:
+		return false
+	if _kit_commit(f, tgt, dist, dir, per):
+		_tally("str_commit")
+		return true
+	var last := step >= f.creature.light_string.size() - 1
+	if (last or (step >= 1 and rng.randf() < 0.4)) and f.creature.moves.has("finisher"):
+		f.input.press(FighterInput.HEAVY)
+		_tally("str_finisher")
+		return true
+	if last:
+		return false
+	f.input.press(FighterInput.LIGHT)
+	_tally("str_light")
+	_next_src = "st"
+	_next_src_t = _t
+	return true
+
+
+## Closest distance (to the target's body) at which `slot` still connects: area moves and grabs
+## work up close; a strike needs its weapon to travel INTO the target, so a target nearer than
+## where the weapon rests (a horn on a long head, a claw held out) is too close for it.
+func _min_range(c: CreatureDef, slot: String) -> float:
+	var key := "min:" + c.id + ":" + slot
+	if _reach_cache.has(key):
+		return _reach_cache[key]
+	var m: MoveDef = c.moves.get(slot)
+	var r := 0.0
+	if m != null and m.kind != "grab":
+		var area := false
+		for e in m.effects:
+			if typeof(e) == TYPE_DICTIONARY and str(e.get("type", "")) == "area":
+				area = true
+		if not area:
+			for w in m.windows:
+				for wn in w["weapons"]:
+					var wd: BodyDef.Weapon = c.body.weapons.get(wn)
+					if wd:
+						var wseg: BodyDef.Seg = c.body.segments[wd.seg]
+						r = maxf(r, (wd.local + wseg.pivot).z - 0.25)
+	_reach_cache[key] = maxf(r, 0.0)
+	return _reach_cache[key]
+
+
+## True when `slot` can connect from here: likely to connect at this distance and roughly facing
+## the target (attacks snap toward a target within 70 degrees of the facing).
+func _lands(f: Fighter, slot: String, dist: float, dir: Vector3) -> bool:
+	if not f.creature.moves.has(slot):
+		return false
+	if _connect_chance(f.creature, slot, dist - _bulk) < 0.35:
+		return false
+	return f.forward().dot(dir) > cos(deg_to_rad(70.0))
+
+
+## Distance band (0.25 m) of a distance to the target's body.
+static func _band(sd: float) -> int:
+	return clampi(int(floor(maxf(sd, 0.0) / 0.25)), 0, 15)
+
+
+## Chance that own `slot` connects at body distance `sd`: what the bot has seen its own attacks
+## do this fight (uncancelled, not interrupted), over a prior from the move's geometry - a player
+## learns his ranges against this opponent as he goes.
+func _connect_chance(c: CreatureDef, slot: String, sd: float) -> float:
+	# a weapon at full stretch has no closing speed left: strikes connect well inside the farthest
+	# point their animation reaches
+	var r := reach_of(c, slot) * EFFECTIVE_REACH
+	var lo := _min_range(c, slot)
+	var prior := 0.1
+	if sd >= lo and sd <= r:
+		prior = 0.6
+	elif sd >= lo - 0.1 and sd <= r + 0.2:
+		prior = 0.35
+	var obs: Array = _conn.get("%s|%d" % [slot, _band(sd)], [0, 0])
+	return (float(obs[0]) + prior * 2.0) / (float(obs[1]) + 2.0)
+
+
+func _learn_range(slot: String, band: int, hit: bool) -> void:
+	var key := "%s|%d" % [slot, band]
+	var obs: Array = _conn.get(key, [0, 0])
+	_conn[key] = [int(obs[0]) + (1 if hit else 0), int(obs[1]) + 1]
+
+
+# =====================================================================================
+# Reading and answering attacks
+# =====================================================================================
+
+## Registers a target attack the moment it becomes visible in the reaction-delayed record.
+func _note_seen(tgt: Fighter) -> void:
+	var per := _perceived()
+	var ps := int(per.get("state", Fighter.State.NEUTRAL))
+	var atk := ps == Fighter.State.ATTACK or ps == Fighter.State.ABILITY
+	var slot := str(per.get("slot", ""))
+	var pst := float(per.get("st", 0.0))
+	if atk and slot != "" and (not _per_atk or slot != _per_slot or pst < _per_st - 0.001):
+		_seen_id += 1
+		_seen.append({"id": _seen_id, "slot": slot, "start": float(per["t"]) - pst, "info": _move_info(tgt.creature, slot)})
+		if _seen.size() > 10:
+			_seen.pop_front()
+		# the reaction time already includes deciding: an attack seen begin is answered now, not
+		# at the next scheduled think
+		_next_think = minf(_next_think, _t)
+		_match_contacts()
+	if atk and _per_atk and slot == _per_slot and absf(pst - _per_st) < 0.0005:
+		_per_frozen += float(per.get("t", 0.0)) - _per_t
+	else:
+		_per_frozen = 0.0
+	_per_atk = atk
+	_per_slot = slot
+	_per_st = pst
+	_per_t = float(per.get("t", 0.0))
+
+
+## Contacts the bot feels (a hit blocked, parried or taken) teach it how long after an attack's
+## first hit frame that attack actually reaches it (a lunge connects late in its window): parry
+## taps aim at that. A contact is matched to the seen attack whose time span holds it, now or as
+## soon as that attack has been seen.
+func _note_contact(f: Fighter, blocks: int) -> void:
+	var tgt := f.target
+	var now := [blocks, int(f.stats_record.get("parries", 0)), int(tgt.stats_record.get("hits", 0)) if tgt else 0]
+	var touched := int(_c_counts[0]) >= 0 and (int(now[0]) > int(_c_counts[0]) or int(now[1]) > int(_c_counts[1]) or int(now[2]) > int(_c_counts[2]))
+	_c_counts = now
+	if touched:
+		_contacts_pending.append(_t)
+	_match_contacts()
+
+
+func _match_contacts() -> void:
+	var keep: Array = []
+	for c in _contacts_pending:
+		var ct := float(c)
+		var done := false
+		for i in range(_seen.size() - 1, -1, -1):
+			var mv: Dictionary = _seen[i]
+			var after_first := ct - float(mv["start"]) - float(mv["info"]["first"])
+			if after_first >= -0.03 and after_first <= float(mv["info"]["dur"]):
+				var k := str(mv["slot"])
+				_contact[k] = lerpf(float(_contact.get(k, after_first)), clampf(after_first, 0.0, 0.3), 0.4)
+				done = true
+				break
+		if not done and _t - ct < 1.0:
+			keep.append(ct)
+	_contacts_pending = keep
+
+
+## Expected delay from a seen attack's first hit frame to its contact with this bot (learned).
+func _contact_after_first(slot: String) -> float:
+	return float(_contact.get(slot, 0.03))
+
+
+## Own parries (felt, not seen): a parry stuns the attacker and is punished. Parry taps are
+## tallied by outcome (parried / blocked / hit / nothing came).
+func _note_own(f: Fighter) -> void:
+	var blocks := int(f.stats_record.get("blocks", 0))
+	_note_contact(f, blocks)
+	if _tap_track > 0.0 and _t >= _tap_track:
+		_tap_track = -1.0
+		_tap_counts = [blocks, int(f.stats_record.get("parries", 0)), float(f.stats_record.get("damage_taken", 0.0))]
+		_tap_check = _t + 0.16
+	if _tap_check > 0.0 and _t >= _tap_check:
+		_tap_check = -1.0
+		if int(f.stats_record.get("parries", 0)) > int(_tap_counts[1]):
+			_tally("tap_parried")
+		elif float(f.stats_record.get("damage_taken", 0.0)) > float(_tap_counts[2]) + 0.01 and blocks == int(_tap_counts[0]):
+			_tally("tap_hit")
+		elif blocks > int(_tap_counts[0]):
+			_tally("tap_blocked")
+		else:
+			_tally("tap_nothing")
+	var parries := int(f.stats_record.get("parries", 0))
+	if _parries_seen < 0:
+		_parries_seen = parries
+	elif parries > _parries_seen:
+		_parries_seen = parries
+		_punish_parry(f)
+
+
+## Timing facts of a move as a player learns them from its animation (cached per creature/slot).
+func _move_info(c: CreatureDef, slot: String) -> Dictionary:
+	var key := c.id + ":" + slot
+	if _info_cache.has(key):
+		return _info_cache[key]
+	var base := slot.split("@")[0]
+	var is_ab := c.abilities.has(slot) or (not c.moves.has(slot) and c.abilities.has(base))
+	var m: MoveDef = (c.abilities if is_ab else c.moves).get(slot, (c.abilities if is_ab else c.moves).get(base))
+	var info := {"first": 0.3, "last": 0.45, "dur": 0.7, "cancel": 9.0, "cls": Combat.move_class(base), "grab": false,
+		"unblockable": false, "armored": false, "threat": true, "reach": reach_of(c, slot if (c.moves.has(slot) or c.abilities.has(slot)) else base, is_ab)}
+	if m:
+		info["first"] = _first_threat(m)
+		info["last"] = maxf(_kit_last_threat(m), float(info["first"]))
+		info["dur"] = m.duration
+		info["cancel"] = m.cancel_t0
+		if m.move_class != "":
+			info["cls"] = m.move_class
+		info["grab"] = m.kind == "grab"
+		info["unblockable"] = m.unblockable
+		info["armored"] = _armor_through(m)
+		var hits := not m.windows.is_empty()
+		for e in m.effects:
+			if typeof(e) == TYPE_DICTIONARY and str(e.get("type", "")) in ["area", "projectile", "charge", "leap", "delayed", "push"]:
+				hits = true
+		info["threat"] = hits or m.kind == "grab"
+	_info_cache[key] = info
+	return info
+
+
+## Time of a move's first threat: its first hit window, or its first timed hit effect (a stomp's
+## area, a thrown projectile) when that comes sooner or the move has no hit window.
+static func _first_threat(m: MoveDef) -> float:
+	var first := m.first_active() if not m.windows.is_empty() else m.duration
+	for e in m.effects:
+		if typeof(e) == TYPE_DICTIONARY and str(e.get("type", "")) in ["area", "projectile", "charge", "leap", "push"]:
+			first = minf(first, float(e.get("t", 0.0)))
+	return first
+
+
+## True when the move's armor covers Lights from its first frames through its first hit window
+## (it blows through a stream of Lights).
+static func _armor_through(m: MoveDef) -> bool:
+	if not m.armor_level in ["all", "lights", "all_but_heavy"]:
+		return false
+	for r in m.armor:
+		if r.size() >= 2 and float(r[0]) <= 0.06 and float(r[1]) >= m.first_active() - 0.01:
+			return true
+	return false
+
+
+## The bot's own answers: [{btn, slot, startup, reach, value, armored}], read from its kit.
+func _own_options(f: Fighter) -> Array:
+	var c := f.creature
+	if _own_cache.has(c.id):
+		return _own_cache[c.id]
+	var out: Array = []
+	var first_light := str(c.light_string[0]) if not c.light_string.is_empty() else "l1"
+	for pair in [[FighterInput.LIGHT, first_light], [FighterInput.HEAVY, "heavy"], [FighterInput.GRAB, "grab"]]:
+		var slot := str(pair[1])
+		var m: MoveDef = c.moves.get(slot)
+		if m == null or (m.windows.is_empty() and m.effects.is_empty()):
+			continue
+		var dmg := m.damage
+		var stun := m.stun
+		if m.kind == "grab":
+			var td: Dictionary = c.throws.get("throw_fwd", {})
+			dmg = float(td.get("damage", Tuning.v("throw_damage")))
+			stun = 0.8   # the throw knocks down
+		for e in m.effects:
+			if typeof(e) == TYPE_DICTIONARY and str(e.get("type", "")) == "area":
+				dmg += float(e.get("damage", 0.0))
+		out.append({"btn": int(pair[0]), "slot": slot, "startup": _first_threat(m), "reach": reach_of(c, slot),
+			"value": dmg * (1.0 + stun), "armored": _armor_through(m)})
+	_own_cache[c.id] = out
+	return out
+
+
+## Strongest own move that lands within `window` seconds from now at `dist`, or {}.
+func _pick_punish(f: Fighter, window: float, dist: float, dir: Vector3) -> Dictionary:
+	var best := {}
+	for o in _own_options(f):
+		if float(o["startup"]) + 0.03 > window or not _lands(f, str(o["slot"]), dist, dir):
+			continue
+		if int(o["btn"]) == FighterInput.GRAB and bool(personality.get("no_punish_grab", false)):
+			continue
+		if best.is_empty() or float(o["value"]) > float(best["value"]):
+			best = o
+	return best
+
+
+## Presses `o` at time `at` (letting go of the guard just before) and keeps the bot from other
+## decisions until it is out.
+func _commit(o: Dictionary, at: float, why := "pn") -> void:
+	var delay := maxf(0.0, at - _t)
+	_tally("commit_" + str(o["slot"]))
+	_next_src = why + "_" + str(o["slot"])
+	_next_src_t = _t + delay
+	_queue(int(o["btn"]), delay)
+	if int(o["btn"]) == FighterInput.HEAVY:
+		_heavy_hold_until = 0.0
+	_guard_until = minf(_guard_until, _t + delay)
+	_tap_at = -1.0
+	_busy_until = _t + delay + 0.05
+	_move = Vector3.ZERO
+
+
+## Starts holding the guard now (or keeps holding it) until `until`.
+func _hold_guard(f: Fighter, until: float) -> void:
+	if not (_guard and _t >= _guard_from and _t < _guard_until):
+		_guard_from = _t
+		if not f.input.is_held(FighterInput.GUARD) and _tap_at < _t:
+			f.input.press(FighterInput.GUARD)
+	_guard = true
+	_guard_until = maxf(_guard_until, minf(until, _t + float(personality.get("guard_max", 9.0))))
+
+
+## How long before the expected hit a parry tap is pressed: a fresh guard takes ~0.04 s to come up
+## (guard_blend_time) and the parry window lasts 0.12 s, so aim for the middle of what works.
+const PARRY_LEAD := 0.08
+
+
+## A parry is a fresh Guard press shortly before the hit lands: a held guard is let go for a tick
+## first, a bot in neutral waits for the tap; the guard is then held for `hold`.
+func _parry_tap(at: float, hold := 0.3) -> void:
+	at = maxf(at, _t + 0.009)
+	if not (_guard and _t >= _guard_from and _t < _guard_until):
+		_guard_from = at
+	_guard = true
+	_tap_at = at
+	_tap_track = at
+	_guard_until = maxf(_guard_until, at + hold)
+	_queue(FighterInput.GUARD, at - _t)
+
+
+## Human timing error of a planned press (s): wider for slower players.
+func _jitter() -> float:
+	return rng.randfn(0.0, float(p["reaction"]) * 0.15)
+
+
+## True while the target throws attacks non-stop (>= 5 begun in the last 2 s of what it saw,
+## mostly Lights): a button-masher.
+func _mashing() -> bool:
+	var n := 0
+	var lights := 0
+	var since := _t - float(p["reaction"]) - 2.0
+	for s in _seen:
+		if float(s["start"]) >= since:
+			n += 1
+			if str(s["info"]["cls"]) == "light":
+				lights += 1
+	return n >= 5 and lights >= 3
+
+
+## Answers the newest attack seen begin (once per attack) and keeps that answer up. Returns
+## true when it decided this think step.
+func _react(f: Fighter, tgt: Fighter, per: Dictionary, attacking: bool, dist: float, dir: Vector3) -> bool:
+	if _seen.is_empty():
+		return false
+	var mv: Dictionary = _seen[_seen.size() - 1]
+	var info: Dictionary = mv["info"]
+	var start := float(mv["start"])
+	var eta := start + float(info["first"]) - _t        # until its first hit frame
+	var over := start + float(info["last"]) - _t        # until its last threat has passed
+	var free := start + float(info["dur"]) - _t         # until the attacker can act again
+	var in_reach := dist < float(info["reach"]) + 0.55 + _my_bulk
+	var committal := float(info["cancel"]) >= float(info["dur"]) - 0.05 or str(info["cls"]) in ["heavy", "ability", "juice"]
+	# a cancelable move (a Light in a string) threatens a follow-up until it ends: a guard raised
+	# on seeing it covers the next hits even when this one is already past
+	var guard_end := over if committal else maxf(over, free)
+	var threat := attacking and bool(info["threat"]) and in_reach and guard_end > -0.03
+	if int(_answer.get("id", -1)) != int(mv["id"]):
+		_answer = {"id": int(mv["id"]), "kind": "none", "punished": false}
+		if not threat:
+			_answer["kind"] = "miss" if attacking and (not in_reach or not bool(info["threat"])) else "none"
+		elif rng.randf() < float(p["mistake"]):
+			_answer["kind"] = "mistake"
+		else:
+			_answer["kind"] = _choose_answer(f, tgt, per, info, eta, guard_end, dist, dir)
+	# reads a charge-up: a Heavy held in its wind-up (the move time it sees stands still). Its
+	# release cannot be timed, but a grab beats the charge's armor; otherwise back out of reach
+	if attacking and in_reach and _per_frozen >= 0.06 and str(mv["slot"]).begins_with("heavy") and not bool(_answer.get("charge", false)):
+		_answer["charge"] = true
+		if rng.randf() < _pv("read"):
+			_tally("charge_read")
+			_tap_at = -1.0
+			if _lands(f, "grab", dist, dir):
+				_answer["kind"] = "counter"
+				_commit({"btn": FighterInput.GRAB, "slot": "grab"}, _t, "ch")
+				return true
+			_answer["kind"] = "dodge"
+			_guard_until = _t
+			_move = -dir
+			return true
+	var kind := str(_answer["kind"])
+	if not bool(_answer.get("counted", false)):
+		_answer["counted"] = true
+		_tally("ans_" + kind)
+	# ---- punish what was blocked, dodged or whiffed (once per attack) ----
+	if committal and not bool(_answer["punished"]) and kind in ["block", "parry", "dodge", "miss"] and free > 0.0:
+		_answer["punished"] = true
+		if rng.randf() < _pv("punish"):
+			_tally("punish_try_" + kind)
+			var at := maxf(_t, start + float(info["last"]) + 0.03)
+			if kind == "dodge":
+				at = maxf(at, _t + f.eff("dodge_time") + Tuning.v("dodge_recovery"))
+			var o := _pick_punish(f, start + float(info["dur"]) - at, dist, dir)
+			if not o.is_empty():
+				_commit(o, at, "pn")
+				return true
+	if not threat:
+		return false
+	match kind:
+		"block", "parry":
+			_hold_guard(f, _t + maxf(guard_end, 0.0) + 0.1)
+			if kind == "block":
+				_move = -dir * 0.2
+			return true
+		"dodge", "armor", "counter":
+			return true
+	return false
+
+
+## The answer to one seen attack: "parry", "dodge", "counter", "armor", "block" or "none".
+func _choose_answer(f: Fighter, tgt: Fighter, per: Dictionary, info: Dictionary, eta: float, over: float, dist: float, dir: Vector3) -> String:
+	var heavyish := str(info["cls"]) in ["heavy", "ability", "juice"]
+	var light := str(info["cls"]) == "light"
+	var mash := _mashing() and _pv("read") > 0.0
+	if _kit_ability(f, tgt, dist, dir, per, true):   # kit hint: reactive abilities (counters, armor)
+		return "counter"
+	var sidestep := not (light and mash and rng.randf() < _pv("read"))   # a read masher is blocked, not sidestepped
+	if _kit_defend(f, tgt, per, eta > 0.0, dir, eta, sidestep):   # kit hints: parry_heavy / dodge_for_guard
+		return "parry" if _tap_at > _t else "dodge"
+	# strikes beat a grab's start-up; a dodge gets out of it
+	if bool(info["grab"]):
+		var poke := _pick_punish(f, eta - 0.02, dist, dir)
+		if not poke.is_empty() and int(poke["btn"]) != FighterInput.GRAB and rng.randf() < _pv("punish"):
+			_commit(poke, _t, "cp")
+			return "counter"
+		if rng.randf() < float(p["dodge"]) + float(p["block"]) * 0.5:
+			_dodge(f, dir, eta)
+			return "dodge"
+		return "none"
+	# armored against Lights right now (Dust Bowl, JUICE...): trade instead of guarding
+	if light and f._armor_covers("light"):
+		return "none"
+	# a masher's beat: tap a parry for his next hit (parry share x read)
+	if light and mash and rng.randf() < float(p["parry"]) * _pv("read") * 1.5 and _beat_tap():
+		return "parry"
+	# button-mashing: blow through the Lights with an armored move (read)
+	if light and mash and _t >= _armor_next and rng.randf() < _pv("read") * 0.45:
+		for o in _own_options(f):
+			if bool(o["armored"]) and _lands(f, str(o["slot"]), dist, dir):
+				_armor_next = _t + 1.4
+				_commit(o, _t, "ar")
+				return "armor"
+	# hit it before it comes out: counter-poke a slow wind-up that has no armor
+	if heavyish and not bool(info["armored"]) and rng.randf() < _pv("punish") * 0.4:
+		var o2 := _pick_punish(f, eta - 0.03, dist, dir)
+		if not o2.is_empty() and int(o2["btn"]) != FighterInput.GRAB:
+			_commit(o2, _t, "cp")
+			return "counter"
+	# too close for its own strikes while a masher presses in: step back out of the pocket (read)
+	if light and mash and f.stamina > 20.0 and rng.randf() < _pv("read") * float(p["spacing"]) * 0.6 and _too_close(f, dist):
+		_backstep(f, dir)
+		return "dodge"
+	# one roll split into the tier's parry / dodge / block shares. A parry needs time to see the
+	# wind-up coming; dodges are for heavies and abilities (a dodge's recovery hands a string free
+	# hits). Shares that do not apply become blocks.
+	var roll := rng.randf()
+	var pp := float(p["parry"])
+	var pd := float(p["dodge"])
+	var pb := float(p["block"]) + (_pv("read") * 0.5 if mash else 0.0)
+	var eta_contact := eta + _contact_after_first(str(_seen[_seen.size() - 1]["slot"]) if not _seen.is_empty() else "")
+	if roll < pp and not bool(info["unblockable"]) and eta_contact - PARRY_LEAD > 0.012:
+		_parry_tap(_t + eta_contact - PARRY_LEAD + _jitter())
+		return "parry"
+	if roll >= pp and roll < pp + pd and (heavyish or bool(info["unblockable"])):
+		_dodge(f, dir, eta)
+		return "dodge"
+	if bool(info["unblockable"]):
+		return "none"
+	# a Heavy blocked when winded breaks the guard: a good reader sidesteps it instead
+	if heavyish and f.stamina < Tuning.v("stamina_low") + 4.0 and rng.randf() < _pv("read"):
+		if f.stamina >= 4.0 and not f.statuses.flag("no_dodge"):
+			_dodge(f, dir, eta)
+			return "dodge"
+		return "none"
+	# a guard nearly broken is not held against a stream of Lights
+	if light and f.stamina < 8.0 and mash:
+		return "none"
+	if roll < pp + pd + pb:
+		_hold_guard(f, _t + maxf(over, 0.0) + 0.08)
+		return "block"
+	return "none"
+
+
+## True when the second hit of the Light string connects from here (an opener that whiffs at this
+## range can still lead into it).
+func _second_light_lands(f: Fighter, dist: float, dir: Vector3) -> bool:
+	var ls: Array = f.creature.light_string
+	return ls.size() >= 2 and _lands(f, str(ls[1]), dist, dir)
+
+
+## Nearest body distance at which the first Light or the Heavy can still strike.
+func _strike_floor(c: CreatureDef) -> float:
+	var first_light := str(c.light_string[0]) if not c.light_string.is_empty() else "l1"
+	var r := _min_range(c, first_light)
+	if c.moves.has("heavy"):
+		r = minf(r, _min_range(c, "heavy"))
+	return r
+
+
+## True when the target's body is nearer than both the first Light and the Heavy can strike.
+func _too_close(f: Fighter, dist: float) -> bool:
+	return dist - _bulk < _strike_floor(f.creature)
+
+
+## Dodges straight back (a little to the side) to make room.
+func _backstep(f: Fighter, dir: Vector3) -> void:
+	_move = (-dir + dir.cross(Vector3.UP) * (0.3 if rng.randf() < 0.5 else -0.3)).normalized()
+	_guard = false
+	_guard_until = _t
+	_queue(FighterInput.DODGE, 0.0)
+	_busy_until = _t + 0.1
+	_tally("backstep")
+
+
+## Sidestep (and back off) so the evasion frames cover the hit.
+func _dodge(f: Fighter, dir: Vector3, eta: float) -> void:
+	var side := dir.cross(Vector3.UP) * (1.0 if rng.randf() < 0.5 else -1.0)
+	_move = (side - dir * 0.5).normalized()
+	_guard = false
+	_guard_until = _t
+	_queue(FighterInput.DODGE, clampf(eta - 0.06, 0.0, 0.3))
+	_busy_until = _t + clampf(eta - 0.06, 0.0, 0.3) + 0.05
+
+
+## Rhythm read: a button-masher repeats the same pattern (Light, Light, Light, Finisher...), so
+## after a given move his next hit comes a steady time later. From the attacks it has SEEN begin
+## (reaction-delayed) the bot learns those gaps and chains them forward to time a parry tap for
+## his next hit - anticipation from what it saw, never from the attacker's input. Returns true
+## when it tapped.
+func _beat_tap() -> bool:
+	if _seen.size() < 4:
+		return false
+	# gaps between consecutive hits seen in one flurry, keyed by the earlier move
+	var gaps := {}
+	var after := {}
+	for i in range(1, _seen.size()):
+		var a: Dictionary = _seen[i - 1]
+		var b: Dictionary = _seen[i]
+		if float(b["start"]) - float(a["start"]) > 1.0:
+			continue
+		var gap := (float(b["start"]) + float(b["info"]["first"])) - (float(a["start"]) + float(a["info"]["first"]))
+		var key := str(a["slot"])
+		if not gaps.has(key):
+			gaps[key] = []
+		(gaps[key] as Array).append(gap)
+		after[key] = str(b["slot"])
+	var cur: Dictionary = _seen[_seen.size() - 1]
+	var slot := str(cur["slot"])
+	var at := float(cur["start"]) + float(cur["info"]["first"])
+	for step in 6:
+		var g: Array = gaps.get(slot, [])
+		if g.is_empty():
+			return false
+		g = g.slice(maxi(0, g.size() - 3))
+		g.sort()
+		if float(g[g.size() - 1]) - float(g[0]) > 0.08 or float(g[g.size() / 2]) < 0.08:
+			return false
+		at += float(g[g.size() / 2])
+		slot = str(after[slot])
+		if at >= _t + 0.07:
+			if at - _t > 0.5:
+				return false
+			_parry_tap(at + _contact_after_first(slot) - PARRY_LEAD + _jitter(), 0.25)
+			_tally("beat_tap")
+			return true
+	return false
+
+
+## A parried attacker is stunned (parry_stun) and the guard may cancel into anything for a moment:
+## answer with the strongest move that lands in time.
+func _punish_parry(f: Fighter) -> void:
+	if rng.randf() >= _pv("punish"):
+		return
+	var delay := float(p["reaction"]) * 0.35
+	var per := _perceived()
+	if f.target == null or per.is_empty():
+		return
+	var tp: Vector3 = per["pos"]
+	var d := Vector2(tp.x - f.pos().x, tp.z - f.pos().z).length()
+	var o := _pick_punish(f, Tuning.v("parry_stun") - delay - 0.05, d, Vector3(tp.x - f.pos().x, 0.0, tp.z - f.pos().z).normalized())
+	if not o.is_empty():
+		_tally("parry_punish")
+		_commit(o, _t + delay, "pp")
 
 
 ## Mode objectives that are not plain fighting: hold a button at a spot (revives), strike an
@@ -398,8 +1153,17 @@ func _toward(from: Vector3, to: Vector3) -> Vector3:
 #       within this many metres beyond the target, on the line from this fighter), target_down,
 #       target_cornered (target within 1.3 m of a wall), target_closing (distance shrank since the
 #       last think), projectile_incoming (an enemy projectile within 4 m flying at this fighter),
-#       in_enemy_zone, self_juiced, chance (this alternative only fires with that probability).
+#       in_enemy_zone, self_juiced, target_mashing (the bot reads a button-masher: attacks begun
+#       non-stop; only as often as its "read" skill), chance (this alternative only fires with
+#       that probability).
 #       Reactive conditions (target_heavy / target_winding) are also checked while defending.
+#       Optional "stick": "away" | "toward" commits the stick for 0.35 s when the ability fires
+#       (blinks / dives that travel along the stick).
+#   "range_needs_tools": true   "range" holds only while a ranged ability hint (min >= 1.5 m) has a
+#                               charge: a zoner with its tools on cooldown closes in and fights
+#   "heavy_vs_windup": p, "heavy_reach": m   Heavy into a perceived windup with > 0.3 s left
+#   "avoid_zones": true         step out of enemy zones that hurt or build up before closing in
+#   (stick / range_needs_tools / heavy_vs_windup / avoid_zones added with the Slurry/Jitters kits)
 # NPC kits (Kid Lamprey, minions, bosses; docs/kits/minions.md, bosses.md):
 #   "keep_distance": m          ranged-unit shorthand (the campaign's Pelter recipe): range m +- 0.4
 #                               plus an implicit hint for its ranged ability ("ranged_slot", default
@@ -456,9 +1220,20 @@ func _kit_ability(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dict
 					ok = true
 					break
 		if ok:
+			_kit_stick(h, dir)
 			f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
 			return true
 	return false
+
+
+func _kit_stick(h: Dictionary, dir: Vector3) -> void:
+	match str(h.get("stick", "")):
+		"away":
+			_move = -dir
+			_kit_hold_until = _t + 0.35
+		"toward":
+			_move = dir
+			_kit_hold_until = _t + 0.35
 
 
 func _kit_when(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary, w: Dictionary, reactive: bool) -> bool:
@@ -516,6 +1291,9 @@ func _kit_when(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Diction
 					return false
 			"self_juiced":
 				if f.has_flag("juiced") != bool(v):
+					return false
+			"target_mashing":
+				if (_pv("read") > 0.0 and _mashing() and rng.randf() < _pv("read")) != bool(v):
 					return false
 			"chance":
 				if rng.randf() >= float(v):
@@ -599,18 +1377,15 @@ func _kit_maybe_charge() -> void:
 		_heavy_hold_until = _t + rng.randf_range(0.6, 1.1)
 
 
-## Defence hints: a timed parry against a perceived Heavy windup (profile-gated) or a sidestep
+## Defence hints: a timed parry tap against a perceived Heavy wind-up (profile-gated) or a sidestep
 ## instead of a long guard. Returns true when it decided this think step.
-func _kit_defend(f: Fighter, tgt: Fighter, per: Dictionary, winding: bool, dir: Vector3) -> bool:
+func _kit_defend(f: Fighter, tgt: Fighter, per: Dictionary, winding: bool, dir: Vector3, eta := -1.0, sidestep := true) -> bool:
 	var ph = personality.get("parry_heavy", {})
 	if winding and typeof(ph) == TYPE_DICTIONARY and not (ph as Dictionary).is_empty() and _kit_profile_at_least(str(ph.get("from", "champion"))) \
-			and tgt != null and str(per.get("slot", "")).begins_with("heavy") and rng.randf() < float(ph.get("chance", 0.35)):
-		var eta := maxf(0.0, float(per["first"]) - float(per["st"]) - float(p["reaction"]))
-		_queue(FighterInput.GUARD, maxf(0.0, eta - 0.06))
-		_guard = true
-		_guard_until = _t + eta + 0.25
+			and tgt != null and str(per.get("slot", "")).begins_with("heavy") and eta - PARRY_LEAD > 0.012 and rng.randf() < float(ph.get("chance", 0.35)):
+		_parry_tap(_t + eta + _contact_after_first(str(per.get("slot", ""))) - PARRY_LEAD + _jitter())
 		return true
-	if personality.has("dodge_for_guard") and rng.randf() < float(p["block"]) * float(personality["dodge_for_guard"]) and f.stamina > 12.0:
+	if sidestep and personality.has("dodge_for_guard") and rng.randf() < float(p["block"]) * float(personality["dodge_for_guard"]) and f.stamina > 12.0:
 		var side := dir.cross(Vector3.UP) * (1.0 if rng.randf() < 0.5 else -1.0)
 		_move = (side - dir * 0.6).normalized()
 		f.input.press(FighterInput.DODGE)
@@ -663,6 +1438,30 @@ func _kit_taunt(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictio
 	var chance := float(personality.get("taunt_chance", 0.05)) * (3.0 if difficulty == "rookie" else 1.0)
 	if rng.randf() < chance and _kit_any_when(personality["taunt_when"], f, tgt, dist, dir, per):
 		f.input.press(FighterInput.TAUNT)
+
+
+func _kit_range_ready(f: Fighter) -> bool:
+	if not bool(personality.get("range_needs_tools", false)):
+		return true
+	for slot in ["ability1", "ability2"]:
+		var h := _kit_hint(slot)
+		if h.is_empty() or float(h.get("min", 0.0)) < 1.5 or not f.creature.abilities.has(slot):
+			continue
+		if int(f.charges_left.get(slot, 1)) > 0:
+			return true
+	return false
+
+
+func _kit_heavy_vs_windup(f: Fighter, dist: float, per: Dictionary) -> bool:
+	var hw := float(personality.get("heavy_vs_windup", 0.0))
+	if hw <= 0.0 or f.state != Fighter.State.NEUTRAL or dist > float(personality.get("heavy_reach", 2.2)):
+		return false
+	var st := int(per.get("state", Fighter.State.NEUTRAL))
+	var left := float(per.get("first", 0.0)) - float(per.get("st", 0.0))
+	if (st == Fighter.State.ATTACK or st == Fighter.State.ABILITY) and left > 0.3 and rng.randf() < hw:
+		f.input.press(FighterInput.HEAVY)
+		return true
+	return false
 
 
 # -------------------------------------------------------------------------------------
@@ -762,6 +1561,30 @@ func _kit_think(f: Fighter, sim: MatchSim, tgt: Fighter, dist: float, dir: Vecto
 	return false
 
 
+## Steps out of an enemy zone that hurts or builds up (puddles, patches) instead of idling in it,
+## sideways relative to the target so the bot keeps facing the fight. Skill-scaled (spacing).
+func _kit_avoid_zone(f: Fighter, sim: MatchSim, dir: Vector3) -> bool:
+	if not bool(personality.get("avoid_zones", false)) or sim == null:
+		return false
+	if rng.randf() >= float(p["spacing"]):
+		return false
+	var fp := f.pos()
+	for z in sim.effects.entities:
+		if str(z["kind"]) != "zone" or int(z["owner"]) < 0 or int(z["team"]) == f.team:
+			continue
+		var e: Dictionary = z["e"]
+		if float(e.get("tick_damage", 0.0)) <= 0.0 and float(e.get("buildup", 0.0)) <= 0.0:
+			continue
+		var off := Vector3(fp.x - float(z["pos"].x), 0.0, fp.z - float(z["pos"].z))
+		if off.length() > float(z["radius"]) + 0.3:
+			continue
+		var out := off.normalized() if off.length_squared() > 1e-4 else dir.cross(Vector3.UP)
+		var side := dir.cross(Vector3.UP)
+		_move = (out + side * (1.0 if side.dot(out) >= 0.0 else -1.0) * 0.5).normalized()
+		return true
+	return false
+
+
 ## How much closer than its root a "bulky" target's body is to this unit (metres, less a 0.25 m
 ## allowance for segment thickness), added to the unit's reach. 0 for ordinary bodies.
 func _kit_target_bulk(f: Fighter, tgt: Fighter) -> float:
@@ -774,6 +1597,26 @@ func _kit_target_bulk(f: Fighter, tgt: Fighter) -> float:
 		var bp: Vector3 = b.global_position
 		nearest = minf(nearest, me.distance_to(Vector3(bp.x, 0.0, bp.z)))
 	return maxf(0.0, root_d - nearest - 0.25)
+
+
+## How much closer than its root `body`'s surface is to the point `from` (metres, over the
+## ground plane, to the hurt shapes hits are tested against): reach is judged to the body, not
+## the root, so a long head (Dozer) or a boss is in range sooner.
+static func _surface_depth(from: Vector3, body: Fighter) -> float:
+	if body == null or body.rig == null:
+		return 0.0
+	var me := Vector3(from.x, 0.0, from.z)
+	var root_d := me.distance_to(Vector3(body.pos().x, 0.0, body.pos().z))
+	var nearest := root_d
+	for s: BodyDef.Seg in body.creature.body.segments:
+		var t := body.rig.bodies[s.index].global_transform
+		for sh: BodyDef.Shape in s.shapes:
+			var a := t * sh.hit_a
+			var b := t * sh.hit_b
+			a.y = 0.0
+			b.y = 0.0
+			nearest = minf(nearest, me.distance_to(MathX.closest_on_segment(me, a, b)) - sh.hit_r)
+	return maxf(0.0, root_d - maxf(nearest, 0.0) - 0.1)
 
 
 ## True when a bulky target's perceived move is past its last threat (hit windows, lunges and

@@ -1,23 +1,21 @@
 class_name BotTiers
 extends RefCounted
 ## THE single mapping between player-facing bot skill tiers (GAME_PITCH: career-stage nouns) and
-## BotBrain difficulty profiles. Every menu that offers a bot difficulty uses this table.
-##
-## BotBrain currently ships four profiles (rookie/regular/pro/champion). CAMPAIGN.md specifies a
-## fifth tier, Hall-of-Famer (reaction 0.14 s, 2% mistakes); it asks for a "hall_of_famer" profile
-## and falls back to "champion" until the AI owner adds one — no code change needed here then.
+## BotBrain difficulty profiles. Every menu that offers a bot difficulty uses this table; the
+## campaign's bot tiers (content/core/ladder/difficulty.json) name the same profiles. What each
+## tier does and the measured ladder: docs/BOTS.md.
 
 const TIERS := [
 	{"id": "punching_bag", "name": "Punching Bag", "brain": "rookie",
-		"blurb": "Slow reactions, plenty of mistakes, never parries. For learning the basics."},
+		"blurb": "Slow reactions, plenty of mistakes, never parries or punishes. For learning the basics."},
 	{"id": "journeyman", "name": "Journeyman", "brain": "regular",
-		"blurb": "Blocks some, punishes some, rarely parries. A fair fight for most players."},
+		"blurb": "Blocks some strings, punishes the odd big swing, rarely parries. A fair fight for most players."},
 	{"id": "contender", "name": "Contender", "brain": "pro",
-		"blurb": "Quick reactions, real combos, parries now and then. Bring your guard."},
+		"blurb": "Quicker reads, real combos, punishes whiffed Heavies, parries now and then. Bring your guard."},
 	{"id": "headliner", "name": "Headliner", "brain": "champion",
-		"blurb": "Sharp spacing, frequent parries, smart ability and JUICE use."},
+		"blurb": "Fast reads: blocks your strings, parries and punishes button-mashing. Sharp spacing and JUICE use."},
 	{"id": "hall_of_famer", "name": "Hall-of-Famer", "brain": "hall_of_famer", "fallback": "champion",
-		"blurb": "Reads your charge-ups. The best the Circuit has."},
+		"blurb": "Reads charge-ups and mashing, parries on your rhythm, punishes everything. The best the Circuit has."},
 ]
 const DEFAULT := "journeyman"
 ## Settings "gameplay.difficulty" (campaign presets) -> the bot tier quick fights use.
