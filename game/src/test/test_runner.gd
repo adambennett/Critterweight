@@ -73,7 +73,8 @@ func _collect(dir: String) -> Array:
 		if d.current_is_dir():
 			if not n.begins_with("."):
 				out.append_array(_collect(p))
-		elif n.begins_with("test_") and n.ends_with(".gd"):
-			out.append(p)
+		elif n.begins_with("test_") and (n.ends_with(".gd") or n.ends_with(".gd.remap")):
+			# exported builds list compiled scripts as <name>.gd.remap
+			out.append(p.trim_suffix(".remap"))
 		n = d.get_next()
 	return out

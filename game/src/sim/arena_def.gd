@@ -17,7 +17,8 @@ var theme := "can"
 var spawns: Array = []         ## [Vector3(x, 0, z) with .y unused, yaw radians] -> stored as [Vector3, float]
 var props: Array = []          ## [{type, pos: Vector3, yaw: float, scale: float}]
 var hazards: Array = []        ## [{type, pos: Vector3, radius: float, params}]
-var markers := {}              ## name -> Array[Vector3]
+var markers := {}              ## name -> Array[Vector3] (positions; see markers_of() for full entries)
+var marker_entries := {}       ## name -> Array[Dictionary] {pos: Vector3, yaw: float, team: int, size: Vector3}
 var gravity_mult := 1.0
 var author := ""
 var version := 1
@@ -56,13 +57,34 @@ static func from_dict(d: Dictionary, src := "") -> ArenaDef:
 	var md: Dictionary = d.get("markers", {})
 	for k in md:
 		var pts := []
+		var entries := []
 		for m in md[k]:
+			# accepted forms: [x, z] | [x, z, y] | {"pos": [x, y, z], "yaw": deg, "team": n, "size": [w, h, d]}
 			if typeof(m) == TYPE_ARRAY and m.size() >= 2:
-				pts.append(Vector3(float(m[0]), float(m[2]) if m.size() > 2 else 0.0, float(m[1])))
+				var p3 := Vector3(float(m[0]), float(m[2]) if m.size() > 2 else 0.0, float(m[1]))
+				pts.append(p3)
+				entries.append({"pos": p3, "yaw": 0.0, "team": -1, "size": Vector3.ZERO})
+			elif typeof(m) == TYPE_DICTIONARY:
+				var p4 := MathX.vec3(m.get("pos", [0, 0, 0]))
+				pts.append(p4)
+				entries.append({"pos": p4, "yaw": deg_to_rad(float(m.get("yaw", 0.0))), "team": int(m.get("team", -1)), "size": MathX.vec3(m.get("size", [0, 0, 0]))})
 		a.markers[str(k)] = pts
+		a.marker_entries[str(k)] = entries
 	if a.id == "":
 		a.errors.append("arena without id")
 	return a
+
+
+## Marker positions by name ("spotlight_anchor", "goal", "ball_spawn", "wave_gate", "unit_spawn",
+## "boss", "spawn", ...). Accepts names with or without the "marker_" prefix.
+func marker_points(name_: String) -> Array:
+	var n := name_.trim_prefix("marker_")
+	return markers.get(n, markers.get("marker_" + n, []))
+
+
+func markers_of(name_: String) -> Array:
+	var n := name_.trim_prefix("marker_")
+	return marker_entries.get(n, marker_entries.get("marker_" + n, []))
 
 
 func to_dict() -> Dictionary:
@@ -79,10 +101,11 @@ func to_dict() -> Dictionary:
 		var v3: Vector3 = h["pos"]
 		hz.append({"type": h["type"], "pos": [snappedf(v3.x, 0.01), 0.0, snappedf(v3.z, 0.01)], "radius": h["radius"], "params": h["params"]})
 	var mk := {}
-	for k in markers:
+	for k in marker_entries:
 		var arr := []
-		for v4: Vector3 in markers[k]:
-			arr.append([snappedf(v4.x, 0.01), snappedf(v4.z, 0.01)])
+		for me in marker_entries[k]:
+			var v4: Vector3 = me["pos"]
+			arr.append({"pos": [snappedf(v4.x, 0.01), snappedf(v4.y, 0.01), snappedf(v4.z, 0.01)], "yaw": snappedf(rad_to_deg(float(me["yaw"])), 0.1), "team": int(me["team"]), "size": [me["size"].x, me["size"].y, me["size"].z]})
 		mk[k] = arr
 	return {"id": id, "name": display_name, "base": base, "radius": radius, "wall_height": wall_height,
 		"ringout": ringout, "theme": theme, "gravity_mult": gravity_mult, "author": author, "version": version,
