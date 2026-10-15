@@ -4876,27 +4876,27 @@
    "sections": [
     {
      "id": "intro",
-     "startBar": 1,
+     "start_bar": 1,
      "bars": 4
     },
     {
      "id": "A",
-     "startBar": 5,
+     "start_bar": 5,
      "bars": 16
     },
     {
      "id": "B",
-     "startBar": 21,
+     "start_bar": 21,
      "bars": 16
     },
     {
      "id": "A2",
-     "startBar": 37,
+     "start_bar": 37,
      "bars": 16
     },
     {
      "id": "tag",
-     "startBar": 53,
+     "start_bar": 53,
      "bars": 4
     }
    ],
@@ -4926,22 +4926,22 @@
    "sections": [
     {
      "id": "A",
-     "startBar": 1,
+     "start_bar": 1,
      "bars": 16
     },
     {
      "id": "B",
-     "startBar": 17,
+     "start_bar": 17,
      "bars": 16
     },
     {
      "id": "A2",
-     "startBar": 33,
+     "start_bar": 33,
      "bars": 16
     },
     {
      "id": "C",
-     "startBar": 49,
+     "start_bar": 49,
      "bars": 8
     }
    ],
@@ -4972,22 +4972,22 @@
    "sections": [
     {
      "id": "A",
-     "startBar": 1,
+     "start_bar": 1,
      "bars": 16
     },
     {
      "id": "B",
-     "startBar": 17,
+     "start_bar": 17,
      "bars": 16
     },
     {
      "id": "A2",
-     "startBar": 33,
+     "start_bar": 33,
      "bars": 16
     },
     {
      "id": "C",
-     "startBar": 49,
+     "start_bar": 49,
      "bars": 8
     }
    ],
@@ -5045,22 +5045,22 @@
    "sections": [
     {
      "id": "A",
-     "startBar": 1,
+     "start_bar": 1,
      "bars": 16
     },
     {
      "id": "B",
-     "startBar": 17,
+     "start_bar": 17,
      "bars": 16
     },
     {
      "id": "A2",
-     "startBar": 33,
+     "start_bar": 33,
      "bars": 16
     },
     {
      "id": "D",
-     "startBar": 49,
+     "start_bar": 49,
      "bars": 8
     }
    ],
@@ -5118,17 +5118,17 @@
    "sections": [
     {
      "id": "intro",
-     "startBar": 1,
+     "start_bar": 1,
      "bars": 8
     },
     {
      "id": "A",
-     "startBar": 9,
+     "start_bar": 9,
      "bars": 16
     },
     {
      "id": "B",
-     "startBar": 25,
+     "start_bar": 25,
      "bars": 16
     }
    ],
@@ -5195,12 +5195,12 @@
    "sections": [
     {
      "id": "fanfare",
-     "startBar": 1,
+     "start_bar": 1,
      "bars": 4
     },
     {
      "id": "tag",
-     "startBar": 5,
+     "start_bar": 5,
      "bars": 2
     }
    ],
@@ -5226,7 +5226,7 @@
    "sections": [
     {
      "id": "A",
-     "startBar": 1,
+     "start_bar": 1,
      "bars": 4
     }
    ],
@@ -5252,17 +5252,17 @@
    "sections": [
     {
      "id": "intro",
-     "startBar": 1,
+     "start_bar": 1,
      "bars": 4
     },
     {
      "id": "A",
-     "startBar": 5,
+     "start_bar": 5,
      "bars": 16
     },
     {
      "id": "B",
-     "startBar": 21,
+     "start_bar": 21,
      "bars": 8
     }
    ],

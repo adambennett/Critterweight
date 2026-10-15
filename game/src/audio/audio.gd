@@ -1045,6 +1045,7 @@ func set_room(room: String) -> void:
 ## ctx: {player_index: int, fighters: [{index, creature, name, team}], arena: String, seed: int,
 ##       context: "campaign"|"coop"|"versus", round_time: float}
 func begin_match(ctx: Dictionary) -> void:
+	stop_announcer()  # a menu quip must never block the walk-in line
 	_match = ctx.duplicate(true)
 	_ann_used.clear()
 	_ann_rotation.clear()
