@@ -60,14 +60,30 @@ $t = RunExe @("--headless", "--fixed-fps", "120", "--", "--user-root", $userRoot
 $sum = ($t.text | Select-String "^tests: ").Line
 if ($t.code -eq 0) { Record "packaged test suite" "pass" $sum } else { Record "packaged test suite" "fail" "$sum (exit $($t.code))" }
 
+# Runs the packaged game and samples its working set until it exits (release builds do not track
+# their own static memory, so process memory is measured from outside).
+function RunPeak($argList, $outName) {
+	$o = Join-Path $out $outName
+	$p = Start-Process -FilePath $exe -ArgumentList $argList -PassThru -RedirectStandardOutput $o -RedirectStandardError ($o + ".err")
+	$peak = 0
+	while (-not $p.HasExited) {
+		try { $p.Refresh(); if ($p.WorkingSet64 -gt $peak) { $peak = $p.WorkingSet64 } } catch {}
+		Start-Sleep -Milliseconds 250
+	}
+	return @{ code = $p.ExitCode; peak_mb = [math]::Round($peak / 1MB) }
+}
+
 # 1b. cold-ish boot time to the first menu screen + memory (PERF-03)
 $boot = Join-Path $out "boot_report.json"
-$bp = Start-Process -FilePath $exe -ArgumentList @("--", "--user-root", $userRoot, "--windowed", "--size", "1600x900", "--boot-report", $boot) -PassThru -Wait
+$bp = RunPeak @("--", "--user-root", $userRoot, "--windowed", "--size", "1600x900", "--boot-report", $boot) "boot.out"
 if (Test-Path $boot) {
 	$br = Get-Content $boot | ConvertFrom-Json
 	$st = if ($br.ms_since_start -lt 10000) { "pass" } else { "fail" }
-	Record "boot to first menu (< 10 s)" $st ("{0} ms to '{1}', {2:N0} MB static memory" -f $br.ms_since_start, $br.screen, $br.static_memory_mb)
-} else { Record "boot to first menu" "fail" "no report (exit $($bp.ExitCode))" }
+	Record "boot to first menu (< 10 s)" $st ("{0} ms to '{1}', peak working set {2} MB" -f $br.ms_since_start, $br.screen, $bp.peak_mb)
+} else { Record "boot to first menu" "fail" "no report (exit $($bp.code))" }
+$mem = RunPeak @("--", "--user-root", $userRoot, "--windowed", "--size", "1920x1080", "--sandbox", "--autoplay", "--rules", "free_for_all", "--n", "8", "--capture", (Join-Path $out "mem_ffa8.png"), "--capture-at", "25") "mem_ffa8.out"
+$mst = if ($mem.peak_mb -gt 0 -and $mem.peak_mb -lt 4096) { "pass" } else { "fail" }
+Record "memory: 8-fighter match, 25 s (< 4 GB)" $mst ("peak working set {0} MB" -f $mem.peak_mb)
 
 # 2. runtime captures from the packaged game (real rendering, isolated user data)
 $captures = @(

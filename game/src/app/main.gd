@@ -10,9 +10,11 @@ extends Node
 ##   --bench <scene>         performance capture
 
 var args: PackedStringArray
+var _ready_ms := 0
 
 
 func _ready() -> void:
+	_ready_ms = Time.get_ticks_msec()
 	args = OS.get_cmdline_user_args()
 	# integration points other owners' menus call into
 	TutorialHook.launcher = Callable(Tutorial, "start_lesson")
@@ -41,6 +43,8 @@ func _ready() -> void:
 		mode = "autotest"
 	elif args.has("--bench"):
 		mode = "bench"
+	elif args.has("--hub"):
+		mode = "hub"
 	if args.has("--capture"):
 		_setup_capture()
 	if args.has("--boot-report"):
@@ -55,8 +59,12 @@ func _exit_tree() -> void:
 
 
 func _on_boot_screen(screen: String) -> void:
+	var built := Time.get_ticks_msec()
 	await RenderingServer.frame_post_draw
-	var rep := {"screen": screen, "ms_since_start": Time.get_ticks_msec(), "static_memory_mb": OS.get_static_memory_usage() / 1048576.0,
+	# breakdown: engine + autoloads until the main scene is ready, then the first screen is built,
+	# then its first frame is drawn (pipeline/shader compilation lands in the last part)
+	var rep := {"screen": screen, "ms_since_start": Time.get_ticks_msec(), "ms_main_ready": _ready_ms, "ms_screen_built": built,
+		"static_memory_mb": OS.get_static_memory_usage() / 1048576.0,
 		"video_memory_mb": Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0}
 	var f := FileAccess.open(arg_value("--boot-report", "user://boot_report.json"), FileAccess.WRITE)
 	if f:
@@ -112,6 +120,10 @@ func _start(mode: String) -> void:
 			var bench = load("res://src/test/bench.gd").new()
 			add_child(bench)
 			bench.call("run", arg_value("--bench", "busy"), args)
+		"hub":
+			# The Cannery directly (docs/HUB_SYSTEMS.md): --hub-spot <space> --hub-fighter <id> --hub-demo <presets>
+			Cannery.enter({"spot": arg_value("--hub-spot", ""), "fighter": arg_value("--hub-fighter", ""), "demo": arg_value("--hub-demo", ""),
+				"board": arg_value("--hub-board", ""), "cam_yaw": arg_value("--hub-cam-yaw", "")})
 		_:
 			_boot_game()
 
