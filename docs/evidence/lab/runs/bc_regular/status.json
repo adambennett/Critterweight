@@ -1,1 +1,1 @@
-{"state":"completed","message":"completed: validation accuracy move 71%, button 82% (majority baseline 46% / 59%)","pid":68720,"kind":"bc","run_id":"bc_regular","updated":1792047352.339,"report":"<evidence>/bc_regular/report.json","policy_id":"u_dev_biped_tmxsl4917","final":true}
+{"state":"completed","message":"completed: test-episode accuracy move 67%, button 83% (majority baseline 40% / 76%)","pid":67188,"kind":"bc","run_id":"bc_regular","updated":1792073092.27,"report":"../runs/bc_regular/report.json","policy_id":"u_dev_biped_tmycg4899","final":true}

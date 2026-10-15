@@ -23,7 +23,10 @@ static func ensure_dir(d: String) -> void:
 		DirAccess.make_dir_recursive_absolute(d)
 
 
-static func write_json(path: String, data) -> Error:
+## Atomic write (temp file + rename). Windows cannot rename over a file another process holds
+## open (a reader racing us): the rename is retried `retries` times with growing waits (2, 4,
+## 8... ms). Returns the final error; callers that must deliver (worker results) retry later.
+static func write_json(path: String, data, retries := 4) -> Error:
 	ensure_dir(path.get_base_dir())
 	var tmp := "%s.%d.tmp" % [path, OS.get_process_id()]
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
@@ -33,12 +36,15 @@ static func write_json(path: String, data) -> Error:
 	f.flush()
 	f.close()
 	var err := DirAccess.rename_absolute(tmp, path)
-	if err != OK:
-		# Windows cannot rename over a file another process holds open; retry once
-		OS.delay_msec(5)
+	var wait := 2
+	var tries := 0
+	while err != OK and tries < retries:
+		OS.delay_msec(wait)
+		wait *= 2
+		tries += 1
 		err = DirAccess.rename_absolute(tmp, path)
-		if err != OK:
-			DirAccess.remove_absolute(tmp)
+	if err != OK:
+		DirAccess.remove_absolute(tmp)
 	return err
 
 
@@ -106,6 +112,18 @@ static func floats_b64(s: String) -> PackedFloat32Array:
 	if s == "" or s.length() % 4 != 0:
 		return PackedFloat32Array()
 	return Marshalls.base64_to_raw(s).to_float32_array()
+
+
+## Moves a file (rename; copy + delete when the rename is impossible, e.g. across volumes).
+static func move_file(src: String, dst: String) -> Error:
+	ensure_dir(dst.get_base_dir())
+	var err := DirAccess.rename_absolute(src, dst)
+	if err == OK:
+		return OK
+	err = DirAccess.copy_absolute(src, dst)
+	if err == OK:
+		DirAccess.remove_absolute(src)
+	return err
 
 
 static func remove_tree(dir: String) -> void:

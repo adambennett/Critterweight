@@ -425,13 +425,13 @@ func _update_train_help() -> void:
 		"es":
 			t += "Learns from the reward alone: each generation tries mirrored random variations of the network in real matches and moves toward the ones that scored better. Needs no recordings. Strength grows with training time.\n\n"
 		"bc":
-			t += "Copies a recorded playstyle (yours or a bot's): supervised learning on (observation, action) pairs, with a held-out validation split and early stopping. Fast; quality depends on how much and how consistent the recorded play is.\n\n"
+			t += "Copies a recorded playstyle (yours or a bot's): supervised learning on (observation, action) pairs. Whole recorded episodes are held out for validation (early stopping) and for the reported test accuracy, so it needs at least %d recorded episodes (rounds). Fast; quality depends on how much and how consistent the recorded play is.\n\n" % LabBC.MIN_EPISODES
 		"bc_es":
 			t += "Starts from a cloned policy (pick it under 'Start from policy') and improves it with evolution strategies on the chosen objective.\n\n"
 	t += "[b]Objective:[/b] %s\n%s\n\n" % [str(LabRewards.PRESETS[pid]["name"]), str(LabRewards.PRESETS[pid]["help"])]
 	t += "[b]Scenario:[/b] %s\n%s\n\n" % [str(LabScenarios.PRESETS[sid]["name"]), str(LabScenarios.PRESETS[sid]["help"])]
-	t += "[b]Evaluation[/b] is separate from training: fixed baseline opponents, held-out seeds and the standard corner spawns; reports show mean ± std and 95% intervals.\n\n"
-	t += "[b]Speed on this PC[/b]: one worker simulates ~14 seconds of fighting per second (~1 short episode/s); add workers for more. The game stays responsive — training runs in background processes and can be paused, cancelled or resumed after a crash.\n\n"
+	t += "[b]Evaluation[/b] is separate from training: fixed baseline opponents, held-out seeds and the standard corner spawns (jittered, so no episode repeats); reports show mean ± std, 95% intervals and paired comparisons on the same episodes.\n\n"
+	t += "[b]Speed[/b]: one worker simulates roughly 8–16 seconds of fighting per second, depending on the PC and what else is running; add workers for more. The game stays responsive — training runs in background processes and can be paused, cancelled or resumed after a crash.\n\n"
 	t += "[color=#a8a0b0]Learning is real but not magic: short runs learn simple habits (approach, hit, guard). Beating strong players needs long training and is not guaranteed.[/color]"
 	_train_help.text = t
 
@@ -599,16 +599,26 @@ func _delete_run() -> void:
 
 
 ## "Mad Scientist": a trained policy beat its baseline in a held-out evaluation (ES/BC→ES: the
-## trained network vs its starting network on test seeds; evaluation runs: vs a random network;
-## BC: held-out accuracy clearly above the majority-class baseline).
+## trained network vs its starting network on the same test episodes, paired 95% interval above
+## zero; evaluation runs: the same vs a random network; BC: test-episode accuracy clearly above
+## the majority-class baseline). Reports written before the paired test fall back to their own
+## criteria.
 static func beats_baseline(rep: Dictionary) -> bool:
 	if rep.has("initial") and rep.has("trained"):
+		if typeof(rep.get("paired")) == TYPE_DICTIONARY:
+			var p: Dictionary = rep["paired"]
+			return bool(p.get("significant", false)) and float(p.get("mean", 0.0)) > 0.0 and not bool(rep.get("selected_initial", false))
 		return float((rep["trained"] as Dictionary)["reward"]["mean"]) > float((rep["initial"] as Dictionary)["reward"]["mean"]) \
 			and float(rep.get("welch_t", 0.0)) >= 2.0
 	if rep.has("target") and rep.has("compare"):
+		if typeof(rep.get("paired_compare")) == TYPE_DICTIONARY:
+			var pc: Dictionary = rep["paired_compare"]
+			return bool(pc.get("significant", false)) and float(pc.get("mean", 0.0)) > 0.0
 		var t: Array = (rep["target"] as Dictionary)["reward"]["ci95"]
 		var c: Array = (rep["compare"] as Dictionary)["reward"]["ci95"]
 		return t.size() == 2 and c.size() == 2 and float(t[0]) > float(c[1])
+	if rep.has("test") and rep.has("majority_baseline"):
+		return float((rep["test"] as Dictionary).get("acc_joint", 0.0)) > float((rep["majority_baseline"] as Dictionary).get("acc_joint", 1.0)) + 0.05
 	if rep.has("final_val") and rep.has("majority_baseline"):
 		return float((rep["final_val"] as Dictionary).get("acc_joint", 0.0)) > float((rep["majority_baseline"] as Dictionary).get("acc_joint", 1.0)) + 0.05
 	return false
@@ -760,27 +770,50 @@ func _report_text(rep: Dictionary) -> String:
 	if rep.is_empty():
 		return "[color=#a8a0b0]The evaluation report appears here when the run completes.[/color]"
 	var t := "[b]Evaluation report[/b] (%s)\n" % str(rep.get("kind", ""))
+	if rep.has("error"):
+		t += "[color=#ff8a7a]%s[/color]\n" % LabUi.esc(rep["error"])
 	if rep.has("initial") and rep.has("trained"):
 		t += "Held-out test episodes — starting policy vs trained policy:\n"
 		t += "  start:   %s\n  trained: %s\n" % [LabEval.one_line(rep["initial"]), LabEval.one_line(rep["trained"])]
-		t += "  Welch t = %.2f\n" % float(rep.get("welch_t", 0.0))
+		if typeof(rep.get("paired")) == TYPE_DICTIONARY:
+			t += "  trained − start: %s\n" % LabEval.paired_line(rep["paired"])
+		else:
+			t += "  Welch t = %.2f\n" % float(rep.get("welch_t", 0.0))
+		if bool(rep.get("selected_initial", false)):
+			t += "  [color=#f0d070]No trained network beat the starting network on validation: the saved policy is the starting network.[/color]\n"
 		t += _per_opponent(rep["trained"])
-	if rep.has("final_val"):
+	if rep.has("test") and rep.has("split"):
+		var sp: Dictionary = rep["split"]
+		t += "Split by whole episodes: %d train / %d validation (early stopping) / %d test%s\n" % [int(sp.get("train_episodes", 0)),
+			int(sp.get("val_episodes", 0)), int(sp.get("test_episodes", 0)),
+			(" · %d duplicate episode copies ignored" % int(sp.get("duplicate_episodes", 0))) if int(sp.get("duplicate_episodes", 0)) > 0 else ""]
+		var te: Dictionary = rep["test"]
+		var bt: Dictionary = rep.get("majority_baseline", {})
+		t += "Test-episode accuracy vs the recorded actions: move %.0f%%, button %.0f%%, both %.0f%%\n" % [100.0 * float(te.get("acc_move", 0)), 100.0 * float(te.get("acc_button", 0)), 100.0 * float(te.get("acc_joint", 0))]
+		t += "Majority-class baseline (test episodes): move %.0f%%, button %.0f%%\n" % [100.0 * float(bt.get("acc_move", 0)), 100.0 * float(bt.get("acc_button", 0))]
+	elif rep.has("final_val"):
 		var v: Dictionary = rep["final_val"]
 		var b: Dictionary = rep.get("majority_baseline", {})
-		t += "Validation accuracy vs the recorded actions: move %.0f%%, button %.0f%%, both %.0f%%\n" % [100.0 * float(v.get("acc_move", 0)), 100.0 * float(v.get("acc_button", 0)), 100.0 * float(v.get("acc_joint", 0))]
+		t += "Validation accuracy (the early-stopping split) vs the recorded actions: move %.0f%%, button %.0f%%, both %.0f%%\n" % [100.0 * float(v.get("acc_move", 0)), 100.0 * float(v.get("acc_button", 0)), 100.0 * float(v.get("acc_joint", 0))]
 		t += "Majority-class baseline: move %.0f%%, button %.0f%%\n" % [100.0 * float(b.get("acc_move", 0)), 100.0 * float(b.get("acc_button", 0))]
+	if rep.has("final_val") or rep.has("test"):
 		if rep.has("tvd_move"):
 			t += "Action-distribution distance to the teacher (0 = identical): move %.3f, button %.3f\n" % [float(rep["tvd_move"]), float(rep["tvd_button"])]
 		if rep.has("clone_rollouts"):
 			t += "Clone in matches: %s\n" % LabEval.one_line(rep["clone_rollouts"])
 		if rep.has("teacher_rollouts"):
 			t += "Teacher, same episodes: %s\n" % LabEval.one_line(rep["teacher_rollouts"])
+		if typeof(rep.get("paired_teacher")) == TYPE_DICTIONARY:
+			t += "Clone − teacher: %s\n" % LabEval.paired_line(rep["paired_teacher"])
 	if rep.has("target"):
 		t += "%s\n" % LabEval.one_line(rep["target"])
+		if not bool(rep.get("complete", true)):
+			t += "[color=#f0d070]Stopped early (%s): %d of %d planned episodes per policy.[/color]\n" % [LabUi.esc(rep.get("stop_reason", "")), int(rep.get("played_episodes", 0)), int(rep.get("planned_episodes", 0))]
 		t += _per_opponent(rep["target"])
 		if rep.has("compare"):
 			t += "Comparison (%s): %s\n" % [LabUi.esc(rep.get("compare_label", "")), LabEval.one_line(rep["compare"])]
+			if typeof(rep.get("paired_compare")) == TYPE_DICTIONARY:
+				t += "  policy − comparison: %s\n" % LabEval.paired_line(rep["paired_compare"])
 	if rep.has("samples") and rep.has("dataset"):
 		t += "Recorded %d samples into %s\n" % [int(rep["samples"]), LabUi.esc(str(rep["dataset"]).get_file())]
 	if str(rep.get("policy_id", "")) != "":
@@ -961,6 +994,9 @@ func _show_policy() -> void:
 	# policy files come from mods, imports and the player: every field is escaped for BBCode
 	if not bool(s.get("valid", false)):
 		_pol_info.text = "[b]%s[/b]\n[color=#ff8a7a]This file cannot be used:[/color]\n%s" % [LabUi.esc(id), LabUi.esc(s.get("error", ""))]
+		if str(s.get("source", "")) == "user":
+			_pol_info.text += "\n\n[color=#a8a0b0]You can delete it, or rename the file to keep it aside.[/color]"
+			_rename_edit.text = id
 		return
 	var p := PolicyLibrary.get_policy(id)
 	if p == null:
@@ -983,9 +1019,14 @@ func _show_policy() -> void:
 	if typeof(tr.get("test_eval")) == TYPE_DICTIONARY:
 		var te: Dictionary = tr["test_eval"]
 		t += "\n[b]Held-out test evaluation[/b]\n  before training: %s\n  after training:  %s\n" % [LabEval.one_line(te.get("initial", {})), LabEval.one_line(te.get("trained", {}))]
-	if typeof(tr.get("val_accuracy")) == TYPE_DICTIONARY:
+		if typeof(te.get("paired")) == TYPE_DICTIONARY:
+			t += "  difference: %s\n" % LabEval.paired_line(te["paired"])
+	if typeof(tr.get("test_accuracy")) == TYPE_DICTIONARY:
+		var ta: Dictionary = tr["test_accuracy"]
+		t += "\n[b]Imitation accuracy on held-out test episodes[/b] move %.0f%% · button %.0f%% · both %.0f%%\n" % [100.0 * float(ta.get("move", 0)), 100.0 * float(ta.get("button", 0)), 100.0 * float(ta.get("joint", 0))]
+	elif typeof(tr.get("val_accuracy")) == TYPE_DICTIONARY:
 		var va: Dictionary = tr["val_accuracy"]
-		t += "\n[b]Imitation accuracy (held-out)[/b] move %.0f%% · button %.0f%% · both %.0f%%\n" % [100.0 * float(va.get("move", 0)), 100.0 * float(va.get("button", 0)), 100.0 * float(va.get("joint", 0))]
+		t += "\n[b]Imitation accuracy on the validation episodes[/b] (also used for early stopping) move %.0f%% · button %.0f%% · both %.0f%%\n" % [100.0 * float(va.get("move", 0)), 100.0 * float(va.get("button", 0)), 100.0 * float(va.get("joint", 0))]
 	for w in PolicyLibrary.warnings_for(p):
 		t += "\n[color=#f0d070]%s[/color]" % LabUi.esc(w)
 	if p.source != "user":
@@ -997,8 +1038,16 @@ func _show_policy() -> void:
 
 func _rename_policy() -> void:
 	var id := _selected_policy_id()
+	if id == "":
+		return
+	var invalid := PolicyLibrary.get_policy(id) == null
 	var err := PolicyLibrary.rename(id, _rename_edit.text)
-	_set_status("Renamed." if err == OK else "Rename failed: %s (built-in policies are read-only)" % error_string(err))
+	if err == OK:
+		_set_status("Renamed the file (it still cannot be used)." if invalid else "Renamed.")
+	elif PolicyLibrary.is_builtin(id):
+		_set_status("Built-in policies are read-only.")
+	else:
+		_set_status("Rename failed: %s" % error_string(err))
 	_refresh_policies()
 
 

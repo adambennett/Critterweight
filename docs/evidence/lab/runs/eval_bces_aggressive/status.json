@@ -1,0 +1,1 @@
+{"state":"completed","message":"evaluated: n=30 reward 83.38 ± 27.23 (95% CI 73.21..93.54) win 87% [70–95%]","pid":42224,"kind":"eval","run_id":"eval_bces_aggressive","updated":1792075014.5380001,"report":"../runs/eval_bces_aggressive/report.json","policy_id":"","final":true}

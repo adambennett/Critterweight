@@ -230,25 +230,79 @@ static func save(p: PolicyData) -> Error:
 	return err
 
 
+## The user-library file listed under `id` even when it cannot be loaded: list() shows an
+## unreadable file by its file stem, so an [INVALID] entry can still be renamed or deleted.
+## Only files directly inside the user folder are ever returned ("" if none).
+static func user_file_for(id: String) -> String:
+	if id == "" or id.contains("/") or id.contains("\\") or id.contains(".."):
+		return ""
+	var d := DirAccess.open(user_dir())
+	if d == null:
+		return ""
+	for fn in d.get_files():
+		if str(fn) == id + PolicyIO.EXT:
+			return user_dir().path_join(str(fn))
+	var p := path_for(id)
+	return p if FileAccess.file_exists(p) else ""
+
+
+## Renames a user policy (its display name). An unreadable ([INVALID]) user file cannot carry a
+## new name inside, so its FILE is renamed instead (to the name's file-safe form).
 static func rename(id: String, new_name: String) -> Error:
-	var p := get_policy(id)
-	if p == null or p.source != "user":
-		return ERR_UNAVAILABLE
 	var n := new_name.strip_edges().strip_escapes().substr(0, 64)
 	if n == "":
 		return ERR_INVALID_PARAMETER
-	p.name = n
-	return save(p)
+	var p := get_policy(id)
+	if p != null:
+		if p.source != "user":
+			return ERR_UNAVAILABLE
+		p.name = n
+		return save(p)
+	if is_builtin(id):
+		return ERR_UNAVAILABLE
+	var path := user_file_for(id)
+	if path == "":
+		return ERR_DOES_NOT_EXIST
+	var dest := user_dir().path_join(file_stem(n) + PolicyIO.EXT)
+	if dest == path:
+		return OK
+	if FileAccess.file_exists(dest):
+		return ERR_ALREADY_EXISTS
+	var err := DirAccess.rename_absolute(path, dest)
+	if err == OK:
+		for ext in [".bak", ".tmp"]:
+			if FileAccess.file_exists(path + ext):
+				DirAccess.rename_absolute(path + ext, dest + ext)
+		_forget_path(path)
+		_errors.erase(id)
+	return err
 
 
-## Removes a user policy (and its backups). Built-in policies cannot be deleted.
+## Removes a user policy (and its backups) — also an unreadable ([INVALID]) user file. Built-in
+## policies cannot be deleted.
 static func delete(id: String) -> Error:
 	var p := get_policy(id)
-	if p == null or p.source != "user":
+	if p != null:
+		if p.source != "user":
+			return ERR_UNAVAILABLE
+		PolicyIO.delete_file(p.path)
+		_cache.erase(id)
+		return OK
+	if is_builtin(id):
 		return ERR_UNAVAILABLE
-	PolicyIO.delete_file(p.path)
-	_cache.erase(id)
+	var path := user_file_for(id)
+	if path == "":
+		return ERR_DOES_NOT_EXIST
+	PolicyIO.delete_file(path)
+	_forget_path(path)
+	_errors.erase(id)
 	return OK
+
+
+static func _forget_path(path: String) -> void:
+	for k in _cache.keys():
+		if str((_cache[k] as Dictionary).get("path", "")) == path:
+			_cache.erase(k)
 
 
 ## Writes a copy to any path (".policy.json" appended when missing).

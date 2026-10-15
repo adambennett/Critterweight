@@ -13,6 +13,8 @@ game/export_cache/
 # Local verification captures (curated evidence lives in docs/evidence/)
 captures/
 *.log
+# AI Lab runs made with the documented commands (docs/AI_LAB.md, docs/evidence/lab/README.md)
+/runs/
 
 # Tool dependencies
 tools/**/node_modules/

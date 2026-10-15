@@ -1,0 +1,1 @@
+{"state":"completed","message":"evaluated: n=30 reward 51.28 ± 18.81 (95% CI 44.25..58.30) win 100% [89–100%]","pid":52568,"kind":"eval","run_id":"eval_es_drill","updated":1792074809.414,"report":"../runs/eval_es_drill/report.json","policy_id":"","final":true}
