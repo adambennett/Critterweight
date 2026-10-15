@@ -396,17 +396,17 @@
   "variants": {
    "overcast": {
     "label": "Overcast",
-    "key": "#EEF2F4",
-    "key_energy": 1.25,
+    "key": "#F2F0E8",
+    "key_energy": 1.15,
     "rim": "#C9D3D8",
     "spot": "#FFFFFF",
     "bg": "#C9D3D8",
-    "fog": "#BCC7CD",
-    "fog_density": 0.012,
-    "ambient": "#AEB9C0",
-    "ambient_energy": 0.9,
-    "sky_top": "#8FA2AE",
-    "sky_horizon": "#DCE3E6",
+    "fog": "#9DAAB2",
+    "fog_density": 0.0045,
+    "ambient": "#8E9AA2",
+    "ambient_energy": 0.5,
+    "sky_top": "#7F93A0",
+    "sky_horizon": "#C3CDD3",
     "crowd_energy": 0.3
    }
   },

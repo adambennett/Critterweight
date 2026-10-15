@@ -1303,6 +1303,8 @@ func view_state() -> Dictionary:
 		if bool(rec["spawned"]):
 			e["pos"] = rec["pos"]
 			e["yaw"] = rec["yaw"]
+		if not bool(rec["available"]):
+			e["respawn_in"] = maxf(0.0, float(rec["respawn_at"]) - sim.time)
 		if rec["body"] is Node3D and is_instance_valid(rec["body"]) and str(rec["def"].get("body", "")) in ["dynamic", "bag"]:
 			e["xform"] = (rec["body"] as Node3D).global_transform
 		pr_out.append(e)
