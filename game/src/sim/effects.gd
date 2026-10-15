@@ -298,7 +298,8 @@ func _blink(f: Fighter, e: Dictionary) -> void:
 # ---------------------------------------------------------------------------------------
 
 func _spawn_projectile(f: Fighter, e: Dictionary, yaw_off: float) -> void:
-	var origin := f.pos() + MathX.yaw_basis(f.facing_yaw) * MathX.vec3(e.get("offset", [0, 0.3, 0.5]))
+	# offset is in fighter space like body pivots: floor at y = 0, +Z forward, +X the fighter's left
+	var origin := f.ground_pos() + MathX.yaw_basis(f.facing_yaw) * MathX.vec3(e.get("offset", [0, 1.1, 0.5]))
 	var from_w := str(e.get("from", ""))
 	if from_w != "" and f.creature.body.weapons.has(from_w):
 		var w: BodyDef.Weapon = f.creature.body.weapons[from_w]
