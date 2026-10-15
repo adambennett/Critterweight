@@ -16,9 +16,14 @@ func on_enter(_p: Dictionary) -> void:
 	_scroll = FocusScroll.new(14)
 	_scroll.size_flags_stretch_ratio = 1.3
 	cols.add_child(_scroll)
+	var rs := ScrollContainer.new()
+	rs.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	rs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	cols.add_child(rs)
 	var right := UiTheme.vbox(UiTheme.GAP_M)
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	cols.add_child(right)
+	rs.add_child(right)
 	_build_widgets(_scroll.content)
 	_build_art(right)
 	play_intro()
@@ -65,6 +70,20 @@ func _build_widgets(c: VBoxContainer) -> void:
 
 
 func _build_art(c: VBoxContainer) -> void:
+	c.add_child(UiTheme.label("WORDMARK & MARK", "Eyebrow"))
+	var brand := UiTheme.hbox(UiTheme.GAP_L)
+	for s in [96.0, 48.0, 32.0]:
+		var mark := TextureRect.new()
+		mark.texture = load("res://assets/ui/logo_mark.svg")
+		mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		mark.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		mark.custom_minimum_size = Vector2(s, s)
+		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		brand.add_child(mark)
+	var wm := Wordmark.new(52.0)
+	wm.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	brand.add_child(wm)
+	c.add_child(brand)
 	c.add_child(UiTheme.label("ELEMENTS", "Eyebrow"))
 	var er := HFlowContainer.new()
 	er.add_theme_constant_override("h_separation", 26)
@@ -121,6 +140,3 @@ func _build_art(c: VBoxContainer) -> void:
 	c.add_child(tr)
 	c.add_child(StatBar.new("Health", 0.7, "110"))
 	c.add_child(StatBar.new("Speed", 0.45, "3.4"))
-	var wm := Wordmark.new(64.0)
-	wm.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	c.add_child(wm)

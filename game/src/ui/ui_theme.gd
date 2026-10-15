@@ -586,7 +586,10 @@ static func panel(variation := "", margin_override := -1.0) -> PanelContainer:
 	if variation != "":
 		p.theme_type_variation = variation
 	if margin_override >= 0.0:
-		var sb := p.get_theme_stylebox("panel").duplicate() as StyleBox
+		# read from OUR theme: the node is not in the tree yet, so p.get_theme_stylebox() would
+		# resolve Godot's default (translucent) panel instead
+		var type := variation if variation != "" else "PanelContainer"
+		var sb := get_theme().get_stylebox(&"panel", type).duplicate() as StyleBox
 		sb.content_margin_left = margin_override
 		sb.content_margin_right = margin_override
 		sb.content_margin_top = margin_override

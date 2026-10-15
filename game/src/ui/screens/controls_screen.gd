@@ -10,7 +10,7 @@ var _in_game := false
 func on_enter(p: Dictionary) -> void:
 	_in_game = bool(p.get("in_game", false)) or MatchFlow.match_running()
 	if _in_game:
-		add_dimmer(0.8)
+		add_dimmer(0.93)
 	else:
 		MenuBackdrop.ensure()
 		add_backdrop_gradient(0.97, 0.8)

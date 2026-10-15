@@ -42,7 +42,7 @@ func show_toast(text: String, kind := "info", seconds := 3.5) -> void:
 	var spec: Array = KINDS.get(kind, KINDS["info"])
 	var p := PanelContainer.new()
 	p.theme_type_variation = "PanelToast"
-	var sb := p.get_theme_stylebox("panel").duplicate() as StyleBoxFlat
+	var sb := UiTheme.get_theme().get_stylebox(&"panel", &"PanelToast").duplicate() as StyleBoxFlat
 	sb.border_color = spec[1]
 	p.add_theme_stylebox_override("panel", sb)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE

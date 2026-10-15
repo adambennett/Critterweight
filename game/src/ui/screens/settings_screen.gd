@@ -25,7 +25,7 @@ var _reset_button: UiButton
 func on_enter(p: Dictionary) -> void:
 	_in_game = bool(p.get("in_game", false)) or MatchFlow.match_running()
 	if _in_game:
-		add_dimmer(0.8)
+		add_dimmer(0.93)          # the fight HUD behind must not compete with the header
 	else:
 		MenuBackdrop.ensure()
 		add_backdrop_gradient(0.97, 0.7)

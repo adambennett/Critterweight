@@ -63,8 +63,16 @@ func _build() -> void:
 	_press = press_row
 	col.add_child(press_row)
 	col.add_child(UiTheme.spacer(false, 40))
-	var foot := UiTheme.hbox(UiTheme.GAP_L)
+	var foot := UiTheme.hbox(UiTheme.GAP_M)
+	var mark := TextureRect.new()
+	mark.texture = load("res://assets/ui/logo_mark.svg")
+	mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	mark.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	mark.custom_minimum_size = Vector2(56, 56)
+	mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	foot.add_child(mark)
 	var ver := UiTheme.label("v%s  ·  local build" % str(ProjectSettings.get_setting("application/config/version", "0.0.0")), "Caption")
+	ver.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	foot.add_child(ver)
 	foot.add_child(UiTheme.spacer())
 	var device := UiTheme.label("", "Caption")

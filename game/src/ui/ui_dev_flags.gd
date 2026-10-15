@@ -38,6 +38,13 @@ static func handle() -> bool:
 	var style := arg("--ui-prompts", "")
 	if style != "":
 		Settings.set_value("input.prompts", style, true, false)
+	if has("--ui-toasts"):
+		var tt := (Engine.get_main_loop() as SceneTree).create_timer(1.2)
+		tt.timeout.connect(func() -> void:
+			UiNav.toast("Settings saved.", "info", 8.0)
+			UiNav.toast("Profile Rookie created.", "success", 8.0)
+			UiNav.toast("Controller disconnected.", "warning", 8.0)
+			UiNav.toast("Could not write settings.json (disk full?).", "error", 8.0))
 	var screen := arg("--ui-screen", "")
 	if screen == "" or screen == "title":
 		return false
