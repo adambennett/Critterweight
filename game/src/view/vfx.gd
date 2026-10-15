@@ -171,6 +171,40 @@ func word(pos: Vector3, text: String, color: Color, size := 64) -> void:
 	tw.tween_callback(l.queue_free)
 
 
+## Cartoon "seeing stars": glowing dots orbiting above a knocked-out head (the non-gory KO cue;
+## shown at every gore level).
+func stars(follow: Callable, seconds := 2.4) -> void:
+	var root := Node3D.new()
+	add_child(root)
+	var n := 5
+	for i in n:
+		var mi := MeshInstance3D.new()
+		var q := QuadMesh.new()
+		q.size = Vector2(0.16, 0.16)
+		q.material = _spark_mat
+		mi.mesh = q
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var a := TAU * i / n
+		mi.position = Vector3(cos(a) * 0.32, 0.0, sin(a) * 0.32)
+		root.add_child(mi)
+		var col := Color(1.0, 0.92, 0.35) if i % 2 == 0 else Color(1.0, 1.0, 1.0)
+		var m := _spark_mat.duplicate() as StandardMaterial3D
+		m.albedo_color = col
+		m.vertex_color_use_as_albedo = false
+		m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+		q.material = m
+	var t0 := Time.get_ticks_msec()
+	var tw := create_tween()
+	tw.tween_method(func(v: float) -> void:
+		if not is_instance_valid(root):
+			return
+		var hp: Vector3 = follow.call() if follow.is_valid() else root.global_position
+		root.global_position = hp + Vector3.UP * (0.32 + 0.04 * sin(v * 9.0))
+		root.rotation.y = v * 5.0
+		root.scale = Vector3.ONE * clampf(1.0 - (float(Time.get_ticks_msec() - t0) / 1000.0 - seconds + 0.4) / 0.4, 0.0, 1.0), 0.0, seconds, seconds)
+	tw.tween_callback(root.queue_free)
+
+
 ## Mirrors simulation entities (projectiles / zones) as simple glowing visuals.
 func sync_entities(entities: Array) -> void:
 	var seen := {}

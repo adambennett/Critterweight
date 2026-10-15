@@ -24,6 +24,7 @@ const HOVER_ZETA := 0.9
 const ROOT_W := 14.0            ## upright / yaw spring natural frequency
 const ROOT_ZETA := 1.1
 const TONE_EPS := 0.015         ## re-send spring gains when tone changes more than this
+const EQ_EPS_SQ := 0.0018 * 0.0018
 
 var def: BodyDef
 var bodies: Array[RigidBody3D] = []
@@ -59,6 +60,7 @@ var root_inertia := 1.0
 var _qa_off: Array[Quaternion] = []   ## joint frame in body A (rest), per joint
 var _qb_off: Array[Quaternion] = []   ## joint frame in body B (rest), per joint
 var _sent_tone: PackedFloat32Array = PackedFloat32Array()
+var _sent_eq: PackedVector3Array = PackedVector3Array()   ## last equilibrium angles sent per joint
 var _ray := PhysicsRayQueryParameters3D.new()
 
 
@@ -75,6 +77,8 @@ func build(body_def: BodyDef, index: int, pos: Vector3, yaw: float, material: Ph
 	_qb_off.resize(n)
 	_sent_tone.resize(n)
 	_sent_tone.fill(-1.0)
+	_sent_eq.resize(n)
+	_sent_eq.fill(Vector3(INF, INF, INF))
 	var mat := material
 	if mat == null:
 		mat = PhysicsMaterial.new()
@@ -324,6 +328,10 @@ func _send_gains(i: int, tone_key: float, k: float, c: float) -> void:
 func _send_target(i: int, q_a: Quaternion, q_b_target: Quaternion) -> void:
 	var rel := (q_a * _qa_off[i]).inverse() * (q_b_target * _qb_off[i])
 	var e := Basis(rel.inverse()).get_euler(EULER_ORDER_XYZ)
+	# skip sub-0.1-degree changes: same physics, far fewer server calls when holding a pose
+	if e.distance_squared_to(_sent_eq[i]) < EQ_EPS_SQ:
+		return
+	_sent_eq[i] = e
 	var rid := joint_rids[i]
 	PhysicsServer3D.generic_6dof_joint_set_param(rid, Vector3.AXIS_X, PhysicsServer3D.G6DOF_JOINT_ANGULAR_SPRING_EQUILIBRIUM_POINT, e.x)
 	PhysicsServer3D.generic_6dof_joint_set_param(rid, Vector3.AXIS_Y, PhysicsServer3D.G6DOF_JOINT_ANGULAR_SPRING_EQUILIBRIUM_POINT, e.y)
