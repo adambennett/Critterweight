@@ -22,3 +22,6 @@ __pycache__/
 
 # Agent worktrees and local tool state
 .claude/
+
+# per-build stamp written by tools/build/package.ps1 during export
+game/build_info.json
