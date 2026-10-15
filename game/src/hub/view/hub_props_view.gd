@@ -4,7 +4,8 @@ extends Node3D
 ## bag is shaped like the Commissioner), crates, carryable parts (fuse, cable spool, red button,
 ## the sign's fallen A, the trash-can lid), chum buckets in flight, the loose panel, the elevator
 ## chain gate, the pier-ladder tarp, the Wall of Fame photos and the secret world states (open belt
-## case, boiler hatch, lit sign letter). Every transform mirrors the physics body each frame.
+## case, boiler hatch, lit sign letter) and the shelf of fished-up supplement cans by your locker.
+## Every transform mirrors the physics body each frame.
 
 var v: HubView
 var mode: HubMode
@@ -18,6 +19,7 @@ var gate_node: Node3D
 var tarp_node: Node3D
 var photos_node: Node3D
 var boiler_hatch: Node3D
+var catch_nodes := {}              ## fished cosmetic id -> Node3D (a can on the locker-room shelf)
 var _bucket_mesh: Mesh
 var _bucket_mat: Material
 
@@ -32,8 +34,8 @@ func build(view: HubView) -> void:
 		crate_nodes.append(_crate_visual())
 	for item_id in HubLayout.ITEMS:
 		item_nodes[item_id] = _item_visual(str(item_id))
-	panel_node = _box_node(Vector3(0.12, 2.0, 1.55), Color("#86614f"), HubMeshKit.BRICK)
-	panel_node.position = Vector3(HubLayout.PANEL_RECT.position.x + 0.15, 1.0, 4.9)
+	panel_node = _box_node(Vector3(0.12, 2.1, HubLayout.PANEL_RECT.size.y - 0.05), Color("#86614f"), HubMeshKit.BRICK)
+	panel_node.position = Vector3(HubLayout.PANEL_RECT.position.x + 0.15, 1.05, HubLayout.PANEL_RECT.get_center().y)
 	add_child(panel_node)
 	gate_node = _gate()
 	tarp_node = _tarp()
@@ -46,8 +48,51 @@ func build(view: HubView) -> void:
 	bm.height = 0.3
 	_bucket_mesh = bm
 	_bucket_mat = Materials.toon(Color("#b0b6ba"), 0.5, 0.3)
+	_catch_shelf()
 	refresh_world()
 	refresh_photos()
+
+
+## Your catches (secret #8's fishing): a shelf on the Locker Room's west wall, one can per variant.
+func _catch_shelf() -> void:
+	var shelf := _box_node(Vector3(0.26, 0.04, 1.3), Color("#6a5442"), HubMeshKit.PLANK)
+	shelf.name = "CatchShelf"
+	shelf.position = Vector3(-11.72, 1.3, 14.3)
+	add_child(shelf)
+	var label := Label3D.new()
+	label.text = "MY CATCH"
+	label.font = load("res://assets/fonts/BarlowCondensed-700.woff2")
+	label.font_size = 40
+	label.pixel_size = 0.004
+	label.modulate = Color("#e8b923")
+	label.position = Vector3(-11.83, 1.18, 14.3)
+	label.rotation = Vector3(0, PI * 0.5, 0)
+	add_child(label)
+	var ids: Array = HubSecrets.FISH_POOL
+	for i in ids.size():
+		var cid := str(ids[i])
+		var col := Color.from_string(str(HubContent.cosmetic(cid).get("color", "#b0b6ba")), Color("#b0b6ba"))
+		var can := Node3D.new()
+		can.name = "Catch_" + cid
+		var body := MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.top_radius = 0.045
+		cm.bottom_radius = 0.045
+		cm.height = 0.13
+		body.mesh = cm
+		body.material_override = Materials.toon(Color("#c9ced2"), 0.35, 0.6)
+		can.add_child(body)
+		var band := MeshInstance3D.new()
+		var bm2 := CylinderMesh.new()
+		bm2.top_radius = 0.047
+		bm2.bottom_radius = 0.047
+		bm2.height = 0.07
+		band.mesh = bm2
+		band.material_override = Materials.toon(col, 0.6, 0.0)
+		can.add_child(band)
+		can.position = Vector3(-11.7, 1.385, 13.75 + i * 0.22)
+		add_child(can)
+		catch_nodes[cid] = can
 
 
 func _box_node(size: Vector3, col: Color, pattern := HubMeshKit.PLAIN) -> Node3D:
@@ -202,6 +247,8 @@ func refresh_world() -> void:
 		var a_letter: MeshInstance3D = dress.sign_letters.get("A2")
 		if a_letter:
 			a_letter.set_instance_shader_parameter("lit", 1.0 if s.sign_fixed() else 0.0)
+	for cid in catch_nodes:
+		(catch_nodes[cid] as Node3D).visible = mode.state.has_cosmetic(str(cid))
 	var glass := v.get_node_or_null("BeltCaseGlass") as Node3D
 	if glass:
 		glass.position.y = 1.64 + (0.5 if mode.state.has_secret("sec_belt_case_combo") else 0.0)

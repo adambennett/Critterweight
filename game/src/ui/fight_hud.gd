@@ -178,7 +178,8 @@ func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dic
 		box.alignment = BoxContainer.ALIGNMENT_BEGIN
 	var team_col := TeamColors.color(f.team)
 	var head := HBoxContainer.new()
-	box.add_child(head)
+	# the profile owner's card wears the equipped profile frame (a Cannery cosmetic)
+	box.add_child(ProfileFrame.wrap(head, ProfileFrame.style(), 26) if f.index == _owner_index() else head)
 	var name_l := _label(f.display_name.to_upper(), 32 if big else 26, _font_heavy)
 	name_l.add_theme_color_override("font_color", team_col.lightened(0.3))
 	head.add_child(name_l)
@@ -214,6 +215,14 @@ func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dic
 	box.add_child(status)
 	return {"box": box, "hp": hp, "trail": trail, "hp_text": hp_text, "st": st, "hype": hype, "hype_l": hype_l,
 		"cd1": cd1, "cd2": cd2, "status": status, "lives": lives, "trail_v": 1.0, "big": big}
+
+
+## The first local player's fighter (the profile owner), -1 when none fights.
+func _owner_index() -> int:
+	for f in sim.fighters:
+		if f.controller_kind == "player":
+			return f.index
+	return -1
 
 
 func _process(dt: float) -> void:
