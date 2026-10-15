@@ -100,6 +100,10 @@ func reach_of(c: CreatureDef, slot: String, abilities := false) -> float:
 	var key := c.id + ":" + slot
 	if _reach_cache.has(key):
 		return _reach_cache[key]
+	var authored: Dictionary = c.ai.get("reach", {})   # NPC-kit extension: bodies whose strikes come from bending
+	if authored.has(slot):
+		_reach_cache[key] = float(authored[slot])
+		return _reach_cache[key]
 	var m: MoveDef = (c.abilities if abilities else c.moves).get(slot)
 	var r := 0.0
 	if m:
@@ -181,12 +185,12 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	to.y = 0.0
 	var dist := to.length()
 	var dir := to / maxf(dist, 0.01)
-	var my_reach := reach_of(c, "l1")
+	var my_reach := reach_of(c, "l1") + _npc_target_bulk(f, tgt)
 	var their_reach := reach_of(tgt.creature, "heavy") if tgt else 1.0
 	var mistake := rng.randf() < float(p["mistake"])
 	# ---- defence: react to a perceived windup ----
 	var per_state := int(per.get("state", Fighter.State.NEUTRAL))
-	var attacking := per_state == Fighter.State.ATTACK or per_state == Fighter.State.ABILITY
+	var attacking := (per_state == Fighter.State.ATTACK or per_state == Fighter.State.ABILITY) and not _npc_opening(per, tgt)
 	var winding := attacking and float(per.get("st", 0.0)) < float(per.get("first", 0.0))
 	if attacking and dist < their_reach + 0.6 and not mistake and f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD]:
 		var roll := rng.randf()
@@ -339,6 +343,16 @@ func _toward(from: Vector3, to: Vector3) -> Vector3:
 #   counter_slot    ability answering a perceived wind-up the generic defence did not answer,
 #                   with probability "counter_chance" (default 0.5) scaled by the tier's block
 #   ally_ko_flinch  seconds the unit freezes after an ally within 3 m is knocked out
+#   reach           {slot: metres} authored reach for slots whose strike comes from bending a
+#                   long body rather than lunging (read by reach_of before its geometric guess)
+#   rest            [min, max] seconds the unit waits after each of its own attacks/abilities
+#                   before it starts another (it only circles meanwhile): the breather after a big
+#                   boss move that keeps its rhythm readable and leaves the punish window
+#   bulky           true on a big body (bosses): bots fighting it measure their reach to its
+#                   nearest body part instead of its root (its head or shell is in reach long
+#                   before its root is), and treat the recovery of its long moves (after the last
+#                   hit window / effect) as the opening to punish instead of a threat to dodge.
+#                   Read from the TARGET's ai block; fights between ordinary bodies are unchanged.
 # Momentary buttons are released every tick (pressing alone used to leave Heavy held down for
 # good, turning every bot Heavy into a full charge); Heavy is held only for a deliberate charge.
 # =====================================================================================
@@ -352,6 +366,8 @@ var _charge_st := 0.0                ## its state_time when last seen (a drop = 
 var _charge_to := 0.0                ## charge level to hold it to (0 = a tap)
 var _flinch_until := -1.0
 var _ev_cursor := -1
+var _was_busy := false               ## attacking / using an ability last tick (for "rest")
+var _rest_until := -1.0
 
 
 ## Every tick, before anything else: releases momentary buttons, holds Heavy for deliberate
@@ -372,6 +388,11 @@ func _npc_pre_poll(f: Fighter) -> bool:
 			f.input.set_held(b, false)
 	if keep_heavy:
 		f.input.set_held(FighterInput.HEAVY, true)
+	var busy := f.state == Fighter.State.ATTACK or f.state == Fighter.State.ABILITY
+	var rest: Array = personality.get("rest", [])
+	if _was_busy and not busy and rest.size() >= 2:
+		_rest_until = _t + rng.randf_range(float(rest[0]), float(rest[1]))
+	_was_busy = busy
 	if _t < _flinch_until:
 		f.input.move = Vector3.ZERO
 		f.input.held = 0
@@ -408,6 +429,13 @@ func _npc_think(f: Fighter, sim: MatchSim, tgt: Fighter, dist: float, dir: Vecto
 			f.input.press(_ability_button(cslot))
 			_move = Vector3.ZERO
 			return true
+	if _t < _rest_until and f.state == Fighter.State.NEUTRAL:
+		if _t >= _strafe_until:
+			_strafe = -1.0 if rng.randf() < 0.5 else 1.0
+			_strafe_until = _t + rng.randf_range(0.6, 1.6)
+		var circle := dir.cross(Vector3.UP) * _strafe * 0.45
+		_move = (circle + dir * 0.5).normalized() * 0.6 if dist > my_reach + 1.0 else circle
+		return true
 	var space: Dictionary = personality.get("ability_space", {})
 	for slot in space:
 		var s := str(slot)
@@ -426,6 +454,39 @@ func _npc_think(f: Fighter, sim: MatchSim, tgt: Fighter, dist: float, dir: Vecto
 		_pack_hold(f, dist, dir, attacking, their_reach)
 		return true
 	return false
+
+
+## How much closer than its root a "bulky" target's body is to this unit (metres, less a 0.25 m
+## allowance for segment thickness), added to the unit's reach. 0 for ordinary bodies.
+func _npc_target_bulk(f: Fighter, tgt: Fighter) -> float:
+	if tgt == null or tgt.rig == null or not bool(tgt.creature.ai.get("bulky", false)):
+		return 0.0
+	var me := Vector3(f.pos().x, 0.0, f.pos().z)
+	var root_d := me.distance_to(Vector3(tgt.pos().x, 0.0, tgt.pos().z))
+	var nearest := root_d
+	for b in tgt.rig.bodies:
+		var bp: Vector3 = b.global_position
+		nearest = minf(nearest, me.distance_to(Vector3(bp.x, 0.0, bp.z)))
+	return maxf(0.0, root_d - nearest - 0.25)
+
+
+## True when a bulky target's perceived move is past its last threat (hit windows, lunges and
+## timed effects, landing included, + 0.1 s): its recovery is an opening, not a threat.
+func _npc_opening(per: Dictionary, tgt: Fighter) -> bool:
+	if tgt == null or not bool(tgt.creature.ai.get("bulky", false)):
+		return false
+	var slot := str(per.get("slot", ""))
+	var m: MoveDef = tgt.creature.moves.get(slot, tgt.creature.abilities.get(slot))
+	if m == null:
+		return false
+	var last := 0.0
+	for w in m.windows:
+		last = maxf(last, float(w["t1"]))
+	for l in m.lunges:
+		last = maxf(last, float(l[1]))
+	for e in m.effects:
+		last = maxf(last, float(e.get("t", 0.0)) + float(e.get("time", 0.0)) + float(e.get("delay", 0.0)))
+	return float(per.get("st", 0.0)) > last + 0.1
 
 
 func _ability_button(slot: String) -> int:

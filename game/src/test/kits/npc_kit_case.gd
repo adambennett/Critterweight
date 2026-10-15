@@ -259,8 +259,11 @@ static func balance_requested() -> bool:
 ## `parallel` at a time, each until a KO or the round timer (decision on health). Returns
 ## {a_wins, b_wins, draws, bouts, a_hits, b_hits, a_dmg, b_dmg, kos, avg_time} where hits and
 ## damage are totals of clean landed hits/damage per side.
-func bouts(a_id: String, b_id: String, tier_a: String, tier_b: String, count: int, round_time := 90.0, gap := 3.0, parallel := 4, seed_base := 100, radius := 5.0) -> Dictionary:
-	var res := {"a_wins": 0, "b_wins": 0, "draws": 0, "bouts": 0, "a_hits": 0, "b_hits": 0, "a_dmg": 0.0, "b_dmg": 0.0, "kos": 0, "time": 0.0}
+## `a_hp_vs_b` > 0 sets A's health to that multiple of B's (ENEMIES_BOSSES.md: a boss filling a
+## bot slot outside the campaign has 2x the highest fighter HP and no phases).
+func bouts(a_id: String, b_id: String, tier_a: String, tier_b: String, count: int, round_time := 90.0, gap := 3.0, parallel := 4, seed_base := 100, radius := 5.0, a_hp_vs_b := 0.0) -> Dictionary:
+	var res := {"a_wins": 0, "b_wins": 0, "draws": 0, "bouts": 0, "a_hits": 0, "b_hits": 0, "a_dmg": 0.0, "b_dmg": 0.0, "kos": 0, "time": 0.0,
+		"a_hp": 0.0, "b_hp": 0.0}
 	var started := 0
 	var live: Array = []
 	var dt := 1.0 / Engine.physics_ticks_per_second
@@ -274,6 +277,9 @@ func bouts(a_id: String, b_id: String, tier_a: String, tier_b: String, count: in
 			var bb := BotBrain.new(tier_b, seed_value * 31 + 2)
 			bb.set_personality(cb.ai)
 			var sim := duel(ca, cb, gap, ba, bb, radius, {"round_time": round_time}, seed_value)
+			if a_hp_vs_b > 0.0:
+				sim.fighters[0].max_health = sim.fighters[1].max_health * a_hp_vs_b
+				sim.fighters[0].health = sim.fighters[0].max_health
 			live.append({"sim": sim, "cursor": 0})
 			started += 1
 		for entry in live:
@@ -288,6 +294,10 @@ func bouts(a_id: String, b_id: String, tier_a: String, tier_b: String, count: in
 					var side := "a" if int(ev["fighter"]) == 0 else "b"
 					res[side + "_hits"] = int(res[side + "_hits"]) + 1
 					res[side + "_dmg"] = float(res[side + "_dmg"]) + float(ev["damage"])
+					var per_slot: Dictionary = res.get(side + "_slots", {})
+					var sk := str(ev.get("slot", "?"))
+					per_slot[sk] = float(per_slot.get(sk, 0.0)) + float(ev["damage"])
+					res[side + "_slots"] = per_slot
 				elif str(ev["type"]) == "ko":
 					res["kos"] = int(res["kos"]) + 1
 			if sim.is_finished or sim.time > round_time + 8.0:
@@ -300,6 +310,8 @@ func bouts(a_id: String, b_id: String, tier_a: String, tier_b: String, count: in
 					res["draws"] = int(res["draws"]) + 1
 				res["bouts"] = int(res["bouts"]) + 1
 				res["time"] = float(res["time"]) + sim.time
+				res["a_hp"] = float(res["a_hp"]) + sim.fighters[0].health_frac()
+				res["b_hp"] = float(res["b_hp"]) + sim.fighters[1].health_frac()
 				live.erase(entry)
 				sim.get_parent().queue_free()
 	return res
@@ -314,8 +326,8 @@ static func _leader(sim: MatchSim) -> int:
 ## One formatted line of a bouts() result.
 static func bout_line(label: String, r: Dictionary) -> String:
 	var n := maxi(1, int(r["bouts"]))
-	return "%-44s A %2d / B %2d / draw %d  (A %3.0f%%)  hits/bout A %.1f B %.1f  dmg/hit A %.1f B %.1f  KOs %d  avg %.0f s" % [
+	return "%-44s A %2d / B %2d / draw %d  (A %3.0f%%)  hits/bout A %.1f B %.1f  dmg/hit A %.1f B %.1f  end HP A %.0f%% B %.0f%%  KOs %d  avg %.0f s" % [
 		label, int(r["a_wins"]), int(r["b_wins"]), int(r["draws"]), 100.0 * float(r["a_wins"]) / n,
 		float(r["a_hits"]) / n, float(r["b_hits"]) / n,
 		float(r["a_dmg"]) / maxf(1.0, float(r["a_hits"])), float(r["b_dmg"]) / maxf(1.0, float(r["b_hits"])),
-		int(r["kos"]), float(r["time"]) / n]
+		100.0 * float(r.get("a_hp", 0.0)) / n, 100.0 * float(r.get("b_hp", 0.0)) / n, int(r["kos"]), float(r["time"]) / n]
