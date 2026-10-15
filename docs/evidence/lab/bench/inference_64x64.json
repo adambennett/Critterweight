@@ -7,11 +7,11 @@
     64,
     64
   ],
-  "max_decision_us": 394,
-  "mean_decision_us": 166.201232032854,
-  "mean_encode_us": 81.1067761806981,
-  "mean_forward_us": 72.1519507186858,
+  "max_decision_us": 2176,
+  "mean_decision_us": 335.067761806982,
+  "mean_encode_us": 164.359342915811,
+  "mean_forward_us": 145.544147843943,
   "params": 13141,
-  "per_tick_us_8_fighters": 168.625,
+  "per_tick_us_8_fighters": 339.954166666667,
   "ticks": 480
 }

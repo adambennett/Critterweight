@@ -1,0 +1,7 @@
+2026-10-15 10:32:50 r0 run eval_es_drill: eval, creature dev_biped, 3 worker process(es) x 2 world(s)
+2026-10-15 10:32:50 r0 helper rank 1 started (pid 61512)
+2026-10-15 10:32:50 r0 helper rank 2 started (pid 51960)
+2026-10-15 10:33:29 r0 evaluation: n=30 reward 51.28 ± 18.81 (95% CI 44.25..58.30) win 100% [89–100%]
+2026-10-15 10:33:29 r0 policy − random_init, paired difference +36.99 (95% CI 29.94..44.05, t = 10.72, n = 30 episodes) — significant
+2026-10-15 10:33:29 r0 policy − jabber, paired difference +1.01 (95% CI -6.03..8.05, t = 0.29, n = 30 episodes) — not significant
+2026-10-15 10:33:29 r0 finished: completed — evaluated: n=30 reward 51.28 ± 18.81 (95% CI 44.25..58.30) win 100% [89–100%]

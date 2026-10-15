@@ -1,0 +1,53 @@
+{
+  "note": "inference bench (8 policy fighters, 32x32 network) alternating between the build before this branch (base, commit 5566e61) and this branch (new) on the same shared PC, 2026-10-15 10:40; machine load from other jobs varied 40-100 percent",
+  "runs": [
+    {
+      "build": "base",
+      "run": 1,
+      "per_tick_us_8_fighters": 186.7,
+      "mean_encode_us": 111.6,
+      "mean_forward_us": 55.3,
+      "machine_load_pct_at_start": 67
+    },
+    {
+      "build": "new",
+      "run": 1,
+      "per_tick_us_8_fighters": 213.0,
+      "mean_encode_us": 126.9,
+      "mean_forward_us": 63.8,
+      "machine_load_pct_at_start": 40
+    },
+    {
+      "build": "base",
+      "run": 2,
+      "per_tick_us_8_fighters": 229.7,
+      "mean_encode_us": 138.5,
+      "mean_forward_us": 66.6,
+      "machine_load_pct_at_start": 62
+    },
+    {
+      "build": "new",
+      "run": 2,
+      "per_tick_us_8_fighters": 279.0,
+      "mean_encode_us": 169.4,
+      "mean_forward_us": 80.0,
+      "machine_load_pct_at_start": 82
+    },
+    {
+      "build": "base",
+      "run": 3,
+      "per_tick_us_8_fighters": 302.1,
+      "mean_encode_us": 183.5,
+      "mean_forward_us": 85.1,
+      "machine_load_pct_at_start": 97
+    },
+    {
+      "build": "new",
+      "run": 3,
+      "per_tick_us_8_fighters": 307.9,
+      "mean_encode_us": 201.3,
+      "mean_forward_us": 77.9,
+      "machine_load_pct_at_start": 100
+    }
+  ]
+}

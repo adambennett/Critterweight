@@ -1,0 +1,1 @@
+2026-10-15 10:09:32 r1 helper rank 1 ready (coordinator pid 8992)

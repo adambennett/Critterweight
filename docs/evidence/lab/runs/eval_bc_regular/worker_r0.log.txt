@@ -1,0 +1,7 @@
+2026-10-15 10:33:36 r0 run eval_bc_regular: eval, creature dev_biped, 3 worker process(es) x 2 world(s)
+2026-10-15 10:33:36 r0 helper rank 1 started (pid 62056)
+2026-10-15 10:33:36 r0 helper rank 2 started (pid 19668)
+2026-10-15 10:34:53 r0 evaluation: n=30 reward 78.85 ± 28.54 (95% CI 68.20..89.51) win 83% [66–93%]
+2026-10-15 10:34:53 r0 policy − random_init, paired difference +6.98 (95% CI -8.37..22.33, t = 0.93, n = 30 episodes) — not significant
+2026-10-15 10:34:53 r0 policy − bot_regular, paired difference +13.17 (95% CI -0.49..26.83, t = 1.97, n = 30 episodes) — not significant
+2026-10-15 10:34:53 r0 finished: completed — evaluated: n=30 reward 78.85 ± 28.54 (95% CI 68.20..89.51) win 83% [66–93%]
