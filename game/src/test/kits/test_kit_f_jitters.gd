@@ -191,10 +191,13 @@ func test_suction_hug_zaps_and_throws() -> void:
 		sim2.queue_free()
 
 
-## Slippery: grabs on Jitters hold 30% shorter (1.4 s); knockdown recovery is 30% faster.
+## Slippery: grabs on Jitters hold 30% shorter (1.4 s); knockdown recovery is 30% faster (kit trait
+## stats held_time 0.7 / getup_speed 1.3).
 func test_slippery_hold_and_quick_getup() -> void:
 	var plain_entry: Dictionary = Content.creature_entry(ID).duplicate(true)
-	plain_entry.erase("mods")
+	var pst: Dictionary = plain_entry["stats"]
+	pst["getup_speed"] = 1.0
+	pst["held_time"] = 1.0
 	var plain := CreatureDef.from_dict(plain_entry)
 	check(plain.is_valid(), "plain Jitters copy invalid")
 	var holds := {}
@@ -304,6 +307,44 @@ func test_spring_pad_launches() -> void:
 		check(not starts.is_empty(), "pad Heavy variant not used (%s)" % str(events(st2, "move_start")))
 		check(f.stamina >= st_before - 0.01, "the pad Squash cost stamina (%.1f -> %.1f)" % [st_before, f.stamina])
 	sim2.queue_free()
+
+
+## Jitters springs off its own pad toward a dummy `gap` m away and presses Heavy `delay` s into the
+## flight (the free pad Squash); returns the run summary from the press on ({} if it never launched).
+func _pad_squash(c: CreatureDef, gap: float, delay: float) -> Dictionary:
+	var steps := [press(T, "ability2"), stick(T + 0.5, T + 1.4, "toward")]
+	var sim := duel(c, "dev_biped", gap, steps, [], [], [], 8.0)
+	var f := sim.fighters[0]
+	var launched_at := -1.0
+	var dt := 1.0 / Engine.physics_ticks_per_second
+	var cursor := 0
+	if not Engine.is_in_physics_frame():
+		await get_tree().physics_frame
+	for i in int(2.4 / dt):
+		sim.step(dt)
+		await get_tree().physics_frame
+		for ev in sim.events_since(cursor):
+			cursor = int(ev["seq"])
+			if str(ev["type"]) == "spring" and int(ev["fighter"]) == 0 and launched_at < 0.0:
+				launched_at = sim.time
+		if launched_at > 0.0 and sim.time >= launched_at + delay:
+			break
+	var st := {}
+	if check(launched_at > 0.0, "Jitters never stepped onto its own pad"):
+		f.input.press(FighterInput.HEAVY)
+		st = await run(sim, 2.4)
+		check(not events(st, "move_start", "slot", "heavy@pad_launched").is_empty(), "pad Squash variant not used")
+		check_sane(st, f, "pad Squash")
+	sim.queue_free()
+	return st
+
+
+## The pad Squash keeps its slam live until the (late, high) landing, so it crushes a target at the
+## bottom of the arc instead of only catching it with the landing circle.
+func test_pad_squash_slam_connects() -> void:
+	var st := await _pad_squash(creature(ID), 5.0, 0.45)
+	if not st.is_empty():
+		check(not hits(st, 0, "heavy@pad_launched", 1).is_empty(), "pad Squash slam never connected (%s)" % _hit_summary(st))
 
 
 ## Overcharge: armored activation, burst, 8 s of: Light-stagger immunity, landing pulses, chain arcs
@@ -428,3 +469,93 @@ func test_bot_pest_uses_kit() -> void:
 	check(not abilities.is_empty(), "the Jitters bot never used an ability")
 	check(hits(st, 0, "", 1).size() >= 3, "the Jitters bot landed fewer than 3 hits in 12 s")
 	sim.queue_free()
+
+
+func _effect_of(m: MoveDef, type: String) -> Dictionary:
+	for e in m.effects:
+		if str(e.get("type", "")) == type:
+			return e
+	return {}
+
+
+## Campaign techniques (content/core/techniques/jitters.json, ROSTER §6) are patches and hooks on
+## this kit: every patch lands on a real field and each technique delivers its effect.
+func test_campaign_techniques_deliver() -> void:
+	var tk := {}
+	for tid in ["tech_jitters_capacitor", "tech_jitters_bouncy_castle", "tech_jitters_chain_reaction", "tech_jitters_rubber_core",
+			"tech_jitters_head_hunter", "tech_jitters_short_fuse"]:
+		var r := technique_kit(ID, tid)
+		tk[tid] = r
+		var tc: CreatureDef = r["creature"]
+		check(tc.errors.is_empty(), "%s: patched kit does not parse: %s" % [tid, str(tc.errors)])
+		check(not (r["hits"] as Array).has(0), "%s: a patch missed the kit (targets per patch %s)" % [tid, str(r["hits"])])
+	# Capacitor: Overcharge 8 -> 10 s, Hype gain +20%
+	var cap: CreatureDef = tk["tech_jitters_capacitor"]["creature"]
+	check_near(float(cap.juice.get("duration", 0.0)), 10.0, 0.01, "Capacitor JUICE duration")
+	check_near(float(_effect_of(cap.abilities["juice"], "juice_state").get("duration", 0.0)), 10.0, 0.01, "Capacitor Overcharge state")
+	check_near(float(tk["tech_jitters_capacitor"]["mods"].get("hype_gain", 1.0)), 1.2, 0.001, "Capacitor Hype gain")
+	# Bouncy Castle: 3 pads, 5 s cooldown
+	var bc: CreatureDef = tk["tech_jitters_bouncy_castle"]["creature"]
+	check_near(float(bc.cooldowns.get("ability2", 0.0)), 5.0, 0.01, "Bouncy Castle cooldown")
+	var sim := duel(bc, "dev_biped", 6.0, [], [], [], [], 8.0)
+	await run(sim, 0.3)
+	for i in 4:
+		sim.effects.fire(sim.fighters[0], _effect_of(bc.abilities["ability2"], "prop"), null)
+	var pads := sim.effects.entities.filter(func(x): return x["kind"] == "prop" and str(x["prop"]) == "spring_pad" and int(x["owner"]) == 0)
+	check_eq(pads.size(), 3, "Bouncy Castle pads active")
+	sim.queue_free()
+	# Chain Reaction: Slapping a Jolted enemy leaks Static to another enemy within 1.5 m (none without it)
+	var leaked := {}
+	for which in ["base", "chain"]:
+		var cc: CreatureDef = creature(ID) if which == "base" else technique_kit(ID, "tech_jitters_chain_reaction")["creature"]
+		var sim2 := duel(cc, "dev_biped", 0.8, [press(T + 0.3, "light")], [], [[0, -0.4, 0], [0, 0.4, 180], [1.0, -0.5, 0]], ["dev_biped"])
+		await run(sim2, 0.3)
+		sim2.fighters[1].statuses.add_buildup("static", 100.0, sim2.fighters[0])
+		check(sim2.fighters[1].statuses.has("jolted"), "pre-Jolt failed")
+		var st2 := await run(sim2, 1.0)
+		check(not hits(st2, 0, "l1", 1).is_empty(), "%s: Slap missed the Jolted enemy" % which)
+		check(hits(st2, 0, "l1", 2).is_empty(), "%s: the Slap itself reached the bystander (test setup)" % which)
+		leaked[which] = float(sim2.fighters[2].statuses.buildup.get("static", 0.0)) + (100.0 if sim2.fighters[2].statuses.has("jolted") else 0.0)
+		sim2.queue_free()
+	check(float(leaked["base"]) < 0.01 and float(leaked["chain"]) > 4.0, "Chain Reaction leak: base %.1f, technique %.1f" % [float(leaked["base"]), float(leaked["chain"])])
+	# Rubber Core: poise 60, and the run's get-up x1.5 stacks with the kit's own x1.3
+	var rc: Dictionary = tk["tech_jitters_rubber_core"]
+	check_near((rc["creature"] as CreatureDef).stat("poise"), 60.0, 0.01, "Rubber Core poise")
+	var sim3 := duel(rc["creature"], "dev_biped", 3.0, [])
+	with_mods(sim3.fighters[0], rc["mods"])
+	check_near(sim3.fighters[0].getup_speed_mult(), 1.3 * 1.5, 0.001, "Rubber Core get-up speed")
+	sim3.queue_free()
+	# Head Hunter: both Squash variants leap 0.5 m higher to a 2.5 m target point, the slam window and
+	# recovery run on to the later landing, and head hits Bonk for +7 instead of +3
+	var hh: CreatureDef = tk["tech_jitters_head_hunter"]["creature"]
+	var plain := creature(ID)
+	for slot in ["heavy", "heavy@pad_launched"]:
+		var lp := _effect_of(hh.moves[slot], "leap")
+		var lp0 := _effect_of(plain.moves[slot], "leap")
+		check_near(float(lp["height"]), float(lp0["height"]) + 0.5, 0.001, "%s leap height" % slot)
+		check_near(float(lp["distance"]), 2.5, 0.001, "%s leap target point" % slot)
+		check_near(hh.moves[slot].duration, plain.moves[slot].duration + 0.24, 0.001, "%s duration" % slot)
+	var bonk := {}
+	for which in ["base", "hunter"]:
+		var sim4 := duel(plain if which == "base" else hh, "f_slurry", 2.0, [press(T, "heavy")])
+		var st4 := await run(sim4, 2.6, "heavy")
+		var hs := hits(st4, 0, "heavy", 1)
+		if check(not hs.is_empty() and str(hs[0]["part"]) == "head", "%s Squash vs Slurry: no head hit (%s)" % [which, _hit_summary(st4)]):
+			bonk[which] = float(hs[0]["damage"])
+		check_sane(st4, sim4.fighters[0], "%s Squash" % which)
+		sim4.queue_free()
+	if bonk.size() == 2:
+		check(float(bonk["hunter"]) >= float(bonk["base"]) + 4.0, "Head Hunter Bonk %.1f vs %.1f" % [float(bonk["hunter"]), float(bonk["base"])])
+	var sim5 := duel(hh, "f_jitters", 2.2, [press(T, "heavy")])
+	var st5 := await run(sim5, 2.6, "heavy")
+	check(not hits(st5, 0, "heavy", 1).is_empty(), "Head Hunter Squash whiffed a target 2.2 m away (%s)" % _hit_summary(st5))
+	check_sane(st5, sim5.fighters[0], "Head Hunter Squash")
+	sim5.queue_free()
+	var st6 := await _pad_squash(hh, 5.0, 0.45)
+	if not st6.is_empty():
+		check(not hits(st6, 0, "heavy@pad_launched", 1).is_empty(), "Head Hunter pad Squash slam never connected (%s)" % _hit_summary(st6))
+	# Short Fuse: Arc Lash homing 90 -> 180 deg/s and 2 charges; stamina regen -20%
+	var sf: CreatureDef = tk["tech_jitters_short_fuse"]["creature"]
+	check_near(float(_effect_of(sf.abilities["ability1"], "projectile")["homing_deg"]), 180.0, 0.01, "Short Fuse homing")
+	check_eq(int(sf.ability_charges.get("ability1", 0)), 2, "Short Fuse charges")
+	check_near(float(tk["tech_jitters_short_fuse"]["mods"].get("stamina_regen", 1.0)), 0.8, 0.001, "Short Fuse stamina regen")

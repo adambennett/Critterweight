@@ -1,7 +1,8 @@
 extends "res://src/test/kits/kit_sj_helpers.gd"
 ## Unit tests for the small generic engine extensions added for the Slurry / Jitters kits (all
 ## data-driven, none keyed to a fighter id): hooks "emerge" event (with main's cooldown action, the
-## Drain Dive refund) and the "hit_part" condition the Bonk relies on; creature "mods";
+## Drain Dive refund) and the "hit_part" condition the Bonk relies on; kit trait stats
+## getup_speed / held_time (stacking with run mods);
 ## Fighter.is_airborne(); charge bounce; debuff.require_status; projectile burst_on_hit and lob
 ## arrive_y; spring pads ignore airborne fighters; keyed joints skip the gait wave; "ballistic"
 ## leaps / launches are not ground-braked; the extra bot kit hints (range_needs_tools, ability
@@ -10,12 +11,6 @@ extends "res://src/test/kits/kit_sj_helpers.gd"
 
 func _pair(a = "dev_biped", b = "dev_biped", gap := 2.0) -> MatchSim:
 	return duel(a, b, gap, [], [], [], [], 7.0)
-
-
-func _creature_with(base_id: String, extra: Dictionary) -> CreatureDef:
-	var d: Dictionary = Content.creature_entry(base_id).duplicate(true)
-	d.merge(extra, true)
-	return CreatureDef.from_dict(d)
 
 
 func test_hook_emerge_event() -> void:
@@ -50,18 +45,30 @@ func test_hook_hit_part_condition() -> void:
 	sim.queue_free()
 
 
-func test_creature_mods() -> void:
-	var c := _creature_with("dev_biped", {"mods": {"getup_speed": 1.3, "held_time_mult": 0.7, "no_juice": true}})
-	check(c.is_valid(), "mods rejected: %s" % str(c.errors))
-	check_eq(float(c.mods["getup_speed"]), 1.3, "parsed mod")
-	var bad := _creature_with("dev_biped", {"mods": {"getup_speed": [1, 2]}})
-	check(not bad.errors.is_empty(), "array mod accepted")
+## Kit trait stats getup_speed / held_time parse like any stat and multiply with the run/rules
+## mods of the same name. A campaign spawn entry REPLACES Fighter.mods values, so a technique such
+## as Rubber Core (getup_speed x1.5) must stack with the kit's own trait instead of overwriting it.
+func test_kit_trait_stats() -> void:
+	var d: Dictionary = Content.creature_entry("dev_biped").duplicate(true)
+	var stt: Dictionary = d.get("stats", {})
+	stt["getup_speed"] = 1.3
+	stt["held_time"] = 0.7
+	d["stats"] = stt
+	var c := CreatureDef.from_dict(d)
+	check(c.is_valid(), "trait stats rejected: %s" % str(c.errors))
+	check_near(c.stat("getup_speed"), 1.3, 1e-6, "parsed getup_speed")
+	var plain := Content.creature("dev_biped")
+	check_near(plain.stat("getup_speed"), 1.0, 1e-6, "default getup_speed")
+	check_near(plain.stat("held_time"), 1.0, 1e-6, "default held_time")
 	var sim := duel(c, "dev_biped", 2.0, [])
 	var f := sim.fighters[0]
-	check_near(float(f.mods["getup_speed"]), 1.3, 1e-6, "getup_speed applied")
-	check_near(float(f.mods["held_time_mult"]), 0.7, 1e-6, "held_time_mult applied")
-	check_eq(bool(f.mods["no_juice"]), true, "flag mod applied")
-	check_near(float(f.mods["damage"]), 1.0, 1e-6, "untouched default")
+	check_near(f.getup_speed_mult(), 1.3, 1e-6, "kit get-up trait")
+	check_near(f.held_time_mult(), 0.7, 1e-6, "kit hold trait")
+	f.mods["getup_speed"] = 1.5          # what a campaign spawn entry writes for Rubber Core
+	f.mods["held_time_mult"] = 1.2
+	check_near(f.getup_speed_mult(), 1.95, 1e-6, "get-up trait stacks with a run mod")
+	check_near(f.held_time_mult(), 0.84, 1e-6, "hold trait stacks with a run mod")
+	check_near(sim.fighters[1].getup_speed_mult(), 1.0, 1e-6, "plain fighter unchanged")
 	sim.queue_free()
 
 

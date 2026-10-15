@@ -127,7 +127,6 @@ func setup(c: CreatureDef, idx: int, team_id: int, match_sim, pos: Vector3, yaw:
 	hooks = Hooks.new(self)
 	for h in c.passives:
 		hooks.add(h, "kit")
-	_apply_kit_mods(c)
 	_seg_stagger.resize(c.body.segments.size())
 	_seg_stagger.fill(0.0)
 	reset_vitals()
@@ -859,14 +858,14 @@ func knock_down(reason := "hit", by: Fighter = null) -> void:
 func _st_knockdown(_dt: float) -> void:
 	rig.desired_vel = Vector3.ZERO
 	motor.tuck = true
-	if state_time > Tuning.v("knockdown_min") / float(mods.get("getup_speed", 1.0)) and rig.root().linear_velocity.length() < 1.5:
+	if state_time > Tuning.v("knockdown_min") / getup_speed_mult() and rig.root().linear_velocity.length() < 1.5:
 		_set_state(State.DOWN)
 
 
 func _st_down(_dt: float) -> void:
 	rig.desired_vel = Vector3.ZERO
 	var wants := input.move.length() > 0.5 or not _buffer.is_empty()
-	if (state_time > 0.15 and wants) or state_time > Tuning.v("knockdown_auto_getup") / float(mods.get("getup_speed", 1.0)):
+	if (state_time > 0.15 and wants) or state_time > Tuning.v("knockdown_auto_getup") / getup_speed_mult():
 		_buffer.clear()
 		_set_state(State.GETUP)
 		rig.hover_enabled = true
@@ -876,7 +875,7 @@ func _st_down(_dt: float) -> void:
 
 
 func _st_getup(dt: float) -> void:
-	var gt := Tuning.v("getup_time") / float(mods.get("getup_speed", 1.0))
+	var gt := Tuning.v("getup_time") / getup_speed_mult()
 	var k := MathX.smooth01(state_time / gt)
 	rig.muscle = lerpf(Tuning.v("knockdown_muscle"), 1.0, k)
 	rig.upright_strength = k
@@ -1205,7 +1204,7 @@ func begin_grab(victim: Fighter, my_seg: int, victim_seg: int) -> void:
 		return
 	holding = victim
 	victim.held_by = self
-	_hold_left = Tuning.v("grab_hold_max") * float(victim.mods.get("held_time_mult", 1.0)) + float(mods.get("grab_hold_add", 0.0))
+	_hold_left = Tuning.v("grab_hold_max") * victim.held_time_mult() + float(mods.get("grab_hold_add", 0.0))
 	victim._escape_presses = 0
 	_pummels = 0
 	_interrupt_move()
@@ -1616,7 +1615,8 @@ func _hover_tick() -> bool:
 # =====================================================================================
 # Kit extensions (data-driven, generic; added with the Slurry/Jitters kits)
 #  * is_airborne(): true during a ballistic leap / launch (spring pads ignore airborne fighters).
-#  * creature "mods": base Fighter.mods (e.g. getup_speed, held_time_mult) applied at setup.
+#  * kit trait stats "getup_speed" / "held_time" (CreatureDef.stats) multiplied with the run/rules
+#    mods of the same name, so a campaign bonus stacks with the kit trait instead of replacing it.
 #  * charge effects take "bounce" (n) / "bounce_distance" (m): a wall contact turns the charge
 #    toward the target (or reflects it off the fence) for another leg instead of ending it.
 # =====================================================================================
@@ -1626,15 +1626,16 @@ func is_airborne() -> bool:
 	return _airborne
 
 
-## Creature-level base modifiers ("mods" in the creature JSON, Fighter.mods keys such as
-## getup_speed or held_time_mult): numbers multiply into the defaults, flags/strings replace.
-func _apply_kit_mods(c: CreatureDef) -> void:
-	for k in c.mods:
-		var v = c.mods[k]
-		if typeof(v) == TYPE_BOOL or typeof(v) == TYPE_STRING:
-			mods[k] = v
-		else:
-			mods[k] = float(mods.get(k, 1.0)) * float(v)
+## Knockdown recovery speed: the kit's "getup_speed" stat x the "getup_speed" mod (techniques,
+## supplements, rules). Spawn entries replace Fighter.mods values, so the kit trait lives in the
+## stats and the two layers multiply here.
+func getup_speed_mult() -> float:
+	return maxf(0.05, creature.stat("getup_speed") * float(mods.get("getup_speed", 1.0)))
+
+
+## How long grabs can hold this fighter: the kit's "held_time" stat x the "held_time_mult" mod.
+func held_time_mult() -> float:
+	return maxf(0.05, creature.stat("held_time") * float(mods.get("held_time_mult", 1.0)))
 
 
 ## Charge option "bounce": n rebounds off walls. On contact the charge turns toward the target

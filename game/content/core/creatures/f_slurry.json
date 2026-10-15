@@ -365,7 +365,7 @@
     {"t": 0.45, "type": "juice_state", "duration": 6.0, "hooks": [
      {"on": "move_start", "if": {"move_class": "light"}, "do": [{"type": "projectile", "id": "overflow_spit", "from": "fang", "aim": "target", "speed": 14, "life": 0.26, "radius": 0.12,
       "damage": 3, "knockback": 1.5, "stun": 0.15, "poise": 4, "element": "sludge", "buildup": 10, "class": "light", "vfx": "spit"}]},
-     {"on": "tick", "every": 0.5, "if": {"in_zone": "sludge"}, "do": [{"type": "heal", "amount": 1.0}]},
+     {"id": "slurry_overflow_heal", "on": "tick", "every": 0.5, "if": {"in_zone": "sludge"}, "do": [{"type": "heal", "amount": 1.0}]},
      {"on": "tick", "every": 0.5, "do": [{"type": "debuff", "radius": 40.0, "require_status": "sludge",
       "status": {"id": "overflow_gunk", "name": "Overflowing", "duration": 0.6, "dps": 1.5, "tick": 0.5}}]}
     ]}
@@ -373,7 +373,7 @@
  },
  "juice": {"duration": 6.0},
  "passives": [
-  {"id": "drain_refund", "on": "emerge", "if": {"in_zone": "sludge"}, "do": [{"type": "cooldown", "slot": "ability2", "add": -3.0}]}
+  {"id": "slurry_dive_refund", "on": "emerge", "if": {"in_zone": "sludge"}, "do": [{"type": "cooldown", "slot": "ability2", "add": -3.0}]}
  ],
  "audio": {},
  "ai": {"personality": "trapper", "aggression": -0.12, "block": 0.08, "dodge": 0.04, "ability": 0.3, "grab": -0.04,

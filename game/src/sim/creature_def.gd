@@ -16,6 +16,9 @@ var stats := {
 	"stamina": 100.0, "stamina_regen": 12.0, "poise": 60.0, "poise_regen": 15.0,
 	"dodge_distance": 2.8, "dodge_time": 0.3, "power": 1.0, "defense": 1.0, "weight": 1.0,
 	"dodge_side_distance": 0.0,   ## > 0: dash length of a sideways dodge (crabs); see Fighter.dodge_distance_now
+	# kit traits (multipliers; run/rules mods of the same name multiply on top, see Fighter.getup_speed_mult)
+	"getup_speed": 1.0,           ## knockdown recovery speed (1.3 = 30% faster)
+	"held_time": 1.0,             ## how long grabs can hold this fighter (0.7 = 30% shorter)
 }
 var moves := {}                 ## slot -> MoveDef (plus any extra ids used by abilities)
 var abilities := {}             ## slot -> MoveDef (kind "ability") with cooldown
@@ -25,7 +28,6 @@ var light_string: Array = ["l1", "l2", "l3"]   ## Light presses walk this list (
 var ability_charges := {}       ## slot -> max charges (default 1)
 var passives: Array = []        ## always-on Hooks (kit traits, techniques)
 var throws := {}                ## throw_fwd / throw_side / throw_back -> {distance, damage, up, knockdown, buildup}
-var mods := {}                  ## kit base modifiers (Fighter.mods keys, e.g. getup_speed), applied at setup
 var art := {}                   ## model path, palette, gore piece
 var audio := {}                 ## voice/impact palette
 var ai := {}                    ## bot personality weights
@@ -99,15 +101,6 @@ static func from_dict(d: Dictionary, body_lookup: Callable = Callable(), src := 
 		for e in Hooks.validate(ph):
 			c.errors.append("%s: %s" % [c.id, e])
 	c.throws = d.get("throws", {})
-	var md2 = d.get("mods", {})
-	if typeof(md2) == TYPE_DICTIONARY:
-		for mk in md2:
-			if typeof(md2[mk]) in [TYPE_FLOAT, TYPE_INT, TYPE_BOOL, TYPE_STRING]:
-				c.mods[str(mk)] = md2[mk]
-			else:
-				c.errors.append("%s: mod '%s' must be a number, bool or string" % [c.id, mk])
-	else:
-		c.errors.append("%s: 'mods' must be an object" % c.id)
 	c.art = d.get("art", {})
 	c.audio = d.get("audio", {})
 	c.ai = d.get("ai", {})

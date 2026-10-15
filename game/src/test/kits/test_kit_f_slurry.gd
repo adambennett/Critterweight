@@ -395,3 +395,109 @@ func test_bot_trapper_uses_kit() -> void:
 	check(not events(st, "ability", "slot", "ability1").is_empty(), "the Slurry bot never lobbed")
 	check(not hits(st, 0, "sludge_lob", 1).is_empty() or not hits(st, 0, "", 1).is_empty(), "the Slurry bot never landed anything")
 	sim.queue_free()
+
+
+## Campaign techniques (content/core/techniques/slurry.json, ROSTER §5) are patches and hooks on
+## this kit: every patch lands on a real field and each technique delivers its effect.
+func test_campaign_techniques_deliver() -> void:
+	var base := creature(ID)
+	var tk := {}
+	for tid in ["tech_slurry_septic_bloom", "tech_slurry_lockjaw", "tech_slurry_blood_thinner", "tech_slurry_grease_trap",
+			"tech_slurry_double_dip", "tech_slurry_hardened_arteries"]:
+		var r := technique_kit(ID, tid)
+		tk[tid] = r
+		var tc: CreatureDef = r["creature"]
+		check(tc.errors.is_empty(), "%s: patched kit does not parse: %s" % [tid, str(tc.errors)])
+		check(not (r["hits"] as Array).has(0), "%s: a patch missed the kit (targets per patch %s)" % [tid, str(r["hits"])])
+	# Septic Bloom: every puddle 50% wider and +2 s (Rear & Crash puddle 1.3 m / 4 s -> 1.95 m / 6 s)
+	var sim := duel(ID, "dev_biped", 3.0, [])
+	with_mods(sim.fighters[0], tk["tech_slurry_septic_bloom"]["mods"])
+	await run(sim, 0.3)
+	for e in base.moves["heavy_charged"].effects:
+		if str(e.get("type", "")) == "zone":
+			sim.effects.fire(sim.fighters[0], e, null)
+	var zs := sim.effects.entities.filter(func(z): return z["kind"] == "zone" and int(z["owner"]) == 0)
+	if check(zs.size() == 1, "Septic Bloom: %d puddles" % zs.size()):
+		check_near(float(zs[0]["radius"]), 1.3 * 1.5, 0.01, "Septic Bloom puddle radius")
+		check_near(float(zs[0]["life"]), 4.0 + 2.0, 0.01, "Septic Bloom puddle duration")
+	sim.queue_free()
+	# Lockjaw: Fang Snap drags far harder (bite pull and delayed yank both x2.4) ...
+	var lj: CreatureDef = tk["tech_slurry_lockjaw"]["creature"]
+	var pulls := {}
+	for which in ["base", "lockjaw"]:
+		var c3: CreatureDef = creature(ID, ["l3"]) if which == "base" else technique_kit(ID, "tech_slurry_lockjaw")["creature"]
+		c3.light_string = ["l3"]
+		var sim3 := duel(c3, "dev_biped", 1.3, [press(T, "light")])
+		var st3 := await run(sim3, 1.6, "l3")
+		check(not hits(st3, 0, "l3", 1).is_empty(), "%s Fang Snap missed" % which)
+		pulls[which] = -kb_along(st3)
+		check_sane(st3, sim3.fighters[0], "%s Fang Snap" % which)
+		sim3.queue_free()
+	check(float(pulls["lockjaw"]) >= 0.6 and float(pulls["lockjaw"]) >= float(pulls["base"]) + 0.45,
+		"Lockjaw pull %.2f m (base %.2f m)" % [float(pulls["lockjaw"]), float(pulls["base"])])
+	# ... and Coil reaches ~0.2 m further (lunge x1.4): grabs where the base Coil whiffs
+	for gc in [["dev_biped", 1.55], ["f_jitters", 1.95]]:
+		for which in ["base", "lockjaw"]:
+			var sim4 := duel(base if which == "base" else lj, str(gc[0]), float(gc[1]), [press(T, "grab")])
+			var st4 := await run(sim4, 1.4)
+			var grabbed := not events(st4, "grab").is_empty()
+			check(grabbed == (which == "lockjaw"), "%s Coil vs %s at %.2f m: grabbed=%s" % [which, gc[0], float(gc[1]), str(grabbed)])
+			check_sane(st4, sim4.fighters[0], "%s Coil" % which)
+			sim4.queue_free()
+	# Blood Thinner: Gunking adds the extra bleed; blocked hits on Gunked targets let 35% through, not 25%
+	var blocked_dmg := {}
+	for which in ["base", "thinner"]:
+		var c5: CreatureDef = creature(ID, ["l1"]) if which == "base" else technique_kit(ID, "tech_slurry_blood_thinner")["creature"]
+		c5.light_string = ["l1"]
+		var sim5 := duel(c5, "dev_biped", 1.1, [press(T + 0.3, "light")], [hold(T - 0.3, T + 2.0, "guard")])
+		await run(sim5, 0.3)
+		sim5.fighters[1].statuses.add_buildup("sludge", 100.0, sim5.fighters[0])
+		check(sim5.fighters[1].statuses.has("gunked"), "pre-Gunk failed")
+		check(sim5.fighters[1].statuses.has("blood_thinner") == (which == "thinner"), "%s: Blood Thinner bleed present=%s" % [which, str(sim5.fighters[1].statuses.has("blood_thinner"))])
+		var st5 := await run(sim5, 1.4, "l1")
+		var bl: Array = hits(st5, 0, "l1", 1).filter(func(h): return bool(h["blocked"]))
+		if check(not bl.is_empty(), "%s: Head Butt was not blocked (%s)" % [which, _hit_summary(st5)]):
+			blocked_dmg[which] = float(bl[0]["damage"])
+		sim5.queue_free()
+	if blocked_dmg.size() == 2:
+		check_near(float(blocked_dmg["thinner"]) / maxf(0.01, float(blocked_dmg["base"])), 1.4, 0.03, "Blood Thinner chip through guard")
+	# Grease Trap: all three puddle sources Grease enemies (dodge -40%); Slurry glides in any Sludge zone
+	var gt: CreatureDef = tk["tech_slurry_grease_trap"]["creature"]
+	var greased := 0
+	var zone_specs: Array = [gt.abilities["ability1"].effects[0].get("on_expire", {})]
+	for e in gt.moves["heavy_charged"].effects + gt.abilities["juice"].effects:
+		if str(e.get("type", "")) == "zone":
+			zone_specs.append(e)
+	for z in zone_specs:
+		var zst: Dictionary = (z as Dictionary).get("status", {})
+		if str(zst.get("id", "")) == "grease_trap" and is_equal_approx(float(zst.get("dash", 1.0)), 0.6) and bool(z.get("owner_immune", false)):
+			greased += 1
+	check_eq(greased, 5, "Greased puddle sources (lob, Rear & Crash, 3x Overflow)")
+	var sim6 := duel(gt, "dev_biped", 1.6, [])
+	await run(sim6, 0.3)
+	for e in gt.moves["heavy_charged"].effects:
+		if str(e.get("type", "")) == "zone":
+			sim6.effects.fire(sim6.fighters[0], e, null)
+	sim6.effects.spawn_zone(null, {"kind": "sludge_puddle", "radius": 0.8, "duration": 3.0}, sim6.fighters[0].pos())
+	await run(sim6, 0.6)
+	check(sim6.fighters[1].statuses.has("grease_trap"), "the enemy in Slurry's puddle is not Greased")
+	check(not sim6.fighters[0].statuses.has("grease_trap"), "Slurry Greased by its own puddle")
+	check(sim6.fighters[0].statuses.has("grease_glide"), "Slurry does not glide in a Sludge zone")
+	sim6.queue_free()
+	# Double Dip: 3 lob charges; Drain Dive emerge 9 dmg in 1.6 m
+	var dd: CreatureDef = tk["tech_slurry_double_dip"]["creature"]
+	check_eq(int(dd.ability_charges.get("ability1", 0)), 3, "Double Dip lob charges")
+	var emerge: Dictionary = (dd.abilities["ability2"].effects[0]["on_emerge"] as Array)[0]
+	check_near(float(emerge["damage"]), 9.0, 0.01, "Double Dip emerge damage")
+	check_near(float(emerge["radius"]), 1.6, 0.01, "Double Dip emerge radius")
+	# Hardened Arteries: poise 80; the dive refund and the Overflow self-heal are gone
+	var ha: CreatureDef = tk["tech_slurry_hardened_arteries"]["creature"]
+	check_near(ha.stat("poise"), 80.0, 0.01, "Hardened Arteries poise")
+	check(ha.passives.filter(func(h): return str(h.get("id", "")) == "slurry_dive_refund").is_empty(), "dive refund still there")
+	var heal_hooks := 0
+	for e in ha.abilities["juice"].effects:
+		for h in e.get("hooks", []):
+			if str(h.get("id", "")) == "slurry_overflow_heal":
+				heal_hooks += 1
+	check_eq(heal_hooks, 0, "Overflow self-heal hooks left")
+	check(not base.passives.filter(func(h): return str(h.get("id", "")) == "slurry_dive_refund").is_empty(), "base kit lost its tagged dive refund")

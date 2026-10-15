@@ -22,6 +22,34 @@ func creature(id: String, light_string: Array = []) -> CreatureDef:
 	return c
 
 
+## A kit with one campaign technique applied the way BuildApplier.compose applies it: patches on
+## the creature JSON, hooks appended to the passives. Returns {creature, mods, hits}: mods are the
+## run modifiers a campaign spawn entry writes into Fighter.mods (see with_mods), hits the number of
+## targets each patch changed (0 = the patch missed this kit).
+func technique_kit(fid: String, tid: String) -> Dictionary:
+	var d: Dictionary = Content.creature_entry(fid).duplicate(true)
+	var t := Content.get_entry("techniques", tid)
+	var ap: Dictionary = t.get("apply", {})
+	var hit_counts := []
+	for p in ap.get("patches", []):
+		hit_counts.append(ContentPatch.apply(d, p))
+	var pas: Array = d.get("passives", [])
+	for h in ap.get("hooks", []):
+		var hc: Dictionary = (h as Dictionary).duplicate(true)
+		hc["source"] = tid
+		pas.append(hc)
+	d["passives"] = pas
+	var mods := {}
+	BuildApplier.add_mods(mods, ap.get("mods", []), 1, "solo")
+	return {"creature": CreatureDef.from_dict(d), "mods": mods, "hits": hit_counts}
+
+
+## Writes campaign run modifiers into a fighter exactly as MatchSim does for a spawn entry.
+func with_mods(f: Fighter, mods: Dictionary) -> void:
+	for k in mods:
+		f.mods[k] = float(mods[k])
+
+
 ## Two fighters facing each other `gap` metres apart (root to root) in an octagon of `radius`,
 ## or custom spawns ([[x, z, yaw_deg], ...]) with extra fighters (each on its own team).
 func duel(a, b, gap: float, a_steps: Array, b_steps: Array = [], spawns: Array = [], extra: Array = [], radius := 6.0) -> MatchSim:
