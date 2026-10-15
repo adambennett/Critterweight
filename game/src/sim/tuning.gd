@@ -1,8 +1,10 @@
 class_name Tuning
 ## Global combat tuning. Defaults live here; content/core/tuning.json (and balance mods) may
 ## override any key. Values are read through `Tuning.v("key")` so tests and mods see one source.
+## Invariant: every Content reload calls reset() before applying the merged tuning.json, so values
+## from a mod that has since been disabled never linger.
 
-static var values := {
+const DEFAULTS := {
 	# input
 	"input_buffer": 0.15,
 	# guard / parry
@@ -90,16 +92,29 @@ static var values := {
 	"dbg_reaction": 1.0,
 }
 
+static var values := DEFAULTS.duplicate()
+
 
 static func v(key: String) -> float:
 	return float(values.get(key, 0.0))
 
 
+## Back to the built-in defaults (Content.reload() calls this before applying tuning.json).
+static func reset() -> void:
+	values = DEFAULTS.duplicate()
+
+
+## Applies tuning.json overrides. Returns one problem per rejected key: "unknown key 'k'" or
+## "'k' must be a finite number" (those keys keep their current value).
 static func apply_overrides(d: Dictionary) -> PackedStringArray:
-	var unknown := PackedStringArray()
+	var problems := PackedStringArray()
 	for k in d:
-		if values.has(k):
-			values[k] = float(d[k])
-		else:
-			unknown.append(str(k))
-	return unknown
+		if not values.has(k):
+			problems.append("unknown key '%s'" % str(k))
+			continue
+		var x = d[k]
+		if (typeof(x) != TYPE_FLOAT and typeof(x) != TYPE_INT) or not is_finite(float(x)):
+			problems.append("'%s' must be a finite number" % str(k))
+			continue
+		values[k] = float(x)
+	return problems

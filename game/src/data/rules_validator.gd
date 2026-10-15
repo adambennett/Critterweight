@@ -143,6 +143,27 @@ const FIELDS := {
 const MODE_FORMATS := {"standard": ["duel", "ffa", "teams", "coop"], "spotlight_hog": ["ffa", "teams"], "chumball": ["teams"],
 	"absolute_unit": ["ffa"], "chum_rush": ["coop"], "tag_team": ["tag"], "practice": ["practice"]}
 
+## The fighter modifiers a rules preset may set in "fighter_mods" (docs/MODDING.md): numbers with
+## their allowed range [min, max] (multipliers on the fighter's own value; "_add" keys and
+## start_hype are added), or true/false flags. Anything else is dropped by normalize(), reported
+## by validate() and ignored by MatchSim, which clamps every value again when it applies them.
+const FIGHTER_MODS := {
+	"damage": [0.1, 4.0], "defense": [0.1, 4.0], "speed": [0.1, 3.0], "move_speed": [0.1, 3.0],
+	"stamina_regen": [0.1, 4.0], "knockback_taken": [0.1, 4.0], "knockback_dealt": [0.1, 4.0],
+	"cooldown": [0.1, 4.0], "hype_gain": [0.0, 5.0], "poise": [0.1, 4.0], "heal": [0.0, 4.0],
+	"max_health": [0.25, 4.0], "stamina_cost": [0.1, 4.0], "dodge_cost": [0.1, 4.0],
+	"dodge_distance": [0.25, 3.0], "throw_distance": [0.25, 3.0], "getup_speed": [0.25, 4.0],
+	"held_time_mult": [0.25, 4.0], "buildup_taken": [0.0, 4.0], "reach_radius": [0.5, 2.0],
+	"vmin_mult": [0.25, 4.0], "charge_distance": [0.25, 3.0], "charge_speed": [0.25, 3.0],
+	"charge_steer": [0.0, 4.0], "hover_duration": [0.25, 4.0], "zone_size": [0.25, 3.0],
+	"guard_absorb_mult": [0.0, 4.0], "status_duration_taken": [0.0, 4.0],
+	"start_hype": [0.0, 100.0], "max_health_add": [0.0, 200.0], "stamina_add": [0.0, 100.0],
+	"poise_add": [0.0, 100.0], "parry_window_add": [0.0, 0.3], "dodge_iframes_add": [0.0, 0.3],
+	"wakeup_invuln_add": [0.0, 1.0], "grab_hold_add": [0.0, 2.0], "grab_escape_add": [0.0, 10.0],
+	"splat_damage_add": [0.0, 20.0], "splat_poise_add": [0.0, 50.0], "zone_duration_add": [0.0, 10.0],
+	"no_grabs": "flag", "no_juice": "flag", "no_abilities": "flag", "auto_charge": "flag", "all_moves_elemental": "flag",
+}
+
 
 static func field(key: String) -> Dictionary:
 	return FIELDS.get(key, {})
@@ -245,7 +266,8 @@ static func defaults_for(mode: String) -> Dictionary:
 	return r
 
 
-## Clamps every known field and fills missing ones; unknown keys (hooks, mod data) are kept.
+## Clamps every known field and fills missing ones; unknown keys (hooks, mod data) are kept,
+## except inside "fighter_mods", which keeps only FIGHTER_MODS keys with clamped values.
 static func normalize(rules: Dictionary) -> Dictionary:
 	var mode := str(rules.get("mode", "standard"))
 	var out := defaults_for(mode)
@@ -254,11 +276,60 @@ static func normalize(rules: Dictionary) -> Dictionary:
 	for k in FIELDS:
 		if out.has(k):
 			out[k] = coerce(k, out[k])
-	var pl: Array = out.get("players", [2, 2])
-	var lo := clampi(int(pl[0]) if pl.size() > 0 else 2, 1, 8)
-	var hi := clampi(int(pl[1]) if pl.size() > 1 else lo, 1, 8)
+	var pl: Array = out.get("players", [2, 2]) if typeof(out.get("players")) == TYPE_ARRAY else [2, 2]
+	var lo := clampi(int(pl[0]) if pl.size() > 0 and _is_number(pl[0]) else 2, 1, 8)
+	var hi := clampi(int(pl[1]) if pl.size() > 1 and _is_number(pl[1]) else lo, 1, 8)
 	out["players"] = [lo, maxi(lo, hi)]
+	if out.has("fighter_mods"):
+		out["fighter_mods"] = clean_fighter_mods(out["fighter_mods"])
 	return out
+
+
+static func _is_number(v) -> bool:
+	return (typeof(v) == TYPE_INT or typeof(v) == TYPE_FLOAT) and is_finite(float(v))
+
+
+## A numeric rules field as the simulation may use it: its default when missing or not a finite
+## number, otherwise clamped to the field's range.
+static func field_num(rules: Dictionary, key: String) -> float:
+	var f := field(key)
+	var v = rules.get(key)
+	if not _is_number(v):
+		return float(f.get("def", 0.0))
+	return clampf(float(v), float(f.get("min", -1e9)), float(f.get("max", 1e9)))
+
+
+## Only the allowed fighter modifiers, each a finite number clamped to its range or a bool flag.
+## Safe on any input (non-dictionaries give {}); MatchSim applies only what this returns.
+static func clean_fighter_mods(fm) -> Dictionary:
+	var out := {}
+	if typeof(fm) != TYPE_DICTIONARY:
+		return out
+	for k in fm:
+		var spec = FIGHTER_MODS.get(str(k))
+		var v = fm[k]
+		if spec == null:
+			continue
+		if typeof(spec) == TYPE_STRING:
+			if typeof(v) == TYPE_BOOL:
+				out[str(k)] = v
+		elif _is_number(v):
+			out[str(k)] = clampf(float(v), float(spec[0]), float(spec[1]))
+	return out
+
+
+## Why a fighter_mods entry is not accepted as written ("" when it is).
+static func fighter_mod_problem(key: String, v) -> String:
+	var spec = FIGHTER_MODS.get(key)
+	if spec == null:
+		return "'%s' is not a fighter modifier rules can change." % key
+	if typeof(spec) == TYPE_STRING:
+		return "" if typeof(v) == TYPE_BOOL else "'%s' must be true or false." % key
+	if not _is_number(v):
+		return "'%s' must be a number." % key
+	if float(v) < float(spec[0]) or float(v) > float(spec[1]):
+		return "'%s' must be between %s and %s." % [key, str(spec[0]), str(spec[1])]
+	return ""
 
 
 ## Problems with a preset: [{field, severity, text}]. Errors block saving/hosting; warnings explain.
@@ -339,6 +410,15 @@ static func validate(rules: Dictionary) -> Array:
 			if typeof(h) == TYPE_DICTIONARY:
 				for e in Hooks.validate(h):
 					err.call("fighter_hooks", e)
+	if rules.has("fighter_mods"):
+		var fm = rules["fighter_mods"]
+		if typeof(fm) != TYPE_DICTIONARY:
+			err.call("fighter_mods", "Fighter modifiers must be a list of name: value pairs.")
+		else:
+			for k in fm:
+				var problem := fighter_mod_problem(str(k), fm[k])
+				if problem != "":
+					err.call("fighter_mods", problem)
 	return out
 
 

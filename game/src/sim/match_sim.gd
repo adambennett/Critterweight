@@ -65,7 +65,7 @@ func setup(config: Dictionary) -> void:
 	seed_value = int(config.get("seed", 1))
 	rng.seed = seed_value
 	arena_nodes = ArenaBuilder.build(self, arena)
-	gravity = 9.81 * arena.gravity_mult * clampf(float(rules.get("gravity_mult", 1.0)), 0.3, 2.0)
+	gravity = 9.81 * arena.gravity_mult * RulesValidator.field_num(rules, "gravity_mult")
 	if is_inside_tree():
 		PhysicsServer3D.area_set_param(get_world_3d().space, PhysicsServer3D.AREA_PARAM_GRAVITY, gravity)
 	_fighter_root = Node3D.new()
@@ -107,32 +107,37 @@ func _create_fighter(idx: int, e: Dictionary, pos: Vector3, yaw: float) -> Fight
 	return f
 
 
+## Rules multipliers are clamped to RulesValidator's ranges here as well: rules may come from mods,
+## imported presets or a host, and a non-number or huge value must never reach the physics.
 func _apply_rule_mods(f: Fighter) -> void:
-	f.mods["damage"] = float(f.mods["damage"]) * float(rules.get("damage_mult", 1.0))
-	f.mods["knockback_taken"] = float(f.mods["knockback_taken"]) * float(rules.get("knockback_mult", 1.0))
-	f.mods["cooldown"] = float(f.mods["cooldown"]) * float(rules.get("cooldown_rate", 1.0))
-	f.mods["hype_gain"] = float(f.mods["hype_gain"]) * float(rules.get("hype_mult", 1.0))
-	f.mods["max_health"] = float(f.mods.get("max_health", 1.0)) * float(rules.get("health_mult", 1.0))
-	f.mods["stamina_regen"] = float(f.mods["stamina_regen"]) * float(rules.get("regen_mult", 1.0))
+	f.mods["damage"] = float(f.mods["damage"]) * RulesValidator.field_num(rules, "damage_mult")
+	f.mods["knockback_taken"] = float(f.mods["knockback_taken"]) * RulesValidator.field_num(rules, "knockback_mult")
+	f.mods["cooldown"] = float(f.mods["cooldown"]) * RulesValidator.field_num(rules, "cooldown_rate")
+	f.mods["hype_gain"] = float(f.mods["hype_gain"]) * RulesValidator.field_num(rules, "hype_mult")
+	f.mods["max_health"] = float(f.mods.get("max_health", 1.0)) * RulesValidator.field_num(rules, "health_mult")
+	f.mods["stamina_regen"] = float(f.mods["stamina_regen"]) * RulesValidator.field_num(rules, "regen_mult")
 	if rules.has("start_hype"):
-		f.mods["start_hype"] = float(rules["start_hype"])
+		f.mods["start_hype"] = RulesValidator.field_num(rules, "start_hype")
 	if not bool(rules.get("abilities", true)):
 		f.mods["no_abilities"] = true
 	if not bool(rules.get("juice", true)):
 		f.mods["no_juice"] = true
 	if not bool(rules.get("grabs", true)):
 		f.mods["no_grabs"] = true
-	# data-driven rule extensions (custom rules and rule/mode mods): stat mods and hooks for all
-	var fm = rules.get("fighter_mods", {})
-	if typeof(fm) == TYPE_DICTIONARY:
-		for k in fm:
-			var v = fm[k]
-			if typeof(v) == TYPE_BOOL or typeof(v) == TYPE_STRING:
-				f.mods[k] = v
-			elif f.mods.has(k) and typeof(f.mods[k]) == TYPE_FLOAT:
-				f.mods[k] = float(f.mods[k]) * float(v)
-			else:
-				f.mods[k] = float(v)
+	# data-driven rule extensions (custom rules and rule/mode mods): stat mods and hooks for all.
+	# Rules can come from mods, imported presets or a host, so only whitelisted modifiers with
+	# clamped finite values are applied (RulesValidator.FIGHTER_MODS).
+	var fm := RulesValidator.clean_fighter_mods(rules.get("fighter_mods", {}))
+	for k in fm:
+		var v = fm[k]
+		if typeof(v) == TYPE_BOOL:
+			f.mods[k] = v
+		elif str(k).ends_with("_add"):
+			f.mods[k] = float(f.mods.get(k, 0.0)) + float(v)
+		elif k == "start_hype":
+			f.mods[k] = clampf(float(f.mods.get(k, 0.0)) + float(v), 0.0, 100.0)
+		else:
+			f.mods[k] = float(f.mods.get(k, 1.0)) * float(v)
 	var fh = rules.get("fighter_hooks", [])
 	if typeof(fh) == TYPE_ARRAY:
 		for h in fh:
