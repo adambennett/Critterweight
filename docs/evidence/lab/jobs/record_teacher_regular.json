@@ -1,0 +1,27 @@
+{
+  "kind": "record",
+  "name": "Record Bot: Regular vs Rookie",
+  "creature": "dev_biped",
+  "seed": 7,
+  "objective": {
+    "preset": "aggressive"
+  },
+  "scenario": {
+    "preset": "spar_jabber",
+    "opponents": [
+      "bot_rookie"
+    ],
+    "round_time": 20
+  },
+  "record": {
+    "teacher": "bot_regular",
+    "episodes": 90,
+    "dataset_id": "ev_teacher_regular_vs_rookie",
+    "dataset_name": "Teacher: Bot Regular vs Rookie"
+  },
+  "limits": {
+    "workers": 3,
+    "worlds": 2,
+    "low_priority": false
+  }
+}
