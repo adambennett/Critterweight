@@ -133,7 +133,7 @@
        "win": ["Upset special! I love an upset. I hate paying them."],
        "title": ["The champ! Your odds just went from 'lol' to 'hmm'."]
      },
-     "lines": {"upgrade": "Pleasure! Your credit's good here. Your credit's fake, but it's good.", "boiler_face": "Don't do that again. The boiler remembers.", "bookie_absent": "Table's closed tonight. The cards haven't come in yet.", "lab_absent": "Terminal's dark. Somebody's still wiring the brain in that thing."},
+     "lines": {"upgrade": "Pleasure! Your credit's good here. Your credit's fake, but it's good.", "boiler_face": "Don't do that again. The boiler remembers.", "bookie_absent": "Table's closed tonight. The cards haven't come in yet.", "lab_absent": "Terminal's dark. Somebody's still wiring the brain in that thing.", "bookie_back": "Win or lose, the house thanks you for your patronage. Mostly the lose part."},
      "options": ["bookie", "ai_lab", "station:boiler_room", "last_run"]},
 
     {"id": "npc_barnaby", "type": "npc", "key": "barnaby", "name": "Barnaby Bellows", "role": "Announcer", "speaker": "barnaby", "color": "#C9A227",

@@ -7,7 +7,12 @@ extends RefCounted
 ## (quality weighted), the Body bag (shaped like the Commissioner) only scores head/shell hits.
 ## Tiers 300/600/1000 pay 10/25/50 Clout once per tier per fighter per bag.
 
-var mode
+var _mode_ref: WeakRef = null
+## The owning HubMode, held weakly: the mode owns this object, so a strong back-reference would be a
+## reference cycle that leaks the whole hub sim state on every visit.
+var mode:
+	get:
+		return _mode_ref.get_ref() if _mode_ref != null else null
 var bag := ""
 var phase := "idle"            ## idle | countdown | running | done
 var t := 0.0
@@ -21,7 +26,7 @@ var result := {}
 
 
 func _init(m) -> void:
-	mode = m
+	_mode_ref = weakref(m)
 	cfg = HubContent.activity("bags")
 
 

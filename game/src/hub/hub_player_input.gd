@@ -7,10 +7,10 @@ extends LocalPlayerInput
 ## as usual. While a hub board/menu is open (and for a moment after it closes, so the press that
 ## closed it does nothing) the fighter gets no input.
 
-const AFTER_SCREEN_MS := 260
+const AFTER_SCREEN := 0.26          ## seconds of no fighter input after a board/menu closes
 
 var mode: HubMode
-var _screen_seen_ms := -100000
+var _block_left := 0.0
 
 
 func label() -> String:
@@ -18,10 +18,12 @@ func label() -> String:
 
 
 func poll(f: Fighter, s, dt: float) -> void:
-	var now := Time.get_ticks_msec()
+	# counted in simulated time (the step's dt), so it holds the same at any frame rate
 	if App.top_screen() != null:
-		_screen_seen_ms = now
-	var blocked := not enabled or now - _screen_seen_ms < AFTER_SCREEN_MS or (mode != null and not mode.transition.is_empty())
+		_block_left = AFTER_SCREEN
+	elif _block_left > 0.0:
+		_block_left -= dt
+	var blocked := not enabled or _block_left > 0.0 or (mode != null and not mode.transition.is_empty())
 	if blocked:
 		f.input.move = Vector3.ZERO
 		f.input.held = 0

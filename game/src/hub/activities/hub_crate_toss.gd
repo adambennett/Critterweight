@@ -7,7 +7,12 @@ extends RefCounted
 ## by the ring it lands in (3 m: 5, 5 m: 10, 8 m: 20). Tiers 30/60/100 pay 10/25/50 Clout; 100
 ## with Jitters earns Ludlow's hint about the pier (secret #8).
 
-var mode
+var _mode_ref: WeakRef = null
+## The owning HubMode, held weakly: the mode owns this object, so a strong back-reference would be a
+## reference cycle that leaks the whole hub sim state on every visit.
+var mode:
+	get:
+		return _mode_ref.get_ref() if _mode_ref != null else null
 var phase := "idle"            ## idle | running | done
 var t := 0.0
 var points := 0
@@ -20,7 +25,7 @@ var _pending := {}             ## crate index -> true (thrown this session, not 
 
 
 func _init(m) -> void:
-	mode = m
+	_mode_ref = weakref(m)
 	cfg = HubContent.activity("crates")
 
 

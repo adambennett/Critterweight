@@ -16,6 +16,11 @@ const STATION_NAMES := {"gym_floor": ["Gym Floor", "Granny's clipboard"], "med_b
 
 var state: HubState
 var backend: Object = null
+## Development stand-ins (CampaignFlow.make_catalog(true)): while fighter kits are still being
+## authored the campaign treats them as unusable; stand-ins let a run start anyway (marked custom),
+## exactly like the campaign menu's "ENABLE DEV STAND-INS".
+var stand_ins := false
+var _standin_catalog: CampaignCatalog = null
 
 
 func _init(s: HubState, test_backend: Object = null) -> void:
@@ -34,6 +39,10 @@ func unavailable_reason() -> String:
 
 
 func catalog() -> CampaignCatalog:
+	if stand_ins:
+		if _standin_catalog == null:
+			_standin_catalog = CampaignFlow.make_catalog(true)
+		return _standin_catalog
 	return CampaignCatalog.shared()
 
 
@@ -97,7 +106,7 @@ func run_config(choices: Dictionary) -> Dictionary:
 		seed_value = RunRng.text_to_seed(st)
 	var cfg := FightCamp.run_config(state.profile, {"variant": "fight_camp", "fighter": str(choices.get("fighter", "")),
 		"difficulty": str(choices.get("difficulty", "amateur")), "dose": int(choices.get("dose", 0)), "seed": seed_value,
-		"coop_format": str(choices.get("coop_format", "simultaneous")), "custom_reasons": CampaignFlow.custom_reasons(false)})
+		"coop_format": str(choices.get("coop_format", "simultaneous")), "custom_reasons": CampaignFlow.custom_reasons(stand_ins)})
 	cfg["content_hash"] = Content.content_hash()
 	return cfg
 
@@ -148,7 +157,7 @@ func open_bookie() -> bool:
 		return false
 	Profiles.save()
 	App.set_scene(null)
-	App.goto("bookie", {"from_hub": true})
+	App.goto("bookie", {"from_hub": true, "stand_ins": stand_ins})
 	return true
 
 

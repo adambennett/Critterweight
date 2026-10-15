@@ -115,9 +115,11 @@ static func confirm_buy(b: HubBoard, id: String) -> Dictionary:
 
 # ---- Snappington's sign-up sheet (run start) ------------------------------------------------------
 
-static func build_run(b: HubBoard, _p: Dictionary) -> void:
+static func build_run(b: HubBoard, p: Dictionary) -> void:
 	b.frame("Commission sign-up sheet", "Fight Camp card", 1080.0)
 	var sv := b.services()
+	if bool(p.get("stand_ins", false)):
+		sv.stand_ins = true
 	var st := b.hub_state()
 	if not sv.available():
 		b.text_line("\"%s\"" % HubContent.keyed_line("snappington", "run_absent"), "H3")
@@ -126,6 +128,16 @@ static func build_run(b: HubBoard, _p: Dictionary) -> void:
 		return
 	var o := sv.run_options()
 	var fighters: Array = o.get("fighters", [])
+	if fighters.is_empty():
+		b.text_line("\"The Commission has no fighters cleared for the card yet.\" (The roster's fight kits are still being finished.)", "Warning")
+		var use_standins := func() -> void:
+			b.close()
+			b.open_child("run", {"stand_ins": true})
+		b.button("Use development stand-ins (custom run)", use_standins, "Development stand-ins",
+			"Missing kits are replaced by a placeholder body so you can try the card; the run is marked custom (no records).")
+		b.button("Campaign menu (suspended runs, co-op lobby)", sv.open_campaign_menu)
+		b.focus_first()
+		return
 	var names: Array = fighters.map(func(f): return str(Content.get_entry("creatures", str(f)).get("name", f)))
 	var me := ""
 	if b.scene != null:

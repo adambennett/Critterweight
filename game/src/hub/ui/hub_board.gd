@@ -61,6 +61,11 @@ func on_enter(p: Dictionary) -> void:
 			_build_rest()
 		_:
 			_build_info(p)
+	# a board with nothing to select (an empty Wall of Fame, the map before Fast walk) still gets
+	# a focused Close, so a controller always has somewhere to be
+	if list != null and is_instance_valid(list) and not list.is_queued_for_deletion() and list.focusables().is_empty():
+		button("Close", close, "Close", "Back to the Cannery.")
+		focus_first()
 	play_intro()
 
 

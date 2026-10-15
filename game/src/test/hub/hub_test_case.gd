@@ -12,16 +12,23 @@ class PathDriver:
 	var reach := 0.35
 	var press_next := []        ## button names to press once on the next poll
 	var hold := []              ## button names held while set
+	## Like a player: a waypoint someone is standing on (Ludlow parked on his mopping spot) is
+	## given up after a few seconds without progress (the last one counts once within 1.5 m).
+	var lenient := false
 
 	func set_path(pts: Array) -> void:
 		points = pts
 		index = 0
+		_best = INF
+		_since = 0.0
+		_blocked = 0.0
 
 	func done() -> bool:
 		return index >= points.size()
 
 	var _best := INF
 	var _since := 0.0
+	var _blocked := 0.0
 	var _side := 0.0
 
 	func poll(f: Fighter, _sim, dt: float) -> void:
@@ -35,17 +42,21 @@ class PathDriver:
 		while index < points.size():
 			var target: Vector3 = points[index]
 			var to := Vector3(target.x - f.pos().x, 0.0, target.z - f.pos().z)
-			if to.length() <= reach:
+			var last := index == points.size() - 1
+			if to.length() <= reach or (lenient and _blocked > 3.0 and (not last or to.length() < 1.5)):
 				index += 1
 				_best = INF
 				_since = 0.0
+				_blocked = 0.0
 				continue
 			# a player steps around something in the way (Ludlow on his rounds, a stray crate)
 			if to.length() < _best - 0.1:
 				_best = to.length()
 				_since = 0.0
+				_blocked = 0.0
 			else:
 				_since += dt
+				_blocked += dt
 			if _since > 1.5:
 				_side = 0.45
 				_since = 0.0

@@ -21,7 +21,12 @@ const FISH_TIME := 20.0
 const SCRAPLING_SPEED := 2.6          ## a little slower than any fighter: catchable if you cut it off
 const FISH_POOL := ["hub_fish_electrolyte", "hub_fish_tonic", "hub_fish_jerky", "hub_fish_liniment", "hub_fish_lozenge", "hub_fish_shake"]
 
-var mode
+var _mode_ref: WeakRef = null
+## The owning HubMode, held weakly: the mode owns this object, so a strong back-reference would be a
+## reference cycle that leaks the whole hub sim state on every visit.
+var mode:
+	get:
+		return _mode_ref.get_ref() if _mode_ref != null else null
 var state: HubState
 var bath_time := 0.0
 var _belt_taunts: Array = []        ## sim times of recent taunts at the case
@@ -33,7 +38,7 @@ var _hint_this_visit := false
 
 
 func _init(m, s: HubState) -> void:
-	mode = m
+	_mode_ref = weakref(m)
 	state = s
 	if state.has_secret("sec_sleeping_scrapling") or bool(state.flag("scrapling_woken")):
 		scrapling["state"] = "gone"
