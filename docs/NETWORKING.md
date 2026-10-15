@@ -697,7 +697,8 @@ Also LOOPBACK on one PC.
   campaign events; `test_net_parity` lists them) travel with their type name instead of a 1-byte
   id: they work, the event packets are just a little larger. Giving them ids is a protocol bump.
 * Co-op: party runs are started (new) or resumed (suspended) from the lobby through party seats
-  and `NetPartyRuns` (tested between processes up to the first route vote). The lobby plays the
+  and `NetPartyRuns` (resuming tested between processes up to the first route vote, dealing a
+  new run in-process). The lobby plays the
   route votes; the other campaign stops (fights, shops, events) are not yet played online - the
   run waits in the lobby and stays in everyone's party save. Co-op runs are otherwise verified
   over the loopback transport.
