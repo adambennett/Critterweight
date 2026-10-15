@@ -308,6 +308,14 @@ func test_join_errors_and_kick_show_reasons() -> void:
 	await press_joy(JOY_BUTTON_A, 4)
 	check_eq(top_name(), "online", "OK returns to the Online screen")
 	expect_focus("after the password dialog")
+	# a different game version (refused on this side before anything else): both versions shown
+	OnlineFlow.begin()
+	check_eq(Net.join("127.0.0.1", port, "sesame", {"test_game_version": "9.9.9"}), OK, "joining with another game version")
+	check(await until(func() -> bool: return top_name() == "dialog", 8.0), "a version mismatch opens a dialog")
+	check(find_label(App.top_screen(), "9.9.9") != null and find_label(App.top_screen(), NetProtocol.game_version()) != null,
+		"it shows both game versions")
+	await press_joy(JOY_BUTTON_A, 4)
+	check_eq(top_name(), "online", "OK returns to the Online screen")
 	# full: one player already in
 	var first := guest(port, {"name": "First", "password": "sesame"})
 	check(await until(func() -> bool: return first.state == NetClient.State.LOBBY, 6.0), "someone takes the only place")
