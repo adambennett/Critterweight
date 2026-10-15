@@ -322,6 +322,27 @@ func test_balance_vs_roster() -> void:
 
 ## `--kit-tut <exercise index> <player id>`: traces the Kid's moves, distances and contacts in a
 ## real tutorial run with the player holding guard.
+## `--kit-string [gaps...]`: which string hits meet each roster fighter (guarding: B = blocked,
+## open: damage) at the given root distances (tuning aid for strike re-aim, CMB-09).
+func test_zz_string_contacts() -> void:
+	var args := OS.get_cmdline_user_args()
+	if not args.has("--kit-string"):
+		return
+	for target in ROSTER:
+		var line := "%-10s" % target
+		for gap in [0.75, 0.9, 1.05, 1.2, 1.35]:
+			var g := await shoot(KID, target, gap, string_presses(3, 0.25), 2.0, [{"t0": 0.0, "t1": 3.0, "hold": ["guard"]}])
+			var o := await shoot(KID, target, gap, string_presses(3, 0.25), 2.0)
+			line += " | %.2f:" % gap
+			for slot in ["l1", "l2", "l3"]:
+				var blk := false
+				for ev in g["events"]:
+					if str(ev["type"]) == "hit" and int(ev["fighter"]) == 0 and str(ev.get("slot", "")) == slot:
+						blk = true
+				line += " %s%s/%.0f" % [slot.substr(1), "B" if blk else "-", float((o["slot_dmg"] as Dictionary).get(slot, 0.0))]
+		print(line)
+
+
 func test_zz_debug_tutorial() -> void:
 	var args := OS.get_cmdline_user_args()
 	var di := args.find("--kit-tut")

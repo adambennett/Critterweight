@@ -202,7 +202,9 @@ func test_scrapling_dies_in_a_few_clean_hits() -> void:
 			await get_tree().physics_frame
 			for ev in sim.events_since(cursor):
 				cursor = int(ev["seq"])
-				if str(ev["type"]) == "hit" and int(ev["fighter"]) == 0 and not bool(ev["blocked"]) and float(ev["damage"]) > 0.5:
+				# a clean hit: unblocked, on a standing Scrapling, a real blow (>= 2), not a graze
+				if str(ev["type"]) == "hit" and int(ev["fighter"]) == 0 and not bool(ev["blocked"]) and not bool(ev.get("otg", false)) \
+						and float(ev["damage"]) >= 2.0:
 					hits += 1
 					if OS.get_cmdline_user_args().has("--kit-ttk"):
 						print("   hit %s %.1f at %.2f hp %.1f" % [str(ev.get("slot", "")), float(ev["damage"]), sim.time, sim.fighters[1].health])
@@ -296,7 +298,8 @@ func test_blister_inflate_and_pop() -> void:
 			for c in sim.combat.debug_contacts:
 				line += " CONTACT vn=%.2f" % c["vn"]
 			print(line)
-	var r := await shoot(BLISTER, PUNCHER, 1.3, press("ability1"), 2.2, at([{"t0": 0.4, "t1": 1.0, "move": "to_target"}, {"t0": 0.6, "t1": 0.65, "press": ["light"]}]), Callable(), 6.0, each)
+	# the puncher steps in, plants, then jabs (walking through the jab only shoves the Blister)
+	var r := await shoot(BLISTER, PUNCHER, 1.3, press("ability1"), 2.2, at([{"t0": 0.4, "t1": 0.6, "move": "to_target"}, {"t0": 0.66, "t1": 0.71, "press": ["light"]}]), Callable(), 6.0, each)
 	var pops := []
 	var jabbed := false
 	if OS.get_cmdline_user_args().has("--kit-events"):
