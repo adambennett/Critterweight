@@ -54,6 +54,7 @@ func frame(_dt: float) -> void:
 		if compare != null and compare.net.hidden == target.net.hidden and compare.net.activation == target.net.activation:
 			items.append_array(LabEval.items(job, "compare", "test", opps, n, std, "compare", items.size(), compare.act_mode))
 			extra["compare"] = compare.net.params
+		items.append_array(LabEval.reference_items(job, opps, n, std, items.size()))
 		batch.submit(items, _payload_for(target, "target", extra))
 		_submitted = true
 		progress["step"] = "evaluating (%d episodes)" % items.size()
@@ -67,6 +68,10 @@ func frame(_dt: float) -> void:
 		if compare != null:
 			rep["compare_label"] = str(job["target"]["compare"])
 			rep["compare"] = LabEval.summarize(res, w, "compare")
+		var s_ref := LabEval.summarize(res, w, "reference")
+		if int(s_ref["n"]) > 0:
+			rep["reference_kind"] = str(job["eval"].get("reference", ""))
+			rep["reference"] = s_ref
 		write_report(rep)
 		note("evaluation: %s" % LabEval.one_line(rep["target"]))
 		message = "evaluated: " + LabEval.one_line(rep["target"])

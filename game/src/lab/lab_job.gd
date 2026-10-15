@@ -19,9 +19,9 @@ static func defaults() -> Dictionary:
 		"seed": 1,
 		"objective": {"preset": "aggressive", "weights": {}},
 		"scenario": {"preset": "drill_dummy"},
-		"eval": {"opponents": [], "episodes": 6, "val_episodes": 6, "every": 5, "standard_spawns": true},
-		"model": {"hidden": [32, 32], "activation": "tanh", "init_policy": "", "mode": "", "temperature": 1.0, "init_seed": 0, "out_scale": 0.1},
-		"es": {"pairs": 12, "sigma": 0.05, "lr": 0.03, "l2": 0.005, "episodes_per_candidate": 1},
+		"eval": {"opponents": [], "episodes": 6, "val_episodes": 6, "every": 5, "standard_spawns": true, "reference": ""},
+		"model": {"hidden": [32, 32], "activation": "tanh", "init_policy": "", "mode": "", "temperature": 1.0, "init_seed": 0, "out_scale": 0.01},
+		"es": {"pairs": 12, "sigma": 0.05, "lr": 0.02, "l2": 0.005, "episodes_per_candidate": 1},
 		"bc": {"datasets": [], "epochs": 60, "batch": 128, "lr": 0.003, "val_frac": 0.2, "patience": 8, "l2": 0.0001,
 			"rollouts": 6, "balance": false},
 		"record": {"teacher": "bot_regular", "episodes": 40, "dataset_id": "", "dataset_name": ""},
@@ -135,6 +135,10 @@ static func normalize(raw: Dictionary) -> Dictionary:
 		if LabOpponents.is_valid(str(o)):
 			eops.append(str(o))
 	ev["opponents"] = eops if not eops.is_empty() else opps.duplicate()
+	var ref := str(ev.get("reference", ""))
+	if ref != "" and not LabOpponents.BASELINES.has(ref):
+		errors.append("unknown scripted reference '%s'" % ref)
+		ev["reference"] = ""
 	if str(job["opponent_creature"]) == "":
 		job["opponent_creature"] = job["creature"]
 	if str(job["kind"]) == "bc" and (job["bc"]["datasets"] as Array).is_empty():

@@ -30,6 +30,18 @@ static func items(job: Dictionary, key: String, stream: String, opponents: Array
 	return out
 
 
+## The same test episodes played by a scripted reference (job.eval.reference, e.g. "jabber"),
+## so a trained policy can be compared with a hand-written script on identical conditions.
+static func reference_items(job: Dictionary, opponents: Array, n: int, standard: bool, start_index: int) -> Array:
+	var kind := str((job["eval"] as Dictionary).get("reference", ""))
+	if kind == "" or not LabOpponents.BASELINES.has(kind):
+		return []
+	var out := items(job, "none", "test", opponents, n, standard, "reference", start_index)
+	for it: Dictionary in out:
+		it["learner"] = {"type": "scripted", "kind": kind}
+	return out
+
+
 ## Summary of results (optionally filtered to one group) under objective `weights`.
 static func summarize(results: Array, weights: Dictionary, group := "") -> Dictionary:
 	var by_opp := {}

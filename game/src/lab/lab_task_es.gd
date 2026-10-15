@@ -3,10 +3,13 @@ extends LabTask
 ## Evolution-strategies training job (approach "es"; also "bc→es" when started from a cloned
 ## policy via model.init_policy). Each generation evaluates 2·pairs mirrored candidates on the
 ## same training episodes (common random numbers), shapes fitness by rank and takes one Adam
-## step. Every `eval.every` generations the current mean policy θ is evaluated on validation
-## seeds (model selection keeps the best θ). At the end, the initial and the selected policy are
-## both evaluated on separate test seeds against the evaluation opponents, so the reported
-## improvement is measured on episodes neither training nor selection ever saw.
+## step on the mean θ.
+## Model selection: ES improves the noise-smoothed objective, so early on the mean θ can play
+## worse than its best perturbations. Every `eval.every` generations both θ and the generation's
+## best candidate ("elite") are evaluated on VALIDATION seeds; the best validated network is
+## kept. At the end the initial and the selected network are evaluated on separate TEST seeds
+## (and, if configured, a scripted reference on the same episodes), so the reported improvement
+## is measured on episodes neither training nor selection ever saw.
 
 var es := LabES.new()
 var gen := 0
@@ -17,6 +20,9 @@ var theta0 := PackedFloat32Array()
 var best_theta := PackedFloat32Array()
 var best_val := -INF
 var best_gen := 0
+var best_source := "initial"
+var elite := PackedFloat32Array()
+var elite_fit := -INF
 var last_val := {}
 var last_fit := {}
 var _submitted := false
@@ -37,7 +43,7 @@ func begin() -> void:
 		activation = str(model["activation"])
 		var seed_init := int(model.get("init_seed", 0))
 		var mlp := PolicyMLP.create(PolicyObs.SIZE, hidden, PolicyActions.OUTPUTS, activation, seed_init if seed_init != 0 else int(job["seed"]) * 7 + 3,
-			float(model.get("out_scale", 0.1)))
+			float(model.get("out_scale", 0.01)))
 		theta0 = mlp.params
 	if str(model.get("mode", "")) != "":
 		act_mode = str(model["mode"])
@@ -50,11 +56,16 @@ func begin() -> void:
 		best_theta = LabIO.floats_b64(str(ck.get("best_theta", "")))
 		best_val = float(ck.get("best_val", -1e30))
 		best_gen = int(ck.get("best_gen", 0))
+		best_source = str(ck.get("best_source", "theta"))
+		elite = LabIO.floats_b64(str(ck.get("elite", "")))
+		elite_fit = float(ck.get("elite_fit", -1e30))
 		phase = str(ck.get("phase", "gen"))
 		if phase not in ["gen", "val", "final"]:
 			phase = "gen"
 		if best_theta.size() != es.theta.size():
 			best_theta = es.theta.duplicate()
+		if elite.size() != es.theta.size():
+			elite = PackedFloat32Array()
 		LabIO.truncate_lines(run_dir.path_join("metrics.jsonl"), "gen", gen)
 		note("resumed at generation %d (best validation reward %.2f at gen %d)" % [gen, best_val, best_gen])
 	else:
@@ -64,12 +75,8 @@ func begin() -> void:
 			int(esj["episodes_per_candidate"]), es.sigma, es.lr])
 
 
-func _limits() -> Dictionary:
-	return job["limits"]
-
-
 func _check_limits() -> void:
-	var lim := _limits()
+	var lim: Dictionary = job["limits"]
 	if gen >= int(lim["max_generations"]):
 		request_stop("generation limit (%d)" % int(lim["max_generations"]))
 	elif int(lim["max_episodes"]) > 0 and episodes >= int(lim["max_episodes"]):
@@ -98,6 +105,16 @@ func _train_items() -> Array:
 
 func _payload(params: Dictionary) -> Dictionary:
 	return payload(hidden, activation, act_mode, params)
+
+
+func _val_items() -> Array:
+	var ev: Dictionary = job["eval"]
+	var opps: Array = job["scenario"]["opponents"]
+	var n := int(ev["val_episodes"])
+	var items := LabEval.items(job, "theta", "val", opps, n, false, "val", 0)
+	if not elite.is_empty():
+		items.append_array(LabEval.items(job, "elite", "val", opps, n, false, "val_elite", items.size()))
+	return items
 
 
 func frame(_dt: float) -> void:
@@ -130,8 +147,10 @@ func frame(_dt: float) -> void:
 				_finish_generation(batch.ordered_results())
 		"val":
 			if not _submitted:
-				var ev2: Dictionary = job["eval"]
-				batch.submit(LabEval.items(job, "theta", "val", job["scenario"]["opponents"], int(ev2["val_episodes"]), false, "val", 0), _payload({"theta": es.theta}))
+				var params := {"theta": es.theta}
+				if not elite.is_empty():
+					params["elite"] = elite
+				batch.submit(_val_items(), _payload(params))
 				_submitted = true
 				progress["step"] = "validation after generation %d" % gen
 			elif batch.poll():
@@ -149,6 +168,7 @@ func frame(_dt: float) -> void:
 				var std := bool(ev3.get("standard_spawns", true))
 				var items := LabEval.items(job, "init", "test", opps, n, std, "init", 0)
 				items.append_array(LabEval.items(job, "best", "test", opps, n, std, "best", items.size()))
+				items.append_array(LabEval.reference_items(job, opps, n, std, items.size()))
 				batch.submit(items, _payload({"init": theta0, "best": best_theta}))
 				_submitted = true
 				progress["step"] = "final test evaluation (%d episodes)" % items.size()
@@ -182,8 +202,15 @@ func _finish_generation(res: Array) -> void:
 		dealt += float((r.get("raw", {}) as Dictionary).get("damage_dealt", 0.0))
 		if str(r.get("outcome", "")) == "win":
 			wins += 1
+	var top := 0
 	for k in pop:
 		fit[k] = fit[k] / float(maxi(counts[k], 1))
+		if fit[k] > fit[top]:
+			top = k
+	# the generation's best candidate, rebuilt from the pre-update mean (validated later)
+	var spec := es.candidate_spec(gen, top)
+	elite = LabES.perturbed(es.theta, int(spec["noise_seed"]), float(spec["sign"]), float(spec["sigma"]))
+	elite_fit = fit[top]
 	var ups := es.update(gen, fit)
 	gen += 1
 	var fl := Array(fit)
@@ -204,27 +231,42 @@ func _finish_generation(res: Array) -> void:
 
 
 func _record_val(res: Array) -> void:
-	var s := LabEval.summarize(res, weights(), "val")
-	var rw: Dictionary = s["reward"]
-	var v := float(rw["mean"])
-	last_val = {"gen": gen, "eval_reward": v, "eval_reward_std": rw["std"], "eval_n": s["n"],
-		"eval_damage": LabEval.mean_term(res, "damage_dealt"), "eval_taken": LabEval.mean_term(res, "damage_taken"),
+	var w := weights()
+	var s := LabEval.summarize(res, w, "val")
+	var v := float((s["reward"] as Dictionary)["mean"])
+	last_val = {"gen": gen, "eval_reward": v, "eval_reward_std": (s["reward"] as Dictionary)["std"], "eval_n": s["n"],
+		"eval_damage": LabEval.mean_term(res, "damage_dealt", "val"), "eval_taken": LabEval.mean_term(res, "damage_taken", "val"),
 		"eval_win_rate": s["win_rate"]}
-	if v > best_val:
-		best_val = v
+	var cand := v
+	var cand_params := es.theta
+	var cand_src := "theta"
+	var se := LabEval.summarize(res, w, "val_elite")
+	if int(se["n"]) > 0:
+		var ve := float((se["reward"] as Dictionary)["mean"])
+		last_val["eval_elite_reward"] = ve
+		if ve > cand:
+			cand = ve
+			cand_params = elite
+			cand_src = "elite"
+	if cand > best_val:
+		best_val = cand
 		best_gen = gen
-		best_theta = es.theta.duplicate()
+		best_theta = cand_params.duplicate()
+		best_source = cand_src if gen > 0 else "initial"
 		last_val["new_best"] = true
+	last_val["best_eval_reward"] = best_val
 	metrics(last_val.duplicate())
 	progress["eval_reward"] = v
 	progress["best_eval_reward"] = best_val
 	progress["best_gen"] = best_gen
-	note("validation at gen %d: %s%s" % [gen, LabEval.one_line(s), " (new best)" if gen == best_gen else ""])
+	note("validation at gen %d: %s%s%s" % [gen, LabEval.one_line(s), (" | elite %.2f" % float(last_val["eval_elite_reward"])) if last_val.has("eval_elite_reward") else "",
+		" (new best: %s)" % best_source if gen == best_gen else ""])
 
 
 func _ck() -> Dictionary:
 	return {"gen": gen, "es": es.to_dict(), "theta0": LabIO.b64_floats(theta0), "best_theta": LabIO.b64_floats(best_theta),
-		"best_val": best_val if is_finite(best_val) else -1e30, "best_gen": best_gen}
+		"best_val": best_val if is_finite(best_val) else -1e30, "best_gen": best_gen, "best_source": best_source,
+		"elite": LabIO.b64_floats(elite), "elite_fit": elite_fit if is_finite(elite_fit) else -1e30}
 
 
 func _finish(res: Array) -> void:
@@ -237,22 +279,32 @@ func _finish(res: Array) -> void:
 		if r.has("error"):
 			continue
 		var rw := LabRewards.score(r.get("raw", {}), w)
-		if str(r.get("group", "")) == "init":
-			r_init.append(rw)
-		else:
-			r_best.append(rw)
+		match str(r.get("group", "")):
+			"init":
+				r_init.append(rw)
+			"best":
+				r_best.append(rw)
 	var t := LabStats.welch_t(r_best, r_init)
 	note("test: initial %s" % LabEval.one_line(s_init))
 	note("test: trained %s (Welch t = %.2f)" % [LabEval.one_line(s_best), t])
-	var extra := {"generations": gen, "best_gen": best_gen, "es": job["es"], "selection": "best validation reward",
+	var s_ref := LabEval.summarize(res, w, "reference")
+	if int(s_ref["n"]) > 0:
+		note("test: scripted reference (%s) %s" % [str(job["eval"].get("reference", "")), LabEval.one_line(s_ref)])
+	var approach := "es" if str(job["model"].get("init_policy", "")) == "" else "bc_es"
+	var extra := {"generations": gen, "best_gen": best_gen, "best_source": best_source, "es": job["es"],
+		"selection": "best validation reward among the mean and each validation step's elite",
 		"test_eval": {"initial": s_init, "trained": s_best, "welch_t": t}, "val_best_reward": best_val}
-	var best_pol := make_policy(hidden, activation, best_theta, act_mode, "es" if str(job["model"].get("init_policy", "")) == "" else "bc_es", extra)
+	if int(s_ref["n"]) > 0:
+		extra["test_eval"]["reference"] = s_ref
+		extra["test_eval"]["reference_kind"] = str(job["eval"].get("reference", ""))
+	var best_pol := make_policy(hidden, activation, best_theta, act_mode, approach, extra)
 	policy_id = publish_policy(best_pol, "best.policy.json", true)
-	var final_pol := make_policy(hidden, activation, es.theta, act_mode, "es", {"generations": gen, "note": "last generation (not selected)"})
+	var final_pol := make_policy(hidden, activation, es.theta, act_mode, approach, {"generations": gen, "note": "mean after the last generation (not selected)"})
 	final_pol.id = best_pol.id + "_last"
 	publish_policy(final_pol, "final.policy.json", false)
-	write_report({"approach": best_pol.training["approach"], "generations": gen, "best_gen": best_gen, "episodes": episodes,
+	write_report({"approach": approach, "generations": gen, "best_gen": best_gen, "best_source": best_source, "episodes": episodes,
 		"sim_seconds": sim_seconds(), "wall_s": elapsed_s, "initial": s_init, "trained": s_best, "welch_t": t,
+		"reference": s_ref if int(s_ref["n"]) > 0 else {}, "reference_kind": str(job["eval"].get("reference", "")),
 		"policy_id": policy_id, "stop_reason": stop_requested, "seeds": {"job": int(job["seed"]), "train": "train:<seed>:<gen>:<k>",
 			"validation": "val:<seed>:<i>", "test": "test:<seed>:<i>"}})
 	message = "completed (%s): trained policy %s" % [stop_requested if stop_requested != "" else "done", LabEval.one_line(s_best)]
