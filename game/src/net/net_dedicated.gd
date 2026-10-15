@@ -20,11 +20,14 @@ var _stdin_thread: Thread = null
 var _stdin_mutex := Mutex.new()
 var _stdin_lines: Array[String] = []
 var _stdin_done := false
+var _stdin_stop := false
+var _stdin_type := 0
 var _status_ms := 0
 var _shutting_down := false
 var _shutdown_at_ms := 0
 var _shutdown_msg := ""
 var _shutdown_restart := false
+var _close_started := false
 
 
 func run(args: PackedStringArray) -> int:
@@ -123,24 +126,35 @@ func _start_stdin() -> void:
 	if t != OS.STD_HANDLE_CONSOLE and t != OS.STD_HANDLE_PIPE and t != OS.STD_HANDLE_FILE:
 		Log.i("server", "admin console disabled: no usable stdin")
 		return
+	_stdin_type = t
 	_stdin_thread = Thread.new()
 	_stdin_thread.start(_stdin_loop)
 	Log.i("server", "admin console ready on stdin (type 'help')")
 
 
+## Reader thread. Consoles block until a line is typed; pipes may be non-blocking (empty reads
+## just mean "nothing yet"); a redirected file ends with repeated empty reads (EOF).
 func _stdin_loop() -> void:
 	var empties := 0
 	var pending := ""
 	while true:
+		_stdin_mutex.lock()
+		var stop_now := _stdin_stop
+		_stdin_mutex.unlock()
+		if stop_now:
+			break
 		var chunk := OS.read_string_from_stdin(1024)
 		if chunk == "":
 			empties += 1
-			if empties > 25:
+			if _stdin_type == OS.STD_HANDLE_FILE and empties > 25:
 				break
-			OS.delay_msec(40)
+			OS.delay_msec(50)
 			continue
 		empties = 0
-		pending += chunk
+		# reads return whole lines with the final line break removed: a chunk ends a line
+		pending += chunk.replace("\r", "")
+		if not pending.ends_with("\n"):
+			pending += "\n"
 		var stop := false
 		while pending.contains("\n"):
 			var nl := pending.find("\n")
@@ -181,8 +195,9 @@ func _process(_dt: float) -> void:
 	if now - _status_ms >= STATUS_EVERY_MS and not _shutting_down:
 		_status_ms = now
 		_write_status("running")
-	if _shutting_down and now >= _shutdown_at_ms:
-		_finish_shutdown()
+	if _shutting_down and now >= _shutdown_at_ms and not _close_started:
+		_close_started = true
+		_begin_close()
 
 
 func _write_status(state: String) -> void:
@@ -216,25 +231,46 @@ func request_shutdown(message: String, restarting := false) -> void:
 	Log.w("server", "shutdown requested: %s%s" % [message, " (restart expected)" if restarting else ""])
 
 
-func _finish_shutdown() -> void:
+## Notifies clients and waits (without blocking the loop) until they acknowledged or 3 s passed.
+func _begin_close() -> void:
+	if server == null or server.is_closed():
+		_finish_shutdown(0, "")
+		return
+	if server.playlist:
+		server.playlist.save_state()
+	server.closed.connect(_finish_shutdown, CONNECT_ONE_SHOT)
+	server.close_async(NetProtocol.R_SHUTDOWN, _shutdown_msg, _shutdown_restart, 3000)
+
+
+func _finish_shutdown(_code: int, _msg: String) -> void:
 	set_process(false)
-	if server:
-		if server.playlist:
-			server.playlist.save_state()
-		server.close(NetProtocol.R_SHUTDOWN, _shutdown_msg, _shutdown_restart, 800)
 	if tcp:
 		tcp.stop()
 	_write_status("stopped")
 	Log.w("server", "server stopped")
-	_stdin_mutex.lock()
-	var reader_blocked := _stdin_thread != null and not _stdin_done
-	_stdin_mutex.unlock()
-	if _stdin_thread != null and not reader_blocked:
-		_stdin_thread.wait_to_finish()
-		_stdin_thread = null
+	var reader_blocked := false
+	if _stdin_thread != null:
+		_stdin_mutex.lock()
+		_stdin_stop = true
+		_stdin_mutex.unlock()
+		# pipes/files notice the stop flag within ~50 ms; an interactive console read cannot be
+		# interrupted until Enter is pressed
+		for i in 10:
+			_stdin_mutex.lock()
+			var done := _stdin_done
+			_stdin_mutex.unlock()
+			if done:
+				break
+			OS.delay_msec(30)
+		_stdin_mutex.lock()
+		reader_blocked = not _stdin_done
+		_stdin_mutex.unlock()
+		if not reader_blocked:
+			_stdin_thread.wait_to_finish()
+			_stdin_thread = null
 	if reader_blocked:
-		# The console reader thread is blocked in a read that cannot be interrupted; state is
-		# saved and logs are flushed, so end the process directly (exit code 0 on Windows).
+		# State is saved and the log flushed (warning line above); end the process directly
+		# (exit code 0 on Windows) instead of waiting for a key press on the console.
 		OS.kill(OS.get_process_id())
 		return
 	get_tree().quit(0)

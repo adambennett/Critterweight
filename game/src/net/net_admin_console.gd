@@ -87,8 +87,9 @@ func _status(server: NetServer) -> String:
 		int(s["uptime_s"]), s["players"], int(s["max_players"]), s["reserved"], s["spectators"]])
 	lines.append("match %d %s | fighters %d | tick %d | playlist %s (%d played)" % [s["match_id"], s["entry"], s["fighters"],
 		s["tick"], s["playlist"], s["matches_played"]])
-	lines.append("sim %.2f ms avg (1 s window %.2f avg / %.2f max) | physics frame %.2f ms | net %.3f ms/tick" % [float(s["sim_ms_avg"]),
-		float(s["tick_ms_avg_1s"]), float(s["tick_ms_max_1s"]), float(s["physics_frame_ms_avg"]), float(s["net_ms_avg"])])
+	lines.append("sim %.2f ms/tick avg (last 1 s: %.2f avg / %.2f max) | longest physics frame %.2f ms (avg of 1 s maxima %.2f) | net %.3f ms/tick" % [
+		float(s["sim_ms_avg"]), float(s["tick_ms_avg_1s"]), float(s["tick_ms_max_1s"]), float(s["physics_frame_max_ms"]),
+		float(s["physics_frame_max_ms_avg"]), float(s["net_ms_avg"])])
 	lines.append("traffic out %.1f KB/s in %.1f KB/s | snapshot %.0f B avg | mem %.1f MB | objects %d nodes %d orphans %d" % [
 		float(s["out_kbps"]), float(s["in_kbps"]), float(s["snapshot_bytes_avg"]), float(s["mem_static_mb"]), s["objects"], s["nodes"], s["orphans"]])
 	return "\n".join(lines)

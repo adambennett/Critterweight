@@ -14,7 +14,7 @@ extends Node
 ##   --blackhole-at <s>  conditioner drops everything from then on (timeout test)
 ##   --test-protocol N --test-game-version X --net-test-mod <dir>   incompatible-build simulation
 ##   --net-latency ms --net-jitter ms --net-loss f       network conditioner
-##   host only: --host-start-after-players N --rules id --arena id --bots n --rules-override <json>
+##   host only: --host-start-after-players N --rules id --arena id --bots n --rounds n --round-time s
 ##   --app-request <type>  send one app request once in the lobby (app channel test)
 
 const RESULT_EVERY_MS := 500
@@ -375,10 +375,13 @@ func _start_host() -> void:
 	_server = Net.server
 	result["connected"] = true
 	result["player_id"] = 1
-	if args.has("--rules-override"):
-		var ov = JSON.parse_string(arg("--rules-override"))
-		if typeof(ov) == TYPE_DICTIONARY:
-			Net.host_set("rules_override", ov)
+	var ov := {}
+	if args.has("--rounds"):
+		ov["rounds"] = int(arg("--rounds"))
+	if args.has("--round-time"):
+		ov["round_time"] = float(arg("--round-time"))
+	if not ov.is_empty():
+		Net.host_set("rules_override", ov)
 	Net.match_starting.connect(_on_host_match_started)
 	Net.match_ended.connect(_on_match_ended)
 	Net.notice.connect(_on_notice)

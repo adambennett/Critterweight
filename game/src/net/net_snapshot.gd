@@ -10,7 +10,8 @@ class_name NetSnapshot
 ##     [u16 poise*10][u16 max_poise*10][u8 hype*2.55][i8 lives][i8 target]
 ##     [u8 cooldown count] ([str slot][u16 seconds*100]) x n
 ##     [u8 status count]  ([str id][str element][u16 seconds*100]) x n
-##   [u8 entity count] per entity: [u16 id][u8 kind][vec3q pos][u16 radius*100][str element][i8 team]
+##   [u8 entity count] per entity: [u16 id][u8 kind code (255: str kind)][str zone_kind/prop]
+##                     [vec3q pos][u16 radius*100][str element][i8 team]
 ##   [u8 prop count]   per dynamic prop: [u8 prop index][vec3q pos][quat32 rotation]
 ##   mode: [u8 phase][u8 round index][u16 round timer*10][u8 flags][i8 winner][i8 round winner]
 ##         [u8 team count] ([i8 team][u8 round wins][i16 score]) x n [str hud status]
@@ -37,8 +38,7 @@ const MAX_ENTITIES := 96
 const MAX_PROPS := 64
 const MAX_STATUSES := 12
 const MAX_COOLDOWNS := 8
-const KIND_PROJECTILE := 0
-const KIND_ZONE := 1
+const KINDS := ["projectile", "zone", "prop", "delayed"]   ## entity kind codes (255 = text follows)
 
 
 # ---- compatibility helpers (Fighter/MatchMode features added by other subsystems) ----
@@ -99,7 +99,12 @@ static func encode_body(sim: MatchSim, gens: PackedByteArray) -> PackedByteArray
 	for e in ents:
 		var ed2: Dictionary = e
 		w.u16(int(ed2.get("id", 0)) & 0xFFFF)
-		w.u8(KIND_PROJECTILE if str(ed2.get("kind", "")) == "projectile" else KIND_ZONE)
+		var kind := str(ed2.get("kind", ""))
+		var kc := KINDS.find(kind)
+		w.u8(kc if kc >= 0 else 255)
+		if kc < 0:
+			w.text(kind, 24)
+		w.text(str(ed2.get("zone_kind", ed2.get("prop", ""))), 32)
 		w.vec3q(ed2.get("pos", Vector3.ZERO))
 		w.u16(clampi(roundi(float(ed2.get("radius", 0.25)) * 100.0), 0, 65535))
 		w.text(str(ed2.get("element", "")), 24)
@@ -282,13 +287,19 @@ static func decode_body(r: NetReader) -> Dictionary:
 	var ne := r.count(MAX_ENTITIES)
 	for k in ne:
 		var eid := r.u16()
-		var kind := r.u8()
+		var kc := r.u8()
+		var kind: String = r.text(24) if kc == 255 else (str(KINDS[kc]) if kc < KINDS.size() else "zone")
+		var sub := r.text(32)
 		var pos := r.vec3q()
 		var rad := r.u16() / 100.0
 		var el2 := r.text(24)
 		var team := r.i8()
-		ents.append({"id": eid, "kind": "projectile" if kind == KIND_PROJECTILE else "zone", "pos": pos,
-			"radius": rad, "element": el2, "team": team, "e": {}})
+		var ent := {"id": eid, "kind": kind, "pos": pos, "radius": rad, "element": el2, "team": team, "e": {}}
+		if kind == "prop":
+			ent["prop"] = sub
+		elif sub != "":
+			ent["zone_kind"] = sub
+		ents.append(ent)
 	out["entities"] = ents
 	var props: Array = []
 	var np := r.count(MAX_PROPS)

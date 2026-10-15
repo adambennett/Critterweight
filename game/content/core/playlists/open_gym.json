@@ -1,0 +1,14 @@
+{
+  "id": "open_gym",
+  "name": "Open Gym",
+  "version": 1,
+  "description": "A no-vote rotation for always-on servers: the next match is drawn by weight right after results, bots fill empty slots, humans-only duels never start with bots.",
+  "voting": {"enabled": false, "candidates": 1},
+  "repeat_avoidance": 1,
+  "entries": [
+    {"id": "gym_duel", "name": "Sparring Duel (humans only)", "rules": "duel", "arena": "the_gullet", "weight": 3, "bots": 0},
+    {"id": "gym_ffa", "name": "Open Gym Free-for-All", "rules": "free_for_all", "arena": "the_gullet", "weight": 2,
+      "min_players": 3, "rules_override": {"round_time": 120}},
+    {"id": "gym_teams", "name": "Gym Teams 2v2", "rules": "teams_2v2", "arena": "the_gullet", "weight": 1}
+  ]
+}

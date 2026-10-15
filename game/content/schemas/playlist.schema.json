@@ -2,16 +2,40 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "critterweight/playlist",
   "title": "Server playlist",
-  "description": "Weighted rotation of rules + arena entries. See docs/SERVER.md#playlists.",
+  "description": "Weighted rotation of rules + arena entries with optional player voting. Rules for weights, candidates, ties, repeat avoidance, minimum players and invalid entries: docs/SERVER.md#playlists.",
   "type": "object",
   "required": ["id", "name", "entries"],
   "properties": {
-    "id": {"type": "string"},
-    "name": {"type": "string"},
-    "entries": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["rules", "arena", "weight"],
-      "properties": {"rules": {"type": "string"}, "arena": {"type": "string"}, "weight": {"type": "number", "minimum": 0},
-        "min_players": {"type": "integer", "minimum": 1, "maximum": 8}, "max_players": {"type": "integer", "minimum": 1, "maximum": 8}, "bots": {"type": "integer", "minimum": 0, "maximum": 7}}}},
-    "voting": {"type": "object"},
-    "repeat_avoidance": {"type": "integer", "minimum": 0}
+    "id": {"type": "string", "pattern": "^([a-z0-9_]+:)?[a-z0-9_]+$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 60},
+    "description": {"type": "string", "maxLength": 500},
+    "version": {"type": "integer", "minimum": 1},
+    "override": {"type": "boolean"},
+    "entries": {
+      "type": "array", "minItems": 1, "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": ["rules", "arena", "weight"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_:@.-]+$", "maxLength": 64, "description": "Stable key used by repeat avoidance and the saved history (default: rules@arena)."},
+          "name": {"type": "string", "maxLength": 60, "description": "Shown on vote cards (default: '<rules name> @ <arena name>')."},
+          "rules": {"type": "string", "description": "Rules preset id (content rules/*.json)."},
+          "arena": {"type": "string", "description": "Arena id (content arenas/*.json or an installed layout package)."},
+          "weight": {"type": "number", "minimum": 0, "description": "Relative chance of being drawn. 0 disables the entry."},
+          "min_players": {"type": "integer", "minimum": 1, "maximum": 8, "description": "Fighters needed to start (default: the rules format minimum). Bots fill when allowed."},
+          "max_players": {"type": "integer", "minimum": 1, "maximum": 8, "description": "Maximum human fighters; extra humans spectate this match."},
+          "bots": {"type": "integer", "minimum": 0, "maximum": 7, "description": "Bots this entry may add (0 = humans only). Absent: the server's 'bots' setting decides."},
+          "rules_override": {"type": "object", "description": "Rules keys applied on top of the preset (e.g. round_time, rounds, lives)."}
+        }
+      }
+    },
+    "voting": {
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean", "description": "false: the next entry is drawn by weight without a vote."},
+        "candidates": {"type": "integer", "minimum": 1, "maximum": 5, "description": "Entries offered per vote (capped by the server's vote_candidates)."}
+      }
+    },
+    "repeat_avoidance": {"type": "integer", "minimum": 0, "maximum": 16, "description": "The last N played entries are not offered again (relaxed if nothing else can start)."}
   }
 }

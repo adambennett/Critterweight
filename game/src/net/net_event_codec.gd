@@ -19,11 +19,14 @@ const TYPES := ["hit", "glance", "grab_tech", "effect", "reflect", "reaction", "
 	"round_reset", "round_intro", "round_start", "match_end", "elimination", "respawn", "timeout",
 	"round_end", "status", "fighter_spawned", "fighter_despawned", "fighter_rebuilt", "goal",
 	"unit_crowned", "unit_toppled", "unit_transforming", "wave_start", "wave_cleared", "pick_offered",
-	"pick_taken", "tag", "reaction_zone", "carry", "throw_ball"]
+	"pick_taken", "tag", "reaction_zone", "carry", "throw_ball", "dot", "zone_reaction", "prop_spawn",
+	"projectile_destroyed", "arc", "spring", "prop_destroyed", "splat", "hover", "land", "submerge",
+	"wall_bonk", "counter", "flinch"]
 const KEYS := ["fighter", "target", "victim", "attacker", "damage", "point", "normal", "pos", "blocked",
 	"parried", "counter", "part", "element", "quality", "move", "slot", "knockdown", "otg", "effect",
 	"vfx", "reaction", "name", "a", "b", "id", "reason", "arena", "mode", "speed", "round", "winner",
-	"by", "status", "creature", "team", "scale", "wave", "upgrade", "score", "kind", "amount", "dir"]
+	"by", "status", "creature", "team", "scale", "wave", "upgrade", "score", "kind", "amount", "dir",
+	"result", "prop", "from", "to", "dest", "interrupted"]
 const COMMON := ["", "core", "head", "arm", "leg", "tail", "wing", "shell", "horn", "fin", "l1", "l2",
 	"l3", "heavy", "finisher", "dash_attack", "grab", "taunt", "juice", "ability1", "ability2", "effect",
 	"zone", "pummel", "throw", "slam", "reaction", "projectile", "area", "buff", "debuff", "heal",

@@ -58,6 +58,8 @@ var _seq := 0
 var _phys := 0
 var _last_tick := 0
 var _closed_emitted := false
+var _ping_ms := 0
+var _last_rx_ms := 0
 ## stats
 var _win_ms := 0
 var _win_snaps := 0
@@ -153,7 +155,7 @@ func _finish(reason: Dictionary, as_failure: bool) -> void:
 	_closed_emitted = true
 	var was := state
 	_end_match_presentation()
-	transport.close()
+	transport.close(NetProtocol.R_LEFT)
 	if conditioner:
 		conditioner.stop()
 	_set_state(State.CLOSED)
@@ -191,6 +193,17 @@ func _physics_process(_dt: float) -> void:
 				if not transport.is_open():
 					return
 	var now := Time.get_ticks_msec()
+	if is_connected_to_server():
+		# heartbeat: the server answers every ping, so both sides always hear each other at
+		# least once per second and can apply the configured timeout precisely
+		if now - _ping_ms >= 1000:
+			_ping_ms = now
+			var pw := NetWriter.new(NetProtocol.C_PING)
+			pw.u32(now)
+			transport.send(1, NetProtocol.CH_CONTROL, pw.data(), false)
+		if _last_rx_ms > 0 and now - _last_rx_ms > transport.timeout_ms:
+			_finish(NetProtocol.describe(NetProtocol.R_TIMEOUT, ["Nothing received from the server for %d s." % roundi(transport.timeout_ms / 1000.0)]), false)
+			return
 	if state == State.CONNECTING and now - _connect_ms > transport.timeout_ms + 1500:
 		_fail_now(NetProtocol.describe(NetProtocol.R_CONNECT_FAILED, ["No answer from %s:%d within %d s." % [address, port, roundi(transport.timeout_ms / 1000.0)]]))
 		return
@@ -239,6 +252,7 @@ func _on_disconnect(code: int) -> void:
 # =====================================================================================
 
 func _on_packet(channel: int, data: PackedByteArray) -> void:
+	_last_rx_ms = Time.get_ticks_msec()
 	if data.is_empty() or data.size() > NetProtocol.MAX_SERVER_PACKET:
 		malformed += 1
 		return

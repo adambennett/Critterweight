@@ -1,0 +1,17 @@
+{
+  "id": "bargain_bin",
+  "name": "Bargain Bin",
+  "version": 1,
+  "description": "Crowded cage chaos: free-for-alls topped up with bots so a match can start with 2 humans. Vote between 3; the last played entry is not offered again.",
+  "voting": {"enabled": true, "candidates": 3},
+  "repeat_avoidance": 1,
+  "entries": [
+    {"id": "ffa_gullet", "name": "Free-for-All (4 fighters)", "rules": "free_for_all", "arena": "the_gullet", "weight": 3,
+      "min_players": 4},
+    {"id": "ffa_stocks_gullet", "name": "Three-Stock Brawl", "rules": "free_for_all", "arena": "the_gullet", "weight": 2,
+      "min_players": 4, "rules_override": {"lives": 3, "respawn": true, "respawn_delay": 3.0, "round_time": 240}},
+    {"id": "ffa_big_gullet", "name": "Packed House (6 fighters)", "rules": "free_for_all", "arena": "the_gullet", "weight": 1,
+      "min_players": 6},
+    {"id": "tag_along_bots", "name": "Tag Along 2v2", "rules": "teams_2v2", "arena": "the_gullet", "weight": 1}
+  ]
+}

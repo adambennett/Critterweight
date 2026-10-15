@@ -129,12 +129,17 @@ func rejoin() -> Error:
 	return join(str(_rejoin["address"]), int(_rejoin["port"]), str(_rejoin.get("password", "")), {"token": _rejoin["token"]})
 
 
-## Leaves the current session. A listen host closes it for everyone ("The host left").
+## Leaves the current session. A listen host closes it for everyone ("The host left"); the
+## server node finishes delivering that notice in the background, then frees itself.
 func leave() -> void:
 	match role:
 		"host":
-			server.close(NetProtocol.R_HOST_LEFT, "The host left the session.", false, 300)
-			_drop_server()
+			var s := server
+			server = null
+			if s.match_info.size() > 0 and s.scene != null and is_instance_valid(s.scene) and App.current_scene == s.scene:
+				App.set_scene(null)
+			s.closed.connect(func(_c: int, _m: String) -> void: s.queue_free(), CONNECT_ONE_SHOT)
+			s.close_async(NetProtocol.R_HOST_LEFT, "The host left the session.", false, 2000)
 		"client":
 			if client:
 				client.leave()

@@ -69,6 +69,10 @@ var _bans: Array = []
 var _lobby_dirty := true
 var _lobby_sent_ms := 0
 var _closing := false
+var _finalized := false
+var _close_deadline := 0
+var _close_code := NetProtocol.R_SHUTDOWN
+var _close_message := ""
 var _aborting := ""
 var _beacon_ms := 0
 var _stats_ms := 0
@@ -167,12 +171,38 @@ func is_running() -> bool:
 	return transport.is_open() and not _closing
 
 
-## Graceful close: tells every client why (and whether a restart is expected), lets the
-## notices leave, then tears everything down. `wait_ms` blocks briefly to deliver them.
+func is_closed() -> bool:
+	return _finalized
+
+
+## Graceful close (blocking - for quitting processes): tells every client why (and whether a
+## restart is expected), pumps the network for up to `wait_ms` so the notices are acknowledged,
+## then tears everything down. Prefer close_async() when the process keeps running.
 func close(code := NetProtocol.R_SHUTDOWN, message := "", restarting := false, wait_ms := 400) -> void:
+	if _finalized:
+		return
+	begin_close(code, message, restarting)
+	transport.drain(wait_ms)
+	_finalize_close()
+
+
+## Graceful close without blocking: notices go out now; the server keeps servicing the network
+## until every client has acknowledged and disconnected (or `max_ms` passes), then emits `closed`.
+## ENet drops undelivered packets when a disconnect overtakes them, so this is how the shutdown
+## reason reliably reaches slow or high-latency clients.
+func close_async(code := NetProtocol.R_SHUTDOWN, message := "", restarting := false, max_ms := 2500) -> void:
+	if _closing:
+		return
+	begin_close(code, message, restarting)
+	_close_deadline = Time.get_ticks_msec() + max_ms
+
+
+func begin_close(code: int, message: String, restarting: bool) -> void:
 	if _closing:
 		return
 	_closing = true
+	_close_code = code
+	_close_message = message
 	var w := NetWriter.new(NetProtocol.S_CLOSING)
 	w.u8(code)
 	w.text(message, 400)
@@ -186,7 +216,15 @@ func close(code := NetProtocol.R_SHUTDOWN, message := "", restarting := false, w
 	for peer in _pending.keys():
 		transport.disconnect_peer(int(peer), code, true)
 	transport.flush()
-	transport.drain(wait_ms)
+	Log.i("net", "server closing (%s)%s" % [NetProtocol.reason_name(code), (": " + message) if message != "" else ""])
+
+
+func _finalize_close() -> void:
+	if _finalized:
+		return
+	_finalized = true
+	var code := _close_code
+	var message := _close_message
 	Log.i("net", "server closed (%s)%s" % [NetProtocol.reason_name(code), (": " + message) if message != "" else ""])
 	_teardown_match()
 	transport.close()
@@ -203,7 +241,7 @@ func close(code := NetProtocol.R_SHUTDOWN, message := "", restarting := false, w
 
 
 func _exit_tree() -> void:
-	if not _closing and transport.is_open():
+	if not _finalized and transport.is_open():
 		close(NetProtocol.R_SHUTDOWN, "", false, 100)
 
 
@@ -212,7 +250,15 @@ func _exit_tree() -> void:
 # =====================================================================================
 
 func _physics_process(dt: float) -> void:
-	if _closing or not transport.is_open():
+	if _finalized or not transport.is_open():
+		return
+	if _closing:
+		# async close: keep servicing so the closing notices are acknowledged
+		for ev in transport.poll():
+			pass
+		transport.flush()
+		if transport.peer_ids().is_empty() or (_close_deadline > 0 and Time.get_ticks_msec() >= _close_deadline):
+			_finalize_close()
 		return
 	var t0 := Time.get_ticks_usec()
 	for ev in transport.poll():
@@ -246,9 +292,10 @@ func _physics_process(dt: float) -> void:
 
 
 func _process(_dt: float) -> void:
+	# Godot's TIME_PHYSICS_PROCESS monitor is the longest physics frame (script + Jolt step) of
+	# the previous second; sampled here so status() can report it during matches.
 	if sim != null and (phase == PHASE_MATCH or phase == PHASE_RESULTS):
-		perf["phys_ms_total"] = float(perf["phys_ms_total"]) + Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0
-		perf["phys_samples"] = int(perf["phys_samples"]) + 1
+		perf["phys_max_ms"] = Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0
 
 
 func _on_transport_event(ev: Dictionary) -> void:
@@ -385,6 +432,7 @@ func _handle_hello(peer: int, data: PackedByteArray) -> void:
 	p2.token = NetProtocol.random_bytes(NetProtocol.TOKEN_BYTES)
 	p2.address = addr
 	p2.joined_ms = Time.get_ticks_msec()
+	p2.last_rx_ms = p2.joined_ms
 	players[p2.id] = p2
 	_peer_player[peer] = p2.id
 	_send_welcome(p2, false, as_spectator and not want_spectate)
@@ -435,6 +483,7 @@ func _bind_rejoin(p: NetPlayer, peer: int, addr: String) -> void:
 	p.left_voluntarily = false
 	p.address = addr
 	p.match_seen = 0
+	p.last_rx_ms = Time.get_ticks_msec()
 	_peer_player[peer] = p.id
 	if sim != null and p.fighter >= 0 and p.fighter < sim.fighters.size() and phase == PHASE_MATCH:
 		if p.input == null:
@@ -574,6 +623,7 @@ func _on_receive(peer: int, channel: int, data: PackedByteArray) -> void:
 	if p == null:
 		return
 	p.bytes_in += data.size()
+	p.last_rx_ms = Time.get_ticks_msec()
 	if not p.rl_bytes.take(float(data.size())):
 		kick(p.id, "flooding", NetProtocol.R_FLOOD)
 		return
@@ -734,7 +784,7 @@ func _handle_ping(p: NetPlayer, data: PackedByteArray) -> void:
 	var w := NetWriter.new(NetProtocol.S_PONG)
 	w.u32(echo)
 	w.u32(Time.get_ticks_msec())
-	transport.send(p.peer, NetProtocol.CH_CONTROL, w.data(), true)
+	transport.send(p.peer, NetProtocol.CH_CONTROL, w.data(), false)
 
 
 # =====================================================================================
@@ -903,7 +953,7 @@ func _on_peer_disconnected(peer: int, code: int) -> void:
 	p.disconnected_ms = Time.get_ticks_msec()
 	var grace := int(cfg["rejoin_grace"])
 	var why := "left" if p.left_voluntarily else ("timed out" if code == 0 else NetProtocol.reason_name(code))
-	if p.left_voluntarily or grace <= 0 or p.spectator or code == NetProtocol.R_KICKED:
+	if p.left_voluntarily or grace <= 0 or p.spectator or code == NetProtocol.R_KICKED or code == NetProtocol.R_LEFT:
 		_remove_player(p, why)
 		return
 	_bot_takeover(p)
@@ -1524,10 +1574,17 @@ func _housekeeping() -> void:
 		if now - int(_pending[peer]["since"]) > HANDSHAKE_MS:
 			_reject(int(peer), NetProtocol.R_HANDSHAKE_TIMEOUT, "handshake timed out")
 	var grace_ms := int(cfg["rejoin_grace"]) * 1000
+	var timeout_ms := int(cfg["timeout"]) * 1000
 	for p in players.values():
 		var np: NetPlayer = p
 		if not np.connected and np.peer != -1 and now - np.disconnected_ms > grace_ms:
 			_remove_player(np, "did not return within %d s" % int(cfg["rejoin_grace"]))
+		elif np.connected and np.peer > 0 and np.last_rx_ms > 0 and now - np.last_rx_ms > timeout_ms:
+			# application-level timeout (clients send at least a ping every second)
+			var dead := np.peer
+			Log.i("net", "player %d '%s' timed out (no data for %d s)" % [np.id, np.name, int(cfg["timeout"])])
+			transport.disconnect_peer(dead, NetProtocol.R_TIMEOUT, false)
+			_on_peer_disconnected(dead, 0)
 	if now - _rtt_ms > 500:
 		_rtt_ms = now
 		for p in players.values():
@@ -1555,6 +1612,9 @@ func _housekeeping() -> void:
 		var wt := int(perf["window_ticks"])
 		perf["tick_ms_avg"] = float(perf["window_sim_us"]) / 1000.0 / float(wt) if wt > 0 else 0.0
 		perf["tick_ms_max"] = float(perf["window_sim_max"]) / 1000.0
+		if wt > 0:
+			perf["phys_ms_total"] = float(perf["phys_ms_total"]) + float(perf.get("phys_max_ms", 0.0))
+			perf["phys_samples"] = int(perf["phys_samples"]) + 1
 		perf["window_ticks"] = 0
 		perf["window_sim_us"] = 0
 		perf["window_sim_max"] = 0
@@ -1638,7 +1698,8 @@ func status() -> Dictionary:
 		"sim_ms_avg": float(perf["sim_us_total"]) / 1000.0 / float(ticks),
 		"sim_ms_max": float(perf["sim_us_max"]) / 1000.0,
 		"tick_ms_avg_1s": perf["tick_ms_avg"], "tick_ms_max_1s": perf["tick_ms_max"],
-		"physics_frame_ms_avg": float(perf["phys_ms_total"]) / maxf(1.0, float(perf["phys_samples"])),
+		"physics_frame_max_ms": float(perf.get("phys_max_ms", 0.0)),
+		"physics_frame_max_ms_avg": float(perf["phys_ms_total"]) / maxf(1.0, float(perf["phys_samples"])),
 		"net_ms_avg": float(perf["net_us_total"]) / 1000.0 / float(net_ticks),
 		"net_ms_max": float(perf["net_us_max"]) / 1000.0,
 		"snapshot_bytes_avg": float(perf["snapshot_bytes"]) / float(snaps),
@@ -1654,9 +1715,9 @@ func status() -> Dictionary:
 
 func stats_line() -> String:
 	var s := status()
-	return "phase=%s players=%d spect=%d match=%d fighters=%d sim_ms(1s avg/max)=%.2f/%.2f phys_frame_ms=%.2f out=%.1fKB/s in=%.1fKB/s mem=%.1fMB objects=%d nodes=%d orphans=%d" % [
+	return "phase=%s players=%d spect=%d match=%d fighters=%d sim_ms(1s avg/max)=%.2f/%.2f phys_frame_max_ms=%.2f out=%.1fKB/s in=%.1fKB/s mem=%.1fMB objects=%d nodes=%d orphans=%d" % [
 		s["phase"], s["players"], s["spectators"], s["match_id"], s["fighters"], float(s["tick_ms_avg_1s"]), float(s["tick_ms_max_1s"]),
-		float(s["physics_frame_ms_avg"]), float(s["out_kbps"]), float(s["in_kbps"]), float(s["mem_static_mb"]), s["objects"], s["nodes"], s["orphans"]]
+		float(s["physics_frame_max_ms"]), float(s["out_kbps"]), float(s["in_kbps"]), float(s["mem_static_mb"]), s["objects"], s["nodes"], s["orphans"]]
 
 
 func players_public() -> Array:

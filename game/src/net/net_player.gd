@@ -31,6 +31,7 @@ var violation_ms := 0
 var violation_log := 0
 var last_input_seq := -1
 var last_ack_tick := 0
+var last_rx_ms := 0              ## last packet from this player (application-level timeout)
 var bytes_in := 0
 var rl_input := NetRateLimiter.new(150.0, 60.0)
 var rl_control := NetRateLimiter.new(30.0, 60.0)

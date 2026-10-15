@@ -228,10 +228,10 @@ func drain(ms: int) -> void:
 	host.flush()
 
 
-func close() -> void:
+func close(code := NetProtocol.R_SHUTDOWN) -> void:
 	if host:
 		for p in _peers.values():
-			(p as ENetPacketPeer).peer_disconnect_now(NetProtocol.R_SHUTDOWN)
+			(p as ENetPacketPeer).peer_disconnect_now(code)
 		host.flush()
 		host.destroy()
 	host = null
