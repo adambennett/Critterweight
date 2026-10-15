@@ -126,7 +126,7 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 ## Art, animation, graphics, audio, tone [12]
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
-| ART-01 | Art direction guide | ~ | docs/design/ART_DIRECTION.md (in progress) |
+| ART-01 | Art direction guide | I | docs/design/ART_DIRECTION.md: style statement, silhouettes/proportions, global/element/fighter palettes, stylized PBR materials, active-ragdoll animation principles, per-element VFX shape language (readable without colour), impact/hit-flash rules, UI style and typography, wordmark, readability in 4-8 fighter scenes, asset standards for the forge pipeline |
 | ART-02 | Cohesive cartoony 3D style, original creatures; representative fighter & arena early | I | Forged original creatures (docs/evidence/art), The Gullet arena; tools/forge |
 | ART-03 | glTF import path validated; PBR, soft shadows, SSAO, HDR tonemapping; scalable quality | I | glTF pipeline (forge -> .glb -> Godot import; runtime GLTFDocument for mods), PBR hints, AgX, SSAO, soft shadows, quality presets |
 | ART-04 | Readable locomotion, attacks, abilities, hit reactions, blocking, knockdowns/recovery, win/loss per anatomy | — | |
@@ -176,10 +176,9 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
 | PRV-01 | Original names, designs, writing, UI identity, audio | ~ | docs/design |
-| PRV-02 | Third-party inventory incl. Cage Rules reuse and engine/deps | ~ | docs/THIRD_PARTY.md (Godot, Jolt, fonts incl. Bungee); Cage Rules reuse to be completed |
-| PRV-03 | Generated assets: tool/source recorded, editable sources kept | — | |
-| PRV-04 | Credits/notices; unresolved legal/platform items recorded; no certification claims | — | |
-
+| PRV-02 | Third-party inventory incl. Cage Rules reuse and engine/deps | I | docs/THIRD_PARTY.md: engine/middleware, fonts (Barlow via Cage Rules, Bungee) with sources, licences, notices; Cage Rules reuse audited repo-wide (fonts only; its bundled three.js/rapier/peerjs unused); original-asset inventory (models, visuals, audio, policies, writing) |
+| PRV-03 | Generated assets: tool/source recorded, editable sources kept | I | Models: tools/forge from tools/forge/defs (docs/ART_PIPELINE.md, generator recorded in each .glb); audio: tools/audio sources with byte-identical re-render check (docs/AUDIO.md); icons: game/assets/ui/source/make_icons.py; policies: Lab jobs/logs in docs/evidence/lab |
+| PRV-04 | Credits/notices; unresolved legal/platform items recorded; no certification claims | I | In-game Credits + Notices (engine licence/component texts from the running binary, OFL texts); docs/CREDITS.md and THIRD_PARTY.md + OFL files ship in every package (tools/build/package.ps1); open legal/platform items listed in THIRD_PARTY.md (no certification claims) |
 ## Verification gates [17, 19]
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|

@@ -5,7 +5,8 @@ game/*.translation
 *.import.tmp
 
 # Build outputs (packaged builds are produced by tools/build/*.ps1; see README)
-build/
+/build/
+tools/forge/build/
 dist/
 game/export_cache/
 

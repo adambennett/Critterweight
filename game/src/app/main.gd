@@ -6,13 +6,14 @@ extends Node
 ##   --probe <name>          run a physics/combat probe and print metrics
 ##   --server [--config p]   dedicated server (see docs/SERVER.md)
 ##   --lab-worker <job>      AI Lab training worker (spawned by the Lab UI)
-##   --autotest <scenario>   scripted runtime verification of the real game UI
 ##   --bench <scene>         performance capture
 
 var args: PackedStringArray
+var _ready_ms := 0
 
 
 func _ready() -> void:
+	_ready_ms = Time.get_ticks_msec()
 	args = OS.get_cmdline_user_args()
 	# integration points other owners' menus call into
 	TutorialHook.launcher = Callable(Tutorial, "start_lesson")
@@ -33,8 +34,6 @@ func _ready() -> void:
 		mode = "server"
 	elif args.has("--lab-worker"):
 		mode = "lab_worker"
-	elif args.has("--autotest"):
-		mode = "autotest"
 	elif args.has("--bench"):
 		mode = "bench"
 	elif args.has("--hub"):
@@ -53,8 +52,12 @@ func _exit_tree() -> void:
 
 
 func _on_boot_screen(screen: String) -> void:
+	var built := Time.get_ticks_msec()
 	await RenderingServer.frame_post_draw
-	var rep := {"screen": screen, "ms_since_start": Time.get_ticks_msec(), "static_memory_mb": OS.get_static_memory_usage() / 1048576.0,
+	# breakdown: engine + autoloads until the main scene is ready, then the first screen is built,
+	# then its first frame is drawn (pipeline/shader compilation lands in the last part)
+	var rep := {"screen": screen, "ms_since_start": Time.get_ticks_msec(), "ms_main_ready": _ready_ms, "ms_screen_built": built,
+		"static_memory_mb": OS.get_static_memory_usage() / 1048576.0,
 		"video_memory_mb": Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0}
 	var f := FileAccess.open(arg_value("--boot-report", "user://boot_report.json"), FileAccess.WRITE)
 	if f:
@@ -94,10 +97,6 @@ func _start(mode: String) -> void:
 			var worker = load("res://src/lab/lab_worker.gd").new()
 			add_child(worker)
 			worker.call("run_from_cli", args)
-		"autotest":
-			var at = load("res://src/test/autotest.gd").new()
-			add_child(at)
-			at.call("run", arg_value("--autotest", ""), args)
 		"bench":
 			var bench = load("res://src/test/bench.gd").new()
 			add_child(bench)

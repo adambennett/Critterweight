@@ -23,7 +23,9 @@ import tarfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 GAME = os.path.join(ROOT, "game")
-RES_RE = re.compile(r"res://[A-Za-z0-9_\-./ ]+")
+RES_RE = re.compile(r"res://[A-Za-z0-9_\-./]+")
+# paths tests use on purpose because they must not exist (rejection tests)
+EXPECTED_MISSING = {"res://evil.gd"}
 SKIP_DIRS = {".godot", ".import", "node_modules"}
 
 
@@ -56,6 +58,8 @@ def check_res_paths():
         text = open(path, encoding="utf-8", errors="replace").read()
         for m in RES_RE.finditer(text):
             lit = m.group(0).rstrip(". /")
+            if lit in EXPECTED_MISSING:
+                continue
             rel = lit[len("res://"):]
             if not rel or rel.endswith("/") or "%" in rel or rel.startswith("."):
                 continue
@@ -88,13 +92,18 @@ def check_windows_only():
         rel = os.path.relpath(path, ROOT)
         if "/test/" in rel.replace("\\", "/"):
             continue
+        prev = ""
         for i, line in enumerate(open(path, encoding="utf-8", errors="replace"), 1):
             s = line.strip()
             if s.startswith("#"):
                 continue
+            # a branch that only runs on Windows (e.g. `if OS.get_name() == "Windows":`) is fine
+            guarded = ("OS.get_name() == \"Windows\"" in prev) or ("OS.has_feature(\"windows\")" in prev)
             for rx, what in WIN_PATTERNS:
-                if rx.search(line):
+                if rx.search(line) and not guarded:
                     hits.append("%s:%d %s: %s" % (rel, i, what, s[:100]))
+            if s:
+                prev = s
     return hits
 
 

@@ -154,3 +154,34 @@ func test_size_budget() -> void:
 	var m := _manifest()
 	var total := int(m.get("bytes", 0))
 	check(total > 0 and total <= 140 * 1048576, "rendered audio %.1f MB stays near the ~120 MB budget" % (total / 1048576.0))
+
+
+## Every sound or track the code asks for by a literal id exists (a missing id is silent at
+## runtime: the menu once asked for a "menu_theme" track that was never in the bank).
+func test_literal_ids_in_code_exist() -> void:
+	if OS.has_feature("template"):
+		return
+	var re := RegEx.create_from_string('Audio\\.(music|sfx|ui|ambience)\\("([^"]+)"')
+	var missing := []
+	var seen := 0
+	var dirs := ["res://src"]
+	while not dirs.is_empty():
+		var dir: String = dirs.pop_back()
+		var d := DirAccess.open(dir)
+		if d == null:
+			continue
+		for sub in d.get_directories():
+			if sub != "test":
+				dirs.append(dir.path_join(sub))
+		for f in d.get_files():
+			if not f.ends_with(".gd"):
+				continue
+			for m in re.search_all(FileAccess.get_file_as_string(dir.path_join(f))):
+				seen += 1
+				var kind := m.get_string(1)
+				var id := m.get_string(2)
+				var ok := (Audio.bank.get("music", {}) as Dictionary).has(id) if kind == "music" else Audio.has_sfx(id)
+				if not ok:
+					missing.append("%s(\"%s\") in %s" % [kind, id, f])
+	check(seen > 20, "scanned %d literal audio ids" % seen)
+	check(missing.is_empty(), "ids not in the bank: %s" % [missing])
