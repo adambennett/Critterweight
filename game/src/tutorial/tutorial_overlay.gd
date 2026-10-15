@@ -42,7 +42,7 @@ func _exit_tree() -> void:
 
 
 func _on_subtitle(speaker: String, text: String, seconds: float) -> void:
-	if speaker.begins_with("Granny"):
+	if speaker == "granny":
 		return
 	if is_instance_valid(scene) and scene.hud:
 		scene.hud.subtitle(speaker, text, seconds)
