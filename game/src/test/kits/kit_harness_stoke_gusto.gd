@@ -514,6 +514,11 @@ func showcase(att_id: String, shots: Array) -> void:
 		var arena: Dictionary = Content.get_entry("arenas", "the_gullet").duplicate(true)
 		arena["id"] = "kit_showcase"
 		arena["spawns"] = [[0, -gap * 0.5, 0], [0, gap * 0.5, 180]]
+		# format-2 arenas append their spawn markers to the ring and pick opposite ring points:
+		# drop them so the two scripted spawns are the whole ring
+		var mk: Dictionary = arena.get("markers", {})
+		mk.erase("spawn")
+		mk.erase("marker_spawn")
 		var scene := App.start_match({"arena": ArenaDef.from_dict(arena), "seed": 7, "no_record": true,
 			"rules": {"id": "kit_showcase", "name": "Kit showcase", "mode": "standard", "rounds": 1, "round_time": 0, "intro_time": 0.4},
 			"fighters": [{"creature": att_id, "team": 0, "kind": "scripted", "source": d, "name": att_id.trim_prefix("f_").to_upper()},
