@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "critterweight/creature",
+  "title": "Creature (playable fighter, minion or boss)",
+  "description": "See docs/MODDING.md#creatures. Coordinates are fighter space: +Z forward, +Y up, +X = creature's left, metres.",
+  "type": "object",
+  "required": ["id", "name", "body", "moves"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^([a-z0-9_]+:)?[a-z0-9_]+$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 32},
+    "title": {"type": "string", "maxLength": 48},
+    "element": {"enum": ["", "scorch", "brine", "static", "sludge", "grit", "gale"]},
+    "npc_only": {"type": "boolean"},
+    "override": {"type": "boolean"},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "stats": {"type": "object", "additionalProperties": {"type": "number"}},
+    "body": {"type": ["object", "string"]},
+    "moves": {"type": "object", "required": ["l1", "heavy", "grab"], "additionalProperties": {"$ref": "#/$defs/move"}},
+    "abilities": {"type": "object", "additionalProperties": {"$ref": "#/$defs/move"}},
+    "juice": {"type": "object"},
+    "art": {"type": "object"},
+    "audio": {"type": "object"},
+    "ai": {"type": "object"},
+    "techniques": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "move": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "duration": {"type": "number", "minimum": 0.05, "maximum": 12.0},
+        "damage": {"type": "number", "minimum": 0, "maximum": 60},
+        "hit": {"type": "array", "items": {"type": "object", "required": ["t0", "t1", "weapons"]}},
+        "keys": {"type": "array", "items": {"type": "object", "required": ["t"]}},
+        "effects": {"type": "array", "items": {"type": "object", "required": ["t", "type"]}},
+        "cooldown": {"type": "number", "minimum": 0, "maximum": 120}
+      }
+    }
+  }
+}

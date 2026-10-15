@@ -63,7 +63,7 @@ Four arena bases (one polished signature cage, three themed), six example author
 | Size | 14 × 12 m irregular (two 2 m notches cut from opposite corners), **open edges on all sides** |
 | Hazards | **Wind gust** — every 18 s, from a random cardinal direction: 1.5 s telegraph (flags snap, gust sound), then a **push 1.5 m over 1.0 s** on everyone (Winded fighters: ×2, i.e. 3 m). **Edges** — ring-outs (§1). |
 | Props (built-in) | 3 **HVAC units** (1.2 × 1.2 × 1.0 m, indestructible, cover and a ledge), 1 **water tower leg** (0.6 m cylinder), 2 **edge railings** on the short sides (0.9 m, 40 HP, break when splatted into — then it is open edge) |
-| Quirks | Knockback is king: Dredge, Dozer and Gusto love it; Jitters' Spring Pads can launch people off (and save himself: hover ignores the wind). Gale fighters are immune to the gust's push direction penalty (they take it at 50%). Ring-out damage is capped at 8% so it is a positional loss, never a one-shot. |
+| Quirks | Knockback is king: Dredge, Dozer and Gusto love it; Jitters' Spring Pads can launch people off (and save himself: hover ignores the wind). Gale-element fighters take the gust's push at 50%. Ring-out damage is capped at 8% so it is a positional loss, never a one-shot. |
 | Palette | Tar `#2F2B2B`, gravel `#6E6A66`, neon green `#8BD426` and pink `#E04FB0`, night sky `#101624`, rim light neon mix |
 | Best for | Absolute Unit, FFA, Chum Rush (edges shed minions), campaign Act 2 |
 

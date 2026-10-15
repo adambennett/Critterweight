@@ -91,7 +91,7 @@ Everyone fights everyone. The classes exist so the announcer has something to sa
 | Supplements | Product names: <Body Part/Fluid> + <Form>. | Tusk Dust, Marrow Shake, Gland Tonic |
 | Techniques | Gym-talk phrases. | Lead Hand Learner, Quarry Legs |
 | Modes | Two punchy words. | Spotlight Hog, Chum Rush |
-| Difficulty | Fight-card slang. | Sparring, Undercard, Main Card, Title Shot |
+| Difficulty | Career-stage slang (distinct from the act names). | Sparring, Amateur, Pro, Title Shot |
 | Challenge ladder | **The Dosage**, levels "Dose 1" … "Dose 10". | — |
 | Bot skill tiers | Career-stage nouns. | Punching Bag, Journeyman, Contender, Headliner, Hall-of-Famer |
 | Currencies | **Scrip** (in-run, Glandco company scrip) and **Clout** (persistent, fame). | — |

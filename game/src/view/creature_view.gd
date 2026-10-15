@@ -1,0 +1,301 @@
+class_name CreatureView
+extends Node3D
+## Renders one fighter from a stream of segment transforms (local sim or network snapshots).
+## Uses the creature's forged skinned model when available (art.model), otherwise builds a
+## stylized segment model from the body's shapes. Also owns per-creature cosmetic feedback:
+## hit flash, localized bruises, JUICE glow, status tint and the end-of-fight gore gag.
+##
+## The node itself stays at the world origin; bones/segments carry world transforms.
+
+const MAX_BRUISES := 8
+
+var creature: CreatureDef
+var body: BodyDef
+var team_color := Color.WHITE
+var _prev: Array[Transform3D] = []
+var _curr: Array[Transform3D] = []
+var _seg_nodes: Array[Node3D] = []        ## fallback mode: one node per segment
+var _skeleton: Skeleton3D = null
+var _bone_of_seg: PackedInt32Array = PackedInt32Array()
+var _materials: Array[ShaderMaterial] = []
+var _bruises: Array = []                  ## [{seg, local: Vector3, s: float}]
+var _flash := 0.0
+var juice_amount := 0.0
+var status_color := Color(0, 0, 0, 0)
+var gore_level := 2                       ## 0 off, 1 reduced, 2 full
+var detached := false
+var visible_alpha := 1.0
+
+
+func setup(c: CreatureDef, tint := Color.WHITE) -> void:
+	creature = c
+	body = c.body
+	team_color = tint
+	name = "View_" + c.id
+	var model_path := str(c.art.get("model", ""))
+	if model_path != "" and _try_load_model(model_path):
+		pass
+	else:
+		_build_fallback()
+	_prev.resize(body.segments.size())
+	_curr.resize(body.segments.size())
+
+
+func _palette(key: String, fallback: Color) -> Color:
+	var pal: Dictionary = creature.art.get("palette", {})
+	if pal.has(key):
+		return Color.from_string(str(pal[key]), fallback)
+	return fallback
+
+
+func _make_material(color: Color) -> ShaderMaterial:
+	var m := Materials.creature_material()
+	m.set_shader_parameter("tint", color)
+	m.set_shader_parameter("roughness_v", float(creature.art.get("roughness", 0.65)))
+	m.set_shader_parameter("time_offset", randf() * 10.0)
+	m.next_pass = Materials.outline_material(float(creature.art.get("outline", 0.012)))
+	_materials.append(m)
+	return m
+
+
+func _try_load_model(path: String) -> bool:
+	var scene: PackedScene = null
+	if path.begins_with("res://"):
+		if ResourceLoader.exists(path):
+			scene = load(path)
+	else:
+		scene = ModelLoader.load_gltf_scene(path)
+	if scene == null:
+		return false
+	var inst := scene.instantiate()
+	add_child(inst)
+	_skeleton = _find_skeleton(inst)
+	if _skeleton == null:
+		inst.queue_free()
+		return false
+	_bone_of_seg.resize(body.segments.size())
+	for s: BodyDef.Seg in body.segments:
+		_bone_of_seg[s.index] = _skeleton.find_bone(s.id)
+	for mi in _find_meshes(inst):
+		var m := _make_material(Color.WHITE)
+		for si in mi.mesh.get_surface_count():
+			mi.set_surface_override_material(si, m)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	return true
+
+
+func _find_skeleton(n: Node) -> Skeleton3D:
+	if n is Skeleton3D:
+		return n
+	for c in n.get_children():
+		var s := _find_skeleton(c)
+		if s:
+			return s
+	return null
+
+
+func _find_meshes(n: Node) -> Array[MeshInstance3D]:
+	var out: Array[MeshInstance3D] = []
+	if n is MeshInstance3D and (n as MeshInstance3D).mesh:
+		out.append(n)
+	for c in n.get_children():
+		out.append_array(_find_meshes(c))
+	return out
+
+
+## Stylized fallback: smooth primitive per shape, coloured by body part.
+func _build_fallback() -> void:
+	var primary := _palette("primary", Color(0.85, 0.55, 0.3))
+	var secondary := _palette("secondary", primary.darkened(0.25))
+	var accent := _palette("accent", Color(0.95, 0.85, 0.7))
+	var part_colors := {"core": primary, "head": primary.lightened(0.08), "arm": secondary, "leg": secondary,
+		"tail": secondary, "wing": accent, "shell": accent.darkened(0.2), "horn": accent, "fin": accent}
+	var seg_colors: Dictionary = creature.art.get("segment_colors", {})
+	for s: BodyDef.Seg in body.segments:
+		var holder := Node3D.new()
+		holder.name = s.id
+		add_child(holder)
+		_seg_nodes.append(holder)
+		var col: Color = part_colors.get(s.part, primary)
+		if seg_colors.has(s.id):
+			col = Color.from_string(str(seg_colors[s.id]), col)
+		var mat := _make_material(col)
+		for sh: BodyDef.Shape in s.shapes:
+			var mi := MeshInstance3D.new()
+			match sh.type:
+				BodyDef.SHAPE_CAPSULE:
+					var seg_len := sh.a.distance_to(sh.b)
+					if seg_len < 0.005:
+						var sp := SphereMesh.new()
+						sp.radius = sh.radius
+						sp.height = sh.radius * 2.0
+						mi.mesh = sp
+						mi.position = sh.a
+					else:
+						var cap := CapsuleMesh.new()
+						cap.radius = sh.radius
+						cap.height = seg_len + sh.radius * 2.0
+						cap.radial_segments = 20
+						cap.rings = 6
+						mi.mesh = cap
+						mi.transform = Transform3D(Basis(MathX.rotation_between(Vector3.UP, sh.b - sh.a)), (sh.a + sh.b) * 0.5)
+				BodyDef.SHAPE_SPHERE:
+					var sp2 := SphereMesh.new()
+					sp2.radius = sh.radius
+					sp2.height = sh.radius * 2.0
+					sp2.radial_segments = 24
+					sp2.rings = 12
+					mi.mesh = sp2
+					mi.position = sh.a
+				BodyDef.SHAPE_BOX:
+					var bx := BoxMesh.new()
+					bx.size = sh.size
+					mi.mesh = bx
+					mi.position = sh.a
+			mi.material_override = mat
+			holder.add_child(mi)
+		if s.part == "head":
+			_add_eyes(holder, s)
+
+
+func _add_eyes(holder: Node3D, s: BodyDef.Seg) -> void:
+	var sh: BodyDef.Shape = s.shapes[0]
+	var r := sh.radius
+	var white := Materials.toon(Color(0.98, 0.97, 0.94), 0.4, 0.0, 0.0)
+	var pupil := Materials.toon(Color(0.06, 0.05, 0.08), 0.2, 0.0, 0.0)
+	for side in [-1.0, 1.0]:
+		var eye := MeshInstance3D.new()
+		var em := SphereMesh.new()
+		em.radius = r * 0.28
+		em.height = r * 0.56
+		eye.mesh = em
+		eye.material_override = white
+		eye.position = sh.a + Vector3(side * r * 0.38, r * 0.18, r * 0.82)
+		holder.add_child(eye)
+		var pu := MeshInstance3D.new()
+		var pm := SphereMesh.new()
+		pm.radius = r * 0.12
+		pm.height = r * 0.24
+		pu.mesh = pm
+		pu.material_override = pupil
+		pu.position = eye.position + Vector3(0, 0, r * 0.2)
+		holder.add_child(pu)
+
+
+## Called once per simulation tick with world transforms of every segment.
+func push_transforms(xf: Array[Transform3D]) -> void:
+	for i in xf.size():
+		_prev[i] = _curr[i] if _curr[i] != Transform3D() else xf[i]
+		_curr[i] = xf[i]
+
+
+## Snap without interpolation (spawn / teleport).
+func snap_transforms(xf: Array[Transform3D]) -> void:
+	for i in xf.size():
+		_prev[i] = xf[i]
+		_curr[i] = xf[i]
+
+
+func render(alpha: float) -> void:
+	var n := _curr.size()
+	for i in n:
+		var a := _prev[i]
+		var b := _curr[i]
+		var t := Transform3D(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha), a.origin.lerp(b.origin, alpha))
+		if _skeleton:
+			var bi := _bone_of_seg[i]
+			if bi >= 0:
+				_skeleton.set_bone_pose_position(bi, t.origin)
+				_skeleton.set_bone_pose_rotation(bi, t.basis.get_rotation_quaternion())
+		elif i < _seg_nodes.size():
+			_seg_nodes[i].global_transform = t
+	_update_materials()
+
+
+func segment_world(i: int) -> Transform3D:
+	return _curr[i] if i < _curr.size() else Transform3D()
+
+
+func flash(amount := 1.0) -> void:
+	_flash = maxf(_flash, amount)
+
+
+func add_bruise(seg: int, world_point: Vector3, strength: float) -> void:
+	if seg < 0 or seg >= _curr.size():
+		return
+	var local := _curr[seg].affine_inverse() * world_point
+	for b in _bruises:
+		if b["seg"] == seg and (b["local"] as Vector3).distance_to(local) < 0.07:
+			b["s"] = minf(1.0, float(b["s"]) + strength * 0.5)
+			return
+	_bruises.append({"seg": seg, "local": local, "s": clampf(strength, 0.15, 1.0)})
+	if _bruises.size() > MAX_BRUISES:
+		_bruises.sort_custom(func(x, y): return x["s"] > y["s"])
+		_bruises.resize(MAX_BRUISES)
+
+
+func clear_bruises() -> void:
+	_bruises.clear()
+	detached = false
+
+
+func _update_materials() -> void:
+	var dt := get_process_delta_time()
+	_flash = maxf(0.0, _flash - dt * 6.0)
+	var arr: Array[Vector4] = []
+	arr.resize(MAX_BRUISES)
+	for i in MAX_BRUISES:
+		if i < _bruises.size() and gore_level > 0:
+			var b: Dictionary = _bruises[i]
+			var p: Vector3 = _curr[int(b["seg"])] * (b["local"] as Vector3)
+			arr[i] = Vector4(p.x, p.y, p.z, float(b["s"]))
+		else:
+			arr[i] = Vector4.ZERO
+	for m in _materials:
+		m.set_shader_parameter("flash", _flash)
+		m.set_shader_parameter("juice", juice_amount)
+		m.set_shader_parameter("status_color", status_color)
+		m.set_shader_parameter("bruises", arr)
+
+
+## The cosmetic end-of-fight gag: a creature-specific piece pops off and bounces away.
+## Purely visual (debris layer); never affects the simulation.
+func detach_piece(impulse_dir: Vector3) -> RigidBody3D:
+	if detached or gore_level < 2:
+		return null
+	detached = true
+	var g: Dictionary = creature.art.get("gore_piece", {})
+	var seg_id := str(g.get("segment", "head"))
+	var si: int = body.seg_index.get(seg_id, 0)
+	var xf := _curr[si]
+	var piece := RigidBody3D.new()
+	piece.collision_layer = Rig.LAYER_DEBRIS
+	piece.collision_mask = Rig.LAYER_WORLD
+	piece.mass = 0.3
+	var cs := CollisionShape3D.new()
+	var sp := SphereShape3D.new()
+	var size := float(g.get("size", 0.06))
+	sp.radius = size
+	cs.shape = sp
+	piece.add_child(cs)
+	var mi := MeshInstance3D.new()
+	match str(g.get("shape", "tooth")):
+		"horn", "spike":
+			var cyl := CylinderMesh.new()
+			cyl.top_radius = 0.0
+			cyl.bottom_radius = size
+			cyl.height = size * 3.0
+			mi.mesh = cyl
+		_:
+			var bm := BoxMesh.new()
+			bm.size = Vector3(size, size * 1.4, size * 0.9)
+			mi.mesh = bm
+	mi.material_override = Materials.toon(Color.from_string(str(g.get("color", "#f4efe2")), Color.WHITE), 0.3)
+	piece.add_child(mi)
+	get_parent().add_child(piece)
+	piece.global_position = xf * MathX.vec3(g.get("offset", [0, 0, 0.1]))
+	piece.linear_velocity = impulse_dir.normalized() * 4.0 + Vector3.UP * 3.5
+	piece.angular_velocity = Vector3(randf_range(-20, 20), randf_range(-20, 20), randf_range(-20, 20))
+	var timer := get_tree().create_timer(6.0)
+	timer.timeout.connect(piece.queue_free)
+	return piece

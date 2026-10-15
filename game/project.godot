@@ -20,6 +20,17 @@ config/icon="res://assets/ui/icon.svg"
 [autoload]
 
 Log="*res://src/core/log.gd"
+Paths="*res://src/persist/paths.gd"
+Saves="*res://src/persist/saves.gd"
+Controls="*res://src/input/controls.gd"
+Settings="*res://src/persist/settings.gd"
+Profiles="*res://src/persist/profiles.gd"
+Content="*res://src/data/content.gd"
+Mods="*res://src/mods/mod_manager.gd"
+Audio="*res://src/audio/audio.gd"
+Net="*res://src/net/net.gd"
+Platform="*res://src/platform/platform.gd"
+App="*res://src/app/app.gd"
 
 [display]
 

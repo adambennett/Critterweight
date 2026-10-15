@@ -1,0 +1,10 @@
+{
+  "id": "core",
+  "name": "Critterweight: The Circuit",
+  "version": "1.0.0",
+  "game_version": "0.1.0",
+  "description": "Base game content. Mods use exactly the same package format (docs/MODDING.md).",
+  "requires": [],
+  "load_after": [],
+  "capabilities": []
+}

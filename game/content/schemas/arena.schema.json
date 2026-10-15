@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "critterweight/arena",
+  "title": "Arena layout",
+  "description": "See docs/MODDING.md#arenas. Positions are metres on the arena floor (x, y, z); spawns are [x, z, yaw_deg].",
+  "type": "object",
+  "required": ["id", "name", "base"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^([a-z0-9_]+:)?[a-z0-9_]+$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 40},
+    "base": {"enum": ["octagon", "square", "circle", "platform"]},
+    "radius": {"type": "number", "minimum": 2.5, "maximum": 12.0},
+    "wall_height": {"type": "number", "minimum": 0, "maximum": 4.0},
+    "ringout": {"type": "boolean"},
+    "theme": {"type": "string"},
+    "gravity_mult": {"type": "number", "minimum": 0.3, "maximum": 2.0},
+    "author": {"type": "string", "maxLength": 40},
+    "version": {"type": "integer", "minimum": 1},
+    "override": {"type": "boolean"},
+    "spawns": {"type": "array", "maxItems": 16, "items": {"type": "array", "minItems": 2, "maxItems": 3, "items": {"type": "number"}}},
+    "props": {"type": "array", "maxItems": 40, "items": {"type": "object", "required": ["type", "pos"]}},
+    "hazards": {"type": "array", "maxItems": 16, "items": {"type": "object", "required": ["type", "pos"]}},
+    "markers": {"type": "object"}
+  }
+}

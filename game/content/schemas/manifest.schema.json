@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "critterweight/manifest",
+  "title": "Content package / mod manifest",
+  "description": "See docs/MODDING.md#manifest.",
+  "type": "object",
+  "required": ["id", "name", "version", "game_version"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9_]{3,32}$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 48},
+    "version": {"type": "string", "pattern": "^[0-9]+\.[0-9]+\.[0-9]+$"},
+    "game_version": {"type": "string"},
+    "author": {"type": "string", "maxLength": 48},
+    "description": {"type": "string", "maxLength": 600},
+    "requires": {"type": "array", "items": {"type": "object", "required": ["id"], "properties": {"id": {"type": "string"}, "version": {"type": "string"}}}},
+    "load_after": {"type": "array", "items": {"type": "string"}},
+    "capabilities": {"type": "array", "items": {"enum": ["scripts", "replaces_core", "large_assets"]}},
+    "client_only": {"type": "boolean"}
+  }
+}

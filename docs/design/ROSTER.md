@@ -246,7 +246,7 @@ Charger tank. **Beginner hook:** hold Heavy and let go — you are a truck. Horn
 
 | Strengths | Weaknesses | Counterplay against him |
 |---|---|---|
-| 130 HP / 85 poise, armor on every Heavy, best poise damage, Caked victims crumble, charges that carry targets into walls | Wide turn radius, almost nothing hits to his sides or behind, slow Lights, Bulldoze into a wall without a target staggers him 0.6 s, weak to Sludge (Slurry corrodes him +15%) | Sidestep his line and hit the flank; dodge Bulldoze late and punish the wall stagger; Mud/Soaked stops his charge distance; grabs when he's Caked by his own rubble? No — he's immune to his own Grit; use Brine to Mudbound him |
+| 130 HP / 85 poise, armor on every Heavy, best poise damage, Caked victims crumble, charges that carry targets into walls | Wide turn radius, almost nothing hits to his sides or behind, slow Lights, Bulldoze into a wall without a target staggers him 0.6 s, weak to Sludge (Slurry corrodes him +15%) | Sidestep his line and hit the flank; dodge Bulldoze late and punish the wall stagger; Soaked cuts his charge distance and Mudbound (Brine on his own Grit rubble) grounds him outright; he is immune to his own Grit, so bring your own element |
 
 ### Moveset
 
@@ -332,7 +332,7 @@ Zoner / trapper. **Beginner hook:** Spit (LB) from range, lay a puddle (RB), bit
 | Id | Technique | Effect | Tags |
 |---|---|---|---|
 | `tech_slurry_septic_bloom` | **Septic Bloom** | Slurry's puddles are 50% larger and last +2 s | zone |
-| `tech_slurry_lockjaw` | **Lockjaw** | Fang Snap pull 0.5 → 1.2 m; Coil reach 1.4 → 1.7 m | grab, pull |
+| `tech_slurry_lockjaw` | **Lockjaw** | Fang Snap pull 0.5 → 1.2 m; Coil reach 1.4 → 1.6 m | grab, pull |
 | `tech_slurry_blood_thinner` | **Blood Thinner** | Gunked damage 1.5 → 2.25 HP/s; Gunked targets' guard absorbs 65% instead of 75% | status |
 | `tech_slurry_grease_trap` | **Grease Trap** | Enemies in Slurry's puddles: dodge distance −40%; Slurry moves +15% faster in any Sludge zone | zone, mobility |
 | `tech_slurry_double_dip` | **Double Dip** | Sludge Lob charges 2 → 3; Drain Dive emerge damage 5 → 9 and radius 1.2 → 1.6 m | projectile, blink |
@@ -341,7 +341,7 @@ Zoner / trapper. **Beginner hook:** Spit (LB) from range, lay a puddle (RB), bit
 | Build | Techniques | Synergy tags | How it plays |
 |---|---|---|---|
 | **Swamp** | Septic Bloom + Grease Trap | zone, mobility, status | Cover the floor; nobody can dodge; you glide. |
-| **Constrictor** | Lockjaw + Hardened Arteries | grab, pull, tank | Drag them in from 1.7 m, coil, Gulp-and-Spit, stand your ground. |
+| **Constrictor** | Lockjaw + Hardened Arteries | grab, pull, tank | Drag them in from 1.6 m, coil, Gulp-and-Spit, stand your ground. |
 | **Toxin** | Blood Thinner + Double Dip | status, projectile, blink | Three lobs, Gunked melts guards and HP, dive in and out. |
 
 ### AI notes
@@ -421,7 +421,7 @@ Vocal: squeaky hum with crackles, a high "eep" when hit, a kazoo-ish giggle. Imp
 |---|---|
 | Six different body plans | biped, crab, avian, quadruped, serpent, hopper ✔ |
 | Six different elements | Scorch, Brine, Gale, Grit, Sludge, Static ✔ |
-| Reach cap ≤ 1.6 m | Max is Dredge's Mooring Chain grab (1.6 m) and Slurry's Lockjaw coil (1.7 m — grab, not strike; cap it at 1.6 m if the engine insists) |
+| Reach cap ≤ 1.6 m | Longest strikes: Gusto's wings and Slurry's tail at 1.5 m. Longest grabs (with techniques): Dredge's Mooring Chain and Slurry's Lockjaw, both exactly 1.6 m ✔ |
 | Beginner mash viability | Every L1–L3 string chains at 0.1–0.2 s startups, every Heavy has a visible wind-up and a payoff, every fighter has one "hold Heavy and win a trade" option |
 | Deliberate depth | Every fighter has a parry build, a resource tradeoff technique (glass tag), and a status-dependent property on at least two moves |
 | Tag/co-op | Each fighter has at least one tool that helps a partner: Steam Vent (projectile wall), Undertow puddles, Gust Bomb pushes, Dust Bowl anti-projectile, Dilute via Tide Spit, Spring Pads for allies |

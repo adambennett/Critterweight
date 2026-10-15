@@ -1,0 +1,93 @@
+{
+  "_doc": "Element data (docs/design/ELEMENTS.md). Engine: src/sim/elements.gd, status_set.gd, effects.gd. Status fields: duration, dps, tick, speed, dash, knockback_taken, push_taken, stamina_regen, heal, guard_cost, poise_max, poise_regen, dodge_cost, heavy_poise_taken, cooldown_rate, pulse_interval, pulse_stun, no_hover, hit_buildup (element->amount added to the target's buildup when it is hit), buildup_received (element->mult).",
+  "rules": {
+    "threshold": 100,
+    "decay_per_s": 15,
+    "decay_delay": 1.5,
+    "post_status_immunity": 2.0,
+    "max_statuses": 3,
+    "guard_buildup_mult": 0.5,
+    "reaction_cooldown": 1.5,
+    "max_zones": 24,
+    "ally_reaction_damage_mult": 0.25,
+    "ally_reaction_buildup_mult": 0.5
+  },
+  "elements": [
+    {"id": "scorch", "name": "Scorch", "status_name": "Sizzle", "color": "#FF6B2B", "icon": "flame",
+     "status": {"id": "sizzle", "name": "Sizzle", "duration": 5.0, "dps": 2.0, "tick": 0.5, "stamina_regen": 0.5, "hit_buildup": {"scorch": 5}}},
+    {"id": "brine", "name": "Brine", "status_name": "Soaked", "color": "#2E9BE0", "icon": "wave",
+     "status": {"id": "soaked", "name": "Soaked", "duration": 6.0, "speed": 0.85, "dash": 0.8, "knockback_taken": 1.25, "buildup_received": {"static": 1.5}}},
+    {"id": "static", "name": "Static", "status_name": "Jolted", "color": "#F7E04A", "icon": "bolt",
+     "status": {"id": "jolted", "name": "Jolted", "duration": 4.0, "pulse_interval": 1.0, "pulse_stun": 0.15, "cooldown_rate": 0.7, "no_hover": true}},
+    {"id": "sludge", "name": "Sludge", "status_name": "Gunked", "color": "#8BD426", "icon": "blob",
+     "status": {"id": "gunked", "name": "Gunked", "duration": 6.0, "dps": 1.5, "tick": 0.5, "heal": 0.5, "guard_cost": 1.5}},
+    {"id": "grit", "name": "Grit", "status_name": "Caked", "color": "#B8905E", "icon": "nugget",
+     "status": {"id": "caked", "name": "Caked", "duration": 5.0, "poise_max": 0.7, "poise_regen": 0.5, "dodge_cost": 1.5, "heavy_poise_taken": 1.2, "buildup_received": {"static": 0.75}}},
+    {"id": "gale", "name": "Gale", "status_name": "Winded", "color": "#CFF4F2", "outline": "#4FB3B8", "icon": "swirl",
+     "status": {"id": "winded", "name": "Winded", "duration": 4.0, "stamina_regen": 0.0, "dodge_cost": 2.0, "knockback_taken": 1.3, "push_taken": 2.0}}
+  ],
+  "matchups": [
+    {"attacker": "scorch", "defender": "gale", "mult": 1.15}, {"attacker": "gale", "defender": "scorch", "mult": 0.85},
+    {"attacker": "gale", "defender": "sludge", "mult": 1.15}, {"attacker": "sludge", "defender": "gale", "mult": 0.85},
+    {"attacker": "sludge", "defender": "grit", "mult": 1.15}, {"attacker": "grit", "defender": "sludge", "mult": 0.85},
+    {"attacker": "grit", "defender": "static", "mult": 1.15}, {"attacker": "static", "defender": "grit", "mult": 0.85},
+    {"attacker": "static", "defender": "brine", "mult": 1.15}, {"attacker": "brine", "defender": "static", "mult": 0.85},
+    {"attacker": "brine", "defender": "scorch", "mult": 1.15}, {"attacker": "scorch", "defender": "brine", "mult": 0.85}
+  ],
+  "reactions": [
+    {"id": "steam_burst", "name": "Steam Burst", "a": "scorch", "b": "brine", "consumes": "both",
+     "damage": 4, "poise": 15, "push": 2.0, "push_shape": "cone_away", "cone_deg": 60, "radius": 2.0,
+     "zone": {"kind": "steam", "radius": 2.0, "duration": 2.0, "cosmetic": true, "blind_bots": 1.0}},
+    {"id": "flare_up", "name": "Flare-Up", "a": "scorch", "b": "sludge", "consumes": "sludge",
+     "radius": 2.0, "splash_damage": 10, "damage": 10, "launch": 4.8, "splash_buildup": {"scorch": 60}, "hits_attacker": true},
+    {"id": "backdraft", "name": "Backdraft", "a": "scorch", "b": "gale", "consumes": "none",
+     "refresh": "scorch", "spread_radius": 2.5, "spread_buildup": {"scorch": 60}, "push_mult": 2.0},
+    {"id": "short_out", "name": "Short-Out", "a": "brine", "b": "static", "consumes": "brine",
+     "damage": 8, "stun": 0.9, "puddle_damage": 6, "puddle_stun": 0.5},
+    {"id": "mudbound", "name": "Mudbound", "a": "brine", "b": "grit", "consumes": "both",
+     "zone": {"kind": "mud", "radius": 2.5, "duration": 4.0, "status": {"id": "mired", "name": "Mired", "duration": 0.3, "speed": 0.7, "dash": 0.5, "no_leap": true, "no_hover": true, "no_blink": true}}},
+    {"id": "dilute", "name": "Dilute", "a": "brine", "b": "sludge", "consumes": "sludge",
+     "burst_remaining": "sludge", "burst_fraction": 0.5, "burst_max": 5},
+    {"id": "catalyze", "name": "Catalyze", "a": "static", "b": "sludge", "consumes": "static",
+     "accelerate": "sludge", "accelerate_over": 1.0, "splash_radius": 1.5, "splash_buildup": {"static": 20}},
+    {"id": "stormfront", "name": "Stormfront", "a": "static", "b": "gale", "consumes": "present",
+     "delayed_strike": {"radius": 1.5, "delay": 0.6, "damage": 12, "poise": 25, "buildup": {"static": 50}}},
+    {"id": "crust", "name": "Crust", "a": "sludge", "b": "grit", "consumes": "both",
+     "status": {"id": "encrusted", "name": "Encrusted", "duration": 2.5, "damage_taken": 0.75, "knockback_taken": 0.5, "no_dodge": true, "no_blink": true, "grab_lock": 1.0}},
+    {"id": "spray", "name": "Spray", "a": "sludge", "b": "gale", "consumes": "sludge",
+     "splash_radius": 2.0, "splash_buildup": {"sludge": 40}, "splash_excludes_target": true,
+     "zone": {"kind": "sludge_puddle", "radius": 1.5, "duration": 3.0}},
+    {"id": "sandblast", "name": "Sandblast", "a": "grit", "b": "gale", "consumes": "grit",
+     "damage": 6, "status": {"id": "guard_open", "name": "Guard Open", "duration": 1.5, "no_guard": true},
+     "cone_behind": {"radius": 2.0, "cone_deg": 70, "buildup": {"grit": 30}}}
+  ],
+  "zones": {
+    "scorch_patch": {"element": "scorch", "radius": 1.5, "duration": 3.0, "tick": 0.5, "tick_damage": 1.5, "buildup": 7.5, "vfx": "scorch_patch"},
+    "brine_puddle": {"element": "brine", "radius": 1.5, "duration": 5.0, "tick": 0.5, "buildup": 7.5, "vfx": "brine_puddle"},
+    "static_field": {"element": "static", "radius": 1.5, "duration": 2.0, "tick": 0.5, "buildup": 10, "flinch_on_entry": 0.15, "vfx": "static_field"},
+    "sludge_puddle": {"element": "sludge", "radius": 1.5, "duration": 6.0, "tick": 0.5, "tick_damage": 0.75, "buildup": 7.5, "vfx": "sludge_puddle"},
+    "grit_rubble": {"element": "grit", "radius": 1.5, "duration": 4.0, "tick": 0.5, "buildup": 7.5, "status": {"id": "rubble_slow", "name": "Rubble", "duration": 0.3, "speed": 0.9}, "vfx": "grit_rubble"},
+    "gale_vortex": {"element": "gale", "radius": 1.2, "duration": 2.0, "tick": 0.25, "buildup": 3.75, "push_out": 2.0, "deflect_projectiles": 20, "vfx": "gale_vortex"},
+    "mud": {"element": "", "radius": 2.5, "duration": 4.0, "tick": 0.25, "status": {"id": "mired", "name": "Mired", "duration": 0.3, "speed": 0.7, "dash": 0.5, "no_leap": true, "no_hover": true, "no_blink": true}, "vfx": "mud"},
+    "steam": {"element": "", "radius": 2.0, "duration": 2.0, "tick": 0.5, "cosmetic": true, "vfx": "steam"}
+  },
+  "zone_reactions": [
+    {"existing": "brine_puddle", "incoming": "scorch", "result": "steam", "removes_existing": true},
+    {"existing": "scorch_patch", "incoming": "brine", "result": "steam", "removes_existing": true},
+    {"existing": "sludge_puddle", "incoming": "scorch", "result": "burning_puddle", "removes_existing": true},
+    {"existing": "brine_puddle", "incoming": "static", "result": "live_puddle", "removes_existing": false},
+    {"existing": "brine_puddle", "incoming": "grit", "result": "mud", "removes_existing": true},
+    {"existing": "sludge_puddle", "incoming": "brine", "result": "grow", "grow": 1.5, "tick_mult": 0.5},
+    {"existing": "sludge_puddle", "incoming": "static", "result": "fizzing_puddle", "removes_existing": true},
+    {"existing": "gale_vortex", "incoming": "static", "result": "storm", "removes_existing": true},
+    {"existing": "sludge_puddle", "incoming": "grit", "result": "rubble_prop", "removes_existing": true},
+    {"existing": "sludge_puddle", "incoming": "gale", "result": "smear", "length": 4.0},
+    {"existing": "scorch_patch", "incoming": "gale", "result": "slide", "slide": 2.0, "grow": 1.5}
+  ],
+  "derived_zones": {
+    "burning_puddle": {"element": "scorch", "radius": 1.5, "duration": 3.0, "tick": 0.5, "tick_damage": 1.5, "buildup": 10, "vfx": "burning_puddle"},
+    "live_puddle": {"element": "static", "radius": 1.5, "duration": 2.0, "tick": 0.5, "buildup": 10, "flinch_on_tick": 0.12, "vfx": "live_puddle"},
+    "fizzing_puddle": {"element": "static", "radius": 1.5, "duration": 3.0, "tick": 0.5, "tick_damage": 0.75, "buildup": 7.5, "extra_buildup": {"sludge": 7.5}, "vfx": "fizzing_puddle"},
+    "storm": {"element": "static", "radius": 1.6, "duration": 2.0, "tick": 0.7, "random_bolt": {"damage": 6, "poise": 12, "buildup": {"static": 25}, "radius": 0.8}, "vfx": "storm"}
+  }
+}
