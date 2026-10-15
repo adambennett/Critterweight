@@ -129,8 +129,8 @@ func _on_bell() -> void:
 
 func tick_fight(dt: float) -> void:
 	super.tick_fight(dt)
-	if boss == null or boss.is_out():
-		if boss and boss.is_out() and not _defeated:
+	if boss == null or is_beaten(boss):
+		if boss and is_beaten(boss) and not _defeated:
 			_defeated = true
 			sim.emit_event({"type": "boss_defeated", "fighter": boss.index, "line": str(bdata.get("defeat_line", ""))})
 		return

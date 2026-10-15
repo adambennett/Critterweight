@@ -65,32 +65,36 @@ func test_throw_hook_slot_and_throw_stun() -> void:
 	a.creature.throws = saved
 
 
-## Bot kit tactics (bot_brain.gd "Kit tactics" block): a Heavy press is a tap unless the
-## creature's ai block asks for a charge; ability rules fire on their conditions only.
+## Bot kit hints (bot_brain.gd "Kit hints" block): a Heavy press is a tap unless the creature's
+## ai block asks for a charge (profile-gated with {"from": ...}); ability hints fire on their
+## conditions only.
 func test_bot_heavy_tap_and_charge_rule() -> void:
 	var sim := _sim(3.0)
 	await step_sim(sim, 0.5)
 	var f := sim.fighters[0]
 	var bb := BotBrain.new("regular", 7)
-	bb._kit_press_heavy(f, null)
+	f.input.press(FighterInput.HEAVY)
+	bb._kit_maybe_charge()
 	bb.poll(f, sim, 1.0 / 120.0)
 	check(not f.input.is_held(FighterInput.HEAVY), "plain bot Heavy is a tap")
 	var cb := BotBrain.new("pro", 7)
-	cb.set_personality({"charge_heavy": {"from": "pro", "chance": 1.0}})
-	cb._kit_press_heavy(f, null)
+	cb.set_personality({"charge_heavy": {"from": "pro", "chance": 2.0}})   # x skill (combo 0.75) >= 1
+	f.input.press(FighterInput.HEAVY)
+	cb._kit_maybe_charge()
 	cb.poll(f, sim, 1.0 / 120.0)
-	check(f.input.is_held(FighterInput.HEAVY), "charge rule holds Heavy")
+	check(f.input.is_held(FighterInput.HEAVY), "charge hint holds Heavy")
 	var rb := BotBrain.new("regular", 7)
-	rb.set_personality({"charge_heavy": {"from": "pro", "chance": 1.0}})
-	rb._kit_press_heavy(f, null)
+	rb.set_personality({"charge_heavy": {"from": "pro", "chance": 2.0}})
+	f.input.press(FighterInput.HEAVY)
+	rb._kit_maybe_charge()
 	rb.poll(f, sim, 1.0 / 120.0)
-	check(not f.input.is_held(FighterInput.HEAVY), "charge rule is gated by the profile (Journeyman never charges)")
+	check(not f.input.is_held(FighterInput.HEAVY), "charge hint is gated by the profile (Journeyman never charges)")
 
 
 func test_bot_ability_rules_fire_on_conditions() -> void:
 	var sim := _sim(2.5)
 	var bb := BotBrain.new("champion", 11)
-	bb.set_personality({"abilities": {"ability1": [{"if": ["target_down"], "chance": 1.0}]}})
+	bb.set_personality({"abilities": {"ability1": {"chance": 10.0, "when": [{"target_down": true}]}}})
 	sim.set_input_source(0, bb)
 	await step_sim(sim, 1.5)
 	var used := sim.events.filter(func(e): return e["type"] == "ability" and int(e["fighter"]) == 0 and str(e["slot"]) == "ability1")

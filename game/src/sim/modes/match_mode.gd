@@ -278,6 +278,12 @@ func alive_teams() -> Array:
 	return teams
 
 
+## Beaten for this round: KO'd, downed or inactive and NOT about to come back. A ring-out parks
+## the fighter (inactive) until its respawn, which must not read as a loss in round-over checks.
+func is_beaten(f: Fighter) -> bool:
+	return f.despawned or (f.is_out() and not _pending_respawn(f))
+
+
 func _pending_respawn(f: Fighter) -> bool:
 	for r in _respawns:
 		if r["fighter"] == f:

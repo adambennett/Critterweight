@@ -239,14 +239,17 @@ func test_stoke_step_from_dodge_launches() -> void:
 
 
 func test_clinch_pummel_and_throws() -> void:
-	# grab beats guard; pummel = knee (3 dmg, Scorch 8)
+	# grab beats guard; pummel = knee (3 dmg, Scorch 8), at most one per 0.35 s (pummel `interval`):
+	# the press 0.05 s after the first knee is dropped, the one 0.4 s after it lands
 	var d := Driver.new()
-	d.presses = [{"t": 0.2, "button": FighterInput.GRAB}, {"t": 0.75, "button": FighterInput.LIGHT}]
+	d.presses = [{"t": 0.2, "button": FighterInput.GRAB}, {"t": 0.75, "button": FighterInput.LIGHT},
+		{"t": 0.8, "button": FighterInput.LIGHT}, {"t": 1.15, "button": FighterInput.LIGHT}]
 	var r := await run_move(CID, {"att_src": d, "slot": "grab", "gap": 1.2, "def_id": FOE, "watch": 1.0,
 		"def_src": InputSource.Scripted.new([{"t0": 0.0, "t1": 9.0, "hold": ["guard"]}])})
 	check(int(r.get("ev_grab", 0)) == 1, "Clinch grabs a guarding target")
 	var pm := (r["hits"] as Array).filter(func(h): return str(h["slot"]) == "pummel")
 	check(not pm.is_empty() and absf(float(pm[0]["dmg"]) - 3.0 * Elements.damage_mult("scorch", "gale")) < 0.6, "knee pummel ~3 dmg: %s" % str(pm))
+	check_eq(pm.size(), 2, "one knee per 0.35 s (presses at +0, +0.05, +0.4 s)")
 	check(float((r["sim"] as MatchSim).fighters[1].statuses.buildup.get("scorch", 0.0)) > 4.0, "pummel adds Scorch build-up")
 	dispose(r["sim"])
 	var miss := await run_move(CID, {"slot": "grab", "gap": 1.8})

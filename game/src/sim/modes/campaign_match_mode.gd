@@ -470,7 +470,7 @@ func _party_standing(exclude: Fighter = null) -> int:
 		if _parked.has(f.index):
 			if f.health > 0.0:
 				n += 1
-		elif not f.is_out():
+		elif not is_beaten(f):
 			n += 1
 	return n
 
@@ -483,7 +483,7 @@ func enemies_remaining() -> int:
 		if _parked.has(f.index):
 			if f.health > 0.0:
 				n += 1
-		elif not f.is_out():
+		elif not is_beaten(f):
 			n += 1
 	return n
 
@@ -509,7 +509,7 @@ func on_timeout() -> void:
 		sudden_death = true
 		_sd_time = sim.time
 		for f: Fighter in sim.fighters:
-			var standing := (not f.is_out() and not _parked.has(f.index)) or (_parked.has(f.index) and f.health > 0.0)
+			var standing := (not is_beaten(f) and not _parked.has(f.index)) or (_parked.has(f.index) and f.health > 0.0)
 			if standing:
 				_sd_hp[f.index] = f.health
 				f.health = minf(f.health, 1.0)
@@ -523,7 +523,7 @@ func _decide_by_health() -> void:
 	var party_hp := 0.0
 	var enemy_hp := 0.0
 	for f: Fighter in sim.fighters:
-		if f.is_out() and not _parked.has(f.index):
+		if is_beaten(f) and not _parked.has(f.index):
 			continue
 		# after sudden death everyone sits at 1 HP: judge by the health they had when time ran out
 		var frac := f.health_frac()
@@ -557,7 +557,7 @@ func build_result() -> Dictionary:
 		var role := role_of(f)
 		var st: Dictionary = stats.get(f.index, {})
 		if is_party(f):
-			var out := f.is_out() and not _parked.has(f.index)
+			var out := is_beaten(f) and not _parked.has(f.index)
 			var hp := maxf(0.0, f.health)
 			if _sd_hp.has(f.index) and outcome == "win":
 				hp = maxf(hp, float(_sd_hp[f.index]))      # the 1-HP drop is a rule of this fight only
@@ -568,7 +568,7 @@ func build_result() -> Dictionary:
 				"taunts": int(st.get("taunts", 0)), "downs": int(st.get("downs", 0)), "hit_by_boss": bool(st.get("hit_by_boss", false))}
 		elif is_enemy_side(f):
 			enemies_total += 1
-			if f.is_out() and not _parked.has(f.index):
+			if is_beaten(f) and not _parked.has(f.index):
 				enemies_kod += 1
 	res["campaign"] = {"won": outcome == "win", "outcome": outcome, "time": sim.time, "sudden_death": sudden_death,
 		"players": players, "enemies_total": enemies_total, "enemies_kod": enemies_kod}

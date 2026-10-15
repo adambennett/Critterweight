@@ -259,13 +259,17 @@ func _check_cooldown(slot: String, button: int, cd: float) -> void:
 
 
 func test_talon_snatch_pecks_and_throws() -> void:
+	# pecks at most one per 0.25 s (pummel `interval`): the press 0.05 s after the first peck is
+	# dropped, the one 0.3 s after it lands
 	var d := Driver.new()
-	d.presses = [{"t": 0.2, "button": FighterInput.GRAB}, {"t": 0.8, "button": FighterInput.LIGHT}]
+	d.presses = [{"t": 0.2, "button": FighterInput.GRAB}, {"t": 0.8, "button": FighterInput.LIGHT},
+		{"t": 0.85, "button": FighterInput.LIGHT}, {"t": 1.1, "button": FighterInput.LIGHT}]
 	var r := await run_move(CID, {"att_src": d, "slot": "grab", "gap": 1.3, "def_id": FOE, "watch": 1.0,
 		"def_src": InputSource.Scripted.new([{"t0": 0.0, "t1": 9.0, "hold": ["guard"]}])})
 	check(int(r.get("ev_grab", 0)) == 1, "Talon Snatch grabs a guarding target")
 	var pm := (r["hits"] as Array).filter(func(h): return str(h["slot"]) == "pummel")
 	check(not pm.is_empty() and absf(float(pm[0]["dmg"]) - 2.0 * Elements.damage_mult("gale", "scorch")) < 0.5, "peck pummel ~2 dmg: %s" % str(pm))
+	check_eq(pm.size(), 2, "one peck per 0.25 s (presses at +0, +0.05, +0.3 s)")
 	check_stable(r, "Talon Snatch hold")
 	dispose(r["sim"])
 	var miss := await run_move(CID, {"slot": "grab", "gap": 1.9})
