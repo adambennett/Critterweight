@@ -39,7 +39,7 @@ whole hub.
 
 | Space | Rect (x, z, w, d) / floor | Connections | In it |
 |---|---|---|---|
-| Main Floor | −12, −8, 24 × 16 / 0, 7 m tall | roller door N (4 m) → Dock; doors W → Juice Bar, E → Med Bay, S → Locker Room; stairs → Office; hatch → Boiler Room; freight elevator → Roof (secret #6); loose panel → Crawlspace (secret #1) | 3 bags, practice cage (octagon, apothem 3 m), mats, Granny's corner, bleachers, corkboard map, Wall-side posters |
+| Main Floor | −12, −8, 24 × 16 / 0, 7 m tall | roller door N (4 m) → Dock; doors W → Juice Bar, E → Med Bay, S → Locker Room; stairs → Office; hatch → Boiler Room; freight elevator → Roof (secret #6); loose panel → Crawlspace (secret #1) | 3 bags, practice cage (octagon, apothem 3 m), mats, Granny's corner, bleachers, corkboard map, fight posters |
 | Juice Bar | −22, −8, 10 × 8 | Main Floor | Needles' counter, JUICE neon can, vending machine, radio |
 | Med Bay | 12, −8, 8 × 8 | Main Floor | Doc, exam table, cot, the dumpster ice bath |
 | Loading Dock (exterior) | −10, −18.6, 20 × 10.6 | roller door; pier ladder (secret #8) | crate pile + throw line + rings, chum cannon + drill square, forklift, Ludlow's workbench, the water |
