@@ -83,7 +83,7 @@ puddles). The generic bot adds Venom Spit via the string finisher and JUICE at 1
 ## Verification
 
 `& $g --headless --path game --fixed-fps 120 -- --test test_kit_f_slurry` →
-`game/src/test/kits/test_kit_f_slurry.gd` (13 tests, ~25 s, **all pass**). Every move connects at
+`game/src/test/kits/test_kit_f_slurry.gd` (14 tests, ~30 s, **all pass**; the first checks the creature parses with zero errors). Every move connects at
 its range against both dev_biped and Jitters and whiffs outside it, with damage, knockback (or
 pull), stagger, Sludge build-up, active-weapon reach ≤ 1.6 m (max seen 1.53 m, Tail Flick), no
 tipping (root up > 0.2), no spin-out (< 60 rad/s), no floor clipping, no cage exit, upright at

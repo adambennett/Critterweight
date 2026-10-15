@@ -81,7 +81,7 @@ close). Ability hints: **Arc Lash** at 2.2–7 m (chance 1.4 × 0.35 × skill), 
 ## Verification
 
 `& $g --headless --path game --fixed-fps 120 -- --test test_kit_f_jitters` →
-`game/src/test/kits/test_kit_f_jitters.gd` (15 tests, ~20 s, **all pass**). Every move connects at
+`game/src/test/kits/test_kit_f_jitters.gd` (16 tests, ~25 s, **all pass**; the first checks the creature parses with zero errors). Every move connects at
 its range against dev_biped and Slurry and whiffs outside it, with damage, knockback, stagger,
 Static build-up, active-weapon reach ≤ 1.6 m (max seen 0.66 m), no tipping, no spin-out, no floor
 clipping, no cage exit, upright at the end. Plus: Headbonk bounce, Squash landing circle, Super
