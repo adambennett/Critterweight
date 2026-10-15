@@ -94,7 +94,9 @@ func _ready() -> void:
 		Settings.apply(k)
 	_read_settings()
 	Settings.changed.connect(_on_setting_changed)
-	load_bank()
+	# dedicated-server packages are exported without audio assets and never play sound
+	if not OS.has_feature("dedicated_server"):
+		load_bank()
 	_load_lines()
 	if Content.has_signal("reloaded"):
 		Content.reloaded.connect(_load_lines)

@@ -89,6 +89,10 @@ static func quit_to_menu() -> void:
 	set_paused(false)
 	# a lesson started from the Cannery must not walk a later main-menu lesson back into the hub
 	Tutorial.clear_exit_route()
+	# online: quitting the match leaves the session (a listen host closes it for everyone with
+	# "The host left"); Net removes its match scene itself
+	if Net.has_method("is_session_active") and bool(Net.call("is_session_active")):
+		Net.call("leave")
 	if current_match() != null:
 		App.set_scene(null)
 	App.goto("main_menu")

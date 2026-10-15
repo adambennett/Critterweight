@@ -51,6 +51,13 @@ func log_path() -> String:
 	return _path
 
 
+## Writes buffered lines to disk now (INFO lines are otherwise flushed with the next WARN/ERROR;
+## the dedicated server calls this every second so operators can tail the log).
+func flush() -> void:
+	if _file:
+		_file.flush()
+
+
 func d(tag: String, msg: String) -> void:
 	_emit(Level.DEBUG, tag, msg)
 

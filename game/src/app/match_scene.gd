@@ -159,6 +159,10 @@ func _make_view(i: int) -> void:
 	v.gore_level = int({"full": 2, "reduced": 1, "off": 0}.get(str(Settings.get_value("access.gore")), 2))
 	if i == owner_index and bool(config.get("cosmetics", true)):
 		FighterCosmetics.dress(v, Profiles.current)
+	elif i < (config.get("fighters", []) as Array).size() and typeof(config["fighters"][i]) == TYPE_DICTIONARY \
+			and (config["fighters"][i] as Dictionary).has("cosmetics"):
+		# an online guest's own look, as the server validated it (listen host; view only)
+		FighterCosmetics.dress(v, NetProtocol.cosmetics_profile(config["fighters"][i]["cosmetics"]))
 	v.snap_transforms(f.rig.segment_transforms())
 	views[i] = v
 
@@ -424,7 +428,9 @@ func _update_pick_panel() -> void:
 	if not (sim.mode is ChumRushMode):
 		return
 	var cr := sim.mode as ChumRushMode
-	var mine: Array = cr.pending_pick.get(player_index, [])
+	# only this machine's own fighter: a listen host who sits a match out keeps player_index 0 and
+	# must not see (or answer) the offer of a remote player's fighter
+	var mine: Array = cr.pending_pick.get(player_index, []) if _is_local_player() else []
 	if mine.is_empty():
 		if _pick_panel:
 			_pick_panel.queue_free()
