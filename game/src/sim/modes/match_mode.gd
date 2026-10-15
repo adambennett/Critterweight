@@ -47,8 +47,20 @@ func setup(match_sim) -> void:
 	for f: Fighter in sim.fighters:
 		round_wins[f.team] = 0
 		scores[f.team] = 0.0
-		f.lives = int(rules.get("lives", 1))
+		f.lives = initial_lives()
 	_begin_intro()
+
+
+## Lives each fighter starts a round with. -1 = unlimited: score modes with respawn, presets that
+## enable respawn without a lives count, and "lives": 0. An explicit positive count counts down.
+func initial_lives() -> int:
+	var respawn := bool(rules.get("respawn", false))
+	if rules.has("lives"):
+		var lv := int(rules["lives"])
+		if lv <= 0:
+			return -1 if respawn else 1
+		return lv
+	return -1 if respawn and str(rules.get("win", "ko")) == "score" else 1
 
 
 func rounds_to_win() -> int:
@@ -108,12 +120,20 @@ func tick_fight(_dt: float) -> void:
 
 
 ## Called when a fighter's health is depleted: KO, downed (revivable) or respawn.
-func on_depleted(f: Fighter, attacker: Fighter, _hit: Dictionary) -> void:
-	if bool(rules.get("revive", false)) and _team_has_standing_ally(f):
+func on_depleted(f: Fighter, attacker: Fighter, hit: Dictionary) -> void:
+	# a fighter who fell off the arena is never left "downed" out there (nobody could reach them)
+	if bool(rules.get("revive", false)) and not bool(hit.get("ringout", false)) and _team_has_standing_ally(f):
 		f.set_downed()
 		_downed_at[f.index] = sim.time
 		return
-	f.knock_out(attacker)
+	eliminate(f, attacker)
+
+
+## The one elimination path (KO, ring-out KO, bleed-out): stats, events, score hook, lives,
+## respawn queue and the round check.
+func eliminate(f: Fighter, attacker: Fighter) -> void:
+	if f.state != Fighter.State.KO:
+		f.knock_out(attacker)
 	if attacker and attacker != f:
 		attacker.stats_record["kos"] += 1
 	sim.emit_event({"type": "elimination", "fighter": f.index, "by": attacker.index if attacker else -1})
@@ -135,10 +155,17 @@ func on_ringout(f: Fighter, attacker: Fighter) -> void:
 	if bool(rules.get("ringout_eliminates", false)) or f.health - dmg <= 0.0:
 		f.health = 0.0
 		on_depleted(f, attacker, {"ringout": true})
-		if not f.is_out():
+		if f.health > 0.0 and not f.is_out():
+			# the mode refilled the fighter (practice, tutorial): bring them back like a normal ring-out
+			_ringout_return(f)
+		elif not f.is_out():
 			f.knock_out(attacker)
 		return
 	f.health -= dmg
+	_ringout_return(f)
+
+
+func _ringout_return(f: Fighter) -> void:
 	f.set_inactive(true)
 	var p := f.pos()
 	var back := sim.clamp_to_arena(Vector3(p.x, 0.0, p.z), 1.6)
@@ -156,6 +183,12 @@ func on_round_reset() -> void:
 	_respawns.clear()
 	_revive.clear()
 	_downed_at.clear()
+	# scores are per round (round wins carry the match)
+	for t in scores:
+		scores[t] = 0.0
+	for f: Fighter in sim.fighters:
+		if not f.despawned:
+			f.lives = initial_lives()
 
 
 func _team_has_standing_ally(f: Fighter) -> bool:
@@ -219,9 +252,8 @@ func _tick_revives(dt: float) -> void:
 		if sim.time - float(_downed_at[idx]) > bleed:
 			_downed_at.erase(idx)
 			_revive.erase(idx)
-			f.knock_out(null)
 			sim.emit_event({"type": "bled_out", "fighter": f.index})
-			check_round_over()
+			eliminate(f, sim.last_attacker_of(f))
 
 
 func revive_progress(f: Fighter) -> float:
@@ -410,6 +442,6 @@ func bot_objective(_f: Fighter) -> Dictionary:
 	# revive downed allies when nobody else is
 	for idx in _downed_at:
 		var d := sim.fighters[idx]
-		if d.team == _f.team and d != _f:
+		if d.team == _f.team and d != _f and d.pos().y > -0.5 and sim.arena.inside(d.pos(), -0.3):
 			return {"pos": d.pos(), "engage": 1.0, "hold": "grab", "radius": REVIVE_RANGE * 0.7}
 	return {}

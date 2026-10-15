@@ -57,13 +57,13 @@ const FIELDS := {
 	"grabs": {"group": "Fighters", "label": "Grabs and throws", "type": "bool", "def": true, "help": "Off: Grab does nothing."},
 	"friendly_fire": {"group": "Fighters", "label": "Friendly fire", "type": "bool", "def": false,
 		"help": "Teammates can hurt each other with strikes."},
-	"ally_reaction_damage_mult": {"group": "Fighters", "label": "Ally element reactions", "type": "float", "def": 0.5, "min": 0.0, "max": 1.0, "step": 0.05,
+	"ally_reaction_damage_mult": {"group": "Fighters", "label": "Ally element reactions", "type": "float", "def": 0.25, "min": 0.0, "max": 1.0, "step": 0.05,
 		"help": "Damage teammates take from your element reactions."},
-	"lives": {"group": "Respawn & revive", "label": "Lives", "type": "int", "def": 1, "min": 1, "max": 9,
-		"help": "Knockouts a fighter can take before elimination (needs Respawn)."},
-	"respawn": {"group": "Respawn & revive", "label": "Respawn", "type": "bool", "def": false,
-		"help": "Knocked-out fighters come back after a delay while they have lives (or always, in score modes)."},
-	"respawn_delay": {"group": "Respawn & revive", "label": "Respawn delay (s)", "type": "float", "def": 3.0, "min": 1.0, "max": 15.0, "step": 0.5,
+	"lives": {"group": "Respawn & revive", "label": "Lives", "type": "int", "def": 1, "min": 0, "max": 9, "not_modes": ["tag_team", "chum_rush", "practice"],
+		"help": "Knockouts a fighter can take before elimination (needs Respawn). 0 = unlimited. Score modes without a lives count respawn without limit."},
+	"respawn": {"group": "Respawn & revive", "label": "Respawn", "type": "bool", "def": false, "not_modes": ["tag_team", "chum_rush", "practice"],
+		"help": "Knocked-out fighters come back after a delay while they have lives left."},
+	"respawn_delay": {"group": "Respawn & revive", "label": "Respawn delay (s)", "type": "float", "def": 3.0, "min": 1.0, "max": 15.0, "step": 0.5, "not_modes": ["tag_team", "chum_rush", "practice"],
 		"help": "Seconds out of the fight before respawning."},
 	"revive": {"group": "Respawn & revive", "label": "Revives", "type": "bool", "def": false,
 		"help": "Team formats: a downed fighter can be revived by a teammate holding Grab nearby."},
@@ -83,14 +83,14 @@ const FIELDS := {
 		"options": ["punching_bag", "journeyman", "contender", "headliner", "hall_of_famer"],
 		"help": "Skill of bots that fill empty slots (local, hosted and dedicated matches)."},
 	"bots": {"group": "Bots", "label": "Fill with bots", "type": "int", "def": 0, "min": 0, "max": 7,
-		"help": "Bots added when there are fewer players than the minimum."},
+		"help": "Bots added to every match with these rules (never past the maximum fighters), at the bot skill above."},
 	# ---- mode options ----
 	"light_radius": {"group": "Mode options", "label": "Spotlight size (m)", "type": "float", "def": 2.0, "min": 1.0, "max": 4.0, "step": 0.1,
 		"modes": ["spotlight_hog"], "help": "Radius of the scoring light."},
 	"dwell": {"group": "Mode options", "label": "Spotlight stays (s)", "type": "float", "def": 25.0, "min": 8.0, "max": 90.0, "step": 1.0,
 		"modes": ["spotlight_hog"], "help": "Seconds before the light swings somewhere else."},
-	"contest": {"group": "Mode options", "label": "Contested light", "type": "enum", "def": "strict", "options": ["strict", "split"],
-		"modes": ["spotlight_hog"], "help": "Strict: nobody scores while two sides share the light. Split: everyone inside scores half."},
+	"contest": {"group": "Mode options", "label": "Contested light", "type": "enum", "def": "strict", "options": ["strict", "majority"],
+		"modes": ["spotlight_hog"], "help": "Strict: nobody scores while two sides share the light. Majority: the side with more fighters inside scores (a tie scores nothing)."},
 	"hot_light": {"group": "Mode options", "label": "Hot light", "type": "bool", "def": false,
 		"modes": ["spotlight_hog"], "help": "Standing in the light slowly scorches you."},
 	"ball_mass": {"group": "Mode options", "label": "Ball weight (kg)", "type": "float", "def": 25.0, "min": 8.0, "max": 80.0, "step": 1.0,
@@ -102,9 +102,9 @@ const FIELDS := {
 	"carry": {"group": "Mode options", "label": "Carrying", "type": "bool", "def": true, "modes": ["chumball"],
 		"help": "Grab picks the ball up; attack buttons throw it."},
 	"hot_ball": {"group": "Mode options", "label": "Hot ball", "type": "bool", "def": false, "modes": ["chumball"],
-		"help": "The ball carries the element of the last fighter who hit it."},
-	"chaos": {"group": "Mode options", "label": "Chaos balls", "type": "bool", "def": false, "modes": ["chumball"],
-		"help": "Extra balls drop in during the match."},
+		"help": "A fast-moving ball hurts (4 damage) whoever it hits."},
+	"chaos": {"group": "Mode options", "label": "Chaos", "type": "bool", "def": false, "modes": ["chumball"],
+		"help": "Fighters are not sent back to their spawns after a goal."},
 	"unit_scale": {"group": "Mode options", "label": "Unit size", "type": "float", "def": 1.6, "min": 1.2, "max": 2.0, "step": 0.05,
 		"modes": ["absolute_unit"], "help": "How much bigger the Absolute Unit gets."},
 	"unit_hp": {"group": "Mode options", "label": "Unit health", "type": "float", "def": 2.5, "min": 1.0, "max": 5.0, "step": 0.1,
@@ -112,7 +112,7 @@ const FIELDS := {
 	"unit_juice": {"group": "Mode options", "label": "Unit can JUICE", "type": "bool", "def": false, "modes": ["absolute_unit"],
 		"help": "Let the Absolute Unit use its JUICE."},
 	"hot_potato": {"group": "Mode options", "label": "Hot potato", "type": "bool", "def": false, "modes": ["absolute_unit"],
-		"help": "The crown passes to whoever lands the hit, not only the KO."},
+		"help": "The Unit loses a point for every 5 s it goes without hitting anyone."},
 	"start_wave": {"group": "Mode options", "label": "Starting wave", "type": "int", "def": 1, "min": 1, "max": 60,
 		"modes": ["chum_rush"], "help": "Skip ahead to tougher waves."},
 	"wave_size_mult": {"group": "Mode options", "label": "Wave size", "type": "float", "def": 1.0, "min": 0.5, "max": 3.0, "step": 0.1,
@@ -151,6 +151,8 @@ static func fields_for(mode: String) -> Array:
 			if f["group"] != g:
 				continue
 			if f.has("modes") and not mode in f["modes"]:
+				continue
+			if f.has("not_modes") and mode in f["not_modes"]:
 				continue
 			out.append(k)
 	return out
@@ -222,6 +224,7 @@ static func defaults_for(mode: String) -> Dictionary:
 			r["win"] = "survive"
 			r["revive"] = true
 			r["round_time"] = 0.0
+			r["rounds"] = 1
 		"practice":
 			r["teams"] = 2
 			r["players"] = [1, 2]
@@ -231,6 +234,7 @@ static func defaults_for(mode: String) -> Dictionary:
 	if mode in ["spotlight_hog", "chumball", "absolute_unit"]:
 		r["win"] = "score"
 		r["respawn"] = true
+		r["lives"] = 0          # unlimited: score modes keep everyone in the fight
 		r["rounds"] = 1
 	return r
 
@@ -303,14 +307,16 @@ static func validate(rules: Dictionary) -> Array:
 		err.call("score_target", "Set a score target of at least 1.")
 	if win == "score" and mode == "standard" and int(rules.get("ko_points", 1)) == 0:
 		err.call("ko_points", "With 0 points per KO nobody can score in Standard.")
+	if mode in ["chum_rush", "practice"] and int(rules.get("rounds", 1)) != 1:
+		err.call("rounds", "%s is played as a single round." % mode.capitalize())
 	if int(rules.get("rounds", 1)) % 2 == 0:
 		warn.call("rounds", "An even number of rounds can end in a tie (sudden death settles it if enabled).")
 	var unlimited := float(rules.get("round_time", 99.0)) <= 0.0
 	var respawn := bool(rules.get("respawn", false))
 	if unlimited and respawn and win != "score" and int(rules.get("lives", 1)) >= 9 and fmt != "coop":
 		warn.call("round_time", "No timer, respawns and 9 lives can make very long matches.")
-	if respawn and int(rules.get("lives", 1)) <= 1 and win != "score":
-		warn.call("respawn", "With 1 life, respawning has no effect (raise Lives or use Score).")
+	if respawn and int(rules.get("lives", 1)) == 1 and win != "score":
+		warn.call("respawn", "With 1 life, respawning has no effect (raise Lives, set 0 for unlimited, or use Score).")
 	if bool(rules.get("revive", false)) and not fmt in ["teams", "tag", "coop"]:
 		warn.call("revive", "Revives only work when teammates exist.")
 	if float(rules.get("damage_mult", 1.0)) >= 3.0 and float(rules.get("health_mult", 1.0)) <= 0.5:
