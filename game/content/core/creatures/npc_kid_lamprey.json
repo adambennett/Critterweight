@@ -5,7 +5,7 @@
   "element": "",
   "npc_only": true,
   "tags": ["npc", "biped", "sparring"],
-  "stats": {"health": 90, "walk_speed": 3.5, "accel": 30, "turn_rate": 10, "stamina": 100, "stamina_regen": 12, "poise": 45, "poise_regen": 15, "dodge_distance": 3.0, "dodge_time": 0.3, "power": 1.0, "defense": 1.0, "weight": 1.0},
+  "stats": {"health": 80, "walk_speed": 3.5, "accel": 30, "turn_rate": 10, "stamina": 100, "stamina_regen": 12, "poise": 45, "poise_regen": 15, "dodge_distance": 3.0, "dodge_time": 0.3, "power": 0.72, "defense": 1.0, "weight": 1.0},
   "body": {
     "id": "npc_kid_lamprey_body",
     "name": "Kid Lamprey",
@@ -153,5 +153,5 @@
   ],
   "art": {"model": "res://assets/models/creatures/npc_kid_lamprey.glb", "palette": {"primary": "#3F4A5C", "secondary": "#6E8B8E", "accent": "#C23A2B", "skin": "#6E8B8E", "teeth": "#F2EFE4"}, "roughness": 0.8, "outline": 0.012, "hype_feature": "mouth glow", "gore_piece": {"segment": "head", "offset": [0.03, -0.03, 0.17], "size": 0.03, "shape": "tooth", "color": "#F2EFE4"}},
   "audio": {"voice": "lamprey", "material": "flesh", "plan": "biped", "juice": "juice_generic"},
-  "ai": {"style": "showoff rookie", "aggression": -0.05, "block": -0.05, "grab": -0.06, "charge_heavy": 0.15, "abilities": {"ability2": {"chance": 0.8, "when": [{"target_winding": true}]}}}
+  "ai": {"style": "showoff rookie", "aggression": -0.15, "block": -0.05, "grab": -0.06, "charge_heavy": 0.15, "abilities": {"ability2": {"chance": 0.8, "when": [{"target_winding": true}]}}}
 }
