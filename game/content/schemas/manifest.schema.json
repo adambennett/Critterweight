@@ -8,7 +8,7 @@
   "properties": {
     "id": {"type": "string", "pattern": "^[a-z0-9_]{3,32}$"},
     "name": {"type": "string", "minLength": 1, "maxLength": 48},
-    "version": {"type": "string", "pattern": "^[0-9]+\.[0-9]+\.[0-9]+$"},
+    "version": {"type": "string", "pattern": "^[0-9]+[.][0-9]+[.][0-9]+$"},
     "game_version": {"type": "string"},
     "author": {"type": "string", "maxLength": 48},
     "description": {"type": "string", "maxLength": 600},

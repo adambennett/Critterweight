@@ -156,7 +156,7 @@ func _collect_scripts(dir: String) -> Array:
 		var p := dir.path_join(n)
 		if d.current_is_dir():
 			out.append_array(_collect_scripts(p))
-		elif n.ends_with(".gd"):
-			out.append(p)
+		elif n.ends_with(".gd") or n.ends_with(".gd.remap"):
+			out.append(p.trim_suffix(".remap"))
 		n = d.get_next()
 	return out

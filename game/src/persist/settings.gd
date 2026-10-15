@@ -283,6 +283,10 @@ func _apply_bus(key: String) -> void:
 func _apply_window() -> void:
 	if _headless:
 		return
+	# explicit command-line window options (captures, tests, Steam launch options) win over settings
+	var cli := OS.get_cmdline_args()
+	if cli.has("--resolution") or cli.has("--windowed") or cli.has("-w") or cli.has("--fullscreen") or cli.has("-f"):
+		return
 	var w := get_window()
 	var screen := clampi(int(values["display.screen"]), 0, DisplayServer.get_screen_count() - 1)
 	var mode := str(values["display.window_mode"])
