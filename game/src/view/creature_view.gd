@@ -77,10 +77,14 @@ func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := fa
 func _try_load_model(path: String) -> bool:
 	var scene: PackedScene = null
 	if path.begins_with("res://"):
-		if ResourceLoader.exists(path):
-			scene = load(path)
-	else:
+		# core content only (Content refuses res:// paths from mods), and only imported models
+		if path.get_extension().to_lower() == "glb" and ResourceLoader.exists(path):
+			scene = load(path) as PackedScene
+	elif Content.is_package_asset(path) and path.get_extension().to_lower() == "glb":
+		# a mod's model: only files Content validated as part of a loaded package
 		scene = ModelLoader.load_gltf_scene(path)
+	elif path != "":
+		push_warning("%s: model '%s' is not a validated package file; using the built-in look" % [creature.id, path])
 	if scene == null:
 		return false
 	var inst := scene.instantiate()
