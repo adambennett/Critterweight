@@ -1,13 +1,14 @@
 <#
 .SYNOPSIS
-  UI-12: runs Granny Haymaker's tutorial course (test_tutorial.gd) once per fighter, in parallel,
-  against the Kid the game launches for that fighter, and prints one line per fighter.
+  UI-12: runs Granny Haymaker's tutorial course (test_tutorial.gd) once per fighter against the Kid
+  the game launches for that fighter, and prints one line per fighter.
 .DESCRIPTION
   Fighters: the Test Dummy (dev_biped, npc_only since the roster is complete; test_tutorial's own
   default) and every creature in game/content/core/creatures that is not npc_only (the roster), or
   the ones given with -Fighters (an unknown id stops the script). Each run has its own
-  user-data root under %TEMP%, deleted when it ends. Exit code = the number of fighters with a
-  failing test. See docs/design/ANNOUNCER_AND_TUTORIAL.md section 2.3.
+  user-data root under %TEMP%, deleted when it ends. One Godot process at a time, at below-normal
+  priority (AGENTS.md machine-load rule): about five minutes for all seven. Exit code = the number of
+  fighters with a failing test. See docs/design/ANNOUNCER_AND_TUTORIAL.md section 2.3.
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File tools/verify/tutorial_matrix.ps1
   powershell -ExecutionPolicy Bypass -File tools/verify/tutorial_matrix.ps1 -Fighters f_dozer,f_slurry -Filter test_light_string
@@ -34,7 +35,8 @@ if ($unknown.Count -gt 0) {
 	exit 100
 }
 $test = "test_tutorial.gd" + $(if ($Filter -ne "") { "::$Filter" } else { "" })
-$runs = @()
+try { (Get-Process -Id $PID).PriorityClass = 'BelowNormal' } catch {}   # Godot inherits it
+$failed = 0
 foreach ($id in $Fighters) {
 	$userRoot = Join-Path $env:TEMP "critterweight-tutorial-$id-$PID"
 	New-Item -ItemType Directory -Force $userRoot | Out-Null
@@ -47,16 +49,14 @@ foreach ($id in $Fighters) {
 	$psi.RedirectStandardError = $true
 	$psi.EnvironmentVariables["TUTORIAL_CREATURE"] = $id
 	$p = [System.Diagnostics.Process]::Start($psi)
-	$runs += [pscustomobject]@{ Id = $id; P = $p; Root = $userRoot; Out = $p.StandardOutput.ReadToEndAsync(); Err = $p.StandardError.ReadToEndAsync() }
-}
-$failed = 0
-foreach ($r in $runs) {
-	$r.P.WaitForExit()
-	Remove-Item -Recurse -Force -LiteralPath $r.Root -ErrorAction SilentlyContinue
-	$lines = $r.Out.Result -split "`r?`n"
+	$out = $p.StandardOutput.ReadToEndAsync()
+	$err = $p.StandardError.ReadToEndAsync()
+	$p.WaitForExit()
+	Remove-Item -Recurse -Force -LiteralPath $userRoot -ErrorAction SilentlyContinue
+	$lines = $out.Result -split "`r?`n"
 	$summary = ($lines | Where-Object { $_ -match "^tests: " }) -join ""
-	if ($r.P.ExitCode -ne 0) { $failed += 1 }
-	Write-Host ("{0,-12} exit {1}  {2}" -f $r.Id, $r.P.ExitCode, $summary) -ForegroundColor $(if ($r.P.ExitCode -eq 0) { "Green" } else { "Red" })
+	if ($p.ExitCode -ne 0) { $failed += 1 }
+	Write-Host ("{0,-12} exit {1}  {2}" -f $id, $p.ExitCode, $summary) -ForegroundColor $(if ($p.ExitCode -eq 0) { "Green" } else { "Red" })
 	$lines | Where-Object { $_ -match "^    tut_|^FAIL|^\s{8}" } | ForEach-Object { Write-Host $_ }
 }
 exit $failed

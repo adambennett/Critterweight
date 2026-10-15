@@ -374,7 +374,7 @@ onto Jitters (0.97 m) or past Dredge's raised claws from any distance, so those 
 
 Verification: `test_tutorial` runs the whole course with the pairing the game launches (default: the
 Test Dummy, which is test-only now that the roster is complete); `tools/verify/tutorial_matrix.ps1`
-runs it for the Test Dummy and every roster fighter in parallel (by hand:
+runs it for the Test Dummy and every roster fighter, one at a time at low priority (by hand:
 `TUTORIAL_CREATURE=<id>`; `TUTORIAL_PARTNER=<id>` tries other Kid bodies, `TUTORIAL_TRACE=1` prints
 each exercise's events). The driver stands in for a competent player: hit-confirm string rhythm, parry
 and dodge timing learned from when his strikes actually land, spacing tried and varied like a person
