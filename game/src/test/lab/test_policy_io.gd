@@ -206,6 +206,63 @@ func test_library_operations() -> void:
 	check(PolicyLibrary.get_policy("no_such_policy") == null and PolicyLibrary.last_error("no_such_policy") != "", "missing id explained")
 
 
+## Review finding 11: an [INVALID] user policy file (listed with its reason) used to be stuck:
+## delete and rename needed a loadable policy. Both now work on the file itself; built-in
+## policies stay read-only and nothing outside the user folder is touched.
+func test_invalid_user_files_can_be_renamed_and_deleted() -> void:
+	var lib := PolicyLibrary.user_dir()
+	_write_text(lib.path_join("broken.policy.json"), "{ not a policy")
+	_write_text(lib.path_join("broken.policy.json.bak"), "{ also broken")
+	_write_text(lib.path_join("My Bot.policy.json"), "{\"format\": \"critterweight.policy\"}")
+	var ids := {}
+	for s: Dictionary in PolicyLibrary.list():
+		if not bool(s.get("valid", true)):
+			ids[str(s["id"])] = true
+	check(ids.has("broken") and ids.has("My Bot"), "both files are listed as invalid: %s" % str(ids.keys()))
+	check_eq(PolicyLibrary.rename("broken", "Kept aside"), OK, "an invalid file can be renamed")
+	check(not FileAccess.file_exists(lib.path_join("broken.policy.json")), "old file name gone")
+	check(FileAccess.file_exists(lib.path_join("Kept_aside.policy.json")), "renamed to the name's file-safe form")
+	check(FileAccess.file_exists(lib.path_join("Kept_aside.policy.json.bak")), "its backup moved along")
+	check_eq(PolicyLibrary.delete("Kept_aside"), OK, "an invalid file can be deleted")
+	check(not FileAccess.file_exists(lib.path_join("Kept_aside.policy.json")) and not FileAccess.file_exists(lib.path_join("Kept_aside.policy.json.bak")),
+		"file and backup removed")
+	check_eq(PolicyLibrary.delete("My Bot"), OK, "a file whose name is not a valid id can be deleted too")
+	check(not FileAccess.file_exists(lib.path_join("My Bot.policy.json")), "removed")
+	check(PolicyLibrary.delete("../escape") != OK, "ids never reach outside the policy folder")
+	check(PolicyLibrary.delete("no_such_file") != OK, "a missing file is an error, not a crash")
+	var builtin: Array = Content.ids("policies")
+	if not builtin.is_empty():
+		check(PolicyLibrary.delete(str(builtin[0])) != OK, "built-in policies cannot be deleted")
+		check(PolicyLibrary.rename(str(builtin[0]), "x") != OK, "nor renamed")
+
+
+## Review finding 13: policies shipped by content packages (mods) are size-capped BEFORE they are
+## read, like user files; an oversized one is reported and skipped.
+func test_content_policies_are_size_capped_before_reading() -> void:
+	var pkg := dir.path_join("capmod")
+	DirAccess.make_dir_recursive_absolute(pkg.path_join("policies"))
+	var f := FileAccess.open(pkg.path_join("policies").path_join("huge.json"), FileAccess.WRITE)
+	f.store_string("{\"id\": \"capmod:huge\", \"pad\": \"")
+	var chunk := "0123456789".repeat(10000)
+	for k in 45:
+		f.store_string(chunk)
+	f.store_string("\"}")
+	f.close()
+	var small := _dict(_policy(12))
+	small["id"] = "capmod:small"
+	_write_text(pkg.path_join("policies").path_join("small.json"), JSON.stringify(_resign(small)))
+	var c: Node = load("res://src/data/content.gd").new()
+	for k in Content.KINDS:
+		(c.get("tables") as Dictionary)[k] = {}
+	c.call("_load_package", {"id": "capmod", "path": pkg})
+	var tables: Dictionary = c.get("tables")
+	var errs: PackedStringArray = c.get("errors")
+	check(not (tables["policies"] as Dictionary).has("capmod:huge"), "the oversized policy is not loaded")
+	check(("; ".join(errs)).contains("too large"), "and the reason is reported: %s" % "; ".join(errs))
+	check((tables["policies"] as Dictionary).has("capmod:small"), "a normal policy in the same package still loads")
+	c.free()
+
+
 ## Match setup hook: a missing/incompatible policy never breaks a match (scripted fallback).
 func test_match_hook_falls_back_safely() -> void:
 	var c := Content.creature("dev_biped")

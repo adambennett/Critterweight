@@ -41,16 +41,20 @@ UiTheme text styles, so the text-size and UI-scale settings apply to it.
    Rename, Export to a file, Import (validation errors are shown), Delete (press twice),
    *Open policy folder*, *Evaluate vs baselines* (runs a separate evaluation job), **Fight this bot** (you vs the
    policy, choose your fighter) and **Spectate this bot** (policy vs a bot tier, a scripted
-   drill or another policy).
+   drill or another policy). An [INVALID] user file can still be deleted, or renamed (its file
+   is renamed, since an unreadable file cannot carry a new name inside); built-ins are read-only.
 4. **Recording** — *Record my matches for imitation learning* (off by default): while on, every
    match you play stores what you saw and did into the dataset "My <fighter> matches". You can
-   also record a teacher bot headlessly, and rename/delete datasets.
+   also record a teacher bot headlessly (recording the same teacher again adds new episodes,
+   see §7), and rename/delete datasets.
 
 The game never trains in its own process, so menus stay responsive (measured while a worker
 trains: see `docs/evidence/lab/README.md`). Closing the game stops workers at their last
-checkpoint ("interrupted"); *Continue run* picks them up again. When a completed run shows a
-trained policy beating its baseline on held-out evaluation, the Lab unlocks the *Mad Scientist*
-achievement (`Platform.unlock_achievement("ach_mad_scientist")`).
+checkpoint ("interrupted", within ~15 s); *Continue run* picks them up again. When a completed
+run shows a trained policy beating its baseline on held-out evaluation (a paired 95 % interval
+above zero on the same test episodes; for BC, test-episode accuracy clearly above the
+majority-class baseline), the Lab unlocks the *Mad Scientist* achievement
+(`Platform.unlock_achievement("ach_mad_scientist")`).
 
 ## 2. Training approaches
 
@@ -62,10 +66,15 @@ numbers), fitness = mean episode reward → centred ranks → gradient estimate
 Σ(r⁺−r⁻)ε/(2nσ) → Adam step with decoupled weight decay. No step is taken when every pair ties.
 
 *Model selection.* ES optimises the noise-smoothed objective, so early on the mean θ can play
-worse than its best perturbations. Every `eval.every` generations both θ and the generation's
-best candidate ("elite") play the **validation** seeds; the best validated network is kept.
-The final report evaluates the initial network and the selected one on separate **test** seeds
-(and optionally a scripted reference on the same episodes).
+worse than its best perturbations. Every `eval.every` generations — and once more when training
+stops, if generations ran since the last validation — both θ and the generation's best
+candidate ("elite") play the **validation** seeds; the best validated network is kept. The
+starting network is validated before the first generation and competes too: if nothing beat
+it, the report (`selected_initial`), the run's message and the policy's metadata say that the
+saved policy is the starting network. The final report evaluates the initial network and the
+selected one on separate **test** seeds (and optionally a scripted reference on the same
+episodes), with a paired test over those shared episodes. A run started from a saved policy
+keeps that policy's play settings (temperature, perception lag, decision rate, button mask).
 
 *What it learns / why it fits.* It optimises any episode-level reward (damage, survival,
 parries, taunts…) through the non-differentiable physics, needs no recordings, parallelises over
@@ -75,11 +84,17 @@ Cost: many episodes; it learns coarse behaviours first (approach, attack rhythm,
 ### 2.2 Behaviour cloning (`kind: bc`)
 Supervised learning of the act_v1 heads from recorded (observation, action) pairs:
 masked cross-entropy on the move head and the button head (optionally class-balanced),
-minibatch Adam + L2, validation split by **whole recorded episodes** (no temporal leakage),
-early stopping on validation loss (best weights kept). After training the clone and — when the
-dataset came from a scripted teacher — the teacher itself play the same test episodes; the report
-compares outcomes and action distributions (total variation distance) next to the held-out
-accuracy, the majority-class baseline and the untrained network.
+minibatch Adam + L2. The recorded **episodes** are split three ways (copies of an episode count
+as one, see §7): `val_frac` (20 %) validate — early stopping on validation loss, best weights
+kept — `test_frac` (20 %) test, the rest train. No episode is in two splits and nothing is
+trained on validation or test data; the reported **test accuracy** comes from episodes that
+influenced neither the weights nor the stopping point (validation accuracy is reported too,
+labelled as the early-stopping split). A dataset needs at least **6 episodes** (rounds); smaller
+ones are refused with that message. The report shows the split (`split.mode` "episodes" and the
+episode counts per part). After training the clone and — when the dataset came from a scripted
+teacher — the teacher itself play the same test episodes; the report compares outcomes (with a
+paired test) and action distributions (total variation distance) next to the test accuracy, the
+majority-class baseline and the untrained network.
 
 *What it learns / why it fits.* A playstyle, directly from a few minutes of play (yours or a
 bot's), with no reward design; fast on a CPU. It copies mistakes too and cannot exceed its
@@ -116,7 +131,11 @@ delays and mistakes; never omniscient). `policy:<file>` plays a saved policy.
 Scenario presets (`src/lab/lab_scenarios.gd`): *Drill: standing dummy*, *Drill: patrolling
 dummy*, *Sparring: jabber*, *Sparring: jabber + turtle*, *Bots: Rookie + Regular*, *Bots: Pro +
 Champion*; every field can be overridden (opponents, round length, random vs standard spawns,
-spawn distance, arena).
+spawn distance, arena). Spawns: *random* puts the learner anywhere in the inner part of the
+arena and the opponent `dist` metres away; *standard* uses the arena's standard opposite spawn
+points, jittered per episode seed (±0.35 m, ±25°); *swapped* exchanges the two sides. (Before
+this fix, format-2 arenas such as The Gullet placed the opponent of every random-spawn episode
+on one fixed spawn point and "swapped" did not swap.)
 
 Every episode is a fresh physics world (SubViewport with its own World3D) running a real
 `MatchSim` with the standard `MatchMode` (one round; KO or decision at the time limit). Two
@@ -125,12 +144,26 @@ cosmetic intro is a 0.2 s settle (`intro_time`; round-start hooks still fire) an
 time limit is a draw (`sudden_death: false`) so every episode has a bounded length.
 
 Seeds come from disjoint named streams: `train:<job seed>:<generation>:<k>`,
-`val:<job seed>:<i>` (model selection only) and `test:<job seed>:<i>` (final reports only).
-Evaluation additionally plays the arena's standard corner spawns, a layout random-spawn training
-never sees. Reports give n, mean ± std and 95 % CI of reward, damage dealt/taken and hits, and
-win rate with a Wilson 95 % interval, per opponent — every evaluated episode counts, nothing is
-cherry-picked. Evaluation jobs (`kind: eval`) compare a policy with a random network of the same
-shape and/or a scripted reference on the same test episodes.
+`val:<job seed>:<i>` (model selection only), `test:<job seed>:<i>` (final reports only) and
+`rec:<job seed>:<index>` (teacher recordings). Evaluation additionally plays the arena's standard
+spawns (jittered, alternating sides), a layout random-spawn training never uses.
+
+Every evaluation episode starts differently, so **n counts distinct episodes** (before the
+jitter, a deterministic policy against the standing dummy replayed the standard-spawn episode
+n times and each copy was counted). Reports give n, mean ± std and a 95 % confidence interval
+of reward, damage dealt/taken and hits — a **Student-t** interval (t quantile for n − 1 degrees
+of freedom; no interval at all for n < 2) — and win rate with a Wilson 95 % interval, per
+opponent. Every evaluated episode counts, nothing is cherry-picked. Two conditions played on the
+same episodes (initial vs trained network, a policy vs its comparison or the scripted reference,
+a clone vs its teacher) are compared with a **paired test** over those episodes: mean difference,
+its 95 % interval, t and n (`paired`, `paired_compare`, `paired_reference`, `paired_teacher`);
+"significant" means the interval excludes 0. (Welch's unpaired t is still reported as `welch_t`.)
+Evaluation jobs (`kind: eval`) play the policy exactly as saved (its action mode, temperature,
+perception lag, decision rate and button mask) and compare it with a random network of the same
+shape and settings and/or a scripted reference on the same test episodes. *Evaluate vs baselines*
+scores with the policy's own training objective, including edited reward weights. Evaluation and
+recording jobs run in short batches and stop at their time or episode limit with a partial
+report (`complete: false`, `stop_reason`, played vs planned episodes).
 
 ## 5. Contracts (used identically in training, recording and matches)
 
@@ -179,7 +212,10 @@ weights {encoding "f32le_base64", count, data}, training {...metadata...}, check
 
 `training` records approach, run id, objective, scenario, seed, episodes, simulated seconds,
 wall time, game version, contract versions, limits, and the evaluation summary (ES: test
-results before/after; BC: held-out accuracy, baselines, action-distribution distance).
+results before/after with the paired comparison; BC: test-episode accuracy (`test_accuracy`),
+validation accuracy (`val_accuracy`, the early-stopping split), the split, baselines,
+action-distribution distance). Policies saved by earlier builds only carry `val_accuracy`; the
+Lab labels it as validation accuracy.
 
 **Validation on load** (`PolicyData.from_dict`, `PolicyIO.read_one`): file ≤ 4 MB (checked before
 reading), JSON object, known format, format_version not newer than this build, id/name/creature
@@ -210,27 +246,60 @@ a warning. Incompatible files are listed with their reason and cannot be used.
 ## 7. Datasets and recording
 
 `<user data>/lab/datasets/<id>/`: `meta.json` (Saves envelope: name, creature, contract versions,
-source, optional teacher statistics) + `shard_*.bin` (one recording session each; header
-`CWDS`, format, obs size, count; float32 observations, u8 move, u8 button, u32 episode).
-Reading validates header, exact length, finite values and label ranges; a damaged shard is
-skipped and reported. `PolicyRecorder` wraps any input source and labels each 15 Hz window with
-the act_v1 inverse mapping; the in-game switch wraps the local player only (`LabRecording`).
+source, optional teacher statistics, `next_episode`) + `shard_*.bin` (one recording session each;
+header `CWDS`, format, obs size, count; float32 observations, u8 move, u8 button, u32 episode and
+— shard format 2 — u32 seed per sample). Format 1 shards (no seed column, written by earlier
+builds) still load; new shards are format 2, which earlier builds reject. Reading validates
+header, exact length, finite values and label ranges; a damaged shard is skipped and reported.
+`PolicyRecorder` wraps any input source and labels each 15 Hz window with the act_v1 inverse
+mapping; the in-game switch wraps the local player only (`LabRecording`).
+
+*Seeds and copies.* Each teacher recording run continues the dataset's numbering: episode k of a
+run is recording index `first + k` (stored in the episode column) with seed
+`rec:<job seed>:<first + k>` (stored in the seed column), where `first` follows everything the
+dataset already holds (`meta.next_episode`, reserved when the run starts, and the highest index
+in its shards). Recording the same teacher again — same job seed or not — therefore adds new
+episodes. *Continue run* re-uses the run's reservation (kept in its checkpoint) and skips every
+episode whose seed the dataset already has. Loading drops exact copies of an episode (identical
+samples, e.g. a teacher recorded twice by an earlier build) and gives each remaining episode a
+split unit — its seed when known, else its content hash — so copies of an episode always land in
+the same behaviour-cloning split. Human recordings have no seed (0).
 
 ## 8. Worker processes, jobs, files
 
 ```text
 <game> --headless --fixed-fps 120 -- --lab-worker <job.json> [--lab-out <run dir>] [--user-root <dir>]
 ```
-(from source: `godot --headless --path game --fixed-fps 120 -- --lab-worker …`). `--fixed-fps 120`
-makes every frame exactly one 120 Hz tick, as fast as the CPU allows. The game launches workers
-with `OS.create_process(OS.get_executable_path(), …)`, its own pid, and a private `--user-root`
-per process (so workers never write the player's profile or settings).
+(from source: `godot --headless --path game --fixed-fps 120 -- --lab-worker <job.json>`).
+**`--path game` makes the game folder Godot's working directory**, so relative paths in a
+command run from the repository root must start with `../` (`--lab-worker ../docs/evidence/lab/jobs/…`,
+`--lab-out ../runs/…`) or be absolute; a worker that cannot find its job file says so.
+`--fixed-fps 120` makes every frame exactly one 120 Hz tick, as fast as the CPU allows. The game
+launches workers with `OS.create_process(OS.get_executable_path(), …)`, its own pid, and a
+private `--user-root` per process (so workers never write the player's profile or settings).
 
-Rank 0 (coordinator) spawns `limits.workers − 1` helper processes, runs the job, distributes
-episodes through `gen/task_*.json` / `result_*.json`, and re-runs the share of a helper that dies
-or stops heart-beating (helpers rewrite `gen/hb_r<k>.json` every second; silence for 20 s means
-gone, and a helper that heart-beats again gets work from the next batch). Helpers exit when the
-coordinator is gone. A crashed or stalled helper therefore costs time, never results.
+Rank 0 (coordinator) runs the job and starts `limits.workers − 1` helper processes the first
+time the job hands out episodes (a behaviour-cloning job therefore has no helpers while its
+network trains). It distributes episodes through `gen/task_*.json` / `result_*.json` and re-runs
+a helper's share itself when the helper
+- dies or stops heart-beating (helpers rewrite `gen/hb_r<k>.json` every second, also while the
+  run is paused; silence for `limits.heartbeat_s` = 20 s means gone, and after a resume every
+  helper gets a fresh 20 s grace period), or
+- does not deliver its results in time: once the coordinator has finished its own share, a
+  helper gets 3× that time (scaled to its share size, at least `limits.straggler_s` = 30 s, pauses
+  excluded), counted from the batch's submission — or, for a helper still starting its process,
+  from its first heartbeat (the boot itself is covered by a 60 s startup timeout). A late result
+  is ignored; a helper that misses twice in a row gets no work for the next 5 batches.
+
+A helper that heart-beats again gets work from the next batch. Helpers exit when the
+coordinator is gone (they read its progress heartbeat, and ask the OS only when that is stale).
+A crashed, stalled or stuck helper therefore costs time, never results — and never hangs a run.
+Recording batches: helpers write their shards into `gen/stage_<task>_r<k>/`; the coordinator
+moves them into the dataset only when it accepts that helper's result for the current batch,
+so a re-run share is never stored twice.
+An idle helper looks for new work every 20–250 ms (growing while idle) and sleeps 20 ms per
+frame; the coordinator checks that the game is still running every 15 s through the OS (on
+Windows a `tasklist` call of ~0.1 s), so closing the game stops its workers within ~15 s.
 
 Job file (all fields optional except where noted; defaults in `src/lab/lab_job.gd`):
 
@@ -241,19 +310,30 @@ Job file (all fields optional except where noted; defaults in `src/lab/lab_job.g
  "eval": {"opponents": [], "episodes": 6, "val_episodes": 6, "every": 5, "standard_spawns": true, "reference": ""},
  "model": {"hidden": [32, 32], "activation": "tanh", "init_policy": "", "mode": "", "out_scale": 0.01},
  "es": {"pairs": 12, "sigma": 0.05, "lr": 0.02, "l2": 0.005, "episodes_per_candidate": 1},
- "bc": {"datasets": ["<dataset id or folder>"], "epochs": 60, "batch": 128, "lr": 0.003, "val_frac": 0.2, "patience": 8, "rollouts": 6, "balance": false},
+ "bc": {"datasets": ["<dataset id or folder>"], "epochs": 60, "batch": 128, "lr": 0.003, "val_frac": 0.2, "test_frac": 0.2, "patience": 8, "rollouts": 6, "balance": false},
  "record": {"teacher": "bot_regular", "episodes": 40, "dataset_id": "", "dataset_name": ""},
  "target": {"policy": "<eval: policy id or file>", "compare": "random_init"},
  "limits": {"max_wall_s": 1800, "max_generations": 60, "max_epochs": 60, "max_episodes": 0,
-            "workers": 1, "worlds": 2, "low_priority": true, "cpu_share": 1.0, "max_memory_mb": 3072}}
+            "workers": 1, "worlds": 2, "low_priority": true, "cpu_share": 1.0, "max_memory_mb": 3072,
+            "heartbeat_s": 20, "straggler_s": 30}}
 ```
+
+Job format changes are additive: every field has a default, so older job files run unchanged.
+Added in this version: `bc.test_frac` (episodes held out for the reported test accuracy),
+`limits.heartbeat_s` and `limits.straggler_s` (helper liveness and delivery deadline; tests lower
+them). `max_wall_s` and `max_episodes` now also end evaluation and recording jobs (after the
+current short batch, with a partial report that says so).
+Behaviour change for existing jobs: recording jobs continue the dataset's episode numbering
+(see §7), behaviour cloning needs at least 6 recorded episodes and splits them three ways, and
+evaluation's standard spawns are jittered per seed (§4).
 
 Run folder (`<user data>/lab/runs/<run id>/`): `job.json`, `job_effective.json` (normalised),
 `status.json`, `progress.json` (rewritten every 0.5 s — the heartbeat the UI uses),
 `metrics.jsonl` (one line per generation / epoch / validation), `control.json`
 (`{"desired": "run|pause|cancel", "snapshot_seq": n}`), `checkpoints/ckpt_<n>.json` (last 3,
 Saves envelopes), `report.json`, `best.policy.json`, `final.policy.json`, `worker_r<k>.log`,
-`gen/`, `home_r<k>/`.
+`gen/` (task/result/heartbeat files, helper staging folders), `home_r<k>/`. `progress.json`
+also counts helper shares re-run because the helper was gone (`reassigned`) or late (`late`).
 
 **Pause** freezes the physics spaces of running episodes immediately; **cancel** stops at once
 keeping the last checkpoint; **limits** (time, generations/epochs, episodes, memory) end training
@@ -261,7 +341,9 @@ gracefully: final evaluation, policies saved, status `completed`. **Crash/kill r
 sees a stale heartbeat → `interrupted`; resuming loads the newest valid checkpoint (damaged ones are
 skipped), truncates later metric lines, respawns helpers and continues. **Priority**: workers
 lower their own priority (`low_priority`, Windows via PowerShell, Linux/macOS via `renice`) and
-can idle a fraction of each frame (`cpu_share`).
+can leave a fraction of the CPU to other programs (`cpu_share`: frames are measured including
+the physics step and engine overhead, and the sleep owed is paid off in whole milliseconds by
+the time actually slept, so the long-run share matches the setting; see §12).
 
 Defaults are deliberately modest: 1 worker in jobs written by hand; the UI suggests
 `min(3, cores/2 − 1)` workers, 2 matches per worker, 20-minute limit, low priority.
@@ -274,9 +356,10 @@ Numbers and raw files: `docs/evidence/lab/README.md`. Reproduce:
 
 ```powershell
 $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
-& $g --headless --path game --fixed-fps 120 -- --lab-worker --lab-bench inference              # 8 policy fighters
-& $g --headless --path game --fixed-fps 120 -- --lab-worker --lab-bench inference --hidden 64,64
-& $g --headless --path game --fixed-fps 120 -- --lab-worker --lab-bench throughput             # one worker process
+# from the repository root; --path game makes game/ the working directory, hence ../
+& $g --headless --path game --fixed-fps 120 -- --lab-worker --lab-bench inference --lab-out ../bench32.json   # 8 policy fighters
+& $g --headless --path game --fixed-fps 120 -- --lab-worker --lab-bench inference --hidden 64,64 --lab-out ../bench64.json
+& $g --headless --path game --fixed-fps 120 -- --lab-worker --lab-bench throughput --lab-out ../throughput.json   # one worker process
 ```
 
 **Inference budget** (LAB-09): mean policy cost per 120 Hz physics tick for 8 policy-controlled
@@ -299,17 +382,19 @@ pessimistic.
 ## 10. Reproducible small examples
 
 ```powershell
+# from the repository root (--path game makes game/ the working directory, hence ../)
 # 1. ES learns the drill (approach and hit a standing dummy), ~5 min with 3 worker processes
-& $g --headless --path game --fixed-fps 120 -- --lab-worker docs/evidence/lab/jobs/es_drill_seed101.json --lab-out runs/es101
-# 2. record a teacher (Bot: Regular vs Rookie), then clone it
-& $g --headless --path game --fixed-fps 120 -- --lab-worker docs/evidence/lab/jobs/record_teacher_regular.json --lab-out runs/rec
-& $g --headless --path game --fixed-fps 120 -- --lab-worker docs/evidence/lab/jobs/bc_clone_regular.json --lab-out runs/bc
+& $g --headless --path game --fixed-fps 120 -- --lab-worker ../docs/evidence/lab/jobs/es_drill_seed101.json --lab-out ../runs/es101 --user-root ../runs/home
+# 2. record a teacher (Bot: Regular vs Rookie), then clone it (same --user-root: the dataset is found by id)
+& $g --headless --path game --fixed-fps 120 -- --lab-worker ../docs/evidence/lab/jobs/record_teacher_regular.json --lab-out ../runs/rec --user-root ../runs/home
+& $g --headless --path game --fixed-fps 120 -- --lab-worker ../docs/evidence/lab/jobs/bc_clone_regular.json --lab-out ../runs/bc --user-root ../runs/home
 # 3. evaluate a shipped policy against the fixed baselines
-#    {"kind": "eval", "target": {"policy": "dev_biped_es_drill"}, "eval": {"opponents": ["idle", "bot_rookie"]}}
+& $g --headless --path game --fixed-fps 120 -- --lab-worker ../docs/evidence/lab/jobs/eval_es_drill.json --lab-out ../runs/eval_drill --user-root ../runs/home
 ```
 Each run folder then holds `report.json`, `metrics.jsonl` and the trained `best.policy.json`
-(also added to the policy library unless `output.save_to_library` is false). Same job + same
-seed reproduces the same run (fixed-step worker processes).
+(also added to the policy library of that `--user-root` unless `output.save_to_library` is
+false). Same job + same seed reproduces the same run (fixed-step worker processes) — recording
+into a fresh `--user-root`, since a dataset that already holds episodes continues its numbering.
 
 ## 11. Tests (`game/src/test/lab/`, run `-- --test lab`)
 
@@ -317,11 +402,15 @@ seed reproduces the same run (fixed-step worker processes).
 |---|---|
 | test_policy_contract.gd | obs/act names and layout, bounds, determinism, perception-only and lag, fighter-space frame, wall rays, apply ↔ classify round trip for every action, masks/sampling, recorder reproduces a live policy's actions exactly |
 | test_policy_mlp.gd | parameter layout, deterministic init, fast path = reference, backprop = finite differences (tanh, relu), ES noise reproducibility, centred ranks, ES on a synthetic objective, no step without signal |
-| test_policy_io.gd | exact save/load round trip, rejection of truncated/garbage/edited/tampered/newer/incompatible/malformed/oversized/NaN files, inert unknown fields, .bak recovery, library save/rename/export/import (id collision)/delete, match fallback |
-| test_lab_bc.gd | dataset shards round trip + damaged shard handling, BC overfits a tiny dataset, BC generalises on held-out episodes and beats the majority baseline |
+| test_policy_io.gd | exact save/load round trip, rejection of truncated/garbage/edited/tampered/newer/incompatible/malformed/oversized/NaN files, inert unknown fields, .bak recovery, library save/rename/export/import (id collision)/delete, [INVALID] user files can be renamed and deleted, content-package policies are size-capped before reading, match fallback |
+| test_lab_bc.gd | dataset shards round trip + damaged shard handling, BC overfits a tiny dataset, BC generalises on held-out episodes and beats the majority baseline, the three-way episode split, too-small datasets refused, the BC job reports test-episode accuracy and its split |
+| test_lab_datasets.gd | identical re-recordings (format 1 shards) load once with no held-out sample equal to a training sample, copies of a seeded episode share a split, recording the same teacher twice adds new seeds (helper shards committed once), *Continue run* records nothing twice |
+| test_lab_stats.gd | Student-t intervals (none for n < 2), the paired test, jittered/swapped/random spawns, standard-spawn episodes of a deterministic policy are not repeats |
 | test_lab_recording.gd | a normal MatchScene match with the recording switch on, driven by simulated device input, writes human-labelled light/guard/move samples; with the switch off nothing changes |
 | test_policy_inference.gd | 8 policy fighters in a live match stay within the inference budget |
 | test_lab_worker.gd | the real worker process: pause/resume/cancel, kill + resume from the newest checkpoint with an unbroken curve, ES improves on the drill on held-out test seeds with no helper share dropped, the helper heartbeat rule, a silent worker whose process still runs is neither "interrupted" nor resumable twice |
+| test_lab_worker_faults.gd | a long pause keeps the helpers, a helper that never delivers cannot hang a run, evaluation/recording stop at the time limit with a partial report, ES validates the last generations before selecting, evaluation plays a policy as saved and with its own objective, BC starts helpers only for the rollouts, idle helpers back off, helpers exit when the coordinator dies, the CPU share holds over the long run, straggler and grace rules |
+| test_lab_docs.gd | every documented `--path game` command resolves its paths from the game folder |
 | test_policy_samples.gd | the shipped sample policies validate, are listed and usable by their fighter, and the drill sample lands hits on fresh standing-dummy episodes where an untrained network does not |
 
 Windowed tools (not part of `--test`):
@@ -344,6 +433,11 @@ Windowed tools (not part of `--test`):
 - Training speed is bound by the physics simulation (~14–16 simulated seconds per wall second
   per worker process; ~30× real time with 3 processes on a 4-core PC). Hours of training are
   needed for strong play against the harder bot tiers.
+- CPU share below 100 %: each worker measures whole frames (its script, the physics step and
+  engine overhead) and sleeps off the accumulated difference in whole milliseconds, counting the
+  time it really slept, so the long-run share matches the setting (`test_cpu_throttle_…`). Within
+  a second the pattern is bursty (a few ms of work, then a sleep); the share counts the main
+  thread's wall time, so engine worker threads (if any) are not limited by it.
 - A low-priority worker yields to everything else. On a PC whose cores are all busy it can wait
   minutes for CPU. The Runs tab then says so; the run is not shown as interrupted and cannot be
   started twice, and it continues when CPU frees up.

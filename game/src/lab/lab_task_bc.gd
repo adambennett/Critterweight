@@ -1,13 +1,16 @@
 class_name LabTaskBC
 extends LabTask
-## Behaviour-cloning job (approach "bc"): loads imitation datasets, trains the act_v1 heads with
-## minibatch Adam + early stopping on a held-out split (whole episodes), then measures how close
-## the clone is to its teacher:
-##  * offline: accuracy of the clone's argmax actions vs the teacher's labels on held-out data,
-##    next to the majority-class baseline and the untrained network;
+## Behaviour-cloning job (approach "bc"): loads imitation datasets (exact copies of an episode
+## are loaded once), splits the recorded episodes into training / validation / test (whole
+## episodes, LabBC), trains the act_v1 heads with minibatch Adam + early stopping on the
+## validation episodes, then measures how close the clone is to its teacher:
+##  * offline: accuracy of the clone's argmax actions vs the teacher's labels on the TEST
+##    episodes (used neither for training nor for early stopping), next to the majority-class
+##    baseline and the untrained network;
 ##  * online (when the dataset's teacher is a scripted bot): the clone and the teacher each play
-##    the same test-seed episodes against the same opponents; outcome statistics and action
-##    distributions (total variation distance) are compared.
+##    the same test-seed episodes against the same opponents; outcome statistics (with a paired
+##    test over those episodes) and action distributions (total variation distance) are compared.
+## Datasets with fewer than LabBC.MIN_EPISODES episodes are refused with a clear message.
 
 var bc := LabBC.new()
 var hidden := PackedInt32Array()
@@ -15,45 +18,38 @@ var activation := "tanh"
 var data := {}
 var teacher := {}
 var init_val := {}
+var init_test := {}
 var baseline := {}
+var baseline_val := {}
+var dataset_info := {}
 var _submitted := false
 var _epoch_t0 := 0
 
 
 func begin() -> void:
 	var bcj: Dictionary = job["bc"]
-	var obs := PackedFloat32Array()
-	var moves := PackedByteArray()
-	var buttons := PackedByteArray()
-	var units := PackedInt32Array()
-	var count := 0
-	var unit_base := 0
+	var dirs := []
 	for dref in bcj["datasets"]:
 		# a folder path, or a dataset id inside the datasets folder
 		var dpath := str(dref)
 		if not dpath.is_absolute_path():
 			dpath = PolicyDataset.dir_for(dpath)
-		var r := PolicyDataset.load_all(dpath)
-		for e in r["errors"]:
-			note("dataset %s: %s" % [str(dpath).get_file(), str(e)])
-		if not r["ok"]:
+		dirs.append(dpath)
+	var r := PolicyDataset.load_many(dirs)
+	for e in r["errors"]:
+		note("dataset: %s" % str(e))
+	for meta: Dictionary in r["metas"]:
+		if meta.is_empty():
 			continue
-		var meta: Dictionary = r["meta"]
 		if str(meta.get("creature", job["creature"])) != str(job["creature"]):
-			note("warning: dataset %s was recorded with '%s', training '%s'" % [str(dpath).get_file(), str(meta.get("creature", "")), str(job["creature"])])
+			note("warning: dataset %s was recorded with '%s', training '%s'" % [str(meta.get("id", "")), str(meta.get("creature", "")), str(job["creature"])])
 		if teacher.is_empty() and typeof(meta.get("teacher")) == TYPE_DICTIONARY:
 			teacher = meta["teacher"]
-		obs.append_array(r["obs"])
-		moves.append_array(r["moves"])
-		buttons.append_array(r["buttons"])
-		var u: PackedInt32Array = r["units"]
-		var mx := 0
-		for k in u.size():
-			units.append(unit_base + u[k])
-			mx = maxi(mx, u[k])
-		unit_base += mx + 1
-		count += int(r["count"])
-	data = {"obs": obs, "moves": moves, "buttons": buttons, "units": units, "count": count}
+	dataset_info = {"samples": int(r["count"]), "episodes": int(r["episodes"]), "duplicate_episodes": int(r["duplicate_episodes"]),
+		"duplicate_samples": int(r["duplicate_samples"])}
+	if int(r["duplicate_episodes"]) > 0:
+		note("dataset: %d duplicate episode copies (%d samples) ignored" % [int(r["duplicate_episodes"]), int(r["duplicate_samples"])])
+	data = {"obs": r["obs"], "moves": r["moves"], "buttons": r["buttons"], "units": r["units"], "count": r["count"]}
 	if int(data["count"]) < 20:
 		finished = true
 		final_state = "failed"
@@ -64,6 +60,7 @@ func begin() -> void:
 	var net: PolicyMLP
 	if init != null:
 		net = init.net.clone()
+		play = LabTask.play_of(init)
 	else:
 		hidden = PackedInt32Array(model["hidden"])
 		activation = str(model["activation"])
@@ -72,11 +69,22 @@ func begin() -> void:
 	hidden = net.hidden.duplicate()
 	activation = net.activation
 	var c: CreatureDef = Content.creature(str(job["creature"]))
-	bc.setup(data, net, PolicyActions.button_mask(c), {"lr": bcj["lr"], "l2": bcj["l2"], "batch": bcj["batch"], "seed": job["seed"],
-		"val_frac": bcj["val_frac"], "balance": bcj["balance"]})
-	note("BC: %d samples (%d train / %d validation), %d params" % [bc.sample_count(), bc.train_idx.size(), bc.val_idx.size(), net.params.size()])
+	var why := bc.setup(data, net, PolicyActions.button_mask(c), {"lr": bcj["lr"], "l2": bcj["l2"], "batch": bcj["batch"], "seed": job["seed"],
+		"val_frac": bcj["val_frac"], "test_frac": bcj["test_frac"], "balance": bcj["balance"]})
+	if why != "":
+		finished = true
+		final_state = "failed"
+		message = "cannot train: " + why
+		write_report({"approach": "bc", "error": why, "split": bc.split_info, "dataset": dataset_info})
+		return
+	var si := bc.split_info
+	note("BC: %d samples in %d episodes -> train %d / validation %d / test %d episodes (%d / %d / %d samples), %d params" % [bc.sample_count(),
+		int(si["episodes"]), int(si["train_episodes"]), int(si["val_episodes"]), int(si["test_episodes"]), bc.train_idx.size(), bc.val_idx.size(),
+		bc.test_idx.size(), net.params.size()])
 	init_val = bc.evaluate(bc.val_idx)
-	baseline = bc.majority_baseline(bc.val_idx)
+	init_test = bc.evaluate(bc.test_idx)
+	baseline = bc.majority_baseline(bc.test_idx)
+	baseline_val = bc.majority_baseline(bc.val_idx)
 	var ck := load_checkpoint()
 	if not ck.is_empty() and bc.from_dict(ck.get("bc", {})):
 		init_val = ck.get("init_val", init_val)
@@ -87,11 +95,15 @@ func begin() -> void:
 		note("resumed at epoch %d (best validation loss %.4f at epoch %d)" % [bc.epoch, bc.best_val, bc.best_epoch])
 	else:
 		metrics({"epoch": 0, "val_loss": init_val["loss"], "val_acc_move": init_val["acc_move"], "val_acc_button": init_val["acc_button"],
-			"val_acc_joint": init_val["acc_joint"], "base_acc_move": baseline["acc_move"], "base_acc_button": baseline["acc_button"],
-			"base_acc_joint": baseline["acc_joint"]})
+			"val_acc_joint": init_val["acc_joint"], "base_acc_move": baseline_val["acc_move"], "base_acc_button": baseline_val["acc_button"],
+			"base_acc_joint": baseline_val["acc_joint"]})
 		phase = "train"
 	bc.start_epoch()
 	_epoch_t0 = Time.get_ticks_msec()
+
+
+func busy() -> bool:
+	return phase == "train"
 
 
 func frame(_dt: float) -> void:
@@ -157,12 +169,12 @@ func _rollout_items() -> Array:
 	var t_opps: Array = teacher.get("opponents", []) if typeof(teacher.get("opponents")) == TYPE_ARRAY else []
 	if not t_opps.is_empty():
 		opps = t_opps
-	var items := LabEval.items(job, "clone", "test", opps, n, false, "clone", 0, "sample")
+	var conds := LabEval.conditions(job, "test", opps, n, false)
+	var items := LabEval.items_for(conds, "clone", "clone", 0, "sample")
 	var tk := str(teacher.get("kind", ""))
 	if tk != "" and LabOpponents.BASELINES.has(tk):
-		var t_items := LabEval.items(job, "clone", "test", opps, n, false, "teacher", items.size())
+		var t_items := LabEval.items_for(conds, "clone", "teacher", items.size(), "", {"type": "scripted", "kind": tk})
 		for it: Dictionary in t_items:
-			it["learner"] = {"type": "scripted", "kind": tk}
 			it["record"] = true
 		items.append_array(t_items)
 	return items
@@ -174,10 +186,17 @@ func _ck() -> Dictionary:
 
 func _finish(res: Array) -> void:
 	var val := bc.evaluate(bc.val_idx)
+	var test := bc.evaluate(bc.test_idx)
 	var w := weights()
+	var split := bc.split_info.duplicate()
+	split["duplicate_episodes"] = int(dataset_info.get("duplicate_episodes", 0))
+	split["duplicate_samples"] = int(dataset_info.get("duplicate_samples", 0))
 	var rep := {"approach": "bc", "samples": bc.sample_count(), "train_samples": bc.train_idx.size(), "val_samples": bc.val_idx.size(),
-		"epochs": bc.epoch, "best_epoch": bc.best_epoch, "best_val_loss": bc.best_val, "final_val": val, "untrained_val": init_val,
-		"majority_baseline": baseline, "teacher": teacher, "teacher_label_hist_val": bc.label_hist(bc.val_idx)}
+		"test_samples": bc.test_idx.size(), "split": split, "epochs": bc.epoch, "best_epoch": bc.best_epoch, "best_val_loss": bc.best_val,
+		"test": test, "untrained_test": init_test, "majority_baseline": baseline,
+		"final_val": val, "untrained_val": init_val, "majority_baseline_val": baseline_val,
+		"accuracy_note": "'test' = episodes used neither for training nor for early stopping; 'final_val' = the early-stopping episodes",
+		"teacher": teacher, "teacher_label_hist_test": bc.label_hist(bc.test_idx)}
 	if not res.is_empty():
 		var s_clone := LabEval.summarize(res, w, "clone")
 		rep["clone_rollouts"] = s_clone
@@ -190,9 +209,10 @@ func _finish(res: Array) -> void:
 				has_teacher = true
 				break
 		if not has_teacher:
-			teach_hist = bc.label_hist(bc.val_idx)
+			teach_hist = bc.label_hist(bc.test_idx)
 		else:
 			rep["teacher_rollouts"] = LabEval.summarize(res, w, "teacher")
+			rep["paired_teacher"] = LabEval.compare(res, w, "clone", "teacher")
 		rep["teacher_act_hist"] = teach_hist
 		rep["tvd_move"] = LabStats.tvd(clone_hist.slice(0, PolicyActions.MOVE_COUNT), teach_hist.slice(0, PolicyActions.MOVE_COUNT))
 		rep["tvd_button"] = LabStats.tvd(clone_hist.slice(PolicyActions.MOVE_COUNT), teach_hist.slice(PolicyActions.MOVE_COUNT))
@@ -200,7 +220,12 @@ func _finish(res: Array) -> void:
 		note("clone rollouts: %s" % LabEval.one_line(s_clone))
 		if rep.has("teacher_rollouts"):
 			note("teacher rollouts: %s" % LabEval.one_line(rep["teacher_rollouts"]))
-	var extra := {"epochs": bc.epoch, "best_epoch": bc.best_epoch, "datasets": job["bc"]["datasets"], "samples": bc.sample_count(),
+			note("clone − teacher, %s" % LabEval.paired_line(rep["paired_teacher"]))
+	note("test episodes: accuracy move %.1f%% button %.1f%% both %.1f%% (majority-class baseline %.1f%% / %.1f%% / %.1f%%)" % [100.0 * float(test["acc_move"]),
+		100.0 * float(test["acc_button"]), 100.0 * float(test["acc_joint"]), 100.0 * float(baseline["acc_move"]), 100.0 * float(baseline["acc_button"]),
+		100.0 * float(baseline["acc_joint"])])
+	var extra := {"epochs": bc.epoch, "best_epoch": bc.best_epoch, "datasets": job["bc"]["datasets"], "samples": bc.sample_count(), "split": split,
+		"test_accuracy": {"move": test["acc_move"], "button": test["acc_button"], "joint": test["acc_joint"]}, "test_loss": test["loss"],
 		"val_accuracy": {"move": val["acc_move"], "button": val["acc_button"], "joint": val["acc_joint"]}, "val_loss": val["loss"],
 		"majority_baseline": baseline, "bc": job["bc"], "teacher": str(teacher.get("kind", "human/unknown"))}
 	if rep.has("tvd_move"):
@@ -208,10 +233,11 @@ func _finish(res: Array) -> void:
 	var pol := make_policy(hidden, activation, bc.net.params, "sample", "bc", extra)
 	policy_id = publish_policy(pol, "best.policy.json", true)
 	rep["policy_id"] = policy_id
+	rep["play"] = play_settings()
 	rep["stop_reason"] = stop_requested
 	write_report(rep)
-	message = "completed: validation accuracy move %.0f%%, button %.0f%% (majority baseline %.0f%% / %.0f%%)" % [100.0 * float(val["acc_move"]),
-		100.0 * float(val["acc_button"]), 100.0 * float(baseline["acc_move"]), 100.0 * float(baseline["acc_button"])]
+	message = "completed: test-episode accuracy move %.0f%%, button %.0f%% (majority baseline %.0f%% / %.0f%%)" % [100.0 * float(test["acc_move"]),
+		100.0 * float(test["acc_button"]), 100.0 * float(baseline["acc_move"]), 100.0 * float(baseline["acc_button"])]
 	finished = true
 	final_state = "completed"
 	phase = "done"

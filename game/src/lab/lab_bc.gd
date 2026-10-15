@@ -2,12 +2,18 @@ class_name LabBC
 extends RefCounted
 ## Behaviour cloning: supervised learning of act_v1 from recorded (obs_v1, action) pairs.
 ## Loss = cross-entropy(move head) + cross-entropy(button head, masked to the creature's
-## buttons, optionally class-balanced); minibatch Adam with L2; the validation split is by
-## whole recorded episodes (no temporal leakage between train and validation); early stopping
-## on validation loss keeps the best weights.
+## buttons, optionally class-balanced); minibatch Adam with L2; early stopping on validation
+## loss keeps the best weights.
+## Split: whole recorded episodes (PolicyDataset split units: copies of an episode share one) go
+## to training, validation (early stopping only) or test (reported accuracy only) — so no
+## episode is in two splits, nothing is ever trained on validation or test data, and the
+## reported accuracy comes from episodes that influenced neither the weights nor the stopping
+## point. A dataset needs at least MIN_EPISODES episodes for that; smaller ones are refused.
 ## Why BC here: it learns a playstyle directly from a human or bot in minutes of recorded play,
 ## needs no reward design, and gives a strong starting point for ES fine-tuning (BC→ES).
 ## Training runs in small time slices (`train_steps`) so the worker stays responsive.
+
+const MIN_EPISODES := 6
 
 var net: PolicyMLP
 var x := PackedFloat32Array()
@@ -16,6 +22,9 @@ var buttons := PackedByteArray()
 var units := PackedInt32Array()
 var train_idx := PackedInt32Array()
 var val_idx := PackedInt32Array()
+var test_idx := PackedInt32Array()
+## {mode, episodes, train/val/test episodes and samples}; "" error when the split was refused
+var split_info := {}
 var mask := PackedByteArray()
 var button_w := PackedFloat32Array()
 var lr := 0.003
@@ -39,7 +48,8 @@ var _loss_n := 0
 var _grad: PolicyMLP.Grad
 
 
-func setup(data: Dictionary, p_net: PolicyMLP, p_mask: PackedByteArray, opts: Dictionary) -> void:
+## Prepares training. Returns "" or why the data cannot be split honestly (too few episodes).
+func setup(data: Dictionary, p_net: PolicyMLP, p_mask: PackedByteArray, opts: Dictionary) -> String:
 	net = p_net
 	x = data["obs"]
 	moves = data["moves"]
@@ -71,51 +81,64 @@ func setup(data: Dictionary, p_net: PolicyMLP, p_mask: PackedByteArray, opts: Di
 		for k in PolicyActions.BUTTON_COUNT:
 			if counts[k] > 0:
 				button_w[k] = clampf(sqrt(float(buttons.size()) / (float(used) * float(counts[k]))), 0.2, 5.0)
-	split(float(opts.get("val_frac", 0.2)), int(opts.get("seed", 1)))
 	_grad = net.make_grad()
+	return split(float(opts.get("val_frac", 0.2)), float(opts.get("test_frac", 0.2)), int(opts.get("seed", 1)))
 
 
 func sample_count() -> int:
 	return moves.size()
 
 
-## Validation = a seeded random subset of whole episodes (units). Datasets with very few
-## episodes fall back to contiguous blocks of 150 samples so validation is still disjoint.
-func split(val_frac: float, seed_value: int) -> void:
+## Episode-level split: a seeded shuffle of the split units; the first `val_frac` of them
+## validate (early stopping), the next `test_frac` test (reported only), the rest train. Each
+## part gets at least one episode and training keeps at least half of them. Returns "" or the
+## reason the split was refused (fewer than MIN_EPISODES episodes) — there is no fallback that
+## would put parts of one episode into different splits or train on held-out data.
+func split(val_frac: float, test_frac: float, seed_value: int) -> String:
 	var n := moves.size()
 	var unit_ids := {}
 	for k in n:
 		unit_ids[units[k]] = true
 	var keys: Array = unit_ids.keys()
-	var block_mode := keys.size() < 5
-	var r := RandomNumberGenerator.new()
-	r.seed = seed_value * 31 + 7
-	var val_units := {}
-	if block_mode:
-		var blocks := (n + 149) / 150
-		var nval := maxi(1, int(round(float(blocks) * val_frac)))
-		var ids := []
-		for b in blocks:
-			ids.append(b)
-		_shuffle(ids, r)
-		for b in ids.slice(0, nval):
-			val_units[b] = true
-	else:
-		keys.sort()
-		_shuffle(keys, r)
-		var nval2 := maxi(1, int(round(float(keys.size()) * val_frac)))
-		for u in keys.slice(0, nval2):
-			val_units[u] = true
 	train_idx = PackedInt32Array()
 	val_idx = PackedInt32Array()
-	for k in n:
-		var key: int = (k / 150) if block_mode else units[k]
-		if val_units.has(key):
-			val_idx.append(k)
+	test_idx = PackedInt32Array()
+	split_info = {"mode": "episodes", "episodes": keys.size(), "min_episodes": MIN_EPISODES}
+	if keys.size() < MIN_EPISODES:
+		split_info["error"] = "only %d recorded episode(s): behaviour cloning needs at least %d, so whole episodes can be held out for validation and testing — record a few more matches" % [keys.size(), MIN_EPISODES]
+		return str(split_info["error"])
+	keys.sort()
+	var r := RandomNumberGenerator.new()
+	r.seed = seed_value * 31 + 7
+	_shuffle(keys, r)
+	var u := keys.size()
+	var nval := maxi(1, int(round(float(u) * clampf(val_frac, 0.0, 0.5))))
+	var ntest := maxi(1, int(round(float(u) * clampf(test_frac, 0.0, 0.5))))
+	while nval + ntest > u / 2:
+		if ntest >= nval and ntest > 1:
+			ntest -= 1
+		elif nval > 1:
+			nval -= 1
 		else:
-			train_idx.append(k)
-	if train_idx.is_empty():
-		train_idx = val_idx.duplicate()
+			break
+	var part := {}
+	for i in u:
+		part[keys[i]] = 1 if i < nval else (2 if i < nval + ntest else 0)
+	for k in n:
+		match int(part[units[k]]):
+			1:
+				val_idx.append(k)
+			2:
+				test_idx.append(k)
+			_:
+				train_idx.append(k)
+	split_info["train_episodes"] = u - nval - ntest
+	split_info["val_episodes"] = nval
+	split_info["test_episodes"] = ntest
+	split_info["train_samples"] = train_idx.size()
+	split_info["val_samples"] = val_idx.size()
+	split_info["test_samples"] = test_idx.size()
+	return ""
 
 
 static func _shuffle(a: Array, r: RandomNumberGenerator) -> void:

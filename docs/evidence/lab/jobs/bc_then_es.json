@@ -6,7 +6,7 @@
   "objective": {"preset": "aggressive"},
   "scenario": {"preset": "spar_jabber", "opponents": ["bot_rookie"], "round_time": 20},
   "eval": {"opponents": ["bot_rookie"], "val_episodes": 8, "episodes": 10, "every": 4, "standard_spawns": true, "reference": "bot_regular"},
-  "model": {"init_policy": "<path to the Bot Regular clone, e.g. runs/bc_regular/best.policy.json, or its policy id>"},
+  "model": {"init_policy": "../runs/bc_regular/best.policy.json"},
   "es": {"pairs": 12, "sigma": 0.02, "lr": 0.01, "episodes_per_candidate": 1},
   "limits": {"max_generations": 16, "workers": 3, "worlds": 2, "low_priority": false, "max_wall_s": 5400},
   "output": {"policy_name": "Regular clone + ES (aggressive)"}

@@ -77,6 +77,12 @@ func _load_package(p: Dictionary) -> void:
 		var dir := base.path_join(kind)
 		for f in _list_json(dir):
 			var full := dir.path_join(f)
+			if kind == "policies":
+				# trained policies are size-capped before anything is read (same rule as PolicyIO)
+				var size := _file_size(full)
+				if size > PolicyData.MAX_FILE_BYTES:
+					errors.append("%s/%s/%s: policy file is too large (%d KB > %d KB limit); not loaded" % [pid, kind, f, size / 1024, PolicyData.MAX_FILE_BYTES / 1024])
+					continue
 			var text := FileAccess.get_file_as_string(full)
 			var json := JSON.new()
 			if json.parse(text) != OK:
@@ -225,6 +231,16 @@ func _resolve_extends() -> void:
 				tables[kind].erase(id)
 				continue
 			tables[kind][id] = merged
+
+
+## Size of a file in bytes without reading it (-1 when it cannot be opened).
+static func _file_size(path: String) -> int:
+	var f := FileAccess.open(path, FileAccess.READ)
+	if f == null:
+		return -1
+	var n := f.get_length()
+	f.close()
+	return n
 
 
 func _list_json(dir: String) -> PackedStringArray:
