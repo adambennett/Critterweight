@@ -7,15 +7,19 @@ extends Node
 ## events, encounters, bosses, minions, playlists, announcer, hub, props, ladder, tutorial.
 ## Singletons (package root): elements.json, tuning.json.
 ## Ids: core uses bare ids; mod ids must be "<modid>:<name>" unless "override": true (MOD-02).
+## Creature-bearing entries may `"extends": "<creature id>"` and give only what changes: objects
+## merge recursively, arrays and scalars replace, and `null` removes a key (e.g. a move slot).
+## Mod asset paths (art.model, textures, sounds) are relative to the package folder.
 
 signal reloaded()
 
 const KINDS := ["creatures", "arenas", "rules", "modes", "supplements", "techniques", "meta_upgrades",
-	"events", "encounters", "bosses", "minions", "playlists", "announcer", "hub", "props", "ladder", "tutorial", "policies"]
+	"events", "encounters", "bosses", "boss_fights", "minions", "playlists", "announcer", "hub", "props", "ladder", "tutorial", "policies"]
 ## Kinds that change simulation outcomes and therefore the multiplayer content hash.
 const GAMEPLAY_KINDS := ["creatures", "rules", "modes", "supplements", "techniques", "events", "encounters",
-	"bosses", "minions", "props", "ladder", "arenas"]
-const SCHEMA_FOR := {"creatures": "creature", "arenas": "arena", "rules": "rules", "playlists": "playlist"}
+	"bosses", "boss_fights", "minions", "props", "ladder", "arenas"]
+const SCHEMA_FOR := {"creatures": "creature", "minions": "creature", "bosses": "creature", "arenas": "arena", "rules": "rules", "playlists": "playlist"}
+const CREATURE_KINDS := ["creatures", "minions", "bosses"]
 
 var packages: Array = []          ## [{id, version, path, source:"core"|"mod", manifest}]
 var tables := {}                  ## kind -> {id -> Dictionary}
@@ -51,6 +55,7 @@ func reload(mod_packages: Array) -> void:
 		packages.append(e)
 	for p in packages:
 		_load_package(p)
+	_resolve_extends()
 	_apply_singletons()
 	_hash = _gameplay_bytes.hex_encode().sha256_text() if not _gameplay_bytes.is_empty() else "empty"
 	_gameplay_bytes = PackedByteArray()
@@ -81,7 +86,7 @@ func _load_package(p: Dictionary) -> void:
 				errors.append("%s/%s/%s: expected an object or {\"items\": [...]}" % [pid, kind, f])
 				continue
 			for it in items:
-				_add(kind, it, pid, "%s/%s/%s" % [pid, kind, f])
+				_add(kind, it, pid, "%s/%s/%s" % [pid, kind, f], base)
 			if kind in GAMEPLAY_KINDS:
 				_gameplay_bytes.append_array(("%s|%s|" % [pid, f]).to_utf8_buffer())
 				_gameplay_bytes.append_array(text.sha256_buffer())
@@ -107,7 +112,7 @@ func _merge(a: Dictionary, b: Dictionary) -> Dictionary:
 	return out
 
 
-func _add(kind: String, it, pid: String, where: String) -> void:
+func _add(kind: String, it, pid: String, where: String, base := "") -> void:
 	if typeof(it) != TYPE_DICTIONARY or str(it.get("id", "")) == "":
 		errors.append("%s: entry without an 'id'" % where)
 		return
@@ -115,7 +120,13 @@ func _add(kind: String, it, pid: String, where: String) -> void:
 	if pid != "core" and not id.begins_with(pid + ":") and not bool(it.get("override", false)):
 		errors.append("%s: mod ids must start with '%s:' (got '%s'); set \"override\": true to replace a core entry deliberately" % [where, pid, id])
 		return
-	if SCHEMA_FOR.has(kind):
+	if pid != "core":
+		var bad := _resolve_asset_paths(it, base)
+		if bad != "":
+			errors.append("%s#%s: asset path '%s' must stay inside the package (relative, no '..')" % [where, id, bad])
+			return
+	# entries that extend another are validated after the merge (_resolve_extends)
+	if SCHEMA_FOR.has(kind) and not (kind in CREATURE_KINDS and it.has("extends")):
 		var errs := Schema.validate_named(it, SCHEMA_FOR[kind], "%s#%s" % [where, id])
 		if not errs.is_empty():
 			for e in errs:
@@ -130,6 +141,85 @@ func _add(kind: String, it, pid: String, where: String) -> void:
 	copy["_file"] = where
 	tables[kind][id] = copy
 	origins[key] = pid
+
+
+const ASSET_EXTS := ["png", "jpg", "jpeg", "webp", "glb", "ogg", "wav"]
+
+
+## Rewrites relative asset paths in a mod entry to absolute package paths. Returns the first
+## offending path ("" when all are fine). res:// paths (core assets) are allowed as-is.
+func _resolve_asset_paths(it: Dictionary, base: String) -> String:
+	for key in ["art", "audio"]:
+		var d = it.get(key)
+		if typeof(d) != TYPE_DICTIONARY:
+			continue
+		for k in d.keys():
+			var v = d[k]
+			if typeof(v) != TYPE_STRING or not str(v).get_extension().to_lower() in ASSET_EXTS:
+				continue
+			var sv := str(v)
+			if sv.begins_with("res://"):
+				continue
+			if sv.is_absolute_path() or sv.contains("..") or sv.contains(":") or sv.begins_with("/") or sv.contains("\\"):
+				return sv
+			d[k] = base.path_join(sv)
+	return ""
+
+
+## Deep merge used by "extends": dictionaries merge, everything else replaces, null deletes.
+static func deep_merge(base: Dictionary, over: Dictionary) -> Dictionary:
+	var out := base.duplicate(true)
+	for k in over:
+		var v = over[k]
+		if v == null:
+			out.erase(k)
+		elif typeof(v) == TYPE_DICTIONARY and typeof(out.get(k)) == TYPE_DICTIONARY:
+			out[k] = deep_merge(out[k], v)
+		elif typeof(v) == TYPE_DICTIONARY or typeof(v) == TYPE_ARRAY:
+			out[k] = v.duplicate(true)
+		else:
+			out[k] = v
+	return out
+
+
+func _resolve_extends() -> void:
+	for kind in CREATURE_KINDS:
+		for id in tables[kind].keys():
+			var d: Dictionary = tables[kind][id]
+			if not d.has("extends"):
+				continue
+			var chain := [id]
+			var merged := d
+			var ok := true
+			while merged.has("extends"):
+				var parent_id := str(merged["extends"])
+				if parent_id in chain or chain.size() > 4:
+					errors.append("%s: 'extends' chain %s is circular or deeper than 4" % [d.get("_file", id), " -> ".join(chain + [parent_id])])
+					ok = false
+					break
+				var parent := creature_entry(parent_id)
+				if parent.is_empty():
+					errors.append("%s: extends unknown creature '%s'" % [d.get("_file", id), parent_id])
+					ok = false
+					break
+				chain.append(parent_id)
+				var own := merged.duplicate(true)
+				own.erase("extends")
+				var p2: Dictionary = parent.duplicate(true)
+				for meta in ["id", "_package", "_file", "override", "npc_only", "_extends"]:
+					p2.erase(meta)
+				merged = deep_merge(p2, own)
+			if not ok:
+				tables[kind].erase(id)
+				continue
+			merged["_extends"] = chain.slice(1)
+			var errs := Schema.validate_named(merged, SCHEMA_FOR[kind], "%s#%s" % [d.get("_file", id), id])
+			if not errs.is_empty():
+				for e in errs:
+					errors.append(e)
+				tables[kind].erase(id)
+				continue
+			tables[kind][id] = merged
 
 
 func _list_json(dir: String) -> PackedStringArray:
@@ -164,10 +254,19 @@ func ids(kind: String) -> Array:
 	return out
 
 
+## Raw creature dictionary from any creature-bearing kind (fighters, minions, bosses).
+func creature_entry(id: String) -> Dictionary:
+	for k in CREATURE_KINDS:
+		var d := get_entry(k, id)
+		if not d.is_empty():
+			return d
+	return {}
+
+
 func creature(id: String) -> CreatureDef:
 	if creatures.has(id):
 		return creatures[id]
-	var d := get_entry("creatures", id)
+	var d := creature_entry(id)
 	if d.is_empty():
 		return null
 	var c := CreatureDef.from_dict(d, Callable(), str(d.get("_package", "")))
@@ -175,6 +274,27 @@ func creature(id: String) -> CreatureDef:
 		for e in c.errors:
 			errors.append("%s: %s" % [d.get("_file", id), e])
 	creatures[id] = c
+	return c
+
+
+## A resized variant of a creature (e.g. the Absolute Unit): every body dimension and authored
+## move target is scaled by `scale`, masses by `weight_mult`. Cached per (id, scale, weight).
+func scaled_creature(id: String, scale: float, weight_mult := 1.0) -> CreatureDef:
+	var key := "%s@x%.2f_w%.2f" % [id, scale, weight_mult]
+	if creatures.has(key):
+		return creatures[key]
+	var d := creature_entry(id)
+	if d.is_empty():
+		return null
+	var c2: Dictionary = d.duplicate(true)
+	var body = c2.get("body")
+	if typeof(body) == TYPE_DICTIONARY:
+		body["scale"] = float(body.get("scale", 1.0)) * scale
+	var st: Dictionary = c2.get("stats", {})
+	st["weight"] = float(st.get("weight", 1.0)) * weight_mult
+	c2["stats"] = st
+	var c := CreatureDef.from_dict(c2, Callable(), str(d.get("_package", "")))
+	creatures[key] = c
 	return c
 
 
@@ -203,9 +323,16 @@ func content_hash() -> String:
 	return _hash
 
 
-## Short manifest list for handshakes: [{id, version}] of loaded packages.
+## Short manifest list for handshakes: [{id, version, hash, client_only}] of loaded packages.
 func package_list() -> Array:
 	var out := []
 	for p in packages:
-		out.append({"id": p["id"], "version": p["version"]})
+		var man: Dictionary = p.get("manifest", {}) if typeof(p.get("manifest")) == TYPE_DICTIONARY else {}
+		out.append({"id": p["id"], "version": p["version"], "hash": str(p.get("hash", "")),
+			"client_only": bool(man.get("client_only", false))})
 	return out
+
+
+## Package id that defined an entry ("core" or a mod id), or "".
+func origin_of(kind: String, id: String) -> String:
+	return str(origins.get("%s/%s" % [kind, id], ""))

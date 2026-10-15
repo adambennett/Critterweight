@@ -1,0 +1,176 @@
+{
+  "items": [
+    {
+      "id": "tut_footwork",
+      "order": 1,
+      "title": "Footwork",
+      "goal": "Walk to the three rings, then circle the Kid while facing him.",
+      "dummy": "idle",
+      "check": "footwork",
+      "params": {
+        "rings": [
+          [
+            -1.8,
+            -1.2
+          ],
+          [
+            1.9,
+            -0.6
+          ],
+          [
+            0.2,
+            2.1
+          ]
+        ],
+        "ring_radius": 0.6,
+        "circle_degrees": 330
+      },
+      "highlight": "",
+      "intro": "Stick moves you. Camera does the thinking. Walk to the rings. Then walk around the Kid without taking your eyes off him. He's harmless. Today.",
+      "success": "Good. Feet first. Everything you'll ever do starts with where you're standing.",
+      "hint": "You're facing him automatically. That's the lock-on. You just move ({move}); it does the looking.",
+      "barnaby": "ann_tut_footwork"
+    },
+    {
+      "id": "tut_hands",
+      "order": 2,
+      "title": "Hands",
+      "goal": "Land a full three-hit Light string: {l_names}.",
+      "dummy": "loose",
+      "check": "light_string",
+      "params": {
+        "gap": 1.2
+      },
+      "highlight": "",
+      "intro": "{light}. Three taps, three hits. {l_names} — or whatever your body calls them. Don't think. Tap.",
+      "success": "That's a string. It'll work on a lot of people. Not on the good ones. We'll fix that.",
+      "hint": "Tap {light} three times in a row. Don't hold it. The third hit's the one with the shove.",
+      "barnaby": "ann_tut_string"
+    },
+    {
+      "id": "tut_heavy",
+      "order": 3,
+      "title": "The big one",
+      "goal": "Land a Heavy ({heavy_name}), then hold {heavy} to land a charged one.",
+      "dummy": "loose",
+      "check": "heavy_then_charged",
+      "params": {},
+      "highlight": "",
+      "intro": "{heavy}. It's slower, it hurts more, and it shrugs off little hits while it's coming. Now hold it. Feel that? That's a charge. Let it go.",
+      "success": "That's the one that ends arguments. It's also the one you'll miss most. Don't fall in love with it.",
+      "hint": "Hold {heavy} until your fighter's whole body winds up. Then let go near him.",
+      "barnaby": "ann_tut_heavy"
+    },
+    {
+      "id": "tut_guard",
+      "order": 4,
+      "title": "Hands up",
+      "goal": "Hold {guard} through the Kid's three-hit string (lose less than 10% health).",
+      "dummy": "string",
+      "check": "guard_string",
+      "params": {
+        "max_loss": 0.1,
+        "min_blocked": 2
+      },
+      "highlight": "stamina",
+      "intro": "Guard. Hold {guard}. He's gonna throw three. You'll take a little. You won't take a lot. That's the deal with guard — it costs stamina, so don't live there.",
+      "success": "Hands up, chin down, everything else is details.",
+      "hint": "Hold {guard} before his hands start moving and keep it held. Let go after the third.",
+      "barnaby": "ann_tut_guard"
+    },
+    {
+      "id": "tut_dodge",
+      "order": 5,
+      "title": "Not there",
+      "goal": "Dodge the Kid's Heavy without getting hit, then land a Dash Attack.",
+      "dummy": "heavy",
+      "check": "dodge_then_dash",
+      "params": {},
+      "highlight": "",
+      "intro": "{dodge} plus a direction. Short, quick, and for a split second nothing can touch you. Now — press {light} while you're dodging. That's a dash attack. It closes distance.",
+      "success": "Nothing hits what isn't there. And when you come back, come back swinging.",
+      "hint": "Wait for his big wind-up, then {dodge} sideways. For the dash attack, press {light} while you're still sliding.",
+      "barnaby": "ann_tut_dodge"
+    },
+    {
+      "id": "tut_ability",
+      "order": 6,
+      "title": "Your trick",
+      "goal": "Use {ability1_name} ({ability1}) and make it connect.",
+      "dummy": "loose",
+      "check": "ability_connect",
+      "params": {
+        "slot": "ability1",
+        "window": 3.0
+      },
+      "highlight": "cooldown",
+      "intro": "{ability1}. That's yours. Every critter's got two tricks, and that's the first one — {ability1_name}. It's got a cooldown — see the ring? Use it, watch the ring, use it again.",
+      "success": "That's what makes you you. Everything else, everyone's got.",
+      "hint": "Press {ability1} when he's in front of you. Watch the little ring on the HUD — when it's full, it's ready.",
+      "barnaby": "ann_tut_ability"
+    },
+    {
+      "id": "tut_grab",
+      "order": 7,
+      "title": "Hands on",
+      "goal": "Grab the Kid through his guard ({grab}) and throw him.",
+      "dummy": "guard",
+      "check": "grab_throw",
+      "params": {},
+      "highlight": "",
+      "intro": "He's guarding. Guard beats hands. Grab beats guard. {grab}, then push a direction to throw him. Toward the wall if you're feeling mean.",
+      "success": "Strikes beat grabs. Grabs beat guard. Guard beats strikes. There's your triangle. Everything in this cage is three things.",
+      "hint": "Walk right up to him while his guard's up, press {grab}, then push the stick toward the wall.",
+      "barnaby": "ann_tut_grab"
+    },
+    {
+      "id": "tut_parry",
+      "order": 8,
+      "title": "The read",
+      "goal": "Parry two attacks: tap {guard} right as they land.",
+      "skippable": true,
+      "dummy": "parry_drill",
+      "check": "parries",
+      "params": {
+        "count": 2
+      },
+      "highlight": "",
+      "intro": "Here's the next layer. Guard, but late — right as it lands. That's a parry. He stumbles, you're free. Watch his shoulder. The shoulder never lies.",
+      "success": "That's a read. Do that to the Commissioner and I'll put your picture up myself.",
+      "hint": "Don't hold {guard}. Tap it the instant his hand reaches you. Early is a block. Late is a bruise. The window's small — it's supposed to be.",
+      "barnaby": "ann_tut_parry"
+    },
+    {
+      "id": "tut_finish",
+      "order": 9,
+      "title": "Close it",
+      "goal": "Land a Finisher ({light} {light} then {heavy}), then fill Hype and pop {juice_name} ({juice}).",
+      "skippable": true,
+      "dummy": "loose",
+      "check": "finisher_juice",
+      "params": {},
+      "highlight": "hype",
+      "intro": "Two lights, then {heavy} in the middle of the string. That's your finisher. Now the fun part: see the meter? That's Hype. Hits fill it. Getting hit fills it. Taunting fills it — {taunt} — if you've got the nerve. Full meter, {juice}. That's the JUICE. Yours is called {juice_name}. Don't ask what's in it.",
+      "success": "That's the whole kit. Hands, heavy, guard, dodge, grab, two tricks, and the JUICE. Everything after this is timing.",
+      "hint": "{light}, {light}, then {heavy} quickly. For the JUICE: fill the meter — taunt with {taunt} when he's far away — then press {juice}.",
+      "barnaby": "ann_tut_juice"
+    },
+    {
+      "id": "tut_freestyle",
+      "order": 10,
+      "title": "Freestyle",
+      "goal": "Beat the Kid in a 60-second round: KO him, or have more health left at the bell.",
+      "skippable": true,
+      "dummy": "fight",
+      "check": "win_round",
+      "params": {
+        "time": 60
+      },
+      "highlight": "",
+      "intro": "Alright. He's gonna fight back now. Sixty seconds. Use whatever you learned. Use whatever you didn't. Go.",
+      "success": "Hm. Fine. Granny's corner is always open. Go lose to someone better and come tell me about it.",
+      "hint": "Guard when he winds up. Hit him when he's done. Three things, kid.",
+      "barnaby": "ann_tut_freestyle"
+    }
+  ]
+}

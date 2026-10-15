@@ -11,12 +11,38 @@ var _proj_nodes := {}            ## entity id -> Node3D
 var _spark_mat: StandardMaterial3D
 
 
+var _puff_mat: StandardMaterial3D
+var _fade_ramp: GradientTexture1D
+
+
 func _ready() -> void:
+	# soft round sprite: bright core falling off to transparent (no hard-edged squares)
+	var g := Gradient.new()
+	g.set_color(0, Color(1, 1, 1, 1))
+	g.set_color(1, Color(1, 1, 1, 0))
+	g.add_point(0.35, Color(1, 1, 1, 0.85))
+	var soft := GradientTexture2D.new()
+	soft.gradient = g
+	soft.fill = GradientTexture2D.FILL_RADIAL
+	soft.fill_from = Vector2(0.5, 0.5)
+	soft.fill_to = Vector2(1.0, 0.5)
+	soft.width = 64
+	soft.height = 64
 	_spark_mat = StandardMaterial3D.new()
 	_spark_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_spark_mat.vertex_color_use_as_albedo = true
 	_spark_mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	_spark_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_spark_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	_spark_mat.albedo_texture = soft
+	_puff_mat = _spark_mat.duplicate()
+	_puff_mat.blend_mode = BaseMaterial3D.BLEND_MODE_MIX
+	_puff_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	var fade := Gradient.new()
+	fade.set_color(0, Color(1, 1, 1, 1))
+	fade.set_color(1, Color(1, 1, 1, 0))
+	_fade_ramp = GradientTexture1D.new()
+	_fade_ramp.gradient = fade
 
 
 func _particles(kind: String) -> GPUParticles3D:
@@ -29,8 +55,9 @@ func _particles(kind: String) -> GPUParticles3D:
 	gp.explosiveness = 0.95
 	gp.local_coords = false
 	var pm := ParticleProcessMaterial.new()
+	pm.color_ramp = _fade_ramp
 	var quad := QuadMesh.new()
-	quad.material = _spark_mat
+	quad.material = _puff_mat if kind == "dust" else _spark_mat
 	match kind:
 		"spark":
 			gp.amount = 14
@@ -51,10 +78,17 @@ func _particles(kind: String) -> GPUParticles3D:
 			pm.initial_velocity_min = 0.6
 			pm.initial_velocity_max = 1.6
 			pm.gravity = Vector3(0, 0.3, 0)
-			pm.scale_min = 0.15
-			pm.scale_max = 0.3
+			pm.scale_min = 0.2
+			pm.scale_max = 0.38
 			pm.damping_min = 2.0
 			pm.damping_max = 3.0
+			# puffs grow as they fade
+			var grow := Curve.new()
+			grow.add_point(Vector2(0, 0.5))
+			grow.add_point(Vector2(1, 1.0))
+			var gt := CurveTexture.new()
+			gt.curve = grow
+			pm.scale_curve = gt
 		"burst":
 			gp.amount = 24
 			gp.lifetime = 0.6
@@ -65,12 +99,13 @@ func _particles(kind: String) -> GPUParticles3D:
 			pm.gravity = Vector3(0, -2, 0)
 			pm.scale_min = 0.06
 			pm.scale_max = 0.16
-	var curve := CurveTexture.new()
-	var c := Curve.new()
-	c.add_point(Vector2(0, 1))
-	c.add_point(Vector2(1, 0))
-	curve.curve = c
-	pm.scale_curve = curve
+	if pm.scale_curve == null:
+		var curve := CurveTexture.new()
+		var c := Curve.new()
+		c.add_point(Vector2(0, 1))
+		c.add_point(Vector2(1, 0))
+		curve.curve = c
+		pm.scale_curve = curve
 	gp.process_material = pm
 	gp.draw_pass_1 = quad
 	add_child(gp)

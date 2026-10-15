@@ -18,8 +18,9 @@ const AB2 := 6
 const JUICE := 7
 const TAUNT := 8
 const TARGET := 9
-const BUTTON_COUNT := 10
-const BUTTON_NAMES := ["light", "heavy", "guard", "dodge", "grab", "ability1", "ability2", "juice", "taunt", "target"]
+const TAG := 10
+const BUTTON_COUNT := 11
+const BUTTON_NAMES := ["light", "heavy", "guard", "dodge", "grab", "ability1", "ability2", "juice", "taunt", "target", "tag"]
 
 var move := Vector3.ZERO
 var held := 0

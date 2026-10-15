@@ -1,0 +1,19 @@
+{
+  "id": "teams_3v3",
+  "name": "Teams 3v3",
+  "mode": "standard",
+  "format": "teams",
+  "teams": 2,
+  "players": [
+    6,
+    6
+  ],
+  "rounds": 3,
+  "round_time": 150,
+  "win": "ko",
+  "lives": 1,
+  "revive": true,
+  "downed_time": 12.0,
+  "description": "Three a side, revives on.",
+  "version": 1
+}

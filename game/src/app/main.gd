@@ -2,6 +2,7 @@ extends Node
 ## Process entry point. Dispatches on command-line user arguments (after `--`):
 ##   (none)                  normal game (title screen)
 ##   --test [filter]         run automated tests headless, exit code = failures
+##   --tutorial [n]          start Granny's tutorial at exercise n (0-based) [--creature id]
 ##   --probe <name>          run a physics/combat probe and print metrics
 ##   --server [--config p]   dedicated server (see docs/SERVER.md)
 ##   --lab-worker <job>      AI Lab training worker (spawned by the Lab UI)
@@ -20,6 +21,8 @@ func _ready() -> void:
 		mode = "probe"
 	elif args.has("--sandbox"):
 		mode = "sandbox"
+	elif args.has("--tutorial"):
+		mode = "tutorial"
 	elif args.has("--check"):
 		mode = "check"
 	elif args.has("--server"):
@@ -58,6 +61,8 @@ func _start(mode: String) -> void:
 			probe.run(arg_value("--probe", "stand"))
 		"sandbox":
 			_start_sandbox()
+		"tutorial":
+			Tutorial.start(int(arg_value("--tutorial", "0")), arg_value("--creature", ""))
 		"check":
 			_check_scripts()
 		"server":
@@ -87,27 +92,51 @@ func _start(mode: String) -> void:
 			_boot_game()
 
 
-## Normal game boot: title screen (owned by src/ui).
+## Normal game boot: title screen (owned by src/ui). `--screen <name>` opens a screen directly
+## (captures, runtime checks).
 func _boot_game() -> void:
-	if App.has_screen("title"):
+	var direct := arg_value("--screen", "")
+	if direct != "" and App.has_screen(direct):
+		App.goto(direct)
+	elif App.has_screen("title"):
 		App.goto("title")
 	else:
 		_start_sandbox()
 
 
-## Dev sandbox: player (or bot with --autoplay) vs bot in the primary cage.
+## Dev sandbox: player (or bot with --autoplay) vs bots.
+##   --rules <preset id> (default duel)   --arena <arena id> (default the_gullet)
+##   --n <fighters> (default by preset)  --creature/--creature2 <json path or creature id>
 func _start_sandbox() -> void:
-	var cpath := arg_value("--creature", "res://content/dev/dev_biped.json")
-	var c := CreatureDef.load_json(cpath)
-	var c2 := CreatureDef.load_json(arg_value("--creature2", cpath))
-	var arena := ArenaDef.from_dict({"id": "sandbox", "name": "The Can", "base": "octagon", "radius": 5.0, "theme": arg_value("--theme", "can"),
-		"spawns": [[0, -1.6, 0], [0, 1.6, 180]]})
-	var scene := MatchScene.new()
-	add_child(scene)
-	var p_kind := "bot" if args.has("--autoplay") else "player"
-	scene.start({"arena": arena, "rules": {"rounds": 3, "round_time": 99}, "seed": 11,
-		"fighters": [{"creature": c, "team": 0, "kind": p_kind, "difficulty": arg_value("--p1diff", "pro"), "name": "Player"},
-			{"creature": c2, "team": 1, "kind": "bot", "difficulty": arg_value("--difficulty", "regular"), "name": "Bot"}]})
+	var c1 = _sandbox_creature(arg_value("--creature", "dev_biped"))
+	var c2 = _sandbox_creature(arg_value("--creature2", arg_value("--creature", "dev_biped")))
+	var rules_id := arg_value("--rules", "duel")
+	var preset := Content.get_entry("rules", rules_id)
+	var n := int(arg_value("--n", "0"))
+	if n <= 0:
+		var pl: Array = preset.get("players", [2, 2])
+		n = int(pl[0]) if pl.size() > 0 else 2
+		n = maxi(n, 2)
+	var teams := int(preset.get("teams", 2))
+	var fighters := []
+	for i in n:
+		var kind := "bot"
+		if i == 0 and not args.has("--autoplay"):
+			kind = "player"
+		var team := i
+		if str(preset.get("format", "")) in ["teams", "tag", "coop"]:
+			team = i % maxi(teams, 1) if str(preset.get("format", "")) != "coop" else 0
+		fighters.append({"creature": c1 if i == 0 else c2, "team": team, "kind": kind,
+			"difficulty": arg_value("--difficulty", "regular") if i > 0 else arg_value("--p1diff", "pro"),
+			"name": "Player" if kind == "player" else "Bot %d" % i})
+	App.start_match({"arena": arg_value("--arena", "the_gullet"), "rules": rules_id, "seed": int(arg_value("--seed", "11")), "fighters": fighters})
+
+
+func _sandbox_creature(spec: String):
+	if spec.ends_with(".json"):
+		return CreatureDef.load_json(spec)
+	var c := Content.creature(spec)
+	return c if c else Content.creature("dev_biped")
 
 
 ## --capture <png path> [--capture-at seconds] [--capture-count n --capture-every s]: saves

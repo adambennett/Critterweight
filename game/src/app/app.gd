@@ -32,6 +32,9 @@ const SCREENS := {
 	"spectate": "res://src/ui/screens/spectate_setup.gd",
 	"bookie": "res://src/campaign/ui/bookie_screen.gd",
 	"tutorial_menu": "res://src/ui/screens/tutorial_menu.gd",
+	"controls": "res://src/ui/screens/controls_screen.gd",
+	"text_entry": "res://src/ui/screens/text_entry.gd",
+	"ui_gallery": "res://src/ui/screens/ui_gallery.gd",
 }
 
 var ui_layer: CanvasLayer

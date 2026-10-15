@@ -1,1 +1,18 @@
-{"id": "duel", "name": "Standard Duel", "mode": "standard", "version": 1, "format": "duel", "teams": 2, "rounds": 3, "round_time": 99, "win": "ko", "lives": 1, "description": "Best of three rounds, 99 seconds each. KO wins the round; timeout goes to remaining health."}
+{
+  "id": "duel",
+  "name": "Standard Duel",
+  "mode": "standard",
+  "format": "duel",
+  "teams": 2,
+  "players": [
+    2,
+    2
+  ],
+  "rounds": 3,
+  "round_time": 99,
+  "win": "ko",
+  "lives": 1,
+  "sudden_death": true,
+  "description": "Best of three rounds, 99 seconds each. KO wins the round; at time the higher health wins; a tie goes to sudden death (next clean hit).",
+  "version": 1
+}

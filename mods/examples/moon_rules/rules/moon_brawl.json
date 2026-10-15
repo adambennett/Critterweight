@@ -1,0 +1,21 @@
+{
+  "id": "moon_rules:moon_brawl",
+  "name": "Moon Brawl",
+  "mode": "standard",
+  "format": "ffa",
+  "teams": 0,
+  "players": [2, 8],
+  "rounds": 1,
+  "round_time": 120,
+  "win": "last_standing",
+  "lives": 2,
+  "respawn": true,
+  "respawn_delay": 3.0,
+  "gravity_mult": 0.45,
+  "knockback_mult": 1.25,
+  "fighter_hooks": [
+    {"id": "moon_splat_snack", "on": "wall_splat", "do": [{"type": "heal", "amount": 4}], "cooldown": 1.0, "source": "moon_rules"}
+  ],
+  "description": "Low gravity, big launches, two lives each. Splatting someone on the fence gives you a small snack of health.",
+  "version": 1
+}
