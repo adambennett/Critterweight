@@ -56,7 +56,7 @@ damage ×2).
 | ROSTER property | Implementation |
 |---|---|
 | Headbonk bounces back | `on_hit dash speed −3.4` (inline hook). Test: Jitters moves back ≥ 0.25 m after contact. |
-| Squash leap + landing circle + Bonk | `leap distance 2.0 height 0.7 to_target` with `on_land area squash_landing r 1.0`; `on_hit {if hit_part head → damage_add 3}` (new `hit_part` condition). Test: slam + landing hit at 1.5 m, landing circle alone at 2.8 m. |
+| Squash leap + landing circle + Bonk | `leap distance 2.0 height 0.7 to_target ballistic` with `on_land area squash_landing r 1.0`; `on_hit {if hit_part head → damage_add 3}` (new `hit_part` condition). Test: slam + landing hit at 1.5 m, landing circle alone at 2.8 m. |
 | Super Squash guard-crush, knock-up 0.8 m, landing r 1.6, no armor | `guard_break 2.5` + `on_hit {if target_guarding → guard_crush ×2}`, `launch 4.0`, `on_land area super_squash_landing r 1.6`, no `armor`. Tests: guard drain ≥ 30, dummy rises > 0.25 m, landing hit, empty armor list. |
 | Static Cling +10 Hype on Jolted | passives `static_cling_window` + `static_cling_hype` (`status_applied`, element static + flag). Test: +10.0 Hype when a pre-charged dummy is Jolted by it. |
 | Pinball wall bounce toward the target, ×2 from a pad | `charge` with `bounce 1, bounce_distance 2.2` (charge-bounce extension) and the shared `recovery 0.32` (the spin and hit window play out after the charge) + passive `pad_pinball`. Tests: one bounce, Jitters turns to face the target and travels > 1.1 m back; damage ratio 2.00 with `pad_launched`. |
@@ -133,8 +133,9 @@ All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_
   shared charge `recovery`), `is_airborne()`.
 - `effects.gd`: projectile `burst_on_hit` (Arc Lash pulses only on timeout), spring pads ignore
   airborne fighters (a Squash flying over a pad is not relaunched).
-- `rig.gd`: the horizontal ground drive only acts while the body is supported, so leaps and pad
-  launches are not braked near the floor.
+- `rig.gd` / `effects.gd`: leap and spring-pad option `ballistic` — the flight is not braked by
+  the ground drive while the body is still within hover range of the floor (Jitters' leaps and pads
+  opt in; every other airborne phase keeps the original rule).
 - `bot_brain.gd`: extra optional keys on the shared kit-hint mechanism — `reach`, `heavy_vs_windup`
   / `heavy_reach`, `dash_in`, `avoid_zones` (plus the shared `abilities`, `range`, `charge_heavy`).
 
