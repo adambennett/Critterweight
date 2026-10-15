@@ -187,7 +187,9 @@ func test_disconnect_and_rejoin() -> void:
 		check_eq(int(res[0]["winner_team"]), int(res[0]["fighters"][you]["team"]), "Ann's slot won (bot held it, then Ann)")
 	var slog: String = u.out(srv)
 	check(slog.contains("rejoined"), "server logged the rejoin")
-	var rben: Dictionary = U.read_json(u.result_path("Ben"))
+	# Ben may be writing his final result right now (it is replaced, not appended): poll it
+	var rben: Dictionary = await u.wait_json(u.result_path("Ben"), func(d: Dictionary) -> bool:
+		return str(d.get("notices", [])).contains("a bot holds their fighter"), 10.0)
 	check(str(rben.get("notices", [])).contains("a bot holds their fighter"), "other players were told a bot holds the slot")
 	_no_child_errors([srv, ben, ann2])
 

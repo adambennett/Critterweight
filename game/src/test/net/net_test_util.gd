@@ -245,15 +245,20 @@ func admin(port: int, lines: Array, per_line_s := 1.5) -> String:
 		await tc.get_tree().create_timer(0.05).timeout
 	var text := ""
 	for l in lines:
+		if tcp.get_status() != StreamPeerTCP.STATUS_CONNECTED:
+			break
 		tcp.put_data((str(l) + "\n").to_utf8_buffer())
 		var t_end := Time.get_ticks_msec() + int(per_line_s * 1000.0)
 		while Time.get_ticks_msec() < t_end:
 			tcp.poll()
+			# the server may close after a command (shutdown, refused token): reading a closed
+			# socket only prints an engine error, and nothing unread is lost (poll keeps the
+			# connection open while received bytes are waiting)
+			if tcp.get_status() != StreamPeerTCP.STATUS_CONNECTED:
+				break
 			var n := tcp.get_available_bytes()
 			if n > 0:
 				text += tcp.get_utf8_string(n)
-			if tcp.get_status() != StreamPeerTCP.STATUS_CONNECTED:
-				break
 			await tc.get_tree().create_timer(0.05).timeout
 	tcp.disconnect_from_host()
 	return text

@@ -33,7 +33,9 @@ func _measure(name_: String, rules: String, fighters: int, seconds: float) -> Di
 	var status_path: String = u.path("srv").path_join("server").path_join("status.json")
 	# wait for the fight phase, then measure a window
 	check(await u.wait_until(func() -> bool: return int(U.read_json(status_path).get("tick", 0)) > 400, 30.0), "match running")
-	var r0: Dictionary = U.read_json(u.result_path("Probe"))
+	# the probe replaces its result file every second: poll, never trust one read
+	var has_counters := func(d: Dictionary) -> bool: return d.get("stats", {}).has("conditioner")
+	var r0: Dictionary = await u.wait_json(u.result_path("Probe"), has_counters, 5.0)
 	var c0: Dictionary = r0.get("stats", {}).get("conditioner", {})
 	var p0 := SOAK.proc_usage(srv)
 	var t0 := Time.get_ticks_msec()
@@ -46,7 +48,7 @@ func _measure(name_: String, rules: String, fighters: int, seconds: float) -> Di
 			sim_samples.append(float(st.get("tick_ms_avg_1s", 0.0)))
 			phys_samples.append(float(st.get("physics_frame_max_ms", 0.0)))
 	var span := (Time.get_ticks_msec() - t0) / 1000.0
-	var r1: Dictionary = U.read_json(u.result_path("Probe"))
+	var r1: Dictionary = await u.wait_json(u.result_path("Probe"), has_counters, 5.0)
 	var c1: Dictionary = r1.get("stats", {}).get("conditioner", {})
 	var p1 := SOAK.proc_usage(srv)
 	var st1: Dictionary = U.read_json(status_path)
