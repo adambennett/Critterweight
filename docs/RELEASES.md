@@ -52,4 +52,4 @@ GitHub release with the assets (`gh`). `-DryRun` does everything except pushing 
 
 | Version | Tag | Date | Notes |
 |---|---|---|---|
-| (first release pending) | | | |
+| 0.9.0 (preview) | [v0.9.0](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.0) -> 82653e6 | 2026-10-15 | First published build: six fighters, both campaigns + hub, modes, editors, mods, AI Lab, online versus; online co-op runs sync route votes only; balance/bot tuning in progress |
