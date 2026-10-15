@@ -83,24 +83,35 @@ static func resolver_for(p: Dictionary) -> Callable:
 func alive_helpers() -> Array:
 	var out := []
 	for r in helpers:
-		if bool(helpers[r]["alive"]) and _helper_alive(int(r)):
+		var was := bool(helpers[r]["alive"])
+		var now_alive := _helper_alive(int(r))
+		if now_alive:
 			out.append(int(r))
-		elif bool(helpers[r]["alive"]):
+			if not was:
+				helpers[r]["alive"] = true
+				Log.i("lab", "helper rank %d is heart-beating again; it gets work from the next batch" % int(r))
+		elif was:
 			helpers[r]["alive"] = false
 			Log.w("lab", "helper rank %d is gone; its work moves to the coordinator" % int(r))
 	out.sort()
 	return out
 
 
+## A helper is alive while its process runs and its heartbeat file is fresh. The newest heartbeat
+## time seen is remembered: the helper replaces the file atomically (remove + rename on Windows),
+## so a stat can momentarily fail; that must not count as a missed heartbeat.
 func _helper_alive(r: int) -> bool:
 	var h: Dictionary = helpers[r]
 	if not OS.is_process_running(int(h["pid"])):
 		return false
 	var hb := gen_dir.path_join("hb_r%d.json" % r)
-	if not FileAccess.file_exists(hb):
+	var mt := int(FileAccess.get_modified_time(hb)) if FileAccess.file_exists(hb) else 0
+	if mt > int(h.get("hb_s", 0)):
+		h["hb_s"] = mt
+	var last := int(h.get("hb_s", 0))
+	if last <= 0:
 		return Time.get_ticks_msec() - int(h["started_ms"]) < STARTUP_TIMEOUT_MS
-	var age := int(Time.get_unix_time_from_system()) - int(FileAccess.get_modified_time(hb))
-	return age <= HEARTBEAT_TIMEOUT_S
+	return int(Time.get_unix_time_from_system()) - last <= HEARTBEAT_TIMEOUT_S
 
 
 func submit(p_items: Array, p_payload: Dictionary) -> void:

@@ -13,6 +13,8 @@ const LIVE_STATES: PackedStringArray = ["starting", "running", "paused"]
 const STALE_PROGRESS_S := 20.0
 const STARTUP_GRACE_S := 60.0
 
+static var _seen_updated := {}   ## run dir -> newest progress/status "updated" time read
+
 
 static func runs_dir() -> String:
 	var d := Paths.dir("lab").path_join("runs")
@@ -91,6 +93,9 @@ static func is_alive(run_dir: String) -> bool:
 	var now := Time.get_unix_time_from_system()
 	var pr := progress(run_dir)
 	var updated := maxf(float(pr.get("updated", 0.0)), float(st.get("updated", 0.0)))
+	# a read that races the worker's atomic rewrite returns {}: remember the newest time seen
+	updated = maxf(updated, float(_seen_updated.get(run_dir, 0.0)))
+	_seen_updated[run_dir] = updated
 	var limit := STARTUP_GRACE_S if state == "starting" else STALE_PROGRESS_S
 	return now - updated < limit
 

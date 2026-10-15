@@ -38,6 +38,7 @@ var _wall_mark_us := 0
 var _util := 0.0
 var _mem_peak := 0.0
 var _snapshot_seq := 0
+var _control_seen := false
 var _log: FileAccess
 var _finished := false
 var _last_parent_check := 0
@@ -337,6 +338,9 @@ func _check_control() -> void:
 		_quit(0)
 		return
 	var c := LabIO.read_json(run_dir.path_join("control.json"))
+	if c.is_empty() and _control_seen:
+		return  # the game is replacing control.json right now: keep the current state until the next poll
+	_control_seen = _control_seen or not c.is_empty()
 	var desired := str(c.get("desired", "run"))
 	if desired == "cancel":
 		if rank == 0:

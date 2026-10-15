@@ -483,18 +483,21 @@ func _build_runs() -> Control:
 		_refresh_run_detail(true))
 	left.add_child(_runs_list)
 	var ctrl := GridContainer.new()
-	ctrl.columns = 3
+	ctrl.columns = 2
 	left.add_child(ctrl)
 	_btn_pause = LabUi.button("Pause", func() -> void: _control("pause"))
 	_btn_resume = LabUi.button("Resume", func() -> void: _control("run"))
 	_btn_cancel = LabUi.button("Cancel", func() -> void: _control("cancel"))
-	_btn_continue = LabUi.button("Resume after stop/crash", _continue_run)
-	_btn_snapshot = LabUi.button("Save snapshot policy", func() -> void:
+	_btn_continue = LabUi.button("Continue run", _continue_run)
+	_btn_continue.tooltip_text = "Resume a stopped, cancelled or crashed run from its newest checkpoint."
+	_btn_snapshot = LabUi.button("Save snapshot", func() -> void:
 		if _run_dir != "":
 			LabManager.request_snapshot(_run_dir)
 			_set_status("Snapshot requested — it appears in Policies in a moment."))
+	_btn_snapshot.tooltip_text = "Save the current best network of a running job as a policy."
 	_btn_delete_run = LabUi.button("Delete run", _delete_run)
-	for b in [_btn_pause, _btn_resume, _btn_cancel, _btn_continue, _btn_snapshot, _btn_delete_run]:
+	for b: Button in [_btn_pause, _btn_resume, _btn_cancel, _btn_continue, _btn_snapshot, _btn_delete_run]:
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		ctrl.add_child(b)
 	var right := VBoxContainer.new()
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -677,7 +680,7 @@ func _update_chart(kind: String) -> void:
 		_chart.y_label = "loss / accuracy"
 		_chart.set_series([{"name": "train loss", "points": tl, "color": Color(1.0, 0.65, 0.3)},
 			{"name": "validation loss", "points": vl, "color": Color(0.45, 0.8, 1.0), "dots": true, "shape": "square"},
-			{"name": "val. accuracy (both heads)", "points": acc, "color": Color(0.6, 1.0, 0.55), "dots": true, "shape": "diamond"}])
+			{"name": "val. accuracy", "points": acc, "color": Color(0.6, 1.0, 0.55), "dots": true, "shape": "diamond"}])
 	else:
 		var fit := []
 		var ev := []
@@ -688,8 +691,8 @@ func _update_chart(kind: String) -> void:
 				ev.append([float(l["gen"]), float(l["eval_reward"])])
 		_chart.x_label = "generation"
 		_chart.y_label = "episode reward"
-		_chart.set_series([{"name": "population mean (training)", "points": fit, "color": Color(1.0, 0.65, 0.3)},
-			{"name": "policy on validation seeds", "points": ev, "color": Color(0.45, 0.8, 1.0), "dots": true, "shape": "square"}])
+		_chart.set_series([{"name": "population (training)", "points": fit, "color": Color(1.0, 0.65, 0.3)},
+			{"name": "policy (validation)", "points": ev, "color": Color(0.45, 0.8, 1.0), "dots": true, "shape": "square"}])
 
 
 func _report_text(rep: Dictionary) -> String:
@@ -772,13 +775,14 @@ func _build_policies() -> Control:
 		_delete_pol_armed = ""
 		_show_policy())
 	left.add_child(_pol_list)
-	var right := VBoxContainer.new()
-	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right.add_theme_constant_override("separation", 8)
-	root.add_child(right)
+	# the action column scrolls (follow_focus) so it fits Steam Deck heights
+	var sv := _scroll_col()
+	root.add_child(sv[0])
+	var right: VBoxContainer = sv[1]
+	right.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var info_panel := LabUi.panel_box()
 	info_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	info_panel.custom_minimum_size = Vector2(0, 260)
+	info_panel.custom_minimum_size = Vector2(0, 300)
 	right.add_child(info_panel)
 	_pol_info = LabUi.rich()
 	info_panel.add_child(_pol_info)
@@ -1027,10 +1031,11 @@ func _spectate() -> void:
 func _build_recording() -> Control:
 	var root := HBoxContainer.new()
 	root.add_theme_constant_override("separation", 16)
-	var left := VBoxContainer.new()
-	left.custom_minimum_size = Vector2(620, 0)
-	left.add_theme_constant_override("separation", 8)
-	root.add_child(left)
+	var sv := _scroll_col()
+	(sv[0] as Control).custom_minimum_size = Vector2(700, 0)
+	(sv[0] as Control).size_flags_horizontal = Control.SIZE_FILL
+	root.add_child(sv[0])
+	var left: VBoxContainer = sv[1]
 	left.add_child(LabUi.header("Record your play"))
 	_rec_toggle = CheckBox.new()
 	_rec_toggle.text = "Record my matches for imitation learning"
@@ -1040,7 +1045,7 @@ func _build_recording() -> Control:
 		LabRecording.set_enabled(on)
 		_set_status("Recording %s." % ("ON: your next matches are saved as imitation data" if on else "off")))
 	left.add_child(_rec_toggle)
-	left.add_child(LabUi.label("While this is on, every match you play stores what you saw (the same observations a policy sees) and what you did, in the dataset \"My <fighter> matches\". Matches play exactly as usual. Then pick Behaviour cloning on the Train tab.", "BodyMuted"))
+	left.add_child(LabUi.label("Every match you play stores what you saw and did (dataset \"My <fighter> matches\"); play as usual, then train it with Behaviour cloning.", "BodyMuted"))
 	left.add_child(LabUi.header("Record a teacher bot"))
 	_rec_fighter = LabUi.caption("")
 	LabUi.row(left, "Fighter", _rec_fighter, "The fighter selected on the Train tab.")
@@ -1050,7 +1055,7 @@ func _build_recording() -> Control:
 	LabUi.row(left, "Against", _teacher_opp)
 	_teacher_eps = LabUi.slider(10.0, 400.0, 10.0, 60.0, "%d matches")
 	LabUi.row(left, "Matches", _teacher_eps)
-	left.add_child(LabUi.button("RECORD TEACHER DATASET", _record_teacher, 300))
+	left.add_child(LabUi.button("RECORD TEACHER DATASET", _record_teacher, 300, "PrimaryButton"))
 	var right := VBoxContainer.new()
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.add_child(right)
@@ -1061,6 +1066,7 @@ func _build_recording() -> Control:
 	right.add_child(_ds_list)
 	_ds_rename = LineEdit.new()
 	_ds_rename.max_length = 64
+	_ds_rename.placeholder_text = "new dataset name"
 	var rn := HBoxContainer.new()
 	rn.add_child(_ds_rename)
 	_ds_rename.size_flags_horizontal = Control.SIZE_EXPAND_FILL

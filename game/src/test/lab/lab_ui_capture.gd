@@ -57,6 +57,14 @@ func _run() -> void:
 	screen = app.call("goto", "lab")
 	await _wait(1.0)
 	await _shot("train")
+	if OS.get_cmdline_user_args().has("--static"):
+		# layout check only: every tab, no training
+		for t in [1, 2, 3]:
+			screen.call("_select_tab", t)
+			await _wait(0.8)
+			await _shot("tab%d" % t)
+		quit(0)
+		return
 	# start a real (short) training run from the UI with one worker process
 	var workers_box: Control = screen.get("_workers")
 	(workers_box.get_node("Slider") as HSlider).value = 1

@@ -65,14 +65,15 @@ func _draw() -> void:
 		draw_line(Vector2(plot.position.x, gy), Vector2(plot.end.x, gy), grid_col, 1.0)
 		var val := ymax - (ymax - ymin) * float(k) / 4.0
 		draw_string(font, Vector2(6, gy + 10), _fmt(val), HORIZONTAL_ALIGNMENT_LEFT, pad_l - 8, font_size - 4, Color(0.75, 0.73, 0.8))
+	var int_x := xmax - xmin >= 4.0   # generations / epochs: whole-number ticks
 	for k in 5:
 		var gx := plot.position.x + plot.size.x * float(k) / 4.0
 		draw_line(Vector2(gx, plot.position.y), Vector2(gx, plot.end.y), grid_col, 1.0)
 		var xv := xmin + (xmax - xmin) * float(k) / 4.0
-		draw_string(font, Vector2(gx - 30, plot.end.y + 34), _fmt(xv), HORIZONTAL_ALIGNMENT_LEFT, 90, font_size - 4, Color(0.75, 0.73, 0.8))
+		var xt := ("%d" % roundi(xv)) if int_x else _fmt(xv)
+		var x0 := clampf(gx - 45.0, 0.0, size.x - 92.0)
+		draw_string(font, Vector2(x0, plot.end.y + 34), xt, HORIZONTAL_ALIGNMENT_CENTER, 90, font_size - 4, Color(0.75, 0.73, 0.8))
 	draw_rect(plot, Color(0.5, 0.48, 0.55), false, 1.0)
-	if x_label != "":
-		draw_string(font, Vector2(plot.end.x - 220, size.y - 2), x_label, HORIZONTAL_ALIGNMENT_RIGHT, 220, font_size - 4, Color(0.7, 0.68, 0.75))
 	# series
 	var lx := pad_l
 	for s: Dictionary in series:
@@ -96,8 +97,13 @@ func _draw() -> void:
 		draw_line(Vector2(lx - 4, 22), Vector2(lx + 16, 22), col, 2.0)
 		draw_string(font, Vector2(lx + 24, 32), label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 2, Color(0.9, 0.88, 0.94))
 		lx += 40.0 + font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 2).x
+	# axis names sit inside the plot corners (y: top left, x: bottom right), dimmed
+	var dim := Color(0.7, 0.68, 0.75, 0.85)
 	if y_label != "":
-		draw_string(font, Vector2(lx + 12, 32), "(" + y_label + ")", HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 4, Color(0.7, 0.68, 0.75))
+		draw_string(font, plot.position + Vector2(8, font_size - 2), y_label, HORIZONTAL_ALIGNMENT_LEFT, plot.size.x - 16.0, font_size - 6, dim)
+	if x_label != "":
+		var w := font.get_string_size(x_label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 6).x
+		draw_string(font, Vector2(plot.end.x - w - 8.0, plot.end.y - 8.0), x_label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 6, dim)
 
 
 func _mark(q: Vector2, shape: String, col: Color) -> void:

@@ -90,6 +90,8 @@ static func truncate_lines(path: String, key: String, limit: int) -> void:
 
 
 static func b64_floats(a: PackedFloat32Array) -> String:
+	if a.is_empty():
+		return ""
 	return Marshalls.raw_to_base64(a.to_byte_array())
 
 
