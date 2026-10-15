@@ -1,0 +1,284 @@
+{
+  "_doc": "Random events (docs/design/CAMPAIGN.md §6). Each choice: requires, cost, risk tag, weighted outcomes of effect ops (docs/CAMPAIGN_SYSTEMS.md#events). 'group' events are decided once for the whole co-op party.",
+  "items": [
+    {"id": "evt_needles_sample", "type": "event", "title": "Free Sample", "speaker": "Needles",
+     "text": "Needles leans out of a van. \"New batch. Totally legal. Probably.\"",
+     "choices": [
+       {"id": "take", "label": "Take it", "desc": "A random Prescription supplement and a random side effect.", "risk": "risky",
+        "outcomes": [{"text": "It fizzes. You feel... something.", "effects": [{"op": "grant_supplement", "rarity": "prescription"}, {"op": "side_effect", "count": 1}]}]},
+       {"id": "decline", "label": "Decline", "desc": "+15 Scrip (he pays for your silence).", "risk": "safe",
+        "outcomes": [{"text": "\"You never saw me.\" He presses Scrip into your paw.", "effects": [{"op": "scrip", "amount": 15}]}]}]},
+
+    {"id": "evt_weigh_in", "type": "event", "title": "The Weigh-In", "speaker": "Commission clerk",
+     "text": "The Commission wants you on the scale. The scale is broken.",
+     "choices": [
+       {"id": "cut", "label": "Cut weight", "desc": "Max HP -8, walk speed +0.2 m/s this run.", "risk": "costly",
+        "outcomes": [{"text": "You sweat it out in a sauna that is also a shipping container.", "effects": [{"op": "max_hp", "amount": -8},
+          {"op": "run_patches", "patches": [{"op": "add", "path": "stats.walk_speed", "value": 0.2, "default": 3.4}], "text": "Walk speed +0.2 m/s"}]}]},
+       {"id": "bulk", "label": "Bulk up", "desc": "Max HP +12, dash -0.3 m this run.", "risk": "costly",
+        "outcomes": [{"text": "Four buckets of chum later, you tip the scale. It was already tipped.", "effects": [{"op": "max_hp", "amount": 12},
+          {"op": "run_patches", "patches": [{"op": "add", "path": "stats.dodge_distance", "value": -0.3, "default": 2.8}], "text": "Dash -0.3 m"}]}]},
+       {"id": "bribe", "label": "Bribe the scale", "desc": "Nothing changes. +10 Hype carry.", "risk": "safe", "cost": {"scrip": 40},
+        "outcomes": [{"text": "The scale reads exactly what you paid it to read.", "effects": [{"op": "hype_carry", "amount": 10}]}]}]},
+
+    {"id": "evt_sponsor_read", "type": "event", "title": "Sponsor Read", "speaker": "Producer",
+     "text": "A producer hands you a card. \"Say it with feeling.\"",
+     "choices": [
+       {"id": "read", "label": "Read it", "desc": "+50 Scrip; your Hype carry drops to 0 (you're embarrassed).", "risk": "safe",
+        "outcomes": [{"text": "\"Glandco JUICE: it's in you now.\" You will never forgive yourself.", "effects": [{"op": "scrip", "amount": 50}, {"op": "hype_carry_set", "value": 0}]}]},
+       {"id": "refuse", "label": "Refuse", "desc": "Next fight you start with +30 Hype (the crowd respects it).", "risk": "safe",
+        "outcomes": [{"text": "The crowd chants your name. The producer chants something else.", "effects": [{"op": "next_fight", "rules": {"start_hype": 30}, "text": "Next fight: +30 starting Hype"}]}]}]},
+
+    {"id": "evt_dock_dice", "type": "event", "title": "Dock Dice", "speaker": "Dockworkers",
+     "text": "Dockworkers roll bones on an upturned crate.",
+     "choices": [
+       {"id": "bet", "label": "Bet 30 Scrip", "desc": "45% win 70 Scrip, 40% lose the stake, 15% loaded dice: win 70 and a crate charm.", "risk": "gamble", "cost": {"scrip": 30},
+        "outcomes": [{"weight": 45, "text": "Snake eyes. Yours.", "effects": [{"op": "scrip", "amount": 100}]},
+                     {"weight": 40, "text": "The bones betray you.", "effects": [{"op": "nothing"}]},
+                     {"weight": 15, "text": "These dice are loaded. In your favor. Nobody says a word.", "effects": [{"op": "scrip", "amount": 100}, {"op": "cosmetic", "id": "charm_crate_dice", "name": "Crate Dice charm"}]}]},
+       {"id": "walk", "label": "Walk on", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "You keep your Scrip and your dignity. Mostly the Scrip.", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_lost_dog", "type": "event", "title": "Lost Dog", "speaker": "",
+     "text": "A huge, sad, sludge-soaked hound is tied to a bollard. He looks hungry.", "group": true, "requires": {"act": [1]},
+     "choices": [
+       {"id": "feed", "label": "Feed him", "desc": "Lose 10 HP (he bites). Bilge starts the boss fight at 90% HP and skips his first Lunge-Chomp.", "risk": "costly",
+        "outcomes": [{"text": "He takes the food. And a bit of you. Good boy.", "effects": [{"op": "hp", "amount": -10},
+          {"op": "boss_mod", "boss": "boss_bilge", "start_hp_frac": 0.9, "skip_attack": "lunge_chomp", "text": "Bilge will remember this kindness."}]}]},
+       {"id": "pet", "label": "Pet him", "desc": "+20 Hype carry.", "risk": "safe",
+        "outcomes": [{"text": "He's thrilled. You're covered in sludge. Worth it.", "effects": [{"op": "hype_carry", "amount": 20}]}]},
+       {"id": "walk", "label": "Keep walking", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "He watches you go. Very sadly.", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_commission_hearing", "type": "event", "title": "Commission Hearing", "speaker": "Clerk",
+     "text": "A notice: you are summoned for \"conduct.\" Snappington isn't there. A clerk is.",
+     "choices": [
+       {"id": "pay", "label": "Pay the fine", "desc": "60 Scrip.", "risk": "costly", "cost": {"scrip": 60},
+        "outcomes": [{"text": "The clerk stamps something. Loudly.", "effects": [{"op": "nothing"}]}]},
+       {"id": "forfeit", "label": "Forfeit a supplement", "desc": "Lose 1 random non-Banned supplement.", "risk": "costly", "requires": {"has_supplements": true},
+        "locked_text": "Nothing to forfeit",
+        "outcomes": [{"text": "\"Evidence,\" says the clerk, pocketing it.", "effects": [{"op": "remove_supplement", "filter": "non_banned"}]}]},
+       {"id": "contest", "label": "Contest it", "desc": "50% dismissed, 50% both penalties.", "risk": "gamble",
+        "outcomes": [{"weight": 1, "text": "Case dismissed. The clerk looks disappointed.", "effects": [{"op": "nothing"}]},
+                     {"weight": 1, "text": "Contempt of Commission. Pay up AND hand it over.", "effects": [{"op": "scrip", "amount": -60}, {"op": "remove_supplement", "filter": "non_banned"}]}]}]},
+
+    {"id": "evt_cut_woman", "type": "event", "title": "Cut-Woman", "speaker": "Doc Sutura",
+     "text": "Doc Sutura flags you down between bouts, eight hands already moving.",
+     "choices": [
+       {"id": "quick", "label": "Quick patch", "desc": "Heal 20%.", "risk": "safe",
+        "outcomes": [{"text": "\"Hold still. Hold stiller.\"", "effects": [{"op": "hp_pct", "amount": 0.2}]}]},
+       {"id": "deep", "label": "Deep stitch", "desc": "Heal 40%, max stamina -10 this run.", "risk": "costly",
+        "outcomes": [{"text": "\"You'll live. That's a medical opinion and a threat.\"", "effects": [{"op": "hp_pct", "amount": 0.4},
+          {"op": "run_mods", "mods": [{"key": "stamina_add", "add": -10}], "text": "Max stamina -10"}]}]},
+       {"id": "fine", "label": "\"I'm fine\"", "desc": "+5 poise max this run.", "risk": "safe",
+        "outcomes": [{"text": "She shrugs all eight shoulders.", "effects": [{"op": "run_mods", "mods": [{"key": "poise_add", "add": 5}], "text": "Poise +5"}]}]}]},
+
+    {"id": "evt_vending_machine", "type": "event", "title": "Vending Machine", "speaker": "",
+     "text": "A Glandco machine hums. The glass is cracked.",
+     "choices": [
+       {"id": "insert25", "label": "Insert 25 Scrip", "desc": "A random Over-the-Counter supplement.", "risk": "safe", "cost": {"scrip": 25},
+        "outcomes": [{"text": "Clunk.", "effects": [{"op": "grant_supplement", "rarity": "otc"}]}]},
+       {"id": "kick", "label": "Kick it", "desc": "50% free Over-the-Counter supplement, 50% it falls on you (-15 HP).", "risk": "gamble",
+        "outcomes": [{"weight": 1, "text": "Something drops out. Free!", "effects": [{"op": "grant_supplement", "rarity": "otc"}]},
+                     {"weight": 1, "text": "The machine falls on you. The machine is fine.", "effects": [{"op": "hp", "amount": -15}]}]},
+       {"id": "insert60", "label": "Insert 60 Scrip", "desc": "A random Prescription supplement.", "risk": "safe", "cost": {"scrip": 60},
+        "outcomes": [{"text": "Clunk. Clunk. Pharmacy clunk.", "effects": [{"op": "grant_supplement", "rarity": "prescription"}]}]}]},
+
+    {"id": "evt_the_bookie", "type": "event", "title": "The Bookie", "speaker": "Teddy Two-Tooth",
+     "text": "Teddy Two-Tooth: \"Odds on your next fight are... unflattering.\"",
+     "choices": [
+       {"id": "bet_self", "label": "Bet on yourself (40 Scrip)", "desc": "Win the next fight without being knocked down: 120 Scrip.", "risk": "gamble", "cost": {"scrip": 40},
+        "outcomes": [{"text": "\"A sentimental bet. I love it.\"", "effects": [{"op": "bet", "if": {"won": true, "max_knockdowns": 0}, "win": [{"op": "scrip", "amount": 120}], "lose": [], "text": "Bet placed: no knockdowns next fight"}]}]},
+       {"id": "bet_against", "label": "Bet against yourself", "desc": "Free. If you get knocked down next fight: +50 Scrip.", "risk": "gamble",
+        "outcomes": [{"text": "\"The announcer will notice. He always notices.\"", "effects": [{"op": "bet", "if": {"min_knockdowns": 1}, "win": [{"op": "scrip", "amount": 50}], "lose": [], "text": "Bet placed against yourself"}]}]},
+       {"id": "none", "label": "No bet", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "\"Your loss. Literally, probably.\"", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_press_conference", "type": "event", "title": "Press Conference", "speaker": "",
+     "text": "Microphones. Cameras. Someone from Glandco mouthing \"say the name\".",
+     "choices": [
+       {"id": "trash", "label": "Trash talk", "desc": "Next fight both sides start at 40 Hype.", "risk": "risky",
+        "outcomes": [{"text": "You say something unprintable. They print it.", "effects": [{"op": "next_fight", "rules": {"start_hype": 40, "enemy_start_hype": 40}, "text": "Next fight: everyone starts at 40 Hype"}]}]},
+       {"id": "humble", "label": "Humble", "desc": "Heal 10%.", "risk": "safe",
+        "outcomes": [{"text": "\"I just want to thank the Commission.\" Somewhere, a turtle smiles.", "effects": [{"op": "hp_pct", "amount": 0.1}]}]},
+       {"id": "plug", "label": "Plug the sponsor", "desc": "+40 Scrip.", "risk": "safe",
+        "outcomes": [{"text": "\"Glandco JUICE.\" Cha-ching.", "effects": [{"op": "scrip", "amount": 40}]}]}]},
+
+    {"id": "evt_scrap_crane", "type": "event", "title": "Scrap Crane", "speaker": "Ludlow",
+     "text": "A crane dangles a crate over the pit. Ludlow shrugs: \"Could be anything.\"", "group": true,
+     "choices": [
+       {"id": "grab", "label": "Grab it", "desc": "Fight 3 Scraplings while the crane hook swings. Win: a Treasure pick.", "risk": "risky",
+        "outcomes": [{"text": "Three Scraplings think it's theirs.", "effects": [{"op": "fight", "encounter": "evt_fight_scrap_crane",
+          "on_win": [{"op": "reward_pick", "min_rarity": "black_market", "options": 3, "scrip_alt": 150}], "on_loss": []}]}]},
+       {"id": "leave", "label": "Leave it", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "Ludlow watches the crate sway. \"Huh.\"", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_kid_lamprey_spar", "type": "event", "title": "Sparring Offer", "speaker": "Kid Lamprey",
+     "text": "Kid Lamprey, hood up: \"Three rounds. Lose and I tell everyone.\"",
+     "choices": [
+       {"id": "spar", "label": "Spar", "desc": "Fight a copy of yourself at 60% HP. No HP lost either way. Win: a technique pick.", "risk": "risky",
+        "outcomes": [{"text": "He puts on a wig that looks like you.", "effects": [{"op": "fight", "encounter": "evt_fight_spar", "spar": true,
+          "on_win": [{"op": "technique_pick", "options": 2}], "on_loss": [{"op": "nothing"}]}]}]},
+       {"id": "decline", "label": "Decline", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "\"Scared. Noted. Telling everyone.\"", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_juice_crate", "type": "event", "title": "A Crate of JUICE", "speaker": "",
+     "text": "Unmarked. Still cold. Nobody is watching.",
+     "choices": [
+       {"id": "one", "label": "Drink one", "desc": "Max HP +10 and a random side effect.", "risk": "risky",
+        "outcomes": [{"text": "It glows on the way down.", "effects": [{"op": "max_hp", "amount": 10}, {"op": "side_effect", "count": 1}]}]},
+       {"id": "three", "label": "Drink three", "desc": "Max HP +25, two side effects, +30 Hype carry.", "risk": "risky",
+        "outcomes": [{"text": "You can hear colors.", "effects": [{"op": "max_hp", "amount": 25}, {"op": "side_effect", "count": 2}, {"op": "hype_carry", "amount": 30}]}]},
+       {"id": "sell", "label": "Sell it", "desc": "+80 Scrip.", "risk": "safe",
+        "outcomes": [{"text": "Needles buys it back. He doesn't ask. You don't tell.", "effects": [{"op": "scrip", "amount": 80}]}]}]},
+
+    {"id": "evt_crowd_favor", "type": "event", "title": "Crowd Favorite", "speaker": "",
+     "text": "The crowd is chanting an element: {element}!", "roll": {"element": "any"},
+     "choices": [
+       {"id": "play", "label": "Play to them", "desc": "Hype gain +10% this run.", "risk": "safe", "requires": {"roll_matches": true},
+        "locked_text": "They're not chanting your element",
+        "outcomes": [{"text": "They chant louder. For you.", "effects": [{"op": "run_mods", "mods": [{"key": "hype_gain", "mul": 1.1}], "text": "Hype gain +10%"}]}]},
+       {"id": "show", "label": "Give them a show anyway", "desc": "Next fight: Hype gains x2 for everyone.", "risk": "risky", "requires": {"roll_matches": false},
+        "locked_text": "They're already yours",
+        "outcomes": [{"text": "You promise fireworks.", "effects": [{"op": "next_fight", "rules": {"hype_x2": true}, "text": "Next fight: Hype x2"}]}]},
+       {"id": "ignore", "label": "Ignore them", "desc": "+20 Scrip.", "risk": "safe",
+        "outcomes": [{"text": "A scalper sells your autograph. You get a cut.", "effects": [{"op": "scrip", "amount": 20}]}]}]},
+
+    {"id": "evt_blister_nest", "type": "event", "title": "Blister Nest", "speaker": "",
+     "text": "A drain is full of Blisters. Something glints at the bottom.", "group": true,
+     "choices": [
+       {"id": "clear", "label": "Clear it", "desc": "Fight 6 Blisters. Win: a random Prescription supplement and 30 Scrip.", "risk": "risky",
+        "outcomes": [{"text": "They start whistling.", "effects": [{"op": "fight", "encounter": "evt_fight_blister_nest",
+          "on_win": [{"op": "grant_supplement", "rarity": "prescription"}, {"op": "scrip", "amount": 30}], "on_loss": []}]}]},
+       {"id": "seal", "label": "Seal it", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "You kick the grate shut. Muffled pops.", "effects": [{"op": "nothing"}]}]},
+       {"id": "rock", "label": "Throw a rock", "desc": "They all pop (-10 HP), +30 Scrip.", "risk": "costly",
+        "outcomes": [{"text": "POP. Pop pop pop. You smell like regret and coins.", "effects": [{"op": "hp", "amount": -10}, {"op": "scrip", "amount": 30}]}]}]},
+
+    {"id": "evt_weight_class", "type": "event", "title": "Wrong Weight Class", "speaker": "Clerk",
+     "text": "A clerk insists you're in the wrong bracket.", "requires": {"weight_class": ["pipsqueak", "scrapper", "lunker", "absolute_unit"]},
+     "choices": [
+       {"id": "bump_up", "label": "\"You're too small.\" Accept the bump up", "desc": "Next 2 fights: enemies HP x1.15, Scrip rewards x1.3.", "risk": "risky",
+        "requires": {"weight_class": ["pipsqueak", "scrapper"]}, "locked_text": "You are not small",
+        "outcomes": [{"text": "Welcome to the big leagues. Literally.", "effects": [{"op": "next_fight", "count": 2, "rules": {"enemy_hp_mult": 1.15, "reward_mult": 1.3}, "text": "Next 2 fights: tougher, richer"}]}]},
+       {"id": "bump_down", "label": "\"You're too big.\" Accept the bump down", "desc": "Next 2 fights: enemies HP x0.85, Scrip rewards x0.8.", "risk": "safe",
+        "requires": {"weight_class": ["lunker", "absolute_unit"]}, "locked_text": "You are not big",
+        "outcomes": [{"text": "You fight down a class. The class objects.", "effects": [{"op": "next_fight", "count": 2, "rules": {"enemy_hp_mult": 0.85, "reward_mult": 0.8}, "text": "Next 2 fights: easier, poorer"}]}]},
+       {"id": "argue", "label": "Argue", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "The clerk loses interest mid-sentence.", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_ref_bribe", "type": "event", "title": "A Word With the Ref", "speaker": "Referee",
+     "text": "The referee (a very tired goat) is counting Scrip.",
+     "choices": [
+       {"id": "slip", "label": "Slip him 50", "desc": "Next fight, the first knockdown on you is waved off (poise refills).", "risk": "safe", "cost": {"scrip": 50},
+        "outcomes": [{"text": "He winks. Goats can't wink. He does anyway.", "effects": [{"op": "next_fight", "rules": {"waive_knockdown": true}, "text": "Next fight: first knockdown waved off"}]}]},
+       {"id": "report", "label": "Report him", "desc": "+10 Clout (Fight Camp) / +25 Scrip (Off the Street).", "risk": "safe",
+        "outcomes": [{"text": "The Commission thanks you for your service. He'll be back next week.", "effects": [{"op": "clout", "amount": 10, "variant": "fight_camp"}, {"op": "scrip", "amount": 25, "variant": "off_the_street"}]}]},
+       {"id": "nothing", "label": "Nothing", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "You saw nothing.", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_ice_bath", "type": "event", "title": "Ice Bath", "speaker": "Doc Sutura",
+     "text": "Doc's ice bath. It is a dumpster. It has ice in it.",
+     "choices": [
+       {"id": "get_in", "label": "Get in", "desc": "Heal 25%, but start the next fight Soaked.", "risk": "costly",
+        "outcomes": [{"text": "Every nerve files a complaint.", "effects": [{"op": "hp_pct", "amount": 0.25}, {"op": "next_fight", "rules": {"soaked": true}, "text": "Next fight: start Soaked"}]}]},
+       {"id": "toe", "label": "Toe dip", "desc": "Heal 10%.", "risk": "safe", "outcomes": [{"text": "Bracing.", "effects": [{"op": "hp_pct", "amount": 0.1}]}]},
+       {"id": "no", "label": "No", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "Doc shrugs. \"Your funeral. Literally, maybe.\"", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_wall_of_fame", "type": "event", "title": "Wall of Fame", "speaker": "Ludlow",
+     "text": "Photos of champions. One frame is empty. Ludlow is holding a camera.",
+     "choices": [
+       {"id": "pose", "label": "Pose", "desc": "Unlock a profile frame; +15 Hype carry.", "risk": "safe",
+        "outcomes": [{"text": "Flash. You blinked. It's perfect.", "effects": [{"op": "cosmetic", "id": "frame_wall_of_fame", "name": "Wall of Fame frame"}, {"op": "hype_carry", "amount": 15}]}]},
+       {"id": "dont", "label": "Don't", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "The frame stays empty. For now.", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_rooftop_pigeons", "type": "event", "title": "Pigeons", "speaker": "",
+     "text": "Several hundred pigeons. One has a Scrip note.", "requires": {"act": [2, 3]},
+     "choices": [
+       {"id": "chase", "label": "Chase it", "desc": "60%: +40 Scrip. 40%: nothing, and -5 HP (pecked).", "risk": "gamble",
+        "outcomes": [{"weight": 60, "text": "Got it! The pigeon is furious.", "effects": [{"op": "scrip", "amount": 40}]},
+                     {"weight": 40, "text": "The pigeons win. They always win.", "effects": [{"op": "hp", "amount": -5}]}]},
+       {"id": "feed", "label": "Feed them", "desc": "Next Rooftop fight: the pigeons scatter on your JUICE (+10 Hype on activation).", "risk": "safe",
+        "outcomes": [{"text": "They will remember.", "effects": [{"op": "next_fight", "arena": "rooftop", "apply": {"hooks": [{"on": "juice_start", "do": [{"type": "hype", "amount": 10}]}]}, "text": "Next Rooftop fight: pigeon assist"}]}]}]},
+
+    {"id": "evt_glandco_audit", "type": "event", "title": "Glandco Audit", "speaker": "Glandco auditors",
+     "text": "Men in matching windbreakers. \"We're checking labels.\"",
+     "choices": [
+       {"id": "hand_over", "label": "Hand over a Banned Substance", "desc": "+150 Scrip.", "risk": "costly", "requires": {"has_banned": true}, "locked_text": "You have nothing Banned",
+        "outcomes": [{"text": "\"For destruction,\" they say. They do not destroy it.", "effects": [{"op": "remove_supplement", "filter": "banned"}, {"op": "scrip", "amount": 150}]}]},
+       {"id": "hide", "label": "Hide it", "desc": "70% nothing, 30% they find it: lose it and 30 Scrip.", "risk": "gamble", "requires": {"has_banned": true}, "locked_text": "You have nothing to hide",
+        "outcomes": [{"weight": 70, "text": "They check everywhere except there.", "effects": [{"op": "nothing"}]},
+                     {"weight": 30, "text": "They check there.", "effects": [{"op": "remove_supplement", "filter": "banned"}, {"op": "scrip", "amount": -30}]}]},
+       {"id": "clean", "label": "\"I'm clean.\"", "desc": "They leave a coupon: shop 20% off next visit.", "risk": "safe", "requires": {"no_banned": true}, "locked_text": "You are not clean",
+        "outcomes": [{"text": "A coupon. Glandco-branded. Slightly sticky.", "effects": [{"op": "coupon", "discount": 0.2}]}]}]},
+
+    {"id": "evt_rest_stop", "type": "event", "title": "Highway Rest Stop", "speaker": "",
+     "text": "A bench. A vending machine out of order. Peace.",
+     "choices": [
+       {"id": "nap", "label": "Nap", "desc": "Heal 15%, Hype carry -> 0.", "risk": "safe",
+        "outcomes": [{"text": "You dream of belts.", "effects": [{"op": "hp_pct", "amount": 0.15}, {"op": "hype_carry_set", "value": 0}]}]},
+       {"id": "stretch", "label": "Stretch", "desc": "Max stamina +5 this run.", "risk": "safe",
+        "outcomes": [{"text": "Something pops. Good pop.", "effects": [{"op": "run_mods", "mods": [{"key": "stamina_add", "add": 5}], "text": "Max stamina +5"}]}]},
+       {"id": "graffiti", "label": "Read the graffiti", "desc": "Unlock an announcer idle quip.", "risk": "safe",
+        "outcomes": [{"text": "'BELLOWS WAS HERE'. Of course he was.", "effects": [{"op": "quip"}]}]}]},
+
+    {"id": "evt_the_belt", "type": "event", "title": "The Belt", "speaker": "",
+     "text": "A replica title belt in a pawn shop window.", "group": true, "requires": {"act": [3]},
+     "choices": [
+       {"id": "buy", "label": "Buy it", "desc": "Start the final boss with 100 Hype.", "risk": "costly", "cost": {"scrip": 100},
+        "outcomes": [{"text": "It's plastic. It's perfect.", "effects": [{"op": "boss_mod", "boss": "boss_snappington", "player_start_hype": 100, "text": "The Commissioner will see it."}]}]},
+       {"id": "window", "label": "Window-shop", "desc": "+10 Hype carry.", "risk": "safe",
+        "outcomes": [{"text": "Soon.", "effects": [{"op": "hype_carry", "amount": 10}]}]}]},
+
+    {"id": "evt_boiler_inspector", "type": "event", "title": "Boiler Inspector", "speaker": "City inspector",
+     "text": "A city inspector taps your belly with a wrench. \"That's not up to code.\"", "requires": {"fighters": ["f_stoke"]},
+     "choices": [
+       {"id": "fix", "label": "Let him \"fix\" it", "desc": "Steam Vent cooldown 7 -> 5 s this run, max HP -6.", "risk": "costly",
+        "outcomes": [{"text": "He hits it with the wrench until it sounds different.", "effects": [{"op": "max_hp", "amount": -6},
+          {"op": "run_patches", "patches": [{"op": "mul", "path": "abilities.ability1.cooldown", "value": 0.714}], "text": "Steam Vent cooldown -2 s"}]}]},
+       {"id": "bribe", "label": "Bribe", "desc": "Stoke the Fire no longer burns you this run.", "risk": "safe", "cost": {"scrip": 30},
+        "outcomes": [{"text": "\"Everything's up to code.\" It is not.", "effects": [{"op": "run_patches", "patches": [
+          {"op": "remove", "path": "abilities.ability2.effects[type=self_damage]"}, {"op": "set", "path": "abilities.ability2.effects[type=buff].status.dps", "value": 0}], "text": "No more self-burn"}]}]},
+       {"id": "run", "label": "Run", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "He doesn't chase. He writes it down.", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_molting", "type": "event", "title": "Molting Day", "speaker": "",
+     "text": "Your shell is coming off. It always picks the worst time.", "requires": {"fighters": ["f_dredge"]},
+     "choices": [
+       {"id": "molt", "label": "Molt now", "desc": "Lose 15 HP; then poise +20 and knockback taken -10% this run.", "risk": "costly",
+        "outcomes": [{"text": "Crunch. Squelch. New you.", "effects": [{"op": "hp", "amount": -15},
+          {"op": "run_mods", "mods": [{"key": "poise_add", "add": 20}, {"key": "knockback_taken", "mul": 0.9}], "text": "Poise +20, knockback taken -10%"}]}]},
+       {"id": "hold", "label": "Hold it in", "desc": "Next fight, Anchor Drop has an extra charge.", "risk": "safe",
+        "outcomes": [{"text": "You clench. Everything.", "effects": [{"op": "next_fight", "apply": {"patches": [{"op": "add", "path": "abilities.ability2.charges", "value": 1, "default": 1}]}, "text": "Next fight: free Anchor Drop"}]}]},
+       {"id": "ignore", "label": "Ignore", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "It'll happen when it happens.", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_fan_club", "type": "event", "title": "Fan Club", "speaker": "Six terns",
+     "text": "Six terns in matching crests want a feather.", "requires": {"fighters": ["f_gusto"]},
+     "choices": [
+       {"id": "give", "label": "Give one each", "desc": "Taunts give +4 Hype this run.", "risk": "costly",
+        "outcomes": [{"text": "They faint. All six.", "effects": [{"op": "run_hooks", "hooks": [{"on": "taunt", "do": [{"type": "hype", "amount": 4}]}], "text": "Taunts +4 Hype"}]}]},
+       {"id": "merch", "label": "Sell them merch", "desc": "+45 Scrip.", "risk": "safe",
+        "outcomes": [{"text": "Signed photos. Of you. By you.", "effects": [{"op": "scrip", "amount": 45}]}]},
+       {"id": "nothing", "label": "Sign nothing", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "They chant your name anyway.", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_headlamp", "type": "event", "title": "Dead Battery", "speaker": "",
+     "text": "Your headlamp went out. You walked into a wall.", "requires": {"fighters": ["f_dozer"]},
+     "choices": [
+       {"id": "battery", "label": "Buy a battery", "desc": "Bulldoze steering +10 deg/s this run.", "risk": "safe", "cost": {"scrip": 20},
+        "outcomes": [{"text": "Let there be light. And steering.", "effects": [{"op": "run_patches", "patches": [{"op": "add", "path": "abilities.ability1.effects[type=charge].steer_deg", "value": 10, "default": 20}], "text": "Bulldoze steering +10 deg/s"}]}]},
+       {"id": "dark", "label": "Fight in the dark", "desc": "Next fight is at night with the rim light off; win it for a Black Market pick.", "risk": "risky",
+        "outcomes": [{"text": "You can't see them. They can see you. Fair.", "effects": [{"op": "next_fight", "rules": {"dark": true}, "text": "Next fight: lights out"},
+          {"op": "bet", "if": {"won": true}, "win": [{"op": "reward_pick", "min_rarity": "black_market", "options": 3}], "lose": [], "text": "Win in the dark: Black Market pick"}]}]}]},
+
+    {"id": "evt_drain_backup", "type": "event", "title": "Drain Backup", "speaker": "",
+     "text": "The cannery drain is overflowing. It's your drain.", "requires": {"fighters": ["f_slurry"]},
+     "choices": [
+       {"id": "clear", "label": "Clear it", "desc": "Drain Dive cooldown 9 -> 7 s this run, -8 HP.", "risk": "costly",
+        "outcomes": [{"text": "You go in. You come out. Don't ask.", "effects": [{"op": "hp", "amount": -8},
+          {"op": "run_patches", "patches": [{"op": "mul", "path": "abilities.ability2.cooldown", "value": 0.778}], "text": "Drain Dive cooldown -2 s"}]}]},
+       {"id": "leave", "label": "Leave it", "desc": "Your puddles last +1 s this run.", "risk": "safe",
+        "outcomes": [{"text": "The overflow is... inspiring.", "effects": [{"op": "run_mods", "mods": [{"key": "zone_duration_add", "add": 1}], "text": "Puddles +1 s"}]}]},
+       {"id": "blame", "label": "Blame Ludlow", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "Ludlow mops. Ludlow sighs.", "effects": [{"op": "nothing"}]}]}]},
+
+    {"id": "evt_static_storm", "type": "event", "title": "Storm Warning", "speaker": "",
+     "text": "A thunderhead rolls over the bay. Your bulbs are humming.", "requires": {"party_element": "static"},
+     "choices": [
+       {"id": "stand", "label": "Stand in it", "desc": "Next fight: start with +40 Hype and immune to Jolted, but -10 HP now.", "risk": "costly",
+        "outcomes": [{"text": "ZZZAP. You glow for an hour.", "effects": [{"op": "hp", "amount": -10},
+          {"op": "next_fight", "rules": {"start_hype": 40}, "apply": {"statuses": [{"id": "storm_grounded", "name": "Storm-charged", "duration": 9999, "buildup_received": {"static": 0.0}}]}, "text": "Next fight: +40 Hype, Jolted immunity"}]}]},
+       {"id": "hide", "label": "Hide", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "Under a pallet. Safe. Boring.", "effects": [{"op": "nothing"}]}]},
+       {"id": "battery", "label": "Charge a battery", "desc": "Place a battery in your next fight's arena.", "risk": "safe",
+        "outcomes": [{"text": "It's warm. It's humming. It's yours.", "effects": [{"op": "next_fight", "rules": {"hazards": [{"kind": "batteries", "count": 1}]}, "text": "Next fight: a charged battery"}]}]}]}
+  ]
+}
