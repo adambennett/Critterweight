@@ -1,0 +1,166 @@
+# SLURRY (`f_slurry`) — the Drain Wyrm · kit
+
+Serpent **Scrapper**, element **Sludge**, trapper / zoner (ROSTER §5). Body, model and art are the
+forge's; this kit authors everything Slurry does. Data: `game/content/core/creatures/f_slurry.json`.
+Slurry has no limb chains: every move is joint-driven (head, body1–6, tail) plus root `lean`,
+`height` and lunges, with rearing poses on the rear segments.
+
+## Stats
+
+| HP | Walk | Accel | Turn | Stamina | Poise | Dodge | Mass | Power / Defense |
+|---|---|---|---|---|---|---|---|---|
+| 100 | 3.0 m/s | 22 | 5.0 rad/s (slow turn) | 105 | 55 | 3.0 m / 0.3 s | 95 kg (body) | 1.0 / 1.0 |
+
+## Moves (final numbers)
+
+S/A/R = startup / active / recovery in seconds (first hit window or effect time). KB is the
+engine knockback impulse (m/s, mass-scaled); "KB seen" is the measured displacement of the dummy
+0.45 s after the hit in the kit test (vs the dummy named). Damage is the base before the engine's
+contact-quality / hurt-part / combo scaling (melee) — effects deal it flat. Ranges are root-to-root
+gaps measured in the test setup (dev_biped = tall biped dummy; Jitters = 0.9 m ball).
+
+| Slot | Move | Weapon | S/A/R | Dmg | KB (seen) | Stun | Poise | Stam | CD | Sludge | Connects at | Properties |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| L1 | Head Butt | head + fang | 0.09/0.15/0.20 | 5 | 3.2 (0.73 m) | 0.30 | 8 | 5 | — | 12 | Jitters 0.9–1.7, dev_biped 0.9–1.5 | bows then drives the head ~1.3 m forward (3 m/s lunge), low enough to hit a 0.9 m target |
+| L2 | Tail Flick | tail tip | 0.14/0.22/0.20 | 4 | 3.0 (0.65 m) | 0.25 | 5 | 4 | — | 12 | dev_biped 1.1–1.5, Jitters 0.9–1.7 | whole body spins, the tail whips in from behind at knee height |
+| L3 | Fang Snap | fang + head | 0.12/0.11/0.37 | 7 | pull (−0.36 m) | 0.45 | 12 | 7 | — | 22 | Jitters 0.9–1.7, dev_biped 1.1–1.5 | bite, jerk back, **pull** (yank 0.14 s after the bite) |
+| Heavy | Tail Sweep | tail tip | 0.32/0.34/0.29 | 12 | 6.0 (3.0 m on 45 kg) | 0.50 | 25 | 11 | — | 28 | Jitters 1.1–2.1, dev_biped 1.3–1.7 | ~220° spin sweep at knee height with a 3.2 m/s slide, **multi-target**, **trips Gunked targets** |
+| Charged Heavy | Rear & Crash | head + fang + body_upper + coil | 0.54/0.24/0.47 | 17 | 6.2 (2.2 m) | 0.80 | 45 | 16 | — | 40 | dev_biped 1.0–2.0, Jitters 1.0–2.2 | rears up 0.24 m and slides forward, then the upper body crashes down ~1.5 m ahead; **armor vs Lights 0–0.52 s**, **guard-crush**, **puddle r 1.3 m 4 s** at the impact |
+| Finisher | Venom Spit | projectile (14 m/s, 0.26 s ≈ 4 m) | 0.14/—/0.40 | 8 | 5.0 (1.28 m) | 0.50 | 15 | 9 | — | 40 | ≤ 5.0 m after a Head Butt | Light → Heavy in the cancel window; **reflectable**; guardable, never parryable |
+| Dash Attack | Slither Strike | head + fang | 0.04/0.22/0.28 | 6 | 4.2 (2.4 m) | 0.35 | 10 | 7 (+dodge) | — | 15 | Jitters 2.5–3.5, dev_biped 2.0–3.0 (from a dodge) | low 6.5 m/s slither; **in a Sludge puddle: +2 dmg, +10 build-up** |
+| Grab | Coil | coil + body_upper + head + fang | 0.20/0.22/0.33 | — | — | — | — | 6 | — | — | Jitters / Slurry 0.9–1.7, dev_biped 0.9–1.3 | head tilts down and wraps; pummel **Squeeze** 4 dmg + Sludge 10, one per 0.4 s (max 3) |
+| Ability 1 | Sludge Lob | lobbed projectile (10 m/s, ≤ 9 m) | 0.25/—/0.35 | 6 | 4.3 (0.89 m) | 0.30 | 8 | 10 | 7 s × **2 charges** | 40 | hits at 6 m, lands ≤ 9 m | arc arrives 0.45 m above the floor at the target point; **puddle r 1.3 m 5 s** on impact/expiry; reflectable |
+| Ability 2 | Drain Dive | blink (stick, 4.5 m, 0.5 s) | 0.20/0.50/0.25 | 5 (emerge) | launch 3.0 | 0.30 | 10 | 12 | 9 s | 25 | emerge circle r 1.2 m (hits at 5.0–5.8 m gaps when diving at the target) | **invulnerable while submerged**; **emerging in its own puddle refunds 3 s** |
+| JUICE | Overflow | wave (line 4 × 1.6 m) + river | 0.40/—/0.20 (0.6 s activation) | 8 (wave) | 5.2 (1.33 m) | 0.40 | 20 | — | Hype 100 | 50 | wave ≤ 3.0 m | see below |
+| Taunt | Hypnotic Sway | — | 1.5 s | — | — | — | — | 0 | — | — | — | +8 Hype, no armor |
+
+Throws (from Coil): **Whip Toss** (forward) 3.0 m, 10 dmg · **Slingshot** (side) 3.0 m, 9 dmg ·
+**Gulp-and-Spit** (back) 2.0 m, 9 dmg + Sludge 30 build-up. All knock down.
+
+**Overflow (JUICE)**: 0.6 s activation with full armor and 0.3 s invulnerability (engine), Hype →
+0. At 0.4 s: the ground wave (8 dmg, Sludge 50, class juice) and a **river** of three own puddles
+(r 1.5 m, 8 s) at 1.5 / 4.5 / 7.5 m ahead. Then 6 s of JUICE state:
+- every Light also fires **overflow_spit** (3 dmg, Sludge 10, 14 m/s × 0.26 s ≈ 4 m, aimed);
+- Slurry heals **1 HP every 0.5 s** (2 HP/s) while standing in sludge (`in_zone` sludge);
+- Gunked enemies anywhere take an extra **Overflowing** 1.5 dps debuff (= 2× Gunked damage);
+- ending downside: the engine JUICE crash (2 s at 0.75× speed, half stamina regen).
+
+Passive **drain_refund**: on `emerge`, if Slurry stands in a Sludge zone, `cooldown ability2 −3 s`.
+
+## How the ROSTER properties are implemented
+
+| ROSTER property | Implementation |
+|---|---|
+| Fang Snap pulls 0.5 m | `pull: 0.5` (the bite never knocks back) + inline `on_hit` **delayed** circle (0.14 s, at `forward:0.6`, r 1.0, 0 dmg, `kb_dir: toward`, 2.6 m/s): the yank lands after the head has jerked back out of the way. Test: target moves 0.36 m toward Slurry. |
+| Tail Sweep multi-target | one weapon window; the engine tracks hits per target. Test: two Jitters side by side both hit. |
+| Tail Sweep trips Gunked targets | `on_hit {if target_status sludge → knockdown}`. Test: knockdown only when pre-Gunked. |
+| Rear & Crash armor during the rear | `armor [[0, 0.52]]`, `armor_level lights` (+ the engine's charge armor while held). Test: dummy jabs land, the crash still connects. |
+| Rear & Crash puddle at impact | effect `zone sludge_puddle` at `forward:1.6`, r 1.3, 4 s, `owner_immune` (t 0.7). |
+| Rear & Crash guard-crush | `guard_break 2.5` + `on_hit {if target_guarding → guard_crush ×2}`. Test: guard drain ≥ 30 stamina vs 5.5 for a guarded Tail Sweep. |
+| Venom Spit reflectable | engine projectile default (`reflectable`). Test: a reflect flag bounces it; guard blocks it; a parry-timed press only blocks. |
+| Slither Strike bonus in a puddle | `on_hit {if in_zone sludge → damage_add 2, buildup sludge 10}`. Test: +2.0 dmg and ≥ +9 build-up with a puddle under Slurry. |
+| Coil grab, Squeeze pummel 4 dmg / 0.4 s | `grab` move (head tilted down so it wraps short targets) + `pummel` move (duration = cadence, see extensions). |
+| Gulp-and-Spit lands Gunked +30 | throw `buildup: 30` (engine applies the thrower's element). |
+| Sludge Lob, 2 charges, puddle on impact or expiry | `charges: 2`, projectile `lob`, `range 9`, `arrive_y 0.45`, `on_expire zone sludge_puddle owner_immune` (bursts on hits too). Test: 2 shots then empty, one charge back after 7 s, two puddles. |
+| Drain Dive invulnerable, emerge circle, refund 3 s | `blink dir stick 4.5 m delay 0.5` (the engine makes a submerged fighter untouchable), `on_emerge area drain_emerge`, passive `drain_refund` (new `emerge` hook event + `cooldown` action). Test: no hits taken while submerged; travel ≤ 4.5 m; cooldown 3.0 s shorter when emerging in an own puddle. |
+| Overflow river 8 m × 3 m, 8 s | three circular own puddles (zones are circles) r 1.5 m spaced 3 m. |
+| Overflow: Light spits, 2× Gunked damage, heals 2 HP/s in sludge | `juice_state` hooks: `move_start move_class light → projectile`, `tick 0.5 → debuff require_status sludge (1.5 dps)`, `tick 0.5 in_zone sludge → heal 1`. Tests cover each. |
+| Own puddles never hurt Slurry | every Slurry zone is `owner_immune` (ELEMENTS §7 "kit says otherwise"). Test: Slurry in its own puddle takes 0 damage while the enemy ticks. |
+| Taunt 1.5 s, +8 Hype, no armor | `taunt` move 1.5 s; Hype from the engine. Test: Hype 8, interrupted by a jab. |
+
+## AI (bots)
+
+Personality **trapper** (`ai` block): aggression −0.12, block +0.08, dodge +0.04, ability +0.30,
+grab −0.04; melee reach 1.4 m; preferred band **2.8–5.5 m** held while a Sludge Lob charge is
+ready (with both lobs on cooldown the bot closes in and fights in melee).
+Ability rules: **Sludge Lob** at 2.5–9 m (chance 0.22 per decision × skill); **Drain Dive away**
+from a target within 2.6 m when poise < 40 % (chance 0.7, stick committed away for 0.35 s).
+Because the ai block uses kit keys the bot is *kit-driven*: it releases buttons after each press
+and charges Heavies on purpose (regular 25 %, pro 40 %), and steps out of enemy puddles; the
+engine's generic bot adds Venom Spit via the string finisher and JUICE at 100 Hype.
+
+## Verification
+
+`& $g --headless --path game --fixed-fps 120 -- --test test_kit_f_slurry` →
+`game/src/test/kits/test_kit_f_slurry.gd` (13 tests, ~25 s, **all pass**). Every move connects at
+its range against both dev_biped and Jitters and whiffs outside it, with damage, knockback (or
+pull), stagger, Sludge build-up, active-weapon reach ≤ 1.6 m (max seen 1.53 m, Tail Flick), no
+tipping (root up > 0.2), no spin-out (< 60 rad/s), no floor clipping, no cage exit, upright at
+the end. Plus: guard / parry, Coil + pummels + all three throws, multi-target and Gunked trip,
+armor / puddle / guard-crush, spit reflect, puddle bonus, lob charges / cooldown / puddles / owner
+immunity, dive invulnerability / distance / refund, Overflow start / river / wave / spit / heal /
+extra Gunked damage / end / crash, taunt, and a bot smoke test. Engine extensions:
+`test_kit_extensions_sj.gd`.
+
+## Evidence (GUI captures, the_gullet, vs Jitters)
+
+- `docs/evidence/kits/f_slurry_l1_head_butt.png` — Head Butt impact
+- `docs/evidence/kits/f_slurry_heavy_tail_sweep.png` — Tail Sweep, tail swinging through Jitters
+- `docs/evidence/kits/f_slurry_charged_rear.png` — the rear (S-curve tell)
+- `docs/evidence/kits/f_slurry_charged_crash.png` — the crash landing on Jitters
+- `docs/evidence/kits/f_slurry_ability1_sludge_lob.png` — Sludge Lob glob in flight
+- `docs/evidence/kits/f_slurry_juice_overflow.png` — Overflow wave and river (JUICED)
+
+## Balance
+
+Bot vs bot (`BotBrain` both sides, same tier), arena `the_gullet`, one round capped at 60 s (a
+time-out goes to the higher health fraction), sides alternate every bout, fixed seeds. Final kit,
+after merging main. "Strike dmg/hit" counts landed strikes, projectiles and circles; "all hits" also
+counts Slurry's 0.75-damage puddle ticks; Gunked damage-over-time is extra (per bout).
+
+| Pairing | Tier | Bouts | Wins | Win % | Strike dmg/hit | All hits dmg/hit | Gunked DoT / bout |
+|---|---|---|---|---|---|---|---|
+| Slurry vs Jitters | regular | 24 | 15–9 | **62 / 38** | 6.61 vs 6.78 | 3.39 vs 6.78 | 11.3 |
+| Slurry vs Jitters | pro | 24 | 14–10 | **58 / 42** | 6.24 vs 6.97 | 3.63 vs 6.97 | 7.2 |
+| Slurry mirror | regular | 20 | 10–10 | 50 / 50 | 6.78 vs 6.63 | 3.19 vs 2.82 | 5.0 vs 6.5 |
+| Jitters mirror | regular | 20 | 11–9 | 55 / 45 | 6.93 vs 5.85 | 6.93 vs 5.85 | — |
+
+Earlier samples of the cross matchup with the same kit (before the last Head Butt trim and the main
+merge) ran regular 13–11 and 11–13 and pro 16–8 (67 %, before the zoner band gate: 17–7), so the
+matchup sits around 54 % for Slurry at regular (39–33 over 72 bouts) with ±10 % noise per 24-bout
+sample. Damage sources (regular, final): Slurry — Sludge Lob 450, Head Butt 231, Venom Spit 279,
+Gunked 272, puddle ticks 178, Rear & Crash 88, Tail Sweep 108; Jitters — Arc Lash 409, Squash 286
+(+154 landing circles, +74 pad Squash), Static Cling 214, Pinball 175, Headbonk 109, Slaps 219.
+
+## Generic engine extensions this kit relies on
+
+All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_sj.gd`.
+- `hooks.gd`: event `emerge` (a delayed blink resurfaced) and action `cooldown {slot, amount}` —
+  the Drain Dive refund.
+- `effects.gd`: `debuff.require_status` (Overflow's extra Gunked damage), lob `arrive_y` (the glob
+  arrives at body height instead of the floor).
+- `fighter.gd`: pummel cadence = the `pummel` move's duration (Squeeze every 0.4 s).
+- `fighter_motor.gd`: joints keyed by a move skip the serpent gait wave (the head stays on line).
+- `bot_brain.gd`: `ai` block rules (ability bands / chance / poise gate / dive away, preferred
+  distance band gated on ready ranged tools, enemy-zone avoidance, deliberate charged Heavies).
+
+## Deviations from ROSTER (and why)
+
+- **String order**: L1 is Head Butt, L2 Tail Flick (ROSTER: Tail Flick first). The Tail Flick spins
+  the whole body and commits Slurry's facing for ~0.4 s, a poor opener; the 0.09 s Head Butt is the
+  natural jab. The bot string logic also reads slots in string order.
+- **Tail Flick 0.14/0.22/0.20** (ROSTER 0.12/0.08/0.20) and **Tail Sweep 0.32/0.34/0.29** (ROSTER
+  0.26/0.14/0.40): the tail is a 1.5 m whip driven by root yaw on a ragdoll, so the active window
+  spans the arc it sweeps; the sweep is a ~220° spin rather than a flat 180° arc.
+- **Head moves strike at ~0.8–1.0 m height** (ROSTER "chest height"): low enough to land on the
+  0.9 m Jitters; against tall bipeds they hit the hips/arms. At point blank (< 0.9 m) head moves
+  overshoot.
+- **Damage / numbers tuned for balance**: Venom Spit 8 (9), Sludge Lob 6 dmg / 40 build-up / 7 s
+  cooldown / puddle r 1.3 m 5 s (7 / 45 / 5 s / r 1.5 m 6 s). Knockback values are engine impulses
+  calibrated by measurement, not ROSTER metres.
+- **Drain Dive** travels 4.5 m (≤ 5 m) and is invulnerable for the full 0.5 s dive (≥ 0.4 s).
+- **Overflow** activation is 0.6 s (0.5 s); the river is three r 1.5 m circles (zones are circles).
+- **Gulp-and-Spit** flings the target backward, but Slurry's own head and coils (physical bodies)
+  stop it after ~0.7 m: it lands at Slurry's front / side, knocked down and Gunked +30, not 2 m
+  behind (a higher arc via the throw `up` field did not clear the head either).
+- **Body tweak** (weapon spheres only, points unchanged so reach is unaffected): `fang` radius
+  0.10 → 0.17, `head` 0.16 → 0.19, `tail_tip` 0.10 → 0.20 — Slurry's own collision capsules
+  shadowed the thin spheres so strikes rarely registered.
+
+## Known gaps
+
+- AI does not lead lobs onto a predicted position, place puddles between itself and the target,
+  pick Fang Snap for targets standing in sludge, lob *behind* targets (Headliner+) or avoid
+  spitting near Scorch allies (Flare-Up awareness).
+- Puddles are not 1.5× larger / longer with techniques yet (techniques are another task).
+- Gulp-and-Spit trajectory (above).

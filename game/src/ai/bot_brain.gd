@@ -19,8 +19,12 @@ const PROFILES := {
 		"combo": 0.95, "ability": 0.85, "grab": 0.38, "mistake": 0.02, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0},
 }
 
-## Chance that a chosen Heavy is held into a Charged Heavy (lower tiers never charge).
+## Chance that a chosen Heavy is held into a Charged Heavy (lower tiers never charge). Kit-driven
+## bots only (see KIT_KEYS): other bots keep the original behaviour, where a pressed button stays held.
 const CHARGE_CHANCE := {"rookie": 0.0, "regular": 0.25, "pro": 0.4, "champion": 0.5, "hall_of_famer": 0.55}
+## Creature "ai" keys that make a bot kit-driven (kit rules, button release, deliberate charges,
+## enemy-zone avoidance). A personality without any of them plays exactly as before.
+const KIT_KEYS := ["abilities", "range", "reach", "heavy_vs_windup", "dash_in"]
 
 var difficulty := "regular"
 var p := {}
@@ -43,6 +47,7 @@ var label_text := ""
 var _hold_until := 0.0
 var _kit_hold_until := 0.0        ## kit rule committed the stick (e.g. dive away): skip thinking
 var _charge_until := 0.0          ## holding Heavy to charge it until this time
+var _kit_driven := false          ## the creature ai block uses kit keys (KIT_KEYS)
 
 
 func _init(diff := "regular", seed_value := 0) -> void:
@@ -57,6 +62,10 @@ func label() -> String:
 
 func set_personality(ai: Dictionary) -> void:
 	personality = ai
+	_kit_driven = false
+	for k in KIT_KEYS:
+		if ai.has(k):
+			_kit_driven = true
 	for k in ["aggression", "block", "dodge", "ability", "grab"]:
 		if ai.has(k):
 			p[k] = clampf(float(p[k]) + float(ai[k]), 0.0, 1.0)
@@ -78,13 +87,15 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 		if _t >= float(q["at"]):
 			f.input.press(int(q["b"]))
 			_press_queue.erase(q)
-	# presses set their button's held bit; release them after the press tick so a Heavy is only
-	# charged when the bot means to (it holds Heavy while _charge_until is running)
-	f.input.held &= ~((1 << FighterInput.LIGHT) | (1 << FighterInput.HEAVY) | (1 << FighterInput.DODGE))
+	# presses set their button's held bit; kit-driven bots release them after the press tick so a
+	# Heavy is only charged when the bot means to (it holds Heavy while _charge_until is running)
+	if _kit_driven:
+		f.input.held &= ~((1 << FighterInput.LIGHT) | (1 << FighterInput.HEAVY) | (1 << FighterInput.DODGE))
 	if _t >= _next_think:
 		_next_think = _t + float(p["think"]) * rng.randf_range(0.7, 1.3)
 		_think(f, sim)
-	f.input.set_held(FighterInput.HEAVY, _t < _charge_until)
+	if _kit_driven:
+		f.input.set_held(FighterInput.HEAVY, _t < _charge_until)
 	f.input.move = _move
 	f.input.set_held(FighterInput.GUARD, _guard and _t < _guard_until)
 	f.input.set_held(FighterInput.GRAB, _t < _hold_until)
@@ -240,7 +251,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 				f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
 				return
 	# ---- don't idle in the opponent's puddles / patches ----
-	if dist > my_reach + 0.4 and _avoid_enemy_zone(f, sim, dir):
+	if _kit_driven and dist > my_reach + 0.4 and _avoid_enemy_zone(f, sim, dir):
 		return
 	# ---- offence ----
 	var stamina_ok := f.stamina > 18.0 or rng.randf() < 0.2
@@ -256,7 +267,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 				f.input.press(FighterInput.LIGHT)
 		elif rng.randf() < 0.28:
 			f.input.press(FighterInput.HEAVY)
-			if rng.randf() < float(CHARGE_CHANCE.get(difficulty, 0.25)):
+			if _kit_driven and rng.randf() < float(CHARGE_CHANCE.get(difficulty, 0.25)):
 				_charge_until = _t + rng.randf_range(0.5, 1.0)
 		elif rng.randf() < float(p["grab"]) * 0.4:
 			f.input.press(FighterInput.GRAB)

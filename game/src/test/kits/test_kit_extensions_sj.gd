@@ -301,14 +301,20 @@ func test_bot_avoids_enemy_zones_and_releases_buttons() -> void:
 	sim.effects.spawn_zone(foe, {"kind": "sludge_puddle", "radius": 1.0, "duration": 5.0}, f.pos() + Vector3(0.3, 0, 0))
 	check(bot._avoid_enemy_zone(f, sim, dir), "standing in an enemy puddle, no avoidance")
 	check(bot._move.x < 0.0, "avoidance did not step out of the puddle (%s)" % str(bot._move))
-	# held-button release: a pressed Heavy is not kept held unless the bot is charging
+	# held-button release (kit-driven bots only): a pressed Heavy is not kept held unless charging
 	check(BotBrain.CHARGE_CHANCE.has("rookie") and BotBrain.CHARGE_CHANCE.has("hall_of_famer"), "charge chances missing")
+	check(not bot._kit_driven, "an empty ai block made the bot kit-driven")
+	f.input.set_held(FighterInput.HEAVY, true)
+	bot.poll(f, sim, 1.0 / 120.0)
+	check(f.input.is_held(FighterInput.HEAVY), "a plain bot changed its original held-button behaviour")
+	var kit_bot := _bot_on(sim, {"reach": 1.0})
+	check(kit_bot._kit_driven, "a kit key did not make the bot kit-driven")
 	f.input.set_held(FighterInput.HEAVY, true)
 	f.input.set_held(FighterInput.LIGHT, true)
-	bot.poll(f, sim, 1.0 / 120.0)
+	kit_bot.poll(f, sim, 1.0 / 120.0)
 	check(not f.input.is_held(FighterInput.HEAVY) and not f.input.is_held(FighterInput.LIGHT), "pressed buttons stayed held")
-	bot._charge_until = bot._t + 1.0
-	bot.poll(f, sim, 1.0 / 120.0)
+	kit_bot._charge_until = kit_bot._t + 1.0
+	kit_bot.poll(f, sim, 1.0 / 120.0)
 	check(f.input.is_held(FighterInput.HEAVY), "charging bot did not hold Heavy")
 	sim.queue_free()
 
