@@ -1,5 +1,5 @@
 {
-  "note": "ES drill, job seed 101: the same job run with 3 worker processes and with 1 (twice: before and after merging main). Generations 1-10 compared.",
+  "note": "ES drill, job seed 101: the same job run with 3 worker processes and with 1 (before and after each merge of main). Generations 1-10 compared.",
   "runs": {
     "3 processes (es_drill_seed101)": {
       "fit_mean": {
@@ -69,7 +69,41 @@
       "test_trained_reward_mean": 47.63149084744165,
       "test_initial_reward_mean": -0.8182793140411377
     },
-    "1 process after merging main (es_drill_seed101_1worker_postmerge)": {
+    "1 process after merging main (es_drill_seed101_1worker_postmerge, at fd1e051)": {
+      "fit_mean": {
+        "1": 3.0711928755044937,
+        "2": 9.497895995775858,
+        "3": 15.287919640541077,
+        "4": 13.832100252310434,
+        "5": 25.32997152209282,
+        "6": 27.796041866143543,
+        "7": 36.98770084480444,
+        "8": 38.06175348659357,
+        "9": 40.739881510535874,
+        "10": 40.09515635172526
+      },
+      "validation": {
+        "0": [
+          -0.6809462904930115,
+          null
+        ],
+        "5": [
+          38.61508565896159,
+          63.8492178408843
+        ],
+        "10": [
+          45.74749315582313,
+          59.41339483601467
+        ]
+      },
+      "selected": {
+        "best_gen": 5,
+        "best_source": "elite"
+      },
+      "test_trained_reward_mean": 47.63149084744165,
+      "test_initial_reward_mean": -0.8182793140411377
+    },
+    "1 process after merging main again (at b4103b1)": {
       "fit_mean": {
         "1": 3.0711928755044937,
         "2": 9.497895995775858,
@@ -106,5 +140,9 @@
   },
   "identical_fitness_gen_1_10": true,
   "identical_validation_gen_0_5_10": true,
-  "identical_selection_and_test_means": true
+  "identical_selection_and_test_means": true,
+  "bots_after_second_merge": {
+    "job": "eval_bc_regular (Bot: Rookie opponent, Bot: Regular reference) re-run at b4103b1",
+    "identical_target_compare_reference": true
+  }
 }

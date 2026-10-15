@@ -10,7 +10,7 @@ commands under "Reproduce", and its report counts every evaluated episode.
 | | |
 |---|---|
 | Date | 2026-10-15 |
-| Code | branch `worktree-agent-a42cbda669239d832` (the AI Lab review fixes). The training runs (sections 1–3) were made at `cfb471e`; main was then merged (`fd1e051`) and a re-run of the determinism job reproduced them exactly (section 1). Publishing, evaluation (section 4), captures and measurements were made after the merge. |
+| Code | branch `worktree-agent-a42cbda669239d832` (the AI Lab review fixes). The training runs (sections 1–3) were made at `cfb471e`. Main was then merged twice (`fd1e051`, `b4103b1`); after each merge the determinism job reproduced its metrics and test results exactly, and after the second the Regular-clone evaluation against Bot: Rookie (with Bot: Regular as reference) reproduced exactly too (`determinism/`). Publishing, evaluation (section 4), captures and measurements were made after the first merge. |
 | Machine | Intel i7-7700K (4 cores, 8 threads), 32 GB, Windows 10 |
 | Engine | Godot 4.5.1 (editor binary, console variant), headless workers with `--fixed-fps 120` |
 | Load | The PC also ran other agents' build and test jobs, with the CPU at 40–100 % throughout. Results do not depend on load (fixed-step workers); throughput and timing numbers do, and are pessimistic. |
@@ -47,7 +47,7 @@ fixed, and every run in this folder was made again with the fixed code:
 | `bench/*.json` | Inference cost, single-process throughput, an A/B inference comparison with the build before this branch, and CPU-share measurements. |
 | `ui/` | Lab screen captures, plus `ui_report.json`: frame times and pause/resume/cancel driven through the UI. |
 | `match/` | "Spectate this bot" and "Fight this bot" with the shipped clone, plus `match_report.json`. |
-| `determinism/` | The same ES job with 3 processes and with 1 (before and after merging main), compared. |
+| `determinism/` | The same ES job with 3 processes and with 1 (before and after each merge of main), compared, plus a bot evaluation re-run after the last merge. |
 
 Shipped sample policies built from these runs are in `game/content/core/policies/`:
 `dev_biped_es_drill` (from `es_drill_seed303`), `dev_biped_bc_regular` (from `bc_regular`) and
@@ -97,10 +97,10 @@ because the dummy never attacks.)
   On reward the trained policies are level with the hand-written jabber: none of the three
   paired differences is significant.
 - **Determinism** (`determinism/seed101_processes_and_merge.json`). Seed 101 was run again in
-  one process for 10 generations (`runs/es_drill_seed101_1worker`), once before and once after
-  merging main (`..._postmerge`). All three runs have identical per-generation fitness for
-  generations 1–10, identical validation rewards, the same selected network (generation 5's
-  elite) and the same test results; the two one-process runs have identical metric lines apart
+  one process for 10 generations (`runs/es_drill_seed101_1worker`), before and after each merge
+  of main (`..._postmerge` is the first). All of these runs have identical per-generation fitness
+  for generations 1–10, identical validation rewards, the same selected network (generation 5's
+  elite) and the same test results; the one-process runs have identical metric lines apart
   from their wall-clock fields.
   (Helpers send their results as JSON text, so double-precision statistics of the 3-process run
   can differ in the last printed digit.) Distributing episodes over processes does not change
