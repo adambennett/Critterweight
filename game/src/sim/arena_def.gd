@@ -664,16 +664,16 @@ func to_dict() -> Dictionary:
 		var sp := []
 		for s in spawns:
 			var v: Vector3 = s[0]
-			sp.append([snappedf(v.x, 0.01), snappedf(v.z, 0.01), snappedf(rad_to_deg(s[1]), 0.1) if not is_nan(s[1]) else 0.0])
+			sp.append([r2(v.x), r2(v.z), r1(rad_to_deg(s[1])) if not is_nan(s[1]) else 0.0])
 		var hz := []
 		for h in hazards:
 			var v3: Vector3 = h["pos"]
-			hz.append({"type": h["type"], "pos": [snappedf(v3.x, 0.01), 0.0, snappedf(v3.z, 0.01)], "radius": h["radius"], "params": h["params"]})
+			hz.append({"type": h["type"], "pos": [r2(v3.x), 0.0, r2(v3.z)], "radius": h["radius"], "params": h["params"]})
 		return {"id": id, "name": display_name, "base": base, "radius": radius, "wall_height": wall_height,
 			"ringout": ringout, "theme": theme, "gravity_mult": gravity_mult, "author": author, "version": version,
 			"spawns": sp, "props": pr, "hazards": hz, "markers": mk}
 	var out := {"id": id, "name": display_name, "base": base, "variant": variant, "format": FORMAT,
-		"version": version, "author": author, "size": [snappedf(size.x, 0.01), snappedf(size.y, 0.01)],
+		"version": version, "author": author, "size": [r2(size.x), r2(size.y)],
 		"modes": modes.duplicate(), "flags": flags.duplicate(true), "removed_builtins": removed_builtins.duplicate(),
 		"props": pr, "markers": mk}
 	if description != "":
@@ -683,15 +683,25 @@ func to_dict() -> Dictionary:
 	return out
 
 
+## Rounding for serialization: roundf(v * 100) / 100 is the double closest to the short decimal
+## (snappedf's multiply is not), so values survive JSON text round trips bit-exactly.
+static func r2(v: float) -> float:
+	return roundf(v * 100.0) / 100.0
+
+
+static func r1(v: float) -> float:
+	return roundf(v * 10.0) / 10.0
+
+
 static func prop_to_json(p: Dictionary) -> Dictionary:
 	var v: Vector3 = p["pos"]
-	var o := {"type": str(p["type"]), "pos": [snappedf(v.x, 0.01), snappedf(v.y, 0.01), snappedf(v.z, 0.01)],
-		"yaw": snappedf(rad_to_deg(float(p.get("yaw", 0.0))), 0.1)}
+	var o := {"type": str(p["type"]), "pos": [r2(v.x), r2(v.y), r2(v.z)],
+		"yaw": r1(rad_to_deg(float(p.get("yaw", 0.0))))}
 	if float(p.get("scale", 1.0)) != 1.0:
 		o["scale"] = float(p["scale"])
 	if p.has("pos2"):
 		var v2: Vector3 = p["pos2"]
-		o["pos2"] = [snappedf(v2.x, 0.01), snappedf(v2.y, 0.01), snappedf(v2.z, 0.01)]
+		o["pos2"] = [r2(v2.x), r2(v2.y), r2(v2.z)]
 	var params: Dictionary = p.get("params", {})
 	if not params.is_empty():
 		o["params"] = params.duplicate(true)
@@ -700,7 +710,7 @@ static func prop_to_json(p: Dictionary) -> Dictionary:
 
 static func marker_to_json(me: Dictionary) -> Dictionary:
 	var v: Vector3 = me["pos"]
-	var o := {"pos": [snappedf(v.x, 0.01), snappedf(v.y, 0.01), snappedf(v.z, 0.01)], "yaw": snappedf(rad_to_deg(float(me.get("yaw", 0.0))), 0.1),
+	var o := {"pos": [r2(v.x), r2(v.y), r2(v.z)], "yaw": r1(rad_to_deg(float(me.get("yaw", 0.0)))),
 		"team": int(me.get("team", -1))}
 	var s: Vector3 = me.get("size", Vector3.ZERO)
 	if s != Vector3.ZERO:
@@ -730,7 +740,8 @@ static func canonical(v):
 			var f: float = v
 			if is_finite(f) and floorf(f) == f and absf(f) < 9.0e15:
 				return int(f)
-			return snappedf(f, 0.0001)
+			var q := roundf(f * 10000.0) / 10000.0
+			return int(q) if floorf(q) == q else q
 		TYPE_DICTIONARY:
 			var out := {}
 			for k in v:
