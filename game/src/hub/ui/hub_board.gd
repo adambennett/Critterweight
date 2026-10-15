@@ -28,6 +28,7 @@ var status: Label
 var prompts: PromptBar
 var body_row: HBoxContainer
 var extra := {}                  ## builder-owned state
+var align := ""                  ## where frame() put the panel (HubScene frames your fighter beside it)
 
 
 func on_enter(p: Dictionary) -> void:
@@ -87,29 +88,30 @@ func services() -> HubServices:
 
 ## Standard board chrome: a light dimmer, a diegetic panel (right side by default) with eyebrow,
 ## title and the Clout chip, a scrolling list, an optional help panel and the prompt bar.
-func frame(eyebrow: String, title: String, width := 1020.0, with_help := true, align := "right") -> void:
+func frame(eyebrow: String, title: String, width := 1020.0, with_help := true, align_ := "right") -> void:
+	align = align_
 	add_dimmer(0.38)
 	var st: Array = KIND_STYLE.get(kind, ["#c9a227", "PanelPoster"])
 	var m := UiTheme.margin(64, 52, 44)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
-	var outer: BoxContainer = UiTheme.vbox(UiTheme.GAP_L) if align == "bottom" else UiTheme.hbox(UiTheme.GAP_L)
+	var outer: BoxContainer = UiTheme.vbox(UiTheme.GAP_L) if align_ == "bottom" else UiTheme.hbox(UiTheme.GAP_L)
 	m.add_child(outer)
-	if align != "left":
+	if align_ != "left":
 		outer.add_child(UiTheme.spacer())
 	if str(st[1]) == "ClipboardPanel":
 		panel = ClipboardPanel.new()
 	else:
 		panel = UiTheme.panel(str(st[1]), 26.0)
 	panel.custom_minimum_size = Vector2(width, 0)
-	if align == "bottom":
+	if align_ == "bottom":
 		panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		panel.size_flags_vertical = Control.SIZE_SHRINK_END
-		panel.custom_minimum_size = Vector2(width, 430)
+		panel.custom_minimum_size = Vector2(width, 560)     # the line + three rows of options
 	else:
 		panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	outer.add_child(panel)
-	if align == "center":
+	if align_ == "center":
 		outer.add_child(UiTheme.spacer())
 	var col := UiTheme.vbox(UiTheme.GAP_S)
 	panel.add_child(col)
@@ -144,6 +146,8 @@ func frame(eyebrow: String, title: String, width := 1020.0, with_help := true, a
 		help = HelpPanel.new(list, "Details")
 		help.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		help.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		# long rows must not squeeze the details into a one-word column (it would grow off screen)
+		help.custom_minimum_size = Vector2(340, 0)
 		body_row.add_child(help)
 	status = UiTheme.label("", "Caption", true)
 	status.custom_minimum_size = Vector2(400, 0)

@@ -30,6 +30,13 @@ static func leave() -> void:
 		App.quit()
 
 
+## A hub QA/bench command-line value (after "--"): --hub-pos, --hub-bench, --bench-seconds, ...
+static func cli(flag: String, fallback := "") -> String:
+	var a := OS.get_cmdline_user_args()
+	var i := a.find(flag)
+	return a[i + 1] if i >= 0 and i + 1 < a.size() else fallback
+
+
 ## Accessibility game speed never applies in the hub (it is a social space, not a fight).
 static func _restore_speed() -> void:
 	Engine.time_scale = 1.0

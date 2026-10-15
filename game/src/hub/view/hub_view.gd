@@ -235,8 +235,9 @@ func apply_quality(q: Dictionary) -> void:
 func _build_structure() -> void:
 	# yard around the building and the void under the separate regions
 	var yard := kit("_yard")
-	yard.floor_rect(Rect2(-60, -18.6, 120, 90), -0.02, Color("#3b3b40"), HubMeshKit.CONCRETE)
-	yard.floor_rect(Rect2(36, -8, 22, 16), -0.03, Color("#16151a"), HubMeshKit.PLAIN)
+	# (the yard stops short of the basement: the Boiler Room sits in darkness, not in a parking lot)
+	yard.floor_rect(Rect2(-60, -18.6, 90, 90), -0.02, Color("#3b3b40"), HubMeshKit.CONCRETE)
+	yard.floor_rect(Rect2(30, -14, 34, 28), -0.03, Color("#0b0a0d"), HubMeshKit.PLAIN)
 	yard.floor_rect(Rect2(36, -40, 24, 20), -0.04, Color("#2c2c33"), HubMeshKit.PLAIN)
 	for sid in HubLayout.SPACES:
 		var s: Dictionary = HubLayout.SPACES[sid]

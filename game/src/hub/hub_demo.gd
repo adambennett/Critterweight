@@ -11,7 +11,8 @@ extends RefCounted
 ##   secrets      every secret found (roof open, panel off, sign lit, pier open, pet)
 ##   toured       every public space discovered (Fast walk unlocked)
 ## --hub-board <kind[:arg]> opens a board after a second (talk:granny, station:gym_floor, run, spar,
-## lockers, records, booth, map, pause, lessons, shop, rest).
+## lockers, records, booth, map, pause, lessons, shop, rest) or starts an activity (activity:drill,
+## activity:crates, activity:bag:heavy). --hub-pos x,y,z[,yaw] places the fighter (HubScene).
 
 const UPGRADES := HubUpgradeProps.ALL_UPGRADES
 
@@ -61,6 +62,10 @@ static func open_board(scene: HubScene, spec: String) -> void:
 	var kind := parts[0]
 	var p := {}
 	match kind:
+		"activity":
+			# --hub-board activity:drill | activity:crates | activity:bag:heavy  (starts it, no board)
+			scene.mode.start_activity(parts[1] if parts.size() > 1 else "drill", parts[2] if parts.size() > 2 else "")
+			return
 		"talk":
 			p["npc"] = parts[1] if parts.size() > 1 else "granny"
 		"station":

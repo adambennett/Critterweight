@@ -88,6 +88,7 @@ func setup(k: String, model_path: String, pos: Vector3, yaw: float, h: float, is
 	bubble.outline_size = 12
 	bubble.outline_modulate = Color(0.07, 0.07, 0.1, 0.95)
 	bubble.modulate = Color(1, 1, 1, 0)
+	bubble.visible = false
 	bubble.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	bubble.width = 620
 	bubble.no_depth_test = true
@@ -129,7 +130,14 @@ func walk_to(p: Vector3, yaw: float, moving: bool) -> void:
 func say(text: String, seconds := 3.5) -> void:
 	bubble.text = text
 	_bubble_left = seconds
-	bubble.modulate = Color(1, 1, 1, 1)
+	_bubble_alpha(1.0)
+
+
+## Fill AND outline fade together (an outline left behind reads as dark ghost text).
+func _bubble_alpha(a: float) -> void:
+	bubble.modulate = Color(1, 1, 1, a)
+	bubble.outline_modulate = Color(0.07, 0.07, 0.1, 0.95 * a)
+	bubble.visible = a > 0.0
 
 
 func flinch() -> void:
@@ -165,4 +173,4 @@ func update(dt: float, player_pos: Vector3) -> void:
 	if _bubble_left > 0.0:
 		_bubble_left -= dt
 		if _bubble_left < 0.4:
-			bubble.modulate = Color(1, 1, 1, maxf(0.0, _bubble_left / 0.4))
+			_bubble_alpha(maxf(0.0, _bubble_left / 0.4))

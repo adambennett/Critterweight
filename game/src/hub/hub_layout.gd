@@ -16,6 +16,9 @@ const DOOR_H := 2.4
 
 ## id -> {name, rect: Rect2 (x, z, width, depth), floor, height, room (Audio.set_room id), area,
 ##        exterior, secret, cam: [pitch_deg, distance, yaw_deg = 0 (camera south of you)], arrive: [Vector3, yaw_deg], landmark}
+## (The Locker Room and the Office look south, at the lockers and at Snappington, who face their
+## doors; the Loading Dock looks west along the quay. HubCamera keeps your walking heading while it
+## turns, until you let go of the stick.)
 const SPACES := {
 	"main_floor": {"name": "Main Floor", "rect": Rect2(-12, -8, 24, 16), "floor": 0.0, "height": 7.0, "room": "main", "area": "cannery",
 		"cam": [54.0, 10.5], "arrive": [Vector3(-4.0, 0, -0.5), 180.0], "landmark": "the heavy bags"},
@@ -26,9 +29,9 @@ const SPACES := {
 	"loading_dock": {"name": "Loading Dock", "rect": Rect2(-10, -18.6, 20, 10.6), "floor": 0.0, "height": 0.0, "room": "dock", "area": "cannery", "exterior": true,
 		"cam": [56.0, 11.5, 90.0], "arrive": [Vector3(0.0, 0, -10.2), 0.0], "landmark": "the chum cannon"},
 	"locker_room": {"name": "Locker Room", "rect": Rect2(-12, 8, 12, 8), "floor": 0.0, "height": 3.5, "room": "locker", "area": "cannery",
-		"cam": [58.0, 8.5], "arrive": [Vector3(-7.0, 0, 9.6), 0.0], "landmark": "the belt case"},
+		"cam": [58.0, 8.5, 180.0], "arrive": [Vector3(-7.0, 0, 9.6), 0.0], "landmark": "the belt case"},
 	"office": {"name": "Commissioner's Office", "rect": Rect2(6, 8, 8, 6), "floor": 4.0, "height": 3.0, "room": "office", "area": "cannery",
-		"cam": [58.0, 8.0], "arrive": [Vector3(10.5, 4.0, 9.4), 0.0], "landmark": "Snappington's desk"},
+		"cam": [58.0, 8.0, 180.0], "arrive": [Vector3(10.5, 4.0, 9.4), 0.0], "landmark": "Snappington's desk"},
 	"booth": {"name": "Broadcast Booth", "rect": Rect2(0, 8, 6, 4), "floor": 3.0, "height": 2.6, "room": "booth", "area": "cannery",
 		"cam": [60.0, 7.0], "arrive": [Vector3(0.9, 3.0, 10.8), 90.0], "landmark": "the ON AIR sign"},
 	"boiler_room": {"name": "Boiler Room", "rect": Rect2(40, -5, 14, 10), "floor": 0.0, "height": 4.0, "room": "boiler", "area": "basement",

@@ -500,11 +500,11 @@ func _booth() -> void:
 	k.cyl(Vector3(1.6, y + 0.45, 9.6), Vector3(1.6, y + 0.52, 9.6), 0.26, GOLD.darkened(0.3), 10)
 	# the dusty tape under the desk (only a crouching fighter can reach it)
 	k.box(Vector3(1.35, y + 0.03, 9.1), Vector3(0.12, 0.03, 0.08), Color("#3a3a3a"))
-	# ON AIR sign
-	k.box(Vector3(3.0, y + 2.25, 11.83), Vector3(1.1, 0.36, 0.06), INK)
-	neon_text("ON AIR", Vector3(3.0, y + 2.2, 11.79), PI, 0.26, Color("#ff3b3b"), 3.0)
+	# ON AIR sign over the window, facing into the booth (and the camera)
+	k.box(Vector3(3.0, y + 2.45, 8.2), Vector3(1.1, 0.26, 0.06), INK)
+	neon_text("ON AIR", Vector3(3.0, y + 2.42, 8.25), 0.0, 0.22, Color("#ff3b3b"), 3.0)
 	v.omni(Vector3(3.0, y + 1.9, 10.6), Color("#ffd2a8"), 1.0, 5.0)
-	v.omni(Vector3(3.0, y + 2.1, 11.4), Color("#ff3b3b"), 0.5, 3.0)
+	v.omni(Vector3(3.0, y + 2.1, 8.7), Color("#ff3b3b"), 0.5, 3.0)
 
 
 # ---- Loading Dock -------------------------------------------------------------------------------

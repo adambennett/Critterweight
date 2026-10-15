@@ -108,9 +108,20 @@ func start(p: Dictionary) -> void:
 	if str(p.get("cam_yaw", "")) != "":
 		camera.yaw = deg_to_rad(float(p["cam_yaw"]))
 		camera.snap()
+	# QA captures: --hub-pos x,y,z[,yaw_deg] places the fighter inside the arrival space
+	# (never split_floats an empty string: Godot 4.5 aborts on it)
+	var pos_arg := Cannery.cli("--hub-pos")
+	if pos_arg.count(",") >= 2:
+		var at := pos_arg.split_floats(",")
+		mode.teleport(player(), Vector3(at[0], at[1], at[2]), deg_to_rad(at[3]) if at.size() > 3 else 0.0)
 	if str(p.get("board", "")) != "":
 		var board := str(p["board"])
 		get_tree().create_timer(1.2).timeout.connect(func() -> void: HubDemo.open_board(self, board))
+	if OS.get_cmdline_user_args().has("--hub-bench"):
+		var bench := HubBench.new()
+		bench.scene = self
+		add_child(bench)
+		bench.run.call_deferred()
 
 
 func _secret_space_open(spot: String) -> bool:
@@ -199,6 +210,11 @@ func _process(dt: float) -> void:
 	creature_view.render(Engine.get_physics_interpolation_fraction())
 	creature_view.hype = player().hype / 100.0
 	camera.target = player().pos()
+	var board := App.top_screen() as HubBoard
+	var shift := Vector2.ZERO
+	if board != null:
+		shift = {"right": Vector2(0.4, 0.0), "bottom": Vector2(0.0, 0.34)}.get(board.align, Vector2.ZERO)
+	camera.frame_shift = shift
 	view.update(dt, camera, player().pos())
 	hud.update_hud(dt, mode, state)
 	_update_fade(dt)

@@ -62,6 +62,7 @@ func _ready() -> void:
 	wv.add_child(_space)
 	wv.add_child(_tod)
 	where.add_child(wv)
+	where.size_flags_vertical = Control.SIZE_SHRINK_BEGIN      # the activity panel is taller
 	top.add_child(where)
 	top.add_child(UiTheme.spacer())
 	_activity = UiTheme.panel("PanelPoster", 16.0)
@@ -91,6 +92,7 @@ func _ready() -> void:
 	cv.add_child(_clout_gain)
 	cl.add_child(cv)
 	cl.custom_minimum_size = Vector2(220, 0)
+	cl.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	top.add_child(cl)
 	# middle: countdown + banner
 	var mid := UiTheme.vbox(UiTheme.GAP_S)
