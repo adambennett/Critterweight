@@ -2,7 +2,7 @@
   "_doc": "Hub activity tuning (docs/design/HUB.md §3, docs/HUB_SYSTEMS.md §5). Bag points use the combat damage formula (closing speed quality q and contact cleanliness): base = move damage x (0.55 + 0.6 q) x (0.75 + 0.25 clean) x (1 + charge x charge_damage); points = base x points_per_damage x class multiplier (Heavy x1.5, Finisher x2) x combo multiplier (+combo_step per hit landed within combo_window s, capped). Tiers pay Clout once per tier (bags: once per tier per fighter).",
   "items": [
     {"id": "act_bags", "type": "activity", "name": "Heavy Bag Score Challenge", "duration": 30.0, "countdown": 3.0,
-     "points_per_damage": 6.0, "heavy_mult": 1.5, "finisher_mult": 2.0, "combo_window": 0.6, "combo_step": 0.1, "combo_max": 2.0,
+     "points_per_damage": 3.0, "heavy_mult": 1.5, "finisher_mult": 2.0, "combo_window": 0.6, "combo_step": 0.1, "combo_max": 2.0,
      "tiers": [300, 600, 1000], "clout": [10, 25, 50],
      "bags": {
        "light": {"name": "Light bag", "desc": "Speed: every hit counts, quick strings build the combo faster.", "base_bonus": 6.0, "combo_step_mult": 1.6, "quality_weight": 0.5},

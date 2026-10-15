@@ -885,7 +885,8 @@ func _update_flying() -> void:
 			_return_from_water(str(item_id))
 			continue
 		var half := 0.31 if str(fl["kind"]) == "crate" else 0.2
-		var landed := age > 0.12 and body.linear_velocity.y <= 0.5 and p.y <= half + 0.12 + _floor_under(p)
+		var over_water := p.z < HubLayout.WATER_EDGE_Z and HubLayout.space_at(p + Vector3.UP * 0.5) == ""
+		var landed := age > 0.12 and not over_water and body.linear_velocity.y <= 0.5 and p.y <= half + 0.12 + _floor_under(p)
 		if landed or age > 4.0:
 			flying.erase(item_id)
 			emit_hub({"type": "hub_land", "item": item_id, "pos": p, "dist": dist})

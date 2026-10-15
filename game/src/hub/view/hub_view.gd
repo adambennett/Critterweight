@@ -79,23 +79,37 @@ func build(m: HubMode, s: HubState) -> void:
 	glass_mat.roughness = 0.08
 	glass_mat.metallic_specular = 0.9
 	glass_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var t0 := Time.get_ticks_usec()
 	_build_environment()
 	_build_structure()
+	var t1 := Time.get_ticks_usec()
 	dressing = HubDressing.new()
 	dressing.build(self)
+	var t2 := Time.get_ticks_usec()
 	_commit_batches()
+	var t3 := Time.get_ticks_usec()
 	_build_water()
 	_build_npcs()
+	var t4 := Time.get_ticks_usec()
 	props = HubPropsView.new()
 	add_child(props)
 	props.build(self)
 	upgrades = HubUpgradeProps.new()
 	add_child(upgrades)
 	upgrades.build(self)
+	var t5 := Time.get_ticks_usec()
 	ambient = HubAmbient.new()
 	add_child(ambient)
 	ambient.build(self)
 	apply_time_of_day(tod)
+	var t6 := Time.get_ticks_usec()
+	var verts := 0
+	for k in batches:
+		var mi := batches[k] as MeshInstance3D
+		if mi and mi.mesh:
+			verts += mi.mesh.surface_get_array_len(0)
+	Log.i("hub", "view build ms: structure %.0f dressing %.0f commit %.0f water+npcs %.0f props+upgrades %.0f ambient %.0f; batch verts %d" % [
+		(t1 - t0) / 1000.0, (t2 - t1) / 1000.0, (t3 - t2) / 1000.0, (t4 - t3) / 1000.0, (t5 - t4) / 1000.0, (t6 - t5) / 1000.0, verts])
 
 
 ## A batch (HubMeshKit) for a space; everything added to it becomes one mesh.

@@ -200,12 +200,16 @@ func _main_floor() -> void:
 	for c in [Vector2(er.position.x, er.end.y), Vector2(er.position.x, er.position.y)]:
 		k.box(Vector3(c.x, 2.3, c.y), Vector3(0.14, 4.6, 0.14), STEEL.darkened(0.15))
 	elevator_sign = label("FREIGHT  -  OUT OF ORDER", Vector3(er.get_center().x, 3.2, er.end.y + 0.06), 0.0, 44, Color("#ff5a5a"), F_COND)
-	# fluorescent tubes (dead until the gym is fixed up: HubUpgradeProps lights them)
-	var spots := [Vector3(-7.0, 6.3, -4.0), Vector3(-7.0, 6.3, 3.0), Vector3(0.0, 6.3, -4.0), Vector3(0.0, 6.3, 3.0), Vector3(6.5, 6.3, -4.0), Vector3(6.5, 6.3, 3.0)]
-	for sp: Vector3 in spots:
-		k.box(sp + Vector3.UP * 0.08, Vector3(2.4, 0.08, 0.36), STEEL.darkened(0.3))
-		k.cyl(sp + Vector3(0, 0.12, 0), sp + Vector3(0, 0.7, 0), 0.012, INK, 4)
-		fluorescents.append(neon_box(sp, Vector3(2.2, 0.06, 0.12), Color("#e8f4ff"), 3.0))
+	# wall-mounted fluorescent tubes (dead/flickering until the gym is fixed up: HubUpgradeProps).
+	# Mounted on the walls, not hung from the ceiling, so they never sit between the camera and you.
+	var tubes := [[Vector3(-7.5, 6.3, -7.78), 0.0], [Vector3(7.5, 6.3, -7.78), 0.0], [Vector3(-11.78, 5.2, -4.5), PI * 0.5],
+		[Vector3(-11.78, 5.2, 5.0), PI * 0.5], [Vector3(11.78, 5.2, -5.0), -PI * 0.5], [Vector3(11.78, 5.2, 5.6), -PI * 0.5]]
+	for tb in tubes:
+		var sp: Vector3 = tb[0]
+		var rot := float(tb[1])
+		var bas := Basis(Vector3.UP, rot)
+		k.box(sp - bas * Vector3(0, 0, 0.04), Vector3(2.4, 0.22, 0.1), STEEL.darkened(0.3), HubMeshKit.PLAIN, true, bas)
+		fluorescents.append(neon_box(sp + bas * Vector3(0, 0, 0.03), Vector3(2.2, 0.07, 0.07), Color("#e8f4ff"), 3.0, Vector3(0, rot, 0)))
 	# hanging lights for the gym (energies adjusted by HubUpgradeProps when the tubes are fixed)
 	for sp2: Vector3 in [Vector3(-6.5, 5.6, -0.5), Vector3(0.5, 5.6, -0.5), Vector3(7.0, 5.6, 1.0)]:
 		var o := v.omni(sp2, Color("#f2efe6"), 1.3, 11.0)
@@ -277,16 +281,16 @@ func _cage() -> void:
 	cage_banner = Node3D.new()
 	cage_banner.name = "CageBanner"
 	v.add_child(cage_banner)
-	cage_banner.position = Vector3(c.x, 5.3, c.z + 3.4)
+	cage_banner.position = Vector3(4.3, 5.0, -7.78)      # on the north wall above the cage
 	var bk := HubMeshKit.new()
-	bk.box(Vector3(0, 0, 0), Vector3(5.2, 1.5, 0.05), Color("#2f6b1f"), HubMeshKit.PLAIN, true)
-	bk.cyl(Vector3(-2.7, 0.78, 0), Vector3(2.7, 0.78, 0), 0.04, STEEL, 6)
+	bk.box(Vector3(0, 0, 0), Vector3(4.2, 1.5, 0.05), Color("#2f6b1f"), HubMeshKit.PLAIN, true)
+	bk.cyl(Vector3(-2.2, 0.78, 0), Vector3(2.2, 0.78, 0), 0.04, STEEL, 6)
 	var bm := bk.commit("BannerCloth", v.surface_mat)
 	cage_banner.add_child(bm)
 	var bl := Label3D.new()
 	bl.text = "GLANDCO"
 	bl.font = load(F_BUNGEE)
-	bl.font_size = 110
+	bl.font_size = 96
 	bl.pixel_size = 0.006
 	bl.modulate = Color("#e8f7c8")
 	bl.position = Vector3(0, 0.12, 0.04)
@@ -352,7 +356,6 @@ func _juice_bar() -> void:
 	for p in [Vector3(-19.2, 3.2, -5.2), Vector3(-15.0, 3.2, -2.5)]:
 		k.cyl(p + Vector3.UP * 0.1, p + Vector3.UP * 0.8, 0.01, INK, 4)
 		k.cyl(p - Vector3.UP * 0.1, p + Vector3.UP * 0.1, 0.25, Color("#2f3a2d"), 10, HubMeshKit.PLAIN, true, true, 0.08)
-		neon_box(p - Vector3.UP * 0.12, Vector3(0.18, 0.06, 0.18), Color("#ffe6b8"), 3.0)
 
 
 # ---- Med Bay -----------------------------------------------------------------------------------

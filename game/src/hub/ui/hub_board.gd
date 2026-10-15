@@ -240,7 +240,7 @@ func _ask_leave() -> void:
 		[{"label": "Leave", "id": "leave", "danger": true}, {"label": "Stay", "id": "stay", "cancel": true, "default": true}],
 		func(id: String) -> void:
 			if id == "leave":
-				Hub.leave())
+				Cannery.leave())
 
 
 func _build_lessons() -> void:
@@ -261,7 +261,7 @@ func _start_lesson(i: int) -> void:
 	if scene != null:
 		fid = scene.call("player").creature.id
 	Profiles.save()
-	Tutorial.start(i, fid, func() -> void: Hub.enter({"spot": "main_floor", "from": "tutorial"}))
+	Tutorial.start(i, fid, func() -> void: Cannery.enter({"spot": "main_floor", "from": "tutorial"}))
 
 
 func _build_shop() -> void:

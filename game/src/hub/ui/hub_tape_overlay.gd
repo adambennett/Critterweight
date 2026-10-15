@@ -87,4 +87,4 @@ func _leave() -> void:
 	if _left:
 		return
 	_left = true
-	Hub.enter({"spot": "booth", "from": "tape"})
+	Cannery.enter({"spot": "booth", "from": "tape"})

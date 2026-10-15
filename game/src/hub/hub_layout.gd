@@ -15,7 +15,7 @@ const WALL_T := 0.3
 const DOOR_H := 2.4
 
 ## id -> {name, rect: Rect2 (x, z, width, depth), floor, height, room (Audio.set_room id), area,
-##        exterior, secret, cam: [pitch_deg, distance], arrive: [Vector3, yaw_deg], landmark}
+##        exterior, secret, cam: [pitch_deg, distance, yaw_deg = 0 (camera south of you)], arrive: [Vector3, yaw_deg], landmark}
 const SPACES := {
 	"main_floor": {"name": "Main Floor", "rect": Rect2(-12, -8, 24, 16), "floor": 0.0, "height": 7.0, "room": "main", "area": "cannery",
 		"cam": [54.0, 10.5], "arrive": [Vector3(-4.0, 0, -0.5), 180.0], "landmark": "the heavy bags"},
@@ -24,7 +24,7 @@ const SPACES := {
 	"med_bay": {"name": "Med Bay", "rect": Rect2(12, -8, 8, 8), "floor": 0.0, "height": 4.0, "room": "med_bay", "area": "cannery",
 		"cam": [58.0, 8.5], "arrive": [Vector3(14.0, 0, -2.6), 90.0], "landmark": "the dumpster ice bath"},
 	"loading_dock": {"name": "Loading Dock", "rect": Rect2(-10, -18.6, 20, 10.6), "floor": 0.0, "height": 0.0, "room": "dock", "area": "cannery", "exterior": true,
-		"cam": [50.0, 11.0], "arrive": [Vector3(0.0, 0, -10.2), 0.0], "landmark": "the chum cannon"},
+		"cam": [56.0, 11.5, 90.0], "arrive": [Vector3(0.0, 0, -10.2), 0.0], "landmark": "the chum cannon"},
 	"locker_room": {"name": "Locker Room", "rect": Rect2(-12, 8, 12, 8), "floor": 0.0, "height": 3.5, "room": "locker", "area": "cannery",
 		"cam": [58.0, 8.5], "arrive": [Vector3(-7.0, 0, 9.6), 0.0], "landmark": "the belt case"},
 	"office": {"name": "Commissioner's Office", "rect": Rect2(6, 8, 8, 6), "floor": 4.0, "height": 3.0, "room": "office", "area": "cannery",

@@ -18,6 +18,7 @@ const FROST_TIME := 30.0
 const BELT_TAUNTS := 3
 const BOILER_HITS := 10
 const FISH_TIME := 20.0
+const SCRAPLING_SPEED := 2.6          ## a little slower than any fighter: catchable if you cut it off
 const FISH_POOL := ["hub_fish_electrolyte", "hub_fish_tonic", "hub_fish_jerky", "hub_fish_liniment", "hub_fish_lozenge", "hub_fish_shake"]
 
 var mode
@@ -250,7 +251,7 @@ func tick(dt: float) -> void:
 		else:
 			var target: Vector3 = run[leg + 1]
 			var cur: Vector3 = scrapling["pos"]
-			var step := 3.1 * dt
+			var step := SCRAPLING_SPEED * dt
 			var to := target - cur
 			if to.length() <= step:
 				scrapling["pos"] = target

@@ -17,6 +17,7 @@ var _dist := 10.5
 var _trauma := 0.0
 var _rng := RandomNumberGenerator.new()
 var _zoom := 1.0
+var _ease_to := INF            ## preferred yaw of the space just entered (eased in once; the stick cancels it)
 
 
 func _ready() -> void:
@@ -31,6 +32,9 @@ func set_space(space_id: String) -> void:
 	var cam: Array = s.get("cam", [54.0, 10.5])
 	pitch_deg = float(cam[0])
 	distance = float(cam[1])
+	var want := deg_to_rad(float(cam[2]) if cam.size() > 2 else 0.0)
+	if absf(wrapf(want - yaw, -PI, PI)) > 0.05:
+		_ease_to = want
 
 
 func add_trauma(t: float) -> void:
@@ -38,6 +42,9 @@ func add_trauma(t: float) -> void:
 
 
 func snap() -> void:
+	if _ease_to != INF:
+		yaw = _ease_to
+		_ease_to = INF
 	_focus = target
 	_pitch = pitch_deg
 	_dist = distance
@@ -48,6 +55,13 @@ func _process(dt: float) -> void:
 	var axis := Controls.camera_axis()
 	if App.top_screen() == null:
 		yaw = wrapf(yaw + axis * dt * 2.0, -PI, PI)
+		if absf(axis) > 0.01:
+			_ease_to = INF
+	if _ease_to != INF:
+		yaw = lerp_angle(yaw, _ease_to, MathX.damp_factor(0.35, dt))
+		if absf(wrapf(_ease_to - yaw, -PI, PI)) < 0.01:
+			yaw = _ease_to
+			_ease_to = INF
 	_focus = _focus.lerp(target, MathX.damp_factor(0.1, dt))
 	_pitch = lerpf(_pitch, pitch_deg, MathX.damp_factor(0.35, dt))
 	_dist = lerpf(_dist, distance * _zoom, MathX.damp_factor(0.35, dt))

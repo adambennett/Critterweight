@@ -4,7 +4,7 @@ extends Node3D
 ## the level physics, HubMode), its views (HubView, the fighter's CreatureView, Vfx), the follow
 ## camera, the HUD, the fades for hatches/ladders/elevator, the hub audio (Cannery Radio, room
 ## beds, footsteps through the match audio bridge) and the routing of hub events to boards,
-## barks and feedback. Created by Hub.enter(); App.set_scene() frees it when you leave.
+## barks and feedback. Created by Cannery.enter(); App.set_scene() frees it when you leave.
 
 const BARK_RANGE := 5.0
 const BARK_COOLDOWN := 26.0
@@ -47,14 +47,17 @@ func start(p: Dictionary) -> void:
 		HubDemo.apply(state, str(p["demo"]))
 	var spot := str(p.get("spot", ""))
 	if spot == "" or not HubLayout.SPACES.has(spot):
-		spot = state.spot()
+		# first visit: the Main Floor (HUB.md's hub spawn point); later: where you left off
+		spot = state.spot() if state.discovered().size() > 1 else "main_floor"
 	if bool(HubLayout.space(spot).get("secret", false)) and not _secret_space_open(spot):
 		spot = "main_floor"
-	var fighter := Hub.pick_fighter(state, str(p.get("fighter", "")))
+	var fighter := Cannery.pick_fighter(state, str(p.get("fighter", "")))
 	if state.loadout_fighter() == "":
 		state.set_loadout_fighter(fighter)
 	input = HubPlayerInput.new()
-	sim = Hub.build_sim(self, state, fighter, spot, input, int(Time.get_ticks_msec() % 100000) + 7)
+	var t0 := Time.get_ticks_usec()
+	sim = Cannery.build_sim(self, state, fighter, spot, input, int(Time.get_ticks_msec() % 100000) + 7)
+	Log.i("hub", "sim build ms: %.0f" % ((Time.get_ticks_usec() - t0) / 1000.0))
 	mode = sim.mode as HubMode
 	mode.auto_transition = false
 	mode.dodge_interacts = false

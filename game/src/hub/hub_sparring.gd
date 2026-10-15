@@ -44,8 +44,7 @@ static func arena_for(choices: Dictionary) -> ArenaDef:
 				a = Content.arena(str(id))
 				break
 	if a == null:
-		a = Tutorial.practice_cage()
-		a.display_name = "The Cannery Practice Cage"
+		a = Tutorial.practice_cage()    # the shared content arena "practice_cage" (never mutated here)
 	if bool(choices.get("hazards", false)):
 		var d := a.to_dict()
 		var hz: Array = d.get("hazards", [])
@@ -89,7 +88,7 @@ static func finished(spar: Dictionary, result: Dictionary) -> void:
 	var st := HubState.new(Profiles.current)
 	var rec := st.spar_record(str(spar.get("opponent", "")), str(spar.get("tier", "")), won, str(spar.get("fighter", "")))
 	Profiles.save()
-	Hub.enter({"spot": "main_floor", "from": "spar", "spar": {"won": won, "opponent": str(spar.get("opponent", "")), "tier": str(spar.get("tier", "")),
+	Cannery.enter({"spot": "main_floor", "from": "spar", "spar": {"won": won, "opponent": str(spar.get("opponent", "")), "tier": str(spar.get("tier", "")),
 		"clout": int(rec["clout"]), "badge": str(rec["badge"])}})
 
 
@@ -102,7 +101,7 @@ static func play_tape(_scene: Node) -> MatchScene:
 		"fighters": [{"creature": champ, "team": 0, "kind": "bot", "difficulty": BotTiers.brain_tier("headliner"), "name": "Snappington ('73)"},
 			{"creature": shadow, "team": 1, "kind": "bot", "difficulty": BotTiers.brain_tier("headliner"), "name": "???"}]}
 	Profiles.save()
-	var ms := App.start_match(cfg, func(_r: Dictionary) -> void: Hub.enter({"spot": "booth", "from": "tape"}))
+	var ms := App.start_match(cfg, func(_r: Dictionary) -> void: Cannery.enter({"spot": "booth", "from": "tape"}))
 	if ms:
 		ms.camera.mode = FightCamera.Mode.SPECTATE
 	return ms

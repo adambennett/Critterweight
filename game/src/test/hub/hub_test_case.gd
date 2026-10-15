@@ -69,7 +69,7 @@ func make_hub(fighter := "f_stoke", spot := "main_floor", prof := {}) -> MatchSi
 	state = HubState.new(profile)
 	driver = PathDriver.new()
 	var fid := fighter if Content.creature(fighter) != null else "dev_biped"
-	sim = Hub.build_sim(fresh_world(), state, fid, spot, driver, 7)
+	sim = Cannery.build_sim(fresh_world(), state, fid, spot, driver, 7)
 	mode = sim.mode as HubMode
 	mode.auto_transition = true
 	return sim

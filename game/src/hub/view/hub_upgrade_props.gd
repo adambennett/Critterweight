@@ -100,12 +100,12 @@ func _player_banner(want: bool) -> void:
 	player_banner.name = "PlayerBanner"
 	add_child(player_banner)
 	var c := HubLayout.CAGE_CENTER
-	player_banner.position = Vector3(c.x, 5.3, c.z + 3.4)
+	player_banner.position = Vector3(4.3, 5.0, -7.74)
 	var k := HubMeshKit.new()
-	k.box(Vector3.ZERO, Vector3(5.2, 1.5, 0.05), sec)
-	k.box(Vector3(0, 0, 0.03), Vector3(4.9, 1.25, 0.01), prim.darkened(0.2), HubMeshKit.PAINT)
-	k.sphere(Vector3(-1.7, 0.05, 0.05), 0.42, prim, 5, 10, HubMeshKit.PLAIN, true, Vector3(1, 1, 0.2))
-	k.cyl(Vector3(-2.7, 0.78, 0), Vector3(2.7, 0.78, 0), 0.04, Color("#5b6168"), 6)
+	k.box(Vector3.ZERO, Vector3(4.2, 1.5, 0.05), sec)
+	k.box(Vector3(0, 0, 0.03), Vector3(3.9, 1.25, 0.01), prim.darkened(0.2), HubMeshKit.PAINT)
+	k.sphere(Vector3(-1.4, 0.05, 0.05), 0.42, prim, 5, 10, HubMeshKit.PLAIN, true, Vector3(1, 1, 0.2))
+	k.cyl(Vector3(-2.2, 0.78, 0), Vector3(2.2, 0.78, 0), 0.04, Color("#5b6168"), 6)
 	player_banner.add_child(k.commit("Banner", v.surface_mat))
 	var l := Label3D.new()
 	l.text = str(d.get("name", "CHAMP")).to_upper()

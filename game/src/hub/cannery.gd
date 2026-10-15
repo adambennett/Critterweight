@@ -1,9 +1,10 @@
-class_name Hub
+class_name Cannery
 extends RefCounted
-## Entry points for THE CANNERY, the Fight Camp hub (docs/HUB_SYSTEMS.md §1).
-##   Hub.enter({spot, fighter, from})   leave whatever is running and walk into the hub
+## Entry points for THE CANNERY, the Fight Camp hub (docs/HUB_SYSTEMS.md §1). (Named Cannery, not
+## Hub: the campaign's co-op loopback transport owns an inner class called Hub.)
+##   Cannery.enter({spot, fighter, from})   leave whatever is running and walk into the hub
 ##                                      (App screen "hub" does the same: App.goto("hub", params))
-##   Hub.build_sim(parent, state, ...)  the hub's MatchSim (used by HubScene and the headless tests)
+##   Cannery.build_sim(parent, state, ...)  the hub's MatchSim (used by HubScene and the headless tests)
 ## params: spot = HubLayout space id to arrive in (default: where you left off), fighter = creature
 ## id to walk with (default: the Locker's choice, else the first roster fighter), from = "run" |
 ## "spar" | "tutorial" | "menu" (only changes the welcome line), result = a sparring result.
@@ -40,6 +41,8 @@ static func pick_fighter(state: HubState, wanted := "") -> String:
 		var cid := str(cand)
 		if cid != "" and Content.creature(cid) != null and Content.get_entry("creatures", cid).size() > 0:
 			return cid
+	if Content.creature(Tutorial.DEFAULT_FIGHTER) != null:
+		return Tutorial.DEFAULT_FIGHTER
 	var roster := Content.playable_creatures().filter(func(c): return str(c).begins_with("f_"))
 	if not roster.is_empty():
 		return str(roster[0])

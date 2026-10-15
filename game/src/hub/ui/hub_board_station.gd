@@ -161,5 +161,7 @@ static func build_run(b: HubBoard, _p: Dictionary) -> void:
 			Audio.ui("ui_error")
 			b.set_status(str(r.get("error", "The Commission refused.")), "Danger"))
 	b.list.content.add_child(start)
+	b.button("Campaign menu (suspended runs, co-op lobby)", sv.open_campaign_menu, "Campaign menu",
+		"Resume a suspended Fight Camp run, host co-op, or open the Cannery Ledger.", "", "campaign")
 	b.set_status("Clout %d  ·  Cannery upgrades owned %d / 24 (they apply to this run)." % [st.clout(), st.upgrades_owned()])
 	b.focus_first()
