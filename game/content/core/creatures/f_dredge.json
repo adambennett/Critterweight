@@ -1,0 +1,645 @@
+{
+ "id": "f_dredge",
+ "name": "Dredge",
+ "title": "the Dock Crab",
+ "element": "brine",
+ "npc_only": false,
+ "tags": [
+  "fighter",
+  "crab",
+  "absolute_unit"
+ ],
+ "stats": {
+  "health": 140,
+  "walk_speed": 2.6,
+  "accel": 22,
+  "turn_rate": 5.5,
+  "stamina": 90,
+  "stamina_regen": 12,
+  "poise": 90,
+  "poise_regen": 15,
+  "dodge_speed": 7.3,
+  "dodge_time": 0.3,
+  "power": 1,
+  "defense": 1,
+  "weight": 1
+ },
+ "body": {
+  "id": "f_dredge_body",
+  "name": "Dredge",
+  "gait": "crab",
+  "hover_height": 0.55,
+  "stride": 0.45,
+  "step_height": 0.1,
+  "step_time": 0.2,
+  "segments": [
+   {
+    "id": "shell",
+    "pivot": [0, 0.55, 0],
+    "mass": 78,
+    "part": "shell",
+    "hurt": 0.7,
+    "w0": 30,
+    "guard": true,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [-0.42, 0.58, 0],
+      "b": [0.42, 0.58, 0],
+      "radius": 0.32
+     },
+     {
+      "type": "capsule",
+      "a": [0, 0.56, -0.28],
+      "b": [0, 0.56, 0.3],
+      "radius": 0.3
+     }
+    ]
+   },
+   {
+    "id": "head",
+    "parent": "shell",
+    "pivot": [0, 0.82, 0.38],
+    "mass": 4,
+    "part": "head",
+    "hurt": 1.5,
+    "w0": 26,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [0.1, 0.84, 0.4],
+      "b": [0.12, 1.06, 0.42],
+      "radius": 0.05
+     },
+     {
+      "type": "capsule",
+      "a": [-0.1, 0.84, 0.4],
+      "b": [-0.12, 1.06, 0.42],
+      "radius": 0.05
+     }
+    ]
+   },
+   {
+    "id": "uclaw_l",
+    "parent": "shell",
+    "pivot": [0.42, 0.62, 0.38],
+    "mass": 7,
+    "part": "arm",
+    "guard": true,
+    "hurt": 0.6,
+    "w0": 44,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [0.44, 0.63, 0.4],
+      "b": [0.7, 0.72, 0.6],
+      "radius": 0.07
+     }
+    ]
+   },
+   {
+    "id": "claw_l",
+    "parent": "uclaw_l",
+    "pivot": [0.7, 0.72, 0.6],
+    "mass": 9,
+    "part": "arm",
+    "guard": true,
+    "hurt": 0.5,
+    "w0": 46,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [0.7, 0.72, 0.62],
+      "b": [0.5, 0.7, 0.94],
+      "radius": 0.09
+     },
+     {
+      "type": "sphere",
+      "center": [0.46, 0.7, 0.99],
+      "radius": 0.07
+     }
+    ]
+   },
+   {
+    "id": "uclaw_r",
+    "parent": "shell",
+    "pivot": [-0.42, 0.62, 0.38],
+    "mass": 10,
+    "part": "arm",
+    "guard": true,
+    "hurt": 0.6,
+    "w0": 36,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [-0.44, 0.63, 0.4],
+      "b": [-0.74, 0.74, 0.62],
+      "radius": 0.1
+     }
+    ]
+   },
+   {
+    "id": "claw_r",
+    "parent": "uclaw_r",
+    "pivot": [-0.74, 0.74, 0.62],
+    "mass": 16,
+    "part": "arm",
+    "guard": true,
+    "hurt": 0.6,
+    "w0": 36,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [-0.74, 0.74, 0.64],
+      "b": [-0.54, 0.67, 0.96],
+      "radius": 0.16
+     },
+     {
+      "type": "sphere",
+      "center": [-0.5, 0.66, 1.04],
+      "radius": 0.12
+     }
+    ]
+   },
+   {
+    "id": "uleg_fl",
+    "parent": "shell",
+    "pivot": [0.5, 0.5, 0.25],
+    "mass": 5,
+    "part": "leg",
+    "hurt": 0.5,
+    "w0": 40,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [0.52, 0.52, 0.25],
+      "b": [0.82, 0.78, 0.3],
+      "radius": 0.07
+     }
+    ]
+   },
+   {
+    "id": "lleg_fl",
+    "parent": "uleg_fl",
+    "pivot": [0.82, 0.78, 0.3],
+    "mass": 4,
+    "part": "leg",
+    "hurt": 0.4,
+    "w0": 44,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [0.82, 0.76, 0.3],
+      "b": [0.99, 0.1, 0.36],
+      "radius": 0.055
+     },
+     {
+      "type": "sphere",
+      "center": [1, 0.06, 0.36],
+      "radius": 0.05
+     }
+    ]
+   },
+   {
+    "id": "uleg_bl",
+    "parent": "shell",
+    "pivot": [0.5, 0.5, -0.25],
+    "mass": 5,
+    "part": "leg",
+    "hurt": 0.5,
+    "w0": 40,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [0.52, 0.52, -0.25],
+      "b": [0.82, 0.78, -0.3],
+      "radius": 0.07
+     }
+    ]
+   },
+   {
+    "id": "lleg_bl",
+    "parent": "uleg_bl",
+    "pivot": [0.82, 0.78, -0.3],
+    "mass": 4,
+    "part": "leg",
+    "hurt": 0.4,
+    "w0": 44,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [0.82, 0.76, -0.3],
+      "b": [0.99, 0.1, -0.36],
+      "radius": 0.055
+     },
+     {
+      "type": "sphere",
+      "center": [1, 0.06, -0.36],
+      "radius": 0.05
+     }
+    ]
+   },
+   {
+    "id": "uleg_fr",
+    "parent": "shell",
+    "pivot": [-0.5, 0.5, 0.25],
+    "mass": 5,
+    "part": "leg",
+    "hurt": 0.5,
+    "w0": 40,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [-0.52, 0.52, 0.25],
+      "b": [-0.82, 0.78, 0.3],
+      "radius": 0.07
+     }
+    ]
+   },
+   {
+    "id": "lleg_fr",
+    "parent": "uleg_fr",
+    "pivot": [-0.82, 0.78, 0.3],
+    "mass": 4,
+    "part": "leg",
+    "hurt": 0.4,
+    "w0": 44,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [-0.82, 0.76, 0.3],
+      "b": [-0.99, 0.1, 0.36],
+      "radius": 0.055
+     },
+     {
+      "type": "sphere",
+      "center": [-1, 0.06, 0.36],
+      "radius": 0.05
+     }
+    ]
+   },
+   {
+    "id": "uleg_br",
+    "parent": "shell",
+    "pivot": [-0.5, 0.5, -0.25],
+    "mass": 5,
+    "part": "leg",
+    "hurt": 0.5,
+    "w0": 40,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [-0.52, 0.52, -0.25],
+      "b": [-0.82, 0.78, -0.3],
+      "radius": 0.07
+     }
+    ]
+   },
+   {
+    "id": "lleg_br",
+    "parent": "uleg_br",
+    "pivot": [-0.82, 0.78, -0.3],
+    "mass": 4,
+    "part": "leg",
+    "hurt": 0.4,
+    "w0": 44,
+    "shapes": [
+     {
+      "type": "capsule",
+      "a": [-0.82, 0.76, -0.3],
+      "b": [-0.99, 0.1, -0.36],
+      "radius": 0.055
+     },
+     {
+      "type": "sphere",
+      "center": [-1, 0.06, -0.36],
+      "radius": 0.05
+     }
+    ]
+   }
+  ],
+  "chains": {
+   "arm_l": {
+    "segments": [
+     "uclaw_l",
+     "claw_l"
+    ],
+    "effector": [0.46, 0.7, 1],
+    "pole": [0.96, 0.25, -0.1]
+   },
+   "arm_r": {
+    "segments": [
+     "uclaw_r",
+     "claw_r"
+    ],
+    "effector": [-0.5, 0.66, 1.05],
+    "pole": [-0.93, 0.33, -0.13]
+   },
+   "leg_fl": {
+    "segments": [
+     "uleg_fl",
+     "lleg_fl"
+    ],
+    "effector": [1, 0.06, 0.36],
+    "leg": true,
+    "group": 0,
+    "home": [1, 0.06, 0.36]
+   },
+   "leg_bl": {
+    "segments": [
+     "uleg_bl",
+     "lleg_bl"
+    ],
+    "effector": [1, 0.06, -0.36],
+    "leg": true,
+    "group": 1,
+    "home": [1, 0.06, -0.36]
+   },
+   "leg_fr": {
+    "segments": [
+     "uleg_fr",
+     "lleg_fr"
+    ],
+    "effector": [-1, 0.06, 0.36],
+    "leg": true,
+    "group": 1,
+    "home": [-1, 0.06, 0.36]
+   },
+   "leg_br": {
+    "segments": [
+     "uleg_br",
+     "lleg_br"
+    ],
+    "effector": [-1, 0.06, -0.36],
+    "leg": true,
+    "group": 0,
+    "home": [-1, 0.06, -0.36]
+   }
+  },
+  "weapons": {
+   "claw_crusher": {
+    "segment": "claw_r",
+    "point": [-0.5, 0.66, 1.04],
+    "radius": 0.17
+   },
+   "claw_cutter": {
+    "segment": "claw_l",
+    "point": [0.46, 0.7, 0.99],
+    "radius": 0.11
+   },
+   "shell_edge": {
+    "segment": "shell",
+    "point": [0, 0.6, 0.44],
+    "radius": 0.4
+   },
+   "shell_side_l": {
+    "segment": "shell",
+    "point": [0.62, 0.58, 0],
+    "radius": 0.36
+   },
+   "shell_side_r": {
+    "segment": "shell",
+    "point": [-0.62, 0.58, 0],
+    "radius": 0.36
+   },
+   "head": {
+    "segment": "head",
+    "point": [0, 0.95, 0.42],
+    "radius": 0.14
+   },
+   "leg_tip_fl": {
+    "segment": "lleg_fl",
+    "point": [1, 0.06, 0.36],
+    "radius": 0.08
+   },
+   "leg_tip_fr": {
+    "segment": "lleg_fr",
+    "point": [-1, 0.06, 0.36],
+    "radius": 0.08
+   }
+  },
+  "poses": {
+   "stance": {
+    "chains": {
+     "arm_l": {
+      "target": [0.46, 0.72, 0.98]
+     },
+     "arm_r": {
+      "target": [-0.5, 0.68, 1.02]
+     }
+    },
+    "joints": {
+     "head": [-5, 0, 0]
+    },
+    "height": 0
+   },
+   "guard": {
+    "chains": {
+     "arm_l": {
+      "target": [0.28, 0.9, 0.78]
+     },
+     "arm_r": {
+      "target": [-0.32, 0.9, 0.74]
+     }
+    },
+    "joints": {
+     "head": [10, 0, 0]
+    },
+    "height": -0.08
+   }
+  }
+ },
+ "moves": {
+  "l1": {
+   "_stub": true,
+   "name": "Cutter Snip",
+   "duration": 0.46,
+   "cancel": 0.24,
+   "damage": 5,
+   "knockback": 1.6,
+   "stun": 0.3,
+   "poise": 8,
+   "stamina": 5,
+   "vmin": 1.2,
+   "vref": 4.5,
+   "speed": 1.5,
+   "lunge": [
+    [0.06, 0.16, 1.6]
+   ],
+   "move_mult": 0.3,
+   "element": "brine",
+   "buildup": 12,
+   "hit": [
+    {
+     "t0": 0.14,
+     "t1": 0.26,
+     "weapons": [
+      "claw_cutter"
+     ]
+    }
+   ],
+   "keys": [
+    {
+     "t": 0
+    },
+    {
+     "t": 0.06,
+     "chains": {
+      "arm_l": [0.52, 0.78, 0.8]
+     }
+    },
+    {
+     "t": 0.16,
+     "chains": {
+      "arm_l": [0.3, 0.8, 1.36]
+     }
+    },
+    {
+     "t": 0.26,
+     "chains": {
+      "arm_l": [0.3, 0.8, 1.36]
+     }
+    },
+    {
+     "t": 0.46
+    }
+   ]
+  },
+  "heavy": {
+   "_stub": true,
+   "name": "Crusher Slam",
+   "duration": 0.9,
+   "cancel": 0.7,
+   "cancel_on_hit": true,
+   "damage": 14,
+   "knockback": 2.2,
+   "stun": 0.6,
+   "poise": 30,
+   "stamina": 12,
+   "vmin": 1.6,
+   "vref": 6,
+   "speed": 1.4,
+   "charge_time": 0.8,
+   "charge_damage": 0.3,
+   "lunge": [
+    [0.3, 0.42, 2]
+   ],
+   "element": "brine",
+   "buildup": 30,
+   "armor": [
+    [
+     0,
+     0.32
+    ]
+   ],
+   "hit": [
+    {
+     "t0": 0.32,
+     "t1": 0.46,
+     "weapons": [
+      "claw_crusher"
+     ]
+    }
+   ],
+   "keys": [
+    {
+     "t": 0
+    },
+    {
+     "t": 0.22,
+     "chains": {
+      "arm_r": [-0.5, 1.45, 0.55]
+     },
+     "lean": [-6, 0, 0]
+    },
+    {
+     "t": 0.38,
+     "chains": {
+      "arm_r": [-0.35, 0.28, 1.15]
+     },
+     "lean": [12, 0, 0]
+    },
+    {
+     "t": 0.5,
+     "chains": {
+      "arm_r": [-0.35, 0.2, 1.1]
+     },
+     "lean": [10, 0, 0]
+    },
+    {
+     "t": 0.9
+    }
+   ]
+  },
+  "grab": {
+   "_stub": true,
+   "name": "Clamp",
+   "kind": "grab",
+   "duration": 0.7,
+   "damage": 0,
+   "stamina": 6,
+   "speed": 1.3,
+   "lunge": [
+    [0.06, 0.2, 1.8]
+   ],
+   "hit": [
+    {
+     "t0": 0.14,
+     "t1": 0.34,
+     "weapons": [
+      "claw_crusher"
+     ]
+    }
+   ],
+   "keys": [
+    {
+     "t": 0
+    },
+    {
+     "t": 0.16,
+     "chains": {
+      "arm_r": [-0.22, 0.72, 1.3],
+      "arm_l": [0.4, 0.78, 0.95]
+     },
+     "lean": [8, 0, 0]
+    },
+    {
+     "t": 0.34,
+     "chains": {
+      "arm_r": [-0.22, 0.72, 1.3],
+      "arm_l": [0.4, 0.78, 0.95]
+     },
+     "lean": [8, 0, 0]
+    },
+    {
+     "t": 0.7
+    }
+   ]
+  }
+ },
+ "abilities": {},
+ "art": {
+  "model": "res://assets/models/creatures/f_dredge.glb",
+  "palette": {
+   "primary": "#8C3B2B",
+   "secondary": "#B9B3A6",
+   "accent": "#2E9BE0",
+   "belly": "#E8D9B8",
+   "tips": "#2E2A28",
+   "chain": "#7A7F85",
+   "eyes": "#DDF3FF"
+  },
+  "roughness": 0.5,
+  "outline": 0.012,
+  "hype_feature": "barnacle glow",
+  "gore_piece": {
+   "segment": "claw_l",
+   "offset": [-0.24, -0.02, 0.39],
+   "size": 0.05,
+   "shape": "horn",
+   "color": "#2E2A28"
+  }
+ },
+ "audio": {},
+ "ai": {}
+}

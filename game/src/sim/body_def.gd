@@ -330,6 +330,15 @@ func _parse_chain(cname: String, cd) -> void:
 		c.effector_local = c.effector_rest - s1.pivot
 		if c.len1 < 0.01 or c.len2 < 0.01:
 			_err("chain '%s' has degenerate bone lengths" % cname)
+		if not cd.has("pole"):
+			# Default bend hint = the direction the rest elbow/knee already bends toward, so the
+			# IK reproduces the rest pose exactly (no muscle torque at rest). An authored pole must
+			# contain the rest bend for the same reason (docs/CREATURES.md "poles").
+			var axis := (c.effector_rest - s0.pivot).normalized()
+			var mid := s1.pivot - s0.pivot
+			var perp := mid - axis * mid.dot(axis)
+			if perp.length() > 0.005:
+				c.pole = perp.normalized()
 		c.foot_home = MathX.vec3(cd.get("home", [c.effector_rest.x, c.effector_rest.y, c.effector_rest.z])) * scale
 	chains[cname] = c
 	if c.is_leg:
