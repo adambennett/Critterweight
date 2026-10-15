@@ -128,6 +128,14 @@ func test_snappington_run_options_and_config() -> void:
 
 
 func test_start_run_hands_over_to_the_campaign() -> void:
+	# its own user root and profile: the run it starts is saved, and a suspended Fight Camp run
+	# left by an earlier test run must not stand in the way (that path asks first, see the
+	# campaign UI tests)
+	var old_root := Paths.root
+	var old_profile := Profiles.current
+	Paths.root = temp_dir("hub_start_%d" % Time.get_ticks_usec())
+	Profiles.current = Profiles.default_profile("hub_start", "Start Tester")
+	CampaignProgression.ensure_fields(Profiles.current)
 	var sv := _services(0)
 	var fighters: Array = sv.run_options().get("fighters", [])
 	if fighters.is_empty():
@@ -144,6 +152,8 @@ func test_start_run_hands_over_to_the_campaign() -> void:
 	App.set_scene(null)
 	App.clear_screens()
 	await wait_frames(2)
+	Paths.root = old_root
+	Profiles.current = old_profile
 
 
 func test_bookie_table_and_lab_terminal_for_real() -> void:

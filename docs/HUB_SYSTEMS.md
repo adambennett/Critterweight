@@ -223,7 +223,11 @@ object with the same calls.
   one button away. The campaign's **development stand-ins** (a custom run, no records) are a developer
   tool: the sheet (like the campaign menu and the Bookie's Table) offers them only behind the dev flag
   (`CampaignFlow.dev_tools()`: `--dev`, `--campaign-stand-ins` or Settings → Diagnostics → Developer
-  tools) and only while some roster kit is still unusable.
+  tools) and only while some roster kit is still unusable. The Dosage row only offers Doses the
+  chosen difficulty takes (Sparring: the base card). A profile has ONE suspended Fight Camp run:
+  while one is on file the sheet says so, and signing asks first (`HubServices.start_run` answers
+  `{needs_confirm, suspended}` and starts nothing) — *Abandon it, sign new* (`replace_suspended`: the
+  old run is credited as an abandoned defeat), *Resume it* (`HubServices.resume_run()`) or *Keep it*.
 - **Bookie's Table**: `App.goto("bookie", {from_hub})`; leaving the table walks you back to Teddy.
 - **AI Lab terminal**: `App.goto("lab", {from_hub, boiler_room_key})`; Back returns to the terminal.
   Without the screen installed, Teddy says the terminal is dark.

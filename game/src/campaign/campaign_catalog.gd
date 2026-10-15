@@ -508,6 +508,8 @@ func _check_event(id: String, e: Dictionary) -> void:
 		var cid := str(c.get("id", ""))
 		if cid == "" or seen.has(cid):
 			_err(id, "choice ids must be unique and non-empty")
+		if cid.begins_with("_"):
+			_err(id, "choice id '%s': ids starting with '_' are reserved (EventRunner.PASS)" % cid)
 		seen[cid] = true
 		_check_requires("%s.%s" % [id, cid], c.get("requires", {}))
 		var outs: Array = c.get("outcomes", [])
