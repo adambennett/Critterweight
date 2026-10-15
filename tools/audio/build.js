@@ -210,7 +210,7 @@ function buildMusic(bank, report) {
     const e = emit(baseRel, r.base.buf, sr, loopOpts);
     const entry = {
       file: resPath(baseRel), title: song.title, bpm: song.bpm, beats_per_bar: r.meta.beatsPerBar, bars: r.meta.bars, seconds: e.seconds,
-      bar_seconds: +r.meta.barSeconds.toFixed(6), sections: r.meta.sections, gain: song.gain === undefined ? 0 : song.gain,
+      bar_seconds: +r.meta.barSeconds.toFixed(6), sections: r.meta.sections.map((s) => ({ id: s.id, start_bar: s.startBar, bars: s.bars })), gain: song.gain === undefined ? 0 : song.gain,
       loop: r.loop ? { begin: r.loop.begin, end: r.loop.end, start_bar: r.loop.startBar, end_bar: r.loop.endBar } : null,
       stereo: D.isStereo(r.base.buf), sr, layers: [], tags: song.tags || [], stinger: !!song.stinger,
     };

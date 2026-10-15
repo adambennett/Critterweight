@@ -228,6 +228,30 @@ class Supersaw {
   }
 }
 
+/** Wavetable oscillator: `tables` is an array of single-cycle Float64Arrays; `morph` (0..1) crossfades
+ * between neighbouring tables, positions interpolate linearly. Wavetable.make(fn, size) builds a table. */
+class Wavetable {
+  constructor(sr, tables, phase = 0) { this.sr = sr; this.tables = tables; this.phase = phase; }
+  static make(fn, size = 2048) { const t = new Float64Array(size); for (let i = 0; i < size; i++) t[i] = fn(i / size); return t; }
+  static harmonics(amps, size = 2048) { // additive table from harmonic amplitudes
+    return Wavetable.make((x) => { let v = 0; for (let h = 0; h < amps.length; h++) v += amps[h] * Math.sin(TAU * (h + 1) * x); return v; }, size);
+  }
+  next(freq, morph = 0) {
+    const n = this.tables.length;
+    const m = clamp(morph, 0, 1) * (n - 1);
+    const i0 = Math.floor(m), i1 = Math.min(n - 1, i0 + 1), f = m - i0;
+    const read = (t) => {
+      const p = this.phase * t.length;
+      const j = Math.floor(p), k = p - j;
+      return t[j] + (t[(j + 1) % t.length] - t[j]) * k;
+    };
+    const v = read(this.tables[i0]) * (1 - f) + (f > 0 ? read(this.tables[i1]) * f : 0);
+    this.phase += freq / this.sr;
+    if (this.phase >= 1) this.phase -= Math.floor(this.phase);
+    return v;
+  }
+}
+
 class Noise {
   constructor(rng) { this.rng = rng; }
   next() { return this.rng.float() * 2 - 1; }
@@ -738,7 +762,7 @@ function countOver(b, lin = 1.0) {
 module.exports = {
   TAU, zeros, secs, db, lin2db, clamp, lerp, isStereo, stereo, toStereo, length, mixInto, applyGain, multiply, concat,
   fade, peak, normalize, rms, trimTail, pan, dcBlock, resample,
-  Osc, FmOp, SyncSaw, Supersaw, Noise, Pink, Brown, Lfo,
+  Osc, FmOp, SyncSaw, Supersaw, Wavetable, Noise, Pink, Brown, Lfo,
   adsr, envelope, decay,
   SVF, OnePole, Biquad, DelayLine, Comb, Allpass, filterBuf,
   saturate, bitcrush, chorus, delayFx, reverb, compressor, limiter, widen, spread,
