@@ -596,12 +596,24 @@ func _write(_force: bool) -> void:
 		result["stats"] = _client.stats()
 	elif _server and is_instance_valid(_server):
 		result["server_status"] = _server.status()
+	var text := JSON.stringify(result, "\t")
 	var tmp := result_path + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:
 		return
-	f.store_string(JSON.stringify(result, "\t"))
+	f.store_string(text)
 	f.close()
-	if FileAccess.file_exists(result_path):
-		DirAccess.remove_absolute(result_path)
-	DirAccess.rename_absolute(tmp, result_path)
+	# On Windows the test runner may hold the result file open for a moment while it polls it; then
+	# the replace fails. Retry briefly, and as a last resort write in place (the reader tolerates a
+	# partial file and polls again) - losing the final write made a refused client look silent.
+	for attempt in 8:
+		if FileAccess.file_exists(result_path):
+			DirAccess.remove_absolute(result_path)
+		if DirAccess.rename_absolute(tmp, result_path) == OK:
+			return
+		OS.delay_msec(15)
+	var g := FileAccess.open(result_path, FileAccess.WRITE)
+	if g:
+		g.store_string(text)
+		g.close()
+	DirAccess.remove_absolute(tmp)
