@@ -41,6 +41,7 @@ var seg_muscle: PackedFloat32Array = PackedFloat32Array()  ## per segment 0..1 (
 var seg_speed: PackedFloat32Array = PackedFloat32Array()   ## per segment stiffness multiplier
 var muscle := 1.0              ## global tone 0..1 (knockdown/KO lowers it)
 var support := 1.0             ## anti-gravity fraction applied while grounded
+var ballistic := false         ## kit option (leap / spring pad "ballistic"): while unsupported, the ground drive leaves the body alone
 var gravity := 9.81            ## world gravity this body lives in (MatchSim sets it)
 var hover_enabled := true
 var hover_height := 1.0        ## desired root pivot height above the floor
@@ -283,7 +284,9 @@ func step(_dt: float) -> void:
 		fy = clampf(fy, -m * g * 2.0, m * g * 3.0)
 		root_rb.apply_central_force(Vector3(0.0, fy, 0.0))
 	# ---- horizontal drive (shared across segments so limbs travel with the body) ----
-	if muscle > 0.05 and (grounded or support > 0.0):
+	# a "ballistic" flight (support 0 + ballistic) is never braked by the ground drive, even while the
+	# body is still within hover range of the floor; other airborne phases keep the original rule
+	if muscle > 0.05 and (support > 0.0 or (grounded and not ballistic)):
 		var v := com_velocity()
 		var dv := Vector3(desired_vel.x - v.x, 0.0, desired_vel.z - v.z)
 		var acc := dv * 12.0

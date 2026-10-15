@@ -3,7 +3,7 @@
   "name": "Test Dummy",
   "title": "Engine bring-up biped",
   "element": "",
-  "npc_only": false,
+  "npc_only": true,
   "tags": ["dev"],
   "stats": {"health": 100, "walk_speed": 3.4, "stamina": 100, "poise": 100},
   "body": {
