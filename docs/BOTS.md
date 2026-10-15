@@ -28,7 +28,7 @@ what a player's controller writes — and every combat rule applies to it unchan
 | Punching Bag (`rookie`) | 0.50 s | 0.20 s | 35 % | 0.12 / 0 / 0.04 | 0 | 0 | 0.2 | 0.40 |
 | Journeyman (`regular`) | 0.36 s | 0.14 s | 18 % | 0.35 / 0.05 / 0.12 | 0.25 | 0.3 | 0.5 | 0.55 |
 | Contender (`pro`) | 0.26 s | 0.10 s | 10 % | 0.55 / 0.25 / 0.22 | 0.5 | 0.45 | 0.75 | 0.62 |
-| Headliner (`champion`) | 0.16 s | 0.07 s | 5 % | 0.75 / 0.5 / 0.3 | 0.75 | 0.8 | 0.9 | 0.66 |
+| Headliner (`champion`) | 0.16 s | 0.07 s | 5 % | 0.75 / 0.4 / 0.3 | 0.75 | 0.75 | 0.9 | 0.66 |
 | Hall-of-Famer (`hall_of_famer`) | 0.10 s | 0.04 s | 1 % | 1.0 / 0.55 / 0.36 | 1.0 | 1.0 | 1.0 | 0.75 |
 
 Creature `ai` blocks add their personality offsets (aggression, block, dodge, ability, grab) on top.
@@ -84,3 +84,26 @@ the bot's `read` skill notices the mashing); Dozer's Dust Bowl (`ability2`) uses
 ## Measurements
 
 MEASUREMENTS_PLACEHOLDER
+
+## How it was tuned (and what did not work)
+
+Before (main at 8986502): the masher beat the Headliner 5 of 6; the tier bench read Journeyman 7–5 vs Punching
+Bag, Contender 6–6 vs Journeyman, Headliner 4–8 vs Contender, Hall-of-Famer 8–2 vs Headliner and only 7–5 vs
+Punching Bag. Causes found: defence was re-rolled every think (a top bot dodged nearly every perceived jab and
+the dodge recovery handed the masher free hits), the timed-parry branch raised the guard before its press (so it
+never parried), offence fired on almost every think (top bots were mashers themselves), and bot reach was
+judged root to root (Dozer mirrors fought inside each other's heads, where neither horn connects).
+
+Measured along the way (36-bout ladders unless noted): reaction time is the lever that separates two bots — a
+Headliner at 0.13 s beat a 0.22 s Contender 81 %, at 0.16 s only 50 %; more aggression, a stronger guard habit,
+a larger parry share or perfect punish/read alone moved the rung by little or nothing (±10 % noise at 18–36
+bouts). Parry taps timed off the seen wind-up work; adding the learned contact delay to *those* taps made them
+fire on attacks a reaction-delayed bot cannot time and cost the Contender its well-timed late guard presses
+(its successful parries fell from 22 to 12 per 36 bouts), so the contact delay is used only for taps on a
+masher's pattern, where it lifted the Hall-of-Famer from 71 % to 92 % against the masher. A "gap read"
+(counter-pokes between a string's hits) never fired: the kits' strings leave no gap wider than a jab start-up.
+
+Known limits: the Dozer mirror still favours the masher against the top tiers (his Hoof Stomps are area hits at
+point blank, the bodies end up overlapping, and only the stomp and grabs work there); Stoke's own masher is weak
+for a kit reason (its Light cancel windows open as the hit frames start, so pressing every 0.18 s cancels each
+jab before the fist arrives). Kit balance tables in `docs/kits/` were measured with the earlier bots.

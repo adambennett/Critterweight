@@ -27,9 +27,9 @@ const PROFILES := {
 	"pro": {"reaction": 0.26, "think": 0.1, "aggression": 0.62, "block": 0.55, "parry": 0.25, "dodge": 0.22,
 		"combo": 0.75, "ability": 0.65, "grab": 0.28, "mistake": 0.1, "spacing": 0.75, "juice": 0.9, "wake": 0.4, "mash_escape": 0.85,
 		"punish": 0.5, "read": 0.45, "heavy": 0.28},
-	"champion": {"reaction": 0.16, "think": 0.07, "aggression": 0.66, "block": 0.75, "parry": 0.5, "dodge": 0.3,
+	"champion": {"reaction": 0.16, "think": 0.07, "aggression": 0.66, "block": 0.75, "parry": 0.4, "dodge": 0.3,
 		"combo": 0.9, "ability": 0.8, "grab": 0.35, "mistake": 0.05, "spacing": 0.92, "juice": 1.0, "wake": 0.25, "mash_escape": 1.0,
-		"punish": 0.75, "read": 0.8, "heavy": 0.28},
+		"punish": 0.75, "read": 0.75, "heavy": 0.28},
 	# Hall-of-Famer (CAMPAIGN.md difficulty tiers): the quickest reads, near-flawless, reads charge-ups
 	"hall_of_famer": {"reaction": 0.1, "think": 0.04, "aggression": 0.75, "block": 1.0, "parry": 0.55, "dodge": 0.36,
 		"combo": 1.0, "ability": 0.85, "grab": 0.38, "mistake": 0.01, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0,
@@ -501,7 +501,7 @@ func _string_step(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dict
 	# a whiffed opener is still worth following when the next hit of the string connects from
 	# here (Dozer's Hoof Stomp after a Light that sails past at point blank)
 	var next_lands := step + 1 < f.creature.light_string.size() and not blocked \
-			and _lands(f, str(f.creature.light_string[step + 1]), dist, dir)
+			and _lands(f, str(f.creature.light_string[step + 1]), dist, dir) and rng.randf() < _pv("read")
 	var go := float(p["combo"])
 	if not landed and not next_lands:
 		go *= (1.0 - _pv("read")) * (0.6 if blocked else 0.5)
@@ -620,8 +620,8 @@ func _note_seen(tgt: Fighter) -> void:
 
 
 ## Contacts the bot feels (a hit blocked, parried or taken) teach it how long after an attack's
-## first hit frame that attack actually reaches it (a lunge connects late in its window): parry
-## taps aim at that. A contact is matched to the seen attack whose time span holds it, now or as
+## first hit frame that attack actually reaches it (a lunge connects late in its window): taps on
+## a masher's pattern aim at that. A contact is matched to the seen attack whose time span holds it, now or as
 ## soon as that attack has been seen.
 func _note_contact(f: Fighter, blocks: int) -> void:
 	var tgt := f.target
@@ -931,8 +931,9 @@ func _choose_answer(f: Fighter, tgt: Fighter, per: Dictionary, info: Dictionary,
 	# armored against Lights right now (Dust Bowl, JUICE...): trade instead of guarding
 	if light and f._armor_covers("light"):
 		return "none"
-	# a masher's beat: tap a parry for his next hit (parry share x read)
-	if light and mash and rng.randf() < float(p["parry"]) * _pv("read") * 1.5 and _beat_tap():
+	# a masher's pattern: tap a parry for his next hit. Timing a pattern is a read (a tier with no
+	# parry share never taps)
+	if light and mash and float(p["parry"]) > 0.0 and rng.randf() < _pv("read") * 0.8 and _beat_tap():
 		return "parry"
 	# button-mashing: blow through the Lights with an armored move (read)
 	if light and mash and _t >= _armor_next and rng.randf() < _pv("read") * 0.45:
@@ -958,9 +959,8 @@ func _choose_answer(f: Fighter, tgt: Fighter, per: Dictionary, info: Dictionary,
 	var pp := float(p["parry"])
 	var pd := float(p["dodge"])
 	var pb := float(p["block"]) + (_pv("read") * 0.5 if mash else 0.0)
-	var eta_contact := eta + _contact_after_first(str(_seen[_seen.size() - 1]["slot"]) if not _seen.is_empty() else "")
-	if roll < pp and not bool(info["unblockable"]) and eta_contact - PARRY_LEAD > 0.012:
-		_parry_tap(_t + eta_contact - PARRY_LEAD + _jitter())
+	if roll < pp and not bool(info["unblockable"]) and eta - PARRY_LEAD > 0.012:
+		_parry_tap(_t + eta - PARRY_LEAD + _jitter())
 		return "parry"
 	if roll >= pp and roll < pp + pd and (heavyish or bool(info["unblockable"])):
 		_dodge(f, dir, eta)
@@ -1394,7 +1394,7 @@ func _kit_defend(f: Fighter, tgt: Fighter, per: Dictionary, winding: bool, dir: 
 	var ph = personality.get("parry_heavy", {})
 	if winding and typeof(ph) == TYPE_DICTIONARY and not (ph as Dictionary).is_empty() and _kit_profile_at_least(str(ph.get("from", "champion"))) \
 			and tgt != null and str(per.get("slot", "")).begins_with("heavy") and eta - PARRY_LEAD > 0.012 and rng.randf() < float(ph.get("chance", 0.35)):
-		_parry_tap(_t + eta + _contact_after_first(str(per.get("slot", ""))) - PARRY_LEAD + _jitter())
+		_parry_tap(_t + eta - PARRY_LEAD + _jitter())
 		return true
 	if sidestep and personality.has("dodge_for_guard") and rng.randf() < float(p["block"]) * float(personality["dodge_for_guard"]) and f.stamina > 12.0:
 		var side := dir.cross(Vector3.UP) * (1.0 if rng.randf() < 0.5 else -1.0)
