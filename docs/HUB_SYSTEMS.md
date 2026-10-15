@@ -203,7 +203,11 @@ object with the same calls.
   `CampaignFlow.start(catalog, cfg).show_current()`; the campaign menu (suspended runs, co-op lobby) is
   one button away. While the roster's fight kits are not usable by the campaign, the sheet offers the
   campaign's **development stand-ins** (a custom run, no records) — the same switch the campaign menu
-  has.
+  has. The Dosage row only offers Doses the chosen difficulty takes (Sparring: the base card). A
+  profile has ONE suspended Fight Camp run: while one is on file the sheet says so, and signing asks
+  first (`HubServices.start_run` answers `{needs_confirm, suspended}` and starts nothing) — *Abandon
+  it, sign new* (`replace_suspended`: the old run is credited as an abandoned defeat), *Resume it*
+  (`HubServices.resume_run()`) or *Keep it*.
 - **Bookie's Table**: `App.goto("bookie", {from_hub})`; leaving the table walks you back to Teddy.
 - **AI Lab terminal**: `App.goto("lab", {from_hub, boiler_room_key})`; Back returns to the terminal.
   Without the screen installed, Teddy says the terminal is dark.

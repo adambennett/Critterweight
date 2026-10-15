@@ -8,9 +8,13 @@ extends RefCounted
 ##   run_hooks, next_fight, bet, boss_mod, fight, cosmetic, coupon, flag, nothing, consumable, quip.
 ## Rolls use the node's own stream, so the same seed always produces the same outcome.
 ## Group events (marked "group": true) are decided once for the whole party and apply to every
-## member; Scrip costs are split evenly (rounding up on the Captain).
+## member; Scrip costs are split evenly (rounding up on the Captain), so a group choice is only
+## available while EVERY member can cover their share (co-op votes offer only those).
+## An event never softlocks: when nothing can be taken, the decider may PASS (move on, no
+## outcome) — logged like any choice, so replays reproduce it.
 
 const ELEMENT_ROLL := ["scorch", "brine", "static", "sludge", "grit", "gale"]
+const PASS := "_pass"            ## reserved choice id: nothing can be taken, move on
 
 
 static func begin(ctrl: RunController, node_id: String, event_id: String) -> Dictionary:
@@ -104,24 +108,46 @@ static func view(ctrl: RunController, session: Dictionary, pid: String) -> Dicti
 	var roll: Dictionary = session.get("roll", {})
 	var choices := []
 	for c in ev.get("choices", []):
-		var ok := requirement_ok(ctrl, p, c.get("requires", {}), roll)
 		var cost: Dictionary = c.get("cost", {})
-		var reason := ""
-		var share := _cost_share(ctrl, session, pid, int(cost.get("scrip", 0)))
-		if not ok:
-			reason = str(c.get("locked_text", "Not available"))
-		elif int(p.get("scrip", 0)) < share:
-			ok = false
-			reason = "Not enough Scrip"
+		var reason := block_reason(ctrl, session, pid, c)
 		choices.append({"id": str(c.get("id", "")), "label": fill(str(c.get("label", "")), ctrl, p, roll),
 			"desc": fill(str(c.get("desc", "")), ctrl, p, roll), "risk": str(c.get("risk", "safe")),
-			"cost": cost, "available": ok, "reason": reason})
+			"cost": cost, "available": reason == "", "reason": reason})
 	var decider := str(session.get("decider", ""))
 	return {"id": str(session.get("id", "")), "title": fill(str(ev.get("title", "")), ctrl, p, roll),
 		"speaker": str(ev.get("speaker", "")), "text": fill(str(ev.get("text", "")), ctrl, p, roll),
 		"choices": choices, "group": bool(session.get("group", false)), "decider": decider,
 		"can_decide": decider == "" or decider == pid, "chosen": str(session.get("chosen", "")),
 		"result": session.get("texts", [])}
+
+
+## Why `pid` cannot take choice `c` right now ("" = available). Requirements are the deciding
+## player's; a group choice also needs every member to cover their share of its Scrip cost.
+static func block_reason(ctrl: RunController, session: Dictionary, pid: String, c: Dictionary) -> String:
+	var p: Dictionary = RunState.player(ctrl.state, pid)
+	if not requirement_ok(ctrl, p, c.get("requires", {}), session.get("roll", {})):
+		return str(c.get("locked_text", "Not available"))
+	var cost := int(c.get("cost", {}).get("scrip", 0))
+	if cost <= 0:
+		return ""
+	if not bool(session.get("group", false)):
+		return "Not enough Scrip" if int(p.get("scrip", 0)) < cost else ""
+	for mid in RunState.player_ids(ctrl.state):
+		var mp: Dictionary = RunState.player(ctrl.state, str(mid))
+		if int(mp.get("scrip", 0)) < _cost_share(ctrl, session, str(mid), cost):
+			return "Not enough Scrip" if str(mid) == pid else "%s can't cover their share" % str(mp.get("name", mid))
+	return ""
+
+
+## Ids of the current event's choices `pid` (the decider) can take now — for a group event,
+## only those the whole party can pay for.
+static func available_choices(ctrl: RunController, session: Dictionary, pid: String) -> Array:
+	var ev: Dictionary = ctrl.catalog.events.get(str(session.get("id", "")), {})
+	var out := []
+	for c in ev.get("choices", []):
+		if typeof(c) == TYPE_DICTIONARY and block_reason(ctrl, session, pid, c) == "":
+			out.append(str(c.get("id", "")))
+	return out
 
 
 ## Scrip a player pays for a group choice (even split, remainder on the Captain).
@@ -144,6 +170,15 @@ static func choose(ctrl: RunController, pid: String, choice_id: String) -> Dicti
 	var decider := str(session.get("decider", ""))
 	if decider != "" and decider != pid and not bool(session.get("group", false)):
 		return {"ok": false, "error": "only %s can decide this event" % decider}
+	if choice_id == PASS:
+		if not available_choices(ctrl, session, pid).is_empty():
+			return {"ok": false, "error": "there is still a choice to make"}
+		var pass_texts := ["Nothing here anyone can take. You move on."]
+		session["chosen"] = PASS
+		session["decider"] = pid
+		session["outcome"] = -1
+		session["texts"] = pass_texts
+		return {"ok": true, "texts": pass_texts.duplicate()}
 	var choice := {}
 	for c in ev.get("choices", []):
 		if str(c.get("id", "")) == choice_id:
@@ -163,8 +198,11 @@ static func choose(ctrl: RunController, pid: String, choice_id: String) -> Dicti
 	var cost := int(choice.get("cost", {}).get("scrip", 0))
 	for t2 in targets:
 		var share := _cost_share(ctrl, session, str(t2), cost)
-		if int(RunState.player(ctrl.state, str(t2)).get("scrip", 0)) < share:
-			return {"ok": false, "error": "not enough Scrip"}
+		var tp2: Dictionary = RunState.player(ctrl.state, str(t2))
+		if int(tp2.get("scrip", 0)) < share:
+			if str(t2) == pid:
+				return {"ok": false, "error": "not enough Scrip"}
+			return {"ok": false, "error": "not enough Scrip: %s can't cover their share" % str(tp2.get("name", t2))}
 	for t3 in targets:
 		var tp3: Dictionary = RunState.player(ctrl.state, str(t3))
 		tp3["scrip"] = int(tp3["scrip"]) - _cost_share(ctrl, session, str(t3), cost)

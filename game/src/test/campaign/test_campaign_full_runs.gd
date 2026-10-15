@@ -58,9 +58,12 @@ func test_fight_camp_victory_with_real_fights() -> void:
 	var before := int(prof["camp"]["clout"])
 	var rep := CampaignProgression.finish_run(cat(), ctrl.state, "p0", prof)
 	check(int(prof["camp"]["clout"]) > before, "Clout credited for Cannery upgrades (%d)" % rep["clout"])
-	check(bool(prof["camp"]["flags"].get("beat_run", false)), "camp milestone flags set")
+	# this run is custom (a declared test build): it earns Clout but proves nothing for the
+	# Cannery's milestone gates (CAMPAIGN_SYSTEMS.md custom runs). A standard clear setting them
+	# and opening Walkout Music: test_campaign_run::test_custom_fight_camp_runs_set_no_camp_milestones
+	check(not bool(prof["camp"]["flags"].get("beat_run", false)), "a custom run sets no camp milestone flags")
 	var buy := FightCamp.buy_upgrade(cat(), prof, "meta_walkout")
-	check(bool(buy["ok"]) or str(buy["error"]).contains("Clout"), "beating a run opens Walkout Music")
+	check(not bool(buy["ok"]) and str(buy["error"]).contains("locked"), "Walkout Music stays locked after a custom run")
 
 
 func test_off_the_street_defeat_with_real_fights() -> void:
