@@ -1283,12 +1283,19 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 	return ""
 
 
+## Team per fighter index (humans first, then bots), matching the local setup rules:
+## duel/ffa: everyone on their own team; teams/tag: round-robin honouring requests;
+## coop: humans on team 0, bots join them, or face them when the preset has 2+ teams.
 func _team_layout(rules: Dictionary, chosen: Array, total: int) -> Array[int]:
 	var out: Array[int] = []
 	out.resize(total)
 	var fmt := str(rules.get("format", ""))
 	var nteams := int(rules.get("teams", 0))
-	var team_mode := fmt == "teams" or (nteams >= 2 and fmt != "duel" and fmt != "ffa" and total > nteams)
+	if fmt == "coop":
+		for i in total:
+			out[i] = 0 if i < chosen.size() or nteams < 2 else 1
+		return out
+	var team_mode := fmt == "teams" or fmt == "tag" or (nteams >= 2 and fmt != "duel" and fmt != "ffa" and total > nteams)
 	if not team_mode:
 		for i in total:
 			out[i] = i
@@ -1382,7 +1389,7 @@ func _check_roster() -> Array:
 		var cur := {"obj": f.get_instance_id(), "rig": f.rig.get_instance_id() if f.rig else 0,
 			"creature": f.creature.id if f.creature else "", "scale": f.creature.body.scale if f.creature else 1.0,
 			"despawned": NetSnapshot.is_despawned(f), "team": f.team, "name": f.display_name,
-			"kind": f.controller_kind, "player": int(owners.get(i, 0))}
+			"kind": f.controller_kind, "player": int(owners.get(i, 0)), "tags": NetSnapshot.flag_tags(f)}
 		if i >= _roster.size():
 			cur["gen"] = 1
 			_roster.append(cur)
@@ -1392,7 +1399,7 @@ func _check_roster() -> Array:
 			var body_changed: bool = old["obj"] != cur["obj"] or old["rig"] != cur["rig"] or old["creature"] != cur["creature"] \
 				or absf(float(old["scale"]) - float(cur["scale"])) > 0.0001 or old["despawned"] != cur["despawned"]
 			var info_changed: bool = old["team"] != cur["team"] or old["name"] != cur["name"] or old["kind"] != cur["kind"] \
-				or old["player"] != cur["player"]
+				or old["player"] != cur["player"] or old["tags"] != cur["tags"]
 			if body_changed or info_changed:
 				cur["gen"] = (int(old["gen"]) % 255) + 1 if body_changed else int(old["gen"])
 				_roster[i] = cur
@@ -1407,7 +1414,8 @@ func _roster_public() -> Array:
 	for i in _roster.size():
 		var e: Dictionary = _roster[i]
 		out.append({"index": i, "slot": i, "gen": e["gen"], "player": e["player"], "name": e["name"],
-			"creature": e["creature"], "scale": e["scale"], "team": e["team"], "kind": e["kind"], "despawned": e["despawned"]})
+			"creature": e["creature"], "scale": e["scale"], "team": e["team"], "kind": e["kind"], "despawned": e["despawned"],
+			"tags": e["tags"]})
 	return out
 
 
@@ -1416,7 +1424,7 @@ func _send_roster(slots: Array) -> void:
 	for i in slots:
 		var e: Dictionary = _roster[int(i)]
 		entries.append({"slot": int(i), "gen": e["gen"], "creature": e["creature"], "scale": e["scale"], "team": e["team"],
-			"name": e["name"], "kind": e["kind"], "despawned": e["despawned"]})
+			"name": e["name"], "kind": e["kind"], "despawned": e["despawned"], "tags": e["tags"]})
 	var w := NetWriter.new(NetProtocol.S_ROSTER)
 	w.u32(sim.tick_count)
 	NetSnapshot.encode_roster(w, entries)

@@ -2,14 +2,14 @@
   "id": "fight_night",
   "name": "Fight Night",
   "version": 1,
-  "description": "The classic card: 1v1 duels most of the time, the occasional 2v2. Players vote between 3 entries; the last 2 played are not offered again. Edit freely (docs/SERVER.md#playlists).",
+  "description": "The classic card: 1v1 duels most of the time, with 2v2 and tag-team bouts. Players vote between 3 entries; the last 2 played are not offered again. Edit freely (docs/SERVER.md#playlists).",
   "voting": {"enabled": true, "candidates": 3},
   "repeat_avoidance": 2,
   "entries": [
     {"id": "duel_gullet", "name": "Title Bout @ The Gullet", "rules": "duel", "arena": "the_gullet", "weight": 5},
     {"id": "quick_duel_gullet", "name": "Quick Duel (1 round, 60 s)", "rules": "duel", "arena": "the_gullet", "weight": 2,
       "rules_override": {"rounds": 1, "round_time": 60}},
-    {"id": "tag_along_gullet", "name": "Tag Along 2v2 @ The Gullet", "rules": "teams_2v2", "arena": "the_gullet", "weight": 3,
-      "min_players": 4}
+    {"id": "teams_gullet", "name": "Teams 2v2 @ The Gullet", "rules": "teams_2v2", "arena": "the_gullet", "weight": 3},
+    {"id": "tag_gullet", "name": "Tag Team 2v2 @ The Gullet", "rules": "tag_2v2", "arena": "the_gullet", "weight": 2}
   ]
 }

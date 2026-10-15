@@ -11,7 +11,7 @@ class_name NetSnapshot
 ##     [u8 cooldown count] ([str slot][u16 seconds*100]) x n
 ##     [u8 status count]  ([str id][str element][u16 seconds*100]) x n
 ##   [u8 entity count] per entity: [u16 id][u8 kind code (255: str kind)][str zone_kind/prop]
-##                     [vec3q pos][u16 radius*100][str element][i8 team]
+##                     [str vfx][vec3q pos][u16 radius*100][str element][i8 team]
 ##   [u8 prop count]   per dynamic prop: [u8 prop index][vec3q pos][quat32 rotation]
 ##   mode: [u8 phase][u8 round index][u16 round timer*10][u8 flags][i8 winner][i8 round winner]
 ##         [u8 team count] ([i8 team][u8 round wins][i16 score]) x n [str hud status]
@@ -105,6 +105,7 @@ static func encode_body(sim: MatchSim, gens: PackedByteArray) -> PackedByteArray
 		if kc < 0:
 			w.text(kind, 24)
 		w.text(str(ed2.get("zone_kind", ed2.get("prop", ""))), 32)
+		w.text(str(ed2.get("vfx", "")), 24)
 		w.vec3q(ed2.get("pos", Vector3.ZERO))
 		w.u16(clampi(roundi(float(ed2.get("radius", 0.25)) * 100.0), 0, 65535))
 		w.text(str(ed2.get("element", "")), 24)
@@ -290,11 +291,12 @@ static func decode_body(r: NetReader) -> Dictionary:
 		var kc := r.u8()
 		var kind: String = r.text(24) if kc == 255 else (str(KINDS[kc]) if kc < KINDS.size() else "zone")
 		var sub := r.text(32)
+		var vfx_id := r.text(24)
 		var pos := r.vec3q()
 		var rad := r.u16() / 100.0
 		var el2 := r.text(24)
 		var team := r.i8()
-		var ent := {"id": eid, "kind": kind, "pos": pos, "radius": rad, "element": el2, "team": team, "e": {}}
+		var ent := {"id": eid, "kind": kind, "pos": pos, "radius": rad, "element": el2, "team": team, "vfx": vfx_id, "e": {}}
 		if kind == "prop":
 			ent["prop"] = sub
 		elif sub != "":
@@ -355,7 +357,8 @@ static func fk(body: BodyDef, root: Vector3, rots: Array[Quaternion]) -> Array[T
 
 # ---- roster (reliable): which creature/body occupies each slot ----
 
-## entries: [{slot, gen, creature, scale, team, name, kind, despawned}]
+## entries: [{slot, gen, creature, scale, team, name, kind, despawned, tags: [names of true
+## boolean fighter flags, e.g. "headliner", "boss", "resting"]}]
 static func encode_roster(w: NetWriter, entries: Array) -> void:
 	var n := mini(entries.size(), NetProtocol.MAX_SLOTS)
 	w.u8(n)
@@ -369,6 +372,25 @@ static func encode_roster(w: NetWriter, entries: Array) -> void:
 		w.text(str(e["name"]), 80)
 		w.text(str(e["kind"]), 16)
 		w.boolean(bool(e["despawned"]))
+		var tags: Array = e.get("tags", [])
+		var nt := mini(tags.size(), 8)
+		w.u8(nt)
+		for k in nt:
+			w.text(str(tags[k]), 24)
+
+
+## Names of a fighter's true boolean flags (presentation hints; "_private" ones excluded).
+static func flag_tags(f: Fighter) -> Array:
+	var out: Array = []
+	for k in f.flags.keys():
+		var ks := str(k)
+		if ks.begins_with("_"):
+			continue
+		var v = f.flags[k]
+		if typeof(v) == TYPE_BOOL and v:
+			out.append(ks)
+	out.sort()
+	return out.slice(0, 8)
 
 
 static func decode_roster(r: NetReader) -> Array:
@@ -384,6 +406,11 @@ static func decode_roster(r: NetReader) -> Array:
 		e["name"] = r.text(80)
 		e["kind"] = r.text(16)
 		e["despawned"] = r.boolean()
+		var tags: Array = []
+		var nt := r.count(8)
+		for k in nt:
+			tags.append(r.text(24))
+		e["tags"] = tags
 		if not r.ok or int(e["slot"]) >= NetProtocol.MAX_SLOTS:
 			r.fail("bad roster entry")
 			return []

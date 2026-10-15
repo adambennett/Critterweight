@@ -138,8 +138,14 @@ static func _normalize(raw, i: int) -> Dictionary:
 	return e
 
 
-## Fighter count limits of a rules dictionary: Vector2i(min, max).
+## Fighter count limits of a rules dictionary: Vector2i(min, max). Presets declare
+## "players": [min, max]; older presets fall back to their format.
 static func format_limits(rules: Dictionary) -> Vector2i:
+	var pl = rules.get("players", null)
+	if typeof(pl) == TYPE_ARRAY and (pl as Array).size() >= 2:
+		var lo := clampi(int(pl[0]), 1, NetProtocol.MAX_FIGHTERS)
+		var hi := clampi(int(pl[1]), lo, NetProtocol.MAX_FIGHTERS)
+		return Vector2i(lo, hi)
 	var fmt := str(rules.get("format", ""))
 	var teams := int(rules.get("teams", 0))
 	match fmt:

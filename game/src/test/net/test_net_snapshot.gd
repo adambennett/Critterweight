@@ -133,7 +133,7 @@ func test_hud_mirror_drives_real_fight_hud() -> void:
 	var sample := {"fighters": [fd, fd.duplicate()], "mode": {"phase": 1, "round": 1, "timer": 42.5, "flags": 1, "winner": -2,
 		"round_winner": -2, "teams": [{"team": 0, "wins": 1, "score": 0}], "status": "SUDDEN DEATH",
 		"hud": {"rows": [{"label": "Red", "value": 3, "team": 0}], "status": "SUDDEN DEATH"}, "view": {}}}
-	mirror.update(sample)
+	mirror.update(sample, 1.0 / 60.0)
 	var f0 := mirror.sim.fighters[0]
 	check_near(f0.health, 42.0, 0.001, "health mirrored")
 	check(f0.time < f0.juiced_until, "juice flag mirrored")

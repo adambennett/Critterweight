@@ -21,12 +21,16 @@ const TYPES := ["hit", "glance", "grab_tech", "effect", "reflect", "reaction", "
 	"unit_crowned", "unit_toppled", "unit_transforming", "wave_start", "wave_cleared", "pick_offered",
 	"pick_taken", "tag", "reaction_zone", "carry", "throw_ball", "dot", "zone_reaction", "prop_spawn",
 	"projectile_destroyed", "arc", "spring", "prop_destroyed", "splat", "hover", "land", "submerge",
-	"wall_bonk", "counter", "flinch"]
+	"wall_bonk", "counter", "flinch", "object_hit", "escaped", "gate_spawn", "ball_pickup", "ball_throw",
+	"ball_reset", "ball_drop", "own_goal_denied", "sudden_death", "ringout_respawn_pending", "revived_by",
+	"bled_out", "set_flag", "practice_behavior", "practice_record", "practice_refill", "spotlight_swing",
+	"hog_start", "contested", "cheer", "assist", "auto_tag"]
 const KEYS := ["fighter", "target", "victim", "attacker", "damage", "point", "normal", "pos", "blocked",
 	"parried", "counter", "part", "element", "quality", "move", "slot", "knockdown", "otg", "effect",
 	"vfx", "reaction", "name", "a", "b", "id", "reason", "arena", "mode", "speed", "round", "winner",
 	"by", "status", "creature", "team", "scale", "wave", "upgrade", "score", "kind", "amount", "dir",
-	"result", "prop", "from", "to", "dest", "interrupted"]
+	"result", "prop", "from", "to", "dest", "interrupted", "scorer", "own_goal", "on", "object", "gate",
+	"frames", "behavior"]
 const COMMON := ["", "core", "head", "arm", "leg", "tail", "wing", "shell", "horn", "fin", "l1", "l2",
 	"l3", "heavy", "finisher", "dash_attack", "grab", "taunt", "juice", "ability1", "ability2", "effect",
 	"zone", "pummel", "throw", "slam", "reaction", "projectile", "area", "buff", "debuff", "heal",

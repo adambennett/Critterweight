@@ -1,14 +1,18 @@
 class_name NetHudMirror
 extends RefCounted
-## Client-side stand-ins for HUD code written against MatchSim/Fighter/MatchMode (FightHud):
-## a MatchSim and Fighter objects that are never added to the scene tree, never set up and never
-## stepped - they only carry replicated values, refreshed every frame from interpolated snapshots
-## and the roster. Replicated fields: display_name, index, team, creature, controller_kind,
-## despawned, state, health, max_health, stamina, max_stamina, poise, max_poise, hype, lives,
-## juiced/crash (via time and *_until), guard_held, cooldown_left, statuses (active: id/element/
-## left), target; sim.rules, sim.input_enabled, sim.is_finished; mode phase/round/timer/wins/
-## scores, hud_status(), hud_state(), view_state().
-## Fighter methods that need a physical body (pos(), head_pos(), ...) are NOT available here.
+## Client-side presentation mirror of a remote match: a MatchSim with Fighter objects that are
+## never set up or stepped. They only carry replicated values, refreshed every frame from
+## interpolated snapshots, the roster and due events, so presentation code written against a
+## local MatchSim runs unchanged on network clients:
+##  * FightHud: display_name, index, team, creature, controller_kind, despawned, state, health,
+##    max_health, stamina, max_stamina, poise, max_poise, hype, lives, juiced/crash (via time and
+##    *_until), guard_held, cooldown_left, statuses (active: id/element/left), target, flags (true
+##    tags); sim.rules; mode phase/round/timer/wins/scores, hud_status(), hud_state(), view_state().
+##  * AudioMatchBridge (Audio.attach_match): sim.events/event_seq/events_since() (replicated
+##    events appended when due), sim.time, sim.arena, sim.effects.entities, fighter pos(),
+##    ground_pos(), rig.com_velocity(), rig.grounded, health_frac(), state_name().
+## A fighter's rig is a MirrorRig stand-in (root position + velocity estimated from snapshots);
+## anything needing real bodies (head_pos(), segment transforms) is NOT available here.
 
 class MirrorMode:
 	extends MatchMode
@@ -35,9 +39,22 @@ class MirrorMode:
 		return net_view
 
 
+class MirrorRig:
+	extends Rig
+	var net_root := Vector3.ZERO
+	var net_vel := Vector3.ZERO
+
+	func root_pos() -> Vector3:
+		return net_root
+
+	func com_velocity() -> Vector3:
+		return net_vel
+
+
 var sim: MatchSim = null
 var mode: MirrorMode = null
 var _gen := {}                   ## slot -> roster generation applied
+var _fallback: CreatureDef = null
 
 
 func build(info: Dictionary, replica: NetReplica) -> void:
@@ -45,12 +62,18 @@ func build(info: Dictionary, replica: NetReplica) -> void:
 	sim.name = "NetMirrorSim"
 	sim.running = false
 	sim.rules = (info.get("rules", {}) as Dictionary).duplicate(true)
+	sim.seed_value = int(info.get("match_id", 1))
+	var a := ArenaDef.from_dict(info.get("arena", {}), "net")
+	sim.arena = a
 	mode = MirrorMode.new()
 	mode.net_mode_id = str(info.get("mode", "standard"))
 	mode.sim = sim
 	mode.rules = sim.rules
 	mode.round_timer = float(sim.rules.get("round_time", 99.0))
 	sim.mode = mode
+	var playable := Content.playable_creatures()
+	if not playable.is_empty():
+		_fallback = Content.creature(str(playable[0]))
 	sync_roster(replica)
 
 
@@ -62,6 +85,10 @@ func sync_roster(replica: NetReplica) -> void:
 		f.index = sim.fighters.size()
 		f.statuses = StatusSet.new(f)
 		f.time = 1000.0
+		f.creature = _fallback
+		var rig := MirrorRig.new()
+		f.add_child(rig)
+		f.rig = rig
 		sim.fighters.append(f)
 	for i in n:
 		var e: Dictionary = replica.roster.get(i, {})
@@ -72,6 +99,11 @@ func sync_roster(replica: NetReplica) -> void:
 		f2.display_name = str(e["name"])
 		f2.controller_kind = str(e["kind"])
 		f2.set("despawned", bool(e["despawned"]))
+		for k in f2.flags.keys():
+			if typeof(f2.flags[k]) == TYPE_BOOL:
+				f2.flags.erase(k)
+		for t in e.get("tags", []):
+			f2.flags[str(t)] = true
 		if int(_gen.get(i, -1)) != int(e["gen"]) and e.get("def") != null:
 			_gen[i] = int(e["gen"])
 			f2.creature = e["def"]
@@ -79,15 +111,19 @@ func sync_roster(replica: NetReplica) -> void:
 			f2.health = f2.max_health
 
 
-func update(sample: Dictionary) -> void:
+func update(sample: Dictionary, dt: float) -> void:
 	if sim == null or sample.is_empty():
 		return
+	sim.time = float(sample.get("time", sim.time))
 	var fl: Array = sample.get("fighters", [])
 	for i in mini(fl.size(), sim.fighters.size()):
 		var fd: Dictionary = fl[i]
 		var f := sim.fighters[i]
+		var rig := f.rig as MirrorRig
 		if int(fd["gen"]) == 0:
 			f.state = Fighter.State.INACTIVE
+			if rig:
+				rig.net_vel = Vector3.ZERO
 			continue
 		f.state = int(fd["state"])
 		f.health = float(fd["health"])
@@ -102,10 +138,28 @@ func update(sample: Dictionary) -> void:
 		f.juiced_until = f.time + 1.0 if flags & NetSnapshot.F_JUICED else -1.0
 		f.crash_until = f.time + 1.0 if flags & NetSnapshot.F_CRASH else -1.0
 		f.guard_held = flags & NetSnapshot.F_GUARD != 0
+		var tf = f.get("timed_flags")
+		if typeof(tf) == TYPE_DICTIONARY:
+			var tfd: Dictionary = tf
+			if flags & NetSnapshot.F_HIDDEN:
+				tfd["submerged"] = f.time + 1.0
+			else:
+				tfd.erase("submerged")
 		f.cooldown_left = (fd["cooldowns"] as Dictionary).duplicate()
 		f.statuses.active = (fd["statuses"] as Array).duplicate(true)
 		var ti := int(fd["target"])
 		f.target = sim.fighters[ti] if ti >= 0 and ti < sim.fighters.size() else null
+		if rig:
+			var root: Vector3 = fd["root"]
+			var moved := root - rig.net_root
+			if dt > 0.0 and moved.length() < 2.0:
+				rig.net_vel = rig.net_vel.lerp(moved / dt, clampf(dt * 12.0, 0.0, 1.0))
+			else:
+				rig.net_vel = Vector3.ZERO
+			rig.net_root = root
+			rig.grounded = flags & NetSnapshot.F_GROUNDED != 0
+			rig.ground_y = 0.0
+	sim.effects.entities = sample.get("entities", [])
 	var m: Dictionary = sample.get("mode", {})
 	if not m.is_empty():
 		mode.phase = int(m["phase"])
@@ -121,6 +175,19 @@ func update(sample: Dictionary) -> void:
 			mode.scores[int(t["team"])] = int(t["score"])
 		sim.input_enabled = int(m["flags"]) & NetSnapshot.M_INPUT != 0
 		sim.is_finished = int(m["flags"]) & NetSnapshot.M_FINISHED != 0
+
+
+## Appends a replicated event (now due) to the mirror's event ring, where presentation bridges
+## (AudioMatchBridge) read it exactly like local simulation events.
+func push_event(ev: Dictionary) -> void:
+	if sim == null:
+		return
+	var e := ev.duplicate()
+	sim.event_seq += 1
+	e["seq"] = sim.event_seq
+	sim.events.append(e)
+	if sim.events.size() > MatchSim.MAX_EVENTS:
+		sim.events.pop_front()
 
 
 func free_all() -> void:

@@ -266,6 +266,37 @@ func test_listen_host_with_remote_client() -> void:
 	_no_child_errors([host, g])
 
 
+## Bonus modes change the fighter list mid-match (Chum Rush minions spawn and despawn into
+## reused slots; the Absolute Unit is rebuilt with a scaled body): the roster generations must
+## keep clients consistent, and the presenting client (NetMatchScene + ModeView + audio bridge on
+## the mirror) must run without errors.
+func test_bonus_modes_over_network() -> void:
+	u = U.new(self, "bonus_modes")
+	var port: int = u.base_port
+	var pl: String = u.playlist("bonus.json", [
+		{"id": "rush", "rules": "chum_rush", "arena": "the_gullet", "weight": 1, "bots": 0, "rules_override": {"round_time": 35}},
+		{"id": "unit", "rules": "absolute_unit", "arena": "the_gullet", "weight": 1, "min_players": 4,
+			"rules_override": {"round_time": 40, "score_target": 12}}],
+		{"voting": {"enabled": false, "candidates": 1}, "repeat_avoidance": 1})
+	var srv := await _start_server("srv", u.server_sections(port, {"match": {"playlist": pl, "results_time": 2}}))
+	var a: int = u.spawn("brawler", u.client_args(port, "Brawler", "aggressive", ["--ready", "--stop-after-matches", "2", "--quit-after", "200"]))
+	var b: int = u.spawn("viewer", u.client_args(port, "Viewer", "wander", ["--ready", "--present", "--stop-after-matches", "2", "--quit-after", "200"]))
+	var ra: Dictionary = await u.wait_json(u.result_path("Brawler"), _done, 210.0)
+	var rb: Dictionary = await u.wait_json(u.result_path("Viewer"), _done, 20.0)
+	var modes: Array = []
+	for m in ra.get("matches", []):
+		modes.append(str(m.get("mode", "")))
+	modes.sort()
+	check_eq(modes, ["absolute_unit", "chum_rush"], "both bonus modes were played over the network")
+	check_eq((ra.get("results", []) as Array).size(), 2, "both matches finished and advanced automatically")
+	check(int(ra.get("roster_updates", 0)) > 4, "roster changes replicated (%d updates)" % int(ra.get("roster_updates", 0)))
+	check(int(ra.get("max_snapshot_slots", 0)) > 2, "minion slots appeared in snapshots (%d slots)" % int(ra.get("max_snapshot_slots", 0)))
+	check(int(rb.get("events_total", 0)) > 20, "presenting client consumed events")
+	print("    LOOPBACK bonus modes: roster updates %d, max slots %d, events %d" % [int(ra.get("roster_updates", 0)),
+		int(ra.get("max_snapshot_slots", 0)), int(rb.get("events_total", 0))])
+	_no_child_errors([srv, a, b])
+
+
 func test_lan_discovery_between_processes() -> void:
 	u = U.new(self, "lan")
 	var port: int = u.base_port

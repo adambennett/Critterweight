@@ -81,7 +81,20 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud_layer.add_child(overlay)
 	_apply_presentation_settings()
+	# audio bridge on the mirror: impacts, voices, crowd, announcer and music like local play
+	var seed_v := int(info.get("match_id", 1))
+	Audio.attach_match(mirror.sim, my_index, {"context": "online", "seed": seed_v})
+	Audio.music(_default_music(), 1.5, {"seed": seed_v})
+	if not Audio.subtitle.is_connected(hud.subtitle):
+		Audio.subtitle.connect(hud.subtitle)
 	return ""
+
+
+func _default_music() -> String:
+	var m := str(info.get("mode", "standard"))
+	if m != "standard" or replica.slot_count() > 2:
+		return "combat_b"
+	return "combat_a"
 
 
 func _apply_presentation_settings() -> void:
@@ -92,6 +105,9 @@ func _apply_presentation_settings() -> void:
 
 
 func _exit_tree() -> void:
+	if hud and Audio.subtitle.is_connected(hud.subtitle):
+		Audio.subtitle.disconnect(hud.subtitle)
+	Audio.end_match()
 	if mirror:
 		mirror.free_all()
 		mirror = null
@@ -160,11 +176,12 @@ func _process(dt: float) -> void:
 	for p in _sample["props"]:
 		arena_view.set_prop_transform(int(p["index"]), Transform3D(Basis(p["rot"] as Quaternion), p["pos"]))
 	vfx.sync_entities(_sample["entities"])
-	mirror.update(_sample)
+	mirror.update(_sample, dt)
 	if mode_view:
 		mode_view.call("update_state", _sample["mode"].get("view", {}), dt)
 	_update_pick_panel()
 	for ev in replica.pop_due_events():
+		mirror.push_event(ev)
 		_on_event(ev)
 	if overlay:
 		overlay.visible = bool(Settings.get_value("diag.show_net"))
@@ -421,9 +438,22 @@ func _on_event(ev: Dictionary) -> void:
 			sync_roster()  # views follow the replicated roster (S_ROSTER precedes these events)
 		"goal":
 			hud.callout("GOAL!", 2.0, TeamColors.color(int(ev.get("team", 0))).lightened(0.3))
+			Audio.announce_trigger("mode", {"mode": "chumball_goal"})
 		"unit_crowned":
 			hud.callout("%s IS THE ABSOLUTE UNIT" % _display_name(fi).to_upper(), 2.2, Color("#8BD426"))
+			Audio.announce_trigger("mode", {"mode": "new_unit"}, {"p": _display_name(fi)})
 		"wave_start":
 			hud.callout("WAVE %d" % int(ev.get("wave", 1)), 1.6, Color(1.0, 0.6, 0.3))
+			Audio.announce_trigger("mode", {"mode": "rush_wave"}, {"n": int(ev.get("wave", 1))})
 		"wave_cleared":
 			hud.callout("WAVE CLEARED", 1.4, Color(0.6, 1.0, 0.6))
+		"gate_spawn":
+			var tags: Array = replica.roster.get(fi, {}).get("tags", [])
+			if tags.has("headliner"):
+				hud.callout("HEADLINER: %s" % _display_name(fi).to_upper(), 2.0, Color(1.0, 0.4, 0.3))
+				Audio.announce_trigger("mode", {"mode": "rush_headliner"}, {"o": _display_name(fi)})
+		"spotlight_swing":
+			Audio.announce_trigger("mode", {"mode": "spotlight"})
+		"sudden_death":
+			hud.callout("SUDDEN DEATH", 1.8, Color(1.0, 0.35, 0.3))
+			Audio.announce_trigger("time", {"kind": "sudden_death"})
