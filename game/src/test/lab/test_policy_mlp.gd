@@ -51,7 +51,7 @@ func test_fast_forward_matches_reference() -> void:
 			var worst := 0.0
 			for k in fast.size():
 				worst = maxf(worst, absf(fast[k] - slow[k]))
-			check(worst < 1e-5, "%s: fast path within 1e-5 of reference (worst %.2e)" % [str(cfg), worst])
+			check(worst < 1e-5, "%s: fast path within 1e-5 of reference (worst %.9f)" % [str(cfg), worst])
 			check_eq(fast.size(), int(cfg[2]))
 
 
