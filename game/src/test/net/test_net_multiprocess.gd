@@ -370,6 +370,7 @@ func test_party_run_resumed_through_the_lobby() -> void:
 	check_eq([str(pa.get("net_seat", "")), str(pa.get("me", ""))], ["1", "1"], "Ann plays as member 1 of the run")
 	check_eq([str(pb.get("seat", "")), str(pb.get("me", "")), bool(pb.get("is_host", false))], ["2", "2", true], "Ben hosts as member 2")
 	check_eq(str(pa.get("host_id", "")), "2", "Ann's CoopSession knows Ben (seat 2) as the host")
+	check_eq(str(pa.get("error", "?")), "", "the run Ben resumed checked out against Ann's own save")
 	check_eq(str(pb.get("start_error", "?")), "", "Ben's CoopSession resumed the run")
 	check_eq(pb.get("started_with_missing", ["?"]), [], "after Ann was back")
 	var host_msgs: Array = ra.get("party_run_messages", [])

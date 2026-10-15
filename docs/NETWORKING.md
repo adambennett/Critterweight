@@ -510,9 +510,16 @@ authority:
   is empty (CoopSession.host_resume over NetPartyTransport); a member calls `claim(seat)` when the
   lobby offers a run it holds in its own party save ("rejoins by run id") and then `tick(dt)`
   every frame, which starts CoopSession.member_join once seated, repeats its hello until the run
-  arrives and asks for its fighter back. Dedicated servers do not host party runs. Tested:
+  arrives and asks for its fighter back. The member re-verifies the first state the host sends
+  against its own save (`check_resumed`: same run id and seed, follows from its own decision log
+  via `RunController.verify`, continues the member's log - the host may be further along, never
+  behind or different) and otherwise leaves the party run with the reason (`failed`); CoopSession
+  itself accepts host-only messages only from the host's seat and verifies every later ticket and
+  the final result. Dedicated servers do not host party runs. Tested:
   `test_net_loopback::test_party_seats_inprocess` (seat ids swapped against session ids, claim
-  rules, outsiders kept out) and `test_net_multiprocess::test_party_run_resumed_through_the_lobby`
+  rules, outsiders kept out), `test_net_loopback::test_party_run_member_checks` (same run, ahead,
+  behind, another run under the same id, a forged state) and
+  `test_net_multiprocess::test_party_run_resumed_through_the_lobby`
   (independent processes: Ben resumes the run Ann hosted, Ann claims seat 1 by run id, both vote,
   the run moves on identically on both machines).
 

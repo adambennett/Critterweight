@@ -13,9 +13,11 @@ extends RefCounted
 ##   member claim(seat)             the lobby offers run R: the member must hold R in its own party
 ##                                  save ("rejoins by run id") and asks for its seat (a seat it can
 ##                                  find by profile id / name, or the one the player picked);
-##                                  once Net seats it, tick() starts CoopSession.member_join (the
-##                                  member re-verifies the host's state against its own save) and
-##                                  asks for its fighter back.
+##                                  once Net seats it, tick() starts CoopSession.member_join and
+##                                  asks for its fighter back. The first state the host sends is
+##                                  re-verified against the member's own save (check_resumed: same
+##                                  run, follows from its decision log, continues the member's
+##                                  log); if it does not, the member leaves the party run (failed).
 ##   both   tick(dt) every frame.
 ##
 ## Seat ids are the run's player ids, so CoopSession sees the member ids the run was played with;
@@ -23,6 +25,9 @@ extends RefCounted
 ## Runs that were not started online (non-numeric player ids) cannot be offered.
 
 const HELLO_EVERY_MS := 1000
+
+## A member left the party run because the host's run did not check out against its own save.
+signal failed(reason: String)
 
 var catalog: CampaignCatalog
 var store: RunStore
@@ -32,8 +37,10 @@ var session: CoopSession = null
 var role := ""                     ## "" | "host" | "member"
 var run_id := ""
 var seat := ""
-var state: Dictionary = {}         ## host: the run as loaded from its party save
+var state: Dictionary = {}         ## the run from this machine's own party save
+var error := ""                    ## why the party run was left ("" = fine)
 var _hello_ms := 0
+var _checked := false
 
 
 func _init(cat: CampaignCatalog, run_store: RunStore, prof: Dictionary) -> void:
@@ -166,6 +173,29 @@ func claim(my_seat := "") -> String:
 	role = "member"
 	run_id = id
 	seat = me
+	state = r["state"]
+	_checked = false
+	error = ""
+	return ""
+
+
+## Member side check of the run the host resumed, against this member's own party save: the
+## same run (id + seed), a state that follows from its own decision log (RunController.verify),
+## and a log that continues ours - the host may be further along (it held a newer checkpoint),
+## never behind or different. Returns "" or a UI-ready reason.
+static func check_resumed(cat: CampaignCatalog, own: Dictionary, host_state: Dictionary) -> String:
+	if str(host_state.get("run_id", "")) != str(own.get("run_id", "")) or int(host_state.get("seed", 0)) != int(own.get("seed", 0)):
+		return "The host's run is not the one in your save."
+	var v := RunController.verify(cat, host_state)
+	if not bool(v["ok"]):
+		return "The host's run does not check out (%s)." % str(v["error"])
+	var mine: Array = own.get("log", [])
+	var theirs: Array = host_state.get("log", [])
+	if theirs.size() < mine.size():
+		return "The host's save is older than yours (%d decisions, you have %d): the newest save should host." % [theirs.size(), mine.size()]
+	for i in mine.size():
+		if Saves.checksum(mine[i]) != Saves.checksum(theirs[i]):
+			return "The host's run differs from your save at decision %d." % (i + 1)
 	return ""
 
 
@@ -188,6 +218,14 @@ func tick(dt: float) -> void:
 		_hello_ms = Time.get_ticks_msec()
 		session.transport.send(session.host_id, "hello", {"player": session.me})
 		session.rejoin()
+	if role == "member" and session.ctrl != null and not _checked:
+		_checked = true
+		var why := check_resumed(catalog, state, session.ctrl.state)
+		if why != "":
+			error = why
+			close()
+			failed.emit(why)
+			return
 	session.tick(dt)
 
 

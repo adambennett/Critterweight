@@ -563,6 +563,38 @@ func test_party_seats_inprocess() -> void:
 	party.close()
 
 
+## A member re-verifies the run a host resumes against its own party save before playing on:
+## the same run (id + seed), a state that follows from its decision log, a log that continues the
+## member's (the host may be ahead, never behind or different).
+func test_party_run_member_checks() -> void:
+	var cat := CampaignCatalog.new(Content, "dev_biped")
+	var cfg := {"seed": 777, "variant": "off_the_street", "difficulty": "amateur", "dose": 0, "created_at": 5,
+		"players": [{"id": "1", "name": "Ann", "profile_id": "ann", "fighter": "f_stoke"},
+			{"id": "2", "name": "Ben", "profile_id": "ben", "fighter": "f_dozer"}]}
+	var ctrl := RunController.start_run(cat, cfg)
+	var own: Dictionary = RunStore.json_stable(ctrl.state)
+	check_eq(NetPartyRuns.check_resumed(cat, own, own), "", "the same run checks out")
+	var ahead := RunController.from_state(cat, own.duplicate(true))
+	check(ahead.choose_node(str(ahead.available_nodes()[0]), "1"), "one more decision: %s" % ahead.last_error)
+	var ahead_st: Dictionary = RunStore.json_stable(ahead.state)
+	check_eq(NetPartyRuns.check_resumed(cat, own, ahead_st), "", "a host that is further along is fine")
+	check(NetPartyRuns.check_resumed(cat, ahead_st, own).contains("older"), "a host behind the member's save is refused")
+	var other_cfg := cfg.duplicate(true)
+	other_cfg["seed"] = 778
+	other_cfg["run_id"] = str(own["run_id"])
+	var other: Dictionary = RunStore.json_stable(RunController.start_run(cat, other_cfg).state)
+	check(NetPartyRuns.check_resumed(cat, own, other).contains("not the one"), "another run under the same id is refused")
+	var forged: Dictionary = own.duplicate(true)
+	(forged["players"][1] as Dictionary)["scrip"] = 9999
+	check(NetPartyRuns.check_resumed(cat, own, forged).contains("does not check out"), "a state that does not follow from its log is refused")
+	check_eq(NetPartyRuns.seats_of(own), [{"id": "1", "name": "Ann", "fighter": "f_stoke"}, {"id": "2", "name": "Ben", "fighter": "f_dozer"}], "seats from the run")
+	check_eq(NetPartyRuns.seat_for(own, "ben", "Ben"), "2", "the host finds its own seat by profile id")
+	check_eq(NetPartyRuns.seat_for(own, "nobody", "Ann"), "1", "or by name")
+	var loop_run: Dictionary = own.duplicate(true)
+	(loop_run["players"][0] as Dictionary)["id"] = "p0"
+	check(NetPartyRuns.seats_of(loop_run).is_empty(), "runs not started online have no seats")
+
+
 ## Before a match is built the client checks the arena: local content or an imported layout
 ## package must match the host's content hash; damaged or oversized packages are refused.
 func test_arena_checks_before_the_match() -> void:

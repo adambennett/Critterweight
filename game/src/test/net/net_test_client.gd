@@ -631,6 +631,7 @@ func _party_run_step(dt: float) -> void:
 	pr["seat"] = runs.seat
 	pr["net_seat"] = Net.party_seat()
 	pr["members"] = Net.member_ids()
+	pr["error"] = runs.error
 	if s != null and s.ctrl != null:
 		var st: Dictionary = s.ctrl.state
 		var pos := str(st.get("position", ""))
