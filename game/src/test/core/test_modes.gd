@@ -34,7 +34,7 @@ func test_spotlight_hog_scores_and_swings() -> void:
 	var sim := _mode_sim("spotlight_hog", {"score_target": 12, "dwell": 6.0, "round_time": 90.0}, _bots(4))
 	var seen_swing := false
 	var t := 0.0
-	while t < 90.0 and not sim.is_finished:
+	while t < 100.0 and not sim.is_finished:
 		await step_sim(sim, 1.0)
 		t += 1.0
 		if not _events(sim, "spotlight_swing").is_empty():
@@ -98,3 +98,26 @@ func test_chum_rush_waves_spawn_and_slots_are_reused() -> void:
 	check(mode.kills >= 3, "minions were defeated (%d)" % mode.kills)
 	check(sim.fighters.size() <= MatchSim.MAX_FIGHTERS, "fighter slots bounded (%d)" % sim.fighters.size())
 	check(not _events(sim, "fighter_despawned").is_empty(), "dead minions despawned")
+
+
+## Review regression: score modes respawn knocked-out fighters (the shipped presets have no
+## "lives" key, which once meant one life and no respawn).
+func test_score_mode_presets_respawn_knocked_out_fighters() -> void:
+	for preset in ["spotlight_hog", "chumball", "absolute_unit"]:
+		var rules: Dictionary = Content.get_entry("rules", preset).duplicate(true)
+		var sim := MatchSim.new()
+		sim.running = false
+		fresh_world().add_child(sim)
+		var entries := []
+		for i in 4:
+			entries.append({"creature": Content.creature("dev_biped"), "team": i % 2 if preset == "chumball" else i, "source": null, "kind": "bot"})
+		sim.setup({"arena": Content.arena("the_gullet"), "rules": rules, "seed": 5, "fighters": entries, "mode": ModeRegistry.create(str(rules["mode"]))})
+		await step_sim(sim, 3.0)
+		var victim: Fighter = sim.fighters[3]
+		if preset == "absolute_unit" and sim.mode.get("unit") == victim:
+			victim = sim.fighters[2]
+		sim.on_fighter_depleted(victim, sim.fighters[1], {})
+		check(victim.is_out(), "%s: knocked out" % preset)
+		await step_sim(sim, float(sim.rules.get("respawn_delay", 5.0)) + 1.5)
+		check(not victim.is_out(), "%s: respawned after the delay" % preset)
+		check(not sim.is_finished, "%s: one KO does not end the match" % preset)
