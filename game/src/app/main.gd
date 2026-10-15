@@ -6,7 +6,6 @@ extends Node
 ##   --probe <name>          run a physics/combat probe and print metrics
 ##   --server [--config p]   dedicated server (see docs/SERVER.md)
 ##   --lab-worker <job>      AI Lab training worker (spawned by the Lab UI)
-##   --autotest <scenario>   scripted runtime verification of the real game UI
 ##   --bench <scene>         performance capture
 
 var args: PackedStringArray
@@ -39,8 +38,6 @@ func _ready() -> void:
 		mode = "net"
 	elif args.has("--lab-worker"):
 		mode = "lab_worker"
-	elif args.has("--autotest"):
-		mode = "autotest"
 	elif args.has("--bench"):
 		mode = "bench"
 	elif args.has("--hub"):
@@ -112,10 +109,6 @@ func _start(mode: String) -> void:
 			var worker = load("res://src/lab/lab_worker.gd").new()
 			add_child(worker)
 			worker.call("run_from_cli", args)
-		"autotest":
-			var at = load("res://src/test/autotest.gd").new()
-			add_child(at)
-			at.call("run", arg_value("--autotest", ""), args)
 		"bench":
 			var bench = load("res://src/test/bench.gd").new()
 			add_child(bench)
