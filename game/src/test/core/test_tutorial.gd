@@ -305,28 +305,51 @@ func test_guard_string() -> void:
 	await _run(3, plan, 45.0)
 
 
-## Sidesteps the Kid's Heavy, then dodges toward him and presses Light during the dodge.
+## Sidesteps the Kid's Heavy as it arrives ("wait for his big wind-up, then dodge"): the first
+## guess is its active frame, after that when his Heavies actually landed. Then dodges toward
+## him and presses Light during the dodge.
 func _dodge_plan() -> Callable:
 	return func(f: Fighter, sim, t: float, mem: Dictionary) -> void:
 		var kid: Fighter = sim.fighters[1]
 		var mode := sim.mode as TutorialMode
 		if mode.stage == 0:
-			if kid.state == Fighter.State.ATTACK and kid.move_slot.split("@")[0] in ["heavy", "heavy_charged"] and not mem.has("dodged_at"):
-				mem["dodged_at"] = t
-				var to := _toward(f, kid.pos())
-				f.input.move = Vector3(-to.z, 0, to.x)
-				f.input.press(FighterInput.DODGE)
-			elif mem.has("dodged_at") and t - float(mem["dodged_at"]) > 1.5:
-				mem.erase("dodged_at")
+			var pace := maxf(0.1, float(kid.mods.get("move_speed", 1.0)))
+			var heavy := kid.state == Fighter.State.ATTACK and kid.move != null and kid.move_slot.split("@")[0] in ["heavy", "heavy_charged"]
+			if heavy and not mem.has("start"):
+				mem["start"] = float(sim.time) - kid.state_time / pace
+			elif not heavy and kid.state != Fighter.State.HITSTUN:
+				mem.erase("start")
+				mem.erase("dodged")
+			for ev in sim.events_since(int(mem.get("cur", 0))):
+				mem["cur"] = int(ev["seq"])
+				if ev["type"] == "hit" and int(ev["fighter"]) == 1 and int(ev["target"]) == 0 and mem.has("start"):
+					mem["arrive"] = float(sim.time) - float(mem["start"])
+			if heavy and not mem.has("dodged"):
+				var expect := float(mem.get("arrive", kid.move.first_active() / pace))
+				if float(sim.time) - float(mem["start"]) >= expect - 0.12:
+					mem["dodged"] = true
+					var to := _toward(f, kid.pos())
+					f.input.move = Vector3(-to.z, 0, to.x)
+					f.input.press(FighterInput.DODGE)
 		else:
-			var d := f.pos().distance_to(kid.pos())
-			var dash_range := _rb.reach_of(f.creature, "dash_attack") + f.creature.stat("dodge_distance") + 0.6
-			if d > dash_range and f.state == Fighter.State.NEUTRAL:
-				f.input.move = _toward(f, kid.pos())
-			elif f.state == Fighter.State.NEUTRAL and t - float(mem.get("dash", -9.0)) > 1.0:
-				mem["dash"] = t
-				f.input.move = _toward(f, kid.pos())
-				f.input.press(FighterInput.DODGE)
+			# "it closes distance": dash in from a few steps out (part of the dodge's travel plus
+			# the dash attack's reach), from a little further or closer after a miss
+			var d := _dist(f, kid)
+			var tries := int(mem.get("dash_tries", 0))
+			var want: float = (f.creature.stat("dodge_distance") * 0.5 + _rb.reach_of(f.creature, "dash_attack") * 0.6) * float([1.0, 0.7, 1.3][tries % 3])
+			if f.state == Fighter.State.NEUTRAL:
+				var backing := float(mem.get("back_t", 0.0))
+				if d < want - 0.3 and backing < 1.5:          # (not forever: a wall may be behind)
+					mem["back_t"] = backing + 1.0 / Engine.physics_ticks_per_second
+					f.input.move = -_toward(f, kid.pos())
+				elif d > want + 0.3:
+					f.input.move = _toward(f, kid.pos())
+				elif t - float(mem.get("dash", -9.0)) > 1.0:
+					mem["dash"] = t
+					mem["dash_tries"] = tries + 1
+					mem["back_t"] = 0.0
+					f.input.move = _toward(f, kid.pos())
+					f.input.press(FighterInput.DODGE)
 			elif f.state == Fighter.State.DODGE:
 				f.input.move = _toward(f, kid.pos())
 				f.input.press(FighterInput.LIGHT)

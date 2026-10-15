@@ -699,9 +699,10 @@ class KidScript:
 		if b in ["parry_drill", "heavy"]:
 			k.mods["move_speed"] = 0.75     # telegraphed: longer, readable wind-ups
 		# fighting back he is a Punching Bag-tier bot with the handicaps the game's easiest
-		# difficulty gives every opponent (Sparring, content/core/ladder/difficulty.json): he is
-		# a roster fighter standing in for the Kid, and some matchups would otherwise make the
-		# freestyle round a beginner's worst fight (a rookie Stoke's armored overhand on Dredge)
+		# difficulty gives every opponent (Sparring, content/core/ladder/difficulty.json). The
+		# freestyle closes a beginner's tutorial: without them even his deliberately weak kit
+		# splits 60 s rounds with a slow fighter (Dredge: a strong player needed two rounds),
+		# and a roster stand-in is a full-strength fighter (a rookie Stoke's overhand on Dredge)
 		var spar: Dictionary = Content.get_entry("ladder", "sparring") if b == "fight" else {}
 		k.mods["damage"] = float(spar.get("enemy_damage", 1.0))
 		var hp := float(spar.get("enemy_hp", 1.0))
@@ -747,7 +748,12 @@ class KidScript:
 	##    generous; strikes authored against a tall body pass over a short one from its edge
 	##    (Jitters), and from too close they are smothered by a raised guard before they get
 	##    going (Dredge's claws stand 0.9 m out in front of him).
-	const SPACINGS := [1.0, 0.85, 0.7, 0.55, 0.4]
+	## The estimate (BotBrain.reach_of: furthest strike point + 70% of the lunge + weapon radius)
+	## overshoots where strikes really land: the Kid's jab estimates 1.16 m and lands at
+	## 0.9–1.0 m (docs/kits/npc_kid_lamprey.md), so he starts at 0.8 of it, where a fist meets
+	## the body early in its active window (a parry is timed to that), then tries closer, the
+	## edge, and closer still.
+	const SPACINGS := [0.8, 0.65, 0.95, 0.5, 0.4]
 	const BAND := 0.2            ## m inside his spacing that still counts as "at" it
 
 	func _attacker(f: Fighter, p: Fighter, to: Vector3, dist: float, dt: float) -> void:
