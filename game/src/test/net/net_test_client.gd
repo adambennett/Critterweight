@@ -15,12 +15,13 @@ extends Node
 ##   --test-protocol N --test-game-version X --net-test-mod <dir>   incompatible-build simulation
 ##   --net-latency ms --net-jitter ms --net-loss f       network conditioner
 ##   host only: --host-start-after-players N --rules id --arena id --bots n --rounds n --round-time s
+##              --no-sudden-death (--creature id works for the host's own fighter too)
 ##   --user-rules <name>  host with a player-made rules preset (saved on this machine only, "user:...")
 ##   --assist <f>         aim-assist multiplier sent with the join (default: from Settings)
 ##   --app-request <type>  send one app request once in the lobby (app channel test)
 ##   --party               run the campaign's NetPartyTransport: broadcast one "hello" once another
 ##                         member is present and record the party messages received
-##   --party-run <run id> --party-profile <id> [--party-seat s]
+##   --party-run <run id> --party-profile <id> [--party-seat s] [--party-wait s]
 ##                         resume a suspended co-op party run through the lobby (NetPartyRuns):
 ##                         a host offers it from its party save, a member claims its seat by run
 ##                         id; both vote the first route and stop once the run moved on
@@ -136,7 +137,7 @@ func _start_client() -> void:
 	if args.has("--test-game-version"):
 		opts["test_game_version"] = arg("--test-game-version")
 	var tok := arg("--token", "")
-	if tok != "":
+	if tok != "" and not tok.begins_with("--"):   # an empty value is dropped from the command line
 		opts["token"] = tok.hex_decode()
 	if args.has("--timeout"):
 		opts["timeout_s"] = int(arg("--timeout"))
@@ -390,7 +391,7 @@ func _start_host() -> void:
 		"conditioner_args": _conditioner_args(), "results_time": int(arg("--results-time", "4"))}
 	if args.has("--password"):
 		cfg["password"] = arg("--password")
-	for k in ["rules", "arena", "bots"]:
+	for k in ["rules", "arena", "bots", "creature"]:
 		if args.has("--" + k):
 			cfg[k] = arg("--" + k)
 	if args.has("--discovery-port"):
@@ -411,7 +412,7 @@ func _start_host() -> void:
 		# a player-made preset (MCH-06) exists only on this machine: hosting sends it in full
 		var base: Dictionary = Content.get_entry("rules", str(cfg.get("rules", "duel"))).duplicate(true)
 		base["name"] = arg("--user-rules")
-		base["damage_mult"] = 1.25
+		base["damage_mult"] = 2.0   # also keeps the test's KO well inside the round with roster fighters
 		base.erase("override")
 		var saved := RulePresets.save(base)
 		result["user_rules"] = saved
@@ -433,6 +434,8 @@ func _start_host() -> void:
 		ov["rounds"] = int(arg("--rounds"))
 	if args.has("--round-time"):
 		ov["round_time"] = float(arg("--round-time"))
+	if args.has("--no-sudden-death"):
+		ov["sudden_death"] = false   # a draw at the bell ends the match (tests with a fixed time budget)
 	if not ov.is_empty():
 		Net.host_set("rules_override", ov)
 	Net.match_starting.connect(_on_host_match_started)
@@ -503,12 +506,18 @@ func _physics_process(_dt: float) -> void:
 	if _ended:
 		return
 	var t := Time.get_ticks_msec() - started_ms
-	if hosting and _server and _server.phase == NetServer.PHASE_LOBBY:
+	# a host offering a party run never starts versus matches on its own
+	if hosting and _server and _server.phase == NetServer.PHASE_LOBBY and arg("--party-run", "") == "":
 		var remote := 0
+		var unready := 0
 		for p in _server.players.values():
 			if (p as NetPlayer).peer > 0 and (p as NetPlayer).connected and not (p as NetPlayer).spectator:
 				remote += 1
-		if remote + 1 >= host_start_players and _host_started_match <= _server.match_id:
+				if not (p as NetPlayer).ready:
+					unready += 1
+		var limit := int(arg("--host-auto-start-limit", "0"))
+		var ready_ok := unready == 0 or not args.has("--host-start-when-ready")
+		if remote + 1 >= host_start_players and ready_ok and _host_started_match <= _server.match_id and (limit <= 0 or _server.match_id < limit):
 			_host_started_match = _server.match_id + 1
 			var e := Net.host_start()
 			if e != "":
@@ -568,6 +577,8 @@ func _track_match() -> void:
 	if me >= 0 and me < fl.size() and int(fl[me]["gen"]) != 0:
 		var hm := float(fl[me]["health"])
 		result["my_health_min"] = hm if float(result["my_health_min"]) < 0.0 else minf(float(result["my_health_min"]), hm)
+		# the fighter's full health (it starts full): tests compare against it, not a fixed number
+		result["my_health_max"] = maxf(float(result.get("my_health_max", 0.0)), hm)
 		if _kick_seen_ms < 0:
 			result["my_health_min_before_kick"] = hm if float(result["my_health_min_before_kick"]) < 0.0 else minf(float(result["my_health_min_before_kick"]), hm)
 	if not _client.present:
@@ -637,8 +648,8 @@ func _party_run_step(dt: float) -> void:
 		pr["claim_error"] = runs.claim(arg("--party-seat", ""))
 		pr["offer"] = Net.party()
 	if hosting and runs.role == "host" and runs.session == null:
-		# start once every member is back (or after 30 s without them)
-		if runs.missing_seats().is_empty() or Time.get_ticks_msec() - started_ms > 30000:
+		# start once every member is back (or after --party-wait s without them, default 30)
+		if runs.missing_seats().is_empty() or Time.get_ticks_msec() - started_ms > int(float(arg("--party-wait", "30")) * 1000.0):
 			pr["started_with_missing"] = runs.missing_seats()
 			pr["start_error"] = runs.start_host()
 			if runs.session:

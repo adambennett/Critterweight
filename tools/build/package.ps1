@@ -48,6 +48,11 @@ if ($RunTests) {
 $version = (Select-String -Path (Join-Path $game "project.godot") -Pattern '^config/version="(.+)"').Matches[0].Groups[1].Value
 $rev = (git -C $root rev-parse --short HEAD).Trim()
 $dirty = (git -C $root status --porcelain).Length -gt 0
+$tagAtHead = (git -C $root tag --points-at HEAD | Where-Object { $_ -eq "v$version" } | Select-Object -First 1)
+# build stamp the game shows (main menu, logs): written for the export only, removed afterwards
+$buildInfo = Join-Path $game "build_info.json"
+[ordered]@{ version = $version; tag = "$tagAtHead"; commit = $rev; dirty = $dirty; built_at = (Get-Date).ToString("s") } |
+	ConvertTo-Json | Set-Content -Encoding ascii $buildInfo
 $manifest = [ordered]@{ product = "Critterweight"; version = $version; git_revision = $rev; working_tree_dirty = $dirty;
 	built_at = (Get-Date).ToString("s"); godot = (& $Godot --version).Trim(); targets = @() }
 
@@ -100,5 +105,7 @@ foreach ($t in $Targets) {
 	$manifest.targets += $entry
 }
 
+Remove-Item $buildInfo -ErrorAction SilentlyContinue
+$manifest.tag = "$tagAtHead"
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 (Join-Path $OutDir "BUILD_MANIFEST.json")
 Step "Done. Manifest: $(Join-Path $OutDir 'BUILD_MANIFEST.json')"

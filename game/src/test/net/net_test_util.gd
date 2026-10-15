@@ -13,8 +13,10 @@ extends RefCounted
 
 const KEEP_OUTPUT := 512 * 1024
 ## How long a spawned server may take to print "ready:". It is normally up in 1-2 s; on a shared
-## machine saturated by parallel jobs, engine start alone was seen taking 10 s.
-const SERVER_READY_S := 30.0
+## machine saturated by parallel jobs (several full suites and stress runs at once) engine start
+## alone was seen taking 10 s, and 35-41 s at the worst. Waits for any freshly spawned process to
+## answer use this budget.
+const SERVER_READY_S := 60.0
 
 var tc: Node                       ## the running TestCase (for awaits)
 var root := ""                     ## per-test working folder

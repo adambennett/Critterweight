@@ -183,7 +183,7 @@ func _build() -> void:
 	# --- footer
 	var foot := UiTheme.hbox(UiTheme.GAP_L)
 	outer.add_child(foot)
-	foot.add_child(UiTheme.label("v%s" % str(ProjectSettings.get_setting("application/config/version", "")), "Caption"))
+	foot.add_child(UiTheme.label("v%s" % BuildInfo.label(), "Caption"))     # version + commit for bug reports
 	_bar = PromptBar.new()
 	_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	foot.add_child(_bar)

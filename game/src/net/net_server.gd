@@ -1093,6 +1093,23 @@ func host_set(key: String, value) -> String:
 				if PolicyLibrary.get_policy(str(pid)) == null:
 					return "AI policy '%s' is not available: %s" % [pid, PolicyLibrary.last_error(str(pid))]
 			settings["bot_policy"] = ids
+		"playlist":
+			# listen host: a content playlist ("" = none) - players vote on its candidates and the
+			# host starts the winner (host_start); dedicated servers take theirs from the config
+			if dedicated:
+				return "a dedicated server's playlist comes from its config"
+			var plid := str(value)
+			if plid == "":
+				set_playlist(null)
+			else:
+				var pd := Content.get_entry("playlists", plid)
+				if pd.is_empty():
+					return "unknown playlist '%s'" % plid
+				var pl := NetPlaylist.from_dict(pd, "content")
+				pl.validate()
+				if pl.valid_entries().is_empty():
+					return "playlist '%s' has no entry this game can play" % plid
+				set_playlist(pl)
 		_:
 			return "unknown setting '%s'" % key
 	_lobby_dirty = true
@@ -1507,6 +1524,11 @@ func _tick_idle() -> void:
 
 func _tick_lobby() -> void:
 	if not dedicated:
+		# a listen host with a playlist: players vote while the host decides when to start
+		if playlist != null and vote.is_empty():
+			_open_vote()
+			phase_until = 0
+			_lobby_dirty = true
 		return
 	var humans := _human_players()
 	if _connected_count() == 0 and str(cfg["empty_behavior"]) == "idle":
@@ -1587,10 +1609,19 @@ func _close_vote_and_start() -> void:
 		_open_vote()
 
 
-## Listen host: start with the host's lobby settings.
+## Listen host: start with the host's lobby settings - or, with a playlist, the voted entry.
 func host_start() -> String:
 	if phase != PHASE_LOBBY:
 		return "a match is already running"
+	if playlist != null:
+		if (vote.get("candidates", []) as Array).is_empty():
+			_open_vote()
+			phase_until = 0
+		if (vote.get("candidates", []) as Array).is_empty():
+			var n := _human_players().size()
+			return "no playlist entry can start with %d player%s" % [n, "" if n == 1 else "s"]
+		_close_vote_and_start()
+		return "" if phase == PHASE_MATCH else "the voted entry could not start (see the notices)"
 	var rules := NetPlaylist.resolve_rules(str(settings["rules"]), settings["rules_override"])
 	if rules.is_empty():
 		return "unknown rules preset '%s'" % settings["rules"]
@@ -2174,7 +2205,8 @@ func lobby_state() -> Dictionary:
 		"settings": {"rules": settings["rules"], "rules_name": str(rules.get("name", settings["rules"])),
 			"arena": settings["arena"], "arena_name": ad.display_name if ad else str(settings["arena"]),
 			"mode": str(rules.get("mode", "standard")), "bots": settings["bots"], "bot_difficulty": settings["bot_difficulty"],
-			"rules_override": settings["rules_override"], "bot_policy": settings["bot_policy"]},
+			"rules_override": settings["rules_override"], "bot_policy": settings["bot_policy"],
+			"player_assist": bool(cfg.get("player_assist", true)), "party_relay": bool(cfg.get("party_relay", true))},
 		"entry": current_entry, "game_version": NetProtocol.game_version()}
 	if playlist:
 		var errs: Array = playlist.errors.slice(0, 8)

@@ -97,8 +97,9 @@ func _aggressive(c: NetClient) -> Callable:
 func test_session_flow_inprocess() -> void:
 	var port := _port()
 	var server := _server(port)
-	var a := _client(port, {"name": "Ann"})
-	var b := _client(port, {"name": "Ben"}, true)
+	# roster fighters named explicitly: Ann's Stoke must knock out Ben's (lighter) Jitters in time
+	var a := _client(port, {"name": "Ann", "creature": "f_stoke"})
+	var b := _client(port, {"name": "Ben", "creature": "f_jitters"}, true)
 	check(await _until(func() -> bool: return a.state == NetClient.State.LOBBY and b.state == NetClient.State.LOBBY, 8.0), "both admitted")
 	check_eq(server.players.size(), 2, "two players")
 	check(not a.welcome.is_empty() and int(a.welcome["player_id"]) >= 2, "player ids start at 2 (1 = server)")
@@ -561,6 +562,51 @@ func test_party_seats_inprocess() -> void:
 	check(not changes.is_empty() and changes[-1].is_empty(), "party_changed({}) on close")
 	Net.leave()
 	party.close()
+
+
+## A NEW party run dealt from the lobby (NetPartyRuns.start_new_as_host): the players' session ids
+## become the run's member ids, the offer says "new" (members take their seat without a save of
+## their own), the host's CoopSession runs at once, and a second offer is refused.
+func test_party_new_run_from_the_lobby_inprocess() -> void:
+	var port := _port()
+	check_eq(Net.host({"port": port, "player_name": "Hosty", "lan_discovery": false, "max_players": 4}), OK, "listen server up")
+	var a := _client(port, {"name": "Ann"})
+	check(await _until(func() -> bool: return a.state == NetClient.State.LOBBY, 6.0), "Ann admitted")
+	var dir := Paths.dir("captures").path_join("tests").path_join("net").path_join("party_new_%d" % OS.get_process_id())
+	var store := RunStore.new(dir)
+	var cat := CampaignFlow.make_catalog(CampaignFlow.dev_tools())
+	var pr := NetPartyRuns.new(cat, store, Profiles.current)
+	check(NetPartyRuns.new(cat, store, Profiles.current).claim() != "", "nothing to claim before an offer")
+	var cfg := {"seed": 0, "variant": "off_the_street", "difficulty": "amateur", "dose": 0, "created_at": 5, "coop_format": "simultaneous",
+		"players": [{"id": "1", "name": "Hosty", "fighter": "f_stoke", "profile_id": CampaignFlow.profile_key()},
+			{"id": str(a.player_id), "name": "Ann", "fighter": "f_dozer", "profile_id": ""}]}
+	check_eq(pr.start_new_as_host(cfg), "", "a new party run dealt and offered")
+	var pt := Net.party()
+	var run_id := str(pt.get("run_id", ""))
+	check(run_id != "" and bool((pt.get("info", {}) as Dictionary).get("new", false)), "the offer is marked new: %s" % str(pt.get("info", {})))
+	check_eq((pt.get("seats", []) as Array).map(func(s: Dictionary) -> String: return str(s["id"])), ["1", str(a.player_id)],
+		"the seats are the players' session ids")
+	check_eq(Net.local_member_id(), "1", "the host sits in its own seat")
+	check(pr.session != null and pr.session.ctrl != null, "the host's CoopSession runs")
+	check(NetPartyRuns.new(cat, store, Profiles.current).start_new_as_host(cfg) != "", "a second offer is refused")
+	check(await _until(func() -> bool: return str(a.lobby.get("party", {}).get("run_id", "")) == run_id, 3.0), "the offer reached Ann")
+	a.send_app(NetProtocol.APP_PARTY_CLAIM, {"run_id": run_id, "seat": str(a.player_id)})
+	check(await _until(func() -> bool: return Net.member_ids() == [str(a.player_id)], 3.0), "Ann takes her seat: %s" % str(Net.member_ids()))
+	pr.close()
+	Net.party_close()
+	Net.leave()
+	_remove_tree(dir)
+
+
+func _remove_tree(dir: String) -> void:
+	var d := DirAccess.open(dir)
+	if d == null:
+		return
+	for f in d.get_files():
+		DirAccess.remove_absolute(dir.path_join(f))
+	for sub in d.get_directories():
+		_remove_tree(dir.path_join(sub))
+	DirAccess.remove_absolute(dir)
 
 
 ## Equipped cosmetics travel with the player info (presentation only): validated against the
