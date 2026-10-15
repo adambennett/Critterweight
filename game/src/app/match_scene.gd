@@ -43,6 +43,10 @@ func start(cfg: Dictionary) -> void:
 				lp.camera = camera
 				entry["source"] = lp
 				player_index = idx
+				# accessibility aim assist is part of the fighter's (replicated) modifiers
+				var m: Dictionary = (entry.get("mods", {}) as Dictionary).duplicate()
+				m["assist"] = float({"low": 0.5, "normal": 1.0, "high": 1.8}.get(str(Settings.get_value("access.target_assist")), 1.0))
+				entry["mods"] = m
 			"bot":
 				var bb := BotBrain.new(str(e.get("difficulty", "regular")), int(cfg.get("seed", 1)) * 31 + idx)
 				bb.set_personality((e["creature"] as CreatureDef).ai)
@@ -83,6 +87,10 @@ func start(cfg: Dictionary) -> void:
 	Audio.music(str(cfg.get("music", _default_music())), 1.5, {"seed": int(cfg.get("seed", 1))})
 	if not Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.connect(hud.subtitle)
+	# accessibility game speed: offline matches with a local player only (recorded as custom)
+	var speed := float(Settings.get_value("access.game_speed"))
+	if speed < 0.999 and not bool(cfg.get("online", false)) and not bool(cfg.get("spectate", false)) and _is_local_player():
+		Engine.time_scale = speed
 	if cfg.has("overlay_script"):
 		var ov = load(str(cfg["overlay_script"])).new()
 		hud_layer.add_child(ov)
@@ -242,6 +250,8 @@ func _on_event(ev: Dictionary) -> void:
 			var involved := ti == player_index or int(ev["fighter"]) == player_index
 			if involved:
 				Controls.rumble(clampf(dmg / 20.0, 0.1, 0.6), clampf(dmg / 30.0, 0.0, 0.8), 0.12)
+			if bool(Settings.get_value("gameplay.damage_numbers")) and dmg >= 0.5:
+				vfx.word(p + Vector3.UP * 0.25, "%d" % roundi(dmg), Color(0.75, 0.85, 1.0) if bool(ev["blocked"]) else Color(1.0, 0.95, 0.8), 40)
 		"parry":
 			var pp: Vector3 = ev.get("pos", sim.fighters[int(ev["fighter"])].pos())
 			vfx.word(pp + Vector3.UP * 1.2, "PARRY!", Color(0.5, 0.9, 1.0))

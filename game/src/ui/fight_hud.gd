@@ -97,6 +97,42 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 	_sub.add_theme_constant_override("outline_size", 10)
 	_sub.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	add_child(_sub)
+	_add_control_hints(n)
+
+
+## Settings › Gameplay › Control hints: the core actions with the live bindings (players only).
+func _add_control_hints(n: int) -> void:
+	if not bool(Settings.get_value("gameplay.tutorial_prompts")):
+		return
+	if player_index >= sim.fighters.size() or sim.fighters[player_index].controller_kind != "player":
+		return
+	var bar := PromptBar.new()
+	bar.theme = UiTheme.get_theme()
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.set_prompts([{"actions": ["light"], "text": "Light"}, {"actions": ["heavy"], "text": "Heavy"},
+		{"actions": ["guard"], "text": "Guard"}, {"actions": ["dodge"], "text": "Dodge"}, {"actions": ["grab"], "text": "Grab"},
+		{"actions": ["ability1"], "text": "Trick 1"}, {"actions": ["ability2"], "text": "Trick 2"}, {"actions": ["juice"], "text": "JUICE"}])
+	# a dark strip behind the hints keeps them readable over the bright mat
+	var strip := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.05, 0.03, 0.08, 0.62)
+	sb.set_corner_radius_all(10)
+	sb.set_content_margin_all(8)
+	strip.add_theme_stylebox_override("panel", sb)
+	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	strip.add_child(bar)
+	bar.alignment = BoxContainer.ALIGNMENT_CENTER
+	if n <= 2:
+		strip.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+		strip.offset_top = -78
+		strip.offset_bottom = -16
+	else:
+		strip.set_anchors_preset(Control.PRESET_CENTER_TOP)
+		strip.offset_top = 140
+		strip.offset_bottom = 202
+	strip.offset_left = -720
+	strip.offset_right = 720
+	add_child(strip)
 
 
 func _label(t: String, size: int, font: Font) -> Label:

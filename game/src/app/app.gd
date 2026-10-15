@@ -221,7 +221,7 @@ func _record_match(cfg: Dictionary, scene: MatchScene, result: Dictionary) -> vo
 		return
 	var f := scene.sim.fighters[me]
 	var wt := int(result.get("winner_team", -2))
-	var custom := bool(cfg.get("custom", false)) or not Mods.load_order.is_empty()
+	var custom := bool(cfg.get("custom", false)) or not Mods.load_order.is_empty() or float(Settings.get_value("access.game_speed")) < 0.999
 	var won := wt == f.team
 	Profiles.record_match(won, wt == -1, f.creature.id, f.stats_record, float(result.get("time", 0.0)), custom)
 	if won:
