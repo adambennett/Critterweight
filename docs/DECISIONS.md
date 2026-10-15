@@ -75,7 +75,7 @@ protocol and version/content handshake. Details: docs/NETWORKING.md.
 
 ## D-015 Persistence
 User data under the OS user-data folder (`%APPDATA%\Critterweight`, `~/.local/share/Critterweight`), never the
-install folder. Versioned JSON envelopes with CRC32, atomic write (temp → flush → rotate .bak → rename), recovery
+install folder. Versioned JSON envelopes with a SHA-256 checksum of the canonical data, atomic write (temp → flush → rotate .bak → rename), recovery
 from .bak/.tmp, explicit migrations, non-destructive failure.
 
 ## D-016 Mods are data-only
