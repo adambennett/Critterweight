@@ -19,6 +19,7 @@ var hud_layer: CanvasLayer
 var player_index := 0
 var _event_cursor := 0
 var config := {}
+var director: SpectatorDirector = null   ## auto-director when spectating (cfg.spectate)
 
 
 ## config: {arena: ArenaDef, rules: {}, seed: int, mode: MatchMode, fighters: [{creature, team, kind:"player"|"bot", difficulty, name}]}
@@ -66,6 +67,8 @@ func start(cfg: Dictionary) -> void:
 	mode_view.head_of = _head_of
 	camera.points_provider = _camera_points
 	camera.focus_provider = _camera_focus
+	if bool(cfg.get("spectate", false)):
+		director = SpectatorDirector.new(sim)
 	camera.snap()
 	hud_layer = CanvasLayer.new()
 	add_child(hud_layer)
@@ -94,6 +97,7 @@ func _default_music() -> String:
 
 
 func _exit_tree() -> void:
+	Engine.time_scale = 1.0          # spectator speed control never leaks out of the match
 	if hud and Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.disconnect(hud.subtitle)
 	Audio.end_match()
@@ -132,6 +136,10 @@ func _apply_presentation_settings() -> void:
 
 
 func _camera_points() -> Array:
+	if director and camera.mode == FightCamera.Mode.SPECTATE:
+		var dp := director.points()
+		if not dp.is_empty():
+			return dp
 	var pts := []
 	for f in sim.fighters:
 		if f.despawned or f.state == Fighter.State.INACTIVE:
@@ -142,6 +150,10 @@ func _camera_points() -> Array:
 
 
 func _camera_focus() -> Array:
+	if director and camera.mode == FightCamera.Mode.SPECTATE:
+		var df := director.focus()
+		if not df.is_empty():
+			return df
 	var me := sim.fighters[player_index]
 	return [me.pos(), me.target.pos() if me.target else null]
 
@@ -197,6 +209,10 @@ func _process_events() -> void:
 	for ev in sim.events_since(_event_cursor):
 		_event_cursor = int(ev["seq"])
 		_on_event(ev)
+		if director:
+			director.on_event(ev)
+	if director:
+		director.update(1.0 / Engine.physics_ticks_per_second)
 
 
 func _on_event(ev: Dictionary) -> void:
