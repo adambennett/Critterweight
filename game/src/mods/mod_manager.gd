@@ -5,9 +5,12 @@ extends Node
 ##
 ## Trust model (docs/MODDING.md#trust): packages are DATA ONLY. No script, binary, scene,
 ## shader or resource-pack file is ever loaded or executed and archives are never mounted into
-## res://. Every archive entry is checked (path, size, file type) before anything is extracted;
-## extracted copies live in a private cache keyed by the archive hash. Packages that change core
-## content ("replaces_core") need the player's explicit consent once per version.
+## res://. Every archive entry is checked (path, name, size, file type) before anything is
+## extracted; extracted copies live in a private cache keyed by the archive hash and must match the
+## checked listing exactly. Folder packages are walked without following links (symlinks,
+## junctions): only the files the walk validated are hashed, copied, exported and handed to
+## Content. Packages that change core content ("replaces_core") need the player's explicit
+## consent once per version; Content refuses core overrides without it (D-027).
 
 signal mods_changed()
 
@@ -16,9 +19,15 @@ const SETS_FORMAT := 1
 const ARCHIVE_EXT := ["critmod", "zip"]
 const ALLOWED_EXT := ["json", "txt", "md", "png", "jpg", "jpeg", "webp", "ogg", "wav", "glb"]
 const ID_PATTERN := "^[a-z0-9_]{3,32}$"
+const RESERVED_IDS := ["core", "user"]     ## the base game and the player's own "user:" entries
 const KNOWN_CAPABILITIES := ["replaces_core", "large_assets", "scripts"]
 const CONSENT_CAPABILITIES := ["replaces_core"]
-const CONTENT_KINDS_PRESENTATION := ["announcer"]
+const MAX_DEPTH := 8                       ## folder levels inside a package
+## Names Windows reserves for devices, with or without an extension ("con.json", "LPT1.png").
+const WINDOWS_RESERVED := ["CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$",
+	"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM¹", "COM²", "COM³",
+	"LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9", "LPT¹", "LPT²", "LPT³"]
+const BAD_NAME_CHARS := ["<", ">", "\"", "|", "?", "*"]
 
 ## Hard limits (tests may lower them). large_assets raises package_bytes to large_package_bytes.
 var limits := {"package_bytes": 64 * 1024 * 1024, "large_package_bytes": 256 * 1024 * 1024,
@@ -31,6 +40,13 @@ var consent := {}                ## "id@version" -> [accepted capabilities]
 var load_order: Array = []       ## ids loaded into Content, in order
 var load_report := {}            ## id -> [problems found while loading]
 var safe_mode := false           ## --safe-mode / --no-mods: start with core content only
+var sets_read_only := false      ## modsets.json was written by a newer game version: never rewritten
+var sets_error := ""             ## player-facing note about modsets.json ("" when fine)
+## Test hook: Callable(dir: String, name: String) -> bool that marks extra entries as links (on top
+## of DirAccess.is_link), so the walkers can be tested where links cannot be created.
+var link_check := Callable()
+## Test hook: import_package() fails while copying the new version (nothing may change then).
+var simulate_copy_failure := false
 var _sets_path := ""
 var _root_override := ""
 
@@ -64,6 +80,8 @@ func use_root(dir: String) -> void:
 	sets = {"Default": []}
 	active_set = "Default"
 	consent = {}
+	sets_read_only = false
+	sets_error = ""
 	_load_sets()
 	refresh()
 
@@ -80,8 +98,15 @@ func refresh() -> void:
 			if sub.begins_with("."):
 				continue
 			var p := mods_dir().path_join(sub)
-			if FileAccess.file_exists(p.path_join("manifest.json")):
-				_offer(found, inspect_folder(p, "folder"))
+			if not FileAccess.file_exists(p.path_join("manifest.json")):
+				continue
+			if _is_link(d, mods_dir(), sub):
+				# never followed: a linked folder could expose anything on the disk
+				var li := _new_info(p, "folder")
+				li["errors"].append("'%s' is a link (symbolic link or junction); mods never follow links. Copy the folder into the mods folder instead." % sub)
+				_offer(found, li)
+				continue
+			_offer(found, inspect_folder(p, "folder"))
 		for f in d.get_files():
 			if f.get_extension().to_lower() in ARCHIVE_EXT:
 				_offer(found, inspect_archive(mods_dir().path_join(f)))
@@ -114,42 +139,101 @@ func _offer(found: Dictionary, info: Dictionary) -> void:
 		cur["warnings"].append("an older/invalid copy is ignored: %s" % str(info["path"]).get_file())
 
 
+## Info dictionary for one package. Keys starting with "_" are internal: _entries (the validated
+## listing: [{path, size}], archive paths without root_prefix), _tops (top-level folder names),
+## _root_files, _total (bytes).
 func _new_info(path: String, kind: String) -> Dictionary:
 	return {"id": path.get_file().get_basename(), "name": path.get_file(), "version": "0.0.0", "author": "", "description": "",
 		"path": path, "kind": kind, "manifest": {}, "size": 0, "files": 0, "hash": "", "errors": [],
 		"warnings": [], "client_only": false, "capabilities": [], "requires": [], "load_after": [],
-		"kinds": [], "root_prefix": ""}
+		"kinds": [], "root_prefix": "", "_entries": []}
 
 
 ## Inspects a package folder (installed or bundled example).
 func inspect_folder(path: String, kind := "folder") -> Dictionary:
 	var info := _new_info(path, kind)
 	var entries := []
-	_walk(path, "", entries, 0)
+	var notes := {"links": [], "too_deep": []}
+	_walk(path, "", entries, 0, notes)
+	var links: Array = notes["links"]
+	for i in mini(links.size(), 5):
+		info["warnings"].append("'%s' is a link (symbolic link or junction) and was skipped: mods never follow links" % links[i])
+	if links.size() > 5:
+		info["warnings"].append("%d more links were skipped" % (links.size() - 5))
+	for t in notes["too_deep"]:
+		info["errors"].append("'%s' is nested deeper than %d folders" % [t, MAX_DEPTH])
 	_check_entries(info, entries)
-	if FileAccess.file_exists(path.path_join("manifest.json")):
+	if entries.any(func(e): return str(e["path"]) == "manifest.json"):
 		_check_manifest(info, FileAccess.get_file_as_string(path.path_join("manifest.json")))
+	elif "manifest.json" in links:
+		info["errors"].append("manifest.json is a link; it must be a real file in the package folder")
 	else:
 		info["errors"].append("no manifest.json at the package root")
 	if info["errors"].is_empty():
 		info["hash"] = _hash_folder(path, entries)
+		if str(info["hash"]) == "":
+			info["errors"].append("the folder changed while it was being checked; rescan")
+	info["_entries"] = entries
 	return info
 
 
-func _walk(base: String, rel: String, out: Array, depth: int) -> void:
-	if depth > 8 or out.size() > int(limits["files"]) + 1:
+## True when `name_` inside the folder `dir` is a symbolic link, junction or other reparse point.
+func _is_link(d: DirAccess, dir: String, name_: String) -> bool:
+	if link_check.is_valid() and bool(link_check.call(dir, name_)):
+		return true
+	return d.is_link(dir.path_join(name_))
+
+
+## True when any part of the relative path `rel` under `base` is a link (or no longer opens).
+func _link_in_path(base: String, rel: String) -> bool:
+	var d := DirAccess.open(base)
+	if d == null:
+		return true
+	var cur := base
+	for part in rel.split("/"):
+		if _is_link(d, cur, part):
+			return true
+		cur = cur.path_join(part)
+	return false
+
+
+## Lists a package folder's regular files as [{path, size}] ("/"-separated, relative to `base`).
+## Never follows links: symlinks, junctions and other reparse points are left out and named in
+## notes.links, so nothing outside the folder is validated, hashed, copied, exported or loaded.
+## Hidden names (".git", ".DS_Store"; never packed by tools/mods/pack_mod.py) are skipped. Folders
+## deeper than MAX_DEPTH levels are named in notes.too_deep instead of being walked, and the
+## listing stops past limits.files + 1 entries (rejected as "too many files").
+func _walk(base: String, rel: String, out: Array, depth: int, notes: Dictionary) -> void:
+	if out.size() > int(limits["files"]):
 		return
-	var d := DirAccess.open(base.path_join(rel) if rel != "" else base)
+	var here := base.path_join(rel) if rel != "" else base
+	var d := DirAccess.open(here)
 	if d == null:
 		return
 	for f in d.get_files():
+		if f.begins_with("."):
+			continue
 		var r := rel.path_join(f) if rel != "" else f
-		var fa := FileAccess.open(base.path_join(r), FileAccess.READ)
+		if _is_link(d, here, f):
+			notes["links"].append(r)
+			continue
+		var fa := FileAccess.open(here.path_join(f), FileAccess.READ)
 		out.append({"path": r, "size": fa.get_length() if fa else 0})
+		if out.size() > int(limits["files"]):
+			return
 	for sub in d.get_directories():
 		if sub.begins_with("."):
 			continue
-		_walk(base, rel.path_join(sub) if rel != "" else sub, out, depth + 1)
+		var rs := rel.path_join(sub) if rel != "" else sub
+		if _is_link(d, here, sub):
+			notes["links"].append(rs + "/")
+			continue
+		if depth + 1 > MAX_DEPTH:
+			notes["too_deep"].append(rs + "/")
+			continue
+		_walk(base, rs, out, depth + 1, notes)
+		if out.size() > int(limits["files"]):
+			return
 
 
 ## Inspects an archive without extracting anything: sizes come from the zip central directory
@@ -175,6 +259,7 @@ func inspect_archive(path: String, kind := "archive") -> Dictionary:
 	if prefix != "":
 		for e in entries:
 			e["path"] = str(e["path"]).substr(prefix.length())
+	info["_entries"] = entries
 	_check_entries(info, entries)
 	if not info["errors"].is_empty():
 		return info
@@ -194,7 +279,11 @@ func inspect_archive(path: String, kind := "archive") -> Dictionary:
 
 
 ## Reads a zip's central directory: {entries: [{path, size, csize}]} or {error}. Rejects
-## encrypted entries, ZIP64 and multi-disk archives (never produced by our tools).
+## encrypted entries, ZIP64 and multi-disk archives (never produced by our tools), and any layout
+## where another zip reader could see a different directory: the end record must close the file
+## (its comment reaching exactly the end), the directory must end exactly where the end record
+## starts (no room for a ZIP64 locator or other data), and the directory must hold exactly the
+## declared entries.
 static func zip_directory(path: String) -> Dictionary:
 	var fa := FileAccess.open(path, FileAccess.READ)
 	if fa == null:
@@ -217,8 +306,13 @@ static func zip_directory(path: String) -> Dictionary:
 	var count := tail.decode_u16(eocd + 10)
 	var cd_size := tail.decode_u32(eocd + 12)
 	var cd_off := tail.decode_u32(eocd + 16)
+	var eocd_abs := n - tail_len + eocd
 	if count == 0xFFFF or cd_size == 0xFFFFFFFF or cd_off == 0xFFFFFFFF or cd_off + cd_size > n:
 		return {"error": "ZIP64 or damaged archives are not supported"}
+	if tail.decode_u16(eocd + 8) != count or eocd + 22 + tail.decode_u16(eocd + 20) != tail_len:
+		return {"error": "damaged or altered zip archive (end record does not match the file)"}
+	if cd_off + cd_size != eocd_abs:
+		return {"error": "ZIP64 or altered zip archives are not supported (data between the directory and its end record)"}
 	fa.seek(cd_off)
 	var cd := fa.get_buffer(cd_size)
 	var out := []
@@ -232,15 +326,19 @@ static func zip_directory(path: String) -> Dictionary:
 		var nlen := cd.decode_u16(o + 28)
 		var xlen := cd.decode_u16(o + 30)
 		var clen := cd.decode_u16(o + 32)
+		if o + 46 + nlen + xlen + clen > cd.size():
+			return {"error": "damaged zip directory"}
 		var fname := cd.slice(o + 46, o + 46 + nlen).get_string_from_utf8()
 		o += 46 + nlen + xlen + clen
 		if flags & 1:
-			return {"error": "encrypted archive entries are not supported ('%s')" % fname}
+			return {"error": "encrypted archive entries are not supported ('%s')" % fname.c_escape()}
 		if csize == 0xFFFFFFFF or usize == 0xFFFFFFFF:
-			return {"error": "ZIP64 entries are not supported ('%s')" % fname}
+			return {"error": "ZIP64 entries are not supported ('%s')" % fname.c_escape()}
 		if fname.ends_with("/"):
 			continue
 		out.append({"path": fname, "size": usize, "csize": csize})
+	if o != cd.size():
+		return {"error": "damaged zip directory (unexpected data after the last entry)"}
 	return {"entries": out}
 
 
@@ -257,7 +355,10 @@ func _common_root(entries: Array) -> String:
 	return top
 
 
-## Path/type/size rules shared by folders and archives.
+## Path/name/type/size rules shared by folders and archives. Names must be portable: no hidden
+## (dot) names, no Windows device names (con, nul, com1, lpt1 ... with any extension), no trailing
+## dot/space (Windows drops them), no < > " | ? * or control characters, and no two names that
+## only differ in letter case (they would overwrite each other on Windows).
 func _check_entries(info: Dictionary, entries: Array) -> void:
 	var errs: Array = info["errors"]
 	if entries.size() > int(limits["files"]):
@@ -265,16 +366,36 @@ func _check_entries(info: Dictionary, entries: Array) -> void:
 		return
 	var total := 0
 	var kinds := {}
+	var tops := {}
+	var root_files := []
+	var seen_files := {}     ## folded path -> path as written
+	var seen_dirs := {}      ## folded folder path -> folder path as written
 	for e in entries:
 		var p := str(e["path"]).replace("\\", "/")
 		var size := int(e["size"])
 		total += size
-		if p.begins_with("/") or p.contains(":") or p.split("/").has("..") or p.split("/").has("."):
-			errs.append("unsafe path '%s' (absolute, drive or '..' paths are not allowed)" % p)
+		var parts := p.split("/")
+		if p.begins_with("/") or p.contains(":") or parts.has("..") or parts.has(".") or parts.has(""):
+			errs.append("unsafe path '%s' (absolute, drive, empty or '..' paths are not allowed)" % p.c_escape())
 			continue
 		if p.length() > int(limits["path_length"]):
-			errs.append("path too long: '%s'" % p.substr(0, 60))
+			errs.append("path too long: '%s'" % p.substr(0, 60).c_escape())
 			continue
+		if parts.size() - 1 > MAX_DEPTH:
+			errs.append("'%s' is nested deeper than %d folders" % [p.c_escape(), MAX_DEPTH])
+			continue
+		var bad_name := _name_problem(p, parts)
+		if bad_name != "":
+			errs.append(bad_name)
+			continue
+		var clash := _case_clash(p, parts, seen_files, seen_dirs)
+		if clash != "":
+			errs.append("'%s' and '%s' differ only in letter case (or are the same name); use distinct names" % [p, clash])
+			continue
+		if parts.size() > 1:
+			tops[parts[0]] = true
+		else:
+			root_files.append(p)
 		var ext := p.get_extension().to_lower()
 		if not ext in ALLOWED_EXT:
 			if ext in ["gd", "gdc", "cs", "dll", "so", "dylib", "exe", "bat", "cmd", "ps1", "sh", "py", "js", "pck", "gdextension", "tscn", "scn", "tres", "res", "gdshader", "shader"]:
@@ -291,7 +412,54 @@ func _check_entries(info: Dictionary, entries: Array) -> void:
 	info["size"] = total
 	info["files"] = entries.size()
 	info["kinds"] = kinds.keys().filter(func(k): return k in Content.KINDS)
+	info["_tops"] = tops.keys()
+	info["_root_files"] = root_files
 	info["_total"] = total
+	# content folders load by their exact lowercase name on every platform (see Content)
+	for t in tops:
+		var k := Content.kind_alias(str(t))
+		if k != "" and k != str(t):
+			info["warnings"].append("'%s/' is not loaded: content folders are lowercase ('%s/')" % [t, k])
+
+
+## Why one entry name is not portable ("" when it is fine).
+func _name_problem(p: String, parts: PackedStringArray) -> String:
+	for c in parts:
+		if c.begins_with("."):
+			return "'%s': hidden names (starting with '.') are not allowed" % p.c_escape()
+		if c.ends_with(".") or c.ends_with(" "):
+			return "'%s': names may not end with a dot or a space (Windows drops them)" % p.c_escape()
+		for i in c.length():
+			var ch := c.unicode_at(i)
+			if ch < 32 or ch == 127 or c[i] in BAD_NAME_CHARS:
+				return "'%s': names may not contain control characters or < > \" | ? *" % p.c_escape()
+		if c.get_slice(".", 0).strip_edges().to_upper() in WINDOWS_RESERVED:
+			return "'%s': '%s' is a reserved device name on Windows" % [p, c]
+	return ""
+
+
+## The earlier entry `p` collides with when letter case is ignored ("" if none): the same file
+## twice, or a file named like a folder another entry uses.
+func _case_clash(p: String, parts: PackedStringArray, seen_files: Dictionary, seen_dirs: Dictionary) -> String:
+	var folded := Content.fold(p)
+	if seen_files.has(folded):
+		return str(seen_files[folded])
+	if seen_dirs.has(folded):
+		return str(seen_dirs[folded]) + "/"
+	var prefix := ""
+	for i in parts.size() - 1:
+		prefix = parts[i] if i == 0 else prefix + "/" + parts[i]
+		var fp := Content.fold(prefix)
+		if seen_files.has(fp):
+			return str(seen_files[fp])
+		if seen_dirs.has(fp) and str(seen_dirs[fp]) != prefix:
+			return str(seen_dirs[fp]) + "/"
+	prefix = ""
+	for i in parts.size() - 1:
+		prefix = parts[i] if i == 0 else prefix + "/" + parts[i]
+		seen_dirs[Content.fold(prefix)] = prefix
+	seen_files[folded] = p
+	return ""
 
 
 func _check_manifest(info: Dictionary, text: String) -> void:
@@ -317,8 +485,19 @@ func _check_manifest(info: Dictionary, text: String) -> void:
 	info["capabilities"] = m.get("capabilities", []) if typeof(m.get("capabilities")) == TYPE_ARRAY else []
 	info["requires"] = m.get("requires", []) if typeof(m.get("requires")) == TYPE_ARRAY else []
 	info["load_after"] = m.get("load_after", []) if typeof(m.get("load_after")) == TYPE_ARRAY else []
-	if id == "core" or RegEx.create_from_string(ID_PATTERN).search(id) == null:
-		errs.append("manifest id '%s' must be 3-32 lowercase letters, digits or _ and not 'core'" % id)
+	if id in RESERVED_IDS or not Schema.full_match(ID_PATTERN, id):
+		errs.append("manifest id '%s' must be 3-32 lowercase letters, digits or _ and not %s" % [id.c_escape(), " or ".join(RESERVED_IDS.map(func(r): return "'%s'" % r))])
+	# ids and versions end up in file names, consent keys and handshakes: no hidden characters
+	var texts := [["id", m.get("id")], ["version", m.get("version")], ["game_version", m.get("game_version")]]
+	for r in info["requires"]:
+		if typeof(r) == TYPE_DICTIONARY:
+			texts.append(["requires id", (r as Dictionary).get("id")])
+			texts.append(["requires version", (r as Dictionary).get("version")])
+	for la in info["load_after"]:
+		texts.append(["load_after", la])
+	for tv in texts:
+		if typeof(tv[1]) == TYPE_STRING and has_space_or_control(str(tv[1])):
+			errs.append("manifest %s '%s' must not contain spaces, line breaks or control characters" % [tv[0], str(tv[1]).c_escape()])
 	var gv := str(m.get("game_version", ""))
 	if gv != "" and not game_version_ok(gv):
 		errs.append("made for game version %s; this build is %s (incompatible)" % [gv, Saves.game_version()])
@@ -332,20 +511,93 @@ func _check_manifest(info: Dictionary, text: String) -> void:
 	if int(info.get("_total", 0)) > int(limits["package_bytes"]) and not "large_assets" in info["capabilities"]:
 		errs.append("package is %s, over %s; large packages must declare the 'large_assets' capability" % [_mb(int(info["_total"])), _mb(int(limits["package_bytes"]))])
 	if info["client_only"]:
-		for k in info["kinds"]:
-			if k in Content.GAMEPLAY_KINDS:
-				errs.append("client_only packages may only change presentation, but it contains '%s/'" % k)
+		# presentation only: no gameplay (or other non-presentation) folder in any letter case and no
+		# root singletons; Content enforces the same rule again when it loads the package
+		for t in info.get("_tops", []):
+			var k := Content.kind_alias(str(t))
+			if k != "" and not k in Content.PRESENTATION_KINDS:
+				errs.append("client_only packages may only change presentation, but it contains '%s/'%s" % [t, " (gameplay content)" if k in Content.GAMEPLAY_KINDS else ""])
+		for rf in info.get("_root_files", []):
+			if Content.singleton_alias(str(rf)) != "":
+				errs.append("client_only packages may only change presentation, but it contains '%s' (global game values)" % rf)
 
 
+## True when `s` contains whitespace or control characters (including Unicode spaces).
+static func has_space_or_control(s: String) -> bool:
+	for i in s.length():
+		var c := s.unicode_at(i)
+		if c <= 32 or (c >= 127 and c <= 160) or c == 0x1680 or (c >= 0x2000 and c <= 0x200F) or c in [0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFEFF]:
+			return true
+	return false
+
+
+## Hash over the validated entries' names and contents; "" if a path became a link meanwhile.
 func _hash_folder(path: String, entries: Array) -> String:
 	var ctx := HashingContext.new()
 	ctx.start(HashingContext.HASH_SHA256)
 	var paths := entries.map(func(e): return str(e["path"]))
 	paths.sort()
 	for p in paths:
+		if _link_in_path(path, str(p)):
+			return ""
 		ctx.update(str(p).to_utf8_buffer())
 		ctx.update(FileAccess.get_sha256(path.path_join(p)).to_utf8_buffer())
 	return ctx.finish().hex_encode()
+
+
+## Reads one validated package file for copying or packing. Re-checks that no part of its path
+## became a link and that its size is still the validated one before reading anything.
+## Returns {ok, data, error}.
+func _read_entry(base: String, e: Dictionary) -> Dictionary:
+	var rel := str(e["path"])
+	if _link_in_path(base, rel):
+		return {"ok": false, "data": PackedByteArray(), "error": "'%s' became a link" % rel}
+	var fa := FileAccess.open(base.path_join(rel), FileAccess.READ)
+	if fa == null:
+		return {"ok": false, "data": PackedByteArray(), "error": "cannot read '%s'" % rel}
+	var n := fa.get_length()
+	if n != int(e["size"]) or n > int(limits["file_bytes"]):
+		return {"ok": false, "data": PackedByteArray(), "error": "'%s' changed after it was checked" % rel}
+	var data := fa.get_buffer(n)
+	if data.size() != n:
+		return {"ok": false, "data": PackedByteArray(), "error": "cannot read '%s'" % rel}
+	return {"ok": true, "data": data, "error": ""}
+
+
+## Copies exactly the validated `entries` of folder `src` into `dst` (never through a link,
+## nothing the walk did not validate). Returns "" or the problem.
+func _copy_entries(src: String, dst: String, entries: Array) -> String:
+	if entries.size() > int(limits["files"]):
+		return "too many files"
+	for e in entries:
+		var r := _read_entry(src, e)
+		if not r["ok"]:
+			return str(r["error"])
+		var out := dst.path_join(str(e["path"]))
+		DirAccess.make_dir_recursive_absolute(out.get_base_dir())
+		var fa := FileAccess.open(out, FileAccess.WRITE)
+		if fa == null:
+			return "cannot write %s" % out
+		fa.store_buffer(r["data"])
+		fa.close()
+	return ""
+
+
+## Deletes a temporary copy made by _copy_entries (only the files it wrote, then empty folders).
+func _remove_copy(dst: String, entries: Array) -> void:
+	var dirs := {}
+	for e in entries:
+		var rel := str(e["path"])
+		DirAccess.remove_absolute(dst.path_join(rel))
+		var d := rel.get_base_dir()
+		while d != "":
+			dirs[d] = true
+			d = d.get_base_dir()
+	var ordered: Array = dirs.keys()
+	ordered.sort_custom(func(a, b): return str(a).length() > str(b).length())
+	for d2 in ordered:
+		DirAccess.remove_absolute(dst.path_join(str(d2)))
+	DirAccess.remove_absolute(dst)
 
 
 static func _mb(b: int) -> String:
@@ -543,20 +795,41 @@ func _load_sets() -> void:
 	if not r["ok"]:
 		if r["exists"]:
 			Log.w("mods", "mod sets unreadable (%s); starting with an empty set" % r["error"])
-			if not r["newer"]:
+			if r["newer"]:
+				# never rewrite what a newer game saved: changes this session are not stored
+				sets_read_only = true
+				sets_error = "Your mod sets were saved by a newer version of the game. This version leaves that file untouched, so mod set changes made now are not saved."
+				Log.w("mods", "%s is read-only for this session (written by a newer game version)" % _sets_path.get_file())
+			else:
 				Saves.quarantine(_sets_path)
+		return
+	if typeof(r["data"]) != TYPE_DICTIONARY:
 		return
 	var d: Dictionary = r["data"]
 	var s = d.get("sets", {})
-	if typeof(s) == TYPE_DICTIONARY and not s.is_empty():
-		sets = s
+	if typeof(s) == TYPE_DICTIONARY:
+		# set name -> [mod ids]; malformed sets are dropped instead of breaking every lookup
+		var clean := {}
+		for k in s:
+			if typeof(s[k]) == TYPE_ARRAY:
+				clean[str(k)] = (s[k] as Array).map(func(x): return str(x))
+		if not clean.is_empty():
+			sets = clean
 	active_set = str(d.get("active", "Default"))
 	if not sets.has(active_set):
 		active_set = sets.keys()[0]
-	consent = d.get("consent", {}) if typeof(d.get("consent")) == TYPE_DICTIONARY else {}
+	# consent entries must be "id@version" -> [capability names]; anything else is dropped
+	consent = {}
+	var c = d.get("consent", {})
+	if typeof(c) == TYPE_DICTIONARY:
+		for k in c:
+			if typeof(c[k]) == TYPE_ARRAY:
+				consent[str(k)] = (c[k] as Array).filter(func(x): return typeof(x) == TYPE_STRING)
 
 
 func _save_sets() -> void:
+	if sets_read_only:
+		return
 	Saves.write_json(_sets_path, "modsets", SETS_FORMAT, {"active": active_set, "sets": sets, "consent": consent})
 
 
@@ -655,13 +928,16 @@ func apply() -> void:
 		if str(info["kind"]) in ["archive", "example"]:
 			path = _extract(info)
 			if path == "":
-				load_report[id] = ["could not unpack the archive"]
+				load_report[id] = ["could not unpack the archive (it changed since it was checked, or does not match its checked listing); rescan and try again"]
 				continue
-		pkgs.append({"id": id, "version": info["version"], "path": path, "manifest": info["manifest"], "hash": info["hash"]})
+		# Content reads only these validated files, and only overrides core with this consent
+		var granted = consent.get("%s@%s" % [id, info["version"]], [])
+		pkgs.append({"id": id, "version": info["version"], "path": path, "manifest": info["manifest"], "hash": info["hash"],
+			"files": validated_files(info), "consent": (granted as Array).duplicate() if typeof(granted) == TYPE_ARRAY else []})
 		load_order.append(id)
 	Content.reload(pkgs)
 	for e in Content.errors:
-		var pid := str(e).split("/")[0]
+		var pid := str(e).get_slice("/", 0).get_slice(":", 0)
 		if pid in load_order:
 			var arr: Array = load_report.get(pid, [])
 			arr.append(str(e))
@@ -670,29 +946,66 @@ func apply() -> void:
 	mods_changed.emit()
 
 
+## Relative "/"-separated paths of a package's validated files (what Content may read).
+func validated_files(info: Dictionary) -> PackedStringArray:
+	var out := PackedStringArray()
+	for e in info.get("_entries", []):
+		out.append(str(e["path"]).replace("\\", "/"))
+	return out
+
+
+## Unpacks a checked archive into its hash-keyed cache folder. Refuses (returns "") unless the
+## file still has the checked hash and Godot's zip reader lists exactly the entries that
+## zip_directory() validated, with the same sizes: the two readers must agree on every byte that
+## is extracted.
 func _extract(info: Dictionary) -> String:
 	var dst := mods_dir().path_join(".cache").path_join("%s-%s-%s" % [info["id"], info["version"], str(info["hash"]).substr(0, 12)])
 	if FileAccess.file_exists(dst.path_join(".complete")):
 		return dst
-	var zr := ZIPReader.new()
-	if zr.open(str(info["path"])) != OK:
+	var src := str(info["path"])
+	if str(info["hash"]) == "" or FileAccess.get_sha256(src) != str(info["hash"]):
+		Log.w("mods", "%s changed since it was checked; not unpacked" % src.get_file())
 		return ""
 	var prefix := str(info.get("root_prefix", ""))
-	DirAccess.make_dir_recursive_absolute(dst)
+	var want := {}           ## full entry name -> validated size
+	for e in info.get("_entries", []):
+		want[prefix + str(e["path"])] = int(e["size"])
+	var zr := ZIPReader.new()
+	if zr.open(src) != OK:
+		return ""
+	var seen := {}
 	for f in zr.get_files():
-		if f.ends_with("/") or not f.begins_with(prefix):
+		if f.ends_with("/"):
 			continue
-		var rel := f.substr(prefix.length()).replace("\\", "/")
+		if seen.has(f) or not want.has(f):
+			Log.w("mods", "%s: the zip reader sees '%s', which was not checked; not unpacked" % [src.get_file(), f.c_escape()])
+			zr.close()
+			return ""
+		seen[f] = true
+	if seen.size() != want.size():
+		Log.w("mods", "%s: the zip reader and the checked listing disagree; not unpacked" % src.get_file())
+		zr.close()
+		return ""
+	DirAccess.make_dir_recursive_absolute(dst)
+	for f2 in want:
+		var full := str(f2)
+		var rel := full.substr(prefix.length()).replace("\\", "/")
 		# defence in depth: the entry list was validated in inspect_archive
 		if rel.begins_with("/") or rel.contains(":") or rel.split("/").has("..") or not rel.get_extension().to_lower() in ALLOWED_EXT:
-			continue
+			zr.close()
+			return ""
+		var data := zr.read_file(full)
+		if data.size() != int(want[full]):
+			Log.w("mods", "%s: '%s' unpacked to a different size than checked; not unpacked" % [src.get_file(), rel])
+			zr.close()
+			return ""
 		var out := dst.path_join(rel)
 		DirAccess.make_dir_recursive_absolute(out.get_base_dir())
 		var fa := FileAccess.open(out, FileAccess.WRITE)
 		if fa == null:
 			zr.close()
 			return ""
-		fa.store_buffer(zr.read_file(f))
+		fa.store_buffer(data)
 		fa.close()
 	zr.close()
 	var mark := FileAccess.open(dst.path_join(".complete"), FileAccess.WRITE)
@@ -707,6 +1020,9 @@ func _extract(info: Dictionary) -> String:
 ## Imports a package (archive file or folder) into the user mods folder after validating it.
 ## Same id: a newer version upgrades in place (keeping its enabled state), the same version is
 ## reinstalled, an older one needs allow_downgrade. Returns {ok, id, message, errors}.
+## The new copy is written under a temporary name and verified first; only then is the installed
+## version moved aside (to mods/.removed) and the copy renamed into place, so a failed import never
+## leaves the mod uninstalled. Importing the installed package itself changes nothing.
 func import_package(src: String, allow_downgrade := false) -> Dictionary:
 	src = src.replace("\\", "/")
 	var info: Dictionary
@@ -721,24 +1037,83 @@ func import_package(src: String, allow_downgrade := false) -> Dictionary:
 	var id := str(info["id"])
 	var cur := info_of(id)
 	var verb := "Installed"
-	if not cur.is_empty() and str(cur["kind"]) != "example":
+	var installed := not cur.is_empty() and str(cur["kind"]) != "example"
+	if installed:
 		var c := compare_versions(str(info["version"]), str(cur["version"]))
 		if c < 0 and not allow_downgrade:
 			return {"ok": false, "id": id, "message": "%s %s is older than the installed %s; confirm to downgrade" % [info["name"], info["version"], cur["version"]], "errors": [], "downgrade": true}
 		verb = "Upgraded" if c > 0 else ("Reinstalled" if c == 0 else "Downgraded")
-		_move_aside(str(cur["path"]))
-	var dst := ""
-	if str(info["kind"]) == "archive":
-		dst = mods_dir().path_join("%s-%s.critmod" % [id, info["version"]])
-		if not _copy_file(src, dst):
-			return {"ok": false, "id": id, "message": "Could not copy %s into the mods folder" % src.get_file(), "errors": []}
-	else:
-		dst = mods_dir().path_join(id)
-		_copy_tree(src, dst)
+		if _same_path(src, str(cur["path"])):
+			# the installed package itself: nothing to copy, nothing to move aside
+			refresh()
+			return {"ok": true, "id": id, "message": "%s is already installed (%s %s)" % [src.get_file(), info["name"], info["version"]], "errors": []}
+	var is_archive := str(info["kind"]) == "archive"
+	var dst := mods_dir().path_join("%s-%s.critmod" % [id, info["version"]] if is_archive else id)
+	var tmp := mods_dir().path_join(".importing-%s-%d%s" % [id, Time.get_ticks_usec(), ".part" if is_archive else ""])
+	var problem := _stage_copy(src, tmp, info)
+	if problem != "":
+		return {"ok": false, "id": id, "message": "Could not copy %s into the mods folder: %s. Nothing was changed." % [src.get_file(), problem], "errors": [problem]}
+	# swap: the old version is kept in mods/.removed, never deleted
+	var moved := {}          ## original path -> where it was moved
+	for old in ([str(cur["path"])] if installed else []) + [dst]:
+		if (FileAccess.file_exists(old) or DirAccess.dir_exists_absolute(old)) and not moved.has(old):
+			var aside := _move_aside(old)
+			if aside == "":
+				_unstage(tmp, info)
+				_restore(moved)
+				return {"ok": false, "id": id, "message": "Could not replace the installed copy of %s. Nothing was changed." % info["name"], "errors": []}
+			moved[old] = aside
+	if DirAccess.rename_absolute(tmp, dst) != OK:
+		_unstage(tmp, info)
+		_restore(moved)
+		return {"ok": false, "id": id, "message": "Could not move %s into place. Nothing was changed." % src.get_file(), "errors": []}
 	refresh()
 	if is_enabled(id):
 		apply()
 	return {"ok": true, "id": id, "message": "%s %s %s" % [verb, info["name"], info["version"]], "errors": []}
+
+
+## Copies a validated package to the temporary name `tmp` and checks the copy is exactly what was
+## validated (same hash). Returns "" or the problem (and leaves nothing behind).
+func _stage_copy(src: String, tmp: String, info: Dictionary) -> String:
+	if simulate_copy_failure:
+		return "simulated copy failure"
+	if str(info["kind"]) == "archive":
+		if not _copy_file(src, tmp):
+			DirAccess.remove_absolute(tmp)
+			return "the file could not be copied"
+		if FileAccess.get_sha256(tmp) != str(info["hash"]):
+			DirAccess.remove_absolute(tmp)
+			return "the file changed while it was being copied"
+		return ""
+	var entries: Array = info["_entries"]
+	var err := _copy_entries(src, tmp, entries)
+	if err == "":
+		var check := inspect_folder(tmp, "folder")
+		if not check["errors"].is_empty() or str(check["hash"]) != str(info["hash"]):
+			err = "the folder changed while it was being copied"
+	if err != "":
+		_remove_copy(tmp, entries)
+	return err
+
+
+func _unstage(tmp: String, info: Dictionary) -> void:
+	if str(info["kind"]) == "archive":
+		DirAccess.remove_absolute(tmp)
+	else:
+		_remove_copy(tmp, info["_entries"])
+
+
+## Puts packages moved aside by a failed import back where they were.
+func _restore(moved: Dictionary) -> void:
+	for orig in moved:
+		DirAccess.rename_absolute(str(moved[orig]), str(orig))
+
+
+static func _same_path(a: String, b: String) -> bool:
+	var x := a.replace("\\", "/").simplify_path().trim_suffix("/")
+	var y := b.replace("\\", "/").simplify_path().trim_suffix("/")
+	return x.to_lower() == y.to_lower() if OS.get_name() == "Windows" else x == y
 
 
 ## Removes an installed package (moved to mods/.removed, never deleted outright). The id stays
@@ -754,11 +1129,18 @@ func uninstall(id: String) -> bool:
 	return true
 
 
-func _move_aside(path: String) -> void:
+## Moves a package into mods/.removed under a name that is not taken yet (a rename onto an
+## existing file would replace it). Returns the new path, or "" if it could not be moved.
+func _move_aside(path: String) -> String:
 	var bin := mods_dir().path_join(".removed")
 	DirAccess.make_dir_recursive_absolute(bin)
-	var dst := bin.path_join("%d_%s" % [int(Time.get_unix_time_from_system() * 1000.0), path.get_file()])
-	DirAccess.rename_absolute(path, dst)
+	var stem := "%d_%s" % [int(Time.get_unix_time_from_system() * 1000.0), path.trim_suffix("/").get_file()]
+	var dst := bin.path_join(stem)
+	var n := 2
+	while FileAccess.file_exists(dst) or DirAccess.dir_exists_absolute(dst):
+		dst = bin.path_join("%s_%d" % [stem, n])
+		n += 1
+	return dst if DirAccess.rename_absolute(path, dst) == OK else ""
 
 
 ## Byte copy that also works for files inside the game package (res://).
@@ -774,20 +1156,9 @@ func _copy_file(src: String, dst: String) -> bool:
 	return true
 
 
-func _copy_tree(src: String, dst: String) -> void:
-	DirAccess.make_dir_recursive_absolute(dst)
-	var d := DirAccess.open(src)
-	if d == null:
-		return
-	for f in d.get_files():
-		DirAccess.copy_absolute(src.path_join(f), dst.path_join(f))
-	for sub in d.get_directories():
-		if not sub.begins_with("."):
-			_copy_tree(src.path_join(sub), dst.path_join(sub))
-
-
 ## Writes a shareable .critmod archive of an installed or example package into `dst_dir`
-## (default: the user "packages" folder). Returns the archive path or "".
+## (default: the user "packages" folder). Returns the archive path or "". A folder package is
+## checked again first and only its validated files are packed (links are never followed).
 func export_package(id: String, dst_dir := "") -> String:
 	var info := info_of(id)
 	if info.is_empty() or not info["errors"].is_empty():
@@ -798,15 +1169,24 @@ func export_package(id: String, dst_dir := "") -> String:
 	var out := dst_dir.path_join("%s-%s.critmod" % [id, info["version"]])
 	if str(info["kind"]) in ["archive", "example"]:
 		return out if _copy_file(str(info["path"]), out) else ""
+	var base := str(info["path"])
+	var fresh := inspect_folder(base, str(info["kind"]))
+	if not fresh["errors"].is_empty() or str(fresh["id"]) != id:
+		return ""
+	out = dst_dir.path_join("%s-%s.critmod" % [id, fresh["version"]])
+	var entries: Array = (fresh["_entries"] as Array).duplicate()
+	entries.sort_custom(func(a, b): return str(a["path"]) < str(b["path"]))
 	var zp := ZIPPacker.new()
 	if zp.open(out) != OK:
 		return ""
-	var entries := []
-	_walk(str(info["path"]), "", entries, 0)
-	entries.sort_custom(func(a, b): return str(a["path"]) < str(b["path"]))
 	for e in entries:
+		var r := _read_entry(base, e)
+		if not r["ok"]:
+			zp.close()
+			DirAccess.remove_absolute(out)
+			return ""
 		zp.start_file(str(e["path"]))
-		zp.write_file(FileAccess.get_file_as_bytes(str(info["path"]).path_join(str(e["path"]))))
+		zp.write_file(r["data"])
 		zp.close_file()
 	zp.close()
 	return out

@@ -81,17 +81,29 @@ var values := {}
 var _schema := {}
 var _headless := false
 var load_error := ""
+## settings.json was written by a newer game version: defaults are used and the file is never
+## rewritten this session (changes still apply, they are just not saved). Shown via load_error.
+var read_only := false
+var path_override := ""           ## tests: read/write this file instead of the user settings
 
 
 func _ready() -> void:
 	_headless = DisplayServer.get_name() == "headless"
-	for s in SCHEMA:
-		_schema[s["key"]] = s
-		values[s["key"]] = _copy(s["def"])
+	init_defaults()
 	load_settings()
 	apply_all()
 	get_window().focus_entered.connect(_on_focus.bind(true))
 	get_window().focus_exited.connect(_on_focus.bind(false))
+
+
+func init_defaults() -> void:
+	for s in SCHEMA:
+		_schema[s["key"]] = s
+		values[s["key"]] = _copy(s["def"])
+
+
+func file_path() -> String:
+	return path_override if path_override != "" else Paths.file("profiles", FILE)
 
 
 static func _copy(v):
@@ -197,19 +209,25 @@ func reset(cat := "") -> void:
 
 
 func load_settings() -> void:
-	var r := Saves.read_json(Paths.file("profiles", FILE), "settings", VERSION)
+	var r := Saves.read_json(file_path(), "settings", VERSION)
 	if r["ok"]:
 		var d: Dictionary = r["data"]
 		for k in d:
 			if _schema.has(k):
 				values[k] = _coerce(_schema[k], d[k])
+	elif r["newer"]:
+		read_only = true
+		load_error = "Settings were saved by a newer version of the game. Defaults are in use and that file is left untouched: changes you make now are not saved."
+		Log.w("settings", "%s (%s)" % [load_error, r["error"]])
 	elif r["exists"]:
 		load_error = "Settings could not be read (%s). Defaults are in use; the damaged file was kept." % r["error"]
 		Log.w("settings", load_error)
 
 
 func save_settings() -> void:
-	var err := Saves.write_json(Paths.file("profiles", FILE), "settings", VERSION, values)
+	if read_only:
+		return
+	var err := Saves.write_json(file_path(), "settings", VERSION, values)
 	if err != OK:
 		Log.e("settings", "save failed: %s" % error_string(err))
 

@@ -6,8 +6,12 @@ extends RefCounted
 ##     NOTHING that changes starting power (its 50% Clout goes to a cosmetics-only wallet).
 ##   * Fight Camp: the same plus Clout for Cannery upgrades and camp milestone flags.
 ##   * Custom runs (custom rules, reduced game speed, debug options) count for statistics and
-##     history but never for records, ladder unlocks or cosmetic unlocks; Clout at 50%.
+##     history but never for records, ladder unlocks, cosmetic unlocks or camp milestones; Clout
+##     at 50%.
 ##   * The Bookie's Table: its own record board, Clout at 50%, no ladder progress.
+##   * Dose credit belongs to the profile's OWN ladder: a Dose counts (records, badges, ladder,
+##     ach_fully_dosed) only when this profile has it unlocked and the difficulty takes Doses
+##     (never Sparring) — a co-op guest on the host's Dose 10 earns the clear, not the Dose.
 ## Idempotent per (run id, player): crediting the same finished run twice does nothing, so a
 ## resent co-op "run_end" message or a crash between save and credit cannot duplicate rewards.
 
@@ -60,23 +64,42 @@ static func max_selectable_dose(profile: Dictionary, variant: String) -> int:
 	return clampi(int(l.get("unlocked", 1)), 1, 10) if bool(l.get("open", false)) else 0
 
 
-## The ladder rule (CMP-02): clearing the highest unlocked Dose unlocks the next, up to 10.
-## Returns the newly unlocked Dose (0 if none). A dose-0 clear on Amateur+ opens The Dosage.
+## Highest Dose this profile may play — and be credited for — in `variant` on `difficulty`: 0
+## while its Dosage is closed, or when the difficulty takes no Doses (Sparring).
+static func dose_cap(catalog: CampaignCatalog, profile: Dictionary, variant: String, difficulty: String) -> int:
+	if not bool(catalog.difficulty(difficulty).get("dose_allowed", true)):
+		return 0
+	return max_selectable_dose(profile, variant)
+
+
+## A requested Dose clamped to what this profile may start (run creation: campaign menu, hub
+## sign-up sheet, "Raise the Dose", a co-op host's own profile).
+static func clamp_dose(catalog: CampaignCatalog, profile: Dictionary, variant: String, difficulty: String, dose: int) -> int:
+	return clampi(dose, 0, dose_cap(catalog, profile, variant, difficulty))
+
+
+## The ladder rule (CMP-02): clearing the highest unlocked Dose unlocks the next, up to 10 — only
+## on this profile's own open ladder (a Dose above it, e.g. a co-op host's, unlocks nothing).
+## The first clear on Amateur or harder opens The Dosage (whatever card it was: Dose 1 only).
+## Returns the newly unlocked Dose: 1 = The Dosage just opened, 2..10 = that Dose, 0 = none.
 static func apply_ladder_clear(profile: Dictionary, variant: String, dose: int, difficulty_ok: bool) -> int:
 	ensure_fields(profile)
 	if not difficulty_ok:
 		return 0
 	var l: Dictionary = profile["ladder"][variant]
+	if not bool(l.get("open", false)):
+		l["open"] = true
+		l["unlocked"] = maxi(1, int(l.get("unlocked", 1)))
+		return 1
 	if dose <= 0:
-		if not bool(l.get("open", false)):
-			l["open"] = true
-			l["unlocked"] = maxi(1, int(l.get("unlocked", 1)))
-			return 1
+		return 0
+	var unlocked := clampi(int(l.get("unlocked", 1)), 1, 10)
+	if dose > unlocked:
 		return 0
 	l["cleared"] = maxi(int(l.get("cleared", 0)), dose)
-	if dose >= int(l.get("unlocked", 1)) and int(l.get("unlocked", 1)) < 10:
-		l["unlocked"] = mini(10, dose + 1)
-		return int(l["unlocked"])
+	if dose == unlocked and unlocked < 10:
+		l["unlocked"] = unlocked + 1
+		return unlocked + 1
 	return 0
 
 
@@ -102,7 +125,7 @@ static func board_of(state: Dictionary) -> String:
 ## Credits a finished run to one player's profile. Returns a report for the results card.
 static func finish_run(catalog: CampaignCatalog, state: Dictionary, pid: String, profile: Dictionary) -> Dictionary:
 	ensure_fields(profile)
-	var rep := {"duplicate": false, "clout": 0, "new_dose": 0, "records": [], "cosmetics": [], "ladder_open": false}
+	var rep := {"duplicate": false, "clout": 0, "new_dose": 0, "records": [], "cosmetics": [], "ladder_open": false, "dose_ineligible": false}
 	var res: Dictionary = state.get("result", {})
 	if res.is_empty():
 		rep["error"] = "run is not finished"
@@ -123,6 +146,9 @@ static func finish_run(catalog: CampaignCatalog, state: Dictionary, pid: String,
 	var dose := int(state.get("dose", 0))
 	var diff := catalog.difficulty(str(state.get("difficulty", "amateur")))
 	var fighter := str(p.get("fighter", ""))
+	# decided before this run touches the ladder: the Dose must already be on THIS profile's ladder
+	var dose_ok := dose <= 0 or dose <= dose_cap(catalog, profile, variant, str(state.get("difficulty", "amateur")))
+	rep["dose_ineligible"] = not dose_ok
 	var runs_key := "bookie" if bookie else variant
 	var runs: Dictionary = profile["records"]["runs"][runs_key]
 	runs["attempts"] = int(runs.get("attempts", 0)) + 1
@@ -139,8 +165,8 @@ static func finish_run(catalog: CampaignCatalog, state: Dictionary, pid: String,
 		profile["camp"]["clout_total"] = int(profile["camp"].get("clout_total", 0)) + clout
 	else:
 		profile["unlocks"]["cosmetic_clout"] = int(profile["unlocks"].get("cosmetic_clout", 0)) + clout
-	# Fight Camp milestones (hub gates)
-	if variant == "fight_camp" and not bookie:
+	# Fight Camp milestones (hub gates; a custom run proves nothing)
+	if variant == "fight_camp" and not bookie and not custom:
 		var flags: Dictionary = profile["camp"]["flags"]
 		var act := int(res.get("act", 1))
 		if act >= 2 or victory:
@@ -153,12 +179,14 @@ static func finish_run(catalog: CampaignCatalog, state: Dictionary, pid: String,
 	var standard := str(diff.get("records", "standard")) != "sparring"
 	if victory and not custom and not bookie:
 		var nd := apply_ladder_clear(profile, variant, dose, bool(diff.get("dose_allowed", true)))
-		if dose <= 0 and nd > 0:
+		if nd == 1:
 			rep["ladder_open"] = true
-		elif nd > 0:
+		elif nd > 1:
 			rep["new_dose"] = nd
-		runs["best_dose"] = maxi(int(runs.get("best_dose", 0)), dose)
-	if not custom:
+		if dose_ok:
+			runs["best_dose"] = maxi(int(runs.get("best_dose", 0)), dose)
+	# records are kept per Dose: a Dose this profile has not reached has no board of its own here
+	if not custom and dose_ok:
 		rep["records"] = _update_records(state, p, profile, victory, standard)
 	# cosmetics
 	var cos: Array = profile["unlocks"]["cosmetics"]
@@ -168,11 +196,11 @@ static func finish_run(catalog: CampaignCatalog, state: Dictionary, pid: String,
 			new_cos.append(str(c))
 		if victory and not bookie:
 			new_cos.append("title_%s" % fighter)
-			if dose >= 1:
+			if dose >= 1 and dose_ok:
 				new_cos.append("badge_dose_%d" % dose)
-			if dose >= 5:
+			if dose >= 5 and dose_ok:
 				new_cos.append("jacket_announcer_alt")
-			if dose >= 10:
+			if dose >= 10 and dose_ok:
 				new_cos.append("badge_lethal_dose")
 				new_cos.append("chant_lethal_dose")
 	for c2 in new_cos:
@@ -200,7 +228,7 @@ static func finish_run(catalog: CampaignCatalog, state: Dictionary, pid: String,
 	if victory and not custom and not bookie:
 		ach.append("ach_off_the_street" if variant == "off_the_street" else "ach_made_camp")
 		ach.append("ach_order_in_court")     # the title fight is Commissioner Snappington
-		if dose >= 10:
+		if dose >= 10 and dose_ok:
 			ach.append("ach_fully_dosed")
 	rep["achievements"] = ach
 	return rep

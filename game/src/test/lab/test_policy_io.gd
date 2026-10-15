@@ -254,7 +254,9 @@ func test_content_policies_are_size_capped_before_reading() -> void:
 	var c: Node = load("res://src/data/content.gd").new()
 	for k in Content.KINDS:
 		(c.get("tables") as Dictionary)[k] = {}
-	c.call("_load_package", {"id": "capmod", "path": pkg})
+	# a mod package as the mod manager hands it over: its validated file list
+	c.call("_load_package", {"id": "capmod", "version": "1.0.0", "path": pkg, "manifest": {"id": "capmod"},
+		"files": ["policies/huge.json", "policies/small.json"], "consent": []})
 	var tables: Dictionary = c.get("tables")
 	var errs: PackedStringArray = c.get("errors")
 	check(not (tables["policies"] as Dictionary).has("capmod:huge"), "the oversized policy is not loaded")
