@@ -87,7 +87,7 @@ the Mods screen says exactly why.
 | Fighters & abilities | `creatures/` | Body (segments, chains, weapons, poses), stats, moves by slot (`l1 l2 l3 heavy heavy_charged finisher dash_attack grab pummel taunt`), `abilities` (`ability1 ability2 juice`), `passives` (hooks), `art`, `audio`, `ai` weights. Schema: `creature.schema.json`; fighter space is +Z forward, +Y up, +X = the creature's left |
 | Balance | `tuning.json`, entries with `override` | `tuning.json` keys merge over core (unknown keys are reported) |
 | Rules & modes | `rules/`, `modes/`, `playlists/` | Any built-in mode (`standard`, `spotlight_hog`, `chumball`, `absolute_unit`, `chum_rush`, `tag_team`, `practice`) with its options, plus the data hooks below |
-| Arenas | `arenas/` | Base shape, size, walls/ring-out, props, hazards, spawns, mode markers (`goal`, `ball_spawn`, `spotlight`, `wave_gate`). Schema: `arena.schema.json` |
+| Arenas | `arenas/`, `props/` | Format 2: a base (`gullet drydock crusher rooftop` or a mod base `<mod>:<id>` defined by an entry with `base_def`), size, props from the catalog, mode markers (`spawn`, `goal`, `ball_spawn`, `spotlight_anchor`, `wave_gate`, `unit_spawn`, `boss`, `respawn`); new palette props in `props/`. Format 1 (shape bases, `spawns`) still loads. Schemas: `arena.schema.json`, `prop.schema.json`; reference: `docs/ARENAS_AND_EDITOR.md` |
 | Campaign | `supplements/ techniques/ events/ encounters/ meta_upgrades/ boss_fights/ ladder/` | See `docs/CAMPAIGN_SYSTEMS.md` for formats |
 | Presentation | `art` blocks, `announcer/`, models/textures/sounds | `client_only` packages may contain only these |
 

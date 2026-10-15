@@ -1,0 +1,431 @@
+{
+ "id": "arena_gullet",
+ "name": "The Gullet",
+ "base": "gullet",
+ "variant": "night",
+ "format": 2,
+ "version": 1,
+ "author": "Critterweight",
+ "description": "The Circuit's signature eight-sided cage in the gutted cannery hall. No hazards: the clean competitive baseline. Springy walls rebound splats 0.5 m; corners shove you out (+10% knockback).",
+ "size": [
+  12.0,
+  12.0
+ ],
+ "modes": [
+  "duel",
+  "ffa",
+  "teams",
+  "coop",
+  "spotlight_hog",
+  "chumball",
+  "absolute_unit",
+  "chum_rush",
+  "boss"
+ ],
+ "flags": {},
+ "removed_builtins": [],
+ "props": [],
+ "markers": {
+  "spawn": [
+   {
+    "pos": [
+     0.0,
+     0.0,
+     -3.0
+    ],
+    "yaw": -0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.12,
+     0.0,
+     -2.12
+    ],
+    "yaw": -45.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     3.0,
+     0.0,
+     0.0
+    ],
+    "yaw": -90.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.12,
+     0.0,
+     2.12
+    ],
+    "yaw": -135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     0.0,
+     0.0,
+     3.0
+    ],
+    "yaw": -180.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -2.12,
+     0.0,
+     2.12
+    ],
+    "yaw": 135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -3.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -2.12,
+     0.0,
+     -2.12
+    ],
+    "yaw": 45.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -3.2,
+     0.0,
+     -0.9
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -3.2,
+     0.0,
+     0.9
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -4.4,
+     0.0,
+     -1.6
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -4.4,
+     0.0,
+     1.6
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     3.2,
+     0.0,
+     -0.9
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     3.2,
+     0.0,
+     0.9
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     4.4,
+     0.0,
+     -1.6
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     4.4,
+     0.0,
+     1.6
+    ],
+    "yaw": -90.0,
+    "team": 1
+   }
+  ],
+  "boss": [
+   {
+    "pos": [
+     0,
+     0.0,
+     1.6
+    ],
+    "yaw": 180.0,
+    "team": -1
+   }
+  ],
+  "spotlight_anchor": [
+   {
+    "pos": [
+     0,
+     0.0,
+     0
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     0,
+     0.0,
+     3.6
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     3.6,
+     0.0,
+     0
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     0,
+     0.0,
+     -3.6
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -3.6,
+     0.0,
+     0
+    ],
+    "yaw": 0.0,
+    "team": -1
+   }
+  ],
+  "unit_spawn": [
+   {
+    "pos": [
+     0,
+     0.0,
+     0
+    ],
+    "yaw": 0.0,
+    "team": -1
+   }
+  ],
+  "goal": [
+   {
+    "pos": [
+     -5.85,
+     0.0,
+     0
+    ],
+    "yaw": 90.0,
+    "team": 0,
+    "size": [
+     3.0,
+     2.0,
+     0.2
+    ]
+   },
+   {
+    "pos": [
+     5.85,
+     0.0,
+     0
+    ],
+    "yaw": -90.0,
+    "team": 1,
+    "size": [
+     3.0,
+     2.0,
+     0.2
+    ]
+   }
+  ],
+  "ball_spawn": [
+   {
+    "pos": [
+     0,
+     0.0,
+     0
+    ],
+    "yaw": 0.0,
+    "team": -1
+   }
+  ],
+  "wave_gate": [
+   {
+    "pos": [
+     4.15,
+     0.0,
+     4.15
+    ],
+    "yaw": -135.0,
+    "team": -1,
+    "size": [
+     2.0,
+     2.4,
+     0.2
+    ]
+   },
+   {
+    "pos": [
+     -4.15,
+     0.0,
+     -4.15
+    ],
+    "yaw": 45.0,
+    "team": -1,
+    "size": [
+     2.0,
+     2.4,
+     0.2
+    ]
+   },
+   {
+    "pos": [
+     -4.15,
+     0.0,
+     4.15
+    ],
+    "yaw": 135.0,
+    "team": -1,
+    "size": [
+     2.0,
+     2.4,
+     0.2
+    ]
+   },
+   {
+    "pos": [
+     4.15,
+     0.0,
+     -4.15
+    ],
+    "yaw": -45.0,
+    "team": -1,
+    "size": [
+     2.0,
+     2.4,
+     0.2
+    ]
+   }
+  ]
+ },
+ "base_def": {
+  "id": "gullet",
+  "name": "The Gullet",
+  "shape": "octagon",
+  "style": "gullet",
+  "description": "The Circuit's signature eight-sided cage in the gutted cannery hall. No hazards: the clean competitive baseline. Springy walls rebound splats 0.5 m; corners shove you out (+10% knockback).",
+  "size": [
+   12.0,
+   12.0
+  ],
+  "size_min": [
+   9.0,
+   9.0
+  ],
+  "size_max": [
+   12.0,
+   12.0
+  ],
+  "size_step": 0.5,
+  "wall_height": 2.4,
+  "open_edges": false,
+  "allow_pits": false,
+  "quirks": {
+   "wall_rebound": 0.5,
+   "wall_bounce": 0.45,
+   "corner_shove": 0.1,
+   "corner_radius": 1.6
+  },
+  "hazards": [],
+  "areas": [],
+  "builtins": [],
+  "variants": {
+   "day": {
+    "label": "Day",
+    "key": "#FFE6BE",
+    "key_energy": 1.45,
+    "rim": "#FFD9A0",
+    "spot": "#FFF4E0",
+    "bg": "#2E2721",
+    "fog": "#7E6D58",
+    "fog_density": 0.026,
+    "ambient": "#6E6252",
+    "ambient_energy": 0.75,
+    "sunbeams": true,
+    "crowd_energy": 0.22
+   },
+   "night": {
+    "label": "Night",
+    "key": "#FFD9A0",
+    "key_energy": 1.15,
+    "rim": "#35C1C9",
+    "spot": "#FFF1DA",
+    "bg": "#0A0D14",
+    "fog": "#18202E",
+    "fog_density": 0.02,
+    "ambient": "#2B2F3A",
+    "ambient_energy": 0.6,
+    "crowd_energy": 0.35
+   },
+   "title_night": {
+    "label": "Title Night",
+    "key": "#FFE2B0",
+    "key_energy": 1.2,
+    "rim": "#C9A227",
+    "spot": "#FFE9C2",
+    "bg": "#09080F",
+    "fog": "#1F1830",
+    "fog_density": 0.02,
+    "ambient": "#2B2633",
+    "ambient_energy": 0.6,
+    "confetti": true,
+    "pyro": true,
+    "crowd_energy": 0.6,
+    "accent": "#C9A227"
+   }
+  },
+  "default_variant": "night",
+  "palette": {
+   "floor": "#E9E2CF",
+   "steel": "#5B6168",
+   "pad_a": "#8BD426",
+   "pad_b": "#C9A227",
+   "rim": "#35C1C9",
+   "key": "#FFD9A0",
+   "rust": "#8C3B2B"
+  }
+ }
+}
