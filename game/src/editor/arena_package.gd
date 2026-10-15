@@ -157,10 +157,9 @@ static func safe_entry_name(name_: String) -> String:
 		return "empty or overlong file name"
 	if name_.begins_with("/") or name_.contains("\\") or name_.contains("..") or name_.contains(":") or name_.contains("//"):
 		return "unsafe path '%s'" % name_
-	var re := RegEx.new()
-	re.compile(NAME_RE)
-	if re.search(name_) == null:
-		return "unexpected file '%s'" % name_
+	# full match: PCRE's "$" would also accept a name ending in a line break
+	if not Schema.full_match(NAME_RE, name_):
+		return "unexpected file '%s'" % name_.c_escape()
 	return ""
 
 
