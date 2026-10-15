@@ -406,12 +406,16 @@ func test_custom_fight_camp_runs_set_no_camp_milestones() -> void:
 	var flags: Dictionary = prof["camp"]["flags"]
 	for f in ["beat_act1", "beat_act2", "beat_run"]:
 		check(not bool(flags.get(f, false)), "custom run: no %s" % f)
+	prof["camp"]["clout"] = 1000
+	var locked := FightCamp.buy_upgrade(cat(), prof, "meta_walkout")
+	check(not bool(locked["ok"]) and str(locked["error"]).contains("locked"), "Walkout Music stays locked after a custom clear")
 	var normal := new_run({"seed": 115, "variant": "fight_camp"})   # another run id (credit is per run)
 	play_synthetic(normal)
 	check_eq(normal.phase(), "victory", "precondition: cleared")
 	CampaignProgression.finish_run(cat(), normal.state, "p0", prof)
 	for f2 in ["beat_act1", "beat_act2", "beat_run"]:
 		check(bool(flags.get(f2, false)), "standard run: %s" % f2)
+	check(bool(FightCamp.buy_upgrade(cat(), prof, "meta_walkout")["ok"]), "a standard clear opens Walkout Music")
 
 
 ## Review #14: a boss's own phase-2 threshold from content is used; Dose 8 only brings it sooner.
