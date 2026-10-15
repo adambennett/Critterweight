@@ -16,6 +16,7 @@ signal decision_needed(kind: String)
 signal decision_made()
 signal fight_started(info: Dictionary)
 signal run_over(summary: Dictionary)
+signal stopped()                      ## the play() loop has ended
 
 var catalog: CampaignCatalog
 var ctrl: RunController
@@ -33,7 +34,11 @@ var runs_completed := 0
 var transitions: Array = []           ## [{from, to, what}] (diagnostics, unattended tests)
 var results: Array = []               ## summaries of finished runs
 var running := false
+var waiting_for_player := false       ## attended: the table waits for the player's decision
+var in_fight := false
+var current_fight := {}               ## {encounter, name} of the fight being played
 var _stop := false
+var _decided := false
 
 
 func setup(cat: CampaignCatalog, cfg: Dictionary, prof: Dictionary = {}) -> void:
@@ -50,6 +55,11 @@ func _new_card(seed_value: int) -> void:
 	cfg["run_id"] = "bookie_%d_%d" % [runs_completed, Time.get_ticks_usec()]
 	ctrl = RunController.start_run(catalog, cfg)
 	changed.emit("new_card")
+
+
+## Deals a fresh card with the same settings (e.g. after a run ended and the loop stopped).
+func deal(seed_value := 0) -> void:
+	_new_card(seed_value)
 
 
 func set_speed(k: float) -> void:
@@ -77,16 +87,32 @@ func take_over() -> void:
 func hand_back() -> void:
 	unattended = true
 	changed.emit("hand_back")
-	decision_made.emit()
+	_release()
 
 
+## Ends the loop at the next decision point (or after the fight in progress).
 func stop() -> void:
 	_stop = true
+	_release()
 
 
-## Called by the UI after the player made a decision through ctrl (attended mode).
+func is_stopping() -> bool:
+	return _stop
+
+
+## Called by the UI after the player made a decision through ctrl (attended mode). Safe to call
+## at any time — also synchronously from a decision_needed handler (no lost wake-up).
 func player_decided() -> void:
+	_release()
+
+
+func _release() -> void:
+	_decided = true
 	decision_made.emit()
+
+
+func _is_paused() -> bool:
+	return paused
 
 
 ## Main loop. Returns when stopped, or when the run ends and keep_going is off (or max_runs).
@@ -110,31 +136,47 @@ func play() -> void:
 				continue
 			"fight":
 				var built := ctrl.match_config({"bot_tier_players": fighter_tier, "player_kinds": {"p0": "bot"}})
-				fight_started.emit({"encounter": ctrl.current_plan().get("encounter", ""), "name": ctrl.current_plan().get("name", "")})
-				var res: Dictionary = {}
-				if fight_runner.is_valid():
-					res = await fight_runner.call(self, built["config"])
+				current_fight = {"encounter": ctrl.current_plan().get("encounter", ""), "name": ctrl.current_plan().get("name", "")}
+				if not (built["errors"] as PackedStringArray).is_empty() or (built["config"] as Dictionary).is_empty():
+					# content missing: the card cannot go on; the fight counts as lost
+					push_warning("bookie fight could not be built: %s" % "; ".join(built["errors"]))
+					ctrl.complete_fight({"campaign": {"won": false, "time": 0.0, "players": {}, "error": "; ".join(built["errors"])}})
 				else:
-					res = await HeadlessFightRunner.run(self, built["config"], 420.0, func(): return paused)
-				ctrl.complete_fight(res)
+					in_fight = true
+					fight_started.emit(current_fight)
+					var res: Dictionary = {}
+					if fight_runner.is_valid():
+						res = await fight_runner.call(self, built["config"])
+					else:
+						res = await HeadlessFightRunner.run(self, built["config"], 420.0, _is_paused, is_stopping)
+					in_fight = false
+					ctrl.complete_fight(res)
 			_:
 				if unattended:
 					if think_delay > 0.0:
-						await get_tree().create_timer(think_delay, true, false, true).timeout
-					if paused or not unattended:
+						# real-time pause between Teddy's decisions; pause/stop/take-over cut it short
+						var until := Time.get_ticks_msec() + int(think_delay * 1000.0)
+						while Time.get_ticks_msec() < until and not _stop and not paused and unattended:
+							await get_tree().process_frame
+					if _stop or paused or not unattended:
 						continue
 					if before == "map":
 						ctrl.choose_node(CampaignAutoPilot.choose_route(ctrl, "p0"), "p0")
 					elif not CampaignAutoPilot.settle(ctrl, ["p0"]):
 						await get_tree().process_frame
 				else:
+					_decided = false
+					waiting_for_player = true
 					decision_needed.emit(before)
-					await decision_made
+					if not _decided:
+						await decision_made
+					waiting_for_player = false
 		if ctrl.phase() != before:
 			transitions.append({"from": before, "to": ctrl.phase(), "node": str(ctrl.state.get("position", ""))})
 			changed.emit("phase")
 	running = false
 	SimSpeed.restore()
+	stopped.emit()
 
 
 func _finish_run() -> void:

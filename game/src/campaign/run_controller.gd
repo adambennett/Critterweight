@@ -20,6 +20,7 @@ var state: Dictionary = {}
 var last_error := ""
 var autosave: Callable = Callable()   ## called with (state) after every committed transition
 var replaying := false
+var last_texts: Array = []            ## result lines of the latest event choice (UI only, not saved)
 
 
 static func start_run(cat: CampaignCatalog, cfg: Dictionary) -> RunController:
@@ -623,6 +624,7 @@ func choose_event(pid: String, choice_id: String) -> bool:
 	var r := EventRunner.choose(self, pid, choice_id)
 	if not bool(r.get("ok", false)):
 		return _fail(str(r.get("error", "event choice failed")))
+	last_texts = (r.get("texts", []) as Array).duplicate()
 	_record_claim(node_id, "_run", "event")
 	_log("event", pid, {"choice": choice_id})
 	if phase() == "event":
@@ -940,6 +942,16 @@ func _end_run(victory: bool, abandoned := false) -> void:
 		"variant": str(state.get("variant", "")), "mode": str(state.get("mode", "")), "custom": bool(state.get("custom", false)),
 		"seed_text": str(state.get("seed_text", "")), "players": per, "stats": (state.get("stats", {}) as Dictionary).duplicate(true)}
 	_commit("victory" if victory else "defeat")
+
+
+## The latest fight's compact result from the decision log ({} if none yet): result banners.
+func last_fight() -> Dictionary:
+	var lg: Array = state.get("log", [])
+	for i in range(lg.size() - 1, -1, -1):
+		var e: Dictionary = lg[i]
+		if str(e.get("k", "")) == "fight":
+			return e.get("d", {}).get("result", {})
+	return {}
 
 
 ## Summary for the results card (victory/defeat screen, history).
