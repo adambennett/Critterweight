@@ -36,15 +36,15 @@ static func start(index := 0, creature_id := "", on_exit: Callable = Callable())
 	var partner_id := PARTNER if Content.creature(PARTNER) != null else ("f_gusto" if cid != "f_gusto" else "f_stoke")
 	if Content.creature(partner_id) == null:
 		partner_id = cid
-	var mode := TutorialMode.new()
-	mode.start_index = index
-	mode.on_exit = on_exit if on_exit.is_valid() else Callable(Tutorial, "_default_exit")
+	_exit_override = on_exit
 	var t: Dictionary = Profiles.current.get("tutorial", {})
 	t["times_offered"] = int(t.get("times_offered", 0)) + 1
 	Profiles.current["tutorial"] = t
-	return App.start_match({"arena": practice_cage(), "seed": 1234, "mode": mode, "overlay_script": OVERLAY,
-		"audio_context": "tutorial", "music": "fight_night_poster",
-		"rules": {"id": "tutorial", "name": "Tutorial", "mode": "tutorial", "round_time": 0.0, "rounds": 1, "intro_time": 0.0},
+	# plain data only (no mode object): MatchFlow keeps it for the pause menu's Restart
+	return MatchFlow.launch({"arena": "practice_cage", "seed": 1234, "overlay_script": OVERLAY,
+		"audio_context": "tutorial", "music": "fight_night_poster", "no_record": true,
+		"rules": {"id": "tutorial", "name": "Tutorial", "mode": "tutorial", "round_time": 0.0, "rounds": 1, "intro_time": 0.0,
+			"tutorial_start": index},
 		"fighters": [
 			{"creature": cid, "team": 0, "kind": "player", "name": Profiles.player_name()},
 			{"creature": partner_id, "team": 1, "kind": "scripted", "name": "Kid Lamprey"}]})
@@ -61,6 +61,18 @@ static func start_lesson(lesson_id: String, creature_id := "") -> void:
 	start(idx, creature_id)
 
 
+static var _exit_override: Callable = Callable()
+
+
+static func exit_tutorial() -> void:
+	var cb := _exit_override
+	_exit_override = Callable()
+	if cb.is_valid():
+		cb.call()
+	else:
+		_default_exit()
+
+
 static func _default_exit() -> void:
 	if App.has_screen("tutorial_menu"):
 		App.goto("tutorial_menu")
@@ -70,13 +82,10 @@ static func _default_exit() -> void:
 		App.quit()
 
 
-## The practice cage: the Gullet at 6 m across (ARENAS: "mini-Gullet").
+## The practice cage (content/core/arenas/practice_cage.json): a small Gullet ("mini-Gullet").
 static func practice_cage() -> ArenaDef:
-	# the_gullet is a format-2 base layout (9-12 m); the cage is a small format-1 octagon in the
-	# Gullet's look (theme "can"), two spawns, no props or hazards
-	return ArenaDef.from_dict({"id": "practice_cage", "name": "Granny's Practice Cage", "base": "octagon",
-		"radius": 3.6, "wall_height": 2.4, "theme": "can", "spawns": [[0, -1.6, 0], [0, 1.6, 180]],
-		"props": [], "hazards": []}, "core")
+	var a := Content.arena("practice_cage")
+	return a if a else Content.arena("the_gullet")
 
 
 ## Replaces {tokens} with live binding prompts and the fighter's own move names.

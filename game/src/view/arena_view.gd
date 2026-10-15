@@ -40,6 +40,7 @@ var marker_nodes: Array[Node3D] = []
 var _static_root: Node3D
 var _layout_root: Node3D
 var _hazard_root: Node3D
+var _base_hz_root: Node3D           ## base hazard decals (hidden while the base hazards are off)
 var _crowd: MultiMeshInstance3D
 var _logo_vp: SubViewport
 var _out := {}
@@ -330,13 +331,16 @@ func _build_floor() -> void:
 # =====================================================================================
 
 func _build_base_hazards() -> void:
+	_base_hz_root = Node3D.new()
+	_base_hz_root.name = "BaseHazards"
+	_hazard_root.add_child(_base_hz_root)
 	for h in arena.hazard_defs():
 		var id := str(h.get("id", ""))
 		match str(h.get("type", "")):
 			"tidal_gutter":
 				var r := arena.strip_rect(h)
 				var m := ArenaPropVisuals.decal(ArenaPropVisuals.element_color("brine"), 0, r.size, ArenaPropVisuals.ICONS["brine"], {"icon_spacing": 2.0, "base_alpha": 0.38})
-				ArenaPropVisuals.decal_quad(_hazard_root, m, r.size, Vector3(r.get_center().x, 0.0, r.get_center().y))
+				ArenaPropVisuals.decal_quad(_base_hz_root, m, r.size, Vector3(r.get_center().x, 0.0, r.get_center().y))
 				_hz_decals[id] = {"mats": [m]}
 			"crane_hook":
 				var mats := []
@@ -344,7 +348,7 @@ func _build_base_hazards() -> void:
 					var sp: Vector2 = s
 					var d := float(h.get("radius", 0.75)) * 2.0
 					var m2 := ArenaPropVisuals.decal(Color("#F2D27A"), 1, Vector2(d, d), ArenaPropVisuals.ICONS["hook"], {"icon_spacing": 10.0, "icon_size": 0.6, "base_alpha": 0.45})
-					ArenaPropVisuals.decal_quad(_hazard_root, m2, Vector2(d, d), Vector3(sp.x, 0.0, sp.y))
+					ArenaPropVisuals.decal_quad(_base_hz_root, m2, Vector2(d, d), Vector3(sp.x, 0.0, sp.y))
 					mats.append(m2)
 				_hz_decals[id] = {"mats": mats}
 			"plate_grid":
@@ -354,7 +358,7 @@ func _build_base_hazards() -> void:
 				for c in cells:
 					var cr: Rect2 = c
 					var m3 := ArenaPropVisuals.decal(ArenaPropVisuals.element_color("static"), 0, cr.size - Vector2(0.3, 0.3), ArenaPropVisuals.ICONS["static"], {"icon_spacing": 1.9, "base_alpha": 0.12, "outline_w": 0.1})
-					ArenaPropVisuals.decal_quad(_hazard_root, m3, cr.size - Vector2(0.3, 0.3), Vector3(cr.get_center().x, 0.0, cr.get_center().y))
+					ArenaPropVisuals.decal_quad(_base_hz_root, m3, cr.size - Vector2(0.3, 0.3), Vector3(cr.get_center().x, 0.0, cr.get_center().y))
 					mats2.append(m3)
 				for k in 6:
 					var arc := MeshInstance3D.new()
@@ -362,14 +366,14 @@ func _build_base_hazards() -> void:
 					arc.material_override = ArenaPropVisuals.glow(Color("#F7E04A"), 5.0)
 					arc.visible = false
 					arc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-					_hazard_root.add_child(arc)
+					_base_hz_root.add_child(arc)
 					arcs.append(arc)
 				_hz_decals[id] = {"mats": mats2, "arcs": arcs, "cells": cells}
 			"crane_magnet":
 				var dia := float(h.get("radius", 3.0)) * 2.0
 				var m4 := ArenaPropVisuals.decal(Color("#E04FB0"), 3, Vector2(dia, dia), ArenaPropVisuals.ICONS["magnet"], {"icon_spacing": 1.3, "base_alpha": 0.0})
 				m4.render_priority = 2     # over the plate-grid decals it crosses
-				var node := ArenaPropVisuals.decal_quad(_hazard_root, m4, Vector2(dia, dia))
+				var node := ArenaPropVisuals.decal_quad(_base_hz_root, m4, Vector2(dia, dia))
 				node.visible = false
 				_hz_decals[id] = {"mats": [m4], "node": node}
 			"wind_gust":
@@ -381,7 +385,7 @@ func _build_base_hazards() -> void:
 				node2.material_override = m5
 				node2.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 				node2.visible = false
-				_hazard_root.add_child(node2)
+				_base_hz_root.add_child(node2)
 				_hz_decals[id] = {"mats": [m5], "node": node2}
 
 
@@ -608,6 +612,8 @@ func _transition(key: String, phase: String) -> String:
 
 
 func _apply_hazards(st: Dictionary, dt: float) -> void:
+	if _base_hz_root:
+		_base_hz_root.visible = bool(st.get("enabled", true))
 	for hz in st.get("hazards", []):
 		var id := str(hz["id"])
 		var type := str(hz["type"])

@@ -140,6 +140,8 @@ func _refresh_static() -> void:
 func _process(delta: float) -> void:
 	if mode == null:
 		return
+	if _menu.visible:
+		scene.sim.paused = true
 	var ex := mode.current()
 	_title.text = "EXERCISE %d/%d · %s" % [mode.index + 1, mode.list.size(), str(ex.get("title", "")).to_upper()]
 	_goal.text = mode.objective()

@@ -13,8 +13,8 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 |---|---|---|---|
 | DEL-01 | Packaged self-contained Windows x64 game launches with a fresh profile, no dev tools or login | — | |
 | DEL-02 | Source, assets (+ editable sources), build tools, tests, docs in repo | ~ | repo layout; AGENTS.md |
-| DEL-03 | Linux x86_64 game export + practical Steam Deck path (controller-first, 1280x800 preset, packaging notes); device/runtime checks may be X | — | |
-| DEL-04 | Separate headless dedicated server: Windows package; Linux server build | — | |
+| DEL-03 | Linux x86_64 game export + practical Steam Deck path (controller-first, 1280x800 preset, packaging notes); device/runtime checks may be X | ~ | Linux x86_64 game export built; tools/verify/portability_check.py: ELF64 x86-64, embedded data, glibc <= 2.28 libs only, case-exact res:// paths, no Windows-only code, tar.gz exec bits; runtime on Linux/Deck = X (no local Linux userland) |
+| DEL-04 | Separate headless dedicated server: Windows package; Linux server build | ~ | Windows/Linux dedicated-server exports build (package.ps1); server features pending networking merge |
 | DEL-05 | Reproducible build/package scripts | ~ | tools/build/package.ps1 (+make_tar.py): import, check, tests, 4 exports, manifest with sha256, archives |
 | DEL-06 | Top-level README (launch/build/test), final verification report with artifact paths/versions/results | — | |
 | DEL-07 | Git connected to github.com/adambennett/PokeMMA, reviewed incremental commits & pushes, no force push; push limits reported | ~ | local commits; remote reachable (empty private repo) |
@@ -27,7 +27,7 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 |---|---|---|---|
 | PERF-01 | Stable 60 fps combat at 1080p on the documented PC baseline (measured here: i7-7700K + RTX 4070 Ti SUPER); frame-time distribution recorded for busy scenes | — | |
 | PERF-02 | Deck-class preset for 1280x800 @ 60 fps; layout/readability checked at 1280x800; real Deck test = X | — | |
-| PERF-03 | Loading time and memory use measured | — | |
+| PERF-03 | Loading time and memory use measured | ~ | --boot-report: 7.7 s to title in the editor binary on a loaded machine; bench reports match load (~0.25 s) and memory; packaged quiet-machine numbers pending |
 | PERF-04 | Server simulation cost measured (8-fighter busy scene, playlist soak) | — | |
 | PERF-05 | Quality presets scale expensive effects while keeping combat readable; benchmarks run at stated settings | — | |
 
@@ -43,8 +43,8 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | CMB-07 | No unavoidable infinites or permanent stun locks (combo scaling, stun budget burst, wake-up invulnerability, OTG cap) — tested | ~ | Tuning keys combo_*/stun_budget |
 | CMB-08 | Readable windups, impact feedback, recovery cues, predictable control | — | |
 | CMB-09 | Different body shapes without unreadable reach advantages/broken collisions (reach cap 1.6 m, tests) | — | |
-| CMB-10 | Cosmetic physics separate from authority | ~ | CreatureView.detach_piece (debris layer) |
-| CMB-11 | Repeatable combat scenarios + debug visualizations | ~ | --probe scenarios; debug draw pending |
+| CMB-10 | Cosmetic physics separate from authority | I | Cosmetic layer is view-only: CreatureView bruises/flash/detached gore piece on the debris layer, Vfx, KO stars; sim never reads them |
+| CMB-11 | Repeatable combat scenarios + debug visualizations | I T | Probes (--probe stand|walk|jab|string|heavy|guard|grab|ability|spar), tutorial/kit scenario tests, CombatDebugDraw overlay (F3/--debug-draw: hit capsules, weapon phases, reach circle, targets, hit labels) |
 | CMB-12 | Controller-first: an Xbox-style pad operates every workflow; mouse+keyboard fully supported | I T | Controls + UiNav (stick nav, focus guard, hot-plug); UI tests drive every flow with injected pad/key/mouse events (test/ui) |
 
 ## Roster, elements & content targets [7]
@@ -55,26 +55,26 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | CNT-03 | 6 original elements with statuses, 11 reactions, zones, resist/weak; icons+text+colour | ~ | ELEMENTS.md; Elements/StatusSet engine |
 | CNT-04 | Committed numeric content targets (DESIGN.md §Content targets) all met | — | |
 | CNT-05 | Polished primary cage + useful arena customization & saved layouts | I T | 4 bases (Gullet day/night/title night, Drydock, Crusher, Rooftop) with hazards/quirks, 30-entry prop catalog, 6 example layouts, saved layouts (docs/ARENAS_AND_EDITOR.md); tests arena/*; docs/evidence/arenas |
-| CNT-06 | 4 difficulty presets + The Dosage ladder (10 levels, distinct modifiers, progressive unlock) | — | |
-| CNT-07 | Visibly different seeded runs (events/upgrades/enemies) | — | |
-| CNT-08 | 3 bosses with 2 phases | — | |
+| CNT-06 | 4 difficulty presets + The Dosage ladder (10 levels, distinct modifiers, progressive unlock) | I T | content/core/ladder/{difficulty,doses}.json: Sparring/Amateur/Contender/Title Shot + 5 bot tiers, 10 cumulative Doses with distinct modifiers; unlock rule in CampaignProgression; test_campaign_run (ladder, difficulty/Dose modifiers), test_campaign_generation (Dose 10) |
+| CNT-07 | Visibly different seeded runs (events/upgrades/enemies) | I T | seeded MapGenerator/EncounterBuilder/RewardRoller/EventRunner via RunRng streams (29 events, 45 encounters, 50 supplements, 36 techniques); test_campaign_generation (same seed = same card, varied cards, 500 seeds valid) |
+| CNT-08 | 3 bosses with 2 phases | ~ T | BossMode + boss_fights/{bilge,conduit,snappington}.json: 2 phases, telegraphed attacks, Dazed (test_campaign_fights). Real boss creature kits do not parse yet, so fights run on documented stand-in bodies |
 
 ## Campaigns & co-op [8]
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
-| CMP-01 | Off the Street (fresh-run): no permanent power; only stats/cosmetics/records/ladder persist; unlocks keep parity | — | |
-| CMP-02 | Clearing the highest unlocked Dose unlocks the next, max Dose 10 | — | |
-| CMP-03 | Fight Camp (persistent): permanent upgrades; between runs the player explores the 3D hub | — | |
+| CMP-01 | Off the Street (fresh-run): no permanent power; only stats/cosmetics/records/ladder persist; unlocks keep parity | I T | Off the Street variant: no carried power, cosmetic-only Clout wallet, stats/records/history/ladder persist (CampaignProgression); test_campaign_run, test_campaign_full_runs |
+| CMP-02 | Clearing the highest unlocked Dose unlocks the next, max Dose 10 | I T | CampaignProgression.apply_ladder_clear (Dose 0 clear opens The Dosage; highest Dose clear unlocks next, max 10); test_campaign_run::test_ladder_unlock_rule |
+| CMP-03 | Fight Camp (persistent): permanent upgrades; between runs the player explores the 3D hub | ~ T | Fight Camp: 24 Cannery upgrades (meta_upgrades/cannery.json, meta_bonus) bought with Clout via FightCamp API + Cannery Ledger screen; applied only in Fight Camp runs (test_campaign_run, test_campaign_full_runs). The 3D hub itself is CMP-04 |
 | CMP-04 | Hub: ≥5 connected spaces, characters, activities, secrets, upgrade stations, real movement | — | |
-| CMP-05 | Both: branching routes, risk/reward, synergies, random events, bosses, rewards, victory/defeat/replay | — | |
-| CMP-06 | Pacing/run length defined; seeded reproducible generation; no impossible routes/invalid rewards/softlocks (tested) | — | |
-| CMP-07 | How custom runs affect progression/records defined and shown | — | |
-| COOP-01 | Online co-op in both campaigns, ≥2 humans (limit 4) | — | |
-| COOP-02 | Tag-team and simultaneous allied combat; simultaneous default (reasoned); tag via settings; 1v1 stays the solo norm | — | |
-| COOP-03 | Run ownership, route voting, per-player choices, reward distribution w/o duplication, progression compatibility | — | |
-| COOP-04 | Downed/defeated players, tag-out participation, pause rules | — | |
-| COOP-05 | Disconnect/rejoin, host departure recovery, save/resume party, continue with absent player | — | |
-| COOP-06 | Permanent campaign power kept out of PvP; active custom rules visible | — | |
+| CMP-05 | Both: branching routes, risk/reward, synergies, random events, bosses, rewards, victory/defeat/replay | I T | branching 3-act maps, elites/treasure, synergy tags, events, 3 bosses, rewards, victory/defeat summary with Run it back/New card/Raise the Dose; test_campaign_full_runs (real fights, both variants, victory and defeat), test_campaign_ui |
+| CMP-06 | Pacing/run length defined; seeded reproducible generation; no impossible routes/invalid rewards/softlocks (tested) | I T | pacing rules + estimates (25-40 min), 53-bit seeds, deterministic generation, claim ledger, safe-layout fallback; test_campaign_generation (500 seeds, every route paced and valid), test_campaign_run (duplicate rewards), test_campaign_ui (forfeit when a fight cannot be built) |
+| CMP-07 | How custom runs affect progression/records defined and shown | I T | custom runs (stand-ins, reduced game speed, custom rules) keep stats/history, no records/ladder/unlocks/achievements, Clout 50%, shown on the summary card; test_campaign_run::test_custom_runs_keep_stats_but_no_records |
+| COOP-01 | Online co-op in both campaigns, ≥2 humans (limit 4) | ~ T | CoopSession (2-4) over PartyTransport, both variants; tested over LoopbackTransport (loopback). NetPartyTransport waits for Net app messages (docs/CAMPAIGN_SYSTEMS.md#co-op-protocol) |
+| COOP-02 | Tag-team and simultaneous allied combat; simultaneous default (reasoned); tag via settings; 1v1 stays the solo norm | I T | simultaneous default + tag-team format (CampaignMatchMode party tag group); test_campaign_coop::test_tag_team_format (loopback), test_campaign_fights |
+| COOP-03 | Run ownership, route voting, per-player choices, reward distribution w/o duplication, progression compatibility | I T | host-owned RunController, route votes with Captain tie-break, per-player picks/Scrip, claim ledger, per-player crediting; test_campaign_coop (loopback) |
+| COOP-04 | Downed/defeated players, tag-out participation, pause rules | I T | downed/revive on MatchMode's machinery with shrinking timers, tag-out/cheer/assist, ref-timeout pause budget; test_campaign_fights::test_downed_and_revive_in_coop, test_campaign_coop (loopback) |
+| COOP-05 | Disconnect/rejoin, host departure recovery, save/resume party, continue with absent player | I T | bot takes a disconnected member's fighter, rejoin at node boundary, host departure -> member replica resumes, party slot suspend/resume, absent-member move-on; test_campaign_coop (loopback) |
+| COOP-06 | Permanent campaign power kept out of PvP; active custom rules visible | I T | meta_bonus upgrades applied only by BuildApplier in Fight Camp (or visible Gym Bonuses custom rule); rule tags shown on the fight card/HUD; test_campaign_run::test_fight_camp_meta_applies_only_in_fight_camp |
 
 ## Match types, rules editor, arena editor [9]
 | ID | Requirement / acceptance | State | Evidence |
@@ -110,8 +110,8 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 |---|---|---|---|
 | AI-01 | Distinct bot difficulties (forgiving → demanding), reaction/mistakes/strategy/ability use, no omniscience, every creature & mode tested | ~ | src/ai/bot_brain.gd (perception delay) |
 | AI-02 | AI-vs-AI spectating with camera/HUD controls | I T | SpectatorDirector auto-director, viewer focus lock, free camera, hide HUD, 0.25x-2x speed; tests core/test_spectator; --spectate |
-| AI-03 | Bookie's Table autobattler: player picks fighter/route/upgrades/build, AI fights, shared campaign systems | — | |
-| AI-04 | Unattended mode with auto decisions, pause, speed/camera, take-over; extended unattended run tested | — | |
+| AI-03 | Bookie's Table autobattler: player picks fighter/route/upgrades/build, AI fights, shared campaign systems | I T | BookieTable + Bookie screen: player builds/decides or Teddy decides, bots fight, shared campaign systems; test_campaign_bookie, test_campaign_ui::test_bookie_screen_setup_live_and_stop |
+| AI-04 | Unattended mode with auto decisions, pause, speed/camera, take-over; extended unattended run tested | ~ T | unattended autopilot (CampaignAutoPilot), pause (freezes fight physics), speed 1-4x, take over/hand back; 3 complete unattended runs with real fights (test_campaign_bookie). Camera = the standard fight camera |
 | LAB-01 | Actual local learning (parameters change from experience) | — | |
 | LAB-02 | ≥2 distinct training approaches (evolution strategies RL + behaviour cloning) documented | — | |
 | LAB-03 | Lab UI: fighter, approach, objectives/styles, opponents/scenarios, seed, resource/time limits | — | |
@@ -131,7 +131,7 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | ART-03 | glTF import path validated; PBR, soft shadows, SSAO, HDR tonemapping; scalable quality | I | glTF pipeline (forge -> .glb -> Godot import; runtime GLTFDocument for mods), PBR hints, AgX, SSAO, soft shadows, quality presets |
 | ART-04 | Readable locomotion, attacks, abilities, hit reactions, blocking, knockdowns/recovery, win/loss per anatomy | — | |
 | ART-05 | Effects communicate range/timing/contact/elements/outcomes; legible busy scenes | ~ | Vfx |
-| ART-06 | Localized injury feedback + modest cosmetic gore (default on) with reduced/off and non-gory equivalents | ~ | creature.gdshader bruises; detach_piece |
+| ART-06 | Localized injury feedback + modest cosmetic gore (default on) with reduced/off and non-gory equivalents | I | Bruises + flash (creature.gdshader), detachable gore piece on KO (Full), Reduced = no piece, Off = no bruises; non-gory KO stars at every level (access.gore) |
 | ART-07 | Original satire, memorable announcer, fictional PED theme, coherent tone | ~ | GAME_PITCH.md |
 | ART-08 | Editable source assets and reproducible import/export steps | I | Editable sources: tools/forge defs, tools/audio scores, assets/ui/source; rebuild commands in docs/ART_PIPELINE.md, docs/AUDIO.md |
 | AUD-01 | Menu/combat music, impact/ability/creature sounds, UI feedback, ambience, mixing | I T | Synthesized score (8 tracks), 312 SFX ids, voices, announcer (tools/audio, docs/AUDIO.md); audio bridge attached per match; tests test/audio |
@@ -156,9 +156,9 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 ## Saves & reliability [14]
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
-| SAV-01 | Offline, no login; persist settings, profiles, campaign, suspended runs, unlocks, presets, arenas, mod selections, policies | — | |
-| SAV-02 | Versioned formats, atomic writes, backups, migrations; tested interrupted/damaged/updated/missing-mod/removed-content/incompatible-policy cases; non-destructive failures | — | |
-| SAV-03 | Co-op persistence & ownership; duplicate-reward and invalid-resume protection | — | |
+| SAV-01 | Offline, no login; persist settings, profiles, campaign, suspended runs, unlocks, presets, arenas, mod selections, policies | ~ T | campaign: suspended runs (RunStore), campaign profile fields (records, ladder, Clout, history); test_campaign_persistence. Other data kinds belong to their owners |
+| SAV-02 | Versioned formats, atomic writes, backups, migrations; tested interrupted/damaged/updated/missing-mod/removed-content/incompatible-policy cases; non-destructive failures | ~ T | campaign saves: versioned, atomic via Saves, .bak recovery, v0 migration, damaged/missing/newer/removed-content non-destructive; floats stabilized for JSON (RunStore.json_stable); test_campaign_persistence |
+| SAV-03 | Co-op persistence & ownership; duplicate-reward and invalid-resume protection | I T | party tickets with checksums (replica checkpoints), claims keyed by node, idempotent crediting; test_campaign_persistence, test_campaign_coop (loopback) |
 | SAV-04 | User data outside install; non-admin; spaces/non-ASCII paths; focus/suspend/controller-disconnect/shutdown handling | ~ | User data under %APPDATA%/Critterweight (never install dir); --user-root; tests use an isolated _test_root; unicode/space path test |
 
 ## Modding [15]
@@ -183,11 +183,11 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 ## Verification gates [17, 19]
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
-| VER-01 | Unit/property tests: damage, effects, resources, modifiers, rewards, progression, unlocks, seeds, rule validation, playlists, serialization/migrations, AI contracts | — | |
-| VER-02 | Integration: campaign transitions, victory/defeat, co-op decisions/recovery, save/resume, mod loading, authored arenas, policy training/loading, hosted/dedicated networking | — | |
+| VER-01 | Unit/property tests: damage, effects, resources, modifiers, rewards, progression, unlocks, seeds, rule validation, playlists, serialization/migrations, AI contracts | ~ | Unit tests: persistence/migrations, schema, elements, combat rules (infinites, ranges, determinism), modes, mods, rules validation/presets, tutorial, spectator, audio, UI; campaign/net/lab pending merges |
+| VER-02 | Integration: campaign transitions, victory/defeat, co-op decisions/recovery, save/resume, mod loading, authored arenas, policy training/loading, hosted/dedicated networking | ~ T | campaign transitions, victory/defeat, co-op decisions/recovery (loopback), save/resume covered (test_campaign_*); other integration areas belong to their owners |
 | VER-03 | Runtime (packaged Windows): fresh profile, tutorial, every mode, full runs both variants, both co-op formats, controller/menu navigation, sound/graphics, settings, error flows | — | |
 | VER-04 | Multiplayer: independent clients + headless server, latency/jitter/loss, disconnect/rejoin, incompatible content, playlist transitions, authoritative outcomes (loopback labeled) | — | |
 | VER-05 | Stability/performance: repeated matches, extended spectator/playlist, Lab resource limits, server soak, busy scenes, loading, memory trends, frame times | — | |
-| VER-06 | Asset/content: missing refs, imports, rigs/materials, schemas, safe spawns/bounds, reachable rewards/routes, licenses/credits | — | |
+| VER-06 | Asset/content: missing refs, imports, rigs/materials, schemas, safe spawns/bounds, reachable rewards/routes, licenses/credits | ~ | test_content_audit (content errors, assets, weapons/chains/windows, safe spawns, presets/tutorial/achievements, example mods); portability_check.py; audio bank validation |
 | VER-07 | Independent review of significant changes; final integrated audit against the whole brief | — | |
 | PRC-01 | Records maintained (this ledger, DESIGN, DECISIONS, PROGRESS, VERIFICATION, AGENTS.md) | ~ | |

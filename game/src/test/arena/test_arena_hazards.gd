@@ -336,6 +336,27 @@ func test_rules_switch_hazards_timers_and_ringouts() -> void:
 	check((guarded.arena_nodes["walls"] as Array).size() >= 8, "ring-outs off: guard walls on every open edge")
 
 
+## A mode that runs its own arena hazards (campaign fights: CampaignMatchMode.hazards) takes
+## over: the base's timed hazards stay off and their decals hide, so nothing fires twice.
+class OwnHazardsMode extends MatchMode:
+	var hazards = RefCounted.new()
+
+
+func test_campaign_style_modes_own_the_hazards() -> void:
+	var sim := MatchSim.new()
+	sim.running = false
+	fresh_world().add_child(sim)
+	var fs := []
+	for i in 2:
+		fs.append({"creature": Content.creature("dev_biped"), "team": i})
+	sim.setup({"arena": Content.arena("arena_crusher"), "rules": {"rounds": 1, "round_time": 0}, "seed": 7, "fighters": fs, "mode": OwnHazardsMode.new()})
+	_fight(sim)
+	_steps(sim, 1500)
+	check(not _hz(sim).hazards_live(), "base hazards yield to the mode's own")
+	check(_hz(sim).history["plates"].is_empty() and _hz(sim).history["magnet"].is_empty(), "no base hazard fired")
+	check(not bool(_hz(sim).view_state()["enabled"]), "the view hides the base hazard decals")
+
+
 func test_team_matches_start_in_team_clusters() -> void:
 	var sim := _sim("arena_drydock", 5, {"rounds": 1, "round_time": 0}, 4, [0, 0, 1, 1])
 	var a := sim.arena

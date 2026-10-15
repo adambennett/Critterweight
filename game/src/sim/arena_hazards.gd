@@ -184,13 +184,23 @@ func tick(dt: float) -> void:
 	var fighting := sim.mode == null or sim.mode.phase == MatchMode.Phase.FIGHT
 	if fighting:
 		clock += dt
-		if enabled:
+		if hazards_live():
 			_tick_hazards(dt)
 	_tick_props(dt, fighting)
 	_tick_areas(dt)
 	_apply_shoves(dt)
 	_check_falls()
 	_tick_ringouts()
+
+
+## True while the base's timed hazards run: rules.hazards is on and the mode does not schedule
+## arena hazards itself (campaign fights: CampaignMatchMode/BossMode own a CampaignHazards
+## runner built from campaign data, so the base hazards stay off and nothing fires twice).
+func hazards_live() -> bool:
+	if not enabled:
+		return false
+	var m = sim.mode
+	return not (m != null and ("hazards" in m) and m.get("hazards") != null)
 
 
 ## Test/tool hook: advances only the hazard clock and state machines (no event processing).
@@ -1329,7 +1339,7 @@ func view_state() -> Dictionary:
 		if rec["body"] is Node3D and is_instance_valid(rec["body"]) and str(rec["def"].get("body", "")) in ["dynamic", "bag"]:
 			e["xform"] = (rec["body"] as Node3D).global_transform
 		pr_out.append(e)
-	return {"clock": clock, "enabled": enabled, "hazards": hz_out, "props": pr_out, "ringouts": pending_ringouts.size()}
+	return {"clock": clock, "enabled": hazards_live(), "hazards": hz_out, "props": pr_out, "ringouts": pending_ringouts.size()}
 
 
 ## 0..1 danger of standing at p right now (active hazards 1.0, telegraphed 0.6) — for bots.

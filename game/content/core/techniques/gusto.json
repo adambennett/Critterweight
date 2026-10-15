@@ -1,0 +1,38 @@
+{
+  "_doc": "GUSTO techniques and build directions (docs/design/ROSTER.md §3).",
+  "items": [
+    {"id": "tech_gusto_crowd_work", "type": "technique", "fighter": "f_gusto", "name": "Crowd Work", "build": "build_gusto_showboat",
+     "tags": ["hype"], "effect": "Taunt +8 -> +12 Hype and grants 1.5 s of +15% damage; taunt 1.5 -> 1.1 s",
+     "apply": {"patches": [{"op": "time_scale", "path": "moves.taunt", "value": 0.733}],
+               "hooks": [{"on": "taunt", "do": [{"type": "hype", "amount": 4}, {"type": "buff", "status": {"id": "crowd_work", "name": "Crowd Work", "duration": 1.5, "damage_dealt": 1.15}}]}]}},
+    {"id": "tech_gusto_hollow_bones", "type": "technique", "fighter": "f_gusto", "name": "Hollow Bones", "build": "build_gusto_showboat",
+     "tags": ["mobility", "glass"], "effect": "Dodge distance +0.8 m, dodge stamina -30%; knockback taken +15%",
+     "apply": {"patches": [{"op": "add", "path": "stats.dodge_distance", "value": 0.8, "default": 3.6}],
+               "mods": [{"key": "dodge_cost", "mul": 0.7}, {"key": "knockback_taken", "mul": 1.15}]}},
+    {"id": "tech_gusto_feather_knives", "type": "technique", "fighter": "f_gusto", "name": "Feather Knives", "build": "build_gusto_razorwing",
+     "tags": ["light", "heavy"], "effect": "Wing attacks (L1, Heavy, Finisher) +2 damage per hit; Crosswind Slash gains a third gust (+5)",
+     "apply": {"patches": [{"op": "add", "path": "moves.l1.damage", "value": 2}, {"op": "add", "path": "moves.heavy.damage", "value": 2},
+                           {"op": "add", "path": "moves.finisher.damage", "value": 2},
+                           {"op": "append", "path": "moves.heavy.effects", "value": {"t": 0.36, "type": "area", "shape": "cone", "radius": 1.5, "cone_deg": 100, "damage": 5, "knockback": 1.5, "poise": 8, "element": "gale", "buildup": 10}}]}},
+    {"id": "tech_gusto_tailwind", "type": "technique", "fighter": "f_gusto", "name": "Tailwind", "build": "build_gusto_razorwing",
+     "tags": ["status", "projectile"], "effect": "Winded enemies take +25% knockback from Gusto; Gust Bomb bounces off one wall",
+     "apply": {"patches": [{"op": "add", "path": "abilities.ability1.effects[type=projectile].bounce", "value": 1, "default": 0}],
+               "hooks": [{"on": "pre_hit_dealt", "if": {"target_status": "gale"}, "do": [{"type": "knockback_mult", "mult": 1.25}]}]}},
+    {"id": "tech_gusto_air_superiority", "type": "technique", "fighter": "f_gusto", "name": "Air Superiority", "build": "build_gusto_skyhook",
+     "tags": ["air", "heavy"], "effect": "Hang Time 1.2 -> 2.0 s; Dive Peck and Downdraft +30% poise damage; Hang Time cooldown 6 -> 8 s",
+     "apply": {"mods": [{"key": "hover_duration", "mul": 1.667}],
+               "patches": [{"op": "mul", "path": "moves.l1@hovering.poise", "value": 1.3}, {"op": "mul", "path": "moves.heavy@hovering.poise", "value": 1.3},
+                           {"op": "mul", "path": "moves.heavy_charged.poise", "value": 1.3}, {"op": "mul", "path": "abilities.ability2.cooldown", "value": 1.333}]}},
+    {"id": "tech_gusto_slippery_customer", "type": "technique", "fighter": "f_gusto", "name": "Slippery Customer", "build": "build_gusto_skyhook",
+     "tags": ["parry"], "effect": "Parry window +0.04 s; a parry refunds a dodge's stamina and grants 1 s of evasion",
+     "apply": {"mods": [{"key": "parry_window_add", "add": 0.04}],
+               "hooks": [{"on": "parry_success", "do": [{"type": "stamina", "amount": 12, "target": "self"}, {"type": "dash", "speed": 0.0, "evade": true, "time": 1.0}]}]}},
+
+    {"id": "build_gusto_showboat", "type": "build", "fighter": "f_gusto", "name": "Showboat", "techniques": ["tech_gusto_crowd_work", "tech_gusto_hollow_bones"],
+     "tags": ["hype", "mobility", "juice"], "blurb": "Taunt, dodge, taunt, JUICE twice a fight."},
+    {"id": "build_gusto_razorwing", "type": "build", "fighter": "f_gusto", "name": "Razorwing", "techniques": ["tech_gusto_feather_knives", "tech_gusto_tailwind"],
+     "tags": ["light", "heavy", "status"], "blurb": "Wing strings and launched Winded victims into walls."},
+    {"id": "build_gusto_skyhook", "type": "build", "fighter": "f_gusto", "name": "Skyhook", "techniques": ["tech_gusto_air_superiority", "tech_gusto_slippery_customer"],
+     "tags": ["air", "parry", "heavy"], "blurb": "Live in the air, parry what comes up, dive on the recovery."}
+  ]
+}

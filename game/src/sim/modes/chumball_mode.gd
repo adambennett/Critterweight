@@ -208,6 +208,9 @@ func start_sudden_death() -> void:
 
 func on_timeout() -> void:
 	if float(scores.get(0, 0.0)) == float(scores.get(1, 0.0)):
+		if not bool(rules.get("sudden_death", true)):
+			end_round(-1)
+			return
 		start_sudden_death()
 	else:
 		end_round(0 if float(scores.get(0, 0.0)) > float(scores.get(1, 0.0)) else 1)
