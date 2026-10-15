@@ -77,3 +77,45 @@ protocol and version/content handshake. Details: docs/NETWORKING.md.
 User data under the OS user-data folder (`%APPDATA%\Critterweight`, `~/.local/share/Critterweight`), never the
 install folder. Versioned JSON envelopes with CRC32, atomic write (temp → flush → rotate .bak → rename), recovery
 from .bak/.tmp, explicit migrations, non-destructive failure.
+
+## D-016 Mods are data-only
+Mod packages contain JSON, images, sounds and glTF models only; any script, binary, scene, engine resource
+or resource pack is rejected and archives are never mounted into `res://`. Behaviour comes from the shared hooks
+DSL and rule options, which already express kits, statuses, techniques and modes. Reasons: a cage fighter with
+online play cannot let a downloaded package run code on players' machines or servers; the data surface is
+large enough for fighters, rules/modes, arenas, campaign content and presentation; validation can be complete.
+Archives are inspected from the zip central directory before anything is inflated (zip bombs, traversal,
+encryption, ZIP64 refused) and extracted to a hash-keyed cache. Overrides of core content need consent
+(`replaces_core`). Details: docs/MODDING.md.
+
+## D-017 Creature inheritance ("extends")
+Creature entries may extend another creature and state only differences (objects merge, arrays/scalars
+replace, `null` deletes). Used by mods, fighter variants and campaign build patches; the merged result is
+schema-validated. Chosen over copy-paste variants so balance changes to a base fighter flow into variants.
+
+## D-018 User rules presets are runtime content
+Player-made rules presets are stored as versioned, checksummed saves under `presets/rules` and registered into
+the content registry as `user:<id>` after every reload, so every menu, host screen and playlist sees them with
+core and mod presets. They are excluded from the multiplayer content hash: hosts send the full rules
+dictionary. One table (`RulesValidator.FIELDS`) drives the editor rows, help text, normalization and validation.
+
+## D-019 Tutorial is a mode with data-driven exercises
+The tutorial is a `MatchMode` (real combat rules, real fighters) whose ten exercises, lines and success checks
+are content data; prompts are filled from live bindings and the fighter's own move names. Each exercise is
+proven completable by an automated scripted player. The sparring partner is a scripted input source, so the
+same code drives the Kid in the tutorial and in hub sparring.
+
+## D-020 Spectator auto-director in the view layer
+Spectating uses the normal fight camera driven by a director that only reads sim events (no gameplay effect):
+interest scores, cuts to big moments, wide shots, viewer lock. Playback speed uses `Engine.time_scale` offline
+only and is reset when the match scene exits.
+
+## D-021 Platform services: local backend first
+All store-like services (identity, invites, presence, achievements, workshop, cloud saves) go through the
+`Platform` autoload with a complete local implementation. Steam integration is deferred and documented in
+docs/PLATFORM.md; nothing claims it.
+
+## D-022 Cage collision matches the visible fence
+Collision walls are built on the same polygon as the rendered fence (side normals at `TAU*i/sides`) and rise
+5 m above it; a containment net in `MatchSim` pulls any rig that still escapes back inside and logs it. Found
+from mode captures where fighters stood outside the cage.
