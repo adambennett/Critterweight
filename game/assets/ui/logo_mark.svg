@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+<polygon points="40,4 88,4 124,40 124,88 88,124 40,124 4,88 4,40" fill="#1a1d24" stroke="#c9a227" stroke-width="6" stroke-linejoin="round"/>
+<polygon points="44,16 84,16 112,44 112,84 84,112 44,112 16,84 16,44" fill="#232731" stroke="#5b6168" stroke-width="3"/>
+<g stroke="#5b6168" stroke-width="1.6" opacity="0.7">
+<path d="M16 44 L84 112 M30 30 L98 98 M44 16 L112 84 M16 84 L84 16 M30 98 L98 30 M44 112 L112 44"/>
+</g>
+<g transform="rotate(-14 64 64)">
+<rect x="46" y="26" width="36" height="72" rx="9" fill="#8bd426" stroke="#1a1d24" stroke-width="4"/>
+<rect x="46" y="48" width="36" height="24" fill="#5c8f17"/>
+<rect x="51" y="31" width="26" height="4" rx="2" fill="#1a1d24"/>
+<path d="M64 51 C 69 58 71 61 71 64 a7 7 0 0 1 -14 0 C 57 61 59 58 64 51 Z" fill="#f2f2ec"/>
+</g>
+<g transform="rotate(32 64 64)">
+<rect x="22" y="56" width="62" height="20" rx="8" fill="#f2f2ec" stroke="#1a1d24" stroke-width="4"/>
+<g fill="#f2f2ec" stroke="#1a1d24" stroke-width="3.5">
+<rect x="78" y="48" width="18" height="36" rx="8"/>
+</g>
+<path d="M85 55 V77" stroke="#1a1d24" stroke-width="2.5"/>
+</g>
+</svg>
