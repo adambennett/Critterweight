@@ -45,6 +45,8 @@ func detect_hits() -> void:
 			continue
 		var weps: PackedStringArray = a.move.windows[widx]["weapons"]
 		for wname in weps:
+			if a.move == null:
+				break    # an earlier weapon's contact ended the move (parried, grabbed, interrupted)
 			var w: BodyDef.Weapon = a.creature.body.weapons.get(wname)
 			if w == null:
 				continue
@@ -69,6 +71,8 @@ func detect_hits() -> void:
 					continue
 				if a.move.kind == "grab":
 					_try_grab(a, b, w, c)
+					if a.move == null:
+						break
 					continue
 				var wv := a.rig.point_velocity(w.seg, wp)
 				_resolve_melee(a, b, widx, wp, wv, c)

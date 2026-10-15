@@ -36,8 +36,11 @@ func start(cfg: Dictionary) -> void:
 			"player":
 				var lp := LocalPlayerInput.new()
 				lp.camera = camera
-				entry["source"] = lp
+				entry["source"] = LabRecording.wrap_player(lp, e, self)   # AI Lab imitation recording (off by default)
 				player_index = idx
+			"policy":
+				# AI Lab policy: e.policy_id (falls back to a scripted bot if missing/incompatible)
+				entry["source"] = PolicyInputSource.for_match(e, int(cfg.get("seed", 1)) * 31 + idx, idx)
 			"bot":
 				var bb := BotBrain.new(str(e.get("difficulty", "regular")), int(cfg.get("seed", 1)) * 31 + idx)
 				bb.set_personality((e["creature"] as CreatureDef).ai)
