@@ -23,6 +23,7 @@ var _stdin_done := false
 var _stdin_stop := false
 var _stdin_type := 0
 var _status_ms := 0
+var _flush_ms := 0
 var _shutting_down := false
 var _shutdown_at_ms := 0
 var _shutdown_msg := ""
@@ -231,6 +232,10 @@ func _process(_dt: float) -> void:
 	if tcp:
 		tcp.poll(console)
 	var now := Time.get_ticks_msec()
+	if now - _flush_ms >= 1000:
+		# release builds buffer INFO lines; keep server.log at most a second behind
+		_flush_ms = now
+		Log.flush()
 	if now - _status_ms >= STATUS_EVERY_MS and not _shutting_down:
 		_status_ms = now
 		_write_status("running")

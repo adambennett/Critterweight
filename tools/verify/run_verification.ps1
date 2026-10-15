@@ -2,7 +2,8 @@
 .SYNOPSIS
   End-to-end verification of the PACKAGED Windows build: builds (optional), runs the full test
   suite inside the exported executable, captures runtime screenshots of real screens/modes from
-  the packaged game, runs the performance benches, and writes a machine-readable summary.
+  the packaged game, runs the packaged dedicated server with packaged clients over loopback,
+  runs the performance benches, and writes a machine-readable summary.
 .DESCRIPTION
   Output: docs/evidence/verification/<timestamp>/ with summary.json, summary.md, logs and PNGs.
   Every run uses an isolated user-data root (--user-root) so the player's own profile is never
@@ -14,6 +15,8 @@
 param(
 	[switch]$Build,
 	[switch]$SkipBench,
+	[switch]$SkipNet,
+	[string]$Dist = "",
 	[int]$BenchSeconds = 30,
 	[string]$Godot = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 )
@@ -37,9 +40,10 @@ if ($Build) {
 	if ($LASTEXITCODE -eq 0) { Record "package build (+ source tests)" "pass" "tools/build/package.ps1 -RunTests" } else { Record "package build" "fail" "exit $LASTEXITCODE (see build.log)" }
 }
 
-$exe = Join-Path $root "dist\Critterweight-windows-x64\Critterweight.exe"
+$distDir = if ($Dist -ne "") { $Dist } else { Join-Path $root "dist" }
+$exe = Join-Path $distDir "Critterweight-windows-x64\Critterweight.exe"
 if (-not (Test-Path $exe)) { Record "packaged executable" "fail" "missing $exe (run with -Build)"; $results | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $out "summary.json"); exit 1 }
-$manifest = Join-Path $root "dist\BUILD_MANIFEST.json"
+$manifest = Join-Path $distDir "BUILD_MANIFEST.json"
 if (Test-Path $manifest) { Copy-Item $manifest $out }
 
 # 1. scripts + full test suite inside the packaged build (GUI-subsystem exe: run via Start-Process
@@ -90,6 +94,19 @@ foreach ($c in $captures) {
 	elseif (Test-Path $png) { Record "capture $($c.name)" "fail" "rendered but script errors: $($errs[0].Line)" }
 	else { Record "capture $($c.name)" "fail" "no frame captured (exit $($p.ExitCode))" }
 }
+
+# 2b. online session (LOOPBACK on this PC): packaged dedicated server + packaged clients play a duel,
+#     a windowed spectator captures the online match, TCP admin status/auth, graceful shutdown
+if (-not $SkipNet) {
+	$netOut = Join-Path $out "net"
+	& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "net_session_check.ps1") -Dist $distDir -Out $netOut -UserRoot (Join-Path $userRoot "net") 2>&1 | Out-File (Join-Path $out "net_session.log")
+	$netSteps = Join-Path $netOut "steps.json"
+	if (Test-Path $netSteps) {
+		foreach ($s in @(Get-Content $netSteps -Raw | ConvertFrom-Json)) { Record ("net: " + $s.name) $s.status $s.detail }
+		$netPng = Join-Path $netOut "capture_online_spectator.png"
+		if (Test-Path $netPng) { Copy-Item $netPng $out }
+	} else { Record "net: online session check" "fail" "no steps.json (see net_session.log)" }
+} else { Record "online session (dedicated server + clients)" "skipped" "-SkipNet" }
 
 # 3. performance (packaged build, uncapped, 1080p High)
 if (-not $SkipBench) {

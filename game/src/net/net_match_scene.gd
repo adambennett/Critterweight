@@ -81,7 +81,8 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 		director = SpectatorDirector.new(mirror.sim)
 		camera.mode = FightCamera.Mode.SPECTATE
 		_spec_label = Label.new()
-		_spec_label.position = Vector2(16, 104)
+		# below the round timer, and below the big fighter cards in 1v1 (like SpectatorOverlay)
+		_spec_label.position = Vector2(16, 104 if replica.slot_count() > 2 else 176)
 		_spec_label.add_theme_font_size_override("font_size", 18)
 		_spec_label.add_theme_constant_override("outline_size", 6)
 		_spec_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
@@ -89,6 +90,8 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 		hud_layer.add_child(_spec_label)
 	overlay = Label.new()
 	overlay.position = Vector2(16, 140)
+	if _spec_label:
+		overlay.position.y = _spec_label.position.y + 30.0
 	overlay.add_theme_font_size_override("font_size", 16)
 	overlay.add_theme_constant_override("outline_size", 6)
 	overlay.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
@@ -460,6 +463,8 @@ func _on_event(ev: Dictionary) -> void:
 				(views[fi] as CreatureView).detach_piece(Vector3(away.x, 0, away.z))
 			hud.callout("K.O.!", 2.0, Color(1.0, 0.35, 0.3))
 			camera.add_trauma(0.5)
+			if fi >= 0:
+				vfx.stars(head_pos.bind(fi), 2.6)
 		"guard_break":
 			vfx.word(head_pos(fi) + Vector3.UP * 0.3, "GUARD BREAK!", Color(1.0, 0.5, 0.2))
 		"burst":
