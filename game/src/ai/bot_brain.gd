@@ -39,6 +39,7 @@ var objective_override := {}      ## set by modes / autobattler
 var label_text := ""
 var _hold_until := 0.0
 var _heavy_hold_until := 0.0      ## kit hint "charge_heavy": Heavy held into the charged version
+var _kit_hold_until := 0.0        ## kit hint ability "stick": the stick is committed, skip thinking
 
 
 func _init(diff := "regular", seed_value := 0) -> void:
@@ -212,6 +213,8 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	to.y = 0.0
 	var dist := to.length()
 	var dir := to / maxf(dist, 0.01)
+	if _t < _kit_hold_until:
+		return   # kit hint "stick": an ability committed the stick (e.g. a dive away)
 	var my_reach := float(personality.get("attack_range", reach_of(c, "l1"))) + _kit_target_bulk(f, tgt)
 	var their_reach := reach_of(tgt.creature, "heavy") if tgt else 1.0
 	var mistake := rng.randf() < float(p["mistake"])
@@ -258,12 +261,16 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	# ---- abilities ----
 	if _kit_ability(f, tgt, dist, dir, per, false):   # kit hints from the creature "ai" block
 		return
+	if _kit_heavy_vs_windup(f, dist, per):   # kit hint: Heavy into a perceived long windup
+		return
 	for slot in ["ability1", "ability2"]:
 		if _kit_hint_for(c, slot).is_empty() and c.abilities.has(slot) and float(f.cooldown_left.get(slot, 0.0)) <= 0.0 and rng.randf() < float(p["ability"]) * 0.35:
 			var ar := reach_of(c, slot, true)
 			if dist <= ar and dist >= minf(1.2, ar * 0.3):
 				f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
 				return
+	if dist > my_reach + 0.4 and _kit_avoid_zone(f, sim, dir):
+		return   # kit hint "avoid_zones": step out of an enemy puddle / patch before closing in
 	# ---- offence ----
 	var stamina_ok := f.stamina > 18.0 or rng.randf() < 0.2
 	var aggression := float(p["aggression"]) * (1.25 if f.health_frac() > tgt.health_frac() else 0.9)
@@ -294,7 +301,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	# ---- footwork ----
 	var want := my_reach * lerpf(0.7, 0.95, float(p["spacing"]))
 	var kit_range := _kit_range()
-	if not kit_range.is_empty():
+	if not kit_range.is_empty() and _kit_range_ready(f):
 		want = lerpf(float(kit_range[1]), float(kit_range[0]), float(p["spacing"]))
 	if f.stamina < 15.0 and rng.randf() < float(p["spacing"]):
 		want = their_reach + 0.8
@@ -400,6 +407,13 @@ func _toward(from: Vector3, to: Vector3) -> Vector3:
 #       last think), projectile_incoming (an enemy projectile within 4 m flying at this fighter),
 #       in_enemy_zone, self_juiced, chance (this alternative only fires with that probability).
 #       Reactive conditions (target_heavy / target_winding) are also checked while defending.
+#       Optional "stick": "away" | "toward" commits the stick for 0.35 s when the ability fires
+#       (blinks / dives that travel along the stick).
+#   "range_needs_tools": true   "range" holds only while a ranged ability hint (min >= 1.5 m) has a
+#                               charge: a zoner with its tools on cooldown closes in and fights
+#   "heavy_vs_windup": p, "heavy_reach": m   Heavy into a perceived windup with > 0.3 s left
+#   "avoid_zones": true         step out of enemy zones that hurt or build up before closing in
+#   (stick / range_needs_tools / heavy_vs_windup / avoid_zones added with the Slurry/Jitters kits)
 # NPC kits (Kid Lamprey, minions, bosses; docs/kits/minions.md, bosses.md):
 #   "keep_distance": m          ranged-unit shorthand (the campaign's Pelter recipe): range m +- 0.4
 #                               plus an implicit hint for its ranged ability ("ranged_slot", default
@@ -456,9 +470,20 @@ func _kit_ability(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dict
 					ok = true
 					break
 		if ok:
+			_kit_stick(h, dir)
 			f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
 			return true
 	return false
+
+
+func _kit_stick(h: Dictionary, dir: Vector3) -> void:
+	match str(h.get("stick", "")):
+		"away":
+			_move = -dir
+			_kit_hold_until = _t + 0.35
+		"toward":
+			_move = dir
+			_kit_hold_until = _t + 0.35
 
 
 func _kit_when(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary, w: Dictionary, reactive: bool) -> bool:
@@ -665,6 +690,30 @@ func _kit_taunt(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictio
 		f.input.press(FighterInput.TAUNT)
 
 
+func _kit_range_ready(f: Fighter) -> bool:
+	if not bool(personality.get("range_needs_tools", false)):
+		return true
+	for slot in ["ability1", "ability2"]:
+		var h := _kit_hint(slot)
+		if h.is_empty() or float(h.get("min", 0.0)) < 1.5 or not f.creature.abilities.has(slot):
+			continue
+		if int(f.charges_left.get(slot, 1)) > 0:
+			return true
+	return false
+
+
+func _kit_heavy_vs_windup(f: Fighter, dist: float, per: Dictionary) -> bool:
+	var hw := float(personality.get("heavy_vs_windup", 0.0))
+	if hw <= 0.0 or f.state != Fighter.State.NEUTRAL or dist > float(personality.get("heavy_reach", 2.2)):
+		return false
+	var st := int(per.get("state", Fighter.State.NEUTRAL))
+	var left := float(per.get("first", 0.0)) - float(per.get("st", 0.0))
+	if (st == Fighter.State.ATTACK or st == Fighter.State.ABILITY) and left > 0.3 and rng.randf() < hw:
+		f.input.press(FighterInput.HEAVY)
+		return true
+	return false
+
+
 # -------------------------------------------------------------------------------------
 # NPC-kit hints (keys listed in the kit-hint header above)
 # -------------------------------------------------------------------------------------
@@ -758,6 +807,30 @@ func _kit_think(f: Fighter, sim: MatchSim, tgt: Fighter, dist: float, dir: Vecto
 	var pack := int(personality.get("pack", 0))
 	if pack > 0 and _kit_range().is_empty() and not _kit_pack_attacker(f, sim, tgt, pack):
 		_kit_pack_hold(f, dist, dir, attacking, their_reach)
+		return true
+	return false
+
+
+## Steps out of an enemy zone that hurts or builds up (puddles, patches) instead of idling in it,
+## sideways relative to the target so the bot keeps facing the fight. Skill-scaled (spacing).
+func _kit_avoid_zone(f: Fighter, sim: MatchSim, dir: Vector3) -> bool:
+	if not bool(personality.get("avoid_zones", false)) or sim == null:
+		return false
+	if rng.randf() >= float(p["spacing"]):
+		return false
+	var fp := f.pos()
+	for z in sim.effects.entities:
+		if str(z["kind"]) != "zone" or int(z["owner"]) < 0 or int(z["team"]) == f.team:
+			continue
+		var e: Dictionary = z["e"]
+		if float(e.get("tick_damage", 0.0)) <= 0.0 and float(e.get("buildup", 0.0)) <= 0.0:
+			continue
+		var off := Vector3(fp.x - float(z["pos"].x), 0.0, fp.z - float(z["pos"].z))
+		if off.length() > float(z["radius"]) + 0.3:
+			continue
+		var out := off.normalized() if off.length_squared() > 1e-4 else dir.cross(Vector3.UP)
+		var side := dir.cross(Vector3.UP)
+		_move = (out + side * (1.0 if side.dot(out) >= 0.0 else -1.0) * 0.5).normalized()
 		return true
 	return false
 
