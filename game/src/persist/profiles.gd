@@ -3,23 +3,50 @@ extends Node
 ## The Dosage ladder progress per campaign variant, cosmetic unlocks, Fight Camp meta progression
 ## (Clout, permanent upgrades, hub secrets/flags), tutorial state and recent run history.
 ## Persistent campaign power lives ONLY in `camp` and is never read by PvP/versus code (COOP-06).
+## Files written by a NEWER game version are never rewritten or deleted: a newer profile list is
+## replaced in memory by a scan of the profile folders (and not saved), a newer profile is
+## skipped (another one, or a new one under an unused id, is used instead). `read_only_note` and
+## `last_error` tell the player.
 
 signal profile_changed()
 
 const VERSION := 1
+const INDEX_VERSION := 1
 const MAX_HISTORY := 60
 
 var current := {}
 var _index := {"profiles": [], "active": ""}
 var last_error := ""
+var index_read_only := false      ## profiles/index.json is from a newer game version: never saved
+var read_only_note := ""          ## player-facing note when newer-version data is being protected
+var root_override := ""           ## tests: use this folder instead of the user "profiles" folder
 
 
 func _ready() -> void:
+	startup()
+
+
+## Loads the profile list and opens the active profile, falling back to the next usable one and,
+## when none is usable (first start, or only newer/unreadable profiles), a new "Rookie" profile.
+func startup() -> void:
 	_load_index()
-	if _index["profiles"].is_empty():
-		create("Rookie")
-	else:
-		switch_to(str(_index["active"]) if _index["active"] != "" else str(_index["profiles"][0]["id"]))
+	var order: Array = []
+	if str(_index["active"]) != "":
+		order.append(str(_index["active"]))
+	for e in _index["profiles"]:
+		if not str(e["id"]) in order:
+			order.append(str(e["id"]))
+	for id in order:
+		if switch_to(str(id)):
+			return
+	create("Rookie")
+
+
+func _dir() -> String:
+	if root_override != "":
+		DirAccess.make_dir_recursive_absolute(root_override)
+		return root_override
+	return Paths.dir("profiles")
 
 
 static func default_profile(id: String, name_: String) -> Dictionary:
@@ -38,28 +65,44 @@ static func default_profile(id: String, name_: String) -> Dictionary:
 
 
 func _index_path() -> String:
-	return Paths.file("profiles", "index.json")
+	return _dir().path_join("index.json")
 
 
 func _profile_path(id: String) -> String:
-	return Paths.dir("profiles").path_join(id).path_join("profile.json")
+	return _dir().path_join(id).path_join("profile.json")
 
 
 func _load_index() -> void:
-	var r := Saves.read_json(_index_path(), "profile_index", 1)
-	if r["ok"]:
+	var r := Saves.read_json(_index_path(), "profile_index", INDEX_VERSION)
+	if r["ok"] and typeof(r["data"]) == TYPE_DICTIONARY and typeof(r["data"].get("profiles")) == TYPE_ARRAY:
 		_index = r["data"]
+	elif r["newer"]:
+		index_read_only = true
+		_note_newer("Your profile list was saved by a newer version of the game. It is left untouched; profiles this version can read are listed, and changes to the list are not saved.")
+		_rebuild_index()
 	elif r["exists"]:
 		last_error = "Profile list unreadable (%s); rebuilding from profile folders." % r["error"]
 		_rebuild_index()
+	elif DirAccess.open(_dir()) != null and not DirAccess.open(_dir()).get_directories().is_empty():
+		# the list is gone but profiles are not: list them again instead of starting over
+		_rebuild_index()
 
 
+func _note_newer(msg: String) -> void:
+	read_only_note = msg
+	last_error = msg
+	Log.w("profiles", msg)
+
+
+## Lists the profile folders this version can read (in memory; saved unless the list is read-only).
 func _rebuild_index() -> void:
 	_index = {"profiles": [], "active": ""}
-	var d := DirAccess.open(Paths.dir("profiles"))
+	var d := DirAccess.open(_dir())
 	if d == null:
 		return
-	for sub in d.get_directories():
+	var subs := d.get_directories()
+	subs.sort()
+	for sub in subs:
 		var r := Saves.read_json(_profile_path(sub), "profile", VERSION, _migrate)
 		if r["ok"]:
 			_index["profiles"].append({"id": sub, "name": r["data"].get("name", sub)})
@@ -67,22 +110,31 @@ func _rebuild_index() -> void:
 
 
 func _save_index() -> void:
-	Saves.write_json(_index_path(), "profile_index", 1, _index)
+	if index_read_only:
+		return
+	Saves.write_json(_index_path(), "profile_index", INDEX_VERSION, _index)
 
 
 func list_profiles() -> Array:
 	return _index["profiles"].duplicate(true)
 
 
+## Creates a profile under an id no listed profile and no folder on disk uses (so it can never
+## land on a newer-version or unreadable profile), and switches to it.
 func create(name_: String) -> String:
 	var base := Paths.slug(name_).to_lower().replace(" ", "_")
 	var id := base
 	var n := 2
-	while _has(id):
+	while _has(id) or DirAccess.dir_exists_absolute(_dir().path_join(id)):
 		id = "%s_%d" % [base, n]
 		n += 1
 	var p := default_profile(id, name_.strip_edges().substr(0, 24))
-	Saves.write_json(_profile_path(id), "profile", VERSION, p)
+	if Saves.write_json(_profile_path(id), "profile", VERSION, p) != OK:
+		last_error = "Could not create the profile '%s'." % p["name"]
+		Log.e("profiles", last_error)
+		current = p      # play on with an unsaved profile rather than none
+		profile_changed.emit()
+		return id
 	_index["profiles"].append({"id": id, "name": p["name"]})
 	_save_index()
 	switch_to(id)
@@ -101,7 +153,10 @@ func switch_to(id: String) -> bool:
 	if not r["ok"]:
 		last_error = "Profile '%s' could not be loaded: %s" % [id, r["error"]]
 		Log.e("profiles", last_error)
-		if not r["exists"] or r.get("newer", false):
+		if r.get("newer", false):
+			_note_newer("The profile '%s' was saved by a newer version of the game. It is left untouched and cannot be used in this version." % id)
+			return false
+		if not r["exists"]:
 			return false
 		# damaged and unrecoverable: keep the damaged file, start a fresh profile in its place
 		Saves.quarantine(_profile_path(id))
@@ -129,8 +184,11 @@ func rename(new_name: String) -> void:
 func delete_profile(id: String) -> void:
 	if _index["profiles"].size() <= 1:
 		return
+	if Saves.is_newer(_profile_path(id), "profile", VERSION):
+		_note_newer("The profile '%s' was saved by a newer version of the game; it was not deleted." % id)
+		return
 	Saves.delete_save(_profile_path(id))
-	DirAccess.remove_absolute(Paths.dir("profiles").path_join(id))
+	DirAccess.remove_absolute(_dir().path_join(id))
 	_index["profiles"] = _index["profiles"].filter(func(e): return e["id"] != id)
 	if current.get("id", "") == id:
 		switch_to(str(_index["profiles"][0]["id"]))

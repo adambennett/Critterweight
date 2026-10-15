@@ -37,22 +37,12 @@ func save(state: Dictionary, profile_id: String, slot := "") -> Error:
 	return Saves.write_json(slot_path(profile_id, s), KIND, RunState.VERSION, json_stable(state))
 
 
-## Godot's JSON reader does not read every 17-digit float back exactly (measured: about 1 value
-## in 7 comes back one ulp off), so a checksum over in-memory floats can fail Saves' verification
-## after a write, or a ticket check after a network hop. Round-tripping the data until its text
-## is a fixed point (usually 2 passes; at most 8 seen over 200k random values) yields data that
-## survives JSON bit-exactly. Numbers come back as floats, exactly like a loaded save.
+## Godot's JSON reader does not read every 17-digit float back exactly, and it misreads a large
+## whole number written as "N.0" by one (which changed 53-bit run seeds on save). Saves.stabilize
+## returns the JSON fixed point with whole numbers kept as integers, so the data survives the
+## file or a network hop bit-exactly and checksums computed now still verify after loading.
 static func json_stable(data):
-	var text := JSON.stringify(data, "", false, true)
-	var cur = JSON.parse_string(text)
-	for i in 24:
-		var t2 := JSON.stringify(cur, "", false, true)
-		if t2 == text:
-			return cur
-		text = t2
-		cur = JSON.parse_string(text)
-	push_warning("RunStore.json_stable: data did not reach a JSON fixed point")
-	return cur
+	return Saves.stabilize(data)
 
 
 ## One float that survives a JSON round trip exactly (for values written into profiles).
@@ -73,7 +63,8 @@ func load_slot(profile_id: String, slot: String, catalog: CampaignCatalog) -> Di
 	var path := slot_path(profile_id, slot)
 	var r := Saves.read_json(path, KIND, RunState.VERSION, migrate)
 	var out := {"ok": false, "state": {}, "error": "", "problems": [], "recovered_from": str(r.get("recovered_from", "")),
-		"migrated": bool(r.get("migrated", false)), "exists": bool(r.get("exists", false)), "path": path}
+		"migrated": bool(r.get("migrated", false)), "exists": bool(r.get("exists", false)), "path": path,
+		"newer": bool(r.get("newer", false))}
 	if not bool(r["ok"]):
 		if not bool(r.get("exists", false)):
 			out["error"] = "No suspended run in this slot."
@@ -153,16 +144,23 @@ static func summarize(st: Dictionary) -> Dictionary:
 		"seed_text": str(st.get("seed_text", "")), "elapsed": float(st.get("elapsed", 0.0)), "custom": bool(st.get("custom", false))}
 
 
-## Removes a finished run's suspend slot (its summary lives on in the profile history).
+## Removes a finished run's suspend slot (its summary lives on in the profile history). A slot
+## written by a newer game version is never touched.
 func clear(profile_id: String, slot: String) -> void:
-	Saves.delete_save(slot_path(profile_id, slot))
+	var path := slot_path(profile_id, slot)
+	if Saves.is_newer(path, KIND, RunState.VERSION):
+		return
+	Saves.delete_save(path)
 
 
 ## Moves an unusable save aside instead of deleting it (abandoning a broken run) — every copy of
 ## the slot (.json, .tmp, .bak), so a recoverable leftover cannot bring it back. Returns the new
-## path of the main file ("" if there was none).
+## path of the main file ("" when it was not moved). A run saved by a newer game version stays
+## where it is: nothing is moved then.
 func quarantine(profile_id: String, slot: String) -> String:
 	var path := slot_path(profile_id, slot)
+	if Saves.is_newer(path, KIND, RunState.VERSION):
+		return ""
 	var main := Saves.quarantine(path)
 	Saves.quarantine(path + ".tmp")
 	Saves.quarantine(path + ".bak")

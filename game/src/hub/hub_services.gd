@@ -132,6 +132,9 @@ func start_run(choices: Dictionary) -> Dictionary:
 	if str(choices.get("fighter", "")) == "":
 		return {"ok": false, "error": "Pick a fighter first."}
 	var held := suspended_run()
+	if bool(held.get("newer", false)):
+		# a newer game version's run is never replaced, moved or deleted
+		return {"ok": false, "error": "Your suspended Fight Camp run was saved by a newer version of the game. It stays as it is; play it with that version."}
 	if not held.is_empty() and not bool(choices.get("replace_suspended", false)):
 		return {"ok": false, "needs_confirm": true, "suspended": held,
 			"error": "You already have a suspended Fight Camp run. Resume it, or abandon it to sign a new card."}

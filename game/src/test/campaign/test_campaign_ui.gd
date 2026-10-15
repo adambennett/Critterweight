@@ -449,6 +449,26 @@ func test_menu_asks_before_replacing_a_suspended_run() -> void:
 	check_eq(int(Profiles.current["records"]["runs"]["off_the_street"]["attempts"]), 1, "counted as an attempt")
 
 
+## Review #2 with the newer-version rule: a run saved by a newer game version is never replaced
+## (nor moved or deleted), so START RUN over it explains instead of dealing a card.
+func test_menu_never_deals_over_a_newer_versions_run() -> void:
+	var rs := RunStore.new()
+	var path := rs.slot_path(CampaignFlow.profile_key(), "off_the_street")
+	Saves.write_json(path, RunStore.KIND, RunState.VERSION + 1, {"future": true})
+	var before := FileAccess.get_file_as_string(path)
+	App.goto("campaign_menu", {"stand_ins": true})
+	await wait_frames(3)
+	await press(find_exact(top(), "START RUN"))
+	check(CampaignUI.has_modal(top()), "START RUN explains")
+	check(find_button(top(), "ABANDON IT") == null, "and offers no way to replace it")
+	check_eq(top().screen_name, "campaign_menu", "no card dealt")
+	check_eq(FileAccess.get_file_as_string(path), before, "the newer run is untouched")
+	var sv := HubServices.new(HubState.new(Profiles.current))
+	sv.stand_ins = true
+	var held := CampaignFlow.suspended_run(sv.catalog(), "off_the_street")
+	check(bool(held.get("newer", false)), "reported as a newer version's run")
+
+
 ## Review #2: the hub's sign-up sheet asks the same (dialog: abandon it / resume it / keep it),
 ## and the services never replace a suspended Fight Camp run without that answer.
 func test_hub_sign_up_asks_before_replacing_a_suspended_run() -> void:

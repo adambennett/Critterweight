@@ -9,6 +9,12 @@ extends RefCounted
 const PAD := 12
 
 
+## Makes text from files, mods or the player inert in BBCode ("[" -> "[lb]") before it goes into
+## a rich text panel, so a policy name or description cannot restyle or hide the panel's text.
+static func esc(v) -> String:
+	return str(v).replace("[", "[lb]")
+
+
 ## Paragraph text (wraps). `style`: Body | BodyStrong | BodyMuted | Caption | CaptionStrong | H3 | Eyebrow ...
 static func label(text: String, style := "Body", color := Color(0, 0, 0, 0)) -> Label:
 	var l := UiTheme.label(text, style, true)

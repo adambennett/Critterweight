@@ -9,7 +9,9 @@ ships with can be extended, rebalanced or replaced by a mod — but a mod can ne
 - Schemas: `game/content/schemas/*.schema.json`
 - Examples (sources): `mods/examples/*` → packed into `game/mods_examples/*.critmod`
 - Packer: `python tools/mods/pack_mod.py <folder> --out <dir>` (or `--examples`)
-- Tests: `game/src/test/mods/test_mods.gd` (`godot --headless --path game -- --test test_mods`)
+- Tests: `game/src/test/mods/` (`godot --headless --path game -- --test mods/`): `test_mods.gd`
+  (workflow) and `test_mod_hardening.gd` (trust rules: links, overrides, client_only, assets,
+  names, archives, imports)
 
 ## 1. Package layout
 
@@ -32,20 +34,29 @@ Files load in sorted order. Distribute a package as a folder or as a zip renamed
 `<id>-<version>.critmod` (`pack_mod.py` produces deterministic archives; a single top-level
 folder inside the zip is fine).
 
+Folder and file names are exact and **lowercase on every platform**: `Rules/` or `Tuning.json`
+is not loaded anywhere (the Mods screen says so), so a package behaves the same on Windows and
+Linux and peers compute the same content hash. `tuning.json` and `elements.json` change core
+values, so they need the `replaces_core` capability (see §3).
+
 ## 2. manifest.json
 
 | Field | Required | Meaning |
 |---|---|---|
-| `id` | yes | 3–32 chars `[a-z0-9_]`, unique, never `core`. All entry ids must start with `<id>:` |
+| `id` | yes | 3–32 chars `[a-z0-9_]`, unique, never `core` or `user` (the player's own presets/arenas). All entry ids must start with `<id>:` |
 | `name` | yes | Display name (≤ 48 chars) |
 | `version` | yes | Semantic version `MAJOR.MINOR.PATCH` |
 | `game_version` | yes | Oldest game version the mod was made for (see compatibility below) |
 | `api` | no | Mod API version (this build: **1**); higher values are rejected |
-| `author`, `description` | no | Shown in the Mods screen |
+| `author`, `description` | no | Shown in the Mods screen (always as plain text: BBCode tags are displayed, never applied) |
 | `requires` | no | `[{"id": "other_mod", "version": "1.2.0"}]` — hard dependencies (`core` allowed) |
 | `load_after` | no | `["other_mod"]` — soft ordering when both are enabled |
-| `capabilities` | no | `replaces_core` (overrides core entries — needs player consent), `large_assets` (allows up to 256 MB) |
-| `client_only` | no | `true` = presentation only (announcer lines, cosmetic art); may not contain gameplay kinds |
+| `capabilities` | no | `replaces_core` (overrides core entries or ships `tuning.json`/`elements.json` — needs player consent), `large_assets` (allows up to 256 MB) |
+| `client_only` | no | `true` = presentation only: `announcer/` content and asset files. Any other content folder (in any letter case) and `tuning.json`/`elements.json` are rejected |
+
+Ids, versions, `game_version`, `requires` and `load_after` values may not contain spaces, line
+breaks or other control characters; patterns such as the version rule are matched against the
+whole string.
 
 **Version rules.** `"1.2.0"`, `">=1.2.0"`, `"^1.2.0"` mean *at least 1.2.0 with the same major*
 (for `0.x`, the same minor); `"=1.2.0"` means exactly; `"*"` means any. `game_version` uses the
@@ -61,7 +72,17 @@ the Mods screen says exactly why.
   with an actionable message.
 - To **replace** a core entry deliberately, reuse its bare id, add `"override": true`, and
   declare the `replaces_core` capability. The player is asked once per mod version before it
-  is enabled; matches and runs using it are marked Modded.
+  is enabled; matches and runs using it are marked Modded. The rules (D-027), enforced when the
+  content loads, whoever loads it:
+  - an override must name an existing **core** entry (it cannot invent new bare ids);
+  - without `replaces_core` in the manifest, or without the player's consent, the override is
+    not loaded and the Mods screen says why (the core entry stays);
+  - a mod can **never** replace another mod's entries (`other_mod:...`) or the player's own
+    (`user:...`), with or without `override`. To build on another mod, `requires` it and add your
+    own entries (creatures can `extends` its fighters);
+  - two enabled mods replacing the same core entry conflict: the first in load order keeps it,
+    the second is reported and its override is not loaded;
+  - an override that fails validation (e.g. a broken `extends`) leaves the core entry in place.
 - Creature entries (`creatures`, `minions`, `bosses`) can **extend** another creature and only
   write what changes:
 
@@ -85,11 +106,11 @@ the Mods screen says exactly why.
 | What | Where | Notes |
 |---|---|---|
 | Fighters & abilities | `creatures/` | Body (segments, chains, weapons, poses), stats, moves by slot (`l1 l2 l3 heavy heavy_charged finisher dash_attack grab pummel taunt`), `abilities` (`ability1 ability2 juice`), `passives` (hooks), `art`, `audio`, `ai` weights. Schema: `creature.schema.json`; fighter space is +Z forward, +Y up, +X = the creature's left |
-| Balance | `tuning.json`, entries with `override` | `tuning.json` keys merge over core (unknown keys are reported) |
+| Balance | `tuning.json`, entries with `override` | `tuning.json` keys merge over core (unknown keys and non-numbers are reported); needs `replaces_core`. Every reload starts from the built-in defaults, so disabling the mod restores them |
 | Rules & modes | `rules/`, `modes/`, `playlists/` | Any built-in mode (`standard`, `spotlight_hog`, `chumball`, `absolute_unit`, `chum_rush`, `tag_team`, `practice`) with its options, plus the data hooks below |
 | Arenas | `arenas/`, `props/` | Format 2: a base (`gullet drydock crusher rooftop` or a mod base `<mod>:<id>` defined by an entry with `base_def`), size, props from the catalog, mode markers (`spawn`, `goal`, `ball_spawn`, `spotlight_anchor`, `wave_gate`, `unit_spawn`, `boss`, `respawn`); new palette props in `props/`. Format 1 (shape bases, `spawns`) still loads. Schemas: `arena.schema.json`, `prop.schema.json`; reference: `docs/ARENAS_AND_EDITOR.md` |
 | Campaign | `supplements/ techniques/ events/ encounters/ meta_upgrades/ boss_fights/ ladder/` | See `docs/CAMPAIGN_SYSTEMS.md` for formats |
-| Presentation | `art` blocks, `announcer/`, models/textures/sounds | `client_only` packages may contain only these |
+| Presentation | `art` blocks, `announcer/`, models/textures/sounds | `client_only` packages may contain only `announcer/` and asset files (checked at install and again at load, whatever the letter case), so they can never change gameplay and never block joining |
 
 **Rule-level data hooks** (usable by any rules preset, including custom rules made in the
 in-game editor):
@@ -105,7 +126,25 @@ in-game editor):
 ```
 
 `gravity_mult` (0.3–2.0) scales world gravity and every body's muscle support. `fighter_mods`
-multiply numeric fighter modifiers (or set flags). `fighter_hooks` are installed on every fighter.
+multiply numeric fighter modifiers (`*_add` keys and `start_hype` add), or set flags.
+`fighter_hooks` are installed on every fighter.
+
+Only these `fighter_mods` are accepted, each clamped to its range (`RulesValidator.FIGHTER_MODS`);
+anything else is reported by the rules editor and ignored by the simulation, which clamps every
+rules value again when it applies it (rules may come from a mod, an imported file or a host):
+
+| Keys | Range |
+|---|---|
+| `damage defense cooldown poise stamina_regen knockback_taken knockback_dealt stamina_cost dodge_cost` | 0.1–4 |
+| `speed move_speed` | 0.1–3 |
+| `hype_gain` | 0–5 |
+| `heal buildup_taken guard_absorb_mult status_duration_taken charge_steer` | 0–4 |
+| `max_health getup_speed held_time_mult vmin_mult hover_duration` | 0.25–4 |
+| `dodge_distance throw_distance charge_distance charge_speed zone_size` | 0.25–3 |
+| `reach_radius` | 0.5–2 |
+| `start_hype` (added, total ≤ 100) | 0–100 |
+| `max_health_add` 0–200, `stamina_add` 0–100, `poise_add` 0–100, `parry_window_add` 0–0.3, `dodge_iframes_add` 0–0.3, `wakeup_invuln_add` 0–1, `grab_hold_add` 0–2, `grab_escape_add` 0–10, `splat_damage_add` 0–20, `splat_poise_add` 0–50, `zone_duration_add` 0–10 | added |
+| `no_grabs no_juice no_abilities auto_charge all_moves_elemental` | `true`/`false` |
 
 **Hooks** are the one behaviour language shared by kits, statuses, techniques, supplements,
 modes and mods (`game/src/sim/hooks.gd`):
@@ -133,7 +172,18 @@ modes and mods (`game/src/sim/hooks.gd`):
 ## 5. Assets
 
 Reference assets with paths relative to the package root, e.g. `"art": {"model":
-"models/my_fighter.glb"}`. Paths may not be absolute or contain `..`/drive letters. glTF models
+"models/my_fighter.glb"}`. In a mod entry's `art` and `audio` blocks (nested objects and lists
+included), `art.model` and every string that looks like a path (it contains `/`, `\` or `:`,
+starts with `.` or `~`, or ends in a file extension) must be:
+
+- relative to the package root — no `res://`, `user://`, absolute or drive paths, no `..`;
+- a file that is in the package, spelled exactly (names are case-sensitive);
+- an asset type: `png jpg jpeg webp glb ogg wav`.
+
+Otherwise the entry is not loaded and the Mods screen names the path. Other strings (colours such
+as `"#2B6FD9"`, words such as `"head"` or audio ids such as `"stoke"`) are left alone. To reuse a
+core model, `extends` the core creature instead of naming its file. The game only ever loads a
+mod file that was validated as part of a loaded package. glTF models
 are loaded at runtime with Godot's `GLTFDocument` (meshes, skins, materials, textures only).
 Bones named after body segment ids drive the mesh (see `docs/design/ART_DIRECTION.md` and the
 forge pipeline in `tools/forge` for a complete, reproducible example).
@@ -146,15 +196,33 @@ forge pipeline in `tools/forge` for a complete, reproducible example).
   file system, so a mod can't replace engine files.
 - **Allowed files:** `json txt md png jpg jpeg webp ogg wav glb`.
 - **Limits:** 64 MB per package (256 MB with `large_assets`), 32 MB per file, 4 MB per JSON
-  file, 2 000 files, 160-character paths, 8 folder levels.
+  file, 2 000 files, 160-character paths, 8 folder levels (deeper folders are an error).
+- **Portable names:** no hidden names (starting with `.`; folder packages simply skip them, like
+  the packer), no Windows device names (`con prn aux nul com1-9 lpt1-9`, with any extension), no
+  names ending in a dot or space, no `< > " | ? *` or control characters, and no two names that
+  differ only in letter case.
+- **Links are never followed.** Symbolic links and junctions inside a package folder are skipped
+  (the Mods screen lists them), so nothing outside the folder is ever validated, loaded, copied
+  into the mods folder or packed by *Export / share*. A package folder that is itself a link is
+  not loaded; copy it into the mods folder instead.
 - **Archive checks happen before extraction:** sizes come from the zip directory (zip bombs are
-  refused unopened); encrypted, multi-part and ZIP64 archives are refused; every entry path is
-  checked for traversal; extraction goes to a private cache keyed by the archive hash.
+  refused unopened); encrypted, multi-part and ZIP64 archives are refused, and so is any archive
+  where another zip reader could see something else (data after the end record, anything between
+  the directory and the end record, prepended data); every entry path is checked for traversal.
+  Extraction goes to a private cache keyed by the archive hash and only happens when the file
+  still has that hash and Godot's zip reader lists exactly the checked entries with the checked
+  sizes.
+- **Only validated files are loaded:** the game reads a package's content from the list of files
+  that passed these checks, never by listing folders again.
 - **No file-system or network access** exists in the data formats; hooks only act inside a
-  match. Asset paths are confined to the package.
+  match. Asset paths are confined to the package (§5).
 - **Servers** load only the packages their configuration names; they never download or run mod
   code. Clients see exactly which mods differ before joining.
-- **Consent:** `replaces_core` asks once per mod version (stored in `mods/modsets.json`).
+- **Consent:** `replaces_core` asks once per mod version (stored in `mods/modsets.json`); the
+  content loader refuses core overrides and `tuning.json`/`elements.json` from a package that did
+  not declare it or was not allowed (§3, D-027).
+- **Newer files stay untouched:** a `modsets.json` written by a newer game version is not
+  rewritten (changes to mod sets are then not saved, and the Mods screen says so).
 
 ## 7. Installing, sets and sharing (players)
 
@@ -163,6 +231,9 @@ forge pipeline in `tools/forge` for a complete, reproducible example).
 - Install: *Import package…* (file browser), drag a `.critmod` onto the window, or put packages
   in the user `downloads` folder and use *Import from Downloads* (controller friendly). A newer
   version upgrades in place and keeps its enabled state; an older one asks before downgrading.
+  The new copy is written and checked first; only then is the installed version moved to
+  `mods/.removed/`, so a failed import never leaves the mod uninstalled. Importing the installed
+  package itself changes nothing.
 - Share: *Export / share* writes `<id>-<version>.critmod` into the user `packages` folder.
 - Uninstall moves the package to `mods/.removed/` (nothing is deleted). Sets that used it list it
   as **MISSING** until it is reinstalled or turned off.
@@ -212,4 +283,12 @@ installed package with the same id takes precedence.
 | `made for game version …` | Update `game_version` after testing on this build |
 | `'file.ext' is code or an engine resource` | Remove it — mods are data-only |
 | `extends unknown creature 'x'` | Check the parent id (and that its mod loads first) |
-| `asset path … must stay inside the package` | Use a relative path inside the package |
+| `asset path … must be a relative path inside the package` / `is not a file in the package` | Use a relative path to a file in the package, spelled exactly, with an asset extension |
+| `replaces the core entry 'x', so the manifest must declare the 'replaces_core' capability` | Declare `replaces_core` (players are asked once), or use your own `<id>:` entry |
+| `'other_mod:x' belongs to 'other_mod'` | Mods cannot replace other mods' entries: add your own entry and `requires` the other mod |
+| `'x' is already replaced by 'other_mod'` | Two enabled mods replace the same core entry: disable one |
+| `tuning.json: changes core values` | Declare `replaces_core` |
+| `client_only packages may only change presentation` | Remove gameplay folders and `tuning.json`/`elements.json`, or drop `client_only` |
+| `'Rules/' is not loaded: content folders are lowercase` | Rename the folder to its lowercase kind name |
+| `… is a link (symbolic link or junction) and was skipped` | Copy the real files into the package folder |
+| `reserved device name`, `hidden names`, `differ only in letter case` | Rename the file so it works on every OS |

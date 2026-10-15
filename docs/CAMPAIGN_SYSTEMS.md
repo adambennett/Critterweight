@@ -352,7 +352,8 @@ campaign menu's START RUN and the hub's sign-up sheet ask first (abandon it and 
 it / cancel), and abandoning credits the old run as an abandoned defeat
 (`CampaignFlow.abandon_suspended`: history, attempts; a run that cannot be loaded is
 quarantined). `CampaignFlow.start` itself does the same for anything still in the slot, so no
-caller can destroy a suspended run without a trace. Party slots (`party_<run id>`) are listed
+caller can destroy a suspended run without a trace. A run saved by a newer game version is never
+replaced, moved or deleted: the menus explain and deal no card over it. Party slots (`party_<run id>`) are listed
 by the campaign menu but never resumed as a solo run (the co-op lobby resumes them through
 `CoopSession.host_resume`); host and members clear them when the run ends.
 

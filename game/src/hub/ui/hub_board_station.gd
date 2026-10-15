@@ -175,7 +175,9 @@ static func build_run(b: HubBoard, p: Dictionary) -> void:
 			"coop_format": str(cr.get_value()), "seed_text": seed_row.get_value()}))
 	b.list.content.add_child(start)
 	var held := sv.suspended_run()
-	if not held.is_empty():
+	if bool(held.get("newer", false)):
+		b.text_line("On file: a Fight Camp run saved by a newer version of the game. It stays as it is, so no new card can be signed here.", "Warning")
+	elif not held.is_empty():
 		b.text_line("On file: a suspended Fight Camp run (%s). Signing a new card abandons it — you'll be asked first." %
 			CampaignFlow.describe_suspended(sv.catalog(), held.get("summary", {})), "Warning")
 	b.button("Campaign menu (suspended runs, co-op lobby)", sv.open_campaign_menu, "Campaign menu",

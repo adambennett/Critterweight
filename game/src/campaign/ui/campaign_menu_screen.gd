@@ -255,9 +255,19 @@ func _on_abandon(id: String, slot: String) -> void:
 	if id != "yes":
 		_after_modal(id)
 		return
+	var held := CampaignFlow.suspended_run(catalog, slot)
+	if bool(held.get("newer", false)):
+		# a newer game version's run is never moved or deleted from here
+		_newer_notice(held)
+		return
 	CampaignFlow.abandon_suspended(catalog, slot)
 	_refresh_runs()
 	_after_modal(id)
+
+
+func _newer_notice(held: Dictionary) -> void:
+	CampaignUI.confirm(self, "Saved by a newer version", "%s\nIt stays as it is; play it with that version." % str(held.get("error", "")),
+		[{"label": "OK", "id": "ok"}], _after_modal)
 
 
 func _after_modal(_id: String) -> void:
@@ -288,6 +298,10 @@ func _start_run() -> void:
 	var held := CampaignFlow.suspended_run(catalog, slot)
 	if held.is_empty():
 		_launch(cfg)
+		return
+	if bool(held.get("newer", false)):
+		# a newer version's run is never replaced (or moved): the new card cannot take its slot
+		_newer_notice(held)
 		return
 	# one suspended run per variant: never replace it without asking
 	var buttons := [{"label": "ABANDON IT & START", "id": "replace", "danger": true}]

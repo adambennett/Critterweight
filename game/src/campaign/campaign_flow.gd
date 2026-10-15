@@ -16,7 +16,8 @@ extends RefCounted
 ##   * "Custom" is re-checked before every fight and when a card is run back; a run that became
 ##     custom stays custom (RunController.mark_custom).
 ##   * A new run never silently replaces a suspended one: callers ask (menu, hub), and whatever
-##     is still in the slot is credited as abandoned before the new run is saved.
+##     is still in the slot is credited as abandoned before the new run is saved. A run saved by
+##     a newer game version is never touched at all (the menus refuse to deal over it).
 
 const REASON_GAME_SPEED := "reduced game speed"
 const REASON_STAND_INS := "development stand-in creatures"
@@ -91,23 +92,26 @@ static func profile_key() -> String:
 
 
 ## The run suspended in `slot` of the active profile ({} if the slot is free):
-## {slot, ok, error, summary} like RunStore.list rows.
+## {slot, ok, error, newer, summary} like RunStore.list rows. `newer`: saved by a newer game
+## version — it is never replaced, moved or deleted (a new run cannot take that slot).
 static func suspended_run(cat: CampaignCatalog, slot: String) -> Dictionary:
 	var res := RunStore.new().load_slot(profile_key(), slot, cat)
 	if not bool(res.get("exists", false)):
 		return {}
-	return {"slot": slot, "ok": bool(res["ok"]), "error": str(res["error"]), "summary": RunStore.summarize(res.get("state", {}))}
+	return {"slot": slot, "ok": bool(res["ok"]), "error": str(res["error"]), "newer": bool(res.get("newer", false)),
+		"summary": RunStore.summarize(res.get("state", {}))}
 
 
 ## Abandons the run suspended in `slot` of the active profile: it is credited as an abandoned
 ## defeat (history and attempts; CampaignProgression.finish_run, idempotent per run) and its
-## slot is cleared. A save that cannot be loaded is moved aside, never deleted. Returns the
-## credit report ({} when the slot was free or unreadable).
+## slot is cleared. A save that cannot be loaded is moved aside, never deleted; one saved by a
+## newer game version is left exactly as it is. Returns the credit report ({} when the slot was
+## free, unreadable or newer).
 static func abandon_suspended(cat: CampaignCatalog, slot: String) -> Dictionary:
 	var rs := RunStore.new()
 	var key := profile_key()
 	var res := rs.load_slot(key, slot, cat)
-	if not bool(res.get("exists", false)):
+	if not bool(res.get("exists", false)) or bool(res.get("newer", false)):
 		return {}
 	if not bool(res["ok"]):
 		rs.quarantine(key, slot)
