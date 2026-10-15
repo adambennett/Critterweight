@@ -141,6 +141,12 @@ off The Rooftop three times in one fight (8% max HP each).
 "N" exactly but misreads a large "N.0" by one, which silently changed 53-bit campaign seeds on save and made a
 resumed run diverge (35 of 300 random seeds before the fix).
 
+## D-026 Headless simulations start in phase with physics
+`HeadlessFightRunner` and the test helper `step_sim` wait for a physics frame before the first simulation step
+when they are called from idle processing. The physics world steps on the engine's physics frames while the
+match logic steps in our loop, so starting from idle ran one extra logic step before the first physics step and
+the same seeded fight could end differently depending on the caller (seen as an order-dependent campaign test).
+
 ## D-027 Mod overrides replace core entries only, with declared and consented `replaces_core`
 A mod entry may replace (`"override": true`, bare id) only an existing **core** entry, and only when the package
 declares `replaces_core` and the player allowed it for that mod version; root `tuning.json`/`elements.json` count

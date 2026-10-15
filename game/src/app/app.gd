@@ -34,6 +34,8 @@ const SCREENS := {
 	"rest": "res://src/campaign/ui/rest_screen.gd",
 	"run_summary": "res://src/campaign/ui/run_summary_screen.gd",
 	"camp_ledger": "res://src/campaign/ui/camp_ledger_screen.gd",
+	"hub": "res://src/hub/ui/hub_entry_screen.gd",
+	"hub_board": "res://src/hub/ui/hub_board.gd",
 	"tutorial_menu": "res://src/ui/screens/tutorial_menu.gd",
 	"controls": "res://src/ui/screens/controls_screen.gd",
 	"text_entry": "res://src/ui/screens/text_entry.gd",
