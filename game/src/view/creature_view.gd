@@ -163,6 +163,9 @@ func _collect_points(mi: MeshInstance3D, inst: Node) -> void:
 			xf = (n as Node3D).transform * xf
 		n = n.get_parent()
 	var sk := mi.skin
+	# gathered in plain Arrays: a packed array read out of a Dictionary is a copy, so appending to it
+	# in place would be lost
+	var acc := {}
 	for surf in mi.mesh.get_surface_count():
 		var arr := mi.mesh.surface_get_arrays(surf)
 		if arr.size() <= Mesh.ARRAY_WEIGHTS:
@@ -191,9 +194,13 @@ func _collect_points(mi: MeshInstance3D, inst: Node) -> void:
 			if bone < 0 or bone >= _seg_of_bone.size() or _seg_of_bone[bone] < 0:
 				continue
 			var si := _seg_of_bone[bone]
-			if not _vis_points.has(si):
-				_vis_points[si] = PackedVector3Array()
-			(_vis_points[si] as PackedVector3Array).append(xf * verts[vi] - (body.segments[si] as BodyDef.Seg).pivot)
+			if not acc.has(si):
+				acc[si] = []
+			(acc[si] as Array).append(xf * verts[vi] - (body.segments[si] as BodyDef.Seg).pivot)
+	for si2 in acc:
+		var pts: PackedVector3Array = _vis_points.get(si2, PackedVector3Array())
+		pts.append_array(PackedVector3Array(acc[si2] as Array))
+		_vis_points[si2] = pts
 
 
 func _find_skeleton(n: Node) -> Skeleton3D:
@@ -364,7 +371,7 @@ func set_cosmetics(items: Array) -> void:
 		if anc.is_empty():
 			continue
 		var xf: Transform3D = anc["xf"]
-		var node := CosmeticAttachments.build(kind, d, float(anc["size"]), xf.basis)
+		var node := CosmeticAttachments.build(kind, d, float(anc["size"]), xf.basis, anc.get("radii", Vector2.ZERO))
 		node.set_meta("cosmetic_id", str(d.get("id", kind)))
 		add_child(node)
 		_attachments.append({"node": node, "seg": int(anc["seg"]), "local": Transform3D(Basis.IDENTITY, xf.origin), "kind": kind,

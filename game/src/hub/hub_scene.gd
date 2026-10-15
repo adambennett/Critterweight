@@ -35,6 +35,7 @@ var _last_bark := -99.0
 var _greeted := {}
 var _suppress_sub := false
 var _last_space := ""
+var _qa_juice := OS.get_cmdline_user_args().has("--hub-juice")
 
 
 func start(p: Dictionary) -> void:
@@ -112,6 +113,12 @@ func start(p: Dictionary) -> void:
 	var zoom_arg := Cannery.cli("--hub-zoom")
 	if zoom_arg != "":
 		camera._zoom = clampf(float(zoom_arg), 0.25, 2.0)
+		camera.snap()
+	# QA captures: --hub-pitch <deg> holds the camera at one pitch (low angles show faces and gear)
+	var pitch_arg := Cannery.cli("--hub-pitch")
+	if pitch_arg != "":
+		camera.pitch_lock = clampf(float(pitch_arg), 5.0, 85.0)
+		camera.pitch_deg = camera.pitch_lock
 		camera.snap()
 	# QA captures: --hub-pos x,y,z[,yaw_deg] places the fighter inside the arrival space
 	# (never split_floats an empty string: Godot 4.5 aborts on it)
@@ -216,6 +223,8 @@ func _process(dt: float) -> void:
 	_time += dt
 	creature_view.render(Engine.get_physics_interpolation_fraction())
 	creature_view.hype = player().hype / 100.0
+	if _qa_juice:
+		creature_view.juice_amount = 1.0       # QA captures: --hub-juice shows the JUICE glow (Sizzle)
 	camera.target = player().pos()
 	var board := App.top_screen() as HubBoard
 	var shift := Vector2.ZERO

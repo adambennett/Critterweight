@@ -43,9 +43,12 @@ static func _restore_speed() -> void:
 
 
 ## The fighter the player walks with: explicit > Locker loadout > last Fight Camp run > the default
-## roster fighter. Always a ROSTER fighter ("f_..."; the dev biped only when no roster is installed),
-## preferring kits the campaign can use (parse cleanly) over ones still being authored.
+## roster fighter. Always a ROSTER fighter ("f_..."; the dev biped only when no roster is installed
+## or a developer asks for it with --hub-fighter), preferring kits the campaign can use (parse
+## cleanly) over ones still being authored.
 static func pick_fighter(state: HubState, wanted := "") -> String:
+	if wanted != "" and wanted == cli("--hub-fighter") and Content.creature(wanted) != null:
+		return wanted
 	for cand in [wanted, state.loadout_fighter(), str(state.last_run().get("fighter", ""))]:
 		var cid := str(cand)
 		if cid.begins_with("f_") and Content.creature(cid) != null and Content.get_entry("creatures", cid).size() > 0:

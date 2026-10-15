@@ -1,8 +1,9 @@
 extends HubTestCase
 ## The Cannery's cosmetics actually show (docs/HUB_SYSTEMS.md §16), view-only:
 ##   * gold tooth / trash-can lid / replica belt / rooftop scarf attach to every roster body and the
-##     dev biped, on the right part, follow the body, carry no collision; the gold tooth is the gag
-##     piece; walkout pieces are put away while the round is live
+##     dev biped, on the right part, fitted to the forged model (on the skin, rings hugging it, the
+##     mouth left clear), follow the body, carry no collision; the gold tooth is the gag piece;
+##     walkout pieces are put away while the round is live
 ##   * only the profile owner's fighter wears them in a real (headless) MatchScene; Sizzle recolours
 ##     Stoke's JUICE and glow, nobody else's
 ##   * the equipped profile frame wraps the owner's name card in the fight HUD, results and profile
@@ -69,6 +70,41 @@ func _view(cid: String) -> CreatureView:
 	return v
 
 
+## What the attachment is fitted to, in segment `si`'s rest frame: the forged model's vertices (or
+## the body shapes) of the segment and its neighbours (rest pose: frames differ by pivots only).
+func _surface(c: CreatureDef, v: CreatureView, si: int) -> PackedVector3Array:
+	var out := PackedVector3Array()
+	var s: BodyDef.Seg = c.body.segments[si]
+	var near: Array[int] = [si]
+	if s.parent >= 0:
+		near.append(s.parent)
+	for ch in s.children:
+		near.append(ch)
+	for k in near:
+		var o: BodyDef.Seg = c.body.segments[k]
+		for p in CosmeticAttachments._pts(o, v._vis_points):
+			out.append(p + o.pivot - s.pivot)
+	return out
+
+
+func _nearest(pts: PackedVector3Array, q: Vector3) -> float:
+	var best := INF
+	for p in pts:
+		best = minf(best, p.distance_to(q))
+	return best
+
+
+## 24 points round a ring anchor, in the anchor segment's frame.
+func _ring_points(anc: Dictionary) -> PackedVector3Array:
+	var out := PackedVector3Array()
+	var xf: Transform3D = anc["xf"]
+	var r: Vector2 = anc["radii"]
+	for k in 24:
+		var a := TAU * float(k) / 24.0
+		out.append(xf * Vector3(r.x * sin(a), 0, r.y * cos(a)))
+	return out
+
+
 func _has_physics(n: Node) -> bool:
 	if n is CollisionObject3D or n is CollisionShape3D:
 		return true
@@ -84,6 +120,13 @@ func test_attachments_fit_every_body_and_follow_it() -> void:
 		if c == null:
 			continue
 		var v := _view(str(cid))
+		if str(c.art.get("model", "")) != "":
+			# the anchors are fitted to the model the player sees, not to the (smaller) collision shapes
+			var with_pts := 0
+			for s0: BodyDef.Seg in c.body.segments:
+				if (v._vis_points.get(s0.index, PackedVector3Array()) as PackedVector3Array).size() > 20:
+					with_pts += 1
+			check(with_pts * 2 >= c.body.segments.size(), "%s: the forged model's vertices are collected per segment (%d of %d)" % [cid, with_pts, c.body.segments.size()])
 		v.set_cosmetics(_items())
 		var rest := _rest(c)
 		v.snap_transforms(rest)
@@ -116,6 +159,29 @@ func test_attachments_fit_every_body_and_follow_it() -> void:
 		check(belt.distance_to(core.pivot) < 0.9, "%s: the belt goes round the torso (%s vs %s)" % [cid, str(belt), str(core.pivot)])
 		var neck := head.pivot if head != null else core.pivot + Vector3(0, 0.3, 0)
 		check(scarf.distance_to(neck) < 0.55, "%s: the scarf sits at the neck (%s vs %s)" % [cid, str(scarf), str(neck)])
+		# fitted to the visible body (the forged model's vertices): on the skin, rings hugging it, and
+		# nothing over the mouth
+		var anc := {}
+		for kind1 in CosmeticAttachments.KINDS:
+			anc[kind1] = CosmeticAttachments.anchor(c, str(kind1), v._vis_points)
+		var tooth_a: Dictionary = anc["tooth"]
+		var tooth_off := _nearest(_surface(c, v, int(tooth_a["seg"])), (tooth_a["xf"] as Transform3D).origin)
+		check(tooth_off < 0.05, "%s: the tooth sits on the face (%.3f m off the skin)" % [cid, tooth_off])
+		var lid_a: Dictionary = anc["lid"]
+		var lid_off := _nearest(_surface(c, v, int(lid_a["seg"])), (lid_a["xf"] as Transform3D).origin)
+		check(lid_off < 0.1, "%s: the lid is strapped on, not floating (%.3f m off the skin)" % [cid, lid_off])
+		var tooth_w := (c.body.segments[int(tooth_a["seg"])] as BodyDef.Seg).pivot + (tooth_a["xf"] as Transform3D).origin
+		for ring_kind in ["belt", "scarf"]:
+			var ra: Dictionary = anc[ring_kind]
+			var surf := _surface(c, v, int(ra["seg"]))
+			var worst := 0.0
+			var to_mouth := INF
+			var pivot := (c.body.segments[int(ra["seg"])] as BodyDef.Seg).pivot
+			for q in _ring_points(ra):
+				worst = maxf(worst, _nearest(surf, q))
+				to_mouth = minf(to_mouth, (pivot + q).distance_to(tooth_w))
+			check(worst < (0.2 if ring_kind == "belt" else 0.12), "%s: the %s hugs the body (at most %.3f m off the skin)" % [cid, ring_kind, worst])
+			check(to_mouth > (0.15 if ring_kind == "belt" else 0.07), "%s: the %s keeps clear of the mouth (%.3f m)" % [cid, ring_kind, to_mouth])
 		# the pieces ride the body: move and turn the fighter, they come along
 		var moved := Transform3D(Basis(Vector3.UP, PI * 0.5), Vector3(5, 0, 3))
 		v.snap_transforms(_rest(c, moved))

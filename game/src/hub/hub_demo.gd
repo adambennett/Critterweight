@@ -15,7 +15,9 @@ extends RefCounted
 ##   catches      every fished-up can on the locker-room shelf, plus the two arena looks
 ## --hub-board <kind[:arg]> opens a board after a second (talk:granny, station:gym_floor, run, spar,
 ## lockers, records, booth, map, pause, lessons, shop, rest) or starts an activity (activity:drill,
-## activity:crates, activity:bag:heavy). --hub-pos x,y,z[,yaw] places the fighter (HubScene).
+## activity:crates, activity:bag:heavy). HubScene capture helpers: --hub-pos x,y,z[,yaw] places the
+## fighter, --hub-zoom <factor> moves the camera closer, --hub-pitch <deg> holds the camera pitch,
+## --hub-juice keeps the JUICE glow on (shows the Sizzle colour).
 
 const UPGRADES := HubUpgradeProps.ALL_UPGRADES
 
