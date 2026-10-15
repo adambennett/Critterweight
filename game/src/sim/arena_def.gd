@@ -19,6 +19,8 @@ extends RefCounted
 
 const BASES := ["octagon", "square", "circle", "platform"]   ## legacy shape bases
 const LEGACY_THEME_STYLE := {"can": "gullet", "rooftop": "rooftop", "scrapyard": "crusher", "sewer": "drydock"}
+## Older marker names (docs/MODDING.md, the bundled rust_bucket example) -> the names modes read.
+const MARKER_ALIASES := {"spotlight": "spotlight_anchor"}
 ## Format-1 free-form prop names mapped onto the catalog at parse time.
 const LEGACY_PROPS := {"crate": "prop_crate", "barrel": "prop_brine_barrel", "pillar": "prop_bollard", "low_wall": "prop_sponsor_board",
 	"bumper": "prop_bumper", "tire_stack": "prop_tire_stack", "turnbuckle": "prop_bollard", "bench": "prop_crate"}
@@ -117,8 +119,9 @@ static func from_dict(d: Dictionary, src := "") -> ArenaDef:
 	if typeof(md) == TYPE_DICTIONARY:
 		for k in md:
 			var key := str(k).trim_prefix("marker_")
-			var pts := []
-			var entries := []
+			key = str(MARKER_ALIASES.get(key, key))
+			var pts: Array = a.markers.get(key, [])
+			var entries: Array = a.marker_entries.get(key, [])
 			if typeof(md[k]) != TYPE_ARRAY:
 				continue
 			for m in md[k]:

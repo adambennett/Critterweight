@@ -317,6 +317,25 @@ func test_mode_ringout_override_is_honoured() -> void:
 	check(_hz(sim).pending_ringouts.is_empty(), "no arena return queued for an eliminated fighter")
 
 
+## The rules editor's Arena switches (RulesValidator: hazards, hazard_timer_mult, ringouts).
+func test_rules_switch_hazards_timers_and_ringouts() -> void:
+	var off := _sim("arena_crusher", 7, {"rounds": 1, "round_time": 0, "hazards": false})
+	_fight(off)
+	_steps(off, 1500)   # 12.5 s: the first plate event (10 s) would have fired
+	check(not bool(_hz(off).view_state()["enabled"]), "hazards off")
+	check(_hz(off).history["plates"].is_empty(), "no plate event with hazards off")
+	var slow := _hz(_sim("arena_crusher", 7, {"rounds": 1, "round_time": 0, "hazard_timer_mult": 2.0}))
+	check_near(float(slow.hazards[0]["next"]), 20.0, 0.01, "timer x2: first plate event at 20 s instead of 10 s")
+	check_near(float(slow.hazards[0]["period"]), 20.0, 0.01, "and every 20 s")
+	var rules := RulesValidator.normalize({})
+	check(bool(rules.get("hazards", false)) and float(rules.get("hazard_timer_mult", 0.0)) == 1.0 and bool(rules.get("ringouts", false)),
+		"the switches are real rules with defaults (rules editor rows)")
+	var guarded := _sim("arena_rooftop", 7, {"rounds": 1, "round_time": 0, "ringouts": false})
+	var open := _sim("arena_rooftop", 7, {"rounds": 1, "round_time": 0})
+	check_eq((open.arena_nodes["walls"] as Array).size(), 0, "rooftop: no walls while ring-outs are on")
+	check((guarded.arena_nodes["walls"] as Array).size() >= 8, "ring-outs off: guard walls on every open edge")
+
+
 func test_team_matches_start_in_team_clusters() -> void:
 	var sim := _sim("arena_drydock", 5, {"rounds": 1, "round_time": 0}, 4, [0, 0, 1, 1])
 	var a := sim.arena

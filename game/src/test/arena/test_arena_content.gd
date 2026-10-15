@@ -147,6 +147,7 @@ func test_format1_mod_arena_still_loads() -> void:
 		check_eq(goals[1]["pos"], Vector3(5.3, 0, 1.0), "z comes second in the floor form")
 		check_eq(int(goals[1]["team"]), 1, "marker team kept")
 	check_eq(a.spawn_point(2, 3)[1], deg_to_rad(270.0), "spawn yaw in degrees")
+	check_eq(a.marker_points("spotlight_anchor").size(), 1, "older 'spotlight' markers feed Spotlight Hog's anchors")
 	var mod_a := Content.arena("rust_bucket:the_drain")
 	if mod_a != null:
 		check_eq(mod_a.markers_of("goal").size(), 2, "the bundled example's goals")
