@@ -7,6 +7,23 @@ extends RefCounted
 ## global campaign state.
 ##   map -> run_map · fight -> App.start_match -> (result) · event -> event · shop -> shop ·
 ##   rest -> rest · reward -> reward · victory/defeat -> run_summary
+## Invariants:
+##   * A pending pick of this player always comes first in any phase but a fight (Train at a
+##     rest, an event's pick, a consumable's pick in a shop): current_screen() never sends a
+##     screen back to itself once its own step is done, so screens never bounce.
+##   * Play time = time in menus + each fight's simulated time, counted once: the wall clock is
+##     stopped while a presented fight runs (the fight adds its own time when it is applied).
+##   * "Custom" is re-checked before every fight and when a card is run back; a run that became
+##     custom stays custom (RunController.mark_custom).
+##   * A new run never silently replaces a suspended one: callers ask (menu, hub), and whatever
+##     is still in the slot is credited as abandoned before the new run is saved. A run saved by
+##     a newer game version is never touched at all (the menus refuse to deal over it).
+
+const REASON_GAME_SPEED := "reduced game speed"
+const REASON_STAND_INS := "development stand-in creatures"
+## Custom reasons that can change while a run goes on (re-checked before fights and on "Run it
+## back"); any other reason (a test build, custom rules) is fixed when the card is dealt.
+const LIVE_REASONS := [REASON_GAME_SPEED, REASON_STAND_INS]
 
 var catalog: CampaignCatalog
 var ctrl: RunController
@@ -16,7 +33,7 @@ var me := "p0"
 var report: Dictionary = {}
 var notices: Array = []
 var intro_seen := {}             ## act -> true once its intro card was shown this session
-var _last_ms := 0
+var _last_ms := 0                ## wall clock of the last time tick; 0 while a presented fight runs
 
 
 static func make_catalog(stand_ins: bool) -> CampaignCatalog:
@@ -27,17 +44,26 @@ static func make_catalog(stand_ins: bool) -> CampaignCatalog:
 static func custom_reasons(stand_ins: bool, extra: Array = []) -> Array:
 	var out := extra.duplicate()
 	if Settings.get_value("access.game_speed") != null and float(Settings.get_value("access.game_speed")) < 0.999:
-		out.append("reduced game speed")
-	if stand_ins:
-		out.append("development stand-in creatures")
+		if not out.has(REASON_GAME_SPEED):
+			out.append(REASON_GAME_SPEED)
+	if stand_ins and not out.has(REASON_STAND_INS):
+		out.append(REASON_STAND_INS)
 	return out
 
 
 static func start(cat: CampaignCatalog, cfg: Dictionary) -> CampaignFlow:
+	var c: Dictionary = cfg.duplicate(true)
+	if str(c.get("mode", "campaign")) != "bookie":
+		# a Dose this profile has not unlocked (or one on Sparring) is never started
+		c["dose"] = CampaignProgression.clamp_dose(cat, Profiles.current, str(c.get("variant", "off_the_street")),
+			str(c.get("difficulty", "amateur")), int(c.get("dose", 0)))
+	# the menus ask before replacing a suspended run; anything still in the slot is credited as
+	# abandoned here rather than overwritten
+	abandon_suspended(cat, RunStore.slot_for(c))
 	var f := CampaignFlow.new()
 	f.catalog = cat
 	f.store = RunStore.new()
-	f.ctrl = RunController.start_run(cat, cfg)
+	f.ctrl = RunController.start_run(cat, c)
 	f._hook()
 	f.save()
 	return f
@@ -54,8 +80,76 @@ static func resume(cat: CampaignCatalog, st: Dictionary) -> CampaignFlow:
 
 func _hook() -> void:
 	ctrl.autosave = save
-	_last_ms = Time.get_ticks_msec()
+	_last_ms = maxi(1, Time.get_ticks_msec())
 
+
+# =============================================================================================
+# Suspended runs of the active profile (one slot per variant)
+# =============================================================================================
+
+static func profile_key() -> String:
+	return Profiles.id() if Profiles.id() != "" else "default"
+
+
+## The run suspended in `slot` of the active profile ({} if the slot is free):
+## {slot, ok, error, newer, summary} like RunStore.list rows. `newer`: saved by a newer game
+## version — it is never replaced, moved or deleted (a new run cannot take that slot).
+static func suspended_run(cat: CampaignCatalog, slot: String) -> Dictionary:
+	var res := RunStore.new().load_slot(profile_key(), slot, cat)
+	if not bool(res.get("exists", false)):
+		return {}
+	return {"slot": slot, "ok": bool(res["ok"]), "error": str(res["error"]), "newer": bool(res.get("newer", false)),
+		"summary": RunStore.summarize(res.get("state", {}))}
+
+
+## Abandons the run suspended in `slot` of the active profile: it is credited as an abandoned
+## defeat (history and attempts; CampaignProgression.finish_run, idempotent per run) and its
+## slot is cleared. A save that cannot be loaded is moved aside, never deleted; one saved by a
+## newer game version is left exactly as it is. Returns the credit report ({} when the slot was
+## free, unreadable or newer).
+static func abandon_suspended(cat: CampaignCatalog, slot: String) -> Dictionary:
+	var rs := RunStore.new()
+	var key := profile_key()
+	var res := rs.load_slot(key, slot, cat)
+	if not bool(res.get("exists", false)) or bool(res.get("newer", false)):
+		return {}
+	if not bool(res["ok"]):
+		rs.quarantine(key, slot)
+		return {}
+	var c := RunController.from_state(cat, res["state"])
+	c.abandon()
+	var rep := CampaignProgression.finish_run(cat, c.state, local_player_id(c.state), Profiles.current)
+	Profiles.save()
+	rs.clear(key, slot)
+	return rep
+
+
+## The player of a run that belongs to the active profile (party saves hold every member).
+static func local_player_id(st: Dictionary) -> String:
+	var pid := Profiles.id()
+	for p in st.get("players", []):
+		if pid != "" and str(p.get("profile_id", "")) == pid:
+			return str(p.get("id", "p0"))
+	var ids := RunState.player_ids(st)
+	return str(ids[0]) if not ids.is_empty() else "p0"
+
+
+## One line describing a suspended run (RunStore.summarize) for confirmations.
+static func describe_suspended(cat: CampaignCatalog, s: Dictionary) -> String:
+	if s.is_empty():
+		return "an unreadable save"
+	var names := []
+	for fid in s.get("fighters", []):
+		names.append(CampaignUI.fighter_name(cat, str(fid)))
+	var dose := int(s.get("dose", 0))
+	return "%s · Act %d · %s · %s%s" % [str(s.get("variant", "")).replace("_", " ").capitalize(), int(s.get("act", 1)),
+		", ".join(names), str(cat.difficulty(str(s.get("difficulty", ""))).get("name", s.get("difficulty", ""))),
+		(" · Dose %d" % dose) if dose > 0 else ""]
+
+
+# =============================================================================================
+# The running card
+# =============================================================================================
 
 ## True for The Bookie's Table (screens adapt labels: "hand back" instead of "suspend").
 func is_bookie() -> bool:
@@ -63,7 +157,12 @@ func is_bookie() -> bool:
 
 
 func profile_id() -> String:
-	return Profiles.id() if Profiles.id() != "" else "default"
+	return profile_key()
+
+
+## Whether this flow's catalog fills missing creatures with development stand-ins.
+func uses_stand_ins() -> bool:
+	return catalog != null and catalog.resolver.stand_in != ""
 
 
 func save(_st = null) -> void:
@@ -76,32 +175,44 @@ func save(_st = null) -> void:
 
 
 func _tick_time() -> void:
-	var now := Time.get_ticks_msec()
-	if _last_ms > 0:
-		ctrl.add_time((now - _last_ms) / 1000.0)
+	if _last_ms <= 0:
+		return      # a presented fight is running: it adds its own (simulated) time
+	var now := maxi(1, Time.get_ticks_msec())
+	ctrl.add_time((now - _last_ms) / 1000.0)
 	_last_ms = now
 
 
-## Shows the screen for the current phase (or launches the pending fight).
+## The screen for the current state: "summary" | "fight" | "reward" | "event" | "shop" | "rest" |
+## "run_map". A pending pick of this player comes first in every phase but a fight; once this
+## player's part of a shop or rest is done (others may still be deciding), it is the map.
+func current_screen() -> String:
+	if ctrl.is_over():
+		return "summary"
+	var ph := ctrl.phase()
+	if ph == "fight":
+		return "fight"
+	if ph != "map" and not ctrl.pending_for(me).is_empty():
+		return "reward"
+	match ph:
+		"event":
+			return "event" if ctrl.session().has("event") else "run_map"
+		"shop":
+			return "run_map" if bool(ctrl.shop_view(me).get("done", true)) else "shop"
+		"rest":
+			return "run_map" if bool(ctrl.session().get("rest", {}).get(me, {}).get("done", true)) else "rest"
+	return "run_map"
+
+
+## Shows the screen for the current state (or launches the pending fight).
 func show_current() -> void:
-	match ctrl.phase():
-		"map":
-			App.goto("run_map", {"flow": self})
+	ctrl.advance_if_done()      # repairs runs saved mid-transition by older builds
+	match current_screen():
+		"summary":
+			finish()
 		"fight":
 			launch_fight()
-		"event":
-			App.goto("event", {"flow": self})
-		"shop":
-			App.goto("shop", {"flow": self})
-		"rest":
-			App.goto("rest", {"flow": self})
-		"reward":
-			if ctrl.pending_for(me).is_empty():
-				App.goto("run_map", {"flow": self})
-			else:
-				App.goto("reward", {"flow": self})
-		"victory", "defeat":
-			finish()
+		var screen:
+			App.goto(screen, {"flow": self})
 
 
 func launch_fight() -> void:
@@ -110,6 +221,7 @@ func launch_fight() -> void:
 		# never strand the player: the map screen explains and offers suspend or forfeit
 		App.goto("run_map", {"flow": self, "fight_error": "\n".join(built["errors"])})
 		return
+	begin_fight()
 	SimSpeed.restore()
 	# the pause menu's "Restart fight" replays MatchFlow.last_config; a campaign fight must not
 	# restart into an unrelated earlier match (quitting keeps the run at this fight instead)
@@ -117,8 +229,18 @@ func launch_fight() -> void:
 	App.start_match(built["config"], _on_match_finished)
 
 
+## Right before a presented fight: re-check what makes a run custom (the game speed may have
+## been lowered since the last fight), then stop the wall clock — the fight adds its own
+## simulated time when it is applied, so it is never counted twice.
+func begin_fight() -> void:
+	ctrl.mark_custom(custom_reasons(uses_stand_ins()))
+	_tick_time()
+	_last_ms = 0
+
+
 func _on_match_finished(result: Dictionary) -> void:
 	App.set_scene(null)
+	_last_ms = maxi(1, Time.get_ticks_msec())     # menus count again from here
 	ctrl.complete_fight(result)
 	show_current()
 
@@ -165,6 +287,8 @@ func finish() -> void:
 
 
 ## A new run with the same settings ("Run it back" keeps the seed; "New card" draws a new one).
+## Whether it is custom is decided afresh: live reasons (game speed, stand-ins) are checked now,
+## reasons fixed at the original deal (a test build, custom rules) carry over.
 func restart(same_seed: bool, dose_delta := 0) -> void:
 	var cfg: Dictionary = ctrl.state.get("start_cfg", {}).duplicate(true)
 	cfg["seed"] = int(ctrl.state.get("seed", 0)) if same_seed else 0
@@ -172,6 +296,14 @@ func restart(same_seed: bool, dose_delta := 0) -> void:
 	cfg["dose"] = clampi(int(cfg.get("dose", 0)) + dose_delta, 0, 10)
 	cfg["created_at"] = int(Time.get_unix_time_from_system())
 	cfg.erase("run_id")
+	var old_reasons: Array = cfg.get("custom_reasons", [])
+	var fixed := []
+	for r in old_reasons:
+		if not LIVE_REASONS.has(str(r)):
+			fixed.append(str(r))
+	var reasons := custom_reasons(uses_stand_ins(), fixed)
+	cfg["custom_reasons"] = reasons
+	cfg["custom"] = not reasons.is_empty() or (bool(cfg.get("custom", false)) and old_reasons.is_empty())
 	if str(cfg.get("variant", "")) == "fight_camp":
 		for p in cfg.get("players", []):
 			p["meta"] = FightCamp.meta_levels(Profiles.current)

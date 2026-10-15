@@ -2,6 +2,8 @@ extends Screen
 ## Rest stop (Doc Sutura's back room): the four options as cards — Patch up (heal %), Train
 ## (learn a technique: opens a pick), Rub-down (clear side effects + small heal), Film study
 ## (reveal the next act's elite/boss, + Hype carry). Unavailable options say why.
+## Once this player has rested, the flow decides what is next (Train's pick, the map); this
+## screen never hands back to a flow that would show it again (it waits for the party instead).
 
 var flow: CampaignFlow
 var ctrl: RunController
@@ -21,7 +23,10 @@ func _build() -> void:
 	_cards.clear()
 	var r: Dictionary = ctrl.session().get("rest", {}).get(flow.me, {})
 	if r.is_empty() or bool(r.get("done", false)):
-		flow.show_current.call_deferred()
+		if flow.current_screen() != "rest":
+			flow.show_current.call_deferred()
+		else:
+			CampaignUI.scaffold(self, "THE BACK ROOM", "Waiting for the rest of the party...")
 		return
 	var p := ctrl.player(flow.me)
 	var v := CampaignUI.scaffold(self, "THE BACK ROOM", "Doc Sutura has one hour and a bucket of ice. Pick one.")
