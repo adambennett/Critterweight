@@ -64,7 +64,58 @@ vibration and the button-prompt style are in Settings › Controls.
 Records: custom rules and mods are allowed everywhere single-player; results played with them are marked
 "custom" and kept separate from standard records. Online, everyone needs the same gameplay mods as the host.
 
-## 4. Settings highlights
+## 4. Playing online
+
+Main menu › **Online** has three tabs (LB/RB, or Q/E): **Host**, **Join** and **LAN**. Y (keyboard R) runs
+the tab's main action. Your player name and the network defaults are in Settings › Network.
+
+**Host a session.** Choose *Matches* (everyone fights under your rules, again and again from the lobby) or
+*Co-op party run* (a campaign run played together, started or resumed in the lobby). For matches pick the
+rules preset (your own saved presets are marked "(yours)"; practice, tutorial and campaign rules are
+offline-only), the arena (your own layouts are sent to the players before each match), an optional
+**playlist** (players then vote between a few of its entries), bots with their skill or one of your
+**AI Lab** policies, plus max players, password, LAN visibility and the port. **Host session** opens the
+lobby.
+
+* Hosting uses **UDP port 7777** (Settings › Network › Host port). Players on your local network can join
+  right away. For play over the internet the host's UDP port must be reachable: forward it on the router
+  to your PC and allow it in the firewall (there is no relay or matchmaking service).
+* **Copy invite** (lobby) copies a line with your address, port and whether a password is needed. It uses
+  your local network address; for internet play tell your friends your public address instead. The
+  Online screen shows this computer's local addresses.
+
+**Join.** Enter the host's address (an IP address such as 192.168.1.20, or a name; with a keyboard you can
+type `address:port`), the port (7777 unless the host changed it), the password if there is one, and
+optionally *Join as spectator*, then **Join**. Dedicated servers are joined the same way. Servers you
+joined before are listed under **Recent servers** (A joins again, X / Delete forgets one).
+
+**LAN.** Lists sessions announced on your local network: name, rules and arena, players, a lock when a
+password is needed. A session you cannot join says why (a different game version, or exactly which mods
+differ). LAN discovery must be on for both sides (Settings › Network); it uses UDP ports 7779–7782.
+
+**The lobby.** The list on the left is yours: fighter (opens the character select), team, spectate and
+**Ready** (Y / R). The host also sets the rules, arena, playlist voting, bots, bot skill and AI Lab policy,
+starts the match (Y / R) and copies the invite. When a vote is open, pick an entry with A. The right side
+shows everyone's name card in their equipped profile frame, the cosmetics they wear, their fighter, ready
+state and ping, and the active rules. **Rules and online restrictions** explains what is different
+online: the host's game (or the server) decides every hit and result, matches never pause and always run
+at full game speed, aim assist follows each player's setting unless the server sets it, cosmetics are
+looks only, and everyone needs the same game version and gameplay mods. After a match the results show
+for a few seconds, then everyone is back in the lobby. B leaves (asks first); when the host closes the
+lobby the session ends for everyone.
+
+**Co-op party runs** (host, in the lobby): *Start a new party run* deals an Off the Street run for the 2–4
+players who are not spectating, or pick a suspended party run and *Offer this run*; its members take their
+seats again (*Rejoin this run*) and the host starts it. The online party run currently plays the route
+votes; the other campaign stops are played in the campaign screens, which do not run online party runs
+yet — the run waits and stays in everyone's party save.
+
+**When something goes wrong** the game says why and leaves you on the Online screen: nobody answered
+(check the address and port, and that the host's port is reachable), wrong password, session full,
+different game version or mods (with the differences listed), removed by the host (with their reason), or
+the host left.
+
+## 5. Settings highlights
 
 Display (resolution, window mode, monitor, frame limit, VSync, render scale/upscaler, UI scale; risky changes
 revert after 15 s unless you keep them), Graphics presets including **Steam Deck**, Audio (master, music,
@@ -72,10 +123,10 @@ effects, voice, UI, ambience, mute when unfocused, output device), Accessibility
 size, colour-vision palettes, screen shake, flashing reduction, motion reduction, gore Full/Reduced/Off, game
 speed and assists), Gameplay (difficulty, announcer level), Network, Diagnostics (FPS/net overlays, logs).
 
-## 5. Your data
+## 6. Your data
 
 Everything you create is stored in your user folder (Windows `%APPDATA%\Critterweight`, Linux
-`~/.local/share/Critterweight`): `profiles/` (profiles and settings), `presets/`, `arenas/`, `runs/`
+`~/.local/share/Critterweight`): `profiles/` (profiles, settings, recent servers), `presets/`, `arenas/`, `runs/`
 (suspended campaign runs), `mods/`, `policies/` (AI Lab), `logs/`. Saves are written atomically with a
 backup and a checksum; a damaged file is set aside (never deleted) and the newest good copy is used.
 Start with `-- --safe-mode` if a mod setup ever gets in your way.

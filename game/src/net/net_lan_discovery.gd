@@ -13,11 +13,16 @@ extends RefCounted
 ## Beacon: "CWLAN1" [u16 protocol][u64 instance][u16 game port][str name][str game version]
 ##   [str content hash prefix][u8 players][u8 max players][u8 spectators][u8 max spectators]
 ##   [u8 flags: 1 password, 2 dedicated, 4 in match][str rules][str arena][str phase]
+##   then (optional, protocol 4) [u8 n + more flag 0x80] n x ([str id][str version][str hash
+##   prefix]) - the server's gameplay packages, so the browser can say WHICH mods differ
+##   (Mods.compare wording) before anyone tries to join.
 
 const MAGIC := "CWLAN1"
 const PORT_SPAN := 4
 const EXPIRE_MS := 4500
 const MAX_SESSIONS := 64
+const MAX_BEACON := 1200
+const BEACON_PACKAGES := 12
 const F_PASSWORD := 1
 const F_DEDICATED := 2
 const F_IN_MATCH := 4
@@ -97,12 +102,20 @@ static func encode_beacon(info: Dictionary, inst: int) -> PackedByteArray:
 	w.text(str(info.get("rules", "")), 64)
 	w.text(str(info.get("arena", "")), 64)
 	w.text(str(info.get("phase", "")), 16)
+	var pkgs := NetProtocol.gameplay_packages(Content.package_list())
+	var n := mini(pkgs.size(), BEACON_PACKAGES)
+	w.u8(n | (0x80 if pkgs.size() > n else 0))
+	for i in n:
+		var p: Dictionary = pkgs[i]
+		w.text(str(p.get("id", "")), 40)
+		w.text(str(p.get("version", "")), 24)
+		w.text(str(p.get("hash", "")).substr(0, 12), 12)
 	return w.data()
 
 
 ## Returns {} when the packet is not a valid beacon.
 static func decode_beacon(data: PackedByteArray) -> Dictionary:
-	if data.size() < 8 or data.size() > 600:
+	if data.size() < 8 or data.size() > MAX_BEACON:
 		return {}
 	if data.slice(0, 6).get_string_from_ascii() != MAGIC:
 		return {}
@@ -127,7 +140,44 @@ static func decode_beacon(data: PackedByteArray) -> Dictionary:
 	d["phase"] = r.text(16)
 	if not r.ok or int(d["port"]) == 0:
 		return {}
+	# protocol 4: the server's gameplay packages (older beacons simply end here)
+	var pk: Array = []
+	if r.remaining() > 0:
+		var nb := r.u8()
+		d["packages_more"] = nb & 0x80 != 0
+		for i in mini(nb & 0x7F, BEACON_PACKAGES):
+			var id := r.text(40)
+			var ver := r.text(24)
+			var h := r.text(12)
+			if not r.ok:
+				return {}
+			pk.append({"id": id, "version": ver, "hash": h, "client_only": false})
+		d["packages_listed"] = true
+	d["packages"] = pk
 	return d
+
+
+## Readable reasons a LAN session is not joinable from here (protocol, game version, and for
+## content the Mods.compare lines: missing / extra / different mods), or [] when it is.
+## `hash_prefix` = this machine's content hash prefix.
+static func compatibility(d: Dictionary, hash_prefix: String) -> Array:
+	if int(d.get("protocol", 0)) != NetProtocol.VERSION:
+		return ["Different network protocol: update the game on both sides."]
+	if str(d.get("game_version", "")) != NetProtocol.game_version():
+		return ["Different game version: theirs %s, yours %s." % [str(d.get("game_version", "?")), NetProtocol.game_version()]]
+	if str(d.get("content", "")) == hash_prefix:
+		return []
+	if not bool(d.get("packages_listed", false)) or bool(d.get("packages_more", false)):
+		return ["Different content or mods (join to see exactly which)."]
+	# compare by id + version (beacons carry only a hash prefix; the join check is the exact one)
+	var remote: Array = []
+	for p in d.get("packages", []):
+		remote.append({"id": p["id"], "version": p["version"], "hash": "", "client_only": false})
+	var cmp: Dictionary = Mods.compare(remote)
+	var lines: Array = (cmp.get("messages", []) as Array).duplicate()
+	if lines.is_empty():
+		lines.append("Same mods and versions, but different files (a package was modified): reinstall it on both sides.")
+	return lines
 
 
 ## Starts listening on the first free port of discovery_port .. +PORT_SPAN-1.
@@ -181,6 +231,7 @@ func poll() -> bool:
 			reasons.append("different content/mods")
 		d["compatible"] = reasons.is_empty()
 		d["incompatible_reason"] = ", ".join(PackedStringArray(reasons))
+		d["compat_lines"] = [] if reasons.is_empty() else compatibility(d, _hash_prefix)
 		if prev.is_empty() or _differs(prev, d):
 			changed = true
 		sessions[key] = d

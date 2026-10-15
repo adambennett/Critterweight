@@ -307,7 +307,10 @@ name, creature, hash}]} (listen hosts; dedicated servers list only creatures), `
   max]` bound everything.
 * Phases: `idle` -> (join) -> `lobby` (vote + countdown; all ready -> 3 s) -> `match` -> `results`
   (`results_time`) -> `lobby` / `idle`, fully automatic on dedicated servers. A listen host starts
-  matches with `Net.host_start()`.
+  matches with `Net.host_start()`. A listen host can also run **playlist voting**
+  (`host_set("playlist", id)`, "" = off): the lobby then offers the playlist's candidates, players
+  vote, and `host_start()` plays the winning entry (it opens a vote first when none is open, and
+  says why when no entry fits the number of players).
 * Leave: `Net.leave()` (graceful, no reservation). Kick: `Net.host_kick(id, reason)` / admin `kick`.
 * Chat: optional, rate-limited, cleaned, logged.
 
@@ -338,7 +341,10 @@ name, creature, hash}]} (listen hosts; dedicated servers list only creatures), `
   limited broadcast out of one interface only) and 127.0.0.1, on ports `discovery_port`..+3.
   Browsers bind the first free of those ports (several game instances per PC can browse), dedupe
   by the server's random instance id, mark incompatible builds/content, and expire silent entries
-  after 4.5 s. Beacons are untrusted: bounded, validated, display only.
+  after 4.5 s. Since protocol 4 a beacon also lists the server's gameplay packages (id, version,
+  hash prefix; up to 12, with a "more" flag), so the browser can show *which* mods differ in the
+  `Mods.compare` wording (`compat_lines`) before anyone tries to join. Beacons are untrusted:
+  bounded (1200 B), validated, display only.
 * **Remote user-hosted server**: forward the UDP port (§11) and share the public address.
 * **Invites**: `Net.invite_text(address := "")` returns `Platform.invite_text(address, port,
   has_password)` for the session this machine hosts, ready to copy into a chat; without an address
@@ -428,8 +434,9 @@ cost, traffic, memory, objects/nodes/orphans).
 ## 14. API for UI and systems (`Net` autoload)
 
 **Lifecycle**: `host(cfg) -> Error` (cfg keys: name, port, max_players, max_spectators, password,
-lan_discovery, player_name, creature, rules, arena, bots, bot_difficulty, rejoin_grace,
-results_time, timeout; defaults from Settings `network.*`), `join(address, port, password, options)
+lan_discovery, player_name, creature, cosmetics, rules, rules_override, arena, bots,
+bot_difficulty, bot_policy, playlist, rejoin_grace, results_time, timeout; defaults from Settings
+`network.*`; a rejected lobby setting is logged and the session still starts), `join(address, port, password, options)
 -> Error` (options: name, spectator, creature, timeout_s, conditioner_args, assist - default from
 Settings), `can_rejoin()`, `rejoin()`, `leave()`, `shutdown()` (App.quit), `start_dedicated(cfg)`,
 `start_dedicated_from_cli(args)`, `start_from_cli(args)`.
@@ -461,17 +468,43 @@ line via `Platform.invite_text`), `local_addresses()` (this PC's IPv4 addresses,
 `set_spectator(bool)`, `send_chat(text)`, `vote(index)`, `set_input_enabled(bool)` (neutral input
 while a menu overlay is open; online matches never pause). **Host only**: `host_set(key, value)`
 (rules - any preset the host has, including the player's own `user:` presets; rules_override;
-arena; bots; bot_difficulty; bot_policy - AI Lab policy id or list) -> error text (validated),
-`host_start()` -> error text, `host_kick(id, reason)`.
+arena; bots; bot_difficulty; bot_policy - AI Lab policy id or list; playlist - content playlist
+id or "" for off) -> error text (validated), `host_start()` -> error text, `host_kick(id, reason)`.
 
 **LAN**: `start_lan_discovery(port := 7779)` (`ERR_UNAVAILABLE` while the setting is off; starts by
-itself when it is switched on), `stop_lan_discovery()`, `is_lan_discovery_active()`, `lan_sessions()` ->
-[{name, address, port, players, max_players, spectators, max_spectators, password, dedicated,
-in_match, rules, arena, phase, game_version, compatible, incompatible_reason}].
+itself when it is switched on; logs the port it listens on, or that all four are busy),
+`stop_lan_discovery()`, `is_lan_discovery_active()`, `lan_sessions()` -> [{name, address, port,
+players, max_players, spectators, max_spectators, password, dedicated, in_match, rules, arena,
+phase, game_version, compatible, incompatible_reason, compat_lines}].
+
+**Recent servers**: `recent_servers()` -> [{address, port, name, dedicated, last}] (newest first,
+at most 8, `profiles/recent_servers.json` through `Saves`), `remember_server(address, port, name,
+dedicated)` (done automatically when a join is admitted), `forget_server(address, port)`;
+`Net.parse_address(text, default_port)` -> {address, port, error} reads "host", "host:port" and
+"[v6]:port" with a player-facing error text.
 
 **Scene handling**: on match start Net installs the scene itself (clients: `App.clear_screens()` +
 `App.set_scene(NetMatchScene)`; host: `App.start_match`), and removes it when the server returns to
 the lobby. UI screens show lobby/results in response to the signals.
+
+**Screens** (`src/ui/screens/online_screen.gd`, `lobby_screen.gd`, `src/ui/online_flow.gd`; layout
+and widgets in docs/UI.md). The **Online** screen hosts (`Net.host(OnlineScreen.host_config())`,
+whose values come from the form and Settings `network.*`), joins by address
+(`Net.parse_address`), from the recent list or from the LAN list (`compat_lines` explain an
+incompatible session; a password session asks first), and shows the connection state with this
+PC's addresses or, while hosting, the invite line. Players enter a lobby with the first playable
+non-development fighter (`OnlineScreen.default_creature()`) and change it there. **OnlineFlow**
+follows a session started from these screens with static state only (no node-bound callables, see
+AGENTS.md): `match_ended` -> the results card (online variant: "Back to the lobby in N s", Back
+to lobby, Leave session), `returned_to_lobby` -> the lobby again, `disconnected` -> the Online
+screen plus a dialog built from the reason (`NetProtocol.describe`: title, message, details),
+except after the player's own leave. Refused joins (`connection_failed`) use the same dialog. The
+**Lobby** reads `Net.lobby()` (rebuilt on shape changes, refreshed in place twice a second for
+pings and countdowns), sends the player's choices (`set_creature`, `set_team`, `set_spectator`,
+`set_ready`, `vote`), drives the host settings through `host_set` (errors shown as toasts),
+starts with `host_start` (errors in a dialog), copies `invite_text()`, explains the active rules
+and the online restrictions (`LobbyScreen.rules_explained`), and drives party runs through
+`NetPartyRuns` (offer a suspended run, start a new one, claim a seat, route votes, suspend).
 
 **App message channel (co-op campaign, custom systems)** - plain-data messages with server
 authority:
@@ -528,7 +561,10 @@ authority:
   `NetPartyRuns` (src/net/net_party_runs.gd) is the lobby glue the UI drives: the host calls
   `open_as_host(run_id)` (loads its party save `party_<run id>`, opens the seats, finds its own by
   profile id / name or takes the one the player picked) and `start_host()` once `missing_seats()`
-  is empty (CoopSession.host_resume over NetPartyTransport); a member calls `claim(seat)` when the
+  is empty (CoopSession.host_resume over NetPartyTransport), or `start_new_as_host(cfg)` to deal a
+  NEW run for the players in the session (CoopSession.host_new; their session ids become the
+  run's member ids, and the offer's `info.new` lets members take a seat without a save of their
+  own); a member calls `claim(seat)` when the
   lobby offers a run it holds in its own party save ("rejoins by run id") and then `tick(dt)`
   every frame, which starts CoopSession.member_join once seated, repeats its hello until the run
   arrives and asks for its fighter back. The member re-verifies the first state the host sends
@@ -620,11 +656,12 @@ $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 
 | File | Covers |
 |---|---|
-| `test_net_codec.gd` | Writer/reader, bounds, quantization error, event codec round trip, 3000-buffer fuzz + every truncation, input clamping, remote-input redundancy/jitter buffer, payload sanitizer, beacons, reasons, password proof, config parser (incl. `server.mods`), package-list codec, content verdict over `Mods.compare`, assist clamping, rate limiter |
+| `test_net_codec.gd` | Writer/reader, bounds, quantization error, event codec round trip, 3000-buffer fuzz + every truncation, input clamping, remote-input redundancy/jitter buffer, payload sanitizer, beacons (+ package list, older beacons, truncation), LAN compatibility lines, address parsing, recent-server list, reasons, password proof, config parser (incl. `server.mods`), package-list codec, content verdict over `Mods.compare`, assist clamping, rate limiter |
 | `test_net_playlist.gd` | Weight distribution (10 000 draws), distinct candidates, repeat avoidance + relaxation, vote/tie/no-vote rules, min players + bot fill, invalid entries/missing content messages, persistence, shipped playlists |
 | `test_net_snapshot.gd` | FK reconstruction vs live sim, snapshot sizes, roster generations, interpolation/teleport/generation switch, event scheduling, mirror driving the real FightHud |
-| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, oversized/flood, host leaving, timeout, LAN discovery, host scene removed mid-match, mode picks for remote players (+ pick timeout), party relay (authenticated sender ids, limits, session end), party seats (claims, seat-stamped and seat-routed messages, outsiders kept out), arena checks before the match (local hash, mismatch, damaged and oversized packages, sandboxed import round trip), AI Lab policy bots (policy hash in the options and MATCH_START) + rules validation, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (`LQ_ASSIST`, snapped levels, `match.player_assist`), live network settings + invite text |
+| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, oversized/flood, host leaving, timeout, LAN discovery, host scene removed mid-match, mode picks for remote players (+ pick timeout), party relay (authenticated sender ids, limits, session end), party seats (claims, seat-stamped and seat-routed messages, outsiders kept out), a new party run dealt from the lobby (session ids as seats, "new" offer, second offer refused), arena checks before the match (local hash, mismatch, damaged and oversized packages, sandboxed import round trip), AI Lab policy bots (policy hash in the options and MATCH_START) + rules validation, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (`LQ_ASSIST`, snapped levels, `match.player_assist`), live network settings + invite text |
 | `test_net_multiprocess.gd` | Independent processes: dedicated match (hits, KO, results, presenting client), rejections (password, full, protocol, build, content refused on the client with Mods.compare wording), server mods (`server.mods` + client `--mods`, vanilla client refused, modded client plays the mod's preset, admin status lists packages), damage injection, disconnect + rejoin, stdin console shutdown, TCP admin auth/kick/ban/shutdown, 80 +- 20 ms / 2 % loss match, listen host (own `user:` rules preset sent in full and own `user:` arena sent as a package to a guest without either, guest aim assist applied, party messages) + remote client + app round trip, bonus modes (Chum Rush, Absolute Unit), LAN discovery, playlist rotation + votes + invalid entries + restart persistence, a suspended co-op party run resumed through the lobby (seat claimed by run id, CoopSession on both machines, route vote) |
+| `test_online_ui.gd` | The Online and Lobby screens driven with controller events, focus checked after every step: tabs and back; host through the Online screen, a guest joins, copy invite, rules dialog, Y starts the match, online results card, automatic return to the lobby, leave; join a host running in another process through the Join tab's recent entry, ready with Y, play its match, come back; refusal dialogs (wrong password, full, nobody answering) and a kick with its reason; LAN tab (listed session, password prompt); layout (footer on screen, text >= 18 px at 1280x800 and 1920x1080) |
 | `test_net_parity.gd` | NetMatchScene handles every event MatchScene reacts to; reports event types without a codec id |
 | `test_net_server_examples.gd` | Example configs and the playlist template stay valid |
 | `test_net_measure.gd` | Bandwidth and server cost (duel, 8-fighter FFA) |
@@ -655,10 +692,11 @@ Also LOOPBACK on one PC.
 * Event types added after the event codec's id table was fixed (arena hazards and props, bosses, ring-out return,
   campaign events; `test_net_parity` lists them) travel with their type name instead of a 1-byte
   id: they work, the event packets are just a little larger. Giving them ids is a protocol bump.
-* Co-op: resuming a suspended party run through the lobby is wired (party seats + `NetPartyRuns`,
-  tested between processes up to the first route vote); fights of an online party run are not
-  yet played as network matches, and starting a *new* party run from the lobby is not wired in
-  the campaign UI (the same seat API covers it: the session ids become the run's player ids).
-  Co-op runs are otherwise verified over the loopback transport.
-* Host/join/lobby screens are built by the UI owner on this API; until then sessions start from
-  the command line (`--host`, `--connect`, `--server`).
+* Co-op: party runs are started (new) or resumed (suspended) from the lobby through party seats
+  and `NetPartyRuns` (tested between processes up to the first route vote). The lobby plays the
+  route votes; the other campaign stops (fights, shops, events) are not yet played online - the
+  run waits in the lobby and stays in everyone's party save. Co-op runs are otherwise verified
+  over the loopback transport.
+* The Online and Lobby screens are tested headless with injected controller events and LOOPBACK
+  sessions (one process, and a host in a second process); not tested with a second machine or a
+  real controller on a real network.

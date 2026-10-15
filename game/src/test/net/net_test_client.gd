@@ -505,10 +505,15 @@ func _physics_process(_dt: float) -> void:
 	var t := Time.get_ticks_msec() - started_ms
 	if hosting and _server and _server.phase == NetServer.PHASE_LOBBY:
 		var remote := 0
+		var unready := 0
 		for p in _server.players.values():
 			if (p as NetPlayer).peer > 0 and (p as NetPlayer).connected and not (p as NetPlayer).spectator:
 				remote += 1
-		if remote + 1 >= host_start_players and _host_started_match <= _server.match_id:
+				if not (p as NetPlayer).ready:
+					unready += 1
+		var limit := int(arg("--host-auto-start-limit", "0"))
+		var ready_ok := unready == 0 or not args.has("--host-start-when-ready")
+		if remote + 1 >= host_start_players and ready_ok and _host_started_match <= _server.match_id and (limit <= 0 or _server.match_id < limit):
 			_host_started_match = _server.match_id + 1
 			var e := Net.host_start()
 			if e != "":

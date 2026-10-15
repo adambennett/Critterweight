@@ -122,6 +122,36 @@ func open_as_host(id: String, my_seat := "") -> String:
 	return ""
 
 
+## Host: deals a NEW party run for the players in the session now (`cfg` as for
+## CoopSession.host_new; cfg.players ids = their session ids, which become the run's member ids)
+## and offers it in the lobby. The CoopSession starts at once; members claim their seats without
+## needing a save (the offer says "new").
+func start_new_as_host(cfg: Dictionary) -> String:
+	if not Net.is_host():
+		return "Host a session first."
+	if session != null or not Net.party().is_empty():
+		return "A party run is already on offer."
+	var s := CoopSession.host_new(NetPartyTransport.new(), catalog, cfg, store, profile)
+	if s.ctrl == null:
+		return "The party run could not be dealt."
+	var st: Dictionary = s.ctrl.state
+	var seats := seats_of(st)
+	if seats.is_empty():
+		return "Every member needs an online member id."
+	var info := RunStore.summarize(st)
+	info["new"] = true
+	var err := Net.party_open(str(st.get("run_id", "")), seats, Net.local_member_id(), info)
+	if err != "":
+		s.transport.close()
+		return err
+	session = s
+	role = "host"
+	run_id = str(st.get("run_id", ""))
+	seat = Net.local_member_id()
+	state = st
+	return ""
+
+
 ## Host: starts the party's CoopSession from the loaded run (members seated by now take their
 ## fighters at once; later ones rejoin at the next node boundary).
 func start_host() -> String:
@@ -156,10 +186,17 @@ func claim(my_seat := "") -> String:
 	if pt.is_empty():
 		return "The host has not offered a party run."
 	var id := str(pt.get("run_id", ""))
+	var fresh := bool((pt.get("info", {}) as Dictionary).get("new", false))
 	var r := store.load_slot(profile_id, slot_of(id), catalog)
-	if not bool(r.get("ok", false)):
+	var own: Dictionary = {}
+	if bool(r.get("ok", false)):
+		own = r["state"]
+	elif not fresh:
 		return "You do not have this party run in your saves (%s)." % str(r.get("error", ""))
-	var me := my_seat if my_seat != "" else seat_for(r["state"], profile_id, _player_name())
+	# a new run's seats are the session ids it was dealt with; a resumed one is matched by save
+	var me := my_seat
+	if me == "":
+		me = str(Net.local_peer_id()) if fresh and own.is_empty() else seat_for(own, profile_id, _player_name())
 	if me == "":
 		return "Pick which player you are in this run."
 	var known := false
@@ -173,7 +210,7 @@ func claim(my_seat := "") -> String:
 	role = "member"
 	run_id = id
 	seat = me
-	state = r["state"]
+	state = own
 	_checked = false
 	error = ""
 	return ""
@@ -220,7 +257,8 @@ func tick(dt: float) -> void:
 		session.rejoin()
 	if role == "member" and session.ctrl != null and not _checked:
 		_checked = true
-		var why := check_resumed(catalog, state, session.ctrl.state)
+		# a member of a new run has no save of it yet: CoopSession checks every ticket by its log
+		var why := "" if state.is_empty() else check_resumed(catalog, state, session.ctrl.state)
 		if why != "":
 			error = why
 			close()
