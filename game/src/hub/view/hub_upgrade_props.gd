@@ -189,9 +189,10 @@ func _gym() -> void:
 	# Mat Room: a second mat zone and its sign
 	var k6 := HubMeshKit.new()
 	k6.floor_rect(Rect2(4.0, 2.9, 4.0, 2.3), 0.014, Color("#355d7f"), HubMeshKit.MAT)
-	k6.box(Vector3(6.0, 1.6, 5.35), Vector3(1.6, 0.4, 0.05), Color("#2b2f3a"))
+	var sz := HubLayout.STAIRS_Z - HubLayout.STAIRS_W * 0.5 - 0.2
+	k6.box(Vector3(6.0, 1.6, sz), Vector3(1.6, 0.4, 0.05), Color("#2b2f3a"))
 	var n6 := _node("meta_mat_room", 1, k6)
-	_sign(n6, "MAT ROOM", Vector3(6.0, 1.6, 5.32), PI, Color("#e8e6dc"))
+	_sign(n6, "MAT ROOM", Vector3(6.0, 1.6, sz - 0.03), PI, Color("#e8e6dc"))
 
 
 func _sign(parent: Node3D, text: String, pos: Vector3, rot_y: float, col: Color, px := 36) -> Label3D:

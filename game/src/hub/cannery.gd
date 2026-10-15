@@ -42,17 +42,21 @@ static func _restore_speed() -> void:
 	Engine.time_scale = 1.0
 
 
-## The fighter the player walks with: explicit > Locker loadout > last Fight Camp run > roster.
+## The fighter the player walks with: explicit > Locker loadout > last Fight Camp run > the default
+## roster fighter. Always a ROSTER fighter ("f_..."; the dev biped only when no roster is installed),
+## preferring kits the campaign can use (parse cleanly) over ones still being authored.
 static func pick_fighter(state: HubState, wanted := "") -> String:
 	for cand in [wanted, state.loadout_fighter(), str(state.last_run().get("fighter", ""))]:
 		var cid := str(cand)
-		if cid != "" and Content.creature(cid) != null and Content.get_entry("creatures", cid).size() > 0:
+		if cid.begins_with("f_") and Content.creature(cid) != null and Content.get_entry("creatures", cid).size() > 0:
 			return cid
-	if Content.creature(Tutorial.DEFAULT_FIGHTER) != null:
-		return Tutorial.DEFAULT_FIGHTER
 	var roster := Content.playable_creatures().filter(func(c): return str(c).begins_with("f_"))
-	if not roster.is_empty():
-		return str(roster[0])
+	var usable := roster.filter(func(c): return not CampaignCatalog.shared().resolver.usable_entry(str(c)).is_empty())
+	for pool in [usable, roster]:
+		if (pool as Array).has(Tutorial.DEFAULT_FIGHTER):
+			return Tutorial.DEFAULT_FIGHTER
+		if not (pool as Array).is_empty():
+			return str((pool as Array)[0])
 	var any := Content.playable_creatures()
 	return str(any[0]) if not any.is_empty() else "dev_biped"
 

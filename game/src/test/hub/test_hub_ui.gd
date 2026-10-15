@@ -262,7 +262,7 @@ func test_first_secret_unlocks_confidant() -> void:
 		return
 	var f := sc.player()
 	# secret #4: taunt at the belt case three times, then try the case
-	sc.mode.teleport(f, Vector3(-3.4, 0, 11.3), PI)
+	sc.mode.teleport(f, HubLayout.BELT_CASE_POS + Vector3(0, 0, 1.1), PI)
 	await wait_physics(30)
 	var s0 := sc.sim.event_seq
 	for i in 3:

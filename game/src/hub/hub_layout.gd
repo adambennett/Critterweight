@@ -29,18 +29,18 @@ const SPACES := {
 	"loading_dock": {"name": "Loading Dock", "rect": Rect2(-10, -18.6, 20, 10.6), "floor": 0.0, "height": 0.0, "room": "dock", "area": "cannery", "exterior": true,
 		"cam": [56.0, 11.5, 90.0], "arrive": [Vector3(0.0, 0, -10.2), 0.0], "landmark": "the chum cannon"},
 	"locker_room": {"name": "Locker Room", "rect": Rect2(-12, 8, 12, 8), "floor": 0.0, "height": 3.5, "room": "locker", "area": "cannery",
-		"cam": [58.0, 8.5, 180.0], "arrive": [Vector3(-7.0, 0, 9.6), 0.0], "landmark": "the belt case"},
+		"cam": [58.0, 8.5, 180.0], "arrive": [Vector3(-7.0, 0, 10.4), 0.0], "landmark": "the belt case"},
 	"office": {"name": "Commissioner's Office", "rect": Rect2(6, 8, 8, 6), "floor": 4.0, "height": 3.0, "room": "office", "area": "cannery",
-		"cam": [58.0, 8.0, 180.0], "arrive": [Vector3(10.5, 4.0, 9.4), 0.0], "landmark": "Snappington's desk"},
+		"cam": [58.0, 8.0, 180.0], "arrive": [Vector3(10.5, 4.0, 9.9), 0.0], "landmark": "Snappington's desk"},
 	"booth": {"name": "Broadcast Booth", "rect": Rect2(0, 8, 6, 4), "floor": 3.0, "height": 2.6, "room": "booth", "area": "cannery",
-		"cam": [60.0, 7.0], "arrive": [Vector3(0.9, 3.0, 10.8), 90.0], "landmark": "the ON AIR sign"},
+		"cam": [60.0, 7.0], "arrive": [Vector3(2.1, 3.0, 10.9), 90.0], "landmark": "the ON AIR sign"},
 	"boiler_room": {"name": "Boiler Room", "rect": Rect2(40, -5, 14, 10), "floor": 0.0, "height": 4.0, "room": "boiler", "area": "basement",
-		"cam": [57.0, 9.5], "arrive": [Vector3(42.0, 0, 3.2), 90.0], "landmark": "the boiler"},
+		"cam": [57.0, 9.5], "arrive": [Vector3(42.7, 0, 3.0), 90.0], "landmark": "the boiler"},
 	"roof": {"name": "The Roof", "rect": Rect2(40, -36, 16, 12), "floor": 0.0, "height": 0.0, "room": "roof", "area": "roof", "exterior": true, "secret": true,
-		"cam": [48.0, 11.5], "arrive": [Vector3(42.2, 0, -25.6), 180.0], "landmark": "the GLANDCO sign"},
+		"cam": [48.0, 11.5], "arrive": [Vector3(42.4, 0, -26.3), 180.0], "landmark": "the GLANDCO sign"},
 	"pier": {"name": "The Pier", "rect": Rect2(20, -44, 8, 4), "floor": 0.0, "height": 0.0, "room": "dock", "area": "pier", "exterior": true, "secret": true,
-		"cam": [55.0, 8.0], "arrive": [Vector3(21.2, 0, -41.0), 90.0], "landmark": "the fishing rod"},
-	"crawlspace": {"name": "The Crawlspace", "rect": Rect2(-15.4, 4.1, 3.4, 1.6), "floor": 0.0, "height": 2.1, "room": "locker", "area": "cannery", "secret": true,
+		"cam": [55.0, 8.0], "arrive": [Vector3(22.2, 0, -42.0), 90.0], "landmark": "the fishing rod"},
+	"crawlspace": {"name": "The Crawlspace", "rect": Rect2(-15.4, 3.7, 3.4, 2.4), "floor": 0.0, "height": 2.1, "room": "locker", "area": "cannery", "secret": true,
 		"cam": [62.0, 7.0], "arrive": [Vector3(-12.9, 0, 4.9), 270.0], "landmark": "a jar on a shelf"},
 }
 
@@ -60,13 +60,13 @@ const DOORS := [
 ## Interaction-driven transitions (hatch, ladders, elevator): a short fade, then the fighter is
 ## placed at `to` facing `yaw`. `needs` names a world condition (HubMode.condition()).
 const TRANSITIONS := {
-	"hatch_down": {"from": Vector3(6.5, 0, 6.9), "to": Vector3(42.0, 0, 3.2), "yaw": 90.0, "space": "main_floor", "dest": "boiler_room", "prompt": "Climb down the hatch"},
+	"hatch_down": {"from": Vector3(6.5, 0, 6.9), "to": Vector3(42.7, 0, 3.0), "yaw": 90.0, "space": "main_floor", "dest": "boiler_room", "prompt": "Climb down the hatch"},
 	"hatch_up": {"from": Vector3(41.2, 0, 4.0), "to": Vector3(6.5, 0, 6.1), "yaw": 180.0, "space": "boiler_room", "dest": "main_floor", "prompt": "Climb up to the Main Floor"},
-	"ladder_up": {"from": Vector3(-0.9, 0, 10.2), "to": Vector3(0.9, 3.0, 10.8), "yaw": 90.0, "space": "locker_room", "dest": "booth", "prompt": "Climb the ladder to the booth"},
-	"ladder_down": {"from": Vector3(0.6, 3.0, 11.3), "to": Vector3(-1.4, 0, 10.6), "yaw": 270.0, "space": "booth", "dest": "locker_room", "prompt": "Climb down to the Locker Room"},
-	"elevator_up": {"from": Vector3(10.5, 0, -6.6), "to": Vector3(42.2, 0, -25.6), "yaw": 180.0, "space": "main_floor", "dest": "roof", "prompt": "Ride the freight elevator up", "needs": "elevator_fixed"},
+	"ladder_up": {"from": Vector3(-0.9, 0, 10.2), "to": Vector3(2.1, 3.0, 10.9), "yaw": 90.0, "space": "locker_room", "dest": "booth", "prompt": "Climb the ladder to the booth"},
+	"ladder_down": {"from": Vector3(0.6, 3.0, 11.3), "to": Vector3(-2.0, 0, 11.4), "yaw": 270.0, "space": "booth", "dest": "locker_room", "prompt": "Climb down to the Locker Room"},
+	"elevator_up": {"from": Vector3(10.5, 0, -6.6), "to": Vector3(42.4, 0, -26.3), "yaw": 180.0, "space": "main_floor", "dest": "roof", "prompt": "Ride the freight elevator up", "needs": "elevator_fixed"},
 	"elevator_down": {"from": Vector3(41.6, 0, -24.9), "to": Vector3(10.4, 0, -4.6), "yaw": 180.0, "space": "roof", "dest": "main_floor", "prompt": "Ride the elevator down"},
-	"pier_down": {"from": Vector3(-7.1, 0, -17.8), "to": Vector3(21.2, 0, -41.0), "yaw": 90.0, "space": "loading_dock", "dest": "pier", "prompt": "Climb down the pier ladder", "needs": "pier_revealed"},
+	"pier_down": {"from": Vector3(-7.1, 0, -17.8), "to": Vector3(22.2, 0, -42.0), "yaw": 90.0, "space": "loading_dock", "dest": "pier", "prompt": "Climb down the pier ladder", "needs": "pier_revealed"},
 	"pier_up": {"from": Vector3(20.6, 0, -40.6), "to": Vector3(-7.1, 0, -16.9), "yaw": 180.0, "space": "pier", "dest": "loading_dock", "prompt": "Climb up to the dock"},
 }
 
@@ -75,25 +75,25 @@ const TRANSITIONS := {
 const NAV := {
 	"mf_center": Vector3(-4.0, 0, -0.6), "mf_mats_s": Vector3(-4.0, 0, 1.8), "mf_north": Vector3(0.0, 0, -6.4),
 	"mf_west": Vector3(-8.4, 0, -3.6), "mf_west_door": Vector3(-10.9, 0, -4.0), "mf_granny": Vector3(-8.0, 0, -4.6),
-	"mf_bag3": Vector3(-8.8, 0, 3.6), "mf_panel": Vector3(-11.3, 0, 4.4),
+	"mf_bag3": Vector3(-8.6, 0, 3.0), "mf_panel": Vector3(-11.0, 0, 3.9),
 	"mf_east": Vector3(7.8, 0, -2.5), "mf_east_door": Vector3(10.9, 0, -2.5), "mf_cage_gate": Vector3(-0.2, 0, -1.4),
 	"mf_cage_in": Vector3(3.6, 0, -1.4), "mf_ne": Vector3(7.9, 0, -6.0), "mf_elevator": Vector3(10.5, 0, -6.6),
-	"mf_south_door": Vector3(-7.0, 0, 6.6), "mf_sw": Vector3(-7.0, 0, 3.4), "mf_stairs_bottom": Vector3(-3.4, 0, 6.7),
-	"mf_stairs_mid": Vector3(3.0, 2.0, 6.7), "mf_stairs_top": Vector3(8.6, 4.0, 6.7), "mf_landing": Vector3(10.5, 4.0, 6.8),
+	"mf_south_door": Vector3(-7.0, 0, 6.6), "mf_sw": Vector3(-7.0, 0, 3.4), "mf_stairs_bottom": Vector3(-3.4, 0, 6.4),
+	"mf_stairs_mid": Vector3(3.0, 2.0, 6.4), "mf_stairs_top": Vector3(8.6, 4.0, 6.4), "mf_landing": Vector3(10.5, 4.0, 6.6),
 	"mf_under_stairs": Vector3(6.5, 0, 4.8), "mf_hatch": Vector3(6.5, 0, 6.6),
 	"dock_door": Vector3(0.0, 0, -9.8), "dock_center": Vector3(-1.0, 0, -13.4), "dock_west": Vector3(-7.0, 0, -13.6),
 	"dock_east": Vector3(7.2, 0, -13.0), "dock_bench": Vector3(-8.0, 0, -12.2), "dock_crates": Vector3(-6.6, 0, -10.4),
 	"dock_edge": Vector3(-7.1, 0, -17.2), "dock_cannon_sq": Vector3(4.0, 0, -14.4), "dock_forklift": Vector3(7.6, 0, -9.4),
 	"jb_door": Vector3(-13.2, 0, -4.0), "jb_center": Vector3(-16.0, 0, -4.2), "jb_counter": Vector3(-18.7, 0, -4.4),
 	"mb_door": Vector3(13.2, 0, -2.5), "mb_center": Vector3(14.4, 0, -3.4), "mb_doc": Vector3(17.6, 0, -3.4), "mb_bath": Vector3(17.0, 0, -3.3),
-	"lr_door": Vector3(-7.0, 0, 9.3), "lr_center": Vector3(-5.0, 0, 12.0), "lr_case": Vector3(-3.4, 0, 11.6), "lr_ladder": Vector3(-1.2, 0, 10.4),
+	"lr_door": Vector3(-7.0, 0, 9.6), "lr_center": Vector3(-5.0, 0, 12.2), "lr_case": Vector3(-4.8, 0, 11.7), "lr_ladder": Vector3(-1.4, 0, 10.7),
 	"lr_lockers": Vector3(-8.4, 0, 13.8), "lr_wall": Vector3(-10.4, 0, 12.4),
 	"of_door": Vector3(10.5, 4.0, 9.3), "of_center": Vector3(10.0, 4.0, 10.4), "of_cabinet": Vector3(7.4, 4.0, 9.6),
-	"bo_arrive": Vector3(0.9, 3.0, 10.8), "bo_center": Vector3(3.0, 3.0, 10.4), "bo_desk": Vector3(1.4, 3.0, 9.6),
-	"br_arrive": Vector3(42.0, 0, 3.2), "br_center": Vector3(46.4, 0, 1.0), "br_table": Vector3(45.0, 0, -1.4), "br_boiler": Vector3(47.8, 0, -2.0),
+	"bo_arrive": Vector3(2.1, 3.0, 10.9), "bo_center": Vector3(2.2, 3.0, 10.0), "bo_desk": Vector3(1.4, 3.0, 9.6),
+	"br_arrive": Vector3(42.7, 0, 3.0), "br_center": Vector3(46.4, 0, 1.0), "br_table": Vector3(45.0, 0, -1.4), "br_boiler": Vector3(47.8, 0, -2.0),
 	"br_terminal": Vector3(51.8, 0, 3.2),
-	"rf_arrive": Vector3(42.2, 0, -25.6), "rf_center": Vector3(47.5, 0, -30.0), "rf_sign": Vector3(48.0, 0, -33.6), "rf_tower": Vector3(51.0, 0, -28.6),
-	"pr_arrive": Vector3(21.2, 0, -41.0), "pr_center": Vector3(24.0, 0, -42.0), "pr_fish": Vector3(26.0, 0, -42.2),
+	"rf_arrive": Vector3(42.4, 0, -26.3), "rf_center": Vector3(47.5, 0, -30.0), "rf_sign": Vector3(48.0, 0, -33.6), "rf_tower": Vector3(51.0, 0, -28.6),
+	"pr_arrive": Vector3(22.2, 0, -42.0), "pr_center": Vector3(24.0, 0, -42.0), "pr_fish": Vector3(26.0, 0, -42.2),
 	"cs_in": Vector3(-12.9, 0, 4.9), "cs_end": Vector3(-14.5, 0, 4.9),
 }
 
@@ -165,13 +165,13 @@ const INTERACTS := [
 	{"id": "booth_desk", "kind": "service", "service": "booth", "pos": Vector3(4.8, 3.0, 9.6), "r": 1.3, "prompt": "Announcer settings and replay booth"},
 	{"id": "bag_light", "kind": "activity", "activity": "bag", "bag": "light", "pos": Vector3(-8.9, 0, -1.8), "r": 1.0, "prompt": "Start the Light bag challenge (30 s)"},
 	{"id": "bag_heavy", "kind": "activity", "activity": "bag", "bag": "heavy", "pos": Vector3(-8.9, 0, 1.0), "r": 1.0, "prompt": "Start the Heavy bag challenge (30 s)"},
-	{"id": "bag_body", "kind": "activity", "activity": "bag", "bag": "body", "pos": Vector3(-9.0, 0, 4.9), "r": 0.9, "prompt": "Start the Body bag challenge (30 s)"},
+	{"id": "bag_body", "kind": "activity", "activity": "bag", "bag": "body", "pos": Vector3(-8.3, 0, 4.9), "r": 0.9, "prompt": "Start the Body bag challenge (30 s)"},
 	{"id": "chum_cannon", "kind": "activity", "activity": "drill", "pos": Vector3(7.6, 0, -12.4), "r": 1.6, "prompt": "Chum Cannon dodge drill (45 s)"},
 	{"id": "crate_pile", "kind": "activity", "activity": "crates", "pos": Vector3(-6.4, 0, -10.0), "r": 1.6, "prompt": "Crate Toss (10 crates)"},
 	{"id": "vending", "kind": "object", "pos": Vector3(-13.4, 0, -6.6), "r": 1.3, "prompt": "Vending machine"},
 	{"id": "radio", "kind": "object", "pos": Vector3(-18.8, 0, -2.0), "r": 1.2, "prompt": "Juice Bar radio"},
 	{"id": "doc_cot", "kind": "service", "service": "rest_preview", "pos": Vector3(13.8, 0, -5.6), "r": 1.3, "prompt": "Doc's cot (Rest preview)"},
-	{"id": "belt_case", "kind": "secret", "pos": Vector3(-3.4, 0, 11.2), "r": 1.6, "prompt": "The belt case"},
+	{"id": "belt_case", "kind": "secret", "pos": Vector3(-4.8, 0, 11.2), "r": 1.6, "prompt": "The belt case"},
 	{"id": "booth_chair", "kind": "secret", "pos": Vector3(1.4, 3.0, 9.4), "r": 0.9, "prompt": "Reach under the desk"},
 	{"id": "filing_cabinet_2", "kind": "secret", "pos": Vector3(7.3, 4.0, 10.5), "r": 1.0, "prompt": "Rummage in the second filing cabinet"},
 	{"id": "crawl_jar", "kind": "secret", "pos": Vector3(-14.5, 0, 4.9), "r": 1.1, "prompt": "Take the jar off the shelf"},
@@ -207,7 +207,7 @@ const CANNON_POS := Vector3(8.6, 0, -14.4)
 const BAGS := {
 	"light": {"hang": Vector3(-10.3, 2.55, -1.8), "radius": 0.26, "length": 1.0, "bottom": 0.75, "mass": 25.0, "name": "Light bag"},
 	"heavy": {"hang": Vector3(-10.3, 2.55, 1.0), "radius": 0.34, "length": 1.35, "bottom": 0.45, "mass": 60.0, "name": "Heavy bag"},
-	"body": {"hang": Vector3(-10.5, 2.55, 4.9), "radius": 0.38, "length": 1.45, "bottom": 0.35, "mass": 70.0, "name": "Body bag"},
+	"body": {"hang": Vector3(-9.4, 2.55, 4.9), "radius": 0.38, "length": 1.45, "bottom": 0.35, "mass": 70.0, "name": "Body bag"},
 }
 
 ## Practice cage on the Main Floor (a mini-Gullet, octagon apothem 3 m).
@@ -216,11 +216,14 @@ const CAGE_APOTHEM := 3.0
 const CAGE_GATE_SIDE := 3          ## octagon side index of the gate (the west side, see cage_points)
 
 ## Secret spots.
-const PANEL_RECT := Rect2(-12.15, 4.1, 0.3, 1.6)
+const PANEL_RECT := Rect2(-12.15, 3.7, 0.3, 2.4)
+## The stairs to the Office: centre line and width (wide enough for Dredge's claws).
+const STAIRS_Z := 6.4
+const STAIRS_W := 2.9
 const BOILER_POS := Vector3(50.5, 0, -2.0)
 const BOILER_R := 1.5
 const ICE_BATH := Rect2(15.6, -2.15, 2.8, 1.4)     ## inside of the dumpster tub
-const BELT_CASE_POS := Vector3(-3.4, 0, 10.2)
+const BELT_CASE_POS := Vector3(-4.8, 0, 10.2)
 const SIGN_SLOT := Vector3(46.6, 2.9, -35.2)       ## the missing "A" of GL_NDCO
 const PIER_LADDER := Vector3(-7.1, 0, -18.4)
 const ELEVATOR_RECT := Rect2(9.2, -7.8, 2.6, 2.4)
@@ -292,7 +295,7 @@ static func walls() -> Array:
 	var w := []
 	# Main Floor shell (7 m)
 	w.append(_wx(-8.0, -12.0, 12.0, 0.0, 7.0, "brick", [[-2.0, 2.0, 0.0, 4.2, "door"], [-9.5, -6.5, 3.6, 5.6, "window"], [6.5, 9.0, 3.6, 5.6, "window"]], "main_floor"))
-	w.append(_wz(-12.0, -8.0, 8.0, 0.0, 7.0, "brick", [[-5.0, -3.0, 0.0, DOOR_H, "door"], [4.1, 5.7, 0.0, 2.1, "panel"], [1.0, 3.6, 4.6, 6.2, "window"]], "main_floor"))
+	w.append(_wz(-12.0, -8.0, 8.0, 0.0, 7.0, "brick", [[-5.0, -3.0, 0.0, DOOR_H, "door"], [3.7, 6.1, 0.0, 2.2, "panel"], [1.0, 3.6, 4.6, 6.2, "window"]], "main_floor"))
 	w.append(_wz(12.0, -8.0, 8.0, 0.0, 7.0, "brick", [[-3.5, -1.5, 0.0, DOOR_H, "door"], [1.0, 4.0, 4.6, 6.2, "window"]], "main_floor"))
 	w.append(_wx(8.0, -12.0, 12.0, 0.0, 7.0, "brick", [[-8.0, -6.0, 0.0, DOOR_H, "door"], [9.5, 11.5, 4.0, 4.0 + DOOR_H, "door"],
 		[0.3, 5.7, 3.4, 5.3, "glass"], [6.6, 9.0, 5.0, 6.5, "glass"]], "main_floor"))
@@ -317,9 +320,9 @@ static func walls() -> Array:
 	w.append(_wz(14.0, 8.0, 14.0, 0.0, 7.0, "wood_panel", [], "office"))
 	w.append(_wx(14.0, 6.0, 14.0, 0.0, 7.0, "wood_panel", [[8.5, 11.5, 5.0, 6.4, "window"]], "office"))
 	# Crawlspace (secret #2): a 3 m tunnel behind bag 3
-	w.append(_wx(4.1, -15.5, -12.0, 0.0, 2.1, "plank", [], "crawlspace"))
-	w.append(_wx(5.7, -15.5, -12.0, 0.0, 2.1, "plank", [], "crawlspace"))
-	w.append(_wz(-15.5, 4.1, 5.7, 0.0, 2.1, "plank", [], "crawlspace"))
+	w.append(_wx(3.7, -15.5, -12.0, 0.0, 2.2, "plank", [], "crawlspace"))
+	w.append(_wx(6.1, -15.5, -12.0, 0.0, 2.2, "plank", [], "crawlspace"))
+	w.append(_wz(-15.5, 3.7, 6.1, 0.0, 2.2, "plank", [], "crawlspace"))
 	# Boiler Room (basement region)
 	w.append(_wx(-5.0, 40.0, 54.0, 0.0, 4.0, "brick_dark", [], "boiler_room"))
 	w.append(_wx(5.0, 40.0, 54.0, 0.0, 4.0, "brick_dark", [], "boiler_room"))
@@ -357,7 +360,7 @@ static func solids() -> Array:
 	# Locker Room: lockers, bench, belt case
 	s.append({"name": "lockers", "box": AABB(Vector3(-11.6, 0.0, 15.3), Vector3(9.0, 2.0, 0.55)), "style": "lockers"})
 	s.append({"name": "lr_bench", "box": AABB(Vector3(-10.6, 0.0, 10.9), Vector3(2.0, 0.45, 0.45)), "style": "bench"})
-	s.append({"name": "belt_case", "box": AABB(Vector3(-4.0, 0.0, 9.9), Vector3(1.2, 1.3, 0.6)), "style": "case"})
+	s.append({"name": "belt_case", "box": AABB(Vector3(-5.4, 0.0, 9.9), Vector3(1.2, 1.3, 0.6)), "style": "case"})
 	# Office: the Commissioner's desk and her shell behind it, filing cabinet #1
 	s.append({"name": "of_desk", "box": AABB(Vector3(9.2, 4.0, 11.5), Vector3(1.6, 0.8, 0.75)), "style": "none", "visible": false})
 	s.append({"name": "of_snap", "box": AABB(Vector3(9.3, 4.0, 12.4), Vector3(1.4, 1.2, 1.5)), "style": "none", "visible": false})
@@ -400,15 +403,15 @@ static func floors() -> Array:
 		{"name": "boiler_floor", "rect": Rect2(39.5, -5.5, 15, 11), "y": 0.0, "style": "none"},
 		{"name": "roof_floor", "rect": Rect2(39.5, -36.5, 17, 13), "y": 0.0, "style": "none"},
 		{"name": "pier_floor", "rect": Rect2(20, -44, 8, 4), "y": 0.0, "style": "none"},
-		{"name": "landing", "rect": Rect2(8, 5.6, 4, 2.4), "y": 4.0, "style": "none", "thick": 0.35},
+		{"name": "landing", "rect": Rect2(8, 4.95, 4, 3.05), "y": 4.0, "style": "none", "thick": 0.35},
 	]
 
 
 ## Real stairs: a ramp from `a` (bottom centre) to `b` (top centre). The thick part is boxed in.
 static func ramps() -> Array:
 	return [
-		{"name": "stairs_low", "a": Vector3(-2.0, 0.0, 6.725), "b": Vector3(4.0, 2.4, 6.725), "width": 2.25, "thick": 2.4},
-		{"name": "stairs_high", "a": Vector3(4.0, 2.4, 6.725), "b": Vector3(8.0, 4.0, 6.725), "width": 2.25, "thick": 0.35},
+		{"name": "stairs_low", "a": Vector3(-2.0, 0.0, STAIRS_Z), "b": Vector3(4.0, 2.4, STAIRS_Z), "width": STAIRS_W, "thick": 2.4},
+		{"name": "stairs_high", "a": Vector3(4.0, 2.4, STAIRS_Z), "b": Vector3(8.0, 4.0, STAIRS_Z), "width": STAIRS_W, "thick": 0.35},
 	]
 
 
@@ -416,8 +419,8 @@ static func ramps() -> Array:
 static func blockers() -> Array:
 	return [
 		{"name": "dock_edge", "box": AABB(Vector3(-10.0, 0.0, -19.4), Vector3(20.0, 3.0, 0.6))},
-		{"name": "stair_rail", "a": Vector3(-2.0, 0.0, 5.55), "b": Vector3(8.0, 4.0, 5.55), "h": 1.3},
-		{"name": "landing_rail", "box": AABB(Vector3(8.0, 4.0, 5.3), Vector3(4.0, 1.3, 0.3))},
+		{"name": "stair_rail", "a": Vector3(-2.0, 0.0, STAIRS_Z - STAIRS_W * 0.5 - 0.15), "b": Vector3(8.0, 4.0, STAIRS_Z - STAIRS_W * 0.5 - 0.15), "h": 1.3},
+		{"name": "landing_rail", "box": AABB(Vector3(8.0, 4.0, STAIRS_Z - STAIRS_W * 0.5 - 0.3), Vector3(4.0, 1.3, 0.3))},
 		{"name": "roof_edge_n", "box": AABB(Vector3(40.0, 0.0, -36.6), Vector3(16.0, 3.0, 0.6))},
 		{"name": "roof_edge_s", "box": AABB(Vector3(40.0, 0.0, -24.0), Vector3(16.0, 3.0, 0.6))},
 		{"name": "roof_edge_w", "box": AABB(Vector3(39.4, 0.0, -36.0), Vector3(0.6, 3.0, 12.0))},
