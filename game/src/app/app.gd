@@ -159,7 +159,7 @@ func set_scene(n: Node) -> void:
 func resolve_match_config(cfg: Dictionary) -> Dictionary:
 	var out := cfg.duplicate()
 	var a = cfg.get("arena", "the_gullet")
-	out["arena"] = a if a is ArenaDef else Content.arena(str(a))
+	out["arena"] = a if a is ArenaDef else ArenaLibrary.resolve(str(a))   # content first, then saved/imported layouts
 	if out["arena"] == null:
 		out["arena"] = Content.arena("the_gullet")
 	var r = cfg.get("rules", "duel")

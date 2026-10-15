@@ -88,6 +88,8 @@ func build(a: ArenaDef) -> void:
 		_:
 			ArenaSetDressing.build_gullet(_static_root, a, variant, _out)
 	_crowd = _out.get("crowd")
+	if editor_mode:
+		_hide_overhead(_static_root)
 	_crowd_energy = float(variant.get("crowd_energy", 0.3))
 	set_crowd_energy(_crowd_energy)
 	_build_base_hazards()
@@ -465,6 +467,22 @@ func show_markers(names: Array) -> void:
 func set_editor_mode(on: bool) -> void:
 	editor_mode = on
 	_auto_bind = not on
+
+
+## Editor: hides set dressing that sits entirely above head height (trusses, light banks, hooks,
+## gantries) so the top-down editing view stays clear.
+func _hide_overhead(n: Node) -> void:
+	for c in n.get_children():
+		if c is VisualInstance3D and c is Node3D:
+			var vi := c as VisualInstance3D
+			var box := (c as Node3D).global_transform * vi.get_aabb()
+			if box.position.y > 4.6:
+				(c as Node3D).visible = false
+				continue
+		if c is Node3D and not (c is VisualInstance3D) and (c as Node3D).global_position.y > 6.0:
+			(c as Node3D).visible = false
+			continue
+		_hide_overhead(c)
 
 
 static func _set_transparency(n: Node, t: float) -> void:

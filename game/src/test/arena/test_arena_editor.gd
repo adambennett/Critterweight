@@ -119,6 +119,24 @@ func test_save_load_round_trip_and_migration() -> void:
 	check(not bool(ArenaLibrary.load_layout(bad)["ok"]), "corrupt layout rejected")
 
 
+func test_saved_layouts_are_playable_in_normal_matches() -> void:
+	var m := _model("layout_crusher_king")
+	m.id = "user:zz_resolve_%d" % Time.get_ticks_usec()
+	m.name = "Resolve Test"
+	var sv := ArenaLibrary.save_layout(m.to_dict())
+	check(bool(sv["ok"]), "saved to the user arenas folder")
+	var cfg := App.resolve_match_config({"arena": m.id, "rules": {"mode": "standard", "rounds": 1}, "fighters": [{"creature": "dev_biped", "team": 0}, {"creature": "dev_biped", "team": 1}], "seed": 3})
+	var a: ArenaDef = cfg["arena"]
+	check(a != null and a.id == m.id, "App resolves a saved layout id for a normal match")
+	check_eq(a.props.size(), m.to_arena().props.size(), "with its props")
+	var listed := false
+	for e in ArenaLibrary.playable_arenas():
+		if str(e["id"]) == m.id and str(e["source"]) == "user":
+			listed = true
+	check(listed, "offered next to the shipped arenas")
+	Saves.delete_save(str(sv["path"]))
+
+
 func test_package_export_import_round_trip() -> void:
 	var dir := temp_dir("arena_pkg")
 	var install := temp_dir("arena_pkg_install")
