@@ -52,6 +52,9 @@ func run(sim: MatchSim, seconds: float, key := "") -> Dictionary:
 	var cursor := 0
 	var f0 := sim.fighters[0]
 	var f1 := sim.fighters[1]
+	# step in phase with physics no matter where the caller was (as TestCase.step_sim does)
+	if not Engine.is_in_physics_frame():
+		await get_tree().physics_frame
 	for i in n:
 		sim.step(dt)
 		await get_tree().physics_frame
