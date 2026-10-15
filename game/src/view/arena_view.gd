@@ -408,30 +408,26 @@ func set_crowd_energy(v: float) -> void:
 
 
 func _build_prop(p: Dictionary) -> Node3D:
-	var def: Dictionary = ArenaBuilder.PROP_TYPES.get(p["type"], {})
+	var def := ArenaCatalog.prop(str(p["type"]))
 	var n := Node3D.new()
 	n.name = "PropView_" + str(p["type"])
 	add_child(n)
 	if def.is_empty():
 		return n
-	var sc: float = p["scale"]
 	var mi := MeshInstance3D.new()
-	var colors := {"crate": Color("#a8743a"), "barrel": Color("#3b6ea8"), "pillar": Color("#6d6875"), "low_wall": Color("#8d8a86"),
-		"bumper": Color("#ff5d8f"), "tire_stack": Color("#2a2a2e"), "turnbuckle": Color("#c23a2b"), "bench": Color("#7a5230")}
-	var col: Color = colors.get(p["type"], Color.GRAY)
-	var h := 1.0
-	if def["shape"] == "box":
+	var col := Color("#8d8a86")
+	var s := ArenaCatalog.footprint_size(p, def)
+	var h := maxf(0.05, float(def["height"]))
+	if ArenaCatalog.footprint_shape(def) == "box":
 		var bm := BoxMesh.new()
-		bm.size = MathX.vec3(def["size"]) * sc
+		bm.size = Vector3(s.x, h, s.y)
 		mi.mesh = bm
-		h = bm.size.y
 	else:
 		var cm := CylinderMesh.new()
-		cm.top_radius = float(def["radius"]) * sc
-		cm.bottom_radius = float(def["radius"]) * sc
-		cm.height = float(def["height"]) * sc
+		cm.top_radius = s.x * 0.5
+		cm.bottom_radius = s.x * 0.5
+		cm.height = h
 		mi.mesh = cm
-		h = cm.height
 	var m := Materials.toon(col, 0.7, 0.0, 0.3)
 	mi.material_override = m
 	n.add_child(mi)

@@ -19,6 +19,9 @@ extends RefCounted
 
 const BASES := ["octagon", "square", "circle", "platform"]   ## legacy shape bases
 const LEGACY_THEME_STYLE := {"can": "gullet", "rooftop": "rooftop", "scrapyard": "crusher", "sewer": "drydock"}
+## Format-1 free-form prop names mapped onto the catalog at parse time.
+const LEGACY_PROPS := {"crate": "prop_crate", "barrel": "prop_brine_barrel", "pillar": "prop_bollard", "low_wall": "prop_sponsor_board",
+	"bumper": "prop_bumper", "tire_stack": "prop_tire_stack", "turnbuckle": "prop_bollard", "bench": "prop_crate"}
 const FORMAT := 2
 const RINGOUT_DEFAULTS := {"damage_frac": 0.08, "out_time": 2.5, "invuln": 1.0, "fall_y": -1.2}
 
@@ -144,7 +147,8 @@ static func from_dict(d: Dictionary, src := "") -> ArenaDef:
 
 
 static func _parse_prop(p: Dictionary, fallback_id: String) -> Dictionary:
-	var out := {"type": str(p.get("type", "")), "pos": MathX.vec3(p.get("pos", [0, 0, 0])),
+	var t := str(p.get("type", ""))
+	var out := {"type": str(LEGACY_PROPS.get(t, t)), "pos": MathX.vec3(p.get("pos", [0, 0, 0])),
 		"yaw": deg_to_rad(float(p.get("yaw", 0.0))), "scale": float(p.get("scale", 1.0)),
 		"params": (p.get("params", {}) as Dictionary).duplicate(true) if typeof(p.get("params", {})) == TYPE_DICTIONARY else {},
 		"id": str(p.get("id", fallback_id)), "builtin": false}

@@ -157,6 +157,7 @@ func step(dt: float) -> void:
 		f.sim_tick(dt)
 	combat.detect_hits()
 	effects.update(dt)
+	ArenaHazards.step(self, dt)   # arena hazards/props/ring-outs (src/sim/arena_hazards.gd)
 	_environment_checks()
 	if mode and not is_finished:
 		mode.tick(dt)
