@@ -47,6 +47,19 @@ func _episodes(run: String) -> int:
 	return int(LabManager.progress(run).get("episodes", 0))
 
 
+## Regression: a helper rewrites its heartbeat file atomically (remove + rename on Windows); a
+## stat inside that window fails (time 0) and used to make the coordinator drop a live helper.
+func test_helper_heartbeat_rule() -> void:
+	var h := {"pid": 1, "alive": true, "started_ms": 1000}
+	check(LabBatch.heartbeat_ok(h, 0, 5000, 2000), "no heartbeat yet: within the startup grace")
+	check(not LabBatch.heartbeat_ok(h.duplicate(), 0, 5000, 1001 + LabBatch.STARTUP_TIMEOUT_MS), "no heartbeat after the startup grace: gone")
+	check(LabBatch.heartbeat_ok(h, 5000, 5001, 3000), "fresh heartbeat")
+	check(LabBatch.heartbeat_ok(h, 0, 5005, 3000), "a failed stat while the helper rewrites its file is not a missed heartbeat")
+	check(LabBatch.heartbeat_ok(h, 4990, 5010, 3000), "an older file time never replaces a newer one")
+	check_eq(int(h["hb_s"]), 5000, "newest heartbeat kept")
+	check(not LabBatch.heartbeat_ok(h, 0, 5001 + LabBatch.HEARTBEAT_TIMEOUT_S, 3000), "silent for longer than the timeout: gone")
+
+
 func test_pause_resume_cancel() -> void:
 	var run := temp_dir("lab_worker_ctl_%d" % Time.get_ticks_usec())
 	_job(run, {})
@@ -123,6 +136,8 @@ func test_es_improves_on_the_drill_task() -> void:
 	check(fits.size() == 12, "12 generations recorded")
 	if fits.size() >= 6:
 		check(LabStats.mean(fits.slice(-3)) > LabStats.mean(fits.slice(0, 3)), "population fitness rose (%s)" % str(fits))
+	var pr := LabManager.progress(run)
+	check_eq(int(pr.get("reassigned", -1)), 0, "the helper process kept its share of every generation")
 	var pol := PolicyIO.read_file(run.path_join("best.policy.json"))
 	check(pol["ok"], "trained policy saved and valid")
 	if pol["ok"]:

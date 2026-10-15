@@ -27,11 +27,12 @@ UiTheme text styles, so the text-size and UI-scale settings apply to it.
    simulated time and speed, episodes/hour, workers alive, coordinator CPU utilisation and
    memory, current and best metrics, a learning curve (population reward and validation reward
    for ES; train/validation loss and accuracy for BC), the checkpoint list and the evaluation
-   report. Buttons: Pause, Resume, Cancel (keeps the checkpoint), *Resume after stop/crash*,
-   *Save snapshot policy* (current best network into the library), Delete run (press twice).
+   report. Buttons: Pause, Resume, Cancel (keeps the checkpoint), *Continue run* (after a
+   stop, cancel or crash, from the newest checkpoint), *Save snapshot* (current best network
+   into the library), Delete run (press twice).
 3. **Policies** — the library (built-in + yours; invalid files are listed with the reason).
    Rename, Export to a file, Import (validation errors are shown), Delete (press twice),
-   *Evaluate vs baselines* (runs a separate evaluation job), **Fight this bot** (you vs the
+   *Open policy folder*, *Evaluate vs baselines* (runs a separate evaluation job), **Fight this bot** (you vs the
    policy, choose your fighter) and **Spectate this bot** (policy vs a bot tier, a scripted
    drill or another policy).
 4. **Recording** — *Record my matches for imitation learning* (off by default): while on, every
@@ -40,7 +41,7 @@ UiTheme text styles, so the text-size and UI-scale settings apply to it.
 
 The game never trains in its own process, so menus stay responsive (measured while a worker
 trains: see `docs/evidence/lab/README.md`). Closing the game stops workers at their last
-checkpoint ("interrupted"); *Resume after stop/crash* continues. When a completed run shows a
+checkpoint ("interrupted"); *Continue run* picks them up again. When a completed run shows a
 trained policy beating its baseline on held-out evaluation, the Lab unlocks the *Mad Scientist*
 achievement (`Platform.unlock_achievement("ach_mad_scientist")`).
 
@@ -220,7 +221,9 @@ per process (so workers never write the player's profile or settings).
 
 Rank 0 (coordinator) spawns `limits.workers − 1` helper processes, runs the job, distributes
 episodes through `gen/task_*.json` / `result_*.json`, and re-runs the share of a helper that dies
-or stops heart-beating. Helpers exit when the coordinator is gone.
+or stops heart-beating (helpers rewrite `gen/hb_r<k>.json` every second; silence for 20 s means
+gone, and a helper that heart-beats again gets work from the next batch). Helpers exit when the
+coordinator is gone. A crashed or stalled helper therefore costs time, never results.
 
 Job file (all fields optional except where noted; defaults in `src/lab/lab_job.gd`):
 

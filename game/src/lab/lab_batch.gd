@@ -102,16 +102,29 @@ func alive_helpers() -> Array:
 ## so a stat can momentarily fail; that must not count as a missed heartbeat.
 func _helper_alive(r: int) -> bool:
 	var h: Dictionary = helpers[r]
-	if not OS.is_process_running(int(h["pid"])):
-		return false
-	var hb := gen_dir.path_join("hb_r%d.json" % r)
-	var mt := int(FileAccess.get_modified_time(hb)) if FileAccess.file_exists(hb) else 0
-	if mt > int(h.get("hb_s", 0)):
-		h["hb_s"] = mt
+	var now_ms := Time.get_ticks_msec()
+	if h.has("checked_ms") and now_ms - int(h["checked_ms"]) < 250:
+		return bool(h["last_ok"])   # poll() asks every frame; the file system is asked 4x a second
+	h["checked_ms"] = now_ms
+	var ok := OS.is_process_running(int(h["pid"]))
+	if ok:
+		var hb := gen_dir.path_join("hb_r%d.json" % r)
+		var mt := int(FileAccess.get_modified_time(hb)) if FileAccess.file_exists(hb) else 0
+		ok = heartbeat_ok(h, mt, int(Time.get_unix_time_from_system()), now_ms)
+	h["last_ok"] = ok
+	return ok
+
+
+## The heartbeat rule on its own (tested directly): keeps the newest heartbeat file time in
+## h["hb_s"], so a failed stat (0) never replaces a good one. Fresh = at most
+## HEARTBEAT_TIMEOUT_S old; before its first heartbeat a helper has STARTUP_TIMEOUT_MS.
+static func heartbeat_ok(h: Dictionary, mtime: int, now_s: int, now_ms: int) -> bool:
+	if mtime > int(h.get("hb_s", 0)):
+		h["hb_s"] = mtime
 	var last := int(h.get("hb_s", 0))
 	if last <= 0:
-		return Time.get_ticks_msec() - int(h["started_ms"]) < STARTUP_TIMEOUT_MS
-	return int(Time.get_unix_time_from_system()) - last <= HEARTBEAT_TIMEOUT_S
+		return now_ms - int(h.get("started_ms", 0)) < STARTUP_TIMEOUT_MS
+	return now_s - last <= HEARTBEAT_TIMEOUT_S
 
 
 func submit(p_items: Array, p_payload: Dictionary) -> void:
