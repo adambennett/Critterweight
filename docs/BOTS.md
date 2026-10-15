@@ -53,12 +53,13 @@ evenly across that threshold (measured: a Headliner at 0.13 s beat a 0.22 s Cont
 * **Strings.** Decided once per Light, after its hit frames: better players continue what lands (or what the
   next hit of the string can still reach — Dozer's Hoof Stomp after a Light that sails past at point blank)
   and stop a blocked or whiffed string; worse ones press on regardless.
-* **Reads (`read`).** Spotting a **button-masher** (≥ 5 attacks begun in 2 s, mostly Lights, and no guard or
-  dodge for 3 s — a quick fighter who also defends is not one): block the stream, time parry taps on the
-  pattern of his hits (the gap after each move, learned from what it saw), blow through it with a move whose
-  armor covers Lights from its first frame (Dozer's and Dredge's Heavies), use kit tools gated by the
-  `target_mashing` hint condition (Dozer's Dust Bowl), step back out of the pocket when too close for its own
-  strikes, and do not trade with him in neutral — wait for the openings his stream gives. **Charge-ups:** a Heavy held in its wind-up (the move time it sees stands still) is not
+* **Reads (`read`).** **Pressure** (≥ 5 attacks begun in the last 2 s it saw, mostly Lights — from a masher or
+  a fast bot): a fuller guard, parry taps on the pattern of the hits (the gap after each move, learned from
+  what it saw, aimed at when those hits have been reaching it), a move whose armor covers Lights from its first
+  frame (Dozer's and Dredge's Heavies), kit tools gated by the `target_mashing` hint condition (Dozer's Dust
+  Bowl), a step back out of the pocket when too close for its own strikes. A **button-masher** — pressure from
+  someone not seen guarding or dodging for 8 s (any bot defends sooner) — is also not traded with in neutral
+  (the reader waits for the openings his stream gives) and is misread less often (mistakes × (1 − read/2)). **Charge-ups:** a Heavy held in its wind-up (the move time it sees stands still) is not
   parry-tapped (its release cannot be timed) but grabbed (a grab beats charge armor) or stepped away from.
   Winded readers sidestep Heavies instead of blocking them (a blocked Heavy below 20 stamina breaks the
   guard).

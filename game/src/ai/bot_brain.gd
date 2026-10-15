@@ -24,14 +24,14 @@ const PROFILES := {
 	"regular": {"reaction": 0.36, "think": 0.14, "aggression": 0.55, "block": 0.35, "parry": 0.05, "dodge": 0.12,
 		"combo": 0.5, "ability": 0.45, "grab": 0.18, "mistake": 0.18, "spacing": 0.5, "juice": 0.75, "wake": 0.6, "mash_escape": 0.6,
 		"punish": 0.25, "read": 0.3, "heavy": 0.28},
-	"pro": {"reaction": 0.26, "think": 0.1, "aggression": 0.62, "block": 0.55, "parry": 0.25, "dodge": 0.22,
+	"pro": {"reaction": 0.25, "think": 0.1, "aggression": 0.62, "block": 0.55, "parry": 0.25, "dodge": 0.22,
 		"combo": 0.75, "ability": 0.65, "grab": 0.28, "mistake": 0.1, "spacing": 0.75, "juice": 0.9, "wake": 0.4, "mash_escape": 0.85,
 		"punish": 0.5, "read": 0.45, "heavy": 0.28},
-	"champion": {"reaction": 0.16, "think": 0.07, "aggression": 0.66, "block": 0.75, "parry": 0.4, "dodge": 0.3,
+	"champion": {"reaction": 0.15, "think": 0.07, "aggression": 0.66, "block": 0.75, "parry": 0.4, "dodge": 0.3,
 		"combo": 0.9, "ability": 0.8, "grab": 0.35, "mistake": 0.05, "spacing": 0.92, "juice": 1.0, "wake": 0.25, "mash_escape": 1.0,
 		"punish": 0.75, "read": 0.75, "heavy": 0.28},
 	# Hall-of-Famer (CAMPAIGN.md difficulty tiers): the quickest reads, near-flawless, reads charge-ups
-	"hall_of_famer": {"reaction": 0.1, "think": 0.04, "aggression": 0.75, "block": 1.0, "parry": 0.55, "dodge": 0.36,
+	"hall_of_famer": {"reaction": 0.09, "think": 0.04, "aggression": 0.75, "block": 1.0, "parry": 0.55, "dodge": 0.36,
 		"combo": 1.0, "ability": 0.85, "grab": 0.38, "mistake": 0.01, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0,
 		"punish": 1.0, "read": 1.0, "heavy": 0.28},
 }
@@ -822,12 +822,20 @@ func _jitter() -> float:
 	return rng.randfn(0.0, float(p["reaction"]) * 0.15)
 
 
-## True while the target throws attacks non-stop and never defends (>= 5 begun in the last 2 s of
-## what it saw, mostly Lights, and no guard or dodge seen for 3 s): a button-masher. A quick
-## fighter's strings alone are not mashing - a player who also guards is reading the fight.
+## A fighter that guards or dodges at all does so within this many seconds; a masher never does.
+const MASHER_NO_DEFENCE := 8.0
+
+
+## True while the target throws attacks non-stop and never defends (pressure, and no guard or
+## dodge seen for MASHER_NO_DEFENCE s): a button-masher. A quick fighter's strings alone are not
+## mashing - a player who also defends is reading the fight, and is traded with as usual.
 func _mashing() -> bool:
-	if _t - _seen_defend_t < 3.0:
-		return false
+	return _t - _seen_defend_t >= MASHER_NO_DEFENCE and _pressured()
+
+
+## True while the target throws attacks non-stop (>= 5 begun in the last 2 s of what it saw,
+## mostly Lights): pressure, answered with a fuller guard, pattern taps and armored blow-throughs.
+func _pressured() -> bool:
 	var n := 0
 	var lights := 0
 	var since := _t - float(p["reaction"]) - 2.0
@@ -914,7 +922,7 @@ func _react(f: Fighter, tgt: Fighter, per: Dictionary, attacking: bool, dist: fl
 func _choose_answer(f: Fighter, tgt: Fighter, per: Dictionary, info: Dictionary, eta: float, over: float, dist: float, dir: Vector3) -> String:
 	var heavyish := str(info["cls"]) in ["heavy", "ability", "juice"]
 	var light := str(info["cls"]) == "light"
-	var mash := _mashing() and _pv("read") > 0.0
+	var mash := _pressured() and _pv("read") > 0.0
 	if _kit_ability(f, tgt, dist, dir, per, true):   # kit hint: reactive abilities (counters, armor)
 		return "counter"
 	var sidestep := not (light and mash and rng.randf() < _pv("read"))   # a read masher is blocked, not sidestepped
@@ -1166,9 +1174,9 @@ func _toward(from: Vector3, to: Vector3) -> Vector3:
 #       within this many metres beyond the target, on the line from this fighter), target_down,
 #       target_cornered (target within 1.3 m of a wall), target_closing (distance shrank since the
 #       last think), projectile_incoming (an enemy projectile within 4 m flying at this fighter),
-#       in_enemy_zone, self_juiced, target_mashing (the bot reads a button-masher: attacks begun
-#       non-stop; only as often as its "read" skill), chance (this alternative only fires with
-#       that probability).
+#       in_enemy_zone, self_juiced, target_mashing (the bot reads the target pressing attacks
+#       non-stop, a button-masher's habit; only as often as its "read" skill), chance (this
+#       alternative only fires with that probability).
 #       Reactive conditions (target_heavy / target_winding) are also checked while defending.
 #       Optional "stick": "away" | "toward" commits the stick for 0.35 s when the ability fires
 #       (blinks / dives that travel along the stick).
@@ -1306,7 +1314,7 @@ func _kit_when(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Diction
 				if f.has_flag("juiced") != bool(v):
 					return false
 			"target_mashing":
-				if (_pv("read") > 0.0 and _mashing() and rng.randf() < _pv("read")) != bool(v):
+				if (_pv("read") > 0.0 and _pressured() and rng.randf() < _pv("read")) != bool(v):
 					return false
 			"chance":
 				if rng.randf() >= float(v):
