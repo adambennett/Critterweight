@@ -96,7 +96,14 @@ a defeat flagged `abandoned`. `RunController.phase()` is the single source of tr
   chosen difficulty takes. Dose records, Dose badges/cosmetics, `best_dose`, ladder progress and
   `ach_fully_dosed` are credited only when the run's Dose is within the crediting profile's cap;
   otherwise the report carries `dose_ineligible` (the clear itself, fighter title and history
-  still count) and the summary card says why.
+  still count) and the summary card says why. The Dose cosmetics (badges, the alternate announcer
+  jacket, Lethal Dose badge/chant) are the track Fight Camp shares with Off the Street: a Fight Camp
+  card's Dose clears count toward it only once the profile owns the Cannery's **Title Contender**
+  (`meta_title_contender`, `CampaignProgression.title_contender`); without it they stay on the Camp
+  board and the report carries `dose_cosmetics_need: "meta_title_contender"`.
+* **Saved builds** (`profile.campaign.saved_builds`, newest first): every credited run saves its
+  fighter, techniques and supplements; the AI Lab trains against them with the Cannery's Boiler
+  Room Key (docs/AI_LAB.md §4).
 * **Difficulty presets** (`ladder/difficulty.json`): Sparring, Amateur, Contender, Title Shot —
   enemy HP/damage, bot tier, reward multipliers, rest heal; Sparring records on its own board and
   disallows Doses. Bot tiers: `punching_bag … hall_of_famer` map to BotBrain profiles.

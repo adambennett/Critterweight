@@ -232,7 +232,8 @@ func _update_scrapling(dt: float) -> void:
 
 
 func _update_pet(dt: float, player_pos: Vector3) -> void:
-	var on := mode.state.has_cosmetic("hub_pet_blister") and mode.state.cosmetic_in("pet") != "none"
+	# follows you only while it is your pet (the locker's "None" clears the slot)
+	var on := mode.state.has_cosmetic("hub_pet_blister") and mode.state.cosmetic_in("pet") == "hub_pet_blister"
 	pet.visible = on
 	if not on:
 		_pet_pos = player_pos

@@ -20,11 +20,44 @@ const PRESETS := {
 		"help": "The two easiest shipped bot tiers, full rules."},
 	"bots_high": {"name": "Bots: Pro + Champion", "opponents": ["bot_pro", "bot_champion"], "round_time": 30.0, "spawn": "standard", "dist": [3.0, 3.6], "arena": "the_gullet",
 		"help": "The two hardest bot tiers. Expect slow progress."},
+	# opponents filled from the profile (saved_build_opponents); offered with the Boiler Room Key
+	"my_builds": {"name": "My saved builds", "opponents": [], "round_time": 30.0, "spawn": "standard", "dist": [3.0, 3.6], "arena": "the_gullet",
+		"help": "Your own campaign builds — the fighter, techniques and supplements you finished a run with — piloted by a Pro bot. Unlocked by the Boiler Room Key (Teddy's ledger in the Cannery)."},
 }
+const SAVED_BUILDS_SHOWN := 6
 
 
 static func preset_ids() -> Array:
 	return ["drill_dummy", "drill_patrol", "spar_jabber", "spar_mixed", "bots_low", "bots_high"]
+
+
+## The scenario list the AI Lab offers this profile: the fixed presets, plus "My saved builds" with
+## the Cannery's Boiler Room Key once the profile has a saved build.
+static func preset_ids_for(profile: Dictionary) -> Array:
+	var out := preset_ids()
+	if not saved_build_opponents(profile).is_empty():
+		out.append("my_builds")
+	return out
+
+
+## The Cannery's Boiler Room Key (meta_boiler_room_key, 100 Clout at Teddy's ledger).
+static func boiler_room_key(profile: Dictionary) -> bool:
+	var camp: Dictionary = profile.get("camp", {})
+	return int((camp.get("upgrades", {}) as Dictionary).get("meta_boiler_room_key", 0)) > 0
+
+
+## Opponent kinds for the profile's most recent saved builds (newest first), or [] without the key.
+static func saved_build_opponents(profile: Dictionary) -> Array:
+	if not boiler_room_key(profile):
+		return []
+	var out := []
+	var builds: Array = (profile.get("campaign", {}) as Dictionary).get("saved_builds", [])
+	for b in builds:
+		if typeof(b) == TYPE_DICTIONARY and str((b as Dictionary).get("fighter", "")) != "":
+			out.append(LabOpponents.build_kind(b))
+		if out.size() >= SAVED_BUILDS_SHOWN:
+			break
+	return out
 
 
 static func seed_for(stream: String, job_seed: int, a: int, b := 0) -> int:

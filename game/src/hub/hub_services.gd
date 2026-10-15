@@ -161,11 +161,12 @@ func resume_run() -> Dictionary:
 	return {"ok": true, "error": ""}
 
 
-## The full campaign menu for Fight Camp (suspended runs, the Ledger, co-op lobby).
+## The full campaign menu for Fight Camp (suspended runs, the Ledger, co-op lobby); its Back walks
+## back to Snappington's desk.
 func open_campaign_menu() -> void:
 	Profiles.save()
 	App.set_scene(null)
-	App.goto("campaign_menu", {"variant": "fight_camp"})
+	App.goto("campaign_menu", {"variant": "fight_camp", "from_hub": true})
 
 
 ## Needles' shop preview: a few supplements with their run prices (read-only outside a run).

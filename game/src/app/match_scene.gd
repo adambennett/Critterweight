@@ -135,12 +135,13 @@ func _default_music() -> String:
 func _exit_tree() -> void:
 	if hud and Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.disconnect(hud.subtitle)
-	# A rematch starts the new scene before this one is freed: only tear down shared state
-	# (audio bridge, playback speed) when no newer match has taken over.
+	# A rematch starts the new scene before this one is freed: only reset the playback speed when no
+	# newer match has taken over. The audio is ended only if it is still this match's own (the hub
+	# or a newer match attached theirs before this scene left).
 	var newer := App.current_scene != null and is_instance_valid(App.current_scene) and App.current_scene != self and App.current_scene is MatchScene
 	if not newer:
 		Engine.time_scale = 1.0          # spectator/accessibility speed never leaks out of the match
-		Audio.end_match()
+	Audio.end_match(sim)
 
 
 func _make_view(i: int) -> void:

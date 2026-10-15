@@ -12,9 +12,12 @@ extends RefCounted
 static var last_config := {}
 
 
-static func launch(cfg: Dictionary) -> MatchScene:
+## `on_finished`: what happens when the match ends (default: the results screen). The match scene
+## keeps it (node meta, never a static), so "Restart fight" ends the same way (a Cannery spar walks
+## back into the hub).
+static func launch(cfg: Dictionary, on_finished: Callable = Callable()) -> MatchScene:
 	last_config = cfg.duplicate(true)
-	var scene := App.start_match(cfg)
+	var scene := App.start_match(cfg, on_finished)
 	if scene == null:
 		return null
 	if bool(cfg.get("spectate", false)):
@@ -23,6 +26,15 @@ static func launch(cfg: Dictionary) -> MatchScene:
 		scene.hud_layer.add_child(ov)
 		ov.setup(scene)
 	return scene
+
+
+## The pause menu's "Restart fight": the last launched config again, ending the way the current
+## match would have (its on_finished).
+static func restart() -> MatchScene:
+	var ms := current_match()
+	var cb: Callable = ms.get_meta("on_finished", Callable()) if ms != null else Callable()
+	set_paused(false)
+	return launch(last_config, cb)
 
 
 static func current_match() -> MatchScene:
@@ -45,7 +57,10 @@ static func match_running() -> bool:
 static func is_online() -> bool:
 	var s = App.current_scene
 	if s != null and is_instance_valid(s) and not (s is MatchScene) and not (s is MenuBackdrop):
-		return true
+		# any other non-match scene is a network one, unless it says it is a local world (the
+		# Cannery hub: is_online() false)
+		if not s.has_method("is_online") or bool(s.call("is_online")):
+			return true
 	var ms := current_match()
 	if ms != null and bool(ms.config.get("online", false)):
 		return true
@@ -72,6 +87,8 @@ static func open_pause(notice := "") -> void:
 ## the main menu then installs the menu backdrop (skipped in headless runs).
 static func quit_to_menu() -> void:
 	set_paused(false)
+	# a lesson started from the Cannery must not walk a later main-menu lesson back into the hub
+	Tutorial.clear_exit_route()
 	if current_match() != null:
 		App.set_scene(null)
 	App.goto("main_menu")

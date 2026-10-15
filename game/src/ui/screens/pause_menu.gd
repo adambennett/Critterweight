@@ -127,8 +127,7 @@ func _ask_restart() -> void:
 		[{"label": "Restart", "id": "restart", "danger": true}, {"label": "Cancel", "id": "cancel", "cancel": true, "default": true}],
 		func(id: String) -> void:
 			if id == "restart":
-				MatchFlow.set_paused(false)
-				MatchFlow.launch(MatchFlow.last_config))
+				MatchFlow.restart())
 
 
 func _ask_quit() -> void:
