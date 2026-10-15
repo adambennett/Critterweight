@@ -178,9 +178,11 @@ func missing_seats() -> Array:
 # Member
 # =====================================================================================
 
-## Member: claims this player's seat in the run the host offers. The player must hold that run
-## in its own party save; `my_seat` = the seat the player picked ("" = find it). Returns "" once
-## the claim is on its way (Net seats us, or reports party_claim_failed).
+## Member: claims this player's seat in the run the host offers. A resumed run must be in the
+## player's own party save (its seat is found there); a NEW run (offer info "new") needs none -
+## its seats are the session ids it was dealt with. `my_seat` = the seat the player picked
+## ("" = find it). Returns "" once the claim is on its way (Net seats us, or reports
+## party_claim_failed).
 func claim(my_seat := "") -> String:
 	var pt := Net.party()
 	if pt.is_empty():
