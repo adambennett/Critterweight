@@ -14,10 +14,10 @@ static func make() -> HubArenaDef:
 	a.id = "hub_cannery"
 	a.display_name = "The Cannery"
 	a.base = "square"
-	a.radius = 4.0              # ArenaBuilder floor patch only (inside the Main Floor)
-	a.wall_height = 0.0
-	a.ringout = false
 	a.theme = "concrete"        # footsteps: concrete surface (AudioMatchBridge)
+	# a legacy open square: ArenaBuilder lays only an 8 x 8 m floor patch (inside the Main Floor)
+	# and no walls; the geometry helpers (extent, edges) are initialised like any legacy arena
+	a._setup_legacy({"base": "square", "radius": 4.0, "wall_height": 0.0, "ringout": false})
 	a.spawns = [[Vector3(-4.0, 0.0, -0.5), PI]]
 	a.source = "hub"
 	return a

@@ -177,7 +177,14 @@ func test_bookie_table_and_lab_terminal_for_real() -> void:
 	if App.has_screen("lab"):
 		check(sv.open_lab(), "the AI Lab terminal opens the Lab")
 		await wait_frames(4)
-		check(App.top_screen() != null and App.top_screen().screen_name == "lab", "the Lab screen is up")
+		var lab := App.top_screen()
+		check(lab != null and lab.screen_name == "lab", "the Lab screen is up")
+		if lab != null:
+			lab.on_back()
+			await wait_physics(10)
+			await wait_frames(4)
+			var sc2 := App.current_scene as HubScene
+			check(sc2 != null and sc2.mode.current_space == "boiler_room", "leaving the Lab walks back to the terminal")
 		App.clear_screens()
 		App.set_scene(null)
 	else:

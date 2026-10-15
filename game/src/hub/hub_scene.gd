@@ -628,6 +628,8 @@ func _welcome() -> void:
 			hud.banner("Granny's corner", "Lesson over", "Hands up. Chin down.", 2.4)
 		"tape":
 			hud.banner("Broadcast Booth", "That was 1973", "The Vintage Bellows line pack is yours.", 3.0)
+		"lab":
+			hud.banner("Boiler Room", "Back from the terminal", "", 2.4)
 		"bookie":
 			hud.banner("Boiler Room", "Back from the table", "", 2.4)
 			get_tree().create_timer(0.8).timeout.connect(func() -> void: npc_say("teddy", HubContent.keyed_line("teddy", "bookie_back")))
