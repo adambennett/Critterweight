@@ -76,6 +76,10 @@ func test_no_file_peaks_above_minus_one_dbfs() -> void:
 
 func test_manifest_matches_files_on_disk() -> void:
 	# the report's measurements only mean something if they describe the committed files
+	if OS.has_feature("template"):
+		# exported builds ship imported samples, not the source .wav files; the stream checks above
+		# cover the packaged game
+		return
 	var m := _manifest()
 	var files: Dictionary = m.get("files", {})
 	var checked := 0
