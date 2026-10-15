@@ -37,6 +37,8 @@ func update_state(v: Dictionary, dt: float) -> void:
 			_update_unit(v)
 		"chum_rush":
 			_update_gates(v)
+		"tutorial":
+			_update_rings(v.get("rings", []))
 	_update_downed(v.get("downed", []))
 
 
@@ -346,6 +348,54 @@ func _update_gates(v: Dictionary) -> void:
 		(bulb.material_override as StandardMaterial3D).albedo_color = Color(1.0, 0.35, 0.25) if (is_open or blink) else Color(0.45, 0.12, 0.1)
 		var cmat := chevron.material_override as StandardMaterial3D
 		cmat.albedo_color.a = lerpf(cmat.albedo_color.a, 0.85 if is_open else 0.0, 0.2)
+
+
+## Tutorial footwork rings: white until stepped in, then green.
+func _update_rings(rings: Array) -> void:
+	var have := get_children().filter(func(c): return str(c.name).begins_with("TutRing"))
+	if have.size() != rings.size():
+		for c in have:
+			c.queue_free()
+		have.clear()
+		for i in rings.size():
+			var mi := MeshInstance3D.new()
+			mi.name = "TutRing%d" % i
+			var tm := TorusMesh.new()
+			tm.inner_radius = 0.78
+			tm.outer_radius = 1.0
+			tm.rings = 32
+			mi.mesh = tm
+			mi.material_override = Materials.unshaded(Color(1.0, 0.8, 0.2, 1.0), true)
+			add_child(mi)
+			# a soft column of light so the ring reads from any camera angle
+			var beam := MeshInstance3D.new()
+			beam.name = "Beam"
+			var cm := CylinderMesh.new()
+			cm.top_radius = 1.0
+			cm.bottom_radius = 1.0
+			cm.height = 1.0
+			cm.cap_top = false
+			cm.cap_bottom = false
+			beam.mesh = cm
+			var bm := Materials.unshaded(Color(1.0, 0.8, 0.25, 0.18), true)
+			bm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+			bm.cull_mode = BaseMaterial3D.CULL_DISABLED
+			bm.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+			beam.material_override = bm
+			beam.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			beam.position = Vector3(0, 0.6 / 0.2, 0)
+			beam.scale = Vector3(0.95, 1.2 / 0.2, 0.95)
+			mi.add_child(beam)
+			have.append(mi)
+	for i in rings.size():
+		var r: Dictionary = rings[i]
+		var mi2: MeshInstance3D = have[i]
+		var p: Vector3 = r["pos"]
+		mi2.global_position = Vector3(p.x, 0.04, p.z)
+		var rad := float(r["radius"]) * (1.0 + (0.0 if bool(r["done"]) else 0.06 * sin(_t * 5.0 + i)))
+		mi2.scale = Vector3(rad, 0.2, rad)
+		(mi2.material_override as StandardMaterial3D).albedo_color = Color(0.4, 1.0, 0.5, 0.9) if bool(r["done"]) else Color(1.0, 0.8, 0.2, 1.0)
+		(mi2.get_node("Beam") as MeshInstance3D).visible = not bool(r["done"])
 
 
 func _update_downed(list: Array) -> void:

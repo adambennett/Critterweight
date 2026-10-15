@@ -19,7 +19,7 @@ var ui_scale := 1.0
 
 
 var _top: HBoxContainer
-var _bottom: HBoxContainer
+var _bottom: GridContainer
 
 
 func setup(match_sim: MatchSim, player_idx: int) -> void:
@@ -46,17 +46,22 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(spacer)
-	_bottom = HBoxContainer.new()
+	var bottom_row := HBoxContainer.new()
+	bottom_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bottom_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_child(bottom_row)
+	_bottom = GridContainer.new()
 	_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bottom.add_theme_constant_override("separation", 16)
-	_bottom.alignment = BoxContainer.ALIGNMENT_CENTER
-	col.add_child(_bottom)
+	_bottom.columns = mini(maxi(n, 1), 4)
+	_bottom.add_theme_constant_override("h_separation", 18)
+	_bottom.add_theme_constant_override("v_separation", 10)
+	bottom_row.add_child(_bottom)
 	var mid := VBoxContainer.new()
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mid.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_timer = _label("99", 54, _font_heavy)
 	_timer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_mode_label = _label("", 24, _font)
+	_mode_label = _label("", 26, _font)
 	_mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	if n <= 2:
 		cards[sim.fighters[0].index] = _make_card(sim.fighters[0], n, _top, false)
@@ -84,13 +89,50 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 	_sub.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	_sub.offset_left = -700
 	_sub.offset_right = 700
-	_sub.offset_top = -230 if n > 2 else -150
-	_sub.offset_bottom = -170 if n > 2 else -70
+	# keep subtitles clear of the fighter cards (one or two rows at the bottom)
+	_sub.offset_top = -150 if n <= 2 else (-250 if n <= 4 else -390)
+	_sub.offset_bottom = _sub.offset_top + 64
 	_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_sub.add_theme_constant_override("outline_size", 10)
 	_sub.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	add_child(_sub)
+	_add_control_hints(n)
+
+
+## Settings › Gameplay › Control hints: the core actions with the live bindings (players only).
+func _add_control_hints(n: int) -> void:
+	if not bool(Settings.get_value("gameplay.tutorial_prompts")):
+		return
+	if player_index >= sim.fighters.size() or sim.fighters[player_index].controller_kind != "player":
+		return
+	var bar := PromptBar.new()
+	bar.theme = UiTheme.get_theme()
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.set_prompts([{"actions": ["light"], "text": "Light"}, {"actions": ["heavy"], "text": "Heavy"},
+		{"actions": ["guard"], "text": "Guard"}, {"actions": ["dodge"], "text": "Dodge"}, {"actions": ["grab"], "text": "Grab"},
+		{"actions": ["ability1"], "text": "Trick 1"}, {"actions": ["ability2"], "text": "Trick 2"}, {"actions": ["juice"], "text": "JUICE"}])
+	# a dark strip behind the hints keeps them readable over the bright mat
+	var strip := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.05, 0.03, 0.08, 0.62)
+	sb.set_corner_radius_all(10)
+	sb.set_content_margin_all(8)
+	strip.add_theme_stylebox_override("panel", sb)
+	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	strip.add_child(bar)
+	bar.alignment = BoxContainer.ALIGNMENT_CENTER
+	if n <= 2:
+		strip.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+		strip.offset_top = -78
+		strip.offset_bottom = -16
+	else:
+		strip.set_anchors_preset(Control.PRESET_CENTER_TOP)
+		strip.offset_top = 140
+		strip.offset_bottom = 202
+	strip.offset_left = -720
+	strip.offset_right = 720
+	add_child(strip)
 
 
 func _label(t: String, size: int, font: Font) -> Label:
@@ -126,7 +168,7 @@ func _bar(w: float, h: float, fill: Color, back := Color(0.08, 0.06, 0.1, 0.85))
 
 func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dictionary:
 	var big := n <= 2
-	var w := 520.0 if big else 300.0
+	var w := 520.0 if big else 340.0
 	var box := VBoxContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_theme_constant_override("separation", 3)
@@ -137,40 +179,41 @@ func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dic
 	var team_col := TeamColors.color(f.team)
 	var head := HBoxContainer.new()
 	box.add_child(head)
-	var name_l := _label(f.display_name.to_upper(), 30 if big else 22, _font_heavy)
+	var name_l := _label(f.display_name.to_upper(), 32 if big else 26, _font_heavy)
 	name_l.add_theme_color_override("font_color", team_col.lightened(0.3))
 	head.add_child(name_l)
-	var tag := _label(" (YOU)" if f.index == player_index else "", 20, _font)
+	var tag := _label(" (YOU)" if f.index == player_index and f.controller_kind == "player" else "", 24, _font)
 	head.add_child(tag)
-	var lives := _label("", 20, _font)
+	var lives := _label("", 24, _font)
 	head.add_child(lives)
 	var hp_stack := Control.new()
-	hp_stack.custom_minimum_size = Vector2(w, 26 if big else 18)
+	hp_stack.custom_minimum_size = Vector2(w, 30 if big else 26)
 	box.add_child(hp_stack)
-	var trail := _bar(w, 26 if big else 18, Color(1.0, 0.85, 0.85))
+	var trail := _bar(w, 30 if big else 26, Color(1.0, 0.85, 0.85))
 	hp_stack.add_child(trail)
-	var hp := _bar(w, 26 if big else 18, Color(0.95, 0.27, 0.3), Color(0, 0, 0, 0))
+	var hp := _bar(w, 30 if big else 26, Color(0.95, 0.27, 0.3), Color(0, 0, 0, 0))
 	hp_stack.add_child(hp)
-	var hp_text := _label("", 18 if big else 14, _font)
+	var hp_text := _label("", 24, _font)
 	hp_text.position = Vector2(8, 0)
 	hp_stack.add_child(hp_text)
-	var st := _bar(w * 0.7, 8, Color(0.35, 0.85, 0.55))
+	var st := _bar(w * 0.7, 10, Color(0.35, 0.85, 0.55))
 	box.add_child(st)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	box.add_child(row)
-	var hype := _bar(w * 0.45, 12, Color(1.0, 0.62, 0.15))
+	var hype := _bar(w * (0.45 if big else 0.32), 14, Color(1.0, 0.62, 0.15))
+	hype.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(hype)
-	var hype_l := _label("HYPE", 16, _font)
+	var hype_l := _label("HYPE", 24, _font)
 	row.add_child(hype_l)
-	var cd1 := _label("", 16, _font)
+	var cd1 := _label("", 24, _font)
 	row.add_child(cd1)
-	var cd2 := _label("", 16, _font)
+	var cd2 := _label("", 24, _font)
 	row.add_child(cd2)
-	var status := _label("", 16, _font)
+	var status := _label("", 23, _font)
 	box.add_child(status)
 	return {"box": box, "hp": hp, "trail": trail, "hp_text": hp_text, "st": st, "hype": hype, "hype_l": hype_l,
-		"cd1": cd1, "cd2": cd2, "status": status, "lives": lives, "trail_v": 1.0}
+		"cd1": cd1, "cd2": cd2, "status": status, "lives": lives, "trail_v": 1.0, "big": big}
 
 
 func _process(dt: float) -> void:
@@ -188,7 +231,8 @@ func _process(dt: float) -> void:
 		(c["st"] as ProgressBar).value = f.stamina / f.max_stamina
 		(c["hype"] as ProgressBar).value = f.hype / 100.0
 		var juiced := f.time < f.juiced_until
-		(c["hype_l"] as Label).text = "JUICED!" if juiced else ("JUICE READY [%s]" % Controls.prompt_for("juice") if f.hype >= 100.0 else "HYPE")
+		var ready_txt := ("JUICE READY [%s]" % Controls.prompt_for("juice")) if bool(c.get("big", true)) else "JUICE!"
+		(c["hype_l"] as Label).text = "JUICED!" if juiced else (ready_txt if f.hype >= 100.0 else "HYPE")
 		(c["cd1"] as Label).text = _cd_text(f, "ability1", "A1")
 		(c["cd2"] as Label).text = _cd_text(f, "ability2", "A2")
 		var st_txt := []
@@ -203,7 +247,7 @@ func _process(dt: float) -> void:
 	var mm := sim.mode
 	if mm:
 		var rt := float(sim.rules.get("round_time", 99.0))
-		_timer.text = "%d" % ceili(mm.round_timer) if rt > 0.0 else "--"
+		_timer.text = "%d" % ceili(mm.round_timer) if rt > 0.0 else ""
 		var hs: Dictionary = mm.hud_state()
 		var parts := []
 		for row in hs.get("rows", []):
@@ -212,10 +256,30 @@ func _process(dt: float) -> void:
 		if hs.has("target") and not parts.is_empty():
 			line += "   (to %d)" % int(hs["target"])
 		_mode_label.text = mm.hud_status() + ("\n" + line if line != "" else "")
+		_apply_highlight(str(hs.get("highlight", "")))
 	if _center.text != "" and Time.get_ticks_msec() / 1000.0 > _center_until:
 		_center.text = ""
 	if _sub.text != "" and Time.get_ticks_msec() / 1000.0 > _sub_until:
 		_sub.text = ""
+
+
+## Pulses one meter on the local player's card (tutorial: "stamina", "cooldown", "hype").
+func _apply_highlight(which: String) -> void:
+	if not cards.has(player_index):
+		return
+	var c: Dictionary = cards[player_index]
+	var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() / 1000.0 * 7.0)
+	var on := Color(1.0 + 0.6 * pulse, 1.0 + 0.6 * pulse, 1.0 + 0.2 * pulse)
+	for key in ["st", "hype", "cd1", "hype_l"]:
+		(c[key] as CanvasItem).modulate = Color.WHITE
+	match which:
+		"stamina":
+			(c["st"] as CanvasItem).modulate = on
+		"hype":
+			(c["hype"] as CanvasItem).modulate = on
+			(c["hype_l"] as CanvasItem).modulate = on
+		"cooldown":
+			(c["cd1"] as CanvasItem).modulate = on
 
 
 func _cd_text(f: Fighter, slot: String, short: String) -> String:
@@ -236,6 +300,10 @@ func callout(text: String, seconds := 1.4, color := Color(1, 0.92, 0.7)) -> void
 
 
 ## Subtitle line (announcer / coach). Always shown when subtitles are on.
+const SPEAKERS := {"barnaby": "Barnaby Bellows", "granny": "Granny Haymaker"}
+
+
 func subtitle(speaker: String, text: String, seconds := 3.0) -> void:
-	_sub.text = ("%s: %s" % [speaker, text]) if speaker != "" else text
+	var who := str(SPEAKERS.get(speaker, speaker.capitalize()))
+	_sub.text = ("%s: %s" % [who, text]) if speaker != "" else text
 	_sub_until = Time.get_ticks_msec() / 1000.0 + seconds

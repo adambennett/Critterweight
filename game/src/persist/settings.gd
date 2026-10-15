@@ -264,8 +264,8 @@ func apply(key: String) -> void:
 			Controls.guard_toggle = bool(v)
 		"input.bindings":
 			var b: Dictionary = v
-			if not b.is_empty():
-				Controls.apply_bindings(b)
+			# an empty map means "defaults" (fresh install or reset), so re-apply them explicitly
+			Controls.apply_bindings(b if not b.is_empty() else Controls.default_bindings())
 		"diag.log_level":
 			Log.level = ["debug", "info", "warn", "error"].find(str(v))
 

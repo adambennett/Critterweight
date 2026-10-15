@@ -14,6 +14,9 @@ const PROFILES := {
 		"combo": 0.75, "ability": 0.65, "grab": 0.28, "mistake": 0.09, "spacing": 0.75, "juice": 0.9, "wake": 0.4, "mash_escape": 0.85},
 	"champion": {"reaction": 0.17, "think": 0.07, "aggression": 0.68, "block": 0.62, "parry": 0.3, "dodge": 0.32,
 		"combo": 0.9, "ability": 0.8, "grab": 0.35, "mistake": 0.04, "spacing": 0.92, "juice": 1.0, "wake": 0.25, "mash_escape": 1.0},
+	# Hall-of-Famer (CAMPAIGN.md difficulty tiers): 0.14 s reactions, 2% mistakes, reads charge-ups
+	"hall_of_famer": {"reaction": 0.14, "think": 0.06, "aggression": 0.7, "block": 0.68, "parry": 0.4, "dodge": 0.38,
+		"combo": 0.95, "ability": 0.85, "grab": 0.38, "mistake": 0.02, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0},
 }
 
 ## Chance that a chosen Heavy is held into a Charged Heavy (lower tiers never charge).
