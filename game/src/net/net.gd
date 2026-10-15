@@ -139,9 +139,11 @@ func host(cfg: Dictionary = {}) -> Error:
 		server = null
 		_fail(reason)
 		return err
-	for k in ["rules", "rules_override", "arena", "bots", "bot_difficulty", "bot_policy"]:
+	for k in ["rules", "rules_override", "arena", "bots", "bot_difficulty", "bot_policy", "playlist"]:
 		if cfg.has(k):
-			server.host_set(k, cfg[k])
+			var herr := server.host_set(k, cfg[k])
+			if herr != "":
+				Log.w("net", "host setting %s: %s" % [k, herr])
 	server.add_local_player(pname, str(cfg.get("creature", "")))
 	server.set_cosmetics(SERVER_ID, cfg.get("cosmetics", session_cosmetics()))
 	_connect_server_signals()
@@ -361,6 +363,7 @@ func _connect_client_signals() -> void:
 	client.admitted.connect(func(w: Dictionary) -> void:
 		_rejoin = {"address": client.address, "port": client.port, "token": client.token, "password": str(client.opts.get("password", "")),
 			"until_ms": Time.get_ticks_msec() + 3600 * 1000}
+		remember_server(client.address, client.port, str(w.get("server_name", "")), bool(w.get("dedicated", false)))
 		var cos := session_cosmetics()
 		if not cos.is_empty():
 			client.send_lobby(NetProtocol.LQ_COSMETICS, cos)
@@ -767,6 +770,75 @@ func party_leave() -> void:
 
 
 # =====================================================================================
+# Recent servers (the Online screen's list; one file per machine)
+# =====================================================================================
+
+const RECENT_FILE := "recent_servers.json"
+const MAX_RECENT := 8
+
+
+## Servers this machine joined, newest first: [{address, port, name, dedicated, last (unix s)}].
+func recent_servers() -> Array:
+	var r := Saves.read_json(Paths.file("profiles", RECENT_FILE), "recent_servers", 1)
+	if not bool(r.get("ok", false)) or typeof(r.get("data")) != TYPE_DICTIONARY:
+		return []
+	var out: Array = []
+	for e in (r["data"] as Dictionary).get("servers", []):
+		if typeof(e) != TYPE_DICTIONARY:
+			continue
+		var addr := str(e.get("address", "")).strip_edges()
+		var port := int(e.get("port", 0))
+		if addr == "" or addr.length() > 255 or port < 1 or port > 65535:
+			continue
+		out.append({"address": addr, "port": port, "name": NetProtocol.clean_text(str(e.get("name", "")), 40),
+			"dedicated": bool(e.get("dedicated", false)), "last": int(e.get("last", 0))})
+		if out.size() >= MAX_RECENT:
+			break
+	return out
+
+
+## Puts a server at the top of the recent list (called when a join is admitted).
+func remember_server(address: String, port: int, server_name := "", is_dedicated := false) -> void:
+	if address == "" or port <= 0:
+		return
+	var list := recent_servers().filter(func(e: Dictionary) -> bool: return not (str(e["address"]) == address and int(e["port"]) == port))
+	list.push_front({"address": address, "port": port, "name": NetProtocol.clean_text(server_name, 40), "dedicated": is_dedicated,
+		"last": int(Time.get_unix_time_from_system())})
+	Saves.write_json(Paths.file("profiles", RECENT_FILE), "recent_servers", 1, {"servers": list.slice(0, MAX_RECENT)})
+
+
+func forget_server(address: String, port: int) -> void:
+	var list := recent_servers().filter(func(e: Dictionary) -> bool: return not (str(e["address"]) == address and int(e["port"]) == port))
+	Saves.write_json(Paths.file("profiles", RECENT_FILE), "recent_servers", 1, {"servers": list})
+
+
+## "host", "host:port" or "[v6]:port" -> {address, port, error}. Port falls back to `default_port`.
+static func parse_address(text: String, default_port: int) -> Dictionary:
+	var t := text.strip_edges()
+	if t == "":
+		return {"address": "", "port": default_port, "error": "Enter the host's address (an IP address or a name)."}
+	var host := t
+	var port := default_port
+	if t.begins_with("["):
+		var close := t.find("]")
+		if close < 0:
+			return {"address": "", "port": default_port, "error": "That address is not valid."}
+		host = t.substr(1, close - 1)
+		var rest := t.substr(close + 1)
+		if rest.begins_with(":"):
+			port = int(rest.substr(1)) if rest.substr(1).is_valid_int() else -1
+	elif t.count(":") == 1:
+		host = t.get_slice(":", 0)
+		var ps := t.get_slice(":", 1)
+		port = int(ps) if ps.is_valid_int() else -1
+	if port < 1 or port > 65535:
+		return {"address": host, "port": default_port, "error": "The port must be a number from 1 to 65535."}
+	if host == "" or host.length() > 253 or host.contains(" "):
+		return {"address": host, "port": port, "error": "That address is not valid."}
+	return {"address": host, "port": port, "error": ""}
+
+
+# =====================================================================================
 # Cosmetics (presentation only)
 # =====================================================================================
 
@@ -836,7 +908,10 @@ func start_lan_discovery(port := DISCOVERY_PORT) -> Error:
 	var err := lan_browser.start_listener(port)
 	if err != OK:
 		lan_browser = null
+		Log.w("net", "LAN browser unavailable: UDP ports %d-%d are all in use" % [port, port + NetLanDiscovery.PORT_SPAN - 1])
 		status_changed.emit("LAN discovery unavailable (ports %d-%d busy)" % [port, port + NetLanDiscovery.PORT_SPAN - 1])
+	else:
+		Log.i("net", "LAN browser listening on UDP %d" % lan_browser.listening_port)
 	return err
 
 

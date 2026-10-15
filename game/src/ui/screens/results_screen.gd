@@ -52,14 +52,25 @@ func on_enter(p: Dictionary) -> void:
 	var buttons := UiTheme.hbox(UiTheme.GAP_M)
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_child(buttons)
-	var spectating := bool(config.get("spectate", false))
-	_rematch = _button(buttons, "Watch again" if spectating else "Rematch", "restart", "rematch", _do_rematch)
-	var ui: Dictionary = config.get("ui", {})
-	if ui.has("mode"):
-		_button(buttons, "Change fighters", "team", "change", _change_fighters)
-	_button(buttons, "Main menu", "back", "menu", func() -> void: MatchFlow.quit_to_menu())
 	var bar := PromptBar.new()
-	bar.set_prompts([{"actions": ["ui_accept"], "text": "Select"}, {"actions": ["ui_cancel"], "text": "Main menu", "call": MatchFlow.quit_to_menu}])
+	if bool(config.get("online", false)):
+		# online: the server decides when the session goes back to its lobby (OnlineFlow)
+		var nxt := int(config.get("next_in", 0))
+		var note := UiTheme.label("Back to the lobby in a few seconds." if nxt <= 0 else "Back to the lobby in %d seconds." % nxt, "Caption")
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		col.add_child(note)
+		col.move_child(note, buttons.get_index())
+		_rematch = _button(buttons, "Back to lobby", "back", "lobby", _close_online)
+		_button(buttons, "Leave session", "quit", "leave", func() -> void: OnlineFlow.leave())
+		bar.set_prompts([{"actions": ["ui_accept"], "text": "Select"}, {"actions": ["ui_cancel"], "text": "Close", "call": _close_online}])
+	else:
+		var spectating := bool(config.get("spectate", false))
+		_rematch = _button(buttons, "Watch again" if spectating else "Rematch", "restart", "rematch", _do_rematch)
+		var ui: Dictionary = config.get("ui", {})
+		if ui.has("mode"):
+			_button(buttons, "Change fighters", "team", "change", _change_fighters)
+		_button(buttons, "Main menu", "back", "menu", func() -> void: MatchFlow.quit_to_menu())
+		bar.set_prompts([{"actions": ["ui_accept"], "text": "Select"}, {"actions": ["ui_cancel"], "text": "Main menu", "call": MatchFlow.quit_to_menu}])
 	col.add_child(bar)
 	play_intro()
 	# stamp once the banner has its final size (pivot = centre)
@@ -192,6 +203,15 @@ func _change_fighters() -> void:
 			App.push("versus_setup", {"mode": m, "setup": setup})
 
 
+## Online: closes the results card; the lobby comes back when the server returns to it.
+func _close_online() -> void:
+	if App.top_screen() == self:
+		App.pop()
+
+
 func on_back() -> bool:
+	if bool(config.get("online", false)):
+		_close_online()
+		return true
 	MatchFlow.quit_to_menu()
 	return true

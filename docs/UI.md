@@ -15,6 +15,7 @@ Living style guide: `godot --path game -- --ui-screen gallery`.
 | `src/ui/bindings_flow.gd` | `BindingsFlow`: rebind / reset with conflict reporting, persisted through Settings |
 | `src/ui/bot_tiers.gd` | `BotTiers`: **the one place** mapping player-facing bot tiers to `BotBrain` profiles |
 | `src/ui/match_flow.gd` | `MatchFlow`: launch / pause / online detection / quit-to-menu around `App.start_match` |
+| `src/ui/online_flow.gd` | `OnlineFlow`: follows a session started from the Online screen (results card, back to the lobby, disconnect reasons, leave) |
 | `src/ui/menu_backdrop.gd` | `MenuBackdrop`: orbiting, spot-lit Gullet behind the title and menus (skipped headless) |
 | `src/ui/spectator_overlay.gd` | Spectator HUD bar: director/free camera, hide HUD, pause |
 | `src/ui/tutorial_hook.gd` | `TutorialHook`: hand-off from the tutorial menu to tutorial gameplay |
@@ -136,6 +137,8 @@ func on_back() -> bool: return false       # true = handled (close a sub-panel, 
 | `spectate` | `versus_setup` with every fighter a bot; launches with the director camera + spectator bar |
 | `character_select` | Cards for `Content.playable_creatures()` + Random; poster: name, epithet, element icon + name + status, weight class, stat bars, playstyle (`blurb`), kit. `{mode: quick|pick, on_pick}` |
 | `tutorial_menu` | Lessons from Content kind `tutorial` or the built-in ten; launching goes through `TutorialHook` |
+| `online` | Tabs HOST / JOIN / LAN (LB/RB), one list per tab + help panel + CONNECTION panel; Y = the tab's action. HOST: session kind (matches / co-op party run), rules (online-capable presets incl. the player's own), arena (incl. user layouts), playlist voting, bots + tier + AI Lab policy, and the `network.*` rows (name, max players, password, LAN discovery, port) via `SettingRows`. JOIN: address (`host:port` parsed), port, password, spectator, name, Join, recent servers (A rejoin, X forget). LAN: discovered sessions (lock / incompatible icons; incompatible ones explain the `Mods.compare` lines in a dialog; password → on-screen keyboard), or a "turn discovery on" button. Hosting/joining calls `OnlineFlow.begin()`; refusals open a dialog with the reason. `{tab}` |
+| `lobby` | Session lobby (host, guests, dedicated-server players). Left list: YOUR fighter (character select in `pick` mode), team, spectate, ready; playlist VOTE; HOST rules / arena / playlist / bots / skill / policy / Start match / Copy invite; CO-OP PARTY RUN (new run, offer a suspended one, seats, rejoin / take a seat, route votes, suspend); SESSION (rules and online restrictions dialog, leave with confirmation). One help line under the list follows focus. Right: players (ProfileFrame name cards, cosmetics, fighter, ready, ping, team chip) and the active rules. Rebuilt only when its shape changes, values updated in place, so focus never jumps |
 | `ui_gallery` | Development style guide |
 
 ## 6. Prompt glyphs (button prompts)
@@ -208,21 +211,40 @@ one step and hold repeats; prompt glyph family follows the device; mouse hover f
 character select → invalid line-up refused → real match → Start/Esc pause → B resume → controller disconnect pause → quit;
 online pause does not pause; every screen opens focused and B returns; text/UI scale live; **layout audit at 1280×800 and
 1920×1080** (footer on screen, all text ≥ 18 px).
+Online screens (`src/test/net/test_online_ui.gd`, network owner, LOOPBACK): tabs/focus/back; hosting through the Online
+screen, a guest joining, copy invite, the rules dialog, Y starts a match, the online results card, the automatic return
+to the lobby, leaving with the confirmation; joining a host in **another process** through the Join tab's recent-server
+entry, readying with Y, playing the host's match and coming back; refusal dialogs (wrong password, another game
+version, full, nobody answering) and a kick with the host's reason; the LAN tab (listed session, password prompt); a
+dedicated server's lobby joined by a typed `address:port` (playlist vote with A, ready with Y); the same layout audit
+for every tab and a lobby with a guest.
 
 Dev flags (handled by the title screen): `--ui-screen <name>` (any screen, plus `practice`, `countdown`, `pause`,
 `ingame_settings`, `match`, `results` = a real 7 s bot round, `gallery`), `--ui-tab <id>`, `--ui-open <category>`,
 `--ui-fighters <n>`, `--ui-device gamepad|keyboard`, `--ui-prompts xbox|playstation`, `--ui-toasts`,
-`--ui-seed-window <WxH|borderless>` (writes windowed display settings into the active `--user-root`, then quits).
+`--ui-seed-window <WxH|borderless>` (writes windowed display settings into the active `--user-root`, then quits),
+`--ui-screen online --ui-tab host|join|lan [--ui-recent]` (two demo recent servers written into the active user root),
+`--ui-screen lobby [--ui-port p] [--ui-bots n] [--ui-guests n]` (hosts a real session; up to 3 scripted guests with
+fighters, cosmetics and ready states), `--ui-demo-net` (the online screens show an example private address instead
+of this PC's).
 Capture: `godot --path game -- --user-root <dir> --ui-screen settings --capture out.png --capture-at 3`.
 
 Evidence: `docs/evidence/ui/` — 24 screens at 1920×1080 and 1280×800 (real GUI renders; results from a real bot round,
-pause over a real paused match) and a native 4K crop of controller prompts.
+pause over a real paused match) and a native 4K crop of controller prompts. Online: `online_host_*`, `online_join_*`
+(two demo recent servers), `online_lan_*` (two dedicated servers announcing on this PC, one with a password) and
+`lobby_host_*` (a real hosted session with three scripted guests wearing cosmetics) at 1600×900 (keyboard prompts) and
+1280×800 (controller prompts); editor binary, `--ui-demo-net` shows an example address instead of this PC's. Note for
+captures: `--capture-at` counts from boot, and the first frame (shader compilation) can take 10–20 s on a loaded
+machine, so capture late (40–50 s) or an early frame is saved.
 
 ## 10. Known gaps (UI)
 
 * The fight HUD (`fight_hud.gd`, combat owner) still uses 14–20 du text: below the 18 px Deck floor at 1280×800.
 * Audio calls (`Audio.sfx("ui_move")` etc.) are no-ops until the audio owner implements them.
-* Hidden main-menu entries: Campaign, Online, Create, AI Lab, Mods (screens owned by other teams do not exist yet).
+* Main-menu entries are hidden while their screen does not exist (dev rule); Online now has its screens (`online`,
+  `lobby`).
+* Online party runs play the route votes in the lobby; the other campaign stops are not yet played online (see
+  docs/NETWORKING.md "Known gaps").
 * Tutorial lessons are listed but not playable until `TutorialHook.launcher` is wired.
 * Results do not record statistics (`Profiles.record_match`) — the match-flow owner should record exactly once per match.
 * Local multi-human versus is not offered: `Controls` reads all devices for one player; the setup has one "You" slot.

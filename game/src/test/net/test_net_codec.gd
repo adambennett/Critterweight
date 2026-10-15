@@ -245,6 +245,87 @@ func test_beacon_codec() -> void:
 	var bad := b.duplicate()
 	bad[0] = 88
 	check(NetLanDiscovery.decode_beacon(bad).is_empty(), "wrong magic rejected")
+	# protocol 4: the server's gameplay packages ride along; a beacon without them still decodes
+	check(bool(d.get("packages_listed", false)), "the package list is in the beacon")
+	var ids: Array = (d.get("packages", []) as Array).map(func(p: Dictionary) -> String: return str(p["id"]))
+	check(ids.has("core"), "with core (%s)" % str(ids))
+	var head := b.slice(0, b.size() - _packages_tail_size(d))
+	var old := NetLanDiscovery.decode_beacon(head)
+	check(not old.is_empty() and not bool(old.get("packages_listed", false)), "an older beacon without the list still decodes")
+	var cut := b.slice(0, b.size() - 3)
+	check(NetLanDiscovery.decode_beacon(cut).is_empty(), "a truncated package list is refused")
+	check(b.size() <= NetLanDiscovery.MAX_BEACON, "beacon within %d B (%d)" % [NetLanDiscovery.MAX_BEACON, b.size()])
+
+
+## Bytes the package list takes at the end of an encoded beacon.
+func _packages_tail_size(d: Dictionary) -> int:
+	var n := 1
+	for p in d.get("packages", []):
+		for k in ["id", "version", "hash"]:
+			n += 1 + str(p[k]).to_utf8_buffer().size()
+	return n
+
+
+## The LAN list explains why a session cannot be joined, in the join check's own wording.
+func test_lan_compatibility_lines() -> void:
+	var mine := Content.content_hash().substr(0, 16)
+	var base := NetLanDiscovery.decode_beacon(NetLanDiscovery.encode_beacon({"port": 7777, "name": "S"}, 1))
+	check(NetLanDiscovery.compatibility(base, mine).is_empty(), "same build and content: nothing to explain")
+	var proto := base.duplicate(true)
+	proto["protocol"] = NetProtocol.VERSION + 1
+	check(str(NetLanDiscovery.compatibility(proto, mine)).contains("network protocol"), "different protocol")
+	var ver := base.duplicate(true)
+	ver["game_version"] = "9.9.9"
+	check(str(NetLanDiscovery.compatibility(ver, mine)).contains("theirs 9.9.9"), "different game version with both versions")
+	var modded := base.duplicate(true)
+	modded["content"] = "0123456789abcdef"
+	(modded["packages"] as Array).append({"id": "moon_rules", "version": "1.0.0", "hash": "ab".repeat(6), "client_only": false})
+	var lines := NetLanDiscovery.compatibility(modded, mine)
+	check(str(lines).contains("Missing mod: moon_rules 1.0.0"), "names the mod we lack (Mods.compare wording): %s" % str(lines))
+	var same_list := base.duplicate(true)
+	same_list["content"] = "0123456789abcdef"
+	check(str(NetLanDiscovery.compatibility(same_list, mine)).contains("different files"), "same list, different files")
+	var unlisted := modded.duplicate(true)
+	unlisted["packages_more"] = true
+	check(str(NetLanDiscovery.compatibility(unlisted, mine)).contains("join to see"), "a list cut short does not guess")
+
+
+func test_parse_address() -> void:
+	var a := Net.parse_address("192.168.1.20", 7777)
+	check_eq([a["address"], a["port"], a["error"]], ["192.168.1.20", 7777, ""], "address alone keeps the default port")
+	var b := Net.parse_address("  play.example.net:27015 ", 7777)
+	check_eq([b["address"], b["port"], b["error"]], ["play.example.net", 27015, ""], "name:port")
+	var c := Net.parse_address("[::1]:7800", 7777)
+	check_eq([c["address"], c["port"], c["error"]], ["::1", 7800, ""], "[v6]:port")
+	check_eq(str(Net.parse_address("::1", 7777)["address"]), "::1", "a bare IPv6 address is not split")
+	for t in ["", "host:0", "host:70000", "host:abc", "[::1", "two words"]:
+		check(str(Net.parse_address(t, 7777)["error"]) != "", "'%s' is refused with a reason" % t)
+
+
+func test_recent_servers_list() -> void:
+	var path := Paths.file("profiles", Net.RECENT_FILE)
+	var before := FileAccess.get_file_as_string(path) if FileAccess.file_exists(path) else ""
+	for e in Net.recent_servers():
+		Net.forget_server(str(e["address"]), int(e["port"]))
+	check(Net.recent_servers().is_empty(), "starts empty")
+	Net.remember_server("10.0.0.1", 7777, "First")
+	Net.remember_server("10.0.0.2", 7778, "Second", true)
+	Net.remember_server("10.0.0.1", 7777, "First again")
+	var r := Net.recent_servers()
+	check_eq(r.size(), 2, "the same server is listed once")
+	check_eq(str(r[0]["name"]), "First again", "newest first, renamed")
+	check(bool(r[1]["dedicated"]), "dedicated flag kept")
+	for i in 12:
+		Net.remember_server("10.1.0.%d" % i, 7777, "S%d" % i)
+	check_eq(Net.recent_servers().size(), Net.MAX_RECENT, "at most %d kept" % Net.MAX_RECENT)
+	Net.forget_server("10.1.0.11", 7777)
+	check(not Net.recent_servers().any(func(e: Dictionary) -> bool: return str(e["address"]) == "10.1.0.11"), "forget removes it")
+	for e in Net.recent_servers():
+		Net.forget_server(str(e["address"]), int(e["port"]))
+	if before != "":
+		var f := FileAccess.open(path, FileAccess.WRITE)
+		f.store_string(before)
+		f.close()
 
 
 func test_reason_texts_are_ui_ready() -> void:

@@ -10,6 +10,10 @@ extends RefCounted
 ##   --ui-prompts <xbox|playstation>  force pad glyph style (not persisted)
 ##   --ui-seed-window <WxH|borderless> persist windowed WxH (or borderless) display settings into
 ##                             the ACTIVE user root (use with --user-root <dir>), then quit
+##   --ui-screen online [--ui-tab host|join|lan] [--ui-recent]   --ui-recent writes two demo
+##                             entries into the ACTIVE user root's recent-server list
+##   --ui-screen lobby [--ui-port p] [--ui-bots n] [--ui-guests n]   hosts a real session (no LAN
+##                             beacons); --ui-guests adds up to 3 scripted guests in this process
 ## Example (1280x800 evidence capture, isolated user data):
 ##   godot --path game -- --user-root <tmp> --ui-seed-window 1280x800   (headless ok)
 ##   godot --path game -- --user-root <tmp> --ui-screen settings --capture out.png --capture-at 3
@@ -24,6 +28,27 @@ static func arg(flag: String, fallback := "") -> String:
 
 static func has(flag: String) -> bool:
 	return OS.get_cmdline_user_args().has(flag)
+
+
+## --ui-demo-net (evidence captures): the Online/Lobby screens SHOW this private example address
+## instead of the machine's real ones (what is copied or sent never changes).
+const DEMO_ADDRESS := "192.168.1.24"
+
+
+static func shown_addresses(real: Array[String]) -> Array[String]:
+	if has("--ui-demo-net"):
+		var out: Array[String] = [DEMO_ADDRESS]
+		return out
+	return real
+
+
+static func shown_address(real: String) -> String:
+	return DEMO_ADDRESS if has("--ui-demo-net") else real
+
+
+## "" = the real address (Net.invite_text picks it), or the demo one under --ui-demo-net.
+static func shown_invite_address() -> String:
+	return DEMO_ADDRESS if has("--ui-demo-net") else ""
 
 
 ## Returns true when a flag took over the boot (the title screen then stays idle).
@@ -115,6 +140,29 @@ static func open_screen(screen: String) -> void:
 			MatchFlow.launch(cfg)
 		"gallery":
 			App.goto("ui_gallery")
+		"online":
+			App.goto("main_menu")
+			if has("--ui-recent"):
+				# evidence captures: two demo entries in the ACTIVE user root's recent-server list
+				Net.remember_server("play.example.net", 7777, "Gullet Nights (dedicated)", true)
+				Net.remember_server("192.168.1.24", 7777, "Rookie's session")
+			App.push("online", {"tab": arg("--ui-tab", "host")})
+		"lobby":
+			# hosts a real session (no LAN beacons) so the lobby has something to show;
+			# --ui-port <p>, --ui-bots <n>
+			App.goto("main_menu")
+			App.push("online")
+			var cfg := {"lan_discovery": false, "bots": int(arg("--ui-bots", "0")), "creature": OnlineScreen.default_creature()}
+			if arg("--ui-port", "") != "":
+				cfg["port"] = int(arg("--ui-port", "7777"))
+			if Net.host(cfg) == OK:
+				OnlineFlow.begin()
+				App.push("lobby")
+				# --ui-guests <n>: scripted guests in this process (evidence captures), each with a
+				# fighter, cosmetics and ready - they are real clients of the hosted session
+				for i in clampi(int(arg("--ui-guests", "0")), 0, 3):
+					_demo_guest(i, int(Net.server.cfg["port"]))
+
 		_:
 			if not App.has_screen(screen):
 				Log.e("ui", "--ui-screen: unknown screen '%s'" % screen)
@@ -122,6 +170,25 @@ static func open_screen(screen: String) -> void:
 				return
 			App.goto("main_menu")
 			App.push(screen, {"tab": arg("--ui-tab", "")} if arg("--ui-tab", "") != "" else {})
+
+
+## A real NetClient in this process that joins the hosted session as a guest (dev captures only).
+static func _demo_guest(i: int, port: int) -> void:
+	var names := ["Ann", "Bo", "Cy"]
+	var c := NetClient.new()
+	c.present = false
+	c.install_scene = false
+	c.name = "DemoGuest%d" % i
+	Net.add_child(c)
+	c.connect_to_server("127.0.0.1", port, {"name": names[i], "timeout_s": 10})
+	var ids := Content.playable_creatures().filter(func(x): return not str(x).begins_with("dev_"))
+	c.admitted.connect(func(_w: Dictionary) -> void:
+		if not ids.is_empty():
+			c.send_lobby(NetProtocol.LQ_CREATURE, str(ids[(i + 1) % ids.size()]))
+		var looks := [{"piece": "hub_gold_tooth", "frame": "hub_frame_soaked", "juice": "hub_juice_sizzle"},
+			{"back": "hub_replica_belt", "frame": "hub_frame_sign_fixer"}, {}]
+		c.send_lobby(NetProtocol.LQ_COSMETICS, looks[i % looks.size()])
+		c.send_lobby(NetProtocol.LQ_READY, i != 1))
 
 
 static func _sample_config(spectate: bool) -> Dictionary:
