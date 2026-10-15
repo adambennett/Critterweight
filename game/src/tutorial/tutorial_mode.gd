@@ -520,6 +520,9 @@ class KidScript:
 	var _last_press := -1.0
 	var _alt := false
 	var _bot: BotBrain = null
+	var _reach := BotBrain.new("regular", 1)   ## only for its cached move-reach estimates
+	var _prev_dist := -1.0
+	var _stuck_t := 0.0
 
 	func _init(m) -> void:
 		mode = m
@@ -559,17 +562,26 @@ class KidScript:
 			"string", "heavy", "parry_drill":
 				_attacker(f, to, dist, dt)
 
-	func _attacker(f: Fighter, to: Vector3, dist: float, _dt: float) -> void:
+	func _attacker(f: Fighter, to: Vector3, dist: float, dt: float) -> void:
 		match _phase:
 			"rest":
 				string_active = false
 				if _phase_t > 2.2:
 					_phase = "approach"
 					_phase_t = 0.0
+					_prev_dist = -1.0
+					_stuck_t = 0.0
 			"approach":
-				var want := 1.05 if behavior == "string" or (behavior == "parry_drill" and not _alt) else 1.25
-				# bodies of very different sizes can't get that close: close enough after a moment
-				var close_enough := dist <= want or (_phase_t > 1.2 and dist <= want + 0.6)
+				var light_move := behavior == "string" or (behavior == "parry_drill" and not _alt)
+				# close enough when the move's own reach covers the gap, or when the Kid is pressed
+				# against a big body and can't get closer
+				var want := _reach.reach_of(f.creature, "l1" if light_move else "heavy") + 0.05
+				if _prev_dist >= 0.0 and _prev_dist - dist < 0.004:
+					_stuck_t += dt
+				else:
+					_stuck_t = 0.0
+				_prev_dist = dist
+				var close_enough := dist <= want or (_phase_t > 0.5 and _stuck_t > 0.35) or _phase_t > 3.0
 				if not close_enough:
 					f.input.move = to.normalized()
 				elif f.state == Fighter.State.NEUTRAL:

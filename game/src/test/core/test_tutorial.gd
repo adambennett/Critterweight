@@ -39,6 +39,25 @@ func _sim(index: int) -> MatchSim:
 	return sim
 
 
+var _rb := BotBrain.new("regular", 1)    ## only for its cached move-reach estimates
+
+
+## Close enough to use `slot` on the Kid: the move's reach covers the gap, or we are pressed
+## against him and can't get closer (bodies of every size).
+func _in_reach(f: Fighter, kid: Fighter, slot: String, mem: Dictionary, ability := false) -> bool:
+	var d := Vector2(kid.pos().x - f.pos().x, kid.pos().z - f.pos().z).length()
+	var r := _rb.reach_of(f.creature, slot, ability) + 0.05
+	var prev := float(mem.get("_pd", -1.0))
+	var stuck := float(mem.get("_st", 0.0))
+	if prev >= 0.0 and prev - d < 0.004:
+		stuck += 1.0 / Engine.physics_ticks_per_second
+	else:
+		stuck = 0.0
+	mem["_pd"] = d
+	mem["_st"] = stuck
+	return d <= r or stuck > 0.35
+
+
 static func _toward(f: Fighter, target: Vector3) -> Vector3:
 	var d := Vector3(target.x - f.pos().x, 0.0, target.z - f.pos().z)
 	return d.normalized() if d.length() > 0.05 else Vector3.ZERO
@@ -90,10 +109,11 @@ func test_footwork() -> void:
 func test_light_string() -> void:
 	var plan := func(f: Fighter, sim, t: float, mem: Dictionary) -> void:
 		var kid: Fighter = sim.fighters[1]
-		if f.pos().distance_to(kid.pos()) > 1.0 and f.state == Fighter.State.NEUTRAL:
+		if f.state == Fighter.State.NEUTRAL and not _in_reach(f, kid, "l1", mem):
 			f.input.move = _toward(f, kid.pos())
-		elif t - float(mem.get("last", -9.0)) > 0.22:
+		elif t - float(mem.get("last", -9.0)) > 0.15:
 			mem["last"] = t
+			f.input.move = _toward(f, kid.pos()) * 0.4
 			f.input.press(FighterInput.LIGHT)
 	await _run(1, plan)
 
@@ -102,7 +122,7 @@ func test_heavy_then_charged() -> void:
 	var plan := func(f: Fighter, sim, t: float, mem: Dictionary) -> void:
 		var kid: Fighter = sim.fighters[1]
 		var mode := sim.mode as TutorialMode
-		if f.pos().distance_to(kid.pos()) > 1.05 and f.state == Fighter.State.NEUTRAL and not mem.has("hold_from"):
+		if f.state == Fighter.State.NEUTRAL and not mem.has("hold_from") and not _in_reach(f, kid, "heavy", mem):
 			f.input.move = _toward(f, kid.pos())
 			return
 		if mode.stage == 0:
@@ -141,7 +161,8 @@ func test_dodge_then_dash_attack() -> void:
 				mem.erase("dodged_at")
 		else:
 			var d := f.pos().distance_to(kid.pos())
-			if d > 2.6 and f.state == Fighter.State.NEUTRAL:
+			var dash_range := _rb.reach_of(f.creature, "dash_attack") + f.creature.stat("dodge_distance") + 0.6
+			if d > dash_range and f.state == Fighter.State.NEUTRAL:
 				f.input.move = _toward(f, kid.pos())
 			elif f.state == Fighter.State.NEUTRAL and t - float(mem.get("dash", -9.0)) > 1.0:
 				mem["dash"] = t
@@ -156,10 +177,11 @@ func test_dodge_then_dash_attack() -> void:
 func test_ability_connects() -> void:
 	var plan := func(f: Fighter, sim, t: float, mem: Dictionary) -> void:
 		var kid: Fighter = sim.fighters[1]
-		if f.pos().distance_to(kid.pos()) > 1.2 and f.state == Fighter.State.NEUTRAL:
+		if f.state == Fighter.State.NEUTRAL and not _in_reach(f, kid, "ability1", mem, true):
 			f.input.move = _toward(f, kid.pos())
 		elif t - float(mem.get("last", -9.0)) > 0.5:
 			mem["last"] = t
+			f.input.move = _toward(f, kid.pos())
 			f.input.press(FighterInput.AB1)
 	await _run(5, plan)
 
@@ -172,7 +194,7 @@ func test_grab_and_throw_through_guard() -> void:
 			if t - float(mem.get("throw", -9.0)) > 0.3:
 				mem["throw"] = t
 				f.input.press(FighterInput.GRAB)
-		elif f.pos().distance_to(kid.pos()) > 0.95 and f.state == Fighter.State.NEUTRAL:
+		elif f.state == Fighter.State.NEUTRAL and not _in_reach(f, kid, "grab", mem):
 			f.input.move = _toward(f, kid.pos())
 		elif t - float(mem.get("grab", -9.0)) > 0.8:
 			mem["grab"] = t
@@ -204,7 +226,7 @@ func test_finisher_then_juice() -> void:
 		if mode.stage == 1 and f.hype >= 100.0:
 			f.input.press(FighterInput.JUICE)
 			return
-		if f.pos().distance_to(kid.pos()) > 1.0 and f.state == Fighter.State.NEUTRAL:
+		if f.state == Fighter.State.NEUTRAL and not _in_reach(f, kid, "l1", mem):
 			f.input.move = _toward(f, kid.pos())
 			return
 		var step := int(mem.get("step", 0))
