@@ -1,0 +1,5468 @@
+{
+ "version": 1,
+ "buses": {
+  "Impacts": {
+   "send": "SFX",
+   "db": 0
+  },
+  "Movement": {
+   "send": "SFX",
+   "db": -4
+  },
+  "Zones": {
+   "send": "SFX",
+   "db": -8
+  },
+  "Creatures": {
+   "send": "Voice",
+   "db": -3
+  },
+  "Dialogue": {
+   "send": "Voice",
+   "db": -2
+  },
+  "Crowd": {
+   "send": "Ambience",
+   "db": 0
+  }
+ },
+ "sfx": {
+  "hit_light": {
+   "files": [
+    "res://assets/audio/impacts/hit_light_0.wav",
+    "res://assets/audio/impacts/hit_light_1.wav",
+    "res://assets/audio/impacts/hit_light_2.wav",
+    "res://assets/audio/impacts/hit_light_3.wav",
+    "res://assets/audio/impacts/hit_light_4.wav",
+    "res://assets/audio/impacts/hit_light_5.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.02,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "hit_heavy": {
+   "files": [
+    "res://assets/audio/impacts/hit_heavy_0.wav",
+    "res://assets/audio/impacts/hit_heavy_1.wav",
+    "res://assets/audio/impacts/hit_heavy_2.wav",
+    "res://assets/audio/impacts/hit_heavy_3.wav",
+    "res://assets/audio/impacts/hit_heavy_4.wav",
+    "res://assets/audio/impacts/hit_heavy_5.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.03,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "hit_layer_chitin": {
+   "files": [
+    "res://assets/audio/impacts/hit_layer_chitin_0.wav",
+    "res://assets/audio/impacts/hit_layer_chitin_1.wav",
+    "res://assets/audio/impacts/hit_layer_chitin_2.wav",
+    "res://assets/audio/impacts/hit_layer_chitin_3.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "hit_layer_jelly": {
+   "files": [
+    "res://assets/audio/impacts/hit_layer_jelly_0.wav",
+    "res://assets/audio/impacts/hit_layer_jelly_1.wav",
+    "res://assets/audio/impacts/hit_layer_jelly_2.wav",
+    "res://assets/audio/impacts/hit_layer_jelly_3.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "hit_guard": {
+   "files": [
+    "res://assets/audio/impacts/hit_guard_0.wav",
+    "res://assets/audio/impacts/hit_guard_1.wav",
+    "res://assets/audio/impacts/hit_guard_2.wav",
+    "res://assets/audio/impacts/hit_guard_3.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.02,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "parry": {
+   "files": [
+    "res://assets/audio/impacts/parry_0.wav",
+    "res://assets/audio/impacts/parry_1.wav",
+    "res://assets/audio/impacts/parry_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.05,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "wall_splat_fence": {
+   "files": [
+    "res://assets/audio/impacts/wall_splat_fence_0.wav",
+    "res://assets/audio/impacts/wall_splat_fence_1.wav",
+    "res://assets/audio/impacts/wall_splat_fence_2.wav",
+    "res://assets/audio/impacts/wall_splat_fence_3.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "wall_splat_concrete": {
+   "files": [
+    "res://assets/audio/impacts/wall_splat_concrete_0.wav",
+    "res://assets/audio/impacts/wall_splat_concrete_1.wav",
+    "res://assets/audio/impacts/wall_splat_concrete_2.wav",
+    "res://assets/audio/impacts/wall_splat_concrete_3.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "wall_splat_steel": {
+   "files": [
+    "res://assets/audio/impacts/wall_splat_steel_0.wav",
+    "res://assets/audio/impacts/wall_splat_steel_1.wav",
+    "res://assets/audio/impacts/wall_splat_steel_2.wav",
+    "res://assets/audio/impacts/wall_splat_steel_3.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "wall_splat_railing": {
+   "files": [
+    "res://assets/audio/impacts/wall_splat_railing_0.wav",
+    "res://assets/audio/impacts/wall_splat_railing_1.wav",
+    "res://assets/audio/impacts/wall_splat_railing_2.wav",
+    "res://assets/audio/impacts/wall_splat_railing_3.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "knockdown": {
+   "files": [
+    "res://assets/audio/impacts/knockdown_0.wav",
+    "res://assets/audio/impacts/knockdown_1.wav",
+    "res://assets/audio/impacts/knockdown_2.wav",
+    "res://assets/audio/impacts/knockdown_3.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "ko": {
+   "files": [
+    "res://assets/audio/impacts/ko_0.wav",
+    "res://assets/audio/impacts/ko_1.wav",
+    "res://assets/audio/impacts/ko_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.2,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "ko_piece": {
+   "files": [
+    "res://assets/audio/impacts/ko_piece_0.wav",
+    "res://assets/audio/impacts/ko_piece_1.wav",
+    "res://assets/audio/impacts/ko_piece_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "glance": {
+   "files": [
+    "res://assets/audio/impacts/glance_0.wav",
+    "res://assets/audio/impacts/glance_1.wav",
+    "res://assets/audio/impacts/glance_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -8,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "guard_break": {
+   "files": [
+    "res://assets/audio/impacts/guard_break_0.wav",
+    "res://assets/audio/impacts/guard_break_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "burst": {
+   "files": [
+    "res://assets/audio/impacts/burst_0.wav",
+    "res://assets/audio/impacts/burst_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "grab": {
+   "files": [
+    "res://assets/audio/impacts/grab_0.wav",
+    "res://assets/audio/impacts/grab_1.wav",
+    "res://assets/audio/impacts/grab_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "throw_release": {
+   "files": [
+    "res://assets/audio/impacts/throw_release_0.wav",
+    "res://assets/audio/impacts/throw_release_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "counter": {
+   "files": [
+    "res://assets/audio/impacts/counter_0.wav",
+    "res://assets/audio/impacts/counter_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "slam": {
+   "files": [
+    "res://assets/audio/impacts/slam_0.wav",
+    "res://assets/audio/impacts/slam_1.wav",
+    "res://assets/audio/impacts/slam_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "pummel": {
+   "files": [
+    "res://assets/audio/impacts/pummel_0.wav",
+    "res://assets/audio/impacts/pummel_1.wav",
+    "res://assets/audio/impacts/pummel_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -2,
+   "pitch": [
+    1.15,
+    1.3
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "hit_otg": {
+   "alias": "hit_light",
+   "gain": -4,
+   "pitch": [
+    0.85,
+    0.92
+   ]
+  },
+  "whoosh_light": {
+   "files": [
+    "res://assets/audio/movement/whoosh_light_0.wav",
+    "res://assets/audio/movement/whoosh_light_1.wav",
+    "res://assets/audio/movement/whoosh_light_2.wav",
+    "res://assets/audio/movement/whoosh_light_3.wav",
+    "res://assets/audio/movement/whoosh_light_4.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "whoosh_heavy": {
+   "files": [
+    "res://assets/audio/movement/whoosh_heavy_0.wav",
+    "res://assets/audio/movement/whoosh_heavy_1.wav",
+    "res://assets/audio/movement/whoosh_heavy_2.wav",
+    "res://assets/audio/movement/whoosh_heavy_3.wav",
+    "res://assets/audio/movement/whoosh_heavy_4.wav"
+   ],
+   "bus": "Movement",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "whoosh_spin": {
+   "files": [
+    "res://assets/audio/movement/whoosh_spin.wav"
+   ],
+   "bus": "Movement",
+   "gain": -4,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "charge_loop": {
+   "files": [
+    "res://assets/audio/movement/charge_loop.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "charge_release": {
+   "files": [
+    "res://assets/audio/movement/charge_release_0.wav",
+    "res://assets/audio/movement/charge_release_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "leap": {
+   "files": [
+    "res://assets/audio/movement/leap_0.wav",
+    "res://assets/audio/movement/leap_1.wav",
+    "res://assets/audio/movement/leap_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "hover_loop": {
+   "files": [
+    "res://assets/audio/movement/hover_loop.wav"
+   ],
+   "bus": "Movement",
+   "gain": -10,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "dodge": {
+   "files": [
+    "res://assets/audio/movement/dodge_0.wav",
+    "res://assets/audio/movement/dodge_1.wav",
+    "res://assets/audio/movement/dodge_2.wav",
+    "res://assets/audio/movement/dodge_3.wav"
+   ],
+   "bus": "Movement",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "blink_down": {
+   "files": [
+    "res://assets/audio/movement/blink_down_0.wav",
+    "res://assets/audio/movement/blink_down_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "blink_up": {
+   "files": [
+    "res://assets/audio/movement/blink_up_0.wav",
+    "res://assets/audio/movement/blink_up_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "spring_pad": {
+   "files": [
+    "res://assets/audio/movement/spring_pad_0.wav",
+    "res://assets/audio/movement/spring_pad_1.wav",
+    "res://assets/audio/movement/spring_pad_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "land_soft": {
+   "files": [
+    "res://assets/audio/movement/land_soft_0.wav",
+    "res://assets/audio/movement/land_soft_1.wav",
+    "res://assets/audio/movement/land_soft_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "land_heavy": {
+   "files": [
+    "res://assets/audio/movement/land_heavy_0.wav",
+    "res://assets/audio/movement/land_heavy_1.wav",
+    "res://assets/audio/movement/land_heavy_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -1,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 50,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "hop_takeoff": {
+   "files": [
+    "res://assets/audio/footsteps/hop_takeoff_0.wav",
+    "res://assets/audio/footsteps/hop_takeoff_1.wav",
+    "res://assets/audio/footsteps/hop_takeoff_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "hop_land_wet": {
+   "files": [
+    "res://assets/audio/footsteps/hop_land_wet_0.wav",
+    "res://assets/audio/footsteps/hop_land_wet_1.wav",
+    "res://assets/audio/footsteps/hop_land_wet_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_stoke_clank": {
+   "files": [
+    "res://assets/audio/footsteps/step_stoke_clank_0.wav",
+    "res://assets/audio/footsteps/step_stoke_clank_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "flap": {
+   "files": [
+    "res://assets/audio/footsteps/flap_0.wav",
+    "res://assets/audio/footsteps/flap_1.wav",
+    "res://assets/audio/footsteps/flap_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "serpent_drip": {
+   "files": [
+    "res://assets/audio/footsteps/serpent_drip_0.wav",
+    "res://assets/audio/footsteps/serpent_drip_1.wav",
+    "res://assets/audio/footsteps/serpent_drip_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "serpent_tick": {
+   "files": [
+    "res://assets/audio/footsteps/serpent_tick_0.wav",
+    "res://assets/audio/footsteps/serpent_tick_1.wav",
+    "res://assets/audio/footsteps/serpent_tick_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "gravel_scatter": {
+   "files": [
+    "res://assets/audio/footsteps/gravel_scatter_0.wav",
+    "res://assets/audio/footsteps/gravel_scatter_1.wav",
+    "res://assets/audio/footsteps/gravel_scatter_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_biped_canvas": {
+   "files": [
+    "res://assets/audio/footsteps/step_biped_canvas_0.wav",
+    "res://assets/audio/footsteps/step_biped_canvas_1.wav",
+    "res://assets/audio/footsteps/step_biped_canvas_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_crab_canvas": {
+   "files": [
+    "res://assets/audio/footsteps/step_crab_canvas_0.wav",
+    "res://assets/audio/footsteps/step_crab_canvas_1.wav",
+    "res://assets/audio/footsteps/step_crab_canvas_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_avian_canvas": {
+   "files": [
+    "res://assets/audio/footsteps/step_avian_canvas_0.wav",
+    "res://assets/audio/footsteps/step_avian_canvas_1.wav",
+    "res://assets/audio/footsteps/step_avian_canvas_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_quadruped_canvas": {
+   "files": [
+    "res://assets/audio/footsteps/step_quadruped_canvas_0.wav",
+    "res://assets/audio/footsteps/step_quadruped_canvas_1.wav",
+    "res://assets/audio/footsteps/step_quadruped_canvas_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "drag_serpent_canvas": {
+   "files": [
+    "res://assets/audio/footsteps/drag_serpent_canvas.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": true,
+   "spatial": true
+  },
+  "hop_land_canvas": {
+   "files": [
+    "res://assets/audio/footsteps/hop_land_canvas_0.wav",
+    "res://assets/audio/footsteps/hop_land_canvas_1.wav",
+    "res://assets/audio/footsteps/hop_land_canvas_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_biped_concrete": {
+   "files": [
+    "res://assets/audio/footsteps/step_biped_concrete_0.wav",
+    "res://assets/audio/footsteps/step_biped_concrete_1.wav",
+    "res://assets/audio/footsteps/step_biped_concrete_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_crab_concrete": {
+   "files": [
+    "res://assets/audio/footsteps/step_crab_concrete_0.wav",
+    "res://assets/audio/footsteps/step_crab_concrete_1.wav",
+    "res://assets/audio/footsteps/step_crab_concrete_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_avian_concrete": {
+   "files": [
+    "res://assets/audio/footsteps/step_avian_concrete_0.wav",
+    "res://assets/audio/footsteps/step_avian_concrete_1.wav",
+    "res://assets/audio/footsteps/step_avian_concrete_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_quadruped_concrete": {
+   "files": [
+    "res://assets/audio/footsteps/step_quadruped_concrete_0.wav",
+    "res://assets/audio/footsteps/step_quadruped_concrete_1.wav",
+    "res://assets/audio/footsteps/step_quadruped_concrete_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "drag_serpent_concrete": {
+   "files": [
+    "res://assets/audio/footsteps/drag_serpent_concrete.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": true,
+   "spatial": true
+  },
+  "hop_land_concrete": {
+   "files": [
+    "res://assets/audio/footsteps/hop_land_concrete_0.wav",
+    "res://assets/audio/footsteps/hop_land_concrete_1.wav",
+    "res://assets/audio/footsteps/hop_land_concrete_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_biped_steel": {
+   "files": [
+    "res://assets/audio/footsteps/step_biped_steel_0.wav",
+    "res://assets/audio/footsteps/step_biped_steel_1.wav",
+    "res://assets/audio/footsteps/step_biped_steel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_crab_steel": {
+   "files": [
+    "res://assets/audio/footsteps/step_crab_steel_0.wav",
+    "res://assets/audio/footsteps/step_crab_steel_1.wav",
+    "res://assets/audio/footsteps/step_crab_steel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_avian_steel": {
+   "files": [
+    "res://assets/audio/footsteps/step_avian_steel_0.wav",
+    "res://assets/audio/footsteps/step_avian_steel_1.wav",
+    "res://assets/audio/footsteps/step_avian_steel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_quadruped_steel": {
+   "files": [
+    "res://assets/audio/footsteps/step_quadruped_steel_0.wav",
+    "res://assets/audio/footsteps/step_quadruped_steel_1.wav",
+    "res://assets/audio/footsteps/step_quadruped_steel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "drag_serpent_steel": {
+   "files": [
+    "res://assets/audio/footsteps/drag_serpent_steel.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": true,
+   "spatial": true
+  },
+  "hop_land_steel": {
+   "files": [
+    "res://assets/audio/footsteps/hop_land_steel_0.wav",
+    "res://assets/audio/footsteps/hop_land_steel_1.wav",
+    "res://assets/audio/footsteps/hop_land_steel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_biped_plank": {
+   "files": [
+    "res://assets/audio/footsteps/step_biped_plank_0.wav",
+    "res://assets/audio/footsteps/step_biped_plank_1.wav",
+    "res://assets/audio/footsteps/step_biped_plank_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_crab_plank": {
+   "files": [
+    "res://assets/audio/footsteps/step_crab_plank_0.wav",
+    "res://assets/audio/footsteps/step_crab_plank_1.wav",
+    "res://assets/audio/footsteps/step_crab_plank_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_avian_plank": {
+   "files": [
+    "res://assets/audio/footsteps/step_avian_plank_0.wav",
+    "res://assets/audio/footsteps/step_avian_plank_1.wav",
+    "res://assets/audio/footsteps/step_avian_plank_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_quadruped_plank": {
+   "files": [
+    "res://assets/audio/footsteps/step_quadruped_plank_0.wav",
+    "res://assets/audio/footsteps/step_quadruped_plank_1.wav",
+    "res://assets/audio/footsteps/step_quadruped_plank_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "drag_serpent_plank": {
+   "files": [
+    "res://assets/audio/footsteps/drag_serpent_plank.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": true,
+   "spatial": true
+  },
+  "hop_land_plank": {
+   "files": [
+    "res://assets/audio/footsteps/hop_land_plank_0.wav",
+    "res://assets/audio/footsteps/hop_land_plank_1.wav",
+    "res://assets/audio/footsteps/hop_land_plank_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_biped_gravel": {
+   "files": [
+    "res://assets/audio/footsteps/step_biped_gravel_0.wav",
+    "res://assets/audio/footsteps/step_biped_gravel_1.wav",
+    "res://assets/audio/footsteps/step_biped_gravel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_crab_gravel": {
+   "files": [
+    "res://assets/audio/footsteps/step_crab_gravel_0.wav",
+    "res://assets/audio/footsteps/step_crab_gravel_1.wav",
+    "res://assets/audio/footsteps/step_crab_gravel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_avian_gravel": {
+   "files": [
+    "res://assets/audio/footsteps/step_avian_gravel_0.wav",
+    "res://assets/audio/footsteps/step_avian_gravel_1.wav",
+    "res://assets/audio/footsteps/step_avian_gravel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "step_quadruped_gravel": {
+   "files": [
+    "res://assets/audio/footsteps/step_quadruped_gravel_0.wav",
+    "res://assets/audio/footsteps/step_quadruped_gravel_1.wav",
+    "res://assets/audio/footsteps/step_quadruped_gravel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "drag_serpent_gravel": {
+   "files": [
+    "res://assets/audio/footsteps/drag_serpent_gravel.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": true,
+   "spatial": true
+  },
+  "hop_land_gravel": {
+   "files": [
+    "res://assets/audio/footsteps/hop_land_gravel_0.wav",
+    "res://assets/audio/footsteps/hop_land_gravel_1.wav",
+    "res://assets/audio/footsteps/hop_land_gravel_2.wav"
+   ],
+   "bus": "Movement",
+   "gain": -6,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 8,
+   "loop": false,
+   "spatial": true
+  },
+  "dash_attack": {
+   "alias": "whoosh_heavy",
+   "gain": -1
+  },
+  "taunt": {
+   "alias": "whoosh_light",
+   "gain": -6,
+   "pitch": [
+    0.8,
+    0.9
+   ]
+  },
+  "el_hit_scorch": {
+   "files": [
+    "res://assets/audio/elements/el_hit_scorch_0.wav",
+    "res://assets/audio/elements/el_hit_scorch_1.wav",
+    "res://assets/audio/elements/el_hit_scorch_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 75,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "el_hit_brine": {
+   "files": [
+    "res://assets/audio/elements/el_hit_brine_0.wav",
+    "res://assets/audio/elements/el_hit_brine_1.wav",
+    "res://assets/audio/elements/el_hit_brine_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 75,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "el_hit_static": {
+   "files": [
+    "res://assets/audio/elements/el_hit_static_0.wav",
+    "res://assets/audio/elements/el_hit_static_1.wav",
+    "res://assets/audio/elements/el_hit_static_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 75,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "el_hit_sludge": {
+   "files": [
+    "res://assets/audio/elements/el_hit_sludge_0.wav",
+    "res://assets/audio/elements/el_hit_sludge_1.wav",
+    "res://assets/audio/elements/el_hit_sludge_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 75,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "el_hit_grit": {
+   "files": [
+    "res://assets/audio/elements/el_hit_grit_0.wav",
+    "res://assets/audio/elements/el_hit_grit_1.wav",
+    "res://assets/audio/elements/el_hit_grit_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 75,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "el_hit_gale": {
+   "files": [
+    "res://assets/audio/elements/el_hit_gale_0.wav",
+    "res://assets/audio/elements/el_hit_gale_1.wav",
+    "res://assets/audio/elements/el_hit_gale_2.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 75,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "status_sizzle": {
+   "files": [
+    "res://assets/audio/elements/status_sizzle_0.wav",
+    "res://assets/audio/elements/status_sizzle_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 80,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "status_soaked": {
+   "files": [
+    "res://assets/audio/elements/status_soaked_0.wav",
+    "res://assets/audio/elements/status_soaked_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 80,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "status_jolted": {
+   "files": [
+    "res://assets/audio/elements/status_jolted_0.wav",
+    "res://assets/audio/elements/status_jolted_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 80,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "status_gunked": {
+   "files": [
+    "res://assets/audio/elements/status_gunked_0.wav",
+    "res://assets/audio/elements/status_gunked_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 80,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "status_caked": {
+   "files": [
+    "res://assets/audio/elements/status_caked_0.wav",
+    "res://assets/audio/elements/status_caked_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 80,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "status_winded": {
+   "files": [
+    "res://assets/audio/elements/status_winded_0.wav",
+    "res://assets/audio/elements/status_winded_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 80,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "zone_scorch": {
+   "files": [
+    "res://assets/audio/zones/zone_scorch.wav"
+   ],
+   "bus": "Zones",
+   "gain": -6,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "zone_brine": {
+   "files": [
+    "res://assets/audio/zones/zone_brine.wav"
+   ],
+   "bus": "Zones",
+   "gain": -6,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "zone_static": {
+   "files": [
+    "res://assets/audio/zones/zone_static.wav"
+   ],
+   "bus": "Zones",
+   "gain": -6,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "zone_sludge": {
+   "files": [
+    "res://assets/audio/zones/zone_sludge.wav"
+   ],
+   "bus": "Zones",
+   "gain": -6,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "zone_grit": {
+   "files": [
+    "res://assets/audio/zones/zone_grit.wav"
+   ],
+   "bus": "Zones",
+   "gain": -6,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "zone_gale": {
+   "files": [
+    "res://assets/audio/zones/zone_gale.wav"
+   ],
+   "bus": "Zones",
+   "gain": -6,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "zone_mud": {
+   "files": [
+    "res://assets/audio/zones/zone_mud.wav"
+   ],
+   "bus": "Zones",
+   "gain": -6,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "zone_steam": {
+   "files": [
+    "res://assets/audio/zones/zone_steam.wav"
+   ],
+   "bus": "Zones",
+   "gain": -6,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown": 0,
+   "priority": 30,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "react_steam_burst": {
+   "files": [
+    "res://assets/audio/reactions/react_steam_burst_0.wav",
+    "res://assets/audio/reactions/react_steam_burst_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_flare_up": {
+   "files": [
+    "res://assets/audio/reactions/react_flare_up_0.wav",
+    "res://assets/audio/reactions/react_flare_up_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_backdraft": {
+   "files": [
+    "res://assets/audio/reactions/react_backdraft_0.wav",
+    "res://assets/audio/reactions/react_backdraft_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_short_out": {
+   "files": [
+    "res://assets/audio/reactions/react_short_out_0.wav",
+    "res://assets/audio/reactions/react_short_out_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_mudbound": {
+   "files": [
+    "res://assets/audio/reactions/react_mudbound_0.wav",
+    "res://assets/audio/reactions/react_mudbound_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_dilute": {
+   "files": [
+    "res://assets/audio/reactions/react_dilute_0.wav",
+    "res://assets/audio/reactions/react_dilute_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_catalyze": {
+   "files": [
+    "res://assets/audio/reactions/react_catalyze_0.wav",
+    "res://assets/audio/reactions/react_catalyze_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_stormfront_mark": {
+   "files": [
+    "res://assets/audio/reactions/react_stormfront_mark_0.wav",
+    "res://assets/audio/reactions/react_stormfront_mark_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_stormfront_strike": {
+   "files": [
+    "res://assets/audio/reactions/react_stormfront_strike_0.wav",
+    "res://assets/audio/reactions/react_stormfront_strike_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_crust": {
+   "files": [
+    "res://assets/audio/reactions/react_crust_0.wav",
+    "res://assets/audio/reactions/react_crust_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_spray": {
+   "files": [
+    "res://assets/audio/reactions/react_spray_0.wav",
+    "res://assets/audio/reactions/react_spray_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "react_sandblast": {
+   "files": [
+    "res://assets/audio/reactions/react_sandblast_0.wav",
+    "res://assets/audio/reactions/react_sandblast_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 88,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "proj_launch_scorch": {
+   "files": [
+    "res://assets/audio/projectiles/proj_launch_scorch_0.wav",
+    "res://assets/audio/projectiles/proj_launch_scorch_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "proj_loop_scorch": {
+   "files": [
+    "res://assets/audio/projectiles/proj_loop_scorch.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "proj_hit_scorch": {
+   "alias": "el_hit_scorch",
+   "gain": -1,
+   "pitch": [
+    0.9,
+    1
+   ]
+  },
+  "proj_launch_brine": {
+   "files": [
+    "res://assets/audio/projectiles/proj_launch_brine_0.wav",
+    "res://assets/audio/projectiles/proj_launch_brine_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "proj_loop_brine": {
+   "files": [
+    "res://assets/audio/projectiles/proj_loop_brine.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "proj_hit_brine": {
+   "alias": "el_hit_brine",
+   "gain": -1,
+   "pitch": [
+    0.9,
+    1
+   ]
+  },
+  "proj_launch_static": {
+   "files": [
+    "res://assets/audio/projectiles/proj_launch_static_0.wav",
+    "res://assets/audio/projectiles/proj_launch_static_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "proj_loop_static": {
+   "files": [
+    "res://assets/audio/projectiles/proj_loop_static.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "proj_hit_static": {
+   "alias": "el_hit_static",
+   "gain": -1,
+   "pitch": [
+    0.9,
+    1
+   ]
+  },
+  "proj_launch_sludge": {
+   "files": [
+    "res://assets/audio/projectiles/proj_launch_sludge_0.wav",
+    "res://assets/audio/projectiles/proj_launch_sludge_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "proj_loop_sludge": {
+   "files": [
+    "res://assets/audio/projectiles/proj_loop_sludge.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "proj_hit_sludge": {
+   "alias": "el_hit_sludge",
+   "gain": -1,
+   "pitch": [
+    0.9,
+    1
+   ]
+  },
+  "proj_launch_grit": {
+   "files": [
+    "res://assets/audio/projectiles/proj_launch_grit_0.wav",
+    "res://assets/audio/projectiles/proj_launch_grit_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "proj_loop_grit": {
+   "files": [
+    "res://assets/audio/projectiles/proj_loop_grit.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "proj_hit_grit": {
+   "alias": "el_hit_grit",
+   "gain": -1,
+   "pitch": [
+    0.9,
+    1
+   ]
+  },
+  "proj_launch_gale": {
+   "files": [
+    "res://assets/audio/projectiles/proj_launch_gale_0.wav",
+    "res://assets/audio/projectiles/proj_launch_gale_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "proj_loop_gale": {
+   "files": [
+    "res://assets/audio/projectiles/proj_loop_gale.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": true,
+   "spatial": true
+  },
+  "proj_hit_gale": {
+   "alias": "el_hit_gale",
+   "gain": -1,
+   "pitch": [
+    0.9,
+    1
+   ]
+  },
+  "proj_reflect": {
+   "files": [
+    "res://assets/audio/projectiles/proj_reflect_0.wav",
+    "res://assets/audio/projectiles/proj_reflect_1.wav"
+   ],
+   "bus": "Movement",
+   "gain": -3,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "hazard_gutter_telegraph": {
+   "files": [
+    "res://assets/audio/hazards/hazard_gutter_telegraph.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "hazard_gutter_flood": {
+   "files": [
+    "res://assets/audio/hazards/hazard_gutter_flood.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": true,
+   "spatial": true
+  },
+  "hazard_crane_telegraph": {
+   "files": [
+    "res://assets/audio/hazards/hazard_crane_telegraph.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "hazard_crane_drop": {
+   "files": [
+    "res://assets/audio/hazards/hazard_crane_drop.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "hazard_plate_telegraph": {
+   "files": [
+    "res://assets/audio/hazards/hazard_plate_telegraph.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "hazard_plate_live": {
+   "files": [
+    "res://assets/audio/hazards/hazard_plate_live.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": true,
+   "spatial": true
+  },
+  "hazard_magnet_telegraph": {
+   "files": [
+    "res://assets/audio/hazards/hazard_magnet_telegraph.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "hazard_magnet_pull": {
+   "files": [
+    "res://assets/audio/hazards/hazard_magnet_pull.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": true,
+   "spatial": true
+  },
+  "hazard_wind_telegraph": {
+   "files": [
+    "res://assets/audio/hazards/hazard_wind_telegraph.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "hazard_wind_gust": {
+   "files": [
+    "res://assets/audio/hazards/hazard_wind_gust_0.wav",
+    "res://assets/audio/hazards/hazard_wind_gust_1.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "prop_break_wood": {
+   "files": [
+    "res://assets/audio/hazards/prop_break_wood_0.wav",
+    "res://assets/audio/hazards/prop_break_wood_1.wav",
+    "res://assets/audio/hazards/prop_break_wood_2.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "prop_break_metal": {
+   "files": [
+    "res://assets/audio/hazards/prop_break_metal_0.wav",
+    "res://assets/audio/hazards/prop_break_metal_1.wav",
+    "res://assets/audio/hazards/prop_break_metal_2.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "bumper_ding": {
+   "files": [
+    "res://assets/audio/hazards/bumper_ding_0.wav",
+    "res://assets/audio/hazards/bumper_ding_1.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "pickup_health": {
+   "files": [
+    "res://assets/audio/hazards/pickup_health_0.wav",
+    "res://assets/audio/hazards/pickup_health_1.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "pickup_hype": {
+   "files": [
+    "res://assets/audio/hazards/pickup_hype_0.wav",
+    "res://assets/audio/hazards/pickup_hype_1.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "drain_teleport": {
+   "files": [
+    "res://assets/audio/hazards/drain_teleport_0.wav",
+    "res://assets/audio/hazards/drain_teleport_1.wav"
+   ],
+   "bus": "Zones",
+   "gain": -2,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "zone_burning_puddle": {
+   "alias": "zone_scorch",
+   "gain": -4
+  },
+  "zone_live_puddle": {
+   "alias": "zone_static",
+   "gain": -5
+  },
+  "zone_fizzing_puddle": {
+   "alias": "zone_static",
+   "gain": -6,
+   "pitch": [
+    1.1,
+    1.15
+   ]
+  },
+  "zone_storm": {
+   "alias": "zone_gale",
+   "gain": -5
+  },
+  "zone_scorch_patch": {
+   "alias": "zone_scorch"
+  },
+  "zone_brine_puddle": {
+   "alias": "zone_brine"
+  },
+  "zone_static_field": {
+   "alias": "zone_static"
+  },
+  "zone_sludge_puddle": {
+   "alias": "zone_sludge"
+  },
+  "zone_grit_rubble": {
+   "alias": "zone_grit"
+  },
+  "zone_gale_vortex": {
+   "alias": "zone_gale"
+  },
+  "prop_burst_scorch": {
+   "alias": "status_sizzle"
+  },
+  "prop_burst_brine": {
+   "alias": "status_soaked"
+  },
+  "prop_burst_static": {
+   "alias": "status_jolted"
+  },
+  "prop_burst_sludge": {
+   "alias": "status_gunked"
+  },
+  "prop_burst_grit": {
+   "alias": "status_caked"
+  },
+  "prop_burst_gale": {
+   "alias": "status_winded"
+  },
+  "ab_steam_vent": {
+   "files": [
+    "res://assets/audio/abilities/ab_steam_vent_0.wav",
+    "res://assets/audio/abilities/ab_steam_vent_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 82,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "ab_stoke_fire": {
+   "files": [
+    "res://assets/audio/abilities/ab_stoke_fire.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 82,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "ab_anchor_drop": {
+   "files": [
+    "res://assets/audio/abilities/ab_anchor_drop.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 82,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "ab_dust_bowl": {
+   "files": [
+    "res://assets/audio/abilities/ab_dust_bowl.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -6,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 82,
+   "max_voices": 4,
+   "loop": true,
+   "spatial": true
+  },
+  "ab_bulldoze_start": {
+   "files": [
+    "res://assets/audio/abilities/ab_bulldoze_start_0.wav",
+    "res://assets/audio/abilities/ab_bulldoze_start_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 82,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "ab_spring_pad_place": {
+   "files": [
+    "res://assets/audio/abilities/ab_spring_pad_place.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -4,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 82,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "juice_pulse": {
+   "files": [
+    "res://assets/audio/juice/juice_pulse_0.wav",
+    "res://assets/audio/juice/juice_pulse_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.5,
+   "priority": 98,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": true
+  },
+  "juice_stoke": {
+   "files": [
+    "res://assets/audio/juice/juice_stoke.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.5,
+   "priority": 98,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": true
+  },
+  "juice_dredge": {
+   "files": [
+    "res://assets/audio/juice/juice_dredge.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.5,
+   "priority": 98,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": true
+  },
+  "juice_gusto": {
+   "files": [
+    "res://assets/audio/juice/juice_gusto.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.5,
+   "priority": 98,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": true
+  },
+  "juice_dozer": {
+   "files": [
+    "res://assets/audio/juice/juice_dozer.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.5,
+   "priority": 98,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": true
+  },
+  "juice_slurry": {
+   "files": [
+    "res://assets/audio/juice/juice_slurry.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.5,
+   "priority": 98,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": true
+  },
+  "juice_jitters": {
+   "files": [
+    "res://assets/audio/juice/juice_jitters.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.5,
+   "priority": 98,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": true
+  },
+  "juice_generic": {
+   "files": [
+    "res://assets/audio/juice/juice_generic.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.5,
+   "priority": 98,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": true
+  },
+  "juice_end": {
+   "files": [
+    "res://assets/audio/juice/juice_end.wav"
+   ],
+   "bus": "Impacts",
+   "gain": 0,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0.5,
+   "priority": 98,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": true
+  },
+  "taunt_sting": {
+   "files": [
+    "res://assets/audio/abilities/taunt_sting_0.wav",
+    "res://assets/audio/abilities/taunt_sting_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -6,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 82,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": true
+  },
+  "hype_tick": {
+   "files": [
+    "res://assets/audio/abilities/hype_tick_0.wav",
+    "res://assets/audio/abilities/hype_tick_1.wav"
+   ],
+   "bus": "Impacts",
+   "gain": -10,
+   "pitch": [
+    0.96,
+    1.04
+   ],
+   "cooldown": 0,
+   "priority": 82,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ab_tide_spit": {
+   "alias": "proj_launch_brine"
+  },
+  "ab_gust_bomb": {
+   "alias": "proj_launch_gale"
+  },
+  "ab_sludge_lob": {
+   "alias": "proj_launch_sludge"
+  },
+  "ab_arc_lash": {
+   "alias": "proj_launch_static"
+  },
+  "ab_hang_time": {
+   "alias": "hover_loop"
+  },
+  "ab_drain_dive": {
+   "alias": "blink_down"
+  },
+  "ab_drain_emerge": {
+   "alias": "blink_up"
+  },
+  "ab_bulldoze_loop": {
+   "alias": "charge_loop"
+  },
+  "ab_bulldoze_hit": {
+   "alias": "charge_release"
+  },
+  "ab_generic": {
+   "alias": "whoosh_heavy",
+   "gain": -2
+  },
+  "voice_stoke_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_stoke_grunt_0.wav",
+    "res://assets/audio/voices/voice_stoke_grunt_1.wav",
+    "res://assets/audio/voices/voice_stoke_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_stoke_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_stoke_hurt_0.wav",
+    "res://assets/audio/voices/voice_stoke_hurt_1.wav",
+    "res://assets/audio/voices/voice_stoke_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_stoke_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_stoke_ko_0.wav",
+    "res://assets/audio/voices/voice_stoke_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_stoke_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_stoke_taunt_0.wav",
+    "res://assets/audio/voices/voice_stoke_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_stoke_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_stoke_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_stoke_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_stoke_idle_0.wav",
+    "res://assets/audio/voices/voice_stoke_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dredge_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_dredge_grunt_0.wav",
+    "res://assets/audio/voices/voice_dredge_grunt_1.wav",
+    "res://assets/audio/voices/voice_dredge_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dredge_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_dredge_hurt_0.wav",
+    "res://assets/audio/voices/voice_dredge_hurt_1.wav",
+    "res://assets/audio/voices/voice_dredge_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dredge_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_dredge_ko_0.wav",
+    "res://assets/audio/voices/voice_dredge_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dredge_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_dredge_taunt_0.wav",
+    "res://assets/audio/voices/voice_dredge_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dredge_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_dredge_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dredge_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_dredge_idle_0.wav",
+    "res://assets/audio/voices/voice_dredge_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_gusto_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_gusto_grunt_0.wav",
+    "res://assets/audio/voices/voice_gusto_grunt_1.wav",
+    "res://assets/audio/voices/voice_gusto_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_gusto_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_gusto_hurt_0.wav",
+    "res://assets/audio/voices/voice_gusto_hurt_1.wav",
+    "res://assets/audio/voices/voice_gusto_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_gusto_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_gusto_ko_0.wav",
+    "res://assets/audio/voices/voice_gusto_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_gusto_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_gusto_taunt_0.wav",
+    "res://assets/audio/voices/voice_gusto_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_gusto_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_gusto_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_gusto_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_gusto_idle_0.wav",
+    "res://assets/audio/voices/voice_gusto_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dozer_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_dozer_grunt_0.wav",
+    "res://assets/audio/voices/voice_dozer_grunt_1.wav",
+    "res://assets/audio/voices/voice_dozer_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dozer_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_dozer_hurt_0.wav",
+    "res://assets/audio/voices/voice_dozer_hurt_1.wav",
+    "res://assets/audio/voices/voice_dozer_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dozer_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_dozer_ko_0.wav",
+    "res://assets/audio/voices/voice_dozer_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dozer_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_dozer_taunt_0.wav",
+    "res://assets/audio/voices/voice_dozer_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dozer_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_dozer_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_dozer_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_dozer_idle_0.wav",
+    "res://assets/audio/voices/voice_dozer_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_slurry_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_slurry_grunt_0.wav",
+    "res://assets/audio/voices/voice_slurry_grunt_1.wav",
+    "res://assets/audio/voices/voice_slurry_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_slurry_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_slurry_hurt_0.wav",
+    "res://assets/audio/voices/voice_slurry_hurt_1.wav",
+    "res://assets/audio/voices/voice_slurry_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_slurry_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_slurry_ko_0.wav",
+    "res://assets/audio/voices/voice_slurry_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_slurry_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_slurry_taunt_0.wav",
+    "res://assets/audio/voices/voice_slurry_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_slurry_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_slurry_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_slurry_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_slurry_idle_0.wav",
+    "res://assets/audio/voices/voice_slurry_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_jitters_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_jitters_grunt_0.wav",
+    "res://assets/audio/voices/voice_jitters_grunt_1.wav",
+    "res://assets/audio/voices/voice_jitters_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_jitters_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_jitters_hurt_0.wav",
+    "res://assets/audio/voices/voice_jitters_hurt_1.wav",
+    "res://assets/audio/voices/voice_jitters_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_jitters_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_jitters_ko_0.wav",
+    "res://assets/audio/voices/voice_jitters_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_jitters_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_jitters_taunt_0.wav",
+    "res://assets/audio/voices/voice_jitters_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_jitters_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_jitters_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_jitters_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_jitters_idle_0.wav",
+    "res://assets/audio/voices/voice_jitters_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_scrapling_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_scrapling_grunt_0.wav",
+    "res://assets/audio/voices/voice_scrapling_grunt_1.wav",
+    "res://assets/audio/voices/voice_scrapling_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_scrapling_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_scrapling_hurt_0.wav",
+    "res://assets/audio/voices/voice_scrapling_hurt_1.wav",
+    "res://assets/audio/voices/voice_scrapling_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_scrapling_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_scrapling_ko_0.wav",
+    "res://assets/audio/voices/voice_scrapling_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_scrapling_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_scrapling_taunt_0.wav",
+    "res://assets/audio/voices/voice_scrapling_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_scrapling_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_scrapling_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_scrapling_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_scrapling_idle_0.wav",
+    "res://assets/audio/voices/voice_scrapling_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_blister_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_blister_grunt_0.wav",
+    "res://assets/audio/voices/voice_blister_grunt_1.wav",
+    "res://assets/audio/voices/voice_blister_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_blister_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_blister_hurt_0.wav",
+    "res://assets/audio/voices/voice_blister_hurt_1.wav",
+    "res://assets/audio/voices/voice_blister_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_blister_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_blister_ko_0.wav",
+    "res://assets/audio/voices/voice_blister_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_blister_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_blister_taunt_0.wav",
+    "res://assets/audio/voices/voice_blister_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_blister_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_blister_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_blister_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_blister_idle_0.wav",
+    "res://assets/audio/voices/voice_blister_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_bilge_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_bilge_grunt_0.wav",
+    "res://assets/audio/voices/voice_bilge_grunt_1.wav",
+    "res://assets/audio/voices/voice_bilge_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_bilge_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_bilge_hurt_0.wav",
+    "res://assets/audio/voices/voice_bilge_hurt_1.wav",
+    "res://assets/audio/voices/voice_bilge_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_bilge_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_bilge_ko_0.wav",
+    "res://assets/audio/voices/voice_bilge_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_bilge_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_bilge_taunt_0.wav",
+    "res://assets/audio/voices/voice_bilge_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_bilge_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_bilge_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_bilge_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_bilge_idle_0.wav",
+    "res://assets/audio/voices/voice_bilge_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_conduit_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_conduit_grunt_0.wav",
+    "res://assets/audio/voices/voice_conduit_grunt_1.wav",
+    "res://assets/audio/voices/voice_conduit_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_conduit_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_conduit_hurt_0.wav",
+    "res://assets/audio/voices/voice_conduit_hurt_1.wav",
+    "res://assets/audio/voices/voice_conduit_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_conduit_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_conduit_ko_0.wav",
+    "res://assets/audio/voices/voice_conduit_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_conduit_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_conduit_taunt_0.wav",
+    "res://assets/audio/voices/voice_conduit_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_conduit_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_conduit_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_conduit_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_conduit_idle_0.wav",
+    "res://assets/audio/voices/voice_conduit_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_snappington_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_snappington_grunt_0.wav",
+    "res://assets/audio/voices/voice_snappington_grunt_1.wav",
+    "res://assets/audio/voices/voice_snappington_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_snappington_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_snappington_hurt_0.wav",
+    "res://assets/audio/voices/voice_snappington_hurt_1.wav",
+    "res://assets/audio/voices/voice_snappington_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_snappington_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_snappington_ko_0.wav",
+    "res://assets/audio/voices/voice_snappington_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_snappington_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_snappington_taunt_0.wav",
+    "res://assets/audio/voices/voice_snappington_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_snappington_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_snappington_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_snappington_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_snappington_idle_0.wav",
+    "res://assets/audio/voices/voice_snappington_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_lamprey_grunt": {
+   "files": [
+    "res://assets/audio/voices/voice_lamprey_grunt_0.wav",
+    "res://assets/audio/voices/voice_lamprey_grunt_1.wav",
+    "res://assets/audio/voices/voice_lamprey_grunt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_lamprey_hurt": {
+   "files": [
+    "res://assets/audio/voices/voice_lamprey_hurt_0.wav",
+    "res://assets/audio/voices/voice_lamprey_hurt_1.wav",
+    "res://assets/audio/voices/voice_lamprey_hurt_2.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0.3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_lamprey_ko": {
+   "files": [
+    "res://assets/audio/voices/voice_lamprey_ko_0.wav",
+    "res://assets/audio/voices/voice_lamprey_ko_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 95,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_lamprey_taunt": {
+   "files": [
+    "res://assets/audio/voices/voice_lamprey_taunt_0.wav",
+    "res://assets/audio/voices/voice_lamprey_taunt_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 3,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_lamprey_juice": {
+   "files": [
+    "res://assets/audio/voices/voice_lamprey_juice.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -3,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 0,
+   "priority": 90,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "voice_lamprey_idle": {
+   "files": [
+    "res://assets/audio/voices/voice_lamprey_idle_0.wav",
+    "res://assets/audio/voices/voice_lamprey_idle_1.wav"
+   ],
+   "bus": "Creatures",
+   "gain": -8,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown": 4,
+   "priority": 60,
+   "max_voices": 6,
+   "loop": false,
+   "spatial": true
+  },
+  "ui_move": {
+   "files": [
+    "res://assets/audio/ui/ui_move_0.wav",
+    "res://assets/audio/ui/ui_move_1.wav",
+    "res://assets/audio/ui/ui_move_2.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0.03,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_accept": {
+   "files": [
+    "res://assets/audio/ui/ui_accept_0.wav",
+    "res://assets/audio/ui/ui_accept_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_back": {
+   "files": [
+    "res://assets/audio/ui/ui_back_0.wav",
+    "res://assets/audio/ui/ui_back_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_error": {
+   "files": [
+    "res://assets/audio/ui/ui_error_0.wav",
+    "res://assets/audio/ui/ui_error_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_toggle": {
+   "files": [
+    "res://assets/audio/ui/ui_toggle_0.wav",
+    "res://assets/audio/ui/ui_toggle_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_slider": {
+   "files": [
+    "res://assets/audio/ui/ui_slider_0.wav",
+    "res://assets/audio/ui/ui_slider_1.wav",
+    "res://assets/audio/ui/ui_slider_2.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0.02,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_tab": {
+   "files": [
+    "res://assets/audio/ui/ui_tab_0.wav",
+    "res://assets/audio/ui/ui_tab_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_stamp": {
+   "files": [
+    "res://assets/audio/ui/ui_stamp_0.wav",
+    "res://assets/audio/ui/ui_stamp_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_scrip": {
+   "files": [
+    "res://assets/audio/ui/ui_scrip_0.wav",
+    "res://assets/audio/ui/ui_scrip_1.wav",
+    "res://assets/audio/ui/ui_scrip_2.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0.05,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_supplement": {
+   "files": [
+    "res://assets/audio/ui/ui_supplement_0.wav",
+    "res://assets/audio/ui/ui_supplement_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_banned": {
+   "files": [
+    "res://assets/audio/ui/ui_banned.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_hype_full": {
+   "files": [
+    "res://assets/audio/ui/ui_hype_full.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_hype_loop": {
+   "files": [
+    "res://assets/audio/ui/ui_hype_loop.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": true,
+   "spatial": false
+  },
+  "ui_cooldown_ready": {
+   "files": [
+    "res://assets/audio/ui/ui_cooldown_ready_0.wav",
+    "res://assets/audio/ui/ui_cooldown_ready_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_round_card": {
+   "files": [
+    "res://assets/audio/ui/ui_round_card.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_fight": {
+   "files": [
+    "res://assets/audio/ui/ui_fight.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_pause": {
+   "files": [
+    "res://assets/audio/ui/ui_pause.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_unpause": {
+   "files": [
+    "res://assets/audio/ui/ui_unpause.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_timer_tick": {
+   "files": [
+    "res://assets/audio/ui/ui_timer_tick_0.wav",
+    "res://assets/audio/ui/ui_timer_tick_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_open": {
+   "files": [
+    "res://assets/audio/ui/ui_open.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_close": {
+   "files": [
+    "res://assets/audio/ui/ui_close.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_card_flip": {
+   "files": [
+    "res://assets/audio/ui/ui_card_flip_0.wav",
+    "res://assets/audio/ui/ui_card_flip_1.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_purchase": {
+   "files": [
+    "res://assets/audio/ui/ui_purchase.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_notify": {
+   "files": [
+    "res://assets/audio/ui/ui_notify.wav"
+   ],
+   "bus": "UI",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 70,
+   "max_voices": 4,
+   "loop": false,
+   "spatial": false
+  },
+  "ui_denied": {
+   "alias": "ui_error"
+  },
+  "ui_focus": {
+   "alias": "ui_move"
+  },
+  "ui_select": {
+   "alias": "ui_accept"
+  },
+  "ui_cancel": {
+   "alias": "ui_back"
+  },
+  "crowd_murmur": {
+   "files": [
+    "res://assets/audio/crowd/crowd_murmur.wav"
+   ],
+   "bus": "Crowd",
+   "gain": -8,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 0,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": true,
+   "spatial": false
+  },
+  "crowd_excited": {
+   "files": [
+    "res://assets/audio/crowd/crowd_excited.wav"
+   ],
+   "bus": "Crowd",
+   "gain": -6,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 0,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": true,
+   "spatial": false
+  },
+  "crowd_roar": {
+   "files": [
+    "res://assets/audio/crowd/crowd_roar.wav"
+   ],
+   "bus": "Crowd",
+   "gain": -4,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 0,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": true,
+   "spatial": false
+  },
+  "crowd_ooh": {
+   "files": [
+    "res://assets/audio/crowd/crowd_ooh_0.wav",
+    "res://assets/audio/crowd/crowd_ooh_1.wav",
+    "res://assets/audio/crowd/crowd_ooh_2.wav"
+   ],
+   "bus": "Crowd",
+   "gain": 0,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 8,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": false,
+   "spatial": false
+  },
+  "crowd_aww": {
+   "files": [
+    "res://assets/audio/crowd/crowd_aww_0.wav",
+    "res://assets/audio/crowd/crowd_aww_1.wav",
+    "res://assets/audio/crowd/crowd_aww_2.wav"
+   ],
+   "bus": "Crowd",
+   "gain": 0,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 8,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": false,
+   "spatial": false
+  },
+  "crowd_boo": {
+   "files": [
+    "res://assets/audio/crowd/crowd_boo_0.wav",
+    "res://assets/audio/crowd/crowd_boo_1.wav"
+   ],
+   "bus": "Crowd",
+   "gain": 0,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 8,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": false,
+   "spatial": false
+  },
+  "crowd_gasp": {
+   "files": [
+    "res://assets/audio/crowd/crowd_gasp_0.wav",
+    "res://assets/audio/crowd/crowd_gasp_1.wav"
+   ],
+   "bus": "Crowd",
+   "gain": 0,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 8,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": false,
+   "spatial": false
+  },
+  "crowd_laugh": {
+   "files": [
+    "res://assets/audio/crowd/crowd_laugh_0.wav",
+    "res://assets/audio/crowd/crowd_laugh_1.wav"
+   ],
+   "bus": "Crowd",
+   "gain": 0,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 8,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": false,
+   "spatial": false
+  },
+  "crowd_cheer": {
+   "files": [
+    "res://assets/audio/crowd/crowd_cheer_0.wav",
+    "res://assets/audio/crowd/crowd_cheer_1.wav",
+    "res://assets/audio/crowd/crowd_cheer_2.wav"
+   ],
+   "bus": "Crowd",
+   "gain": 0,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 6,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": false,
+   "spatial": false
+  },
+  "crowd_chant": {
+   "files": [
+    "res://assets/audio/crowd/crowd_chant.wav"
+   ],
+   "bus": "Crowd",
+   "gain": -5,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 0,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": true,
+   "spatial": false
+  },
+  "crowd_can_shower": {
+   "files": [
+    "res://assets/audio/crowd/crowd_can_shower_0.wav",
+    "res://assets/audio/crowd/crowd_can_shower_1.wav"
+   ],
+   "bus": "Crowd",
+   "gain": 0,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 10,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": false,
+   "spatial": false
+  },
+  "crowd_whistle": {
+   "files": [
+    "res://assets/audio/crowd/crowd_whistle_0.wav",
+    "res://assets/audio/crowd/crowd_whistle_1.wav"
+   ],
+   "bus": "Crowd",
+   "gain": -8,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown": 5,
+   "priority": 40,
+   "max_voices": 3,
+   "loop": false,
+   "spatial": false
+  },
+  "amb_gullet": {
+   "files": [
+    "res://assets/audio/ambience/amb_gullet.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_drydock": {
+   "files": [
+    "res://assets/audio/ambience/amb_drydock.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_crusher": {
+   "files": [
+    "res://assets/audio/ambience/amb_crusher.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_rooftop": {
+   "files": [
+    "res://assets/audio/ambience/amb_rooftop.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_hub_main": {
+   "files": [
+    "res://assets/audio/ambience/amb_hub_main.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_hub_juice_bar": {
+   "files": [
+    "res://assets/audio/ambience/amb_hub_juice_bar.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_hub_dock": {
+   "files": [
+    "res://assets/audio/ambience/amb_hub_dock.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_hub_office": {
+   "files": [
+    "res://assets/audio/ambience/amb_hub_office.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_hub_boiler": {
+   "files": [
+    "res://assets/audio/ambience/amb_hub_boiler.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_hub_locker": {
+   "files": [
+    "res://assets/audio/ambience/amb_hub_locker.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_hub_booth": {
+   "files": [
+    "res://assets/audio/ambience/amb_hub_booth.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "amb_menu": {
+   "files": [
+    "res://assets/audio/ambience/amb_menu.wav"
+   ],
+   "bus": "Ambience",
+   "gain": -8,
+   "pitch": [
+    1,
+    1
+   ],
+   "cooldown": 0,
+   "priority": 20,
+   "max_voices": 2,
+   "loop": true,
+   "spatial": false
+  },
+  "ann_bell": {
+   "files": [
+    "res://assets/audio/announcer/ann_bell_0.wav",
+    "res://assets/audio/announcer/ann_bell_1.wav"
+   ],
+   "bus": "Dialogue",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 85,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": false
+  },
+  "ann_bell_triple": {
+   "files": [
+    "res://assets/audio/announcer/ann_bell_triple.wav"
+   ],
+   "bus": "Dialogue",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 85,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": false
+  },
+  "ann_sting": {
+   "files": [
+    "res://assets/audio/announcer/ann_sting_0.wav",
+    "res://assets/audio/announcer/ann_sting_1.wav"
+   ],
+   "bus": "Dialogue",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 85,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": false
+  },
+  "ann_mic_pop": {
+   "files": [
+    "res://assets/audio/announcer/ann_mic_pop.wav"
+   ],
+   "bus": "Dialogue",
+   "gain": -2,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown": 0,
+   "priority": 85,
+   "max_voices": 2,
+   "loop": false,
+   "spatial": false
+  }
+ },
+ "music": {
+  "fight_night_poster": {
+   "file": "res://assets/audio/music/fight_night_poster.wav",
+   "title": "Fight Night Poster",
+   "bpm": 104,
+   "beats_per_bar": 4,
+   "bars": 56,
+   "seconds": 129.231,
+   "bar_seconds": 2.307692,
+   "sections": [
+    {
+     "id": "intro",
+     "startBar": 1,
+     "bars": 4
+    },
+    {
+     "id": "A",
+     "startBar": 5,
+     "bars": 16
+    },
+    {
+     "id": "B",
+     "startBar": 21,
+     "bars": 16
+    },
+    {
+     "id": "A2",
+     "startBar": 37,
+     "bars": 16
+    },
+    {
+     "id": "tag",
+     "startBar": 53,
+     "bars": 4
+    }
+   ],
+   "gain": -6,
+   "loop": {
+    "begin": 407077,
+    "end": 5699077,
+    "start_bar": 5,
+    "end_bar": 56
+   },
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "menu"
+   ],
+   "stinger": false
+  },
+  "cannery_radio": {
+   "file": "res://assets/audio/music/cannery_radio.wav",
+   "title": "Cannery Radio",
+   "bpm": 92,
+   "beats_per_bar": 4,
+   "bars": 56,
+   "seconds": 146.087,
+   "bar_seconds": 2.608696,
+   "sections": [
+    {
+     "id": "A",
+     "startBar": 1,
+     "bars": 16
+    },
+    {
+     "id": "B",
+     "startBar": 17,
+     "bars": 16
+    },
+    {
+     "id": "A2",
+     "startBar": 33,
+     "bars": 16
+    },
+    {
+     "id": "C",
+     "startBar": 49,
+     "bars": 8
+    }
+   ],
+   "gain": -12,
+   "loop": {
+    "begin": 0,
+    "end": 3221217,
+    "start_bar": 1,
+    "end_bar": 56
+   },
+   "stereo": false,
+   "sr": 22050,
+   "layers": [],
+   "tags": [
+    "hub",
+    "diegetic"
+   ],
+   "stinger": false
+  },
+  "combat_a": {
+   "file": "res://assets/audio/music/combat_a.wav",
+   "title": "Undercard Scrap",
+   "bpm": 128,
+   "beats_per_bar": 4,
+   "bars": 56,
+   "seconds": 105,
+   "bar_seconds": 1.875,
+   "sections": [
+    {
+     "id": "A",
+     "startBar": 1,
+     "bars": 16
+    },
+    {
+     "id": "B",
+     "startBar": 17,
+     "bars": 16
+    },
+    {
+     "id": "A2",
+     "startBar": 33,
+     "bars": 16
+    },
+    {
+     "id": "C",
+     "startBar": 49,
+     "bars": 8
+    }
+   ],
+   "gain": -8,
+   "loop": {
+    "begin": 0,
+    "end": 4630500,
+    "start_bar": 1,
+    "end_bar": 56
+   },
+   "stereo": true,
+   "sr": 44100,
+   "layers": [
+    {
+     "id": "lead",
+     "file": "res://assets/audio/music/combat_a_lead.wav",
+     "default_db": -80,
+     "loop_bars": 56,
+     "kind": "intensity",
+     "seconds": 105,
+     "sr": 22050
+    },
+    {
+     "id": "perc2",
+     "file": "res://assets/audio/music/combat_a_perc2.wav",
+     "default_db": -80,
+     "loop_bars": 4,
+     "kind": "variant",
+     "seconds": 7.5,
+     "sr": 44100
+    },
+    {
+     "id": "perc3",
+     "file": "res://assets/audio/music/combat_a_perc3.wav",
+     "default_db": -80,
+     "loop_bars": 4,
+     "kind": "variant",
+     "seconds": 7.5,
+     "sr": 44100
+    }
+   ],
+   "tags": [
+    "combat"
+   ],
+   "stinger": false
+  },
+  "combat_b": {
+   "file": "res://assets/audio/music/combat_b.wav",
+   "title": "Main Card Heat",
+   "bpm": 128,
+   "beats_per_bar": 4,
+   "bars": 56,
+   "seconds": 105,
+   "bar_seconds": 1.875,
+   "sections": [
+    {
+     "id": "A",
+     "startBar": 1,
+     "bars": 16
+    },
+    {
+     "id": "B",
+     "startBar": 17,
+     "bars": 16
+    },
+    {
+     "id": "A2",
+     "startBar": 33,
+     "bars": 16
+    },
+    {
+     "id": "D",
+     "startBar": 49,
+     "bars": 8
+    }
+   ],
+   "gain": -8,
+   "loop": {
+    "begin": 0,
+    "end": 4630500,
+    "start_bar": 1,
+    "end_bar": 56
+   },
+   "stereo": true,
+   "sr": 44100,
+   "layers": [
+    {
+     "id": "arp",
+     "file": "res://assets/audio/music/combat_b_arp.wav",
+     "default_db": 0,
+     "loop_bars": 56,
+     "kind": "lead",
+     "seconds": 105,
+     "sr": 22050
+    },
+    {
+     "id": "perc2",
+     "file": "res://assets/audio/music/combat_b_perc2.wav",
+     "default_db": -80,
+     "loop_bars": 4,
+     "kind": "variant",
+     "seconds": 7.5,
+     "sr": 44100
+    },
+    {
+     "id": "perc3",
+     "file": "res://assets/audio/music/combat_b_perc3.wav",
+     "default_db": -80,
+     "loop_bars": 4,
+     "kind": "variant",
+     "seconds": 7.5,
+     "sr": 44100
+    }
+   ],
+   "tags": [
+    "combat"
+   ],
+   "stinger": false
+  },
+  "boss": {
+   "file": "res://assets/audio/music/boss.wav",
+   "title": "Her Honor",
+   "bpm": 132,
+   "beats_per_bar": 4,
+   "bars": 40,
+   "seconds": 72.727,
+   "bar_seconds": 1.818182,
+   "sections": [
+    {
+     "id": "intro",
+     "startBar": 1,
+     "bars": 8
+    },
+    {
+     "id": "A",
+     "startBar": 9,
+     "bars": 16
+    },
+    {
+     "id": "B",
+     "startBar": 25,
+     "bars": 16
+    }
+   ],
+   "gain": -8,
+   "loop": {
+    "begin": 641455,
+    "end": 3207273,
+    "start_bar": 9,
+    "end_bar": 40
+   },
+   "stereo": true,
+   "sr": 44100,
+   "layers": [
+    {
+     "id": "p2",
+     "file": "res://assets/audio/music/boss_p2.wav",
+     "default_db": -80,
+     "loop_bars": 40,
+     "kind": "phase",
+     "seconds": 72.727,
+     "sr": 22050
+    },
+    {
+     "id": "bilge",
+     "file": "res://assets/audio/music/boss_bilge.wav",
+     "default_db": -80,
+     "loop_bars": 2,
+     "kind": "boss",
+     "seconds": 3.636,
+     "sr": 44100
+    },
+    {
+     "id": "conduit",
+     "file": "res://assets/audio/music/boss_conduit.wav",
+     "default_db": -80,
+     "loop_bars": 2,
+     "kind": "boss",
+     "seconds": 3.636,
+     "sr": 44100
+    },
+    {
+     "id": "snappington",
+     "file": "res://assets/audio/music/boss_snappington.wav",
+     "default_db": -80,
+     "loop_bars": 2,
+     "kind": "boss",
+     "seconds": 3.636,
+     "sr": 44100
+    }
+   ],
+   "tags": [
+    "boss"
+   ],
+   "stinger": false
+  },
+  "victory": {
+   "file": "res://assets/audio/music/victory.wav",
+   "title": "Belt Up",
+   "bpm": 120,
+   "beats_per_bar": 4,
+   "bars": 6,
+   "seconds": 15.5,
+   "bar_seconds": 2,
+   "sections": [
+    {
+     "id": "fanfare",
+     "startBar": 1,
+     "bars": 4
+    },
+    {
+     "id": "tag",
+     "startBar": 5,
+     "bars": 2
+    }
+   ],
+   "gain": -6,
+   "loop": null,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "sting",
+    "win"
+   ],
+   "stinger": true
+  },
+  "defeat": {
+   "file": "res://assets/audio/music/defeat.wav",
+   "title": "Cut Man",
+   "bpm": 70,
+   "beats_per_bar": 4,
+   "bars": 4,
+   "seconds": 17.714,
+   "bar_seconds": 3.428571,
+   "sections": [
+    {
+     "id": "A",
+     "startBar": 1,
+     "bars": 4
+    }
+   ],
+   "gain": -6,
+   "loop": null,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "sting",
+    "loss"
+   ],
+   "stinger": true
+  },
+  "title_night": {
+   "file": "res://assets/audio/music/title_night.wav",
+   "title": "Title Night",
+   "bpm": 112,
+   "beats_per_bar": 4,
+   "bars": 28,
+   "seconds": 60,
+   "bar_seconds": 2.142857,
+   "sections": [
+    {
+     "id": "intro",
+     "startBar": 1,
+     "bars": 4
+    },
+    {
+     "id": "A",
+     "startBar": 5,
+     "bars": 16
+    },
+    {
+     "id": "B",
+     "startBar": 21,
+     "bars": 8
+    }
+   ],
+   "gain": -6,
+   "loop": {
+    "begin": 378000,
+    "end": 2646000,
+    "start_bar": 5,
+    "end_bar": 28
+   },
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "title",
+    "menu_bonus"
+   ],
+   "stinger": false
+  }
+ },
+ "voices": {
+  "barnaby": {
+   "speaker": "barnaby",
+   "f0": 150,
+   "rate": 11,
+   "pouch": 460,
+   "honk": 1.9,
+   "brightness": 1,
+   "nasal": 0.15,
+   "jitter": 0.025,
+   "growl": 0.12,
+   "grainMs": [
+    70,
+    105
+   ],
+   "consMs": 32,
+   "contour": "auction",
+   "capsGain": 1.4,
+   "capsPitch": 1.3,
+   "fanfare": true,
+   "breath": 0.08,
+   "sr": 22050,
+   "grains": {
+    "v_a_0": "res://assets/audio/announcer/barnaby/v_a_0.wav",
+    "v_a_1": "res://assets/audio/announcer/barnaby/v_a_1.wav",
+    "v_e_0": "res://assets/audio/announcer/barnaby/v_e_0.wav",
+    "v_e_1": "res://assets/audio/announcer/barnaby/v_e_1.wav",
+    "v_i_0": "res://assets/audio/announcer/barnaby/v_i_0.wav",
+    "v_i_1": "res://assets/audio/announcer/barnaby/v_i_1.wav",
+    "v_o_0": "res://assets/audio/announcer/barnaby/v_o_0.wav",
+    "v_o_1": "res://assets/audio/announcer/barnaby/v_o_1.wav",
+    "v_u_0": "res://assets/audio/announcer/barnaby/v_u_0.wav",
+    "v_u_1": "res://assets/audio/announcer/barnaby/v_u_1.wav",
+    "c_plosive_0": "res://assets/audio/announcer/barnaby/c_plosive_0.wav",
+    "c_plosive_1": "res://assets/audio/announcer/barnaby/c_plosive_1.wav",
+    "c_sibilant_0": "res://assets/audio/announcer/barnaby/c_sibilant_0.wav",
+    "c_sibilant_1": "res://assets/audio/announcer/barnaby/c_sibilant_1.wav",
+    "c_sh_0": "res://assets/audio/announcer/barnaby/c_sh_0.wav",
+    "c_sh_1": "res://assets/audio/announcer/barnaby/c_sh_1.wav",
+    "c_fric_0": "res://assets/audio/announcer/barnaby/c_fric_0.wav",
+    "c_fric_1": "res://assets/audio/announcer/barnaby/c_fric_1.wav",
+    "c_nasal_0": "res://assets/audio/announcer/barnaby/c_nasal_0.wav",
+    "c_nasal_1": "res://assets/audio/announcer/barnaby/c_nasal_1.wav",
+    "c_liquid_0": "res://assets/audio/announcer/barnaby/c_liquid_0.wav",
+    "c_liquid_1": "res://assets/audio/announcer/barnaby/c_liquid_1.wav",
+    "fanfare": "res://assets/audio/announcer/barnaby/fanfare.wav"
+   }
+  },
+  "granny": {
+   "speaker": "granny",
+   "f0": 128,
+   "rate": 7,
+   "pouch": 260,
+   "honk": 1.1,
+   "brightness": 0.75,
+   "nasal": 0.45,
+   "jitter": 0.045,
+   "growl": 0,
+   "grainMs": [
+    100,
+    135
+   ],
+   "consMs": 40,
+   "contour": "flat",
+   "capsGain": 1,
+   "capsPitch": 1.08,
+   "fanfare": false,
+   "breath": 0.14,
+   "creak": 0.3,
+   "sr": 22050,
+   "grains": {
+    "v_a_0": "res://assets/audio/announcer/granny/v_a_0.wav",
+    "v_a_1": "res://assets/audio/announcer/granny/v_a_1.wav",
+    "v_e_0": "res://assets/audio/announcer/granny/v_e_0.wav",
+    "v_e_1": "res://assets/audio/announcer/granny/v_e_1.wav",
+    "v_i_0": "res://assets/audio/announcer/granny/v_i_0.wav",
+    "v_i_1": "res://assets/audio/announcer/granny/v_i_1.wav",
+    "v_o_0": "res://assets/audio/announcer/granny/v_o_0.wav",
+    "v_o_1": "res://assets/audio/announcer/granny/v_o_1.wav",
+    "v_u_0": "res://assets/audio/announcer/granny/v_u_0.wav",
+    "v_u_1": "res://assets/audio/announcer/granny/v_u_1.wav",
+    "c_plosive_0": "res://assets/audio/announcer/granny/c_plosive_0.wav",
+    "c_plosive_1": "res://assets/audio/announcer/granny/c_plosive_1.wav",
+    "c_sibilant_0": "res://assets/audio/announcer/granny/c_sibilant_0.wav",
+    "c_sibilant_1": "res://assets/audio/announcer/granny/c_sibilant_1.wav",
+    "c_sh_0": "res://assets/audio/announcer/granny/c_sh_0.wav",
+    "c_sh_1": "res://assets/audio/announcer/granny/c_sh_1.wav",
+    "c_fric_0": "res://assets/audio/announcer/granny/c_fric_0.wav",
+    "c_fric_1": "res://assets/audio/announcer/granny/c_fric_1.wav",
+    "c_nasal_0": "res://assets/audio/announcer/granny/c_nasal_0.wav",
+    "c_nasal_1": "res://assets/audio/announcer/granny/c_nasal_1.wav",
+    "c_liquid_0": "res://assets/audio/announcer/granny/c_liquid_0.wav",
+    "c_liquid_1": "res://assets/audio/announcer/granny/c_liquid_1.wav",
+    "eh": "res://assets/audio/announcer/granny/eh.wav"
+   }
+  }
+ },
+ "creatures": {
+  "f_stoke": {
+   "voice": "stoke",
+   "material": "flesh",
+   "plan": "biped",
+   "juice": "juice_stoke",
+   "step_extra": "step_stoke_clank"
+  },
+  "f_dredge": {
+   "voice": "dredge",
+   "material": "chitin",
+   "plan": "crab",
+   "juice": "juice_dredge"
+  },
+  "f_gusto": {
+   "voice": "gusto",
+   "material": "flesh",
+   "plan": "avian",
+   "juice": "juice_gusto",
+   "dash_extra": "flap"
+  },
+  "f_dozer": {
+   "voice": "dozer",
+   "material": "chitin",
+   "plan": "quadruped",
+   "juice": "juice_dozer"
+  },
+  "f_slurry": {
+   "voice": "slurry",
+   "material": "jelly",
+   "plan": "serpent",
+   "juice": "juice_slurry",
+   "drip": "serpent_drip"
+  },
+  "f_jitters": {
+   "voice": "jitters",
+   "material": "jelly",
+   "plan": "hopper",
+   "juice": "juice_jitters"
+  },
+  "m_scrapling": {
+   "voice": "scrapling",
+   "material": "chitin",
+   "plan": "biped",
+   "juice": "juice_generic"
+  },
+  "m_blister": {
+   "voice": "blister",
+   "material": "jelly",
+   "plan": "hopper",
+   "juice": "juice_generic",
+   "land": "hop_land_wet"
+  },
+  "b_bilge": {
+   "voice": "bilge",
+   "material": "flesh",
+   "plan": "quadruped",
+   "juice": "juice_generic"
+  },
+  "b_conduit": {
+   "voice": "conduit",
+   "material": "chitin",
+   "plan": "serpent",
+   "juice": "juice_generic",
+   "drip": "serpent_tick"
+  },
+  "b_snappington": {
+   "voice": "snappington",
+   "material": "chitin",
+   "plan": "quadruped",
+   "juice": "juice_generic"
+  },
+  "kid_lamprey": {
+   "voice": "lamprey",
+   "material": "flesh",
+   "plan": "biped",
+   "juice": "juice_generic"
+  },
+  "dev_biped": {
+   "voice": "stoke",
+   "material": "flesh",
+   "plan": "biped",
+   "juice": "juice_generic"
+  }
+ }
+}
