@@ -474,9 +474,19 @@ authority:
   excluded); `member_joined(id)` / `member_left(id, "disconnected" | "left" | "session ended")`
   follow the lobby and the end of the session. Delivery is reliable and ordered per sender;
   `net.*` and `mode.*` types are never relayed; relayed messages are limited to 16 KB and charged
-  per recipient; dedicated servers can switch relaying off (`server.party_relay`). The relay passes
-  messages on unchanged with the true sender id, so receivers must validate them: members should
-  accept host-only messages (run state, tickets, run end) only from the host's member id.
+  per recipient; dedicated servers can switch relaying off (`server.party_relay`).
+* **Sender identity is authenticated by the connection, never taken from a message.** The
+  authority maps every ENet peer to the player it admitted (password, version and content checks)
+  and relays with that player's id (`relay_app(p.id, ...)`); fields in or around the payload
+  (`from`, `host`, ...) are never read for it. A client's network host accepts exactly one peer
+  (its server), so `S_APP` sender ids come only from the authority. Only the listen host's own
+  messages carry member id 1. Member ids are never reused while the server process runs (a
+  rejoin keeps its id; a new join gets a new one); they start again after a server restart, so
+  identity across sessions needs the campaign's own check. A direct request to the authority
+  (`Net.request`, `app_request`) never reaches the party channel. Tested in
+  `test_net_loopback::test_party_relay_inprocess` (a member's message dressed up as the host's
+  still arrives with the member's id). Receivers still decide *who may send what*: members accept
+  host-only messages (run state, tickets, run end) only from the current host's member id.
 
 ## 15. Measured bandwidth and server cost
 
@@ -554,7 +564,7 @@ $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 | `test_net_codec.gd` | Writer/reader, bounds, quantization error, event codec round trip, 3000-buffer fuzz + every truncation, input clamping, remote-input redundancy/jitter buffer, payload sanitizer, beacons, reasons, password proof, config parser (incl. `server.mods`), package-list codec, content verdict over `Mods.compare`, assist clamping, rate limiter |
 | `test_net_playlist.gd` | Weight distribution (10 000 draws), distinct candidates, repeat avoidance + relaxation, vote/tie/no-vote rules, min players + bot fill, invalid entries/missing content messages, persistence, shipped playlists |
 | `test_net_snapshot.gd` | FK reconstruction vs live sim, snapshot sizes, roster generations, interpolation/teleport/generation switch, event scheduling, mirror driving the real FightHud |
-| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, oversized/flood, host leaving, timeout, LAN discovery, host scene removed mid-match, mode picks for remote players (+ pick timeout), party relay (limits, session end), arena checks before the match (local hash, mismatch, damaged and oversized packages, sandboxed import round trip), AI Lab policy bots (policy hash in the options and MATCH_START) + rules validation, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (`LQ_ASSIST`, snapped levels, `match.player_assist`), live network settings + invite text |
+| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, oversized/flood, host leaving, timeout, LAN discovery, host scene removed mid-match, mode picks for remote players (+ pick timeout), party relay (authenticated sender ids, limits, session end), arena checks before the match (local hash, mismatch, damaged and oversized packages, sandboxed import round trip), AI Lab policy bots (policy hash in the options and MATCH_START) + rules validation, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (`LQ_ASSIST`, snapped levels, `match.player_assist`), live network settings + invite text |
 | `test_net_multiprocess.gd` | Independent processes: dedicated match (hits, KO, results, presenting client), rejections (password, full, protocol, build, content refused on the client with Mods.compare wording), server mods (`server.mods` + client `--mods`, vanilla client refused, modded client plays the mod's preset, admin status lists packages), damage injection, disconnect + rejoin, stdin console shutdown, TCP admin auth/kick/ban/shutdown, 80 +- 20 ms / 2 % loss match, listen host (own `user:` rules preset sent in full and own `user:` arena sent as a package to a guest without either, guest aim assist applied, party messages) + remote client + app round trip, bonus modes (Chum Rush, Absolute Unit), LAN discovery, playlist rotation + votes + invalid entries + restart persistence |
 | `test_net_parity.gd` | NetMatchScene handles every event MatchScene reacts to; reports event types without a codec id |
 | `test_net_server_examples.gd` | Example configs and the playlist template stay valid |

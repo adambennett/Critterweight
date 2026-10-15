@@ -453,16 +453,29 @@ func test_party_relay_inprocess() -> void:
 	check(await _until(func() -> bool: return got_b.size() == 2, 3.0), "direct message delivered")
 	await wait_physics(10)
 	check_eq(got_host.size(), 1, "not to the others")
+	# the sender id comes from the connection the message arrived on, never from the message: a
+	# member dressing a relayed message up as the host's (from/host fields around or inside the
+	# payload) still arrives as itself, so CoopSession can trust `from` for host-only messages
+	a.send_app(NetProtocol.APP_RELAY, {"to": "", "type": "cmp/run_end", "from": "1", "host": "1",
+		"payload": {"from": "1", "host": "1", "victory": true}})
+	check(await _until(func() -> bool: return got_b.size() == 3 and got_host.size() == 2, 3.0), "forged-looking broadcast delivered")
+	if got_b.size() == 3 and got_host.size() == 2:
+		check_eq(str(got_b[2][0]), ida, "a member's relayed message carries its own id, whatever the payload says")
+		check_eq(str(got_host[1][0]), ida, "the host's adapter sees the true sender too")
+	# a direct request to the authority is not a party message (it arrives as Net.app_request)
+	a.send_app("cmp/run_end", {"victory": true})
+	await wait_physics(10)
+	check_eq(got_host.size(), 2, "a direct request never reaches the party channel")
 	# the host broadcasts through the adapter
 	party.send("", "ticket", {"node": 3})
-	check(await _until(func() -> bool: return got_a.size() == 1 and got_b.size() == 3, 3.0), "host broadcast reached both clients")
+	check(await _until(func() -> bool: return got_a.size() == 1 and got_b.size() == 4, 3.0), "host broadcast reached both clients")
 	if got_a.size() == 1:
 		check_eq(got_a[0], ["1", "cmp/ticket", {"node": 3}], "from member 1")
 	# reserved types and oversized party messages are never relayed
 	a.send_app(NetProtocol.APP_RELAY, {"to": "", "type": "mode.pick", "payload": {}})
 	a.send_app(NetProtocol.APP_RELAY, {"to": "", "type": "cmp/huge", "payload": {"blob": "x".repeat(NetProtocol.MAX_RELAY_PAYLOAD + 100)}})
 	await wait_physics(20)
-	check_eq(got_b.size(), 3, "reserved types and oversized messages are not relayed")
+	check_eq(got_b.size(), 4, "reserved types and oversized messages are not relayed")
 	b.drop()
 	check(await _until(func() -> bool: return not left.is_empty(), 4.0), "member_left when a member drops")
 	if not left.is_empty():
