@@ -69,3 +69,4 @@ func test_fixed_step_runs_are_reproducible_across_processes() -> void:
 ".join(lines))
 	check(str(outs[0]).length() > 200, "probe produced a trace")
 	check_eq(outs[0], outs[1], "identical traces")
+

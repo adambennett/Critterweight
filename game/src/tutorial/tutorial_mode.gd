@@ -7,9 +7,15 @@ extends MatchMode
 ##
 ## Presentation reads `coach` (current line), `objective()` and `progress_text()`; every line is
 ## also emitted as a "tutorial_line" event and spoken through Audio (subtitles always).
+##
+## Every check reads the player's real kit and every drill works for every body: see
+## docs/design/ANNOUNCER_AND_TUTORIAL.md §2.3 (partner choice, how the Kid drills, adaptations).
 
 const SUCCESS_PAUSE := 3.2
 const HINT_IDLE := 20.0
+const HOLD_MARGIN := 0.15     ## m the Kid may still give ground during a Light string drill
+const CHARGED_FRACTION := 0.35  ## a held Heavy counts as charged from here (Fighter switches to heavy_charged at it)
+const RUSH_SLACK := 0.03      ## s of a strike's active part a cancel may cut before it counts as rushed
 
 var start_index := 0
 var on_exit: Callable = Callable()
@@ -85,8 +91,8 @@ func start_exercise(i: int, only_this := false) -> void:
 	if str(ex.get("check", "")) == "win_round":
 		round_timer = float((ex.get("params", {}) as Dictionary).get("time", 60.0))
 	kid.set_behavior(str(ex.get("dummy", "idle")))
-	data["adapt"] = _adaptation(str(ex.get("check", "")), p.creature)
-	var intro := str(ex.get("intro", ""))
+	data["adapt"] = _adaptation(ex, p.creature)
+	var intro := exercise_text("intro")
 	if index == 0 and not only_this:
 		var jab := Tutorial.jab_for(p.creature.id)
 		if jab != "":
@@ -106,34 +112,60 @@ func skip() -> void:
 		_finish_all()
 
 
-## Which parts of an exercise this fighter's kit cannot do (a mod fighter may lack a slot); those
-## parts are explained and skipped instead of blocking the course.
-func _adaptation(check: String, c: CreatureDef) -> Dictionary:
+## Which parts of an exercise this fighter's kit cannot do (a fighter may lack a slot): flag ->
+## true, only for the flags that apply. Those parts are skipped, and the exercise's "adapt" block
+## (exercises.json) says so: its intro / goal / hint / success replace the normal lines (see
+## exercise_text()). "skip": nothing of the exercise is possible; its success line is the explanation.
+func _adaptation(ex: Dictionary, c: CreatureDef) -> Dictionary:
 	var a := {}
-	match check:
+	match str(ex.get("check", "")):
 		"heavy_then_charged":
-			a["no_charge"] = not c.moves.has("heavy_charged") and (not c.moves.has("heavy") or (c.moves["heavy"] as MoveDef).charge_time <= 0.0)
+			if not c.moves.has("heavy_charged") and (not c.moves.has("heavy") or (c.moves["heavy"] as MoveDef).charge_time <= 0.0):
+				a["no_charge"] = true
 		"dodge_then_dash":
-			a["no_dash"] = not c.moves.has("dash_attack")
+			if not c.moves.has("dash_attack"):
+				a["no_dash"] = true
 		"ability_connect":
-			a["no_ability"] = not c.abilities.has("ability1")
+			if not c.abilities.has(str((ex.get("params", {}) as Dictionary).get("slot", "ability1"))):
+				a["skip"] = true
 		"finisher_juice":
-			a["no_finisher"] = not c.moves.has("finisher")
-			a["no_juice"] = not c.abilities.has("juice")
+			if not c.moves.has("finisher"):
+				a["no_finisher"] = true
+			if not c.abilities.has("juice"):
+				a["no_juice"] = true
+			if a.size() == 2:
+				a = {"skip": true}
 		"grab_throw":
-			a["no_grab"] = not c.moves.has("grab")
+			if not c.moves.has("grab"):
+				a["skip"] = true
 	return a
 
 
-func _say(kind: String, text: String) -> void:
-	var line := Tutorial.fill(text, player().creature)
+## The current exercise's line `key` (intro, goal, hint, success): the "adapt" block's version
+## for the first adaptation flag that has one, else the exercise's own.
+func exercise_text(key: String) -> String:
+	var ex := current()
+	var blocks: Dictionary = ex.get("adapt", {})
+	for flag in (data.get("adapt", {}) as Dictionary):
+		var b: Dictionary = blocks.get(flag, {})
+		if b.has(key):
+			return str(b[key])
+	return str(ex.get(key, ""))
+
+
+func adapted(flag: String) -> bool:
+	return bool((data.get("adapt", {}) as Dictionary).get(flag, false))
+
+
+func _say(kind: String, raw: String) -> void:
+	var line := Tutorial.fill(raw, player().creature)
 	coach = {"kind": kind, "text": line}
 	sim.emit_event({"type": "tutorial_line", "kind": kind, "text": line, "index": index})
 	Audio.say("granny", line, 80 if kind != "hint" else 60)
 
 
 func objective() -> String:
-	return Tutorial.fill(str(current().get("goal", "")), player().creature)
+	return Tutorial.fill(exercise_text("goal"), player().creature)
 
 
 func tick_fight(dt: float) -> void:
@@ -169,13 +201,13 @@ func _progress() -> void:
 
 func _hint() -> void:
 	hinted = true
-	_say("hint", str(current().get("hint", "")))
+	_say("hint", exercise_text("hint"))
 
 
 func _fail() -> void:
 	state = "failed"
 	state_t = 0.0
-	_say("hint", str(current().get("hint", "")))
+	_say("hint", exercise_text("hint"))
 
 
 func _succeed() -> void:
@@ -186,9 +218,10 @@ func _succeed() -> void:
 	if not id_ in completed:
 		completed.append(id_)
 	_save_progress(false)
-	_say("success", str(ex.get("success", "")))
+	_say("success", exercise_text("success"))
 	sim.emit_event({"type": "tutorial_success", "index": index, "id": id_})
-	Audio.announce_trigger("tutorial", {"kind": _barnaby_kind(str(ex.get("check", "")))})
+	if not adapted("skip"):
+		Audio.announce_trigger("tutorial", {"kind": _barnaby_kind(str(ex.get("check", "")))})
 	kid.set_behavior("idle")
 
 
@@ -238,6 +271,9 @@ func _check(dt: float, evs: Array) -> void:
 	var prm: Dictionary = ex.get("params", {})
 	var p := player()
 	var k := partner()
+	if adapted("skip"):
+		_succeed()       # the kit can't do any of it: the adapted success line says so
+		return
 	match str(ex.get("check", "")):
 		"footwork":
 			var rings: Array = prm.get("rings", [])
@@ -264,17 +300,23 @@ func _check(dt: float, evs: Array) -> void:
 				if rad_to_deg(float(data.get("circle", 0.0))) >= float(prm.get("circle_degrees", 330.0)):
 					_succeed()
 		"light_string":
-			var string: Array = []
-			for slot in p.creature.light_string.slice(0, 3):
-				string.append(slot if p.creature.moves.has(slot) else "l1")
-			for ev in evs:
+			var string := string_slots(p.creature)
+			var gap := float(prm.get("gap", 1.2))
+			if int(data.get("step", 0)) > 0 and sim.time - float(data.get("t", 0.0)) > gap:
+				data["step"] = 0           # the chain went cold: start over
+				kid.hold_dist = -1.0
+			for i in evs.size():
+				var ev: Dictionary = evs[i]
+				if ev["type"] == "move_start" and int(ev["fighter"]) == 0:
+					_note_swing(str(ev.get("slot", "")).split("@")[0], string)
+					continue
 				if ev["type"] != "hit" or int(ev["fighter"]) != 0 or int(ev["target"]) != 1 or bool(ev["blocked"]):
 					continue
-				var slot := str(ev.get("slot", ""))
+				var slot := _hit_slot(evs, i, p)
+				var swing: Dictionary = data.get("swing", {})
+				if slot == str(swing.get("slot", "")):
+					swing["landed"] = true
 				var step := int(data.get("step", 0))
-				var gap := float(prm.get("gap", 1.2))
-				if step > 0 and sim.time - float(data.get("t", 0.0)) > gap:
-					step = 0
 				if step < string.size() and slot == str(string[step]):
 					step += 1
 					data["t"] = sim.time
@@ -282,33 +324,46 @@ func _check(dt: float, evs: Array) -> void:
 				elif slot == str(string[0]):
 					step = 1
 					data["t"] = sim.time
+				else:
+					continue
 				data["step"] = step
+				if step == 1:
+					# the Kid holds his ground for the rest of the string: he can't be knocked
+					# further away than he stood when the first hit landed (see KidScript)
+					kid.hold_dist = Vector2(k.pos().x - p.pos().x, k.pos().z - p.pos().z).length() + HOLD_MARGIN
 				if step >= string.size():
 					_succeed()
 					return
 		"heavy_then_charged":
-			for ev in evs:
+			for i in evs.size():
+				var ev: Dictionary = evs[i]
 				if ev["type"] != "hit" or int(ev["fighter"]) != 0 or int(ev["target"]) != 1:
 					continue
-				var slot2 := str(ev.get("slot", ""))
-				var charged := slot2 == "heavy_charged" or (slot2 == "heavy" and bool(ev.get("charged", false)))
-				if stage == 0 and slot2 == "heavy" and not charged:
+				var slot2 := _hit_slot(evs, i, p)
+				if not slot2 in ["heavy", "heavy_charged"]:
+					continue
+				# charged: the kit's dedicated charged heavy, or a Heavy held past the point where
+				# Fighter would switch to one (CHARGED_FRACTION of its charge time)
+				var charged := slot2 == "heavy_charged" or (bool(ev.get("charged", false)) and
+					(p.move_slot.split("@")[0] != "heavy" or p.move_charge >= CHARGED_FRACTION))
+				if stage == 0:
 					stage = 1
 					_progress()
-					if bool((data.get("adapt", {}) as Dictionary).get("no_charge", false)):
+					if adapted("no_charge"):
 						_succeed()
 						return
-					_say("hint", "Good. Now hold {heavy} and let it go near him.")
-				elif stage == 1 and charged:
+					_say("hint", "Good. Now hold {heavy} for {charged_name}, and let it go with him in range.")
+				elif charged:
 					_succeed()
 					return
 		"guard_string":
 			_check_guard_string(prm, evs)
 		"dodge_then_dash":
-			for ev in evs:
+			for i in evs.size():
+				var ev: Dictionary = evs[i]
 				var t := str(ev["type"])
 				if stage == 0:
-					if t == "move_start" and int(ev["fighter"]) == 1 and str(ev.get("slot", "")) in ["heavy", "heavy_charged"]:
+					if t == "move_start" and int(ev["fighter"]) == 1 and str(ev.get("slot", "")).split("@")[0] in ["heavy", "heavy_charged"]:
 						data["kid_heavy"] = true
 						data["dodged"] = false
 						data["hit"] = false
@@ -316,7 +371,7 @@ func _check(dt: float, evs: Array) -> void:
 						data["dodged"] = true
 					elif t == "hit" and int(ev["fighter"]) == 1 and int(ev["target"]) == 0:
 						data["hit"] = true
-				elif t == "hit" and int(ev["fighter"]) == 0 and int(ev["target"]) == 1 and str(ev.get("slot", "")) == "dash_attack":
+				elif t == "hit" and int(ev["fighter"]) == 0 and int(ev["target"]) == 1 and _hit_slot(evs, i, p) == "dash_attack":
 					_succeed()
 					return
 			if stage == 0 and bool(data.get("kid_heavy", false)) and k.state != Fighter.State.ATTACK:
@@ -324,17 +379,13 @@ func _check(dt: float, evs: Array) -> void:
 				if bool(data.get("dodged", false)) and not bool(data.get("hit", false)):
 					stage = 1
 					_progress()
-					if bool((data.get("adapt", {}) as Dictionary).get("no_dash", false)):
+					if adapted("no_dash"):
 						_succeed()
 						return
 					_say("hint", "Nothing hits what isn't there. Now press {light} while you're dodging — dash attack.")
 				elif bool(data.get("hit", false)):
 					_hint()
 		"ability_connect":
-			if bool((data.get("adapt", {}) as Dictionary).get("no_ability", false)):
-				_say("hint", "Your fighter has no trick in that slot. Moving on.")
-				_succeed()
-				return
 			var slot3 := str(prm.get("slot", "ability1"))
 			for ev in evs:
 				if ev["type"] == "ability" and int(ev["fighter"]) == 0 and str(ev.get("slot", "")) == slot3:
@@ -365,16 +416,19 @@ func _check(dt: float, evs: Array) -> void:
 						_succeed()
 						return
 		"finisher_juice":
-			var ad: Dictionary = data.get("adapt", {})
-			if stage == 0 and bool(ad.get("no_finisher", false)):
+			if stage == 0 and adapted("no_finisher"):
 				stage = 1
-			if stage == 1 and bool(ad.get("no_juice", false)):
+			if stage == 1 and adapted("no_juice"):
 				_succeed()
 				return
-			for ev in evs:
-				if stage == 0 and ev["type"] == "hit" and int(ev["fighter"]) == 0 and str(ev.get("slot", "")) == "finisher":
+			for i in evs.size():
+				var ev: Dictionary = evs[i]
+				if stage == 0 and ev["type"] == "hit" and int(ev["fighter"]) == 0 and int(ev["target"]) == 1 and _hit_slot(evs, i, p) == "finisher":
 					stage = 1
 					_progress()
+					if adapted("no_juice"):
+						_succeed()
+						return
 					_say("hint", "That's your finisher. Now fill the Hype meter — hits, or {taunt} — then {juice}.")
 				elif stage == 1 and ev["type"] == "juice" and int(ev["fighter"]) == 0:
 					_succeed()
@@ -391,6 +445,22 @@ func _check(dt: float, evs: Array) -> void:
 					_succeed()
 				else:
 					_fail()
+
+
+## Hands drill feedback for mashing: a string Light that starts while the previous one was still
+## in its active part and hadn't landed cancelled it (a buffered Light is consumed at the cancel
+## time, which for some kits is the very tick the active window opens). The second time,
+## Granny says the exercise's "rush" line, once per attempt.
+func _note_swing(slot: String, string: Array) -> void:
+	var prev: Dictionary = data.get("swing", {})
+	if slot in string and prev.has("slot") and not bool(prev.get("landed", false)):
+		var m: MoveDef = player().creature.moves.get(str(prev["slot"]))
+		if m and sim.time - float(prev["t"]) < active_end(m) - RUSH_SLACK:
+			data["rushed"] = int(data.get("rushed", 0)) + 1
+			if int(data["rushed"]) >= 2 and not data.has("rush_said") and exercise_text("rush") != "":
+				data["rush_said"] = true
+				_say("hint", exercise_text("rush"))
+	data["swing"] = {"slot": slot if slot in string else "", "t": sim.time, "landed": false}
 
 
 func _check_guard_string(prm: Dictionary, evs: Array) -> void:
@@ -414,6 +484,76 @@ func _check_guard_string(prm: Dictionary, evs: Array) -> void:
 			_succeed()
 		elif blocked + int(data.get("clean", 0)) > 0:
 			_hint()
+
+
+## True when `f` may throw the next strike of a string and still land the current one: it is
+## free, or its current move connected or has finished its active part (windows and timed
+## effects). A Light pressed earlier is consumed at the move's cancel time, which for some kits
+## is the very tick its active window opens, so the strike would never land.
+static func swing_over(f: Fighter) -> bool:
+	if f.state == Fighter.State.NEUTRAL:
+		return true
+	if f.state != Fighter.State.ATTACK or f.move == null:
+		return false
+	return f.move_hit_any or f.state_time >= active_end(f.move)
+
+
+## True when a buffered Light cancels `m` before it could land: its cancel time comes more than
+## RUSH_SLACK before the end of its active part (Stoke's Jab cancels as its window opens).
+static func rushable(m: MoveDef) -> bool:
+	return m.cancel_t0 < active_end(m) - RUSH_SLACK
+
+
+## When a move's active part is over (move time): its last hit window or timed effect, at least
+## its cancel time, and a little before it ends so a string can still chain from it.
+static func active_end(m: MoveDef) -> float:
+	var t_done := m.cancel_t0
+	for w in m.windows:
+		t_done = maxf(t_done, float(w["t1"]))
+	for e in m.effects:
+		t_done = maxf(t_done, float(e.get("t", 0.0)))
+	return minf(t_done, m.duration - 0.05)
+
+
+## The Light string the Hands drill asks for: the kit's first three string slots (a slot the kit
+## lacks falls back to l1, as Fighter does when it presses Light).
+static func string_slots(c: CreatureDef) -> Array:
+	var out: Array = []
+	for slot in c.light_string.slice(0, 3):
+		out.append(slot if c.moves.has(slot) else "l1")
+	return out
+
+
+## The move slot (variant suffix dropped) behind hit event `evs[i]` of fighter `f`. Effect hits
+## (slot "effect") belong to the move whose own timeline fired them:
+##  * an effect with an "id" reports it as the hit's "move" (Slurry's finisher spits the
+##    projectile "venom_spit", which lands after the move has ended), so it maps to the move
+##    that declares it;
+##  * an unnamed one is paired with its "effect" event: EffectsSystem emits an effect's hits
+##    first (Combat.deliver emits each hit after its hooks ran) and then that effect's event
+##    with the move's id, in the same tick (Dozer's Hoof Stomp, an area at the hoof).
+## Hook-fired and delayed effects carry no move id and give "".
+static func _hit_slot(evs: Array, i: int, f: Fighter) -> String:
+	var ev: Dictionary = evs[i]
+	var slot := str(ev.get("slot", ""))
+	if slot != "effect":
+		return slot.split("@")[0]
+	var eid := str(ev.get("move", ""))
+	for s in f.creature.moves:
+		for e in (f.creature.moves[s] as MoveDef).effects:
+			if typeof(e) == TYPE_DICTIONARY and str((e as Dictionary).get("id", "")) == eid and eid != "":
+				return str(s).split("@")[0]
+	for j in range(i + 1, evs.size()):
+		var e2: Dictionary = evs[j]
+		if int(e2.get("tick", -1)) != int(ev.get("tick", -2)):
+			break
+		if e2["type"] == "effect" and int(e2.get("fighter", -1)) == int(ev["fighter"]):
+			var mid := str(e2.get("move", ""))
+			for s in f.creature.moves:
+				if mid != "" and (f.creature.moves[s] as MoveDef).id == mid:
+					return str(s).split("@")[0]
+			return ""
+	return ""
 
 
 func _buildup_total(f: Fighter) -> float:
@@ -463,6 +603,8 @@ func hud_status() -> String:
 func progress_text() -> String:
 	var ex := current()
 	var prm: Dictionary = ex.get("params", {})
+	if adapted("skip"):
+		return "Not in your kit"
 	match str(ex.get("check", "")):
 		"footwork":
 			var n := (data.get("rings", []) as Array).size()
@@ -471,17 +613,24 @@ func progress_text() -> String:
 				return "Rings %d / %d" % [n, total]
 			return "Circle him: %d° / %d°" % [int(rad_to_deg(float(data.get("circle", 0.0)))), int(prm.get("circle_degrees", 330))]
 		"light_string":
-			return "String %d / 3" % int(data.get("step", 0))
+			return "String %d / %d" % [int(data.get("step", 0)), string_slots(player().creature).size()]
 		"heavy_then_charged":
-			return "Heavy %s   Charged Heavy %s" % ["✓" if stage >= 1 else "–", "–"]
+			var heavy := "Heavy %s" % ("✓" if stage >= 1 else "–")
+			return heavy if adapted("no_charge") else heavy + "   Charged Heavy –"
 		"guard_string":
 			return "Blocked %d of his string" % int(data.get("blocked", 0)) if data.has("hp0") else "Wait for his string…"
 		"dodge_then_dash":
-			return "Dodge his Heavy %s   Dash Attack –" % ("✓" if stage >= 1 else "–")
+			var dodge := "Dodge his Heavy %s" % ("✓" if stage >= 1 else "–")
+			return dodge if adapted("no_dash") else dodge + "   Dash Attack –"
 		"parries":
 			return "Parries %d / %d" % [int(data.get("parries", 0)), int(prm.get("count", 2))]
 		"finisher_juice":
-			return "Finisher %s   Hype %d / 100   JUICE –" % ["✓" if stage >= 1 else "–", int(player().hype)]
+			var parts: Array = []
+			if not adapted("no_finisher"):
+				parts.append("Finisher %s" % ("✓" if stage >= 1 else "–"))
+			if not adapted("no_juice"):
+				parts.append("Hype %d / 100   JUICE –" % int(player().hype))
+			return "   ".join(parts)
 		"win_round":
 			return "%d s   You %d%%  Kid %d%%" % [ceili(round_timer), int(player().health_frac() * 100.0), int(partner().health_frac() * 100.0)]
 	return ""
@@ -523,6 +672,18 @@ class KidScript:
 	var _reach := BotBrain.new("regular", 1)   ## only for its cached move-reach estimates
 	var _prev_dist := -1.0
 	var _stuck_t := 0.0
+	## > 0: the Kid holds his ground (a Light string drill in progress): knockback can't carry
+	## him further than this from the player, so a string that started landing can finish.
+	## Kits whose strings push the target out of the next hit's reach (Stoke's jab and cross on
+	## the 55 kg Gusto stand-in, Dozer's stomp before the Scoop) would otherwise make the Hands
+	## drill a matter of luck; inside that distance he still reacts to every hit normally.
+	var hold_dist := -1.0
+	var _spacing := {}           ## "light" | "heavy" -> index into SPACINGS (fractions of the reach)
+	var _want := 0.0             ## the spacing (m) of the attack being set up
+	var _record := {}            ## "<kind><spacing index>" -> Vector2i(attacks that landed, attacks)
+	var _seen_hit_at := 0.0
+	var _landed := {}            ## slots of the current attack that touched the player
+	var _evaded := false         ## the player dodged the current attack
 
 	func _init(m) -> void:
 		mode = m
@@ -530,17 +691,34 @@ class KidScript:
 	func label() -> String:
 		return "Kid Lamprey (%s)" % behavior
 
+	## Drill state for traces and debugging.
+	func debug_text() -> String:
+		return "%s %s spacing %s hold %.2f" % [behavior, _phase, str(_spacing), hold_dist]
+
 	func set_behavior(b: String) -> void:
 		behavior = b
 		_phase = "rest"
 		_phase_t = 0.0
 		_left = 0
 		string_active = false
-		_bot = BotBrain.new("rookie", 777) if b == "fight" else null
+		hold_dist = -1.0
+		_bot = BotBrain.new(BotTiers.brain_tier("punching_bag"), 777) if b == "fight" else null
 		var k: Fighter = mode.partner()
 		k.mods.erase("move_speed")
 		if b in ["parry_drill", "heavy"]:
 			k.mods["move_speed"] = 0.75     # telegraphed: longer, readable wind-ups
+		# fighting back he is a Punching Bag-tier bot with the handicaps the game's easiest
+		# difficulty gives every opponent (Sparring, content/core/ladder/difficulty.json). The
+		# freestyle closes a beginner's tutorial: without them even his deliberately weak kit
+		# splits 60 s rounds with a slow fighter (Dredge: a strong player needed two rounds),
+		# and a roster stand-in is a full-strength fighter (a rookie Stoke's overhand on Dredge)
+		var spar: Dictionary = Content.get_entry("ladder", "sparring") if b == "fight" else {}
+		k.mods["damage"] = float(spar.get("enemy_damage", 1.0))
+		var hp := float(spar.get("enemy_hp", 1.0))
+		if not is_equal_approx(float(k.mods.get("max_health", 1.0)), hp):
+			k.mods["max_health"] = hp
+			k.max_health = k.creature.stat("health") * hp + float(k.mods.get("max_health_add", 0.0))
+			k.health = k.max_health
 
 	func poll(f: Fighter, sim, dt: float) -> void:
 		_t += dt
@@ -553,6 +731,11 @@ class KidScript:
 		var p: Fighter = sim.fighters[0]
 		var to := Vector3(p.pos().x - f.pos().x, 0.0, p.pos().z - f.pos().z)
 		var dist := to.length()
+		if hold_dist > 0.0 and dist > hold_dist and dist > 0.01:
+			var away := -to / dist
+			var out := f.rig.com_velocity().dot(away)
+			if out > 0.0:
+				f.rig.apply_body_impulse(-away * out * f.rig.total_mass)
 		match behavior:
 			"guard":
 				f.input.set_held(FighterInput.GUARD, true)
@@ -560,9 +743,31 @@ class KidScript:
 				if _bot:
 					_bot.poll(f, sim, dt)
 			"string", "heavy", "parry_drill":
-				_attacker(f, to, dist, dt)
+				_attacker(f, p, to, dist, dt)
 
-	func _attacker(f: Fighter, to: Vector3, dist: float, dt: float) -> void:
+	## The drills' attacks: rest, take up his spacing (walk in, or step back when he's crowding
+	## the player), throw it, rest again. Two rules keep every drill fair for every body:
+	##  * a string goes in one strike at a time: the next Light only once the last one connected
+	##    or finished its swing (pressed earlier, a buffered Light cancels a strike on the very
+	##    tick its active window opens and it never lands);
+	##  * spacing adapts: each attack kind keeps a record per spacing in SPACINGS (fractions of
+	##    the move's estimated reach); when the attacks thrown from one land on the player (two
+	##    strikes of a string, else the strike; blocked and parried count, dodged ones don't
+	##    count either way) less than half the time, the next spacing is tried. The estimate is
+	##    generous; strikes authored against a tall body pass over a short one from its edge
+	##    (Jitters), and from too close they are smothered by a raised guard before they get
+	##    going (Dredge's claws stand 0.9 m out in front of him).
+	## The estimate (BotBrain.reach_of: furthest strike point + 70% of the lunge + weapon radius)
+	## overshoots where strikes really land: the Kid's jab estimates 1.16 m and lands at
+	## 0.9–1.0 m (docs/kits/npc_kid_lamprey.md), so he starts at 0.8 of it, where a fist meets
+	## the body early in its active window (a parry is timed to that), then tries closer, the
+	## edge, and closer still.
+	const SPACINGS := [0.8, 0.65, 0.95, 0.5, 0.4]
+	const BAND := 0.2            ## m inside his spacing that still counts as "at" it
+
+	func _attacker(f: Fighter, p: Fighter, to: Vector3, dist: float, dt: float) -> void:
+		var light := behavior == "string" or (behavior == "parry_drill" and not _alt)
+		var kind := "light" if light else "heavy"
 		match _phase:
 			"rest":
 				string_active = false
@@ -572,43 +777,71 @@ class KidScript:
 					_prev_dist = -1.0
 					_stuck_t = 0.0
 			"approach":
-				var light_move := behavior == "string" or (behavior == "parry_drill" and not _alt)
-				# close enough when the move's own reach covers the gap, or when the Kid is pressed
-				# against a big body and can't get closer
-				var want := _reach.reach_of(f.creature, "l1" if light_move else "heavy") + 0.05
+				var reach := _reach.reach_of(f.creature, "l1" if light else "heavy")
+				var want := reach * float(SPACINGS[int(_spacing.get(kind, 0)) % SPACINGS.size()]) + 0.05
 				if _prev_dist >= 0.0 and _prev_dist - dist < 0.004:
 					_stuck_t += dt
 				else:
 					_stuck_t = 0.0
 				_prev_dist = dist
+				_want = want
 				var close_enough := dist <= want or (_phase_t > 0.5 and _stuck_t > 0.35) or _phase_t > 3.0
-				if not close_enough:
-					f.input.move = to.normalized()
-				elif f.state == Fighter.State.NEUTRAL:
+				if dist < want - BAND and _phase_t < 1.5:
+					f.input.move = -to.normalized()       # crowding him: step back to his spacing
+				elif not close_enough:
+					# eases off as he arrives, so he stops at his spacing instead of sliding past it
+					f.input.move = to.normalized() * clampf((dist - want) / 0.6, 0.25, 1.0)
+				else:
+					_phase = "set"
+					_phase_t = 0.0
+				if _phase_t > 4.0:
+					_phase = "rest"
+					_phase_t = 0.0
+			"set":
+				# plants his feet before he throws: every drill strike starts from rest at his
+				# spacing (walking momentum would carry him into a raised guard), and the beat
+				# before it is the cue Granny tells you to watch for
+				if dist < _want - BAND and _phase_t < 1.0 and _stuck_t <= 0.35:
+					f.input.move = -to.normalized()       # slid in too close: back to his spacing
+					return
+				var v := f.rig.com_velocity()
+				var settled := Vector2(v.x, v.z).length() < 0.4 and _phase_t >= 0.25
+				if (settled or _phase_t > 1.2) and f.state == Fighter.State.NEUTRAL:
 					_phase = "attack"
 					_phase_t = 0.0
 					_last_press = -1.0
-					var light := behavior == "string" or (behavior == "parry_drill" and not _alt)
+					_seen_hit_at = mode.sim.time
+					_landed = {}
+					_evaded = false
 					_left = (3 if behavior == "string" else 1) if light else 0
 					if not light:
 						f.input.press(FighterInput.HEAVY)
 					string_active = true
-				if _phase_t > 4.0:
+				elif _phase_t > 2.0:
 					_phase = "rest"
 					_phase_t = 0.0
 			"attack":
-				if _left > 0 and _phase_t - _last_press > 0.1:
-					var ready := f.state == Fighter.State.NEUTRAL or (f.state == Fighter.State.ATTACK and f.move != null and f.state_time >= f.move.cancel_t0)
-					if ready:
-						f.input.press(FighterInput.LIGHT)
-						_left -= 1
-						_last_press = _phase_t
-				if _left <= 0 and _phase_t > 0.3 and f.state != Fighter.State.ATTACK:
-					_phase = "rest"
-					_phase_t = 0.0
-					_alt = not _alt
-					string_active = false
-				elif _phase_t > 3.0:
+				if p.last_attacker_index == f.index and p.last_attacked_at > _seen_hit_at:
+					_seen_hit_at = p.last_attacked_at      # a new hit on the player (clean, blocked or parried)
+					_landed[f.move_slot if f.move_slot != "" else "?"] = true
+				_evaded = _evaded or p.state == Fighter.State.DODGE or p.is_evading()
+				if _left > 0 and _phase_t - _last_press > 0.1 and TutorialMode.swing_over(f):
+					f.input.press(FighterInput.LIGHT)
+					_left -= 1
+					_last_press = _phase_t
+				var done := _left <= 0 and _phase_t > 0.3 and f.state != Fighter.State.ATTACK
+				if done or _phase_t > 3.0:
+					# a string should land at least two of its three strikes (the guard drill counts
+					# them), a single attack should land; a spacing that misses more often than not
+					# gives way to the next one
+					if not _evaded:
+						var key := "%s%d" % [kind, int(_spacing.get(kind, 0)) % SPACINGS.size()]
+						var rec: Vector2i = _record.get(key, Vector2i.ZERO) + Vector2i(1 if _landed.size() >= (2 if behavior == "string" else 1) else 0, 1)
+						_record[key] = rec
+						if rec.x * 2 < rec.y:
+							_spacing[kind] = int(_spacing.get(kind, 0)) + 1
+					if done:
+						_alt = not _alt
 					_phase = "rest"
 					_phase_t = 0.0
 					string_active = false
