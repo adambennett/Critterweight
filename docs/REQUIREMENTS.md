@@ -151,7 +151,7 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | UI-09 | Network: host/join options, limits, privacy/password, mod compatibility, status, clear errors | — | |
 | UI-10 | 1280x800 readability + controller operability (layout check; device test = X) | I T | 1280x800 layout test (no text < 18 px), Deck preset; HUD essentials >= 23 du; real Deck = X |
 | UI-11 | Single-player freedom; custom vs standard progression clearly labeled; MP restrictions explained | — | |
-| UI-12 | Tutorial with live binding prompts, staged exercises, feedback, retry/skip/replay, practice; naive play supported | I T | Granny Haymaker tutorial: 10 data-driven exercises with live prompts, hints, retry/skip/replay, saved progress (src/tutorial); tests core/test_tutorial (all 10 completable) |
+| UI-12 | Tutorial with live binding prompts, staged exercises, feedback, retry/skip/replay, practice; naive play supported | I T | Granny Haymaker tutorial: 10 data-driven exercises with live prompts, hints, retry/skip/replay, saved progress (src/tutorial); tests core/test_tutorial (all 10 completable with dev_biped and, via TUTORIAL_CREATURE, every roster fighter against the Kid the game launches; honest adaptations for missing kit slots; rhythm advice for mashed strings; ANNOUNCER_AND_TUTORIAL.md §2.3) |
 
 ## Saves & reliability [14]
 | ID | Requirement / acceptance | State | Evidence |

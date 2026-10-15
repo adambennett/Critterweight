@@ -7,6 +7,9 @@ extends MatchMode
 ##
 ## Presentation reads `coach` (current line), `objective()` and `progress_text()`; every line is
 ## also emitted as a "tutorial_line" event and spoken through Audio (subtitles always).
+##
+## Every check reads the player's real kit and every drill works for every body: see
+## docs/design/ANNOUNCER_AND_TUTORIAL.md §2.3 (partner choice, how the Kid drills, adaptations).
 
 const SUCCESS_PAUSE := 3.2
 const HINT_IDLE := 20.0

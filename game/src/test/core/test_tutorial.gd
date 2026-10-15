@@ -185,19 +185,25 @@ func test_footwork() -> void:
 	await _run(0, plan)
 
 
+## The Hands driver's attempts: (fraction of the Jab's reach to start from, how hard the stick
+## pushes toward the Kid during the string). A player whose string doesn't finish tries again
+## from another spacing, pushing in more or less.
+const HANDS_TRIES := [[0.85, 0.3], [0.7, 0.5], [0.95, 0.2], [0.55, 0.5], [0.45, 0.3], [1.0, 0.5]]
+
+
 func test_light_string() -> void:
-	# step in, tap the three Lights in rhythm with the hits while pushing toward the Kid; after a
-	# string that didn't finish, try again from a little closer (then from the top of the reach)
+	# step in, tap the three Lights in rhythm with the hits while pushing toward the Kid
 	var plan := func(f: Fighter, sim, t: float, mem: Dictionary) -> void:
 		var kid: Fighter = sim.fighters[1]
-		var top := _rb.reach_of(f.creature, "l1") * 0.85
-		var want := float(mem.get("want", top))
+		var attempt: Array = HANDS_TRIES[int(mem.get("tries", 0)) % HANDS_TRIES.size()]
+		var want := _rb.reach_of(f.creature, "l1") * float(attempt[0])
+		var push := float(attempt[1])
 		var presses := int(mem.get("presses", 0))
 		if presses == 0:
 			if f.state != Fighter.State.NEUTRAL:
 				return
 			var d := _dist(f, kid)
-			if d < want - 0.3:
+			if d < want - 0.15 and t - float(mem.get("set_t", 0.0)) < 1.5:
 				f.input.move = -_toward(f, kid.pos())
 				mem["_pd"] = -1.0
 				return
@@ -211,12 +217,13 @@ func test_light_string() -> void:
 				mem["last"] = t
 				mem["presses"] = presses + 1
 				f.input.press(FighterInput.LIGHT)
-			f.input.move = _toward(f, kid.pos()) * 0.5
+			f.input.move = _toward(f, kid.pos()) * push
 		elif f.state == Fighter.State.NEUTRAL:
 			mem["presses"] = 0
-			mem["want"] = want - 0.15 if want - 0.15 > 0.5 else top
+			mem["tries"] = int(mem.get("tries", 0)) + 1
+			mem["set_t"] = t
 		else:
-			f.input.move = _toward(f, kid.pos()) * 0.5
+			f.input.move = _toward(f, kid.pos()) * push
 	await _run(1, plan)
 
 
