@@ -4,11 +4,12 @@
   against the Kid the game launches for that fighter, and prints one line per fighter.
 .DESCRIPTION
   Fighters: every creature in game/content/core/creatures that is not npc_only (dev_biped and the
-  roster), or the ones given with -Fighters. Each run has its own user-data root. Exit code = the
-  number of fighters with a failing test. See docs/design/ANNOUNCER_AND_TUTORIAL.md section 2.3.
+  roster), or the ones given with -Fighters (an unknown id stops the script). Each run has its own
+  user-data root under %TEMP%, deleted when it ends. Exit code = the number of fighters with a
+  failing test. See docs/design/ANNOUNCER_AND_TUTORIAL.md section 2.3.
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File tools/verify/tutorial_matrix.ps1
-  powershell -ExecutionPolicy Bypass -File tools/verify/tutorial_matrix.ps1 -Fighters f_dozer -Filter test_light_string
+  powershell -ExecutionPolicy Bypass -File tools/verify/tutorial_matrix.ps1 -Fighters f_dozer,f_slurry -Filter test_light_string
 #>
 param(
 	[string[]]$Fighters = @(),
@@ -16,11 +17,20 @@ param(
 	[string]$Godot = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 )
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
+$known = @{}
+foreach ($f in Get-ChildItem (Join-Path $root "game\content\core\creatures") -Filter *.json) {
+	$c = Get-Content $f.FullName -Raw | ConvertFrom-Json
+	$known[[string]$c.id] = -not $c.npc_only
+}
+# "-Fighters a,b" arrives as one string through "powershell -File".
+$Fighters = @($Fighters | ForEach-Object { $_ -split "," } | Where-Object { $_ -ne "" })
 if ($Fighters.Count -eq 0) {
-	foreach ($f in Get-ChildItem (Join-Path $root "game\content\core\creatures") -Filter *.json) {
-		$c = Get-Content $f.FullName -Raw | ConvertFrom-Json
-		if (-not $c.npc_only) { $Fighters += [string]$c.id }
-	}
+	$Fighters = @($known.Keys | Where-Object { $known[$_] } | Sort-Object)
+}
+$unknown = @($Fighters | Where-Object { -not $known.ContainsKey($_) })
+if ($unknown.Count -gt 0) {
+	Write-Host ("unknown creature id(s): " + ($unknown -join ", ")) -ForegroundColor Red
+	exit 100
 }
 $test = "test_tutorial.gd" + $(if ($Filter -ne "") { "::$Filter" } else { "" })
 $runs = @()
@@ -36,11 +46,12 @@ foreach ($id in $Fighters) {
 	$psi.RedirectStandardError = $true
 	$psi.EnvironmentVariables["TUTORIAL_CREATURE"] = $id
 	$p = [System.Diagnostics.Process]::Start($psi)
-	$runs += [pscustomobject]@{ Id = $id; P = $p; Out = $p.StandardOutput.ReadToEndAsync(); Err = $p.StandardError.ReadToEndAsync() }
+	$runs += [pscustomobject]@{ Id = $id; P = $p; Root = $userRoot; Out = $p.StandardOutput.ReadToEndAsync(); Err = $p.StandardError.ReadToEndAsync() }
 }
 $failed = 0
 foreach ($r in $runs) {
 	$r.P.WaitForExit()
+	Remove-Item -Recurse -Force -LiteralPath $r.Root -ErrorAction SilentlyContinue
 	$lines = $r.Out.Result -split "`r?`n"
 	$summary = ($lines | Where-Object { $_ -match "^tests: " }) -join ""
 	if ($r.P.ExitCode -ne 0) { $failed += 1 }

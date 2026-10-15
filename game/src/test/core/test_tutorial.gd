@@ -20,6 +20,12 @@ static func _partner_id(player_id := "") -> String:
 	return Tutorial.partner_for(player_id if player_id != "" else _player_id())
 
 
+## A misspelt TUTORIAL_CREATURE must not quietly run the course with the Test Dummy.
+func before_each() -> void:
+	var e := OS.get_environment("TUTORIAL_CREATURE")
+	check(e == "" or Content.creature(e) != null, "TUTORIAL_CREATURE=%s names no creature" % e)
+
+
 class Driver:
 	extends InputSource
 	var plan: Callable
