@@ -206,7 +206,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	to.y = 0.0
 	var dist := to.length()
 	var dir := to / maxf(dist, 0.01)
-	var my_reach := reach_of(c, "l1")
+	var my_reach := float(personality.get("attack_range", reach_of(c, "l1")))
 	var their_reach := reach_of(tgt.creature, "heavy") if tgt else 1.0
 	var mistake := rng.randf() < float(p["mistake"])
 	# ---- defence: react to a perceived windup ----
@@ -215,6 +215,8 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	var winding := attacking and float(per.get("st", 0.0)) < float(per.get("first", 0.0))
 	if attacking and dist < their_reach + 0.6 and not mistake and f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD]:
 		if _kit_ability(f, tgt, dist, dir, per, true):   # kit hint: reactive abilities (counters, armor)
+			return
+		if _kit_defend(f, tgt, per, winding, dir):      # kit hints: parry_heavy / dodge_for_guard
 			return
 		var roll := rng.randf()
 		if winding and roll < float(p["parry"]):
@@ -230,7 +232,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 			return
 		elif roll < float(p["parry"]) + float(p["dodge"]) + float(p["block"]):
 			_guard = true
-			_guard_until = _t + rng.randf_range(0.3, 0.7)
+			_guard_until = _t + minf(rng.randf_range(0.3, 0.7), float(personality.get("guard_max", 9.0)))
 			if not f.input.is_held(FighterInput.GUARD):
 				f.input.press(FighterInput.GUARD)
 			_move = -dir * 0.3
@@ -242,7 +244,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		_move = _toward(f.pos(), obj["pos"])
 		return
 	# ---- JUICE ----
-	if f.hype >= 100.0 and rng.randf() < float(p["juice"]) * 0.5 and dist < 3.5:
+	if f.hype >= 100.0 and rng.randf() < float(p["juice"]) * 0.5 and _kit_juice_ok(f, tgt, dist, dir, per):
 		f.input.press(FighterInput.JUICE)
 		return
 	# ---- abilities ----
@@ -261,6 +263,8 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		var t_guarding := per_state == Fighter.State.GUARD
 		if (t_guarding or _kit_grab_target(tgt)) and rng.randf() < float(p["grab"]) * 2.0:
 			f.input.press(FighterInput.GRAB)
+		elif _kit_commit(f, tgt, dist, dir, per):
+			pass
 		elif f.state == Fighter.State.ATTACK and f.move_slot in ["l1", "l2"] and rng.randf() < float(p["combo"]):
 			if f.move_slot == "l2" and rng.randf() < 0.4:
 				f.input.press(FighterInput.HEAVY)
@@ -277,6 +281,8 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		return
 	if f.state == Fighter.State.ATTACK and f.move_hit_any and rng.randf() < float(p["combo"]):
 		f.input.press(FighterInput.LIGHT)
+	if _kit_movement(f, dist, dir):   # kit hints: dash_in / dash_out
+		return
 	# ---- footwork ----
 	var want := my_reach * lerpf(0.7, 0.95, float(p["spacing"]))
 	if personality.get("range") is Array and (personality["range"] as Array).size() >= 2:
@@ -297,7 +303,9 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		_move = side2 * lerpf(0.3, 0.7, float(p["spacing"]))
 	if mistake:
 		_move = _move.rotated(Vector3.UP, rng.randf_range(-1.0, 1.0))
-	if rng.randf() < 0.01 and f.hype < 100.0 and dist > 3.0:
+	if personality.has("taunt_when"):
+		_kit_taunt(f, tgt, dist, dir, per)
+	elif rng.randf() < 0.01 and f.hype < 100.0 and dist > 3.0:
 		f.input.press(FighterInput.TAUNT)
 
 
@@ -355,20 +363,42 @@ func _toward(from: Vector3, to: Vector3) -> Vector3:
 
 
 # =====================================================================================
-# Kit hints (optional keys of the creature "ai" block; added with the Dredge/Dozer kits).
-# Absent keys keep the generic behaviour above.
+# Kit hints (optional keys of the creature "ai" block; added with the Dredge/Dozer kits, extended
+# with the Stoke/Gusto kits). Absent keys keep the generic behaviour above.
 #   "range": [near, far]        preferred engagement distance (root to root) for footwork
-#   "charge_heavy": p           chance a Heavy press is held into the charged version (scaled by skill)
+#   "attack_range": m           distance at which strikes start (default: the L1 reach estimate)
+#   "charge_heavy": p | {"chance": p, "from": profile}
+#                               chance a Heavy press is held into the charged version (scaled by
+#                               skill); "from" = the lowest bot profile that charges at all
+#   "parry_heavy": {"chance": p, "from": profile}   time a parry against a perceived Heavy windup
+#   "guard_max": s              longest guard hold; "dodge_for_guard": p turns that share of guard
+#                               reactions into sidesteps
+#   "dash_in": {"min": m, "max": m, "chance": p}    dodge toward the target, then Light (dash attack)
+#   "dash_out": p               chance to dodge back out when closer than range[0]
 #   "grab_status": [ids]        targets carrying one of these statuses are grabbed like guarding ones
+#   "juice_when": [cond, ...]   JUICE only when an alternative holds (default: target within 3.5 m)
+#   "taunt_when": [cond, ...]   taunt at "taunt_chance" per think (x3 for rookie bots) when one holds
+#   "commit_when": [cond, ...]  Light strings go on to L3 / the Finisher when one holds
 #   "abilities": {slot: {"min": m, "max": m, "chance": c, "when": [cond, ...]}}
 #       an ability with a hint is used only by its hint (replaces the generic reach test). `when` is a
 #       list of alternatives (any may hold; absent = always); each is a dict whose keys must all hold:
 #       min / max (distance), self_poise_below, self_health_below (fractions), target_status (id or
 #       element), target_heavy (perceived Heavy / Charged Heavy windup), target_winding (any windup),
 #       target_ranged (the target has a projectile ability), wall_behind_target (an arena wall
-#       within this many metres beyond the target, on the line from this fighter).
+#       within this many metres beyond the target, on the line from this fighter), target_down,
+#       target_cornered (target within 1.3 m of a wall), target_closing (distance shrank since the
+#       last think), projectile_incoming (an enemy projectile within 4 m flying at this fighter),
+#       in_enemy_zone, self_juiced, chance (this alternative only fires with that probability).
 #       Reactive conditions (target_heavy / target_winding) are also checked while defending.
+# Profiles in skill order: rookie (Punching Bag) < regular (Journeyman) < pro (Contender)
+#   < champion (Headliner) < hall_of_famer.
 # =====================================================================================
+
+const KIT_PROFILE_ORDER := ["rookie", "regular", "pro", "champion", "hall_of_famer"]
+
+var _kit_last_dist := -1.0
+var _kit_dash_until := 0.0
+
 
 func _kit_hint(slot: String) -> Dictionary:
 	var ab = personality.get("abilities", {})
@@ -444,7 +474,68 @@ func _kit_when(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Diction
 					return false
 				if f.sim.arena.inside(f.pos() + dir * (dist + float(v)), 0.3):
 					return false
+			"target_down":
+				if (tgt != null and tgt.is_down()) != bool(v):
+					return false
+			"target_cornered":
+				if (tgt != null and f.sim != null and f.sim.arena != null and not f.sim.arena.inside(tgt.pos(), 1.3)) != bool(v):
+					return false
+			"target_closing":
+				if (_kit_last_dist > 0.0 and _kit_last_dist - dist > 0.08) != bool(v):
+					return false
+			"projectile_incoming":
+				if _kit_projectile_incoming(f) != bool(v):
+					return false
+			"in_enemy_zone":
+				if _kit_in_enemy_zone(f) != bool(v):
+					return false
+			"self_juiced":
+				if f.has_flag("juiced") != bool(v):
+					return false
+			"chance":
+				if rng.randf() >= float(v):
+					return false
 	return true
+
+
+## True when any alternative of a hint's condition list holds (non-reactive).
+func _kit_any_when(whens, f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary) -> bool:
+	if typeof(whens) != TYPE_ARRAY:
+		return false
+	for w in whens:
+		if typeof(w) == TYPE_DICTIONARY and _kit_when(f, tgt, dist, dir, per, w as Dictionary, false):
+			return true
+	return false
+
+
+func _kit_profile_at_least(name_: String) -> bool:
+	return KIT_PROFILE_ORDER.find(difficulty) >= maxi(0, KIT_PROFILE_ORDER.find(name_))
+
+
+func _kit_projectile_incoming(f: Fighter) -> bool:
+	if f.sim == null:
+		return false
+	for e in f.sim.effects.entities:
+		if e["kind"] != "projectile" or int(e["team"]) == f.team:
+			continue
+		var rel: Vector3 = f.pos() - Vector3(e["pos"])
+		rel.y = 0.0
+		var vel: Vector3 = e["vel"]
+		vel.y = 0.0
+		if rel.length() < 4.0 and vel.dot(rel) > 0.0:
+			return true
+	return false
+
+
+func _kit_in_enemy_zone(f: Fighter) -> bool:
+	if f.sim == null:
+		return false
+	for z in f.sim.effects.entities:
+		if z["kind"] != "zone" or int(z["owner"]) == f.index or int(z.get("team", -1)) == f.team:
+			continue
+		if Vector2(f.pos().x - z["pos"].x, f.pos().z - z["pos"].z).length() <= float(z["radius"]):
+			return true
+	return false
 
 
 func _kit_is_ranged(tgt: Fighter) -> bool:
@@ -470,6 +561,80 @@ func _kit_grab_target(tgt: Fighter) -> bool:
 
 ## After a Heavy press: maybe keep holding it so the charged version comes out (skill-scaled).
 func _kit_maybe_charge() -> void:
-	var ch := float(personality.get("charge_heavy", 0.0)) * float(p["combo"])
+	var cfg = personality.get("charge_heavy", 0.0)
+	var ch := 0.0
+	if typeof(cfg) == TYPE_DICTIONARY:
+		if not _kit_profile_at_least(str(cfg.get("from", "rookie"))):
+			return
+		ch = float(cfg.get("chance", 0.0))
+	elif typeof(cfg) == TYPE_FLOAT or typeof(cfg) == TYPE_INT:
+		ch = float(cfg)
+	ch *= float(p["combo"])
 	if ch > 0.0 and rng.randf() < ch:
 		_heavy_hold_until = _t + rng.randf_range(0.6, 1.1)
+
+
+## Defence hints: a timed parry against a perceived Heavy windup (profile-gated) or a sidestep
+## instead of a long guard. Returns true when it decided this think step.
+func _kit_defend(f: Fighter, tgt: Fighter, per: Dictionary, winding: bool, dir: Vector3) -> bool:
+	var ph = personality.get("parry_heavy", {})
+	if winding and typeof(ph) == TYPE_DICTIONARY and not (ph as Dictionary).is_empty() and _kit_profile_at_least(str(ph.get("from", "champion"))) \
+			and tgt != null and str(per.get("slot", "")).begins_with("heavy") and rng.randf() < float(ph.get("chance", 0.35)):
+		var eta := maxf(0.0, float(per["first"]) - float(per["st"]) - float(p["reaction"]))
+		_queue(FighterInput.GUARD, maxf(0.0, eta - 0.06))
+		_guard = true
+		_guard_until = _t + eta + 0.25
+		return true
+	if personality.has("dodge_for_guard") and rng.randf() < float(p["block"]) * float(personality["dodge_for_guard"]) and f.stamina > 12.0:
+		var side := dir.cross(Vector3.UP) * (1.0 if rng.randf() < 0.5 else -1.0)
+		_move = (side - dir * 0.6).normalized()
+		f.input.press(FighterInput.DODGE)
+		return true
+	return false
+
+
+func _kit_juice_ok(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary) -> bool:
+	if personality.has("juice_when"):
+		return _kit_any_when(personality["juice_when"], f, tgt, dist, dir, per)
+	return dist < 3.5
+
+
+## Light strings go on to L3 / the Finisher while a commit condition holds (e.g. a Sizzling target).
+func _kit_commit(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary) -> bool:
+	if not personality.has("commit_when") or f.state != Fighter.State.ATTACK or not f.move_slot in ["l1", "l2", "l3"]:
+		return false
+	if rng.randf() > float(p["combo"]) + 0.15 or not _kit_any_when(personality["commit_when"], f, tgt, dist, dir, per):
+		return false
+	f.input.press(FighterInput.HEAVY if f.move_slot in ["l2", "l3"] else FighterInput.LIGHT)
+	return true
+
+
+## Dash-in attacks and hit-and-run exits; returns true when it decided this think step.
+func _kit_movement(f: Fighter, dist: float, dir: Vector3) -> bool:
+	_kit_last_dist = dist   # "target_closing" compares against this on the next think
+	var rg = personality.get("range", [])
+	var di = personality.get("dash_in", {})
+	if typeof(di) == TYPE_DICTIONARY and not (di as Dictionary).is_empty() and f.state == Fighter.State.NEUTRAL and _t > _kit_dash_until \
+			and f.stamina > 20.0 and dist >= float(di.get("min", 1.6)) and dist <= float(di.get("max", 3.6)) \
+			and rng.randf() < float(di.get("chance", 0.3)) * float(p["aggression"]):
+		_move = dir
+		f.input.press(FighterInput.DODGE)
+		_queue(FighterInput.LIGHT, rng.randf_range(0.11, 0.16))
+		_kit_dash_until = _t + 0.9
+		return true
+	if personality.has("dash_out") and typeof(rg) == TYPE_ARRAY and (rg as Array).size() >= 2 and dist < float(rg[0]) \
+			and f.stamina > 16.0 and _t > _kit_dash_until and f.state == Fighter.State.NEUTRAL \
+			and rng.randf() < float(personality["dash_out"]) * float(p["spacing"]):
+		_move = (-dir + dir.cross(Vector3.UP) * (0.4 if rng.randf() < 0.5 else -0.4)).normalized()
+		f.input.press(FighterInput.DODGE)
+		_kit_dash_until = _t + 0.6
+		return true
+	return false
+
+
+func _kit_taunt(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary) -> void:
+	if f.hype >= 100.0 or f.state != Fighter.State.NEUTRAL:
+		return
+	var chance := float(personality.get("taunt_chance", 0.05)) * (3.0 if difficulty == "rookie" else 1.0)
+	if rng.randf() < chance and _kit_any_when(personality["taunt_when"], f, tgt, dist, dir, per):
+		f.input.press(FighterInput.TAUNT)

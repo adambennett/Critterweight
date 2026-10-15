@@ -697,6 +697,8 @@ func _update_zone(ent: Dictionary, dt: float) -> void:
 
 ## Owner-element and ally rules for zones (ELEMENTS.md §5/§7).
 func _zone_affects(ent: Dictionary, f: Fighter, o: Fighter) -> bool:
+	if zone_ignores(o):
+		return false
 	if f == null:
 		return true
 	if o == f:
@@ -867,3 +869,13 @@ func trigger_reaction(r: Dictionary, victim: Fighter, source, el_a: String, el_b
 	sim.emit_event({"type": "reaction", "fighter": victim.index, "reaction": id, "name": str(r.get("name", id)), "a": el_a, "b": el_b, "pos": p, "by": src.index if src else -1})
 	if src:
 		src.hooks.fire("reaction", {"other": victim, "element": el_a, "status": id})
+
+
+# =====================================================================================
+# Kit extension (Stoke/Gusto kit pass)
+# =====================================================================================
+
+## Zones are ground patches: a fighter hovering above the floor (hover effect active) is not
+## affected by their ticks, entry flinches or push-outs (ROSTER: Hang Time ignores ground zones).
+static func zone_ignores(o: Fighter) -> bool:
+	return o != null and o.has_flag("hovering")

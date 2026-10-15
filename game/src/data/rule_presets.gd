@@ -7,6 +7,7 @@ class_name RulePresets
 const KIND := "rules_preset"
 const VERSION := 1
 const PREFIX := "user:"
+const MAX_IMPORT_BYTES := 256 * 1024
 
 
 static func dir() -> String:
@@ -139,11 +140,26 @@ static func export_preset(id: String, dst_dir := "") -> String:
 	return out
 
 
+## Reads a text file of at most `max_bytes`, checking the size BEFORE reading anything (a huge
+## file is never loaded into memory). Returns {ok, text, error}.
+static func read_limited(path: String, max_bytes: int) -> Dictionary:
+	var fa := FileAccess.open(path, FileAccess.READ)
+	if fa == null:
+		return {"ok": false, "text": "", "error": "unreadable"}
+	var n := fa.get_length()
+	if n == 0:
+		return {"ok": false, "text": "", "error": "empty"}
+	if n > max_bytes:
+		return {"ok": false, "text": "", "error": "too large (%d KB, at most %d KB)" % [ceili(n / 1024.0), int(max_bytes / 1024.0)]}
+	return {"ok": true, "text": fa.get_buffer(n).get_string_from_utf8(), "error": ""}
+
+
 ## Imports a shared .rules.json (or a saved preset file). Returns {ok, id, problems}.
 static func import_preset(path: String) -> Dictionary:
-	var text := FileAccess.get_file_as_string(path)
-	if text == "" or text.length() > 256 * 1024:
-		return {"ok": false, "id": "", "problems": [{"field": "", "severity": "error", "text": "%s is empty, unreadable or too large." % path.get_file()}]}
+	var rd := read_limited(path, MAX_IMPORT_BYTES)
+	if not rd["ok"]:
+		return {"ok": false, "id": "", "problems": [{"field": "", "severity": "error", "text": "%s is %s." % [path.get_file(), rd["error"]]}]}
+	var text := str(rd["text"])
 	var parsed = JSON.parse_string(text)
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return {"ok": false, "id": "", "problems": [{"field": "", "severity": "error", "text": "%s is not a rules file (invalid JSON)." % path.get_file()}]}

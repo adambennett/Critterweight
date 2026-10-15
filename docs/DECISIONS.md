@@ -76,7 +76,10 @@ protocol and version/content handshake. Details: docs/NETWORKING.md.
 ## D-015 Persistence
 User data under the OS user-data folder (`%APPDATA%\Critterweight`, `~/.local/share/Critterweight`), never the
 install folder. Versioned JSON envelopes with a SHA-256 checksum of the canonical data, atomic write (temp → flush → rotate .bak → rename), recovery
-from .bak/.tmp, explicit migrations, non-destructive failure.
+from .bak/.tmp, explicit migrations, non-destructive failure. A file written by a newer format is never written
+(Saves refuses; settings, profiles and mod sets go read-only and tell the player); a damaged main file is
+quarantined rather than rotated, so the last valid .bak survives; recovery orders copies by a per-file write
+sequence number, never by the wall clock.
 
 ## D-016 Mods are data-only
 Mod packages contain JSON, images, sounds and glTF models only; any script, binary, scene, engine resource
@@ -86,7 +89,8 @@ online play cannot let a downloaded package run code on players' machines or ser
 large enough for fighters, rules/modes, arenas, campaign content and presentation; validation can be complete.
 Archives are inspected from the zip central directory before anything is inflated (zip bombs, traversal,
 encryption, ZIP64 refused) and extracted to a hash-keyed cache. Overrides of core content need consent
-(`replaces_core`). Details: docs/MODDING.md.
+(`replaces_core`, D-027). Folder packages are walked without following links, and only validated files are ever
+loaded, copied or exported. Details: docs/MODDING.md.
 
 ## D-017 Creature inheritance ("extends")
 Creature entries may extend another creature and state only differences (objects merge, arrays/scalars
@@ -142,3 +146,13 @@ resumed run diverge (35 of 300 random seeds before the fix).
 when they are called from idle processing. The physics world steps on the engine's physics frames while the
 match logic steps in our loop, so starting from idle ran one extra logic step before the first physics step and
 the same seeded fight could end differently depending on the caller (seen as an order-dependent campaign test).
+
+## D-027 Mod overrides replace core entries only, with declared and consented `replaces_core`
+A mod entry may replace (`"override": true`, bare id) only an existing **core** entry, and only when the package
+declares `replaces_core` and the player allowed it for that mod version; root `tuning.json`/`elements.json` count
+as core overrides too. A mod never replaces another mod's entries or the player's `user:` entries, and when two
+mods replace the same core entry the first in load order keeps it and the other is reported. `Content` enforces
+this at load from the manifest and the consent list `Mods.apply()` passes in, so it holds whoever reloads
+content. Found in review: `override` alone skipped the consent prompt (a mod without `replaces_core` silently
+replaced core rules or took over another mod's entries). Building on another mod = `requires` + own entries or
+`extends`; cross-mod replacement would need its own explicit capability and consent design first.

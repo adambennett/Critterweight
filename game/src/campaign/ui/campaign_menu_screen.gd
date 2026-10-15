@@ -253,6 +253,10 @@ func _on_abandon(id: String, slot: String) -> void:
 	var store := RunStore.new()
 	var pid := Profiles.id() if Profiles.id() != "" else "default"
 	var res := store.load_slot(pid, slot, catalog)
+	if bool(res.get("newer", false)):
+		# a newer game version's run is never moved or deleted from here
+		CampaignUI.confirm(self, "Saved by a newer version", "%s\nIt stays as it is; play it with that version." % str(res["error"]), [{"label": "OK", "id": "ok"}], _after_modal)
+		return
 	if bool(res["ok"]):
 		var f := CampaignFlow.resume(catalog, res["state"])
 		f.ctrl.abandon()
