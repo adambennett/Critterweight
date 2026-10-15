@@ -118,6 +118,16 @@ func _finish(stop_reason: String) -> void:
 	var samples := 0
 	for r: Dictionary in res:
 		samples += int(r.get("samples", 0))
+	# check what really reached the dataset (helper shards are committed separately)
+	var stored_seeds: Dictionary = PolicyDataset.recorded_index(dataset_dir)["seeds"]
+	var recorded := 0
+	var missing := 0
+	for r: Dictionary in res:
+		if r.has("error") or int(r.get("samples", 0)) <= 0:
+			continue
+		recorded += 1
+		if not stored_seeds.has(int(r.get("seed", 0))):
+			missing += 1
 	var w := weights()
 	var s := LabEval.summarize(res, w, "teacher")
 	var meta := PolicyDataset.read_meta(dataset_dir)
@@ -133,12 +143,17 @@ func _finish(stop_reason: String) -> void:
 	PolicyDataset.write_meta(dataset_dir, meta)
 	var rep := {"dataset": dataset_dir, "samples": samples, "episodes": res.size(), "teacher": stats, "summary": s,
 		"seeds": {"stream": "rec:<job seed>:<index>", "first_index": first, "last_index": first + total - 1}, "skipped_already_recorded": skipped,
-		"planned_episodes": todo.size(), "complete": _next >= todo.size(), "helper_shards_committed": batch.committed_shards}
+		"planned_episodes": todo.size(), "complete": _next >= todo.size(), "helper_shards_committed": batch.committed_shards,
+		"helper_shards_dropped": batch.dropped_shards, "episodes_stored": recorded - missing, "episodes_missing": missing}
 	if stop_reason != "":
 		rep["stop_reason"] = stop_reason
 	write_report(rep)
-	message = "recorded %d samples from %d episodes%s" % [samples, res.size(), "" if bool(rep["complete"]) else " (stopped early: %s)" % stop_reason]
-	note(message)
 	finished = true
-	final_state = "completed"
 	phase = "done"
+	if missing > 0:
+		final_state = "failed"
+		message = "%d of %d recorded episodes did not reach the dataset (see the worker log); Continue run records them again" % [missing, recorded]
+	else:
+		final_state = "completed"
+		message = "recorded %d samples from %d episodes%s" % [samples, res.size(), "" if bool(rep["complete"]) else " (stopped early: %s)" % stop_reason]
+	note(message)

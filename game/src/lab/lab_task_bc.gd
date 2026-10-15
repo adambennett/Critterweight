@@ -30,9 +30,10 @@ func begin() -> void:
 	var bcj: Dictionary = job["bc"]
 	var dirs := []
 	for dref in bcj["datasets"]:
-		# a folder path, or a dataset id inside the datasets folder
+		# a folder path (absolute, or relative such as ../runs/...), or a dataset id inside the
+		# datasets folder
 		var dpath := str(dref)
-		if not dpath.is_absolute_path():
+		if not dpath.is_absolute_path() and not dpath.contains("/") and not dpath.contains("\\"):
 			dpath = PolicyDataset.dir_for(dpath)
 		dirs.append(dpath)
 	var r := PolicyDataset.load_many(dirs)

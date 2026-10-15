@@ -15,10 +15,10 @@ extends RefCounted
 ## (retrying a failed write; the coordinator's deadline covers a write that never succeeds) and
 ## heart-beats every second — also while the run is paused (`heartbeat()`). An idle helper looks
 ## for new tasks with a growing interval (20 → 250 ms) instead of every frame.
-## Recording batches: helpers write their shards into `gen/stage_<task>_r<k>/` and list them in
-## their result; the coordinator moves them into the dataset only when it accepts that result
-## for the current task. A helper whose share was re-run elsewhere therefore never adds a second
-## copy of those episodes.
+## Recording batches: helpers write their shards into `gen/stage_<task>_r<k>/` and report their
+## file names in their result; the coordinator moves them (from that folder only) into the
+## dataset when it accepts that result for the current task. A helper whose share was re-run
+## elsewhere therefore never adds a second copy of those episodes.
 ##
 ## Payload: {arch: {hidden, activation}, meta: {mode, temperature, target_lag, decision_hz, mask,
 ##   creature}, meta_by_key?: {key: meta}, params: {key: base64 f32}, record_dir?}; item.policy:
@@ -55,6 +55,7 @@ var helper_stats := {}       ## rank -> {util, mem_mb, episodes}
 var reassigned := 0          ## episodes re-run here because their helper died or went silent
 var late := 0                ## episodes re-run here because their helper missed the deadline
 var committed_shards := 0    ## staged helper shards moved into the dataset
+var dropped_shards := 0      ## shards a helper reported that could not be added (see the log)
 var sink: LabRecordSink      ## set while a recording batch runs on this rank
 ## coordinator: starts the helper processes; called once, before the first batch
 var spawner: Callable = Callable()
@@ -344,22 +345,32 @@ func _requeue(r: int) -> void:
 	pending.erase(r)
 
 
-## Moves a helper's staged shards (inside gen/) into the dataset.
-func _commit_shards(files: Array, r: int) -> void:
+## The staging folder of helper rank `r` for batch `task_id` (the only place its shards come from).
+func stage_dir(task_id: String, r: int) -> String:
+	return gen_dir.path_join("stage_%s_r%d" % [task_id, r])
+
+
+## Moves a helper's staged shards into the dataset. The helper reports shard FILE NAMES only; the
+## path is rebuilt here inside this batch's staging folder for that rank, so nothing a helper
+## writes can name a file elsewhere (and relative run folders such as ../runs/x work).
+func _commit_shards(names: Array, r: int) -> void:
 	var dest := str(payload.get("record_dir", ""))
 	if dest == "":
 		return
-	var stage_root := gen_dir.path_join("stage_")
-	for f in files:
-		var src := str(f).replace("\\", "/")
-		if not src.begins_with(stage_root) or src.contains("..") or not FileAccess.file_exists(src):
-			Log.w("lab", "ignoring shard %s reported by helper rank %d" % [src.get_file(), r])
+	var stage := stage_dir(id, r)
+	for f in names:
+		var name_ := str(f)
+		if name_.get_file() != name_ or name_.contains("..") or not name_.begins_with("shard_") or not name_.ends_with(".bin") \
+				or not FileAccess.file_exists(stage.path_join(name_)):
+			dropped_shards += 1
+			Log.w("lab", "ignoring shard '%s' reported by helper rank %d (not in its staging folder)" % [name_, r])
 			continue
-		var err := LabIO.move_file(src, dest.path_join(src.get_file()))
+		var err := LabIO.move_file(stage.path_join(name_), dest.path_join(name_))
 		if err == OK:
 			committed_shards += 1
 		else:
-			Log.w("lab", "could not add helper shard %s to the dataset: %s" % [src.get_file(), error_string(err)])
+			dropped_shards += 1
+			Log.w("lab", "could not add helper shard %s to the dataset: %s" % [name_, error_string(err)])
 
 
 func ordered_results() -> Array:
@@ -412,7 +423,7 @@ func helper_poll(stats: Dictionary) -> void:
 		_task_results = []
 		_unsent = {}
 		var mine: Array = (d.get("assign", {}) as Dictionary).get(str(rank), [])
-		_prepare_runner(d.get("payload", {}), gen_dir.path_join("stage_%s_r%d" % [_task_id, rank]))
+		_prepare_runner(d.get("payload", {}), stage_dir(_task_id, rank))
 		runner.add_items(mine)
 		return
 	_task_results.append_array(runner.take_results())
@@ -425,8 +436,11 @@ func helper_poll(stats: Dictionary) -> void:
 	if _unsent.is_empty():
 		if sink != null:
 			sink.flush()
-		_unsent = {"id": _task_id, "rank": rank, "results": _task_results, "stats": stats,
-			"shards": Array(sink.files) if sink != null else []}
+		var names := []
+		if sink != null:
+			for path in sink.files:
+				names.append(str(path).get_file())
+		_unsent = {"id": _task_id, "rank": rank, "results": _task_results, "stats": stats, "shards": names}
 		_unsent_since = now
 		_next_send = now
 	if now < _next_send:

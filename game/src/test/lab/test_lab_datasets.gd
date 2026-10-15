@@ -163,21 +163,47 @@ func _run_to_end(run: String, seconds: float) -> String:
 	return str(LabManager.status(run).get("state", ""))
 
 
+## `target` written relative to `base` ("../.." steps), as the documented commands give paths
+## (they run with --path game, so ../runs/... from game/). Another drive: `target` unchanged.
+static func rel_from(base: String, target: String) -> String:
+	var a := base.replace("\\", "/").split("/", false)
+	var b := target.replace("\\", "/").split("/", false)
+	if a.is_empty() or b.is_empty() or a[0].to_lower() != b[0].to_lower():
+		return target
+	var i := 0
+	while i < a.size() and i < b.size() and a[i] == b[i]:
+		i += 1
+	var parts := PackedStringArray()
+	for k in range(i, a.size()):
+		parts.append("..")
+	for k in range(i, b.size()):
+		parts.append(b[k])
+	return "/".join(parts)
+
+
 ## The reviewer's repro: record the same teacher twice with the same job seed into the same
 ## dataset, then "Continue run" a finished recording. New code: the second run records new
 ## seeds, the continued run records nothing twice, and helper shards are committed exactly once.
+## Run folders and the dataset root are given RELATIVE to the working directory (../...), as in
+## the documented commands: helper shards were once dropped for such paths.
 func test_recording_again_adds_new_episodes() -> void:
-	var ds_root := dir.path_join("datasets")
-	var run1 := dir.path_join("rec1")
-	var run2 := dir.path_join("rec2")
+	var cwd := ProjectSettings.globalize_path("res://").trim_suffix("/")
+	var ds_root := rel_from(cwd, dir.path_join("datasets"))
+	var run1 := rel_from(cwd, dir.path_join("rec1"))
+	var run2 := rel_from(cwd, dir.path_join("rec2"))
+	check(run1.begins_with("..") or not OS.get_name() in ["Windows", "Linux"], "the run folder is relative (%s)" % run1)
+	DirAccess.make_dir_recursive_absolute(dir.path_join("rec1"))
+	DirAccess.make_dir_recursive_absolute(dir.path_join("rec2"))
 	_record_job(run1, ds_root, 4)
-	check_eq(await _run_to_end(run1, 180.0), "completed", "first recording completed")
-	var ddir := ds_root.path_join("rec_test")
+	check_eq(await _run_to_end(run1, 180.0), "completed", "first recording completed: %s" % str(LabManager.status(run1).get("message", "")))
+	var ddir := dir.path_join("datasets").path_join("rec_test")
 	var first := PolicyDataset.recorded_index(ddir)
-	check_eq((first["seeds"] as Dictionary).size(), 4, "4 seeded episodes stored")
+	check_eq((first["seeds"] as Dictionary).size(), 4, "4 seeded episodes stored (the helper's share too)")
 	check_eq(int(PolicyDataset.read_meta(ddir).get("next_episode", -1)), 4, "indices 0..3 reserved")
 	var rep1 := LabManager.report(run1)
 	check(int(rep1.get("helper_shards_committed", 0)) >= 1, "the helper's shard was committed (%s)" % str(rep1.get("helper_shards_committed", 0)))
+	check_eq(int(rep1.get("helper_shards_dropped", -1)), 0, "no helper shard dropped")
+	check_eq(int(rep1.get("episodes_stored", -1)), 4, "the report checks what reached the dataset")
 	_record_job(run2, ds_root, 4)
 	check_eq(await _run_to_end(run2, 180.0), "completed", "second recording (same job seed) completed")
 	var second := PolicyDataset.recorded_index(ddir)
