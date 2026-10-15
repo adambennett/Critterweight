@@ -17,7 +17,7 @@ const SCREENS := {
 	"arena_editor": "res://src/editor/arena_editor_screen.gd",
 	"online": "res://src/ui/screens/online_screen.gd",
 	"lobby": "res://src/ui/screens/lobby_screen.gd",
-	"campaign_menu": "res://src/ui/screens/campaign_menu.gd",
+	"campaign_menu": "res://src/campaign/ui/campaign_menu_screen.gd",
 	"run_map": "res://src/campaign/ui/run_map_screen.gd",
 	"reward": "res://src/campaign/ui/reward_screen.gd",
 	"event": "res://src/campaign/ui/event_screen.gd",
@@ -31,6 +31,9 @@ const SCREENS := {
 	"dialog": "res://src/ui/screens/dialog.gd",
 	"spectate": "res://src/ui/screens/spectate_setup.gd",
 	"bookie": "res://src/campaign/ui/bookie_screen.gd",
+	"rest": "res://src/campaign/ui/rest_screen.gd",
+	"run_summary": "res://src/campaign/ui/run_summary_screen.gd",
+	"camp_ledger": "res://src/campaign/ui/camp_ledger_screen.gd",
 	"tutorial_menu": "res://src/ui/screens/tutorial_menu.gd",
 	"controls": "res://src/ui/screens/controls_screen.gd",
 	"text_entry": "res://src/ui/screens/text_entry.gd",
@@ -162,9 +165,13 @@ func set_scene(n: Node) -> void:
 func resolve_match_config(cfg: Dictionary) -> Dictionary:
 	var out := cfg.duplicate()
 	var a = cfg.get("arena", "the_gullet")
-	out["arena"] = a if a is ArenaDef else Content.arena(str(a))
+	out["arena"] = a if a is ArenaDef else ArenaLibrary.resolve(str(a))   # content first, then saved/imported layouts
 	if out["arena"] == null:
 		out["arena"] = Content.arena("the_gullet")
+	# a context may name the arena's look (campaign: gullet_day / gullet_title); unknown names are ignored
+	var ctx = cfg.get("context", {})
+	if typeof(ctx) == TYPE_DICTIONARY:
+		out["arena"] = (out["arena"] as ArenaDef).with_variant(str((ctx as Dictionary).get("variant", "")))
 	var r = cfg.get("rules", "duel")
 	var rules: Dictionary = r if typeof(r) == TYPE_DICTIONARY else Content.get_entry("rules", str(r))
 	out["rules"] = rules.duplicate(true)
@@ -179,10 +186,40 @@ func resolve_match_config(cfg: Dictionary) -> Dictionary:
 			Log.e("app", "unknown creature %s" % str(c))
 			continue
 		fs.append(e)
-	out["fighters"] = fs
 	if not out.has("seed"):
 		out["seed"] = randi()
+	_fill_bots(rules, fs, int(out["seed"]))
+	out["fighters"] = fs
 	return out
+
+
+## Rules "bots" (Fill with bots): adds that many bots at the rules' bot skill, never past the
+## maximum fighters. Teams follow the format (co-op bots join the players' side).
+func _fill_bots(rules: Dictionary, fs: Array, seed_value: int) -> void:
+	var extra := int(rules.get("bots", 0))
+	if extra <= 0:
+		return
+	var pl: Array = rules.get("players", [2, 8])
+	var cap := mini(8, int(pl[1]) if pl.size() > 1 else 8)
+	var roster := Content.playable_creatures().filter(func(c): return not str(c).begins_with("dev_"))
+	if roster.is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value * 977 + 13
+	var fmt := str(rules.get("format", "duel"))
+	var teams := maxi(1, int(rules.get("teams", 2)))
+	var tier := BotTiers.brain_tier(str(rules.get("bot_tier", "journeyman")))
+	var n := 0
+	while n < extra and fs.size() < cap:
+		var i := fs.size()
+		var team := i
+		if fmt == "coop":
+			team = 0
+		elif fmt in ["teams", "tag", "duel"]:
+			team = i % teams
+		var c := Content.creature(str(roster[rng.randi_range(0, roster.size() - 1)]))
+		fs.append({"creature": c, "team": team, "kind": "bot", "difficulty": tier, "name": "%s (bot)" % c.display_name})
+		n += 1
 
 
 ## Starts a local authoritative match with presentation. Menus are cleared; when the match

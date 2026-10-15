@@ -32,6 +32,7 @@ var tuck := false                      ## airborne / falling: legs pull in inste
 var _rest := {}                        ## chain name -> [Basis B1^T, Basis B2^T]
 var _feet: Array = []                  ## Array[Dictionary]
 var _limb_flags := PackedByteArray()
+var strike_height_scale := 1.0     ## set per move by Fighter (target height / own height)
 var _wave_phase := 0.0
 var _hop_phase := 0.0
 var _root_rest := Vector3.ZERO
@@ -165,7 +166,10 @@ func _in_limb(idx: int) -> bool:
 
 func _chain_target(cname: String, c: BodyDef.Chain, gb: float) -> Vector3:
 	if overlay_chains.has(cname):
-		return overlay_chains[cname]
+		var t: Vector3 = overlay_chains[cname]
+		if strike_height_scale != 1.0:
+			t.y *= strike_height_scale     # strikes authored for a same-size opponent re-aim to this one
+		return t
 	return base_chain_target(cname, c)
 
 

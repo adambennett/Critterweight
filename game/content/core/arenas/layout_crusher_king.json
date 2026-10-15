@@ -1,0 +1,193 @@
+{
+ "id": "layout_crusher_king",
+ "name": "Crusher King",
+ "base": "crusher",
+ "variant": "night",
+ "format": 2,
+ "version": 1,
+ "author": "Critterweight",
+ "description": "Hold the center, get blown off it. Plates are off; the magnet still drops walls every 25 s.",
+ "example": true,
+ "size": [
+  12.0,
+  12.0
+ ],
+ "modes": [
+  "spotlight_hog",
+  "ffa"
+ ],
+ "flags": {
+  "electrified_plates": false
+ },
+ "removed_builtins": [],
+ "props": [
+  {
+   "type": "prop_battery",
+   "pos": [
+    -1.0,
+    0.0,
+    0.6
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_battery",
+   "pos": [
+    1.0,
+    0.0,
+    -0.6
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_chum_bucket",
+   "pos": [
+    0,
+    0.0,
+    5.2
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_chum_bucket",
+   "pos": [
+    0,
+    0.0,
+    -5.2
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_fan_unit",
+   "pos": [
+    -2.6,
+    0.0,
+    0.0
+   ],
+   "yaw": 90.0
+  }
+ ],
+ "markers": {
+  "spawn": [
+   {
+    "pos": [
+     0,
+     0.0,
+     -3.4
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.4,
+     0.0,
+     -2.4
+    ],
+    "yaw": -45.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     3.4,
+     0.0,
+     0
+    ],
+    "yaw": -90.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.4,
+     0.0,
+     2.4
+    ],
+    "yaw": -135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     0,
+     0.0,
+     3.4
+    ],
+    "yaw": 180.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -2.4,
+     0.0,
+     2.4
+    ],
+    "yaw": 135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -4.6,
+     0.0,
+     1.2
+    ],
+    "yaw": 104.6,
+    "team": -1
+   },
+   {
+    "pos": [
+     -2.4,
+     0.0,
+     -2.4
+    ],
+    "yaw": 45.0,
+    "team": -1
+   }
+  ],
+  "spotlight_anchor": [
+   {
+    "pos": [
+     0,
+     0.0,
+     0
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -4,
+     0.0,
+     -4
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     4,
+     0.0,
+     -4
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     4,
+     0.0,
+     4
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -4,
+     0.0,
+     4
+    ],
+    "yaw": 0.0,
+    "team": -1
+   }
+  ]
+ }
+}

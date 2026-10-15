@@ -1,0 +1,490 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Random event (content/<pkg>/events)",
+ "type": "object",
+ "required": [
+  "id",
+  "type",
+  "title",
+  "text",
+  "choices"
+ ],
+ "properties": {
+  "_doc": {
+   "type": "string"
+  },
+  "override": {
+   "type": "boolean"
+  },
+  "id": {
+   "type": "string",
+   "pattern": "^([a-z0-9_]+:)?evt_[a-z0-9_]+$"
+  },
+  "type": {
+   "const": "event"
+  },
+  "title": {
+   "type": "string",
+   "minLength": 1
+  },
+  "speaker": {
+   "type": "string"
+  },
+  "text": {
+   "type": "string",
+   "minLength": 1
+  },
+  "requires": {
+   "type": "object",
+   "properties": {
+    "act": {
+     "type": "array",
+     "items": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+     }
+    },
+    "fighters": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "element": {
+     "type": "string"
+    },
+    "party_element": {
+     "type": "string"
+    },
+    "weight_class": {
+     "type": "array",
+     "items": {
+      "enum": [
+       "pipsqueak",
+       "scrapper",
+       "lunker",
+       "absolute_unit"
+      ]
+     }
+    },
+    "scrip": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "has_banned": {
+     "type": "boolean"
+    },
+    "no_banned": {
+     "type": "boolean"
+    },
+    "has_supplements": {
+     "type": "boolean"
+    },
+    "roll_matches": {
+     "type": "boolean"
+    },
+    "variant": {
+     "enum": [
+      "off_the_street",
+      "fight_camp"
+     ]
+    },
+    "coop": {
+     "type": "boolean"
+    }
+   },
+   "additionalProperties": false
+  },
+  "group": {
+   "type": "boolean"
+  },
+  "weight": {
+   "type": "number",
+   "minimum": 0
+  },
+  "roll": {
+   "type": "object",
+   "properties": {
+    "element": {
+     "enum": [
+      "any"
+     ]
+    }
+   },
+   "additionalProperties": false
+  },
+  "choices": {
+   "type": "array",
+   "minItems": 1,
+   "maxItems": 4,
+   "items": {
+    "type": "object",
+    "required": [
+     "id",
+     "label",
+     "outcomes"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+     },
+     "label": {
+      "type": "string",
+      "minLength": 1
+     },
+     "desc": {
+      "type": "string"
+     },
+     "risk": {
+      "enum": [
+       "safe",
+       "risky",
+       "costly",
+       "gamble"
+      ]
+     },
+     "cost": {
+      "type": "object",
+      "properties": {
+       "scrip": {
+        "type": "integer",
+        "minimum": 0
+       }
+      },
+      "additionalProperties": false
+     },
+     "requires": {
+      "type": "object",
+      "properties": {
+       "act": {
+        "type": "array",
+        "items": {
+         "type": "integer",
+         "minimum": 1,
+         "maximum": 3
+        }
+       },
+       "fighters": {
+        "type": "array",
+        "items": {
+         "type": "string"
+        }
+       },
+       "element": {
+        "type": "string"
+       },
+       "party_element": {
+        "type": "string"
+       },
+       "weight_class": {
+        "type": "array",
+        "items": {
+         "enum": [
+          "pipsqueak",
+          "scrapper",
+          "lunker",
+          "absolute_unit"
+         ]
+        }
+       },
+       "scrip": {
+        "type": "integer",
+        "minimum": 0
+       },
+       "has_banned": {
+        "type": "boolean"
+       },
+       "no_banned": {
+        "type": "boolean"
+       },
+       "has_supplements": {
+        "type": "boolean"
+       },
+       "roll_matches": {
+        "type": "boolean"
+       },
+       "variant": {
+        "enum": [
+         "off_the_street",
+         "fight_camp"
+        ]
+       },
+       "coop": {
+        "type": "boolean"
+       }
+      },
+      "additionalProperties": false
+     },
+     "locked_text": {
+      "type": "string"
+     },
+     "outcomes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+       "type": "object",
+       "required": [
+        "effects"
+       ],
+       "properties": {
+        "weight": {
+         "type": "number",
+         "minimum": 0
+        },
+        "text": {
+         "type": "string"
+        },
+        "effects": {
+         "type": "array",
+         "items": {
+          "$ref": "#/$defs/effect"
+         }
+        }
+       },
+       "additionalProperties": false
+      }
+     }
+    },
+    "additionalProperties": false
+   }
+  }
+ },
+ "additionalProperties": false,
+ "$defs": {
+  "patch": {
+   "type": "object",
+   "required": [
+    "op",
+    "path"
+   ],
+   "properties": {
+    "op": {
+     "enum": [
+      "set",
+      "add",
+      "mul",
+      "min",
+      "max",
+      "append",
+      "remove",
+      "merge",
+      "time_scale"
+     ]
+    },
+    "path": {
+     "type": "string",
+     "minLength": 1
+    },
+    "value": {},
+    "default": {
+     "type": "number"
+    },
+    "phase": {
+     "enum": [
+      "all",
+      "startup"
+     ]
+    },
+    "create": {
+     "type": "boolean"
+    },
+    "spread": {
+     "type": "boolean"
+    },
+    "when": {
+     "enum": [
+      "always",
+      "solo",
+      "coop",
+      "tag"
+     ]
+    }
+   },
+   "additionalProperties": false
+  },
+  "mod": {
+   "type": "object",
+   "required": [
+    "key"
+   ],
+   "properties": {
+    "key": {
+     "type": "string",
+     "minLength": 1
+    },
+    "mul": {
+     "type": "number"
+    },
+    "add": {
+     "type": "number"
+    },
+    "set": {},
+    "when": {
+     "enum": [
+      "always",
+      "solo",
+      "coop",
+      "tag"
+     ]
+    }
+   },
+   "additionalProperties": false
+  },
+  "hook": {
+   "type": "object",
+   "required": [
+    "on",
+    "do"
+   ],
+   "properties": {
+    "on": {
+     "type": "string"
+    },
+    "if": {
+     "type": "object"
+    },
+    "do": {
+     "type": "array",
+     "maxItems": 16,
+     "items": {
+      "type": "object",
+      "required": [
+       "type"
+      ]
+     }
+    },
+    "chance": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 1
+    },
+    "cooldown": {
+     "type": "number",
+     "minimum": 0
+    },
+    "max_uses": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "every": {
+     "type": "number",
+     "minimum": 0.05
+    },
+    "id": {
+     "type": "string"
+    },
+    "source": {
+     "type": "string"
+    },
+    "when": {
+     "enum": [
+      "always",
+      "solo",
+      "coop",
+      "tag"
+     ]
+    }
+   },
+   "additionalProperties": false
+  },
+  "apply": {
+   "type": "object",
+   "properties": {
+    "patches": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/patch"
+     }
+    },
+    "mods": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/mod"
+     }
+    },
+    "run": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/mod"
+     }
+    },
+    "hooks": {
+     "type": "array",
+     "maxItems": 16,
+     "items": {
+      "$ref": "#/$defs/hook"
+     }
+    },
+    "statuses": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id"
+      ]
+     }
+    },
+    "fight_rolls": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "key",
+       "min",
+       "max"
+      ]
+     }
+    }
+   },
+   "additionalProperties": false
+  },
+  "effect": {
+   "type": "object",
+   "required": [
+    "op"
+   ],
+   "properties": {
+    "op": {
+     "enum": [
+      "hp",
+      "hp_pct",
+      "max_hp",
+      "scrip",
+      "clout",
+      "hype_carry",
+      "hype_carry_set",
+      "grant_supplement",
+      "side_effect",
+      "remove_supplement",
+      "remove_side_effects",
+      "technique_pick",
+      "reward_pick",
+      "run_mods",
+      "run_patches",
+      "run_hooks",
+      "next_fight",
+      "bet",
+      "boss_mod",
+      "fight",
+      "cosmetic",
+      "coupon",
+      "flag",
+      "nothing",
+      "consumable",
+      "quip",
+      "stat"
+     ]
+    }
+   }
+  },
+  "tags": {
+   "type": "array",
+   "items": {
+    "type": "string",
+    "pattern": "^[a-z_]+(:[a-z_]+)?$"
+   }
+  }
+ }
+}

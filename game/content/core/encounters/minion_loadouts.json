@@ -1,0 +1,26 @@
+{
+  "_doc": "Minion loadout recipes (docs/design/ENEMIES_BOSSES.md §1.3). Used only when no creature entry with the loadout id exists: the base minion (npc_scrapling / npc_blister, authored by the creature owner) is patched. Slot convention: Scrapling l1 = Pipe Swing, l2 = Lid Bash, ability1 = Lid Up, ability2 = Bolt Toss; Blister ability1 = Inflate & Pop.",
+  "items": [
+    {"id": "scrapling_basic", "type": "minion_loadout", "base": "npc_scrapling", "name": "Scrapling", "patches": [], "tags": ["minion", "scrapling"]},
+    {"id": "scrapling_pelter", "type": "minion_loadout", "base": "npc_scrapling", "name": "Scrapling Pelter", "tags": ["minion", "scrapling", "ranged"],
+     "ai": {"prefers": "ranged", "keep_distance": 4.0, "ability": 0.3},
+     "patches": [{"op": "set", "path": "abilities.ability2", "value": {"name": "Bolt Toss", "cooldown": 2.0, "duration": 1.0, "stamina": 4,
+       "effects": [{"t": 0.4, "type": "projectile", "lob": true, "speed": 8, "range": 5, "radius": 0.18, "life": 1.5, "damage": 3, "knockback": 0.3, "poise": 5, "stun": 0.15}]}, "create": true}]},
+    {"id": "scrapling_hot_pipe", "type": "minion_loadout", "base": "npc_scrapling", "name": "Hot Pipe Scrapling", "tags": ["minion", "scrapling", "element:scorch"],
+     "patches": [{"op": "set", "path": "moves.l1.element", "value": "scorch"}, {"op": "set", "path": "moves.l1.buildup", "value": 15},
+                 {"op": "set", "path": "moves.heavy.element", "value": "scorch"}, {"op": "set", "path": "moves.heavy.buildup", "value": 15}]},
+    {"id": "scrapling_gravel_lid", "type": "minion_loadout", "base": "npc_scrapling", "name": "Gravel Lid Scrapling", "tags": ["minion", "scrapling", "element:grit"],
+     "patches": [{"op": "set", "path": "moves.l2.element", "value": "grit"}, {"op": "set", "path": "moves.l2.buildup", "value": 15}]},
+    {"id": "scrapling_leaky_pipe", "type": "minion_loadout", "base": "npc_scrapling", "name": "Leaky Pipe Scrapling", "tags": ["minion", "scrapling", "element:sludge"],
+     "patches": [{"op": "set", "path": "moves.l1.element", "value": "sludge"}, {"op": "set", "path": "moves.l1.buildup", "value": 15}]},
+    {"id": "blister_sludge", "type": "minion_loadout", "base": "npc_blister", "name": "Blister", "patches": [], "tags": ["minion", "blister", "element:sludge"]},
+    {"id": "blister_ember", "type": "minion_loadout", "base": "npc_blister", "name": "Ember Blister", "tags": ["minion", "blister", "element:scorch"],
+     "patches": [{"op": "set", "path": "element", "value": "scorch"},
+                 {"op": "set", "path": "abilities.ability1.effects[type=area].element", "value": "scorch"},
+                 {"op": "set", "path": "abilities.ability1.effects[type=zone].kind", "value": "scorch_patch"}]},
+    {"id": "blister_fuse", "type": "minion_loadout", "base": "npc_blister", "name": "Fuse Blister", "tags": ["minion", "blister", "element:static"],
+     "patches": [{"op": "set", "path": "element", "value": "static"},
+                 {"op": "set", "path": "abilities.ability1.effects[type=area].element", "value": "static"},
+                 {"op": "merge", "path": "abilities.ability1.effects[type=area]", "value": {"stun": 0.4}}]}
+  ]
+}

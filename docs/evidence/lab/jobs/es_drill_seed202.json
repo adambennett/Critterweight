@@ -1,0 +1,43 @@
+{
+  "kind": "es",
+  "name": "ES drill seed 202",
+  "creature": "dev_biped",
+  "seed": 202,
+  "objective": {
+    "preset": "drill"
+  },
+  "scenario": {
+    "preset": "drill_dummy",
+    "round_time": 6
+  },
+  "eval": {
+    "val_episodes": 8,
+    "episodes": 10,
+    "every": 5,
+    "standard_spawns": true,
+    "reference": "jabber"
+  },
+  "model": {
+    "out_scale": 0.01,
+    "hidden": [
+      32,
+      32
+    ]
+  },
+  "es": {
+    "pairs": 12,
+    "sigma": 0.05,
+    "lr": 0.02,
+    "episodes_per_candidate": 1
+  },
+  "limits": {
+    "max_generations": 25,
+    "workers": 3,
+    "worlds": 2,
+    "low_priority": false,
+    "max_wall_s": 3600
+  },
+  "output": {
+    "policy_name": "Drill ES (seed 202)"
+  }
+}

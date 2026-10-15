@@ -26,6 +26,9 @@ func setup(match_sim) -> void:
 	if sim.fighters.size() > 1:
 		dummy_source = PracticeDummy.new(self)
 		sim.set_input_source(1, dummy_source)
+		var b := str(rules.get("dummy_behavior", "stand"))
+		if BEHAVIORS.has(b):
+			set_behavior(b, str(rules.get("dummy_tier", "regular")))
 
 
 func set_behavior(b: String, bot_tier := "regular") -> void:

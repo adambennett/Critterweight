@@ -1,0 +1,1 @@
+{"state":"completed","message":"completed (generation limit (25)): trained policy n=20 reward 51.22 ± 12.51 (95% CI 45.73..56.70) win 100% [84–100%]","pid":37456,"kind":"es","run_id":"es_drill_seed202","updated":1792046968.744,"report":"<evidence>/es_drill_seed202/report.json","policy_id":"u_dev_biped_tmxsag492","final":true}

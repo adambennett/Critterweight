@@ -1,0 +1,571 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Encounter template, minion loadout recipe or act (content/<pkg>/encounters)",
+ "oneOf": [
+  {
+   "type": "object",
+   "required": [
+    "id",
+    "type",
+    "tier",
+    "act",
+    "name",
+    "arena",
+    "enemies"
+   ],
+   "properties": {
+    "_doc": {
+     "type": "string"
+    },
+    "override": {
+     "type": "boolean"
+    },
+    "id": {
+     "type": "string",
+     "pattern": "^([a-z0-9_]+:)?(enc|elite|boss|evt_fight)_[a-z0-9_]+$"
+    },
+    "type": {
+     "const": "encounter"
+    },
+    "tier": {
+     "enum": [
+      "normal",
+      "elite",
+      "boss",
+      "event"
+     ]
+    },
+    "act": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 3
+    },
+    "name": {
+     "type": "string",
+     "minLength": 1
+    },
+    "arena": {
+     "type": "string"
+    },
+    "blurb": {
+     "type": "string"
+    },
+    "enemies": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 12,
+     "items": {
+      "type": "object",
+      "properties": {
+       "minion": {
+        "type": "string"
+       },
+       "fighter": {
+        "type": "string"
+       },
+       "boss_fight": {
+        "type": "string"
+       },
+       "count": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 12
+       },
+       "hp_mult": {
+        "type": "number",
+        "minimum": 0.1,
+        "maximum": 5
+       },
+       "techniques": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 6
+       },
+       "techniques_list": {
+        "type": "array",
+        "items": {
+         "type": "string"
+        }
+       },
+       "build": {
+        "type": "string"
+       },
+       "pool": {
+        "type": "array",
+        "items": {
+         "type": "string"
+        }
+       },
+       "tag": {
+        "type": "boolean"
+       },
+       "start_hype": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100
+       },
+       "wave": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 8
+       },
+       "group": {
+        "type": "integer"
+       },
+       "hp_frac": {
+        "type": "number",
+        "minimum": 0.05,
+        "maximum": 1
+       },
+       "phases": {
+        "type": "array",
+        "items": {
+         "type": "integer"
+        }
+       }
+      },
+      "additionalProperties": false,
+      "anyOf": [
+       {
+        "type": "object",
+        "required": [
+         "minion"
+        ]
+       },
+       {
+        "type": "object",
+        "required": [
+         "fighter"
+        ]
+       },
+       {
+        "type": "object",
+        "required": [
+         "boss_fight"
+        ]
+       }
+      ]
+     }
+    },
+    "special": {
+     "type": "object",
+     "properties": {
+      "handicap": {
+       "type": "boolean"
+      },
+      "hazards": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "kind"
+        ],
+        "properties": {
+         "kind": {
+          "type": "string"
+         },
+         "every": {
+          "type": "number",
+          "minimum": 0.5
+         },
+         "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+         },
+         "duration": {
+          "type": "number",
+          "minimum": 0
+         }
+        },
+        "additionalProperties": true
+       }
+      },
+      "gravity": {
+       "type": "number",
+       "minimum": 0.2,
+       "maximum": 1.0
+      },
+      "tag_bout": {
+       "type": "object"
+      },
+      "ffa": {
+       "type": "boolean"
+      },
+      "sudden_death": {
+       "type": "number",
+       "minimum": 20,
+       "maximum": 600
+      },
+      "waves": {
+       "type": "object",
+       "properties": {
+        "count": {
+         "type": "integer",
+         "minimum": 1,
+         "maximum": 8
+        },
+        "trigger_alive": {
+         "type": "integer",
+         "minimum": 0,
+         "maximum": 6
+        }
+       },
+       "additionalProperties": false
+      },
+      "hype_mult": {
+       "type": "number",
+       "minimum": 0.1,
+       "maximum": 5
+      },
+      "enemy_start_hype": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "zone_duration_mult": {
+       "type": "number",
+       "minimum": 0.1,
+       "maximum": 5
+      },
+      "blister_fast": {
+       "type": "number",
+       "minimum": 0.2,
+       "maximum": 1.0
+      },
+      "sequential": {
+       "type": "boolean"
+      }
+     },
+     "additionalProperties": false
+    },
+    "weight": {
+     "type": "number",
+     "minimum": 0
+    },
+    "tags": {
+     "$ref": "#/$defs/tags"
+    }
+   },
+   "additionalProperties": false
+  },
+  {
+   "type": "object",
+   "required": [
+    "id",
+    "type",
+    "base",
+    "patches"
+   ],
+   "properties": {
+    "_doc": {
+     "type": "string"
+    },
+    "override": {
+     "type": "boolean"
+    },
+    "id": {
+     "type": "string",
+     "pattern": "^([a-z0-9_]+:)?[a-z0-9_]+$"
+    },
+    "type": {
+     "const": "minion_loadout"
+    },
+    "base": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "patches": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/patch"
+     }
+    },
+    "ai": {
+     "type": "object"
+    },
+    "tags": {
+     "$ref": "#/$defs/tags"
+    }
+   },
+   "additionalProperties": false
+  },
+  {
+   "type": "object",
+   "required": [
+    "id",
+    "type",
+    "act",
+    "name",
+    "boss"
+   ],
+   "properties": {
+    "_doc": {
+     "type": "string"
+    },
+    "override": {
+     "type": "boolean"
+    },
+    "id": {
+     "type": "string",
+     "pattern": "^([a-z0-9_]+:)?act_[a-z0-9_]+$"
+    },
+    "type": {
+     "const": "act"
+    },
+    "act": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 3
+    },
+    "name": {
+     "type": "string"
+    },
+    "boss": {
+     "type": "string"
+    },
+    "blurb": {
+     "type": "string"
+    }
+   },
+   "additionalProperties": false
+  }
+ ],
+ "$defs": {
+  "patch": {
+   "type": "object",
+   "required": [
+    "op",
+    "path"
+   ],
+   "properties": {
+    "op": {
+     "enum": [
+      "set",
+      "add",
+      "mul",
+      "min",
+      "max",
+      "append",
+      "remove",
+      "merge",
+      "time_scale"
+     ]
+    },
+    "path": {
+     "type": "string",
+     "minLength": 1
+    },
+    "value": {},
+    "default": {
+     "type": "number"
+    },
+    "phase": {
+     "enum": [
+      "all",
+      "startup"
+     ]
+    },
+    "create": {
+     "type": "boolean"
+    },
+    "spread": {
+     "type": "boolean"
+    },
+    "when": {
+     "enum": [
+      "always",
+      "solo",
+      "coop",
+      "tag"
+     ]
+    }
+   },
+   "additionalProperties": false
+  },
+  "mod": {
+   "type": "object",
+   "required": [
+    "key"
+   ],
+   "properties": {
+    "key": {
+     "type": "string",
+     "minLength": 1
+    },
+    "mul": {
+     "type": "number"
+    },
+    "add": {
+     "type": "number"
+    },
+    "set": {},
+    "when": {
+     "enum": [
+      "always",
+      "solo",
+      "coop",
+      "tag"
+     ]
+    }
+   },
+   "additionalProperties": false
+  },
+  "hook": {
+   "type": "object",
+   "required": [
+    "on",
+    "do"
+   ],
+   "properties": {
+    "on": {
+     "type": "string"
+    },
+    "if": {
+     "type": "object"
+    },
+    "do": {
+     "type": "array",
+     "maxItems": 16,
+     "items": {
+      "type": "object",
+      "required": [
+       "type"
+      ]
+     }
+    },
+    "chance": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 1
+    },
+    "cooldown": {
+     "type": "number",
+     "minimum": 0
+    },
+    "max_uses": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "every": {
+     "type": "number",
+     "minimum": 0.05
+    },
+    "id": {
+     "type": "string"
+    },
+    "source": {
+     "type": "string"
+    },
+    "when": {
+     "enum": [
+      "always",
+      "solo",
+      "coop",
+      "tag"
+     ]
+    }
+   },
+   "additionalProperties": false
+  },
+  "apply": {
+   "type": "object",
+   "properties": {
+    "patches": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/patch"
+     }
+    },
+    "mods": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/mod"
+     }
+    },
+    "run": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/mod"
+     }
+    },
+    "hooks": {
+     "type": "array",
+     "maxItems": 16,
+     "items": {
+      "$ref": "#/$defs/hook"
+     }
+    },
+    "statuses": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id"
+      ]
+     }
+    },
+    "fight_rolls": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "key",
+       "min",
+       "max"
+      ]
+     }
+    }
+   },
+   "additionalProperties": false
+  },
+  "effect": {
+   "type": "object",
+   "required": [
+    "op"
+   ],
+   "properties": {
+    "op": {
+     "enum": [
+      "hp",
+      "hp_pct",
+      "max_hp",
+      "scrip",
+      "clout",
+      "hype_carry",
+      "hype_carry_set",
+      "grant_supplement",
+      "side_effect",
+      "remove_supplement",
+      "remove_side_effects",
+      "technique_pick",
+      "reward_pick",
+      "run_mods",
+      "run_patches",
+      "run_hooks",
+      "next_fight",
+      "bet",
+      "boss_mod",
+      "fight",
+      "cosmetic",
+      "coupon",
+      "flag",
+      "nothing",
+      "consumable",
+      "quip",
+      "stat"
+     ]
+    }
+   }
+  },
+  "tags": {
+   "type": "array",
+   "items": {
+    "type": "string",
+    "pattern": "^[a-z_]+(:[a-z_]+)?$"
+   }
+  }
+ }
+}

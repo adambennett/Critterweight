@@ -8,6 +8,8 @@ extends Node
 ##   -- --bench sim    [--n 8] [--duration 60]: headless authoritative simulation cost per tick
 ##        (dedicated-server capacity), no rendering
 ##   -- --bench soak   [--matches 20]: back-to-back headless matches; memory/object trend
+##   -- --bench roster [--bouts 4] [--tier pro] [--round 60]: bot round robin between the
+##        playable fighters (win rates, hits/min, damage per hit) for balance and size checks
 ##
 ## Rendered benches disable VSync and the frame cap so the numbers show real headroom; the
 ## "frames over 16.7 ms" figure is what matters for the 60 fps target.
@@ -31,6 +33,8 @@ func run(scene: String, a: PackedStringArray) -> void:
 			await _sim_cost(int(_arg("--n", "8")))
 		"soak":
 			await _soak(int(_arg("--matches", "20")))
+		"roster":
+			await _roster(int(_arg("--bouts", "4")), _arg("--tier", "pro"), float(_arg("--round", "60")))
 		_:
 			print("unknown bench '%s' (busy, duel, sim, soak)" % scene)
 			get_tree().quit(2)
@@ -201,6 +205,79 @@ func _soak(matches: int) -> void:
 	report["memory_growth_mb_first_to_last"] = float(mem[-1]) - float(mem[0]) if mem.size() > 1 else 0.0
 	report["object_growth_first_to_last"] = int(objs[-1]) - int(objs[0]) if objs.size() > 1 else 0
 	report["wall_seconds"] = (Time.get_ticks_msec() - t0) / 1000.0
+
+
+## Round robin between the playable fighters (bot vs bot, same tier, fixed step, headless):
+## win rates, hits landed per minute, damage per hit, and how many melee moves connect —
+## catches dominant/weak fighters and size mismatches where strikes whiff.
+func _roster(bouts: int, tier: String, round_time: float) -> void:
+	var ids := Content.playable_creatures().filter(func(c): return not str(c).begins_with("dev_"))
+	var per := {}
+	for id in ids:
+		per[id] = {"wins": 0, "losses": 0, "draws": 0, "hits": 0, "damage": 0.0, "moves": 0, "seconds": 0.0}
+	var pairs := {}
+	var dt := 1.0 / Engine.physics_ticks_per_second
+	for a_i in ids.size():
+		for b_i in range(a_i, ids.size()):
+			var a := str(ids[a_i])
+			var b := str(ids[b_i])
+			var pr := {"a_wins": 0, "b_wins": 0, "draws": 0}
+			for k in bouts:
+				var sv := SubViewport.new()
+				sv.own_world_3d = true
+				sv.render_target_update_mode = SubViewport.UPDATE_DISABLED
+				add_child(sv)
+				var sim := MatchSim.new()
+				sim.running = false
+				sv.add_child(sim)
+				# alternate sides so spawn position never decides a pairing
+				var first := a if k % 2 == 0 else b
+				var second := b if k % 2 == 0 else a
+				var entries := [{"creature": Content.creature(first), "team": 0, "source": BotBrain.new(tier, 1000 + k), "kind": "bot"},
+					{"creature": Content.creature(second), "team": 1, "source": BotBrain.new(tier, 2000 + k), "kind": "bot"}]
+				(entries[0]["source"] as BotBrain).set_personality(Content.creature(first).ai)
+				(entries[1]["source"] as BotBrain).set_personality(Content.creature(second).ai)
+				sim.setup({"arena": Content.arena("the_gullet"), "rules": {"mode": "standard", "rounds": 1, "round_time": round_time},
+					"seed": 50 + k * 7 + a_i * 31 + b_i, "fighters": entries, "mode": ModeRegistry.create("standard")})
+				var t := 0.0
+				while t < round_time + 8.0 and not sim.is_finished:
+					sim.step(dt)
+					t += dt
+					await get_tree().physics_frame
+				var wt := int(sim.result.get("winner_team", -1)) if sim.is_finished else -1
+				var winner := first if wt == 0 else (second if wt == 1 else "")
+				if winner == "":
+					pr["draws"] += 1
+				elif winner == a:
+					pr["a_wins"] += 1
+				else:
+					pr["b_wins"] += 1
+				for fi in 2:
+					var f: Fighter = sim.fighters[fi]
+					var rec: Dictionary = per[f.creature.id]
+					rec["seconds"] = float(rec["seconds"]) + t
+					rec["hits"] = int(rec["hits"]) + int(f.stats_record.get("hits", 0))
+					rec["damage"] = float(rec["damage"]) + float(f.stats_record.get("damage_dealt", 0.0))
+					rec["moves"] = int(rec["moves"]) + sim.events.filter(func(e): return e["type"] == "move_start" and int(e["fighter"]) == fi).size()
+					if winner == "":
+						rec["draws"] = int(rec["draws"]) + 1
+					elif winner == f.creature.id and (a != b or wt == fi):
+						rec["wins"] = int(rec["wins"]) + 1
+					else:
+						rec["losses"] = int(rec["losses"]) + 1
+				sv.queue_free()
+				await get_tree().process_frame
+			pairs["%s vs %s" % [a, b]] = pr
+	var summary := {}
+	for id in per:
+		var r: Dictionary = per[id]
+		var games := maxi(1, int(r["wins"]) + int(r["losses"]) + int(r["draws"]))
+		summary[id] = {"win_rate": snappedf(float(r["wins"]) / games, 0.01), "hits_per_min": snappedf(float(r["hits"]) / maxf(1.0, float(r["seconds"]) / 60.0), 0.1),
+			"damage_per_hit": snappedf(float(r["damage"]) / maxf(1.0, float(r["hits"])), 0.1), "games": games}
+	report["tier"] = tier
+	report["bouts_per_pair"] = bouts
+	report["pairs"] = pairs
+	report["fighters"] = summary
 
 
 static func _to_f(a: PackedInt32Array) -> PackedFloat32Array:

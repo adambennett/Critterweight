@@ -42,6 +42,14 @@ func tick(dt: float) -> void:
 			_pending_at = sim.time + 0.2
 
 
+func on_round_reset() -> void:
+	super.on_round_reset()
+	if unit:
+		_unmake_unit(unit)
+	unit = null
+	_pending = null
+
+
 func _unit_spawn() -> Array:
 	var us := sim.arena.marker_points("unit_spawn")
 	var p: Vector3 = us[0] if not us.is_empty() else Vector3.ZERO
@@ -85,13 +93,20 @@ func _unmake_unit(f: Fighter) -> void:
 
 func on_depleted(f: Fighter, attacker: Fighter, hit: Dictionary) -> void:
 	if f == unit:
-		var heir := attacker if attacker and attacker != f and not attacker.despawned else sim.last_attacker_of(f)
+		var heir := attacker if attacker and attacker != f and not attacker.despawned else null
+		if heir == null:
+			var la := sim.last_attacker_of(f)
+			if la and sim.time - f.last_attacked_at <= 10.0:
+				heir = la
+		if heir == null or heir.is_out():
+			heir = _fallback_heir(f)
 		f.knock_out(attacker)
 		sim.emit_event({"type": "unit_toppled", "fighter": f.index, "by": heir.index if heir else -1})
 		unit = null
 		_unmake_unit_later(f)
 		if heir and heir != f:
-			heir.stats_record["kos"] += 1
+			if attacker == heir:
+				heir.stats_record["kos"] += 1
 			_pending = heir
 			_pending_at = sim.time + 2.0
 			heir.invuln_until = heir.time + 2.0
@@ -103,6 +118,21 @@ func on_depleted(f: Fighter, attacker: Fighter, hit: Dictionary) -> void:
 	super.on_depleted(f, attacker, hit)
 
 
+## Nobody earned the crown (hazard, ring-out, damage over time): the standing fighter with the
+## lowest score gets it, so the round always has a Unit.
+func _fallback_heir(exclude: Fighter) -> Fighter:
+	var best: Fighter = null
+	var best_s := INF
+	for o: Fighter in sim.fighters:
+		if o == exclude or o.despawned or o.is_out():
+			continue
+		var s := float(scores.get(o.team, 0.0))
+		if s < best_s:
+			best_s = s
+			best = o
+	return best
+
+
 func _unmake_unit_later(f: Fighter) -> void:
 	# swap back to the normal body while knocked out so it respawns at normal size
 	if _base_mods.has(f.index):
@@ -112,7 +142,7 @@ func _unmake_unit_later(f: Fighter) -> void:
 	var base := Content.creature(str(_base_creature.get(f.index, f.creature.id)))
 	if base and base != f.creature:
 		f.rebuild(base, f.pos(), f.facing_yaw)
-		f.knock_out(null)
+		f.knock_out(null, true)
 
 
 func on_ringout(f: Fighter, attacker: Fighter) -> void:
