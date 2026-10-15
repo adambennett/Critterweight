@@ -235,7 +235,7 @@ func _apply_look(s: BodyDef.Seg, q_t: Quaternion) -> Quaternion:
 	var want := look_target - head
 	if want.length_squared() < 0.01:
 		return q_t
-	var fwd := q_t * Vector3.FORWARD
+	var fwd := q_t * Vector3.BACK   # the head faces +Z in fighter space
 	var rot := MathX.rotation_between(fwd, want.normalized())
 	var ang := rot.get_angle()
 	var lim := deg_to_rad(50.0)

@@ -350,18 +350,21 @@ func sim_tick(dt: float) -> void:
 	_apply_stagger(dt)
 	rig.yaw_target = facing_yaw
 	motor.locomotion_vel = rig.com_velocity()
-	if _hover_until > time:
-		rig.hover_height += _hover_extra
-		motor.tuck = true
+	var hovering := _hover_tick()
 	if sim and sim.profiling:
 		var a := Time.get_ticks_usec()
 		motor.update(dt)
+		if hovering:
+			rig.hover_height += _hover_extra
 		var b := Time.get_ticks_usec()
 		rig.step(dt)
 		sim.prof["motor"] = float(sim.prof.get("motor", 0.0)) + (b - a)
 		sim.prof["rig"] = float(sim.prof.get("rig", 0.0)) + (Time.get_ticks_usec() - b)
 		return
 	motor.update(dt)
+	# the hover lift must be added after the motor has written the pose's hover height
+	if hovering:
+		rig.hover_height += _hover_extra
 	rig.step(dt)
 
 
@@ -1261,7 +1264,9 @@ func _do_throw(throw_dir: Vector3) -> void:
 	v.rig.apply_body_impulse((horiz + Vector3.UP * vy - v.rig.com_velocity()) * v.rig.total_mass)
 	if sim:
 		var dmg := float(td.get("damage", Tuning.v("throw_damage")))
-		sim.combat.apply_simple_damage(self, v, dmg, "throw")
+		# kit extension: a throw may stun instead of knocking down (no-knockdown spacing throws keep
+		# their distance only while the victim's drive is weakened by hitstun)
+		sim.combat.apply_simple_damage(self, v, dmg, "throw", {"stun": float(td.get("stun", 0.0))})
 		if td.has("buildup") and creature.element != "":
 			v.statuses.add_buildup(creature.element, float(td["buildup"]), self)
 	v.thrown_speed = horiz.length()
@@ -1269,7 +1274,7 @@ func _do_throw(throw_dir: Vector3) -> void:
 	if bool(td.get("knockdown", true)) and not v.is_out():
 		v.knock_down("throw", self)
 	stats_record["throws"] += 1
-	hooks.fire("throw", {"other": v})
+	hooks.fire("throw", {"other": v, "slot": kind})   # kit extension: hooks may filter by throw direction ("slot": "throw_fwd" ...)
 	_emit({"type": "throw", "victim": v.index, "kind": kind})
 	_set_state(State.NEUTRAL)
 
@@ -1504,3 +1509,34 @@ func cooldown_frac(slot: String) -> float:
 		return 0.0
 	var total := float(creature.cooldowns.get(slot, 1.0))
 	return clampf(float(cooldown_left.get(slot, 0.0)) / maxf(total, 0.01), 0.0, 1.0)
+
+
+# =====================================================================================
+# Kit extension (Stoke/Gusto kit pass): hover bookkeeping
+# =====================================================================================
+# Hover effects (e.g. Gusto's Hang Time) raise the hover spring target by `_hover_extra`. The
+# lift is added in sim_tick AFTER the motor writes the pose height (it was added before and got
+# overwritten, so hovers never left the ground). While hovering the legs are tucked; when the
+# hover ends the fighter falls back with tucked legs and re-plants its feet once it is back near
+# its stance height (the legs used to stay tucked until some unrelated landing).
+
+var _hover_was := false
+var _hover_falling := false
+
+
+func _hover_tick() -> bool:
+	var hovering := _hover_until > time
+	if hovering:
+		motor.tuck = true
+		_hover_falling = false
+	elif _hover_was:
+		_hover_falling = true
+	if _hover_falling and not hovering:
+		if _airborne or is_down() or is_out():
+			_hover_falling = false   # leaps, knockdowns and KOs own the legs from here
+		elif rig.ground_dist <= creature.body.hover_height + 0.3:
+			_hover_falling = false
+			motor.tuck = false
+			motor.reset_feet()
+	_hover_was = hovering
+	return hovering
