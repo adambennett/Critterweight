@@ -68,7 +68,7 @@ func shoot(attacker, target, gap: float, steps: Array, seconds := 2.4, target_st
 	var b := sim.fighters[1]
 	var rest_y := b.pos().y
 	var out := {"hits": 0, "blocked": 0, "parried": 0, "damage": 0.0, "slots": {}, "slot_dmg": {}, "glances": 0, "events": [], "push": 0.0, "lift": 0.0,
-		"reach": 0.0, "min_up": 1.0, "max_spin": 0.0, "b_states": {}, "a_inside": true}
+		"reach": 0.0, "min_up": 1.0, "max_spin": 0.0, "b_states": {}, "a_states": {}, "a_inside": true, "first_hit_t": -1.0}
 	var dt := 1.0 / Engine.physics_ticks_per_second
 	var n := int(seconds / dt)
 	var cursor := 0
@@ -97,12 +97,15 @@ func shoot(attacker, target, gap: float, steps: Array, seconds := 2.4, target_st
 				if hit_t < 0.0:
 					hit_t = sim.time
 					hit_pos = b.pos()
+					out["first_hit_t"] = sim.time - SETTLE
 			elif str(ev["type"]) == "parry" and int(ev["fighter"]) == 1:
 				out["parried"] = int(out["parried"]) + 1
 			elif str(ev["type"]) == "glance" and int(ev["fighter"]) == 0:
 				out["glances"] = int(out["glances"]) + 1
 		var bs: Dictionary = out["b_states"]
 		bs[b.state_name()] = float(bs.get(b.state_name(), 0.0)) + dt
+		var as_: Dictionary = out["a_states"]
+		as_[a.state_name()] = float(as_.get(a.state_name(), 0.0)) + dt
 		out["lift"] = maxf(float(out["lift"]), b.pos().y - rest_y)
 		if hit_t >= 0.0 and sim.time - hit_t <= 1.0:
 			var d := Vector2(b.pos().x - hit_pos.x, b.pos().z - hit_pos.z).length()
@@ -195,6 +198,53 @@ static func grab_presses(then := 0.5, pummels := 0, throw_dir := Vector3.ZERO) -
 		steps.append({"t0": t, "t1": t + 0.15, "move": throw_dir})
 		steps.append({"t0": t + 0.02, "t1": t + 0.07, "press": ["grab"]})
 	return at(steps)
+
+
+# ---------------------------------------------------------------------------------------------
+# Tutorial exercises against a chosen partner (Kid Lamprey's scripted behaviours)
+
+class Driver:
+	extends InputSource
+	var plan: Callable
+	var t := 0.0
+	var mem := {}
+
+	func _init(p: Callable) -> void:
+		plan = p
+
+	func poll(f: Fighter, sim, dt: float) -> void:
+		t += dt
+		f.input.move = Vector3.ZERO
+		f.input.held = 0
+		plan.call(f, sim, t, mem)
+
+
+## Runs Granny's exercise `index` with `player` (driven by `plan(f, sim, t, mem)`) against
+## `partner` (driven by the tutorial's own KidScript) until it succeeds or `limit` sim seconds
+## pass. Returns {ok, state, progress, time}.
+func tutorial_run(index: int, player: String, partner: String, plan: Callable, limit := 40.0) -> Dictionary:
+	var sim := MatchSim.new()
+	sim.running = false
+	fresh_world().add_child(sim)
+	var mode := TutorialMode.new()
+	mode.start_index = index
+	sim.setup({"arena": Tutorial.practice_cage(), "seed": 4, "mode": mode,
+		"rules": {"id": "tutorial", "name": "Tutorial", "mode": "tutorial", "round_time": 0.0, "intro_time": 0.0},
+		"fighters": [{"creature": Content.creature(player), "team": 0, "source": null, "kind": "player"},
+			{"creature": Content.creature(partner), "team": 1, "source": null, "kind": "scripted"}]})
+	sim.set_input_source(0, Driver.new(plan))
+	var t := 0.0
+	while t < limit and not mode.state in ["success", "complete", "done_single"]:
+		await step_sim(sim, 0.25)
+		t += 0.25
+	var res := {"ok": mode.state in ["success", "complete", "done_single"], "state": mode.state, "progress": mode.progress_text(), "time": t}
+	sim.get_parent().queue_free()
+	return res
+
+
+static func toward(f: Fighter, target: Vector3) -> Vector3:
+	var d := Vector3(target.x - f.pos().x, 0.0, target.z - f.pos().z)
+	return d.normalized() if d.length() > 0.05 else Vector3.ZERO
 
 
 # ---------------------------------------------------------------------------------------------
