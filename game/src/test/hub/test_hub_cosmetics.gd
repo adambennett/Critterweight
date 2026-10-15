@@ -120,6 +120,9 @@ func test_attachments_fit_every_body_and_follow_it() -> void:
 		if c == null:
 			continue
 		var v := _view(str(cid))
+		# reading a model back is not free: an undressed fighter (every bot, every minion) never does
+		check(v._vis_points.is_empty(), "%s: no model read-back for a view without cosmetics" % cid)
+		v.set_cosmetics(_items())
 		if str(c.art.get("model", "")) != "":
 			# the anchors are fitted to the model the player sees, not to the (smaller) collision shapes
 			var with_pts := 0
@@ -127,7 +130,6 @@ func test_attachments_fit_every_body_and_follow_it() -> void:
 				if (v._vis_points.get(s0.index, PackedVector3Array()) as PackedVector3Array).size() > 20:
 					with_pts += 1
 			check(with_pts * 2 >= c.body.segments.size(), "%s: the forged model's vertices are collected per segment (%d of %d)" % [cid, with_pts, c.body.segments.size()])
-		v.set_cosmetics(_items())
 		var rest := _rest(c)
 		v.snap_transforms(rest)
 		v.render(1.0)

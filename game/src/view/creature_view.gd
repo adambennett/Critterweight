@@ -50,6 +50,9 @@ var cosmetic_combat := false
 var _seg_global: Array[Transform3D] = []
 var _attachments: Array = []               ## [{node: Node3D, seg: int, local: Transform3D, kind, id, walkout: bool, popped: bool}]
 var _vis_points := {}                      ## segment index -> PackedVector3Array: the forged model's vertices (segment-local, rest)
+## Model meshes whose vertices the cosmetic anchors are fitted to, read on first need (reading a
+## mesh back costs ~20-30 ms per fighter, so only a dressed view pays it, once).
+var _point_sources: Array = []             ## [[MeshInstance3D, model root Node]]
 
 
 func setup(c: CreatureDef, tint := Color.WHITE) -> void:
@@ -137,7 +140,7 @@ func _try_load_model(path: String) -> bool:
 			_gore_mesh = mi.mesh
 			mi.visible = false
 			continue
-		_collect_points(mi, inst)
+		_point_sources.append([mi, inst])
 		for si in mi.mesh.get_surface_count():
 			var src := mi.mesh.surface_get_material(si)
 			var rough := -1.0
@@ -154,6 +157,15 @@ func _try_load_model(path: String) -> bool:
 			mi.set_surface_override_material(si, _make_material(tint, rough, metal, glow))
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	return true
+
+
+## The model's vertices per segment (see _collect_points), read the first time they are needed.
+func _ensure_points() -> void:
+	for src in _point_sources:
+		var mi: MeshInstance3D = src[0]
+		if is_instance_valid(mi):
+			_collect_points(mi, src[1])
+	_point_sources.clear()
 
 
 ## The skinned model's vertices grouped by their dominant bone = segment, in segment-local rest
@@ -368,6 +380,8 @@ func set_cosmetics(items: Array) -> void:
 		if is_instance_valid(old):
 			old.queue_free()
 	_attachments.clear()
+	if not items.is_empty():
+		_ensure_points()
 	for it in items:
 		var d: Dictionary = it
 		var kind := str(d.get("kind", ""))
