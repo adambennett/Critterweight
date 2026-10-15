@@ -174,6 +174,8 @@ func resolve_match_config(cfg: Dictionary) -> Dictionary:
 	var ctx = cfg.get("context", {})
 	if typeof(ctx) == TYPE_DICTIONARY:
 		out["arena"] = (out["arena"] as ArenaDef).with_variant(str((ctx as Dictionary).get("variant", "")))
+	# unlocked looks that replace the stock one (the Cannery's Rooftop full neon) apply automatically
+	out["arena"] = ArenaVariants.upgrade(out["arena"] as ArenaDef, Profiles.current)
 	var r = cfg.get("rules", "duel")
 	var rules: Dictionary = r if typeof(r) == TYPE_DICTIONARY else Content.get_entry("rules", str(r))
 	out["rules"] = rules.duplicate(true)

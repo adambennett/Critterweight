@@ -334,23 +334,24 @@ func _stairs() -> void:
 		var top := 4.0 * float(i + 1) / steps
 		var xa := x0 + run * i
 		if xa < 4.4:
-			k.box(Vector3(xa + run * 0.5, top * 0.5, 6.725), Vector3(run, top, 2.25), Color("#6b6f75"), HubMeshKit.PLAIN, true)
+			k.box(Vector3(xa + run * 0.5, top * 0.5, HubLayout.STAIRS_Z), Vector3(run, top, HubLayout.STAIRS_W), Color("#6b6f75"), HubMeshKit.PLAIN, true)
 		else:
-			k.box(Vector3(xa + run * 0.5, top - 0.18, 6.725), Vector3(run, 0.36, 2.25), Color("#6b6f75"), HubMeshKit.PLAIN, true)
-		k.box(Vector3(xa + run * 0.5, top + 0.005, 6.725), Vector3(run * 0.92, 0.02, 2.1), Color("#c9a227"), HubMeshKit.PAINT, true)
+			k.box(Vector3(xa + run * 0.5, top - 0.18, HubLayout.STAIRS_Z), Vector3(run, 0.36, HubLayout.STAIRS_W), Color("#6b6f75"), HubMeshKit.PLAIN, true)
+		k.box(Vector3(xa + run * 0.5, top + 0.005, HubLayout.STAIRS_Z), Vector3(run * 0.92, 0.02, HubLayout.STAIRS_W - 0.15), Color("#c9a227"), HubMeshKit.PAINT, true)
 	# landing slab and its edge
-	k.box(Vector3(10.0, 3.82, 6.8), Vector3(4.0, 0.36, 2.4), Color("#6b6f75"), HubMeshKit.PLAIN, true)
-	k.floor_rect(Rect2(8.0, 5.6, 4.0, 2.4), 4.004, Color("#80848a"), HubMeshKit.PLAIN)
+	var north := HubLayout.STAIRS_Z - HubLayout.STAIRS_W * 0.5
+	k.box(Vector3(10.0, 3.82, (north + 8.0) * 0.5), Vector3(4.0, 0.36, 8.0 - north), Color("#6b6f75"), HubMeshKit.PLAIN, true)
+	k.floor_rect(Rect2(8.0, north, 4.0, 8.0 - north), 4.004, Color("#80848a"), HubMeshKit.PLAIN)
 	# handrails along the open side of the stairs and the landing
 	for i in 11:
 		var x := x0 + i * 1.0
 		var y := clampf((x - x0) / (x1 - x0) * 4.0, 0.0, 4.0)
-		k.cyl(Vector3(x, y, 5.62), Vector3(x, y + 1.05, 5.62), 0.035, Color("#c9a227"), 6)
-	k.cyl(Vector3(x0, 1.05, 5.62), Vector3(x1, 5.05, 5.62), 0.045, Color("#c9a227"), 6)
+		k.cyl(Vector3(x, y, north - 0.08), Vector3(x, y + 1.05, north - 0.08), 0.035, Color("#c9a227"), 6)
+	k.cyl(Vector3(x0, 1.05, north - 0.08), Vector3(x1, 5.05, north - 0.08), 0.045, Color("#c9a227"), 6)
 	for j in 5:
 		var xl := 8.0 + j * 1.0
-		k.cyl(Vector3(xl, 4.0, 5.45), Vector3(xl, 5.05, 5.45), 0.035, Color("#c9a227"), 6)
-	k.cyl(Vector3(8.0, 5.05, 5.45), Vector3(12.0, 5.05, 5.45), 0.045, Color("#c9a227"), 6)
+		k.cyl(Vector3(xl, 4.0, north - 0.15), Vector3(xl, 5.05, north - 0.15), 0.035, Color("#c9a227"), 6)
+	k.cyl(Vector3(8.0, 5.05, north - 0.15), Vector3(12.0, 5.05, north - 0.15), 0.045, Color("#c9a227"), 6)
 
 
 ## Roofs block the sun (shadows) but are never drawn, so rooms read from the camera.

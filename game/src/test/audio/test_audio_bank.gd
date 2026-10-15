@@ -185,3 +185,18 @@ func test_literal_ids_in_code_exist() -> void:
 					missing.append("%s(\"%s\") in %s" % [kind, id, f])
 	check(seen > 20, "scanned %d literal audio ids" % seen)
 	check(missing.is_empty(), "ids not in the bank: %s" % [missing])
+
+
+## Every fighter, minion and boss speaks with its own voice set from the bank (minions and bosses
+## used to fall back to Stoke's voice because only the roster table was read).
+func test_every_creature_has_a_voice_in_the_bank() -> void:
+	var missing := []
+	for kind in Content.CREATURE_KINDS:
+		for id in Content.ids(kind):
+			if Content.origin_of(kind, str(id)) != "core":
+				continue
+			var voice := str(Audio.creature_audio(str(id)).get("voice", ""))
+			for t in ["hurt", "ko"]:
+				if not Audio.has_sfx("voice_%s_%s" % [voice, t]):
+					missing.append("%s -> voice_%s_%s" % [id, voice, t])
+	check(missing.is_empty(), "creature voices missing from the bank: %s" % [missing])

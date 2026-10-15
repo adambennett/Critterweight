@@ -17,6 +17,9 @@ var camera: FightCamera
 var hud: FightHud
 var hud_layer: CanvasLayer
 var player_index := 0
+## The profile owner's fighter (the first local player): wears the profile's Cannery cosmetics
+## (FighterCosmetics, view-only). -1 when no local player fights (spectating, AI-only tapes).
+var owner_index := -1
 var _event_cursor := 0
 var config := {}
 var director: SpectatorDirector = null   ## auto-director when spectating (cfg.spectate)
@@ -44,6 +47,8 @@ func start(cfg: Dictionary) -> void:
 				lp.camera = camera
 				entry["source"] = LabRecording.wrap_player(lp, e, self)   # AI Lab imitation recording (off by default)
 				player_index = idx
+				if owner_index < 0:
+					owner_index = idx
 				# accessibility aim assist is part of the fighter's (replicated) modifiers
 				var m: Dictionary = (entry.get("mods", {}) as Dictionary).duplicate()
 				m["assist"] = float({"low": 0.5, "normal": 1.0, "high": 1.8}.get(str(Settings.get_value("access.target_assist")), 1.0))
@@ -151,6 +156,8 @@ func _make_view(i: int) -> void:
 	add_child(v)
 	v.setup(f.creature, TeamColors.color(f.team))
 	v.gore_level = int({"full": 2, "reduced": 1, "off": 0}.get(str(Settings.get_value("access.gore")), 2))
+	if i == owner_index and bool(config.get("cosmetics", true)):
+		FighterCosmetics.dress(v, Profiles.current)
 	v.snap_transforms(f.rig.segment_transforms())
 	views[i] = v
 
@@ -212,12 +219,14 @@ func _process(delta: float) -> void:
 	if sim == null:
 		return
 	var alpha := Engine.get_physics_interpolation_fraction()
+	var live := sim.mode != null and sim.mode.phase == MatchMode.Phase.FIGHT
 	for i in views.size():
 		if views[i] == null or i >= sim.fighters.size():
 			continue
 		var f := sim.fighters[i]
 		var cv: CreatureView = views[i]
 		cv.juice_amount = 1.0 if f.time < f.juiced_until else 0.0
+		cv.cosmetic_combat = live and f.state != Fighter.State.CELEBRATE
 		cv.status_color = _status_color(f)
 		cv.visible = not f.has_flag("submerged")
 		cv.render(alpha)
@@ -301,9 +310,13 @@ func _on_event(ev: Dictionary) -> void:
 			var fb := sim.fighters[int(ev["fighter"])]
 			vfx.ring(fb.ground_pos() + Vector3.UP * 0.05, 2.5, Color(1, 1, 1, 0.9), 0.35)
 		"juice":
-			var fj := sim.fighters[int(ev["fighter"])]
-			vfx.word(fj.head_pos() + Vector3.UP * 0.4, "JUICED!", Color(1.0, 0.6, 0.1), 80)
-			vfx.emit("burst", fj.pos(), Vector3.UP, Color(1.0, 0.6, 0.15), 1.5)
+			var ji := int(ev["fighter"])
+			var fj := sim.fighters[ji]
+			var jc := Color(1.0, 0.6, 0.1)
+			if ji < views.size() and views[ji] != null:
+				jc = (views[ji] as CreatureView).juice_color    # a cosmetic JUICE colour (Sizzle) shows here too
+			vfx.word(fj.head_pos() + Vector3.UP * 0.4, "JUICED!", jc, 80)
+			vfx.emit("burst", fj.pos(), Vector3.UP, jc, 1.5)
 		"effect":
 			var pe: Vector3 = ev["pos"]
 			var el2 := str(ev.get("element", ""))

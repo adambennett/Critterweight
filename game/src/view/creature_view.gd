@@ -12,8 +12,13 @@ extends Node3D
 ## (skin/iron/cloth/eye/ember/team...) with LINEAR vertex colours as albedo and PBR hints read
 ## from the imported materials, an optional unskinned "gore_piece" mesh (used by detach_piece)
 ## and vertex alpha = emissive strength on glowing surfaces (the fighter's "Hype feature").
+##
+## Cosmetics (view-only, the profile owner's fighter; FighterCosmetics.dress): attachments riding a
+## segment (CosmeticAttachments: gold tooth, trash-can lid, replica belt, scarf) and a JUICE colour
+## variant (juice glow + the glowing surfaces' colour, e.g. Stoke's white-hot Sizzle).
 
 const MAX_BRUISES := 8
+const DEFAULT_JUICE := Color(1.0, 0.55, 0.1)
 
 var creature: CreatureDef
 var body: BodyDef
@@ -37,6 +42,17 @@ var status_color := Color(0, 0, 0, 0)
 var gore_level := 2                       ## 0 off, 1 reduced, 2 full
 var detached := false
 var visible_alpha := 1.0
+var juice_color := DEFAULT_JUICE
+var glow_color := Color(1, 1, 1, 0)       ## rgb = colour the glowing surfaces shift to, a = how far
+## While the round is live the walkout pieces (lid, belt) are put away; the hub and the walkout
+## (intro, celebrations) show everything.
+var cosmetic_combat := false
+var _seg_global: Array[Transform3D] = []
+var _attachments: Array = []               ## [{node: Node3D, seg: int, local: Transform3D, kind, id, walkout: bool, popped: bool}]
+var _vis_points := {}                      ## segment index -> PackedVector3Array: the forged model's vertices (segment-local, rest)
+## Model meshes whose vertices the cosmetic anchors are fitted to, read on first need (reading a
+## mesh back costs ~20-30 ms per fighter, so only a dressed view pays it, once).
+var _point_sources: Array = []             ## [[MeshInstance3D, model root Node]]
 
 
 func setup(c: CreatureDef, tint := Color.WHITE) -> void:
@@ -51,6 +67,7 @@ func setup(c: CreatureDef, tint := Color.WHITE) -> void:
 		_build_fallback()
 	_prev.resize(body.segments.size())
 	_curr.resize(body.segments.size())
+	_seg_global.resize(body.segments.size())
 
 
 func _palette(key: String, fallback: Color) -> Color:
@@ -123,6 +140,7 @@ func _try_load_model(path: String) -> bool:
 			_gore_mesh = mi.mesh
 			mi.visible = false
 			continue
+		_point_sources.append([mi, inst])
 		for si in mi.mesh.get_surface_count():
 			var src := mi.mesh.surface_get_material(si)
 			var rough := -1.0
@@ -139,6 +157,66 @@ func _try_load_model(path: String) -> bool:
 			mi.set_surface_override_material(si, _make_material(tint, rough, metal, glow))
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	return true
+
+
+## The model's vertices per segment (see _collect_points), read the first time they are needed.
+func _ensure_points() -> void:
+	for src in _point_sources:
+		var mi: MeshInstance3D = src[0]
+		if is_instance_valid(mi):
+			_collect_points(mi, src[1])
+	_point_sources.clear()
+
+
+## The skinned model's vertices grouped by their dominant bone = segment, in segment-local rest
+## space (bind pose: bones on the pivots, identity orientation). Cosmetic anchors fit to these, so
+## a ring sits on the visible skin rather than on the (smaller) collision shapes.
+func _collect_points(mi: MeshInstance3D, inst: Node) -> void:
+	var xf := Transform3D.IDENTITY
+	var n: Node = mi
+	while n != null and n != inst:
+		if n is Node3D:
+			xf = (n as Node3D).transform * xf
+		n = n.get_parent()
+	var sk := mi.skin
+	# gathered in plain Arrays: a packed array read out of a Dictionary is a copy, so appending to it
+	# in place would be lost
+	var acc := {}
+	for surf in mi.mesh.get_surface_count():
+		var arr := mi.mesh.surface_get_arrays(surf)
+		if arr.size() <= Mesh.ARRAY_WEIGHTS:
+			continue
+		var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+		if verts.is_empty() or arr[Mesh.ARRAY_BONES] == null or arr[Mesh.ARRAY_WEIGHTS] == null:
+			continue
+		var bones: PackedInt32Array = arr[Mesh.ARRAY_BONES]
+		var weights: PackedFloat32Array = arr[Mesh.ARRAY_WEIGHTS]
+		var per := int(bones.size() / float(verts.size()))
+		if per <= 0:
+			continue
+		var step := maxi(1, int(verts.size() / 2500.0))
+		for vi in range(0, verts.size(), step):
+			var best := -1
+			var best_w := -1.0
+			for k in per:
+				if weights[vi * per + k] > best_w:
+					best_w = weights[vi * per + k]
+					best = bones[vi * per + k]
+			var bone := best
+			if sk != null and best >= 0 and best < sk.get_bind_count():
+				bone = sk.get_bind_bone(best)
+				if bone < 0:
+					bone = _skeleton.find_bone(sk.get_bind_name(best))
+			if bone < 0 or bone >= _seg_of_bone.size() or _seg_of_bone[bone] < 0:
+				continue
+			var si := _seg_of_bone[bone]
+			if not acc.has(si):
+				acc[si] = []
+			(acc[si] as Array).append(xf * verts[vi] - (body.segments[si] as BodyDef.Seg).pivot)
+	for si2 in acc:
+		var pts: PackedVector3Array = _vis_points.get(si2, PackedVector3Array())
+		pts.append_array(PackedVector3Array(acc[si2] as Array))
+		_vis_points[si2] = pts
 
 
 func _find_skeleton(n: Node) -> Skeleton3D:
@@ -271,6 +349,8 @@ func render(alpha: float) -> void:
 			else:
 				global = parent_global * _skeleton.get_bone_rest(bi)
 			_bone_global[bi] = global
+			if si >= 0 and si < n:
+				_seg_global[si] = global
 			var local := parent_global.affine_inverse() * global
 			_skeleton.set_bone_pose_position(bi, local.origin)
 			_skeleton.set_bone_pose_rotation(bi, local.basis.get_rotation_quaternion())
@@ -281,11 +361,67 @@ func render(alpha: float) -> void:
 			var t := Transform3D(Basis(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha)), a.origin.lerp(b.origin, alpha))
 			if i < _seg_nodes.size():
 				_seg_nodes[i].global_transform = t
+			_seg_global[i] = t
+	_update_attachments()
 	_update_materials()
 
 
 func segment_world(i: int) -> Transform3D:
 	return _curr[i] if i < _curr.size() else Transform3D()
+
+
+# ---- cosmetics (view-only) ---------------------------------------------------------------------
+
+## items: [{kind: tooth|lid|belt|scarf, color, accent, id}] (FighterCosmetics.attachments). Replaces
+## whatever was attached; kinds this body has no place for are skipped.
+func set_cosmetics(items: Array) -> void:
+	for a in _attachments:
+		var old: Node3D = a["node"]
+		if is_instance_valid(old):
+			old.queue_free()
+	_attachments.clear()
+	if not items.is_empty():
+		_ensure_points()
+	for it in items:
+		var d: Dictionary = it
+		var kind := str(d.get("kind", ""))
+		var anc := CosmeticAttachments.anchor(creature, kind, _vis_points)
+		if anc.is_empty():
+			continue
+		var xf: Transform3D = anc["xf"]
+		var node := CosmeticAttachments.build(kind, d, float(anc["size"]), xf.basis, anc.get("radii", Vector2.ZERO))
+		node.set_meta("cosmetic_id", str(d.get("id", kind)))
+		add_child(node)
+		_attachments.append({"node": node, "seg": int(anc["seg"]), "local": Transform3D(Basis.IDENTITY, xf.origin), "kind": kind,
+			"id": str(d.get("id", kind)), "walkout": CosmeticAttachments.WALKOUT_ONLY.has(kind), "popped": false})
+	_update_attachments()
+
+
+## The attached cosmetic entries (inspection/tests): [{node, seg, kind, id, walkout, popped}].
+func cosmetics() -> Array:
+	return _attachments
+
+
+## The JUICE glow colour and the glowing surfaces' colour shift (alpha = amount; 0 keeps the model's).
+func set_juice_style(juice: Color, glow := Color(1, 1, 1, 0)) -> void:
+	juice_color = Color(juice.r, juice.g, juice.b, 1.0)
+	glow_color = glow
+	for m in _materials:
+		m.set_shader_parameter("juice_color", juice_color)
+		m.set_shader_parameter("glow_color", glow_color)
+
+
+func _update_attachments() -> void:
+	for a in _attachments:
+		var node: Node3D = a["node"]
+		if not is_instance_valid(node):
+			continue
+		var si := int(a["seg"])
+		node.visible = not bool(a["popped"]) and not (cosmetic_combat and bool(a["walkout"])) and visible_alpha > 0.0
+		if si < _seg_global.size() and _seg_global[si] != Transform3D():
+			node.global_transform = _seg_global[si] * (a["local"] as Transform3D)
+		elif si < _curr.size() and _curr[si] != Transform3D():
+			node.global_transform = _curr[si] * (a["local"] as Transform3D)
 
 
 func flash(amount := 1.0) -> void:
@@ -309,6 +445,8 @@ func add_bruise(seg: int, world_point: Vector3, strength: float) -> void:
 func clear_bruises() -> void:
 	_bruises.clear()
 	detached = false
+	for a in _attachments:
+		a["popped"] = false
 
 
 func _update_materials() -> void:
@@ -340,6 +478,9 @@ func detach_piece(impulse_dir: Vector3) -> RigidBody3D:
 	if detached or gore_level < 2:
 		return null
 	detached = true
+	for a in _attachments:
+		if str(a["kind"]) == "tooth" and is_instance_valid(a["node"]):
+			return _pop_gold_tooth(a, impulse_dir)
 	var g: Dictionary = creature.art.get("gore_piece", {})
 	var seg_id := str(g.get("segment", "head"))
 	var si: int = body.seg_index.get(seg_id, 0)
@@ -379,6 +520,34 @@ func detach_piece(impulse_dir: Vector3) -> RigidBody3D:
 	piece.add_child(mi)
 	get_parent().add_child(piece)
 	piece.global_position = xf * MathX.vec3(g.get("offset", [0, 0, 0.1]))
+	piece.linear_velocity = impulse_dir.normalized() * 4.0 + Vector3.UP * 3.5
+	piece.angular_velocity = Vector3(randf_range(-20, 20), randf_range(-20, 20), randf_range(-20, 20))
+	var timer := get_tree().create_timer(6.0)
+	timer.timeout.connect(piece.queue_free)
+	return piece
+
+
+## With the gold tooth on, the gag piece IS the gold tooth: it pops out of the mouth (debris layer,
+## never touches the simulation) and the attached one disappears until the next round.
+func _pop_gold_tooth(a: Dictionary, impulse_dir: Vector3) -> RigidBody3D:
+	var node: Node3D = a["node"]
+	a["popped"] = true
+	var piece := RigidBody3D.new()
+	piece.name = "GoldTooth"
+	piece.collision_layer = Rig.LAYER_DEBRIS
+	piece.collision_mask = Rig.LAYER_WORLD
+	piece.mass = 0.3
+	var cs := CollisionShape3D.new()
+	var sp := SphereShape3D.new()
+	sp.radius = 0.04
+	cs.shape = sp
+	piece.add_child(cs)
+	var copy := node.duplicate() as Node3D
+	piece.add_child(copy)
+	copy.transform = Transform3D.IDENTITY
+	get_parent().add_child(piece)
+	piece.global_transform = node.global_transform
+	node.visible = false
 	piece.linear_velocity = impulse_dir.normalized() * 4.0 + Vector3.UP * 3.5
 	piece.angular_velocity = Vector3(randf_range(-20, 20), randf_range(-20, 20), randf_range(-20, 20))
 	var timer := get_tree().create_timer(6.0)

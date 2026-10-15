@@ -130,10 +130,14 @@ func _build_setup() -> void:
 	for fid in catalog.available_fighters():
 		fs.append([CampaignUI.fighter_name(catalog, str(fid)), str(fid)])
 	if fs.size() == 1:
-		rows.add_child(CampaignUI.label("No roster fighters are installed yet. Enable development stand-ins to deal a card (runs are marked custom).", 20, CampaignUI.DANGER))
-		var en := CampaignUI.button("ENABLE DEV STAND-INS", _enable_stand_ins, 22)
-		rows.add_child(en)
-		_focusables.append(en)
+		# development stand-ins are a developer tool (CampaignFlow.dev_tools): hidden in normal play
+		if CampaignFlow.dev_tools():
+			rows.add_child(CampaignUI.label("No roster fighters are installed yet. Enable development stand-ins to deal a card (runs are marked custom).", 20, CampaignUI.DANGER))
+			var en := CampaignUI.button("ENABLE DEV STAND-INS", _enable_stand_ins, 22)
+			rows.add_child(en)
+			_focusables.append(en)
+		else:
+			rows.add_child(CampaignUI.label("No roster fighters are cleared for the table yet. Teddy deals once their fight kits are finished.", 20, CampaignUI.DANGER))
 	else:
 		_row(rows, "FIGHTER", fs, fighter, _set_fighter)
 	_row(rows, "CARD", [["Off the Street", "off_the_street"], ["Fight Camp (Clout to the Cannery)", "fight_camp"]], variant, _set_variant)

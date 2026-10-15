@@ -15,6 +15,7 @@ class PathDriver:
 	## Like a player: a waypoint someone is standing on (Ludlow parked on his mopping spot) is
 	## given up after a few seconds without progress (the last one counts once within 1.5 m).
 	var lenient := false
+	var skips := 0              ## waypoints given up on (lenient mode)
 
 	func set_path(pts: Array) -> void:
 		points = pts
@@ -44,6 +45,8 @@ class PathDriver:
 			var to := Vector3(target.x - f.pos().x, 0.0, target.z - f.pos().z)
 			var last := index == points.size() - 1
 			if to.length() <= reach or (lenient and _blocked > 3.0 and (not last or to.length() < 1.5)):
+				if to.length() > reach:
+					skips += 1
 				index += 1
 				_best = INF
 				_since = 0.0
@@ -79,7 +82,7 @@ func make_hub(fighter := "f_stoke", spot := "main_floor", prof := {}) -> MatchSi
 	profile = prof if not prof.is_empty() else {"id": "hub_test", "name": "Tester", "camp": {"clout": 0, "clout_total": 0, "upgrades": {}, "secrets": [], "flags": {}}, "history": []}
 	state = HubState.new(profile)
 	driver = PathDriver.new()
-	var fid := fighter if Content.creature(fighter) != null else "dev_biped"
+	var fid := fighter if Content.creature(fighter) != null else Cannery.pick_fighter(state)
 	sim = Cannery.build_sim(fresh_world(), state, fid, spot, driver, 7)
 	mode = sim.mode as HubMode
 	mode.auto_transition = true

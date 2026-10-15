@@ -68,6 +68,7 @@ const SCHEMA := [
 	{"key": "diag.show_fps", "cat": "diagnostics", "t": "bool", "def": false, "label": "Show FPS", "help": ""},
 	{"key": "diag.show_net", "cat": "diagnostics", "t": "bool", "def": false, "label": "Show network stats", "help": ""},
 	{"key": "diag.log_level", "cat": "diagnostics", "t": "enum", "def": "info", "opts": ["debug", "info", "warn", "error"], "label": "Log detail", "help": "Logs are in the user data folder (logs/)."},
+	{"key": "diag.dev_tools", "cat": "diagnostics", "t": "bool", "def": false, "label": "Developer tools", "help": "Shows developer switches, such as the campaign's development stand-ins for fighters whose kits are still being finished. Runs that use them are marked custom."},
 ]
 
 const PRESETS := {

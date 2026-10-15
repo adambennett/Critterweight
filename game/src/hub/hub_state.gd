@@ -268,8 +268,14 @@ func pack_on(id: String) -> bool:
 	return bool((hub()["packs"] as Dictionary).get(id, false))
 
 
+## Turns an announcer line pack on/off. The in-match announcer reads the profile option
+## `announcer_pack` (Audio.begin_match), so the pack is heard in every match, not only in the hub.
 func set_pack(id: String, on: bool) -> void:
 	hub()["packs"][id] = on
+	if on:
+		profile["announcer_pack"] = id
+	elif str(profile.get("announcer_pack", "")) == id:
+		profile["announcer_pack"] = ""
 	_touch("pack", {"id": id, "on": on})
 
 
