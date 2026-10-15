@@ -45,8 +45,12 @@ static func checksum(data) -> String:
 
 
 func envelope(kind: String, version: int, data) -> Dictionary:
+	# checksum what a reader will get back: Godot's JSON parser is not exact for every 17-digit
+	# float (e.g. 101.44279598486929 reads back 1 ulp off), which made verification of such saves fail
+	var j := JSON.new()
+	var as_read = j.data if j.parse(JSON.stringify(data, "", false, true)) == OK else data
 	return {"format": FORMAT, "kind": kind, "version": version, "game_version": game_version(),
-		"saved_at": Time.get_unix_time_from_system(), "checksum": checksum(data), "data": data}
+		"saved_at": Time.get_unix_time_from_system(), "checksum": checksum(as_read), "data": data}
 
 
 func write_json(path: String, kind: String, version: int, data) -> Error:
