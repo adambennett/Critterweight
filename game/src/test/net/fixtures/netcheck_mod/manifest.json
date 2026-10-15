@@ -1,0 +1,10 @@
+{
+  "id": "netcheck_mod",
+  "name": "Network test mod (content mismatch fixture)",
+  "version": "0.3.0",
+  "game_version": "0.1.0",
+  "description": "Loaded only by the network tests (--net-test-mod) to give a client a different content hash and package list than the server.",
+  "requires": [],
+  "load_after": [],
+  "capabilities": []
+}
