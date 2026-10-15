@@ -923,6 +923,7 @@ func knock_out(by: Fighter = null, silent := false) -> void:
 	if by:
 		by.hooks.fire("ko_dealt", {"other": self})
 	_emit({"type": "ko", "by": by.index if by else -1})
+	hooks.fire("knocked_out", {"other": by})
 
 
 func set_downed() -> void:
@@ -1296,6 +1297,7 @@ func _do_throw(throw_dir: Vector3) -> void:
 		if td.has("buildup") and creature.element != "":
 			v.statuses.add_buildup(creature.element, float(td["buildup"]), self)
 	v.thrown_speed = horiz.length()
+	_npc_thrown_event(v, horiz * air)
 	v.arm_splat(self, {"damage": 4.0 + float(mods.get("splat_damage_add", 0.0)), "stun": 0.3, "poise": float(mods.get("splat_poise_add", 0.0)), "window": 1.0})
 	if bool(td.get("knockdown", true)) and not v.is_out():
 		v.knock_down("throw", self)
@@ -1506,7 +1508,7 @@ func heal(amount: float) -> void:
 ## True if this fighter is currently guarding against an attack arriving from `from_pos`.
 func guards_against(from_pos: Vector3) -> bool:
 	if state != State.GUARD or motor.guard_blend < 0.5:
-		return false
+		return _shield_guards(from_pos)
 	var to := from_pos - pos()
 	to.y = 0.0
 	if to.length() < 0.01:
@@ -1657,3 +1659,58 @@ func _charge_bounce() -> bool:
 	rig.desired_vel = forward() * float(_charge["speed"])
 	_emit({"type": "bounce", "pos": pos()})
 	return true
+
+
+# =====================================================================================
+# NPC-kit extensions (docs/kits/minions.md, docs/kits/bosses.md)
+#  * Shield statuses: a status carrying "guard_arc" (total degrees in front, 360 = all round)
+#    makes its fighter block hits arriving inside that arc while it is on its feet and acting
+#    (neutral, attack, ability, guard, taunt) without being in the GUARD state - a Scrapling's
+#    Lid Up, Snappington's Withdraw. Such blocks cannot parry and drain stamina like any block;
+#    "guard_absorb" (0..1) replaces the guard's damage absorption for them.
+#  * "thrown" hook event: fired on a fighter right after it was thrown, with the expected
+#    landing spot (live-bomb Blisters, thrown Scraplings as projectiles).
+# =====================================================================================
+
+func _shield_status() -> Dictionary:
+	if not state in [State.NEUTRAL, State.ATTACK, State.ABILITY, State.GUARD, State.TAUNT]:
+		return {}
+	var best := {}
+	for s in statuses.active:
+		if float(s.get("guard_arc", 0.0)) > float(best.get("guard_arc", 0.0)):
+			best = s   # the widest shield wins (a Withdraw shell over a raised lid)
+	return best
+
+
+func _shield_guards(from_pos: Vector3) -> bool:
+	var s := _shield_status()
+	if s.is_empty():
+		return false
+	var arc := float(s["guard_arc"])
+	if arc >= 359.0:
+		return true
+	var to := from_pos - pos()
+	to.y = 0.0
+	if to.length() < 0.01:
+		return true
+	return absf(forward().signed_angle_to(to, Vector3.UP)) <= deg_to_rad(arc * 0.5)
+
+
+## Damage multiplier for a hit this fighter blocks: a shield status's own absorption when the
+## block came from the shield (not from the GUARD state), otherwise `base`.
+func shield_damage_mult(base: float) -> float:
+	if state == State.GUARD and motor.guard_blend >= 0.5:
+		return base
+	var s := _shield_status()
+	if s.is_empty() or not s.has("guard_absorb"):
+		return base
+	return clampf(1.0 - float(s["guard_absorb"]), 0.0, 1.0)
+
+
+func _npc_thrown_event(v: Fighter, travel: Vector3) -> void:
+	if v.is_out():
+		return
+	var land := v.ground_pos() + Vector3(travel.x, 0.0, travel.z)
+	if sim:
+		land = sim.clamp_to_arena(land, 0.5)
+	v.hooks.fire("thrown", {"other": self, "point": land})

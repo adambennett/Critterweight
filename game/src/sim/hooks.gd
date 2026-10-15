@@ -45,7 +45,7 @@ func _init(f) -> void:
 
 static func validate(h: Dictionary) -> PackedStringArray:
 	var errs := PackedStringArray()
-	if not EVENTS.has(str(h.get("on", ""))):
+	if not EVENTS.has(str(h.get("on", ""))) and not EVENTS_NPC.has(str(h.get("on", ""))):
 		errs.append("hook: unknown event '%s'" % h.get("on", ""))
 	var acts: Array = h.get("do", [])
 	if acts.size() > MAX_ACTIONS:
@@ -136,6 +136,10 @@ func _conditions(c: Dictionary, ctx: Dictionary) -> bool:
 	var other = ctx.get("other")
 	for k in c:
 		var v = c[k]
+		if k == "not":   # negation (NPC-kit extension block at the end of this file)
+			if typeof(v) == TYPE_DICTIONARY and _conditions(v, ctx):
+				return false
+			continue
 		match k:
 			"slot":
 				if str(ctx.get("slot", "")) != str(v):
@@ -228,6 +232,8 @@ func _run(h: Dictionary, ctx: Dictionary) -> void:
 
 
 func _act(a: Dictionary, ctx: Dictionary) -> void:
+	if _act_on_behalf(a, ctx):
+		return
 	var f = fighter
 	var t := str(a.get("type", ""))
 	var hit = ctx.get("hit")
@@ -317,3 +323,56 @@ func _act_cooldown(a: Dictionary) -> void:
 	f.cooldown_left[slot] = left
 	if left <= 0.0:
 		f.charges_left[slot] = int(f.creature.ability_charges.get(slot, 1))
+
+
+# =====================================================================================
+# NPC-kit extensions (minion / boss / Kid Lamprey kits; docs/kits/minions.md)
+#   events    knocked_out  fired on the fighter that was just KO'd (ctx other = who KO'd it)
+#             thrown       fired on a fighter that was just thrown (ctx other = the thrower,
+#                          point = its expected landing spot)
+#   condition "not": {...}  holds when the nested conditions do NOT all hold
+#   action    "source": "other"  the effect is fired BY the event's other fighter (damage credit,
+#             teams and targeting are the other fighter's) and is centred on the event point,
+#             or on this fighter when the event has none. An event point (e.g. a landing spot)
+#             also centres this fighter's own effects that give no "at".
+#   action    {"type": "self_damage", "lethal": true}  may KO this fighter (EffectsSystem)
+# =====================================================================================
+
+const EVENTS_NPC := ["knocked_out", "thrown"]
+
+
+## Effect actions that need the event point or the other fighter as their source. Returns true
+## when the action was handled here (plain actions fall through to _act).
+func _act_on_behalf(a: Dictionary, ctx: Dictionary) -> bool:
+	var t := str(a.get("type", ""))
+	if fighter.sim == null or not EffectsSystem.TYPES.has(t):
+		return false
+	if t == "self_damage":
+		if not bool(a.get("lethal", false)):
+			return false
+		fighter.sim.effects.fire(fighter, a.duplicate(), null)
+		return true
+	var by_other := str(a.get("source", "")) == "other"
+	var point = ctx.get("point")
+	if not by_other and (point == null or t in ["hype", "cleanse"]):
+		return false
+	var src = fighter
+	if by_other:
+		var other = ctx.get("other")
+		if other == null or not is_instance_valid(other) or other.despawned:
+			return true   # nobody to act for: the action is dropped
+		src = other
+	var e: Dictionary = a.duplicate()
+	e.erase("source")
+	if not e.has("t"):
+		e["t"] = 0.0
+	if not e.has("at") and not e.has("at_point"):
+		var hit = ctx.get("hit")
+		if hit != null:
+			e["at_point"] = hit.get("point", fighter.pos())
+		elif point != null:
+			e["at_point"] = point
+		else:
+			e["at_point"] = fighter.ground_pos()
+	fighter.sim.effects.fire(src, e, null)
+	return true

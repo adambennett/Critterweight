@@ -1122,7 +1122,12 @@ func match_context() -> Dictionary:
 
 func creature_audio(creature_id: String) -> Dictionary:
 	var c: Dictionary = bank.get("creatures", {}).get(creature_id, {})
-	var content_entry := Content.get_entry("creatures", creature_id)
+	# roster fighters, minions and bosses all carry their own audio block
+	var content_entry := {}
+	for kind in Content.CREATURE_KINDS:
+		content_entry = Content.get_entry(kind, creature_id)
+		if not content_entry.is_empty():
+			break
 	if content_entry.has("audio") and typeof(content_entry["audio"]) == TYPE_DICTIONARY:
 		var merged := c.duplicate()
 		for k in content_entry["audio"]:

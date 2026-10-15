@@ -61,6 +61,8 @@ func set_personality(ai: Dictionary) -> void:
 
 func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 	_t += dt
+	if _kit_pre_poll(f):
+		return
 	var tgt := f.target
 	if tgt != _last_target:
 		_history.clear()
@@ -125,6 +127,10 @@ func _queue(b: int, delay: float) -> void:
 func reach_of(c: CreatureDef, slot: String, abilities := false) -> float:
 	var key := c.id + ":" + slot
 	if _reach_cache.has(key):
+		return _reach_cache[key]
+	var authored: Dictionary = c.ai.get("reach", {})   # kit hint "reach" (long bodies that strike by bending)
+	if authored.has(slot):
+		_reach_cache[key] = float(authored[slot])
 		return _reach_cache[key]
 	var m: MoveDef = (c.abilities if abilities else c.moves).get(slot)
 	var r := 0.0
@@ -209,12 +215,12 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	var dir := to / maxf(dist, 0.01)
 	if _t < _kit_hold_until:
 		return   # kit hint "stick": an ability committed the stick (e.g. a dive away)
-	var my_reach := float(personality.get("attack_range", reach_of(c, "l1")))
+	var my_reach := float(personality.get("attack_range", reach_of(c, "l1"))) + _kit_target_bulk(f, tgt)
 	var their_reach := reach_of(tgt.creature, "heavy") if tgt else 1.0
 	var mistake := rng.randf() < float(p["mistake"])
 	# ---- defence: react to a perceived windup ----
 	var per_state := int(per.get("state", Fighter.State.NEUTRAL))
-	var attacking := per_state == Fighter.State.ATTACK or per_state == Fighter.State.ABILITY
+	var attacking := (per_state == Fighter.State.ATTACK or per_state == Fighter.State.ABILITY) and not _kit_opening(per, tgt)
 	var winding := attacking and float(per.get("st", 0.0)) < float(per.get("first", 0.0))
 	if attacking and dist < their_reach + 0.6 and not mistake and f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD]:
 		if _kit_ability(f, tgt, dist, dir, per, true):   # kit hint: reactive abilities (counters, armor)
@@ -246,6 +252,8 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	if obj.has("pos") and dist > float(obj.get("engage", 3.0)):
 		_move = _toward(f.pos(), obj["pos"])
 		return
+	if _kit_think(f, sim, tgt, dist, dir, attacking and not mistake, my_reach, their_reach):
+		return
 	# ---- JUICE ----
 	if f.hype >= 100.0 and rng.randf() < float(p["juice"]) * 0.5 and _kit_juice_ok(f, tgt, dist, dir, per):
 		f.input.press(FighterInput.JUICE)
@@ -256,7 +264,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	if _kit_heavy_vs_windup(f, dist, per):   # kit hint: Heavy into a perceived long windup
 		return
 	for slot in ["ability1", "ability2"]:
-		if _kit_hint(slot).is_empty() and c.abilities.has(slot) and float(f.cooldown_left.get(slot, 0.0)) <= 0.0 and rng.randf() < float(p["ability"]) * 0.35:
+		if _kit_hint_for(c, slot).is_empty() and c.abilities.has(slot) and float(f.cooldown_left.get(slot, 0.0)) <= 0.0 and rng.randf() < float(p["ability"]) * 0.35:
 			var ar := reach_of(c, slot, true)
 			if dist <= ar and dist >= minf(1.2, ar * 0.3):
 				f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
@@ -292,8 +300,9 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		return
 	# ---- footwork ----
 	var want := my_reach * lerpf(0.7, 0.95, float(p["spacing"]))
-	if personality.get("range") is Array and (personality["range"] as Array).size() >= 2 and _kit_range_ready(f):
-		want = lerpf(float(personality["range"][1]), float(personality["range"][0]), float(p["spacing"]))
+	var kit_range := _kit_range()
+	if not kit_range.is_empty() and _kit_range_ready(f):
+		want = lerpf(float(kit_range[1]), float(kit_range[0]), float(p["spacing"]))
 	if f.stamina < 15.0 and rng.randf() < float(p["spacing"]):
 		want = their_reach + 0.8
 	if _t >= _strafe_until:
@@ -386,7 +395,8 @@ func _toward(from: Vector3, to: Vector3) -> Vector3:
 #   "juice_when": [cond, ...]   JUICE only when an alternative holds (default: target within 3.5 m)
 #   "taunt_when": [cond, ...]   taunt at "taunt_chance" per think (x3 for rookie bots) when one holds
 #   "commit_when": [cond, ...]  Light strings go on to L3 / the Finisher when one holds
-#   "abilities": {slot: {"min": m, "max": m, "chance": c, "when": [cond, ...]}}
+#   "abilities": {slot: {"min": m, "max": m, "chance": c, "apart": m, "when": [cond, ...]}}
+#       (`apart`: never while an ally within that many metres performs the same ability)
 #       an ability with a hint is used only by its hint (replaces the generic reach test). `when` is a
 #       list of alternatives (any may hold; absent = always); each is a dict whose keys must all hold:
 #       min / max (distance), self_poise_below, self_health_below (fractions), target_status (id or
@@ -404,6 +414,19 @@ func _toward(from: Vector3, to: Vector3) -> Vector3:
 #   "heavy_vs_windup": p, "heavy_reach": m   Heavy into a perceived windup with > 0.3 s left
 #   "avoid_zones": true         step out of enemy zones that hurt or build up before closing in
 #   (stick / range_needs_tools / heavy_vs_windup / avoid_zones added with the Slurry/Jitters kits)
+# NPC kits (Kid Lamprey, minions, bosses; docs/kits/minions.md, bosses.md):
+#   "keep_distance": m          ranged-unit shorthand (the campaign's Pelter recipe): range m +- 0.4
+#                               plus an implicit hint for its ranged ability ("ranged_slot", default
+#                               the longest-reaching one) from 1.5 m out; "prefers": "ranged" = 4 m
+#   "pack": n                   at most n allies with a "pack" key attack one target at once; the
+#                               rest wait at "pack_ring" m (default 2.2) circling toward its flank
+#                               and raise "pack_guard" (an ability slot, or "guard") when it swings
+#   "ally_ko_flinch": s         freeze this long after an ally within 3 m is knocked out
+#   "rest": [min, max]          wait after each own attack / ability (and queue nothing in its
+#                               recovery) - a boss's breather and the punish window
+#   "reach": {slot: m}          authored reach (bodies that strike by bending, read by reach_of)
+#   "bulky": true               read from the TARGET (bosses): reach is measured to its nearest body
+#                               part, and its long moves' recoveries are openings, not threats
 # Profiles in skill order: rookie (Punching Bag) < regular (Journeyman) < pro (Contender)
 #   < champion (Headliner) < hall_of_famer.
 # =====================================================================================
@@ -424,7 +447,7 @@ func _kit_hint(slot: String) -> Dictionary:
 
 func _kit_ability(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary, reactive: bool) -> bool:
 	for slot in ["ability1", "ability2"]:
-		var h := _kit_hint(slot)
+		var h := _kit_hint_for(f.creature, slot)
 		if h.is_empty() or not f.creature.abilities.has(slot) or int(f.charges_left.get(slot, 1)) <= 0:
 			continue
 		var ab: MoveDef = f.creature.abilities[slot]
@@ -434,6 +457,8 @@ func _kit_ability(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dict
 		if rng.randf() >= gate:
 			continue
 		if dist < float(h.get("min", 0.0)) or dist > float(h.get("max", 99.0)):
+			continue
+		if h.has("apart") and _kit_ally_using(f, slot, float(h["apart"])) != null:
 			continue
 		var whens = h.get("when", [])
 		var ok: bool = typeof(whens) != TYPE_ARRAY or (whens as Array).is_empty()
@@ -689,6 +714,103 @@ func _kit_heavy_vs_windup(f: Fighter, dist: float, per: Dictionary) -> bool:
 	return false
 
 
+# -------------------------------------------------------------------------------------
+# NPC-kit hints (keys listed in the kit-hint header above)
+# -------------------------------------------------------------------------------------
+
+var _flinch_until := -1.0
+var _ev_cursor := -1
+var _was_busy := false               ## attacking / using an ability last tick (for "rest")
+var _rest_until := -1.0
+
+
+## The hint that drives `slot`: the authored one, or the implicit hint of a ranged unit's ranged
+## ability (keep_distance / prefers ranged). Empty = the generic ability logic uses the slot.
+func _kit_hint_for(c: CreatureDef, slot: String) -> Dictionary:
+	var h := _kit_hint(slot)
+	if not h.is_empty() or _kit_keep_distance() <= 0.0:
+		return h
+	var ranged := str(personality.get("ranged_slot", ""))
+	if ranged == "":
+		var best := 0.0
+		for s in ["ability1", "ability2"]:
+			if c.abilities.has(s) and reach_of(c, s, true) > best:
+				best = reach_of(c, s, true)
+				ranged = s
+	if slot != ranged or not c.abilities.has(slot):
+		return {}
+	return {"min": 1.5, "max": reach_of(c, slot, true), "chance": 2.5}
+
+
+func _kit_keep_distance() -> float:
+	return float(personality.get("keep_distance", 4.0 if str(personality.get("prefers", "")) == "ranged" else 0.0))
+
+
+## Preferred engagement distance [near, far] for footwork, or [] for the generic spacing.
+func _kit_range() -> Array:
+	var r = personality.get("range")
+	if r is Array and (r as Array).size() >= 2:
+		return r
+	var kd := _kit_keep_distance()
+	return [kd - 0.4, kd + 0.4] if kd > 0.0 else []
+
+
+## Every tick, before anything else: starts a "rest" when an attack ends and keeps a flinching
+## unit frozen. Returns true when this tick is fully decided.
+func _kit_pre_poll(f: Fighter) -> bool:
+	var busy := f.state == Fighter.State.ATTACK or f.state == Fighter.State.ABILITY
+	var rest = personality.get("rest", [])
+	if _was_busy and not busy and rest is Array and (rest as Array).size() >= 2:
+		_rest_until = _t + rng.randf_range(float(rest[0]), float(rest[1]))
+	_was_busy = busy
+	if _t < _flinch_until:
+		f.input.move = Vector3.ZERO
+		f.input.held = 0
+		return true
+	return false
+
+
+## Kit behaviours that replace the rest of a think step (flinch, rest, pack). Returns true when
+## they decided it.
+func _kit_think(f: Fighter, sim: MatchSim, tgt: Fighter, dist: float, dir: Vector3, attacking: bool,
+		my_reach: float, their_reach: float) -> bool:
+	if personality.is_empty():
+		return false
+	var flinch := float(personality.get("ally_ko_flinch", 0.0))
+	if flinch > 0.0:
+		if _ev_cursor < 0:
+			_ev_cursor = sim.event_seq
+		for ev in sim.events_since(_ev_cursor):
+			_ev_cursor = int(ev["seq"])
+			if str(ev["type"]) != "ko":
+				continue
+			var ki := int(ev.get("fighter", -1))
+			if ki >= 0 and ki < sim.fighters.size() and ki != f.index:
+				var k: Fighter = sim.fighters[ki]
+				if k.team == f.team and k.pos().distance_to(f.pos()) < 3.0:
+					_flinch_until = _t + flinch
+		if _t < _flinch_until:
+			_move = Vector3.ZERO
+			_guard = false
+			return true
+	var rest = personality.get("rest", [])
+	if rest is Array and (rest as Array).size() >= 2 and (f.state == Fighter.State.ATTACK or f.state == Fighter.State.ABILITY) \
+			and f.move != null and f.state_time > _kit_last_threat(f.move) + 0.05:
+		return true   # nothing new is queued in a recovery: the rest follows the move
+	if _t < _rest_until and f.state == Fighter.State.NEUTRAL:
+		if _t >= _strafe_until:
+			_strafe = -1.0 if rng.randf() < 0.5 else 1.0
+			_strafe_until = _t + rng.randf_range(0.6, 1.6)
+		var circle := dir.cross(Vector3.UP) * _strafe * 0.45
+		_move = (circle + dir * 0.5).normalized() * 0.6 if dist > my_reach + 1.0 else circle
+		return true
+	var pack := int(personality.get("pack", 0))
+	if pack > 0 and _kit_range().is_empty() and not _kit_pack_attacker(f, sim, tgt, pack):
+		_kit_pack_hold(f, dist, dir, attacking, their_reach)
+		return true
+	return false
+
+
 ## Steps out of an enemy zone that hurts or builds up (puddles, patches) instead of idling in it,
 ## sideways relative to the target so the bot keeps facing the fight. Skill-scaled (spacing).
 func _kit_avoid_zone(f: Fighter, sim: MatchSim, dir: Vector3) -> bool:
@@ -711,3 +833,97 @@ func _kit_avoid_zone(f: Fighter, sim: MatchSim, dir: Vector3) -> bool:
 		_move = (out + side * (1.0 if side.dot(out) >= 0.0 else -1.0) * 0.5).normalized()
 		return true
 	return false
+
+
+## How much closer than its root a "bulky" target's body is to this unit (metres, less a 0.25 m
+## allowance for segment thickness), added to the unit's reach. 0 for ordinary bodies.
+func _kit_target_bulk(f: Fighter, tgt: Fighter) -> float:
+	if tgt == null or tgt.rig == null or not bool(tgt.creature.ai.get("bulky", false)):
+		return 0.0
+	var me := Vector3(f.pos().x, 0.0, f.pos().z)
+	var root_d := me.distance_to(Vector3(tgt.pos().x, 0.0, tgt.pos().z))
+	var nearest := root_d
+	for b in tgt.rig.bodies:
+		var bp: Vector3 = b.global_position
+		nearest = minf(nearest, me.distance_to(Vector3(bp.x, 0.0, bp.z)))
+	return maxf(0.0, root_d - nearest - 0.25)
+
+
+## True when a bulky target's perceived move is past its last threat (hit windows, lunges and
+## timed effects, landing included, + 0.1 s): its recovery is an opening, not a threat.
+func _kit_opening(per: Dictionary, tgt: Fighter) -> bool:
+	if tgt == null or not bool(tgt.creature.ai.get("bulky", false)):
+		return false
+	var slot := str(per.get("slot", ""))
+	var m: MoveDef = tgt.creature.moves.get(slot, tgt.creature.abilities.get(slot))
+	if m == null:
+		return false
+	return float(per.get("st", 0.0)) > _kit_last_threat(m) + 0.1
+
+
+## Time of a move's last threat: its last hit window, lunge or timed effect (landing included).
+static func _kit_last_threat(m: MoveDef) -> float:
+	var last := 0.0
+	for w in m.windows:
+		last = maxf(last, float(w["t1"]))
+	for l in m.lunges:
+		last = maxf(last, float(l[1]))
+	for e in m.effects:
+		last = maxf(last, float(e.get("t", 0.0)) + float(e.get("time", 0.0)) + float(e.get("delay", 0.0)))
+	return last
+
+
+func _kit_ability_ready(f: Fighter, slot: String) -> bool:
+	return f.creature.abilities.has(slot) and int(f.charges_left.get(slot, 1)) > 0 and not bool(f.mods.get("no_abilities", false))
+
+
+## An ally within `r` m currently performing ability `slot`, or null.
+func _kit_ally_using(f: Fighter, slot: String, r: float) -> Fighter:
+	if f.sim == null:
+		return null
+	for o: Fighter in f.sim.fighters:
+		if o == f or o.despawned or o.is_out() or o.team != f.team:
+			continue
+		if o.state == Fighter.State.ABILITY and o.move_slot.split("@")[0] == slot and o.pos().distance_to(f.pos()) < r:
+			return o
+	return null
+
+
+## True when `f` is one of the `n` pack members closest to the target (only they attack).
+func _kit_pack_attacker(f: Fighter, sim: MatchSim, tgt: Fighter, n: int) -> bool:
+	var mine := f.pos().distance_to(tgt.pos())
+	var closer := 0
+	for o: Fighter in sim.fighters:
+		if o == f or o.despawned or o.is_out() or o.team != f.team or o.target != tgt:
+			continue
+		var oai: Dictionary = o.creature.ai
+		if int(oai.get("pack", 0)) <= 0 or oai.has("range") or float(oai.get("keep_distance", 0.0)) > 0.0 \
+				or str(oai.get("prefers", "")) == "ranged":
+			continue
+		if o.pos().distance_to(tgt.pos()) < mine:
+			closer += 1
+	return closer < n
+
+
+## Waiting pack member: hold a ring around the target, drift toward its flank, shield up when
+## it swings this way.
+func _kit_pack_hold(f: Fighter, dist: float, dir: Vector3, attacking: bool, their_reach: float) -> void:
+	var ring := float(personality.get("pack_ring", 2.2))
+	if _t >= _strafe_until:
+		_strafe = -1.0 if rng.randf() < 0.5 else 1.0
+		_strafe_until = _t + rng.randf_range(0.6, 1.8)
+	var side := dir.cross(Vector3.UP) * _strafe
+	if dist < ring - 0.3:
+		_move = (-dir + side * 0.6).normalized()
+	elif dist > ring + 0.6:
+		_move = (dir + side * 0.4).normalized()
+	else:
+		_move = side * 0.7
+	if attacking and dist < their_reach + 0.8:
+		var g := str(personality.get("pack_guard", "guard"))
+		if g.begins_with("ability") and _kit_ability_ready(f, g):
+			f.input.press(FighterInput.AB1 if g == "ability1" else FighterInput.AB2)
+		else:
+			_guard = true
+			_guard_until = _t + 0.5
+			f.input.press(FighterInput.GUARD)
