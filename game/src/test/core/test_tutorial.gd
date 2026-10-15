@@ -5,7 +5,7 @@ extends TestCase
 ## Run fast with --fixed-fps 120. TUTORIAL_TRACE=1 prints each exercise's events.
 
 ## The fighter taking the course: TUTORIAL_CREATURE=<id> runs the whole course with another
-## fighter (run it for every roster fighter; docs/design/ANNOUNCER_AND_TUTORIAL.md §2.3).
+## fighter (tools/verify/tutorial_matrix.ps1 runs it for every fighter; ANNOUNCER_AND_TUTORIAL.md §2.3).
 static func _player_id() -> String:
 	var e := OS.get_environment("TUTORIAL_CREATURE")
 	return e if e != "" and Content.creature(e) != null else "dev_biped"

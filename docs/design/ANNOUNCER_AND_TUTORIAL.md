@@ -376,9 +376,9 @@ Slurry and Jitters were checked with their real kits on a trial merge of their k
 on main at the time could not do the Heavy and the freestyle: a stub Tail Sweep that hits behind Slurry,
 a stub Jitters without damage to speak of).
 
-Verification: `test_tutorial` runs the whole course with the pairing the game launches; run it per fighter
-with `TUTORIAL_CREATURE=<id>` (`TUTORIAL_PARTNER=<id>` tries other Kid bodies, `TUTORIAL_TRACE=1` prints
-each exercise's events). The driver stands in for a competent player: hit-confirm string rhythm, parry and
+Verification: `test_tutorial` runs the whole course with the pairing the game launches;
+`tools/verify/tutorial_matrix.ps1` runs it for every fighter in parallel (by hand: `TUTORIAL_CREATURE=<id>`;
+`TUTORIAL_PARTNER=<id>` tries other Kid bodies, `TUTORIAL_TRACE=1` prints each exercise's events). The driver stands in for a competent player: hit-confirm string rhythm, parry and
 dodge timing learned from when his strikes actually land, spacing tried and varied like a person would,
 the kit's own bot personality for the freestyle. `test_kit_npc_kid_lamprey` runs the Kid's side of the
 drills for every roster fighter with its own drivers.
