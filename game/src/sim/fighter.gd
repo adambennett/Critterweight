@@ -1249,7 +1249,7 @@ func _do_throw(throw_dir: Vector3) -> void:
 	var mass_ratio := clampf(sqrt(Tuning.v("ref_mass") / maxf(20.0, v.rig.total_mass)), 0.5, 1.6)
 	var air := 0.55
 	var horiz := rel * (dist * mass_ratio / air)
-	var vy := 9.81 * air * 0.5 + float(td.get("up", 0.0))
+	var vy := (sim.gravity if sim else 9.81) * air * 0.5 + float(td.get("up", 0.0))
 	v.rig.apply_body_impulse((horiz + Vector3.UP * vy - v.rig.com_velocity()) * v.rig.total_mass)
 	if sim:
 		var dmg := float(td.get("damage", Tuning.v("throw_damage")))

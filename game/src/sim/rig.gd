@@ -40,6 +40,7 @@ var seg_muscle: PackedFloat32Array = PackedFloat32Array()  ## per segment 0..1 (
 var seg_speed: PackedFloat32Array = PackedFloat32Array()   ## per segment stiffness multiplier
 var muscle := 1.0              ## global tone 0..1 (knockdown/KO lowers it)
 var support := 1.0             ## anti-gravity fraction applied while grounded
+var gravity := 9.81            ## world gravity this body lives in (MatchSim sets it)
 var hover_enabled := true
 var hover_height := 1.0        ## desired root pivot height above the floor
 var desired_vel := Vector3.ZERO
@@ -262,7 +263,7 @@ func probe_ground() -> void:
 ## Applies hover/drive forces and updates every joint's spring target. Call from _physics_process.
 func step(_dt: float) -> void:
 	probe_ground()
-	var g := 9.81
+	var g := gravity
 	var root_rb := bodies[0]
 	var m := total_mass
 	# ---- anti-gravity support (muscles carrying the body) ----

@@ -1,0 +1,18 @@
+{
+  "id": "stoke_variants:overheated_stoke",
+  "extends": "f_stoke",
+  "name": "Stoke",
+  "title": "Overheated",
+  "tags": ["fighter", "biped", "scrapper", "mod"],
+  "stats": {"power": 1.08, "defense": 0.92, "stamina_regen": 14},
+  "moves": {
+    "heavy": {"name": "Overhand Boilover", "damage": 15, "buildup": 40, "stamina": 14}
+  },
+  "passives": [
+    {"id": "pressure_valve", "on": "parry_success", "do": [{"type": "buildup", "element": "scorch", "amount": 45, "target": "other"}],
+     "cooldown": 2.0, "source": "stoke_variants"}
+  ],
+  "art": {
+    "palette": {"primary": "#2B6FD9", "secondary": "#1C1C24", "accent": "#7FE3FF", "wraps": "#F2F2F2", "eyes": "#FFFFFF", "crest": "#0E2A4F"}
+  }
+}

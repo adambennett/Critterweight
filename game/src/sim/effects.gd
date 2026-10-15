@@ -269,8 +269,8 @@ func _leap(f: Fighter, e: Dictionary) -> void:
 	to.y = 0.0
 	var air := float(e.get("time", 0.55))
 	var apex := float(e.get("height", 1.0))
-	var vy := maxf(9.81 * air * 0.5, sqrt(2.0 * 9.81 * maxf(apex, 0.1)))
-	air = 2.0 * vy / 9.81
+	var vy := maxf(sim.gravity * air * 0.5, sqrt(2.0 * sim.gravity * maxf(apex, 0.1)))
+	air = 2.0 * vy / sim.gravity
 	f.begin_airborne(e.get("on_land", []), air)
 	f.rig.freeze_motion()
 	f.rig.apply_body_impulse((to / air + Vector3.UP * vy) * f.rig.total_mass)
@@ -309,7 +309,7 @@ func _spawn_projectile(f: Fighter, e: Dictionary, yaw_off: float) -> void:
 	var grav := float(e.get("gravity", 0.0))
 	if bool(e.get("lob", false)):
 		# ballistic arc to the target's position (or max range ahead), horizontal speed = speed
-		grav = 9.81
+		grav = sim.gravity
 		var maxr := float(e.get("range", 7.0))
 		var tp := f.target.pos() if f.target else origin + dir * maxr
 		var to := tp - origin
@@ -714,8 +714,8 @@ func _update_prop(ent: Dictionary, _dt: float) -> void:
 			cool[o.index] = sim.time + 1.0
 			var fwd := o.forward()
 			var up := float(e.get("launch_up", 2.5))
-			var vy := sqrt(2.0 * 9.81 * up)
-			var air := 2.0 * vy / 9.81
+			var vy := sqrt(2.0 * sim.gravity * up)
+			var air := 2.0 * vy / sim.gravity
 			o.rig.freeze_motion()
 			o.begin_airborne([], air)
 			o.rig.apply_body_impulse((fwd * float(e.get("launch_forward", 3.0)) / air + Vector3.UP * vy) * o.rig.total_mass)

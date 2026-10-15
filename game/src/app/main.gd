@@ -75,9 +75,13 @@ func _start(mode: String) -> void:
 			_boot_game()
 
 
-## Normal game boot: title screen (owned by src/ui).
+## Normal game boot: title screen (owned by src/ui). `--screen <name>` opens a screen directly
+## (captures, runtime checks).
 func _boot_game() -> void:
-	if App.has_screen("title"):
+	var direct := arg_value("--screen", "")
+	if direct != "" and App.has_screen(direct):
+		App.goto(direct)
+	elif App.has_screen("title"):
 		App.goto("title")
 	else:
 		_start_sandbox()

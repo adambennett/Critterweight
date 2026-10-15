@@ -1,0 +1,10 @@
+{
+  "id": "moon_rules:moon_night",
+  "name": "Moon Night",
+  "entries": [
+    {"rules": "moon_rules:moon_brawl", "arena": "the_gullet", "weight": 3, "min_players": 2, "max_players": 8, "bots": 2},
+    {"rules": "moon_rules:juice_frenzy", "arena": "the_gullet", "weight": 2, "min_players": 2, "max_players": 2, "bots": 1}
+  ],
+  "voting": {"enabled": true, "choices": 2, "time": 15},
+  "repeat_avoidance": 1
+}

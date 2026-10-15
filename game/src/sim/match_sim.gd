@@ -44,6 +44,7 @@ var events: Array = []           ## ring of recent events (Dictionaries with "se
 var event_seq := 0
 var hittables: Array = []        ## mode objects weapons can strike (see register_hittable)
 var hazards = null               ## optional ArenaHazards runner (timed hazards, pickups)
+var gravity := 9.81              ## arena gravity_mult x rules gravity_mult (low-grav rules)
 var _prev_speed := {}            ## fighter index -> root speed last tick (slam detection)
 var _fighter_root: Node3D
 
@@ -62,6 +63,9 @@ func setup(config: Dictionary) -> void:
 	seed_value = int(config.get("seed", 1))
 	rng.seed = seed_value
 	arena_nodes = ArenaBuilder.build(self, arena)
+	gravity = 9.81 * arena.gravity_mult * clampf(float(rules.get("gravity_mult", 1.0)), 0.3, 2.0)
+	if is_inside_tree():
+		PhysicsServer3D.area_set_param(get_world_3d().space, PhysicsServer3D.AREA_PARAM_GRAVITY, gravity)
 	_fighter_root = Node3D.new()
 	_fighter_root.name = "Fighters"
 	add_child(_fighter_root)
@@ -82,6 +86,7 @@ func _create_fighter(idx: int, e: Dictionary, pos: Vector3, yaw: float) -> Fight
 	var f := Fighter.new()
 	_fighter_root.add_child(f)
 	f.setup(e["creature"], idx, int(e.get("team", idx)), self, pos, yaw)
+	f.rig.gravity = gravity
 	f.display_name = str(e.get("name", f.creature.display_name))
 	f.controller_kind = str(e.get("kind", "bot"))
 	for k in e.get("mods", {}):
@@ -115,6 +120,22 @@ func _apply_rule_mods(f: Fighter) -> void:
 		f.mods["no_juice"] = true
 	if not bool(rules.get("grabs", true)):
 		f.mods["no_grabs"] = true
+	# data-driven rule extensions (custom rules and rule/mode mods): stat mods and hooks for all
+	var fm = rules.get("fighter_mods", {})
+	if typeof(fm) == TYPE_DICTIONARY:
+		for k in fm:
+			var v = fm[k]
+			if typeof(v) == TYPE_BOOL or typeof(v) == TYPE_STRING:
+				f.mods[k] = v
+			elif f.mods.has(k) and typeof(f.mods[k]) == TYPE_FLOAT:
+				f.mods[k] = float(f.mods[k]) * float(v)
+			else:
+				f.mods[k] = float(v)
+	var fh = rules.get("fighter_hooks", [])
+	if typeof(fh) == TYPE_ARRAY:
+		for h in fh:
+			if typeof(h) == TYPE_DICTIONARY:
+				f.hooks.add(h, "rules")
 	f.reset_vitals()
 
 
@@ -205,6 +226,13 @@ func _physics_process(dt: float) -> void:
 	if not running or paused:
 		return
 	step(dt)
+
+
+func _exit_tree() -> void:
+	# the world outlives the match (menus, the hub): put its gravity back
+	if gravity != 9.81 and get_world_3d():
+		PhysicsServer3D.area_set_param(get_world_3d().space, PhysicsServer3D.AREA_PARAM_GRAVITY,
+			float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)))
 
 
 func step(dt: float) -> void:
