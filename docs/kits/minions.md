@@ -8,7 +8,7 @@ fill the movesets, abilities, passives and AI.
 
 ```powershell
 $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
-& $g --headless --path game --fixed-fps 120 -- --test test_kit_minions          # minion kits (13 tests + aids)
+& $g --headless --path game --fixed-fps 120 -- --test test_kit_minions          # minion kits (14 tests + aids)
 & $g --headless --path game --fixed-fps 120 -- --test test_kit_npc_extensions   # engine extensions (6 tests)
 & $g --headless --path game --fixed-fps 120 -- --test test_kit_minions.gd::test_zz_report_ranges --kit-report
 ```
@@ -94,14 +94,21 @@ Each block is appended in a clearly separated "NPC-kit" section of its file and 
 | `game/src/sim/modes/chum_rush_mode.gd` | `_resolve()` | `"<id>#<variant>"` → creature `"<id>_<variant>"`, else the base id |
 | `game/src/ai/bot_brain.gd` | kit-hint block (shared with the Dredge/Dozer hints) | `pack` / `pack_ring` / `pack_guard`, `ally_ko_flinch`, `apart`, `keep_distance` / `prefers: ranged` (alias of `range` + implicit ranged-ability hint), `reach`, `rest`, `bulky` (bosses, see bosses.md) |
 
-## Campaign compatibility
+## Campaign compatibility (minion loadouts)
 
-The campaign's minion loadouts patch these bases by slot: Scrapling `l1` Pipe Swing, `l2` Lid Bash,
-`ability1` Lid Up, `ability2` Bolt Toss (created by the Pelter recipe); Blister `ability1` Inflate & Pop
-whose effects include one `area` and one `zone` (the Ember / Fuse recipes re-element them). Checked by
-`test_minion_kits_complete_and_valid`; every recipe resolves with no problems (`CampaignCatalog`
-warnings list only the roster stubs' `dodge_speed`).
+`game/content/core/encounters/minion_loadouts.json` patches these bases into the ENEMIES_BOSSES.md §1.3
+variants; the patches were retargeted to how these kits implement each piece (checked by
+`test_technique_lint.gd::test_minion_loadout_patches_hit_their_base_bodies` — every patch hits an
+existing field — and by `test_campaign_loadouts_really_differ`):
 
+| Loadout | Patches |
+|---|---|
+| `scrapling_pelter` | creates A2 Bolt Toss (same numbers and hand offset as `npc_scrapling_pelter`), `ai` keep_distance 4 |
+| `scrapling_hot_pipe` | Pipe Swing and Pipe Smash: Scorch 15 |
+| `scrapling_gravel_lid` | Lid Bash: Grit 15; Lid Up's status `guard_absorb` 1.0 (the lid absorbs 100 %) |
+| `scrapling_leaky_pipe` | Pipe Swing and Pipe Smash: Sludge 15; passive `leaky_puddle` (`knocked_out` → 0.6 m sludge puddle 4 s) |
+| `blister_ember` | element Scorch: Inflate & Pop's area Scorch and its zone `scorch_patch`; Death Pop and the live bomb Scorch; sac `#FF6B2B` |
+| `blister_fuse` | element Static: the pop Static with a 0.4 s stun, zone `static_field`; Death Pop and the live bomb Static + 0.4 s stun; sac `#F7E04A` |
 ## Tests (`test_kit_minions.gd`)
 
 | Test | Checks |
@@ -119,8 +126,9 @@ warnings list only the roster stubs' `dodge_speed`).
 | `test_blister_death_pop` | melee kill → ~6 Death Pop on the killer; ranged kill → nobody hit |
 | `test_thrown_blister_is_a_live_bomb` | lands, pops for the thrower, chains a neighbour, never hits the thrower |
 | `test_blisters_never_inflate_side_by_side` | the `apart` hint |
+| `test_campaign_loadouts_really_differ` | every campaign loadout resolves on these bases and really differs (elements, zones, full lid block, death puddle, Ember/Fuse pops); a Leaky Pipe KO leaves its puddle, a Fuse Death Pop builds Static |
 
-Result (merged with main 2a5beaa): 13 / 13 minion tests and 6 / 6 extension tests pass.
+Result (merged with main 144efdc): 14 / 14 minion tests and 6 / 6 extension tests pass.
 
 ## Evidence
 
@@ -134,9 +142,7 @@ green burst as Dozer's cage slam knocks it out). GUI sandbox autoplay captures.
 - **Lid box vs fists**: the Scrapling's lid is a box; the engine detects melee contacts on thin capsule
   approximations of box hurt shapes, so a punch the lid physically stops may register nothing (the
   Lid Up test uses a projectile).
-- **Ember / Fuse Blisters**: the campaign recipes re-element Inflate & Pop's area and puddle but not the
-  Death Pop / live-bomb passives, which stay Sludge (a data patch in `minion_loadouts.json` would fix it;
-  campaign owner).
+
 - A thrown Blister's pop leaves no puddle (the passive has no zone).
 - **Audio**: `Audio.creature_audio` reads `audio` blocks only from the `creatures` content kind, so
   minions (and bosses) fall back to the generic voice/material (audio owner).

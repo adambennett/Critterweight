@@ -263,6 +263,64 @@ func test_chum_rush_resolves_pelter_variant() -> void:
 	check(mode._resolve("boss_bilge@hp:0.60").id == "boss_bilge", "headliner specs still resolve")
 
 
+## The campaign's loadouts (content/core/encounters/minion_loadouts.json, ENEMIES_BOSSES.md §1.3)
+## patch these bases into real variants: elements, zones, the Gravel Lid's full block, the Leaky
+## Pipe's death puddle, Ember/Fuse pops (Inflate & Pop, Death Pop and the live bomb alike).
+func test_campaign_loadouts_really_differ() -> void:
+	var r = CampaignCatalog.new(Content).resolver
+	var built := {}
+	for id in ["scrapling_pelter", "scrapling_hot_pipe", "scrapling_gravel_lid", "scrapling_leaky_pipe", "blister_ember", "blister_fuse"]:
+		var d: Dictionary = r.creature_dict(id)
+		var errs := PackedStringArray()
+		var c := CreatureResolver.parse(d.duplicate(true), errs)
+		check(c != null and errs.is_empty(), "%s resolves on the real base (%s)" % [id, ", ".join(errs)])
+		built[id] = [c, d]
+	var hot: CreatureDef = built["scrapling_hot_pipe"][0]
+	check(hot.moves["l1"].element == "scorch" and hot.moves["heavy"].element == "scorch", "Hot Pipe: pipe hits carry Scorch")
+	var gravel: CreatureDef = built["scrapling_gravel_lid"][0]
+	check(gravel.moves["l2"].element == "grit", "Gravel Lid: Lid Bash carries Grit")
+	var lid: Dictionary = (gravel.abilities["ability1"] as MoveDef).effects[0]
+	check_near(float(lid["status"]["guard_absorb"]), 1.0, 0.001, "Gravel Lid: the lid absorbs 100 %")
+	var leaky: CreatureDef = built["scrapling_leaky_pipe"][0]
+	check(leaky.moves["l1"].element == "sludge" and leaky.moves["heavy"].element == "sludge", "Leaky Pipe: pipe hits carry Sludge")
+	var pel: CreatureDef = built["scrapling_pelter"][0]
+	check(pel.abilities.has("ability2") and float(pel.ai.get("keep_distance", 0.0)) == 4.0, "Pelter: Bolt Toss and 4 m spacing")
+	for pair in [["blister_ember", "scorch", "scorch_patch"], ["blister_fuse", "static", "static_field"]]:
+		var d: Dictionary = built[pair[0]][1]
+		var c: CreatureDef = built[pair[0]][0]
+		check_eq(c.element, pair[1], "%s is %s" % [pair[0], pair[1]])
+		var pop: Array = d["abilities"]["ability1"]["effects"]
+		for e in pop:
+			if str(e["type"]) == "area":
+				check_eq(str(e["element"]), pair[1], "%s pops %s" % [pair[0], pair[1]])
+			elif str(e["type"]) == "zone":
+				check_eq(str(e["kind"]), pair[2], "%s leaves %s" % [pair[0], pair[2]])
+		for p in d["passives"]:
+			for a in p.get("do", []):
+				if str(a.get("type", "")) in ["area", "delayed"]:
+					check_eq(str(a.get("element", "")), pair[1], "%s %s pop is %s" % [pair[0], p["id"], pair[1]])
+	# behaviour: a Leaky Pipe Scrapling knocked out leaves its 0.6 m puddle
+	var sim := duel(leaky, DUMMY, 2.0)
+	await step_sim(sim, 0.3)
+	sim.combat.apply_simple_damage(sim.fighters[1], sim.fighters[0], 999.0, "test")
+	await step_sim(sim, 0.2)
+	var puddle := 0.0
+	for e in sim.effects.entities:
+		if str(e["kind"]) == "zone" and str(e.get("zone_kind", "")) == "sludge_puddle":
+			puddle = float(e["radius"])
+	check_near(puddle, 0.6, 0.05, "a knocked-out Leaky Pipe Scrapling leaves its puddle")
+	sim.get_parent().queue_free()
+	# behaviour: a Fuse Blister's Death Pop stuns and builds Static on its killer
+	var fuse: CreatureDef = built["blister_fuse"][0]
+	var sim2 := duel(fuse, DUMMY, 0.9)
+	await step_sim(sim2, 0.3)
+	var killer := sim2.fighters[1]
+	sim2.combat.apply_simple_damage(killer, sim2.fighters[0], 999.0, "test")
+	await step_sim(sim2, 0.1)
+	check(float(killer.statuses.buildup.get("static", 0.0)) > 0.0 or killer.statuses.has_element("static"), "the Fuse Blister's Death Pop builds Static on its killer")
+	sim2.get_parent().queue_free()
+
+
 # ---------------------------------------------------------------------------------------------
 # Blister
 
