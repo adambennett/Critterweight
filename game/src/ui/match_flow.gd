@@ -68,7 +68,10 @@ static func open_pause(notice := "") -> void:
 	App.push("pause", {"notice": notice})
 
 
-## Leaves any match and returns to the main menu (unpausing first).
+## Leaves any match and returns to the main menu (unpausing first). The match scene is freed here;
+## the main menu then installs the menu backdrop (skipped in headless runs).
 static func quit_to_menu() -> void:
 	set_paused(false)
+	if current_match() != null:
+		App.set_scene(null)
 	App.goto("main_menu")

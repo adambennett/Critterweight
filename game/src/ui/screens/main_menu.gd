@@ -304,6 +304,11 @@ func submenu_open() -> bool:
 	return _open_index >= 0
 
 
+## Visible top-level entries in order (tests, tooling).
+func items() -> Array[UiButton]:
+	return _items
+
+
 func _ask_quit() -> void:
 	App.dialog("Leave the Circuit?", "Quit CRITTERWEIGHT and return to the desktop?",
 		[{"label": "Quit game", "id": "quit", "danger": true}, {"label": "Stay", "id": "stay", "cancel": true, "default": true}],

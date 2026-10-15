@@ -62,16 +62,19 @@ func show_toast(text: String, kind := "info", seconds := 3.5) -> void:
 		p.modulate.a = 0.0
 		var tw := p.create_tween()
 		tw.tween_property(p, "modulate:a", 1.0, UiTheme.ANIM)
+	# weak reference: the toast may already be gone (evicted when more than MAX_VISIBLE are shown)
+	var wr: WeakRef = weakref(p)
 	var t := get_tree().create_timer(seconds, true, false, true)
 	t.timeout.connect(func() -> void:
-		if not is_instance_valid(p):
+		var node := wr.get_ref() as Control
+		if node == null or node.is_queued_for_deletion():
 			return
 		if UiTheme.reduce_motion():
-			p.queue_free()
+			node.queue_free()
 			return
-		var tw2 := p.create_tween()
-		tw2.tween_property(p, "modulate:a", 0.0, UiTheme.ANIM_SLOW)
-		tw2.tween_callback(p.queue_free))
+		var tw2 := node.create_tween()
+		tw2.tween_property(node, "modulate:a", 0.0, UiTheme.ANIM_SLOW)
+		tw2.tween_callback(node.queue_free))
 
 
 func visible_texts() -> Array[String]:

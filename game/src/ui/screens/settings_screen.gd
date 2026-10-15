@@ -316,8 +316,10 @@ func _on_rebound(action: String, stolen: String, pad: bool) -> void:
 	var other := bind_row_for(stolen)
 	var left_unbound := not BindingsFlow.has_binding(stolen, pad)
 	if other:
-		other.set_note(("%s moved to %s — no %s binding left" if left_unbound else "%s moved to %s") % [input_name, BindingsFlow.label_of(action),
-			"controller" if pad else "keyboard"], "Warning")
+		var note := "%s moved to %s" % [input_name, BindingsFlow.label_of(action)]
+		if left_unbound:
+			note += " — no %s binding left" % ("controller" if pad else "keyboard")
+		other.set_note(note, "Warning")
 	if row:
 		row.set_note("Now: %s (taken from %s)" % [input_name, BindingsFlow.label_of(stolen)], "Warning")
 	UiNav.toast("%s was taken from %s.%s" % [input_name, BindingsFlow.label_of(stolen),

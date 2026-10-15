@@ -37,8 +37,12 @@ func on_enter(p: Dictionary) -> void:
 	panel.add_child(_scroll)
 	_build()
 	Controls.bindings_changed.connect(_build)
-	Controls.device_changed.connect(func(_k: String) -> void: _build())
+	Controls.device_changed.connect(_on_device_changed)
 	play_intro()
+
+
+func _on_device_changed(_kind: String) -> void:
+	_build()
 
 
 func _build() -> void:

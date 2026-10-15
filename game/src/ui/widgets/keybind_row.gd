@@ -46,6 +46,11 @@ func refresh() -> void:
 	pad_slot.refresh()
 
 
+## The note currently shown under the action name ("" when hidden).
+func note_text() -> String:
+	return _note.text if _note.visible else ""
+
+
 ## Shows a short note under the action name (conflict explanations).
 func set_note(text: String, variation := "Warning") -> void:
 	_note.text = text

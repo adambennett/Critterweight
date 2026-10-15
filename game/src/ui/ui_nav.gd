@@ -156,6 +156,11 @@ func _input(event: InputEvent) -> void:
 			if _menu_active():
 				get_viewport().set_input_as_handled()
 				stick_events_swallowed += 1
+				# UiNav runs before Controls._input (reverse tree order), so mirror its device switch
+				# here or stick-only menu users would keep seeing keyboard prompts
+				if absf(jm.axis_value) > 0.5 and Controls.last_device != "gamepad":
+					Controls.last_device = "gamepad"
+					Controls.device_changed.emit("gamepad")
 				_update_stick()
 			else:
 				_stick_dir = Vector2i.ZERO

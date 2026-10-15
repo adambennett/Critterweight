@@ -72,7 +72,7 @@ func on_enter(p: Dictionary) -> void:
 	_ref_box = UiTheme.vbox(UiTheme.GAP_S)
 	ref.add_child(_ref_box)
 	_build_reference()
-	Controls.device_changed.connect(func(_k: String) -> void: _build_reference())
+	Controls.device_changed.connect(_on_device_changed)
 	var bar := PromptBar.new()
 	bar.set_prompts([{"actions": ["ui_accept"], "text": "Select"}, {"actions": ["ui_cancel"], "text": "Resume", "call": _resume_match}])
 	outer.add_child(bar)
@@ -86,6 +86,10 @@ func _button(parent: Container, text: String, icon: String, route: String, cb: C
 	b.pressed.connect(cb)
 	parent.add_child(b)
 	return b
+
+
+func _on_device_changed(_kind: String) -> void:
+	_build_reference()
 
 
 func _build_reference() -> void:
@@ -138,6 +142,13 @@ func _ask_quit() -> void:
 func on_exit() -> void:
 	if not _online:
 		MatchFlow.set_paused(false)
+
+
+## B / Esc resume. (Handled here: during a fight the pause menu is the only screen on the stack,
+## and App.back() never pops the last screen.)
+func on_back() -> bool:
+	_resume_match()
+	return true
 
 
 func _unhandled_input(event: InputEvent) -> void:

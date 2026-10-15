@@ -72,8 +72,16 @@ func _build() -> void:
 	foot.add_child(device)
 	col.add_child(foot)
 	_update_device_hint()
-	Controls.device_changed.connect(func(_k: String) -> void: _update_device_hint())
-	Controls.joy_connection.connect(func(_d: int, _c: bool) -> void: _update_device_hint())
+	Controls.device_changed.connect(_on_device_changed)
+	Controls.joy_connection.connect(_on_joy_connection)
+
+
+func _on_device_changed(_kind: String) -> void:
+	_update_device_hint()
+
+
+func _on_joy_connection(_device: int, _connected: bool) -> void:
+	_update_device_hint()
 
 
 func _update_device_hint() -> void:

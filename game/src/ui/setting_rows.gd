@@ -212,6 +212,7 @@ static func _commit(key: String, v, row: UiRow) -> void:
 
 static func _apply_display(key: String, v, row: UiRow) -> void:
 	var prev := Settings.apply_display_tentative({key: v})
+	var row_ref: WeakRef = weakref(row)
 	App.push("dialog", {"title": "Keep these display settings?",
 		"body": "%s: %s.\nReverting automatically in {s} seconds." % [label_for(key), value_label(key, Settings.get_value(key))],
 		"buttons": [{"label": "Keep", "id": "keep", "default": true}, {"label": "Revert", "id": "revert", "cancel": true}],
@@ -223,8 +224,9 @@ static func _apply_display(key: String, v, row: UiRow) -> void:
 			else:
 				Settings.revert_display(prev)
 				UiNav.toast("Display settings reverted.", "info")
-			if is_instance_valid(row):
-				refresh_row(row, Settings.get_value(key))})
+			var r := row_ref.get_ref() as UiRow
+			if r != null:
+				refresh_row(r, Settings.get_value(key))})
 
 
 ## X / Delete on a row.
