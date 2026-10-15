@@ -105,7 +105,7 @@
                     {"t": 0.40, "chains": {"arm_l": {"target": [0.06, 1.26, 0.66], "pole": [0.8, -0.2, -0.4]}}, "joints": {"chest": [6, -18, 0]}, "lean": [3, 0, 0]},
                     {"t": 0.58}]},
     "heavy": {"name": "Overhand Boiler", "duration": 0.78, "damage": 13, "knockback": 5.4, "stun": 0.6, "poise": 25, "stamina": 12,
-              "vmin": 1.6, "vref": 5.5, "speed": 1.8, "charge_time": 1.0, "charge_damage": 0.0, "lunge": [[0.18, 0.34, 3.2]], "move_mult": 0.25,
+              "vmin": 1.6, "vref": 5.5, "speed": 1.8, "charge_time": 1.0, "charge_damage": 0.0, "lunge": [[0.18, 0.32, 2.6]], "move_mult": 0.25,
               "element": "scorch", "buildup": 30, "armor": [[0.28, 0.38]], "armor_level": "lights",
               "hit": [{"t0": 0.27, "t1": 0.38, "weapons": ["fist_r"]}],
               "keys": [{"t": 0.0},
@@ -217,5 +217,13 @@
     "gore_piece": {"segment": "head", "offset": [0.04, -0.06, 0.17], "size": 0.035, "shape": "tooth", "color": "#F4EFE2"}
   },
   "audio": {},
-  "ai": {"personality": "pressure", "aggression": 0.12, "block": 0.0, "dodge": -0.04, "ability": 0.0, "grab": 0.02}
+  "ai": {"personality": "pressure", "aggression": 0.12, "block": 0.0, "dodge": -0.04, "ability": 0.0, "grab": 0.02,
+         "range": [1.0, 1.2], "attack_range": 1.35,
+         "commit_if": ["target_status:scorch"],
+         "abilities": {"ability1": [{"if": ["projectile_incoming"], "chance": 0.8, "max_dist": 4.5},
+                                    {"if": ["self_poise_below:0.3", "target_near:1.8"], "chance": 0.6}],
+                       "ability2": [{"if": ["target_down"], "chance": 0.8}]},
+         "juice_if": [["target_cornered", "target_near:3.0"], ["self_health_below:0.25", "target_near:3.0"], ["target_near:1.8", "random:0.25"]],
+         "charge_heavy": {"from": "pro", "chance": 0.25},
+         "parry_heavy": {"from": "champion", "chance": 0.35}}
 }

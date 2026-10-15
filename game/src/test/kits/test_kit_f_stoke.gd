@@ -383,3 +383,19 @@ func test_taunt_guard_and_parry() -> void:
 
 func test_zz_lab() -> void:
 	await lab(CID)
+
+
+## Balance spars (gated, slow): `-- --test test_kit_f_stoke.gd::test_zz_balance --kit-balance [n] [difficulty]`
+## prints win rates and damage per landed hit for Stoke vs Gusto and both mirrors.
+func test_zz_balance() -> void:
+	var args := OS.get_cmdline_user_args()
+	var i := args.find("--kit-balance")
+	if i < 0:
+		return
+	var n := int(args[i + 1]) if i + 1 < args.size() and args[i + 1].is_valid_int() else 20
+	var diff := args[i + 2] if i + 2 < args.size() and not args[i + 2].begins_with("--") else "regular"
+	var only := args[args.find("--kit-pair") + 1] if args.has("--kit-pair") else ""
+	for pair in [[CID, FOE], [CID, CID], [FOE, FOE]]:
+		if only != "" and "%s-%s" % [pair[0], pair[1]] != only:
+			continue
+		await balance(pair[0], pair[1], n, diff)

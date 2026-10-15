@@ -40,10 +40,11 @@ func test_stats_slots_and_data() -> void:
 	var raw := FileAccess.get_file_as_string("res://content/core/creatures/%s.json" % CID)
 	check(not raw.contains("_stub"), "no stub moves left")
 	check_near(c.moves["taunt"].duration, 1.5, 0.001, "taunt lasts 1.5 s")
-	_check_timing(c.moves["l1"], [0.10, 0.08, 0.18], 4.0, 4.0)
+	# damage deviations from ROSTER (balance, docs/kits/f_gusto.md): Wing Snap 4 -> 5, Crosswind 6+6 -> 7+7
+	_check_timing(c.moves["l1"], [0.10, 0.08, 0.18], 4.0, 5.0)
 	_check_timing(c.moves["l2"], [0.12, 0.12, 0.20], 4.0, 2.0)
 	_check_timing(c.moves["l3"], [0.16, 0.10, 0.30], 7.0, 7.0)
-	_check_timing(c.moves["heavy"], [0.24, 0.12, 0.40], 11.0, 6.0)
+	_check_timing(c.moves["heavy"], [0.24, 0.12, 0.40], 11.0, 7.0)
 	_check_timing(c.moves["finisher"], [0.15, 0.40, 0.45], 10.0, 3.0)
 	_check_timing(c.moves["dash_attack"], [0.10, 0.12, 0.30], 7.0, 6.0)
 	for slot in ["l1", "l2", "l3", "heavy", "heavy_charged", "finisher", "dash_attack", "pummel", "l1@hovering"]:

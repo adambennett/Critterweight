@@ -382,6 +382,117 @@ func describe(r: Dictionary) -> String:
 		r["poise_dmg"], ", ".join(bu), str(r["statuses"]), r["tgt_turn_deg"], r["stamina_spent"], r["att_disp"]]
 
 
+## One bot-vs-bot bout on The Gullet (1 round, `round_time` s, decision on health at time-out).
+## Returns {winner: 0|1|-1, time, dmg: [dealt0, dealt1], hits: [n0, n1], hp: [h0, h1], ko: bool,
+## abilities: [{slot: n}, {slot: n}], juices: [n0, n1], taunts, throws, knockdowns}.
+func bout(c0: String, c1: String, seed_value: int, difficulty := "regular", round_time := 60.0) -> Dictionary:
+	var sim := MatchSim.new()
+	sim.running = false
+	fresh_world().add_child(sim)
+	var cs := [Content.creature(c0), Content.creature(c1)]
+	var entries := []
+	for i in 2:
+		var bb := BotBrain.new(difficulty, seed_value * 31 + i * 7 + 1)
+		bb.set_personality((cs[i] as CreatureDef).ai)
+		entries.append({"creature": cs[i], "team": i, "source": bb, "kind": "bot", "name": "B%d" % i})
+	if seed_value % 2 == 1:
+		entries.reverse()   # alternate spawn sides
+		for i in 2:
+			entries[i]["team"] = i
+	sim.setup({"arena": Content.arena("the_gullet"), "rules": {"rounds": 1, "round_time": round_time, "intro_time": 0.3, "sudden_death": false},
+		"seed": seed_value, "fighters": entries})
+	var t := 0.0
+	var log: Array = []   # every event (the sim keeps only a short ring)
+	var cursor := 0
+	while not sim.is_finished and t < round_time + 5.0:
+		sim.step(DT)
+		await get_tree().physics_frame
+		t += DT
+		for ev in sim.events_since(cursor):
+			cursor = int(ev["seq"])
+			if str(ev["type"]) in ["hit", "ability", "juice", "taunt", "dodge"]:
+				log.append(ev)
+	var swap := seed_value % 2 == 1
+	var fa: Fighter = sim.fighters[1 if swap else 0]
+	var fb: Fighter = sim.fighters[0 if swap else 1]
+	var wt := int(sim.result.get("winner_team", -1)) if sim.is_finished else -1
+	var winner := -1
+	if wt >= 0:
+		winner = 0 if wt == fa.team else 1
+	var out := {"winner": winner, "time": t, "dmg": [fa.stats_record["damage_dealt"], fb.stats_record["damage_dealt"]],
+		"hits": [fa.stats_record["hits"], fb.stats_record["hits"]], "hp": [fa.health, fb.health], "ko": fa.is_out() or fb.is_out(),
+		"abilities": [{}, {}], "juices": [0, 0], "taunts": [0, 0], "throws": [fa.stats_record["throws"], fb.stats_record["throws"]],
+		"knockdowns": [fb.stats_record["knockdowns"], fa.stats_record["knockdowns"]], "dodges": [0, 0], "guards": [0, 0]}
+	out["by_slot"] = [{}, {}]
+	for ev in log:
+		var who := -1
+		if ev.has("fighter"):
+			who = 0 if int(ev["fighter"]) == fa.index else 1
+		if str(ev["type"]) == "hit" and int(ev["fighter"]) >= 0 and float(ev["damage"]) > 0.0:
+			var bs: Dictionary = out["by_slot"][who]
+			var key := str(ev["slot"]) + ("(blk)" if bool(ev["blocked"]) else "")
+			var cur: Array = bs.get(key, [0, 0.0])
+			bs[key] = [int(cur[0]) + 1, float(cur[1]) + float(ev["damage"])]
+		match str(ev["type"]):
+			"ability":
+				var d: Dictionary = out["abilities"][who]
+				d[str(ev["slot"])] = int(d.get(str(ev["slot"]), 0)) + 1
+			"juice":
+				out["juices"][who] += 1
+			"taunt":
+				out["taunts"][who] += 1
+			"dodge":
+				out["dodges"][who] += 1
+	dispose(sim)
+	return out
+
+
+## Runs `n` bouts and prints/returns the aggregate (win rates, average damage per landed hit...).
+func balance(c0: String, c1: String, n: int, difficulty := "regular", round_time := 60.0, seed0 := 100) -> Dictionary:
+	var agg := {"pair": "%s vs %s" % [c0, c1], "n": n, "wins": [0, 0], "draws": 0, "kos": 0, "dmg": [0.0, 0.0], "hits": [0, 0],
+		"time": 0.0, "abilities": [{}, {}], "juices": [0, 0], "taunts": [0, 0], "throws": [0, 0], "knockdowns": [0, 0], "dodges": [0, 0]}
+	for k in n:
+		var r := await bout(c0, c1, seed0 + k, difficulty, round_time)
+		if int(r["winner"]) >= 0:
+			agg["wins"][int(r["winner"])] += 1
+		else:
+			agg["draws"] += 1
+		if bool(r["ko"]):
+			agg["kos"] += 1
+		agg["time"] = float(agg["time"]) + float(r["time"])
+		for i in 2:
+			agg["dmg"][i] += float(r["dmg"][i])
+			agg["hits"][i] += int(r["hits"][i])
+			agg["juices"][i] += int(r["juices"][i])
+			agg["taunts"][i] += int(r["taunts"][i])
+			agg["throws"][i] += int(r["throws"][i])
+			agg["knockdowns"][i] += int(r["knockdowns"][i])
+			agg["dodges"][i] += int(r["dodges"][i])
+			for s in r["abilities"][i]:
+				agg["abilities"][i][s] = int(agg["abilities"][i].get(s, 0)) + int(r["abilities"][i][s])
+			if not agg.has("by_slot"):
+				agg["by_slot"] = [{}, {}]
+			for s2 in r["by_slot"][i]:
+				var cur: Array = agg["by_slot"][i].get(s2, [0, 0.0])
+				agg["by_slot"][i][s2] = [int(cur[0]) + int(r["by_slot"][i][s2][0]), float(cur[1]) + float(r["by_slot"][i][s2][1])]
+	var line := "BALANCE %s (%s, %d bouts): wins %d-%d draws %d KOs %d avg %.1fs | dmg/bout %.1f vs %.1f | dmg/hit %.2f vs %.2f | hits/bout %.1f vs %.1f | abil %s vs %s | juice %d vs %d | taunts %d vs %d | throws %d vs %d | kd scored %d vs %d | dodges %d vs %d" % [
+		agg["pair"], difficulty, n, agg["wins"][0], agg["wins"][1], agg["draws"], agg["kos"], float(agg["time"]) / n,
+		float(agg["dmg"][0]) / n, float(agg["dmg"][1]) / n,
+		float(agg["dmg"][0]) / maxf(1.0, float(agg["hits"][0])), float(agg["dmg"][1]) / maxf(1.0, float(agg["hits"][1])),
+		float(agg["hits"][0]) / n, float(agg["hits"][1]) / n, str(agg["abilities"][0]), str(agg["abilities"][1]),
+		agg["juices"][0], agg["juices"][1], agg["taunts"][0], agg["taunts"][1], agg["throws"][0], agg["throws"][1],
+		agg["knockdowns"][0], agg["knockdowns"][1], agg["dodges"][0], agg["dodges"][1]]
+	print(line)
+	for i in 2:
+		var parts := PackedStringArray()
+		var bs: Dictionary = agg.get("by_slot", [{}, {}])[i]
+		for s in bs:
+			parts.append("%s %d/%.0f" % [s, int(bs[s][0]), float(bs[s][1])])
+		print("  %s hits/damage by slot: %s" % [c0 if i == 0 else c1, ", ".join(parts)])
+	agg["line"] = line
+	return agg
+
+
 ## Lab entry: `--kit-lab slot[@gap],...` prints describe() lines for the given creature.
 func lab(att_id: String) -> void:
 	var args := OS.get_cmdline_user_args()
