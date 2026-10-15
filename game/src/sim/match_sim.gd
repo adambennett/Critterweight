@@ -207,6 +207,12 @@ func unregister_hittable(id: String) -> void:
 
 
 func emit_event(ev: Dictionary) -> void:
+	if str(ev.get("type", "")) == "hit":
+		var ti := int(ev.get("target", -1))
+		var ai := int(ev.get("fighter", -1))
+		if ti >= 0 and ti < fighters.size() and ai >= 0 and ai != ti:
+			fighters[ti].last_attacker_index = ai
+			fighters[ti].last_attacked_at = time
 	event_seq += 1
 	ev["seq"] = event_seq
 	ev["tick"] = tick_count
@@ -309,6 +315,9 @@ func _environment_checks() -> void:
 
 
 func _last_attacker(f: Fighter) -> Fighter:
+	var li := f.last_attacker_index
+	if li >= 0 and li < fighters.size() and li != f.index and not fighters[li].despawned:
+		return fighters[li]
 	for k in range(events.size() - 1, -1, -1):
 		var ev: Dictionary = events[k]
 		if ev["type"] == "hit" and int(ev.get("target", -1)) == f.index and int(ev.get("fighter", -1)) >= 0:
@@ -361,7 +370,7 @@ func reset_round() -> void:
 			continue
 		var sp := arena.spawn_point(i, alive.size())
 		f.respawn(sp[0], sp[1])
-		f.lives = int(rules.get("lives", 1))
+		f.lives = mode.initial_lives() if mode else int(rules.get("lives", 1))
 		f.invuln_until = -1.0
 	if mode:
 		mode.on_round_reset()

@@ -13,8 +13,8 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 |---|---|---|---|
 | DEL-01 | Packaged self-contained Windows x64 game launches with a fresh profile, no dev tools or login | — | |
 | DEL-02 | Source, assets (+ editable sources), build tools, tests, docs in repo | ~ | repo layout; AGENTS.md |
-| DEL-03 | Linux x86_64 game export + practical Steam Deck path (controller-first, 1280x800 preset, packaging notes); device/runtime checks may be X | — | |
-| DEL-04 | Separate headless dedicated server: Windows package; Linux server build | — | |
+| DEL-03 | Linux x86_64 game export + practical Steam Deck path (controller-first, 1280x800 preset, packaging notes); device/runtime checks may be X | ~ | Linux x86_64 game export built; tools/verify/portability_check.py: ELF64 x86-64, embedded data, glibc <= 2.28 libs only, case-exact res:// paths, no Windows-only code, tar.gz exec bits; runtime on Linux/Deck = X (no local Linux userland) |
+| DEL-04 | Separate headless dedicated server: Windows package; Linux server build | ~ | Windows/Linux dedicated-server exports build (package.ps1); server features pending networking merge |
 | DEL-05 | Reproducible build/package scripts | ~ | tools/build/package.ps1 (+make_tar.py): import, check, tests, 4 exports, manifest with sha256, archives |
 | DEL-06 | Top-level README (launch/build/test), final verification report with artifact paths/versions/results | — | |
 | DEL-07 | Git connected to github.com/adambennett/PokeMMA, reviewed incremental commits & pushes, no force push; push limits reported | ~ | local commits; remote reachable (empty private repo) |
@@ -27,7 +27,7 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 |---|---|---|---|
 | PERF-01 | Stable 60 fps combat at 1080p on the documented PC baseline (measured here: i7-7700K + RTX 4070 Ti SUPER); frame-time distribution recorded for busy scenes | — | |
 | PERF-02 | Deck-class preset for 1280x800 @ 60 fps; layout/readability checked at 1280x800; real Deck test = X | — | |
-| PERF-03 | Loading time and memory use measured | — | |
+| PERF-03 | Loading time and memory use measured | ~ | --boot-report: 7.7 s to title in the editor binary on a loaded machine; bench reports match load (~0.25 s) and memory; packaged quiet-machine numbers pending |
 | PERF-04 | Server simulation cost measured (8-fighter busy scene, playlist soak) | — | |
 | PERF-05 | Quality presets scale expensive effects while keeping combat readable; benchmarks run at stated settings | — | |
 
@@ -43,8 +43,8 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | CMB-07 | No unavoidable infinites or permanent stun locks (combo scaling, stun budget burst, wake-up invulnerability, OTG cap) — tested | ~ | Tuning keys combo_*/stun_budget |
 | CMB-08 | Readable windups, impact feedback, recovery cues, predictable control | — | |
 | CMB-09 | Different body shapes without unreadable reach advantages/broken collisions (reach cap 1.6 m, tests) | — | |
-| CMB-10 | Cosmetic physics separate from authority | ~ | CreatureView.detach_piece (debris layer) |
-| CMB-11 | Repeatable combat scenarios + debug visualizations | ~ | --probe scenarios; debug draw pending |
+| CMB-10 | Cosmetic physics separate from authority | I | Cosmetic layer is view-only: CreatureView bruises/flash/detached gore piece on the debris layer, Vfx, KO stars; sim never reads them |
+| CMB-11 | Repeatable combat scenarios + debug visualizations | I T | Probes (--probe stand|walk|jab|string|heavy|guard|grab|ability|spar), tutorial/kit scenario tests, CombatDebugDraw overlay (F3/--debug-draw: hit capsules, weapon phases, reach circle, targets, hit labels) |
 | CMB-12 | Controller-first: an Xbox-style pad operates every workflow; mouse+keyboard fully supported | I T | Controls + UiNav (stick nav, focus guard, hot-plug); UI tests drive every flow with injected pad/key/mouse events (test/ui) |
 
 ## Roster, elements & content targets [7]
@@ -131,7 +131,7 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | ART-03 | glTF import path validated; PBR, soft shadows, SSAO, HDR tonemapping; scalable quality | I | glTF pipeline (forge -> .glb -> Godot import; runtime GLTFDocument for mods), PBR hints, AgX, SSAO, soft shadows, quality presets |
 | ART-04 | Readable locomotion, attacks, abilities, hit reactions, blocking, knockdowns/recovery, win/loss per anatomy | — | |
 | ART-05 | Effects communicate range/timing/contact/elements/outcomes; legible busy scenes | ~ | Vfx |
-| ART-06 | Localized injury feedback + modest cosmetic gore (default on) with reduced/off and non-gory equivalents | ~ | creature.gdshader bruises; detach_piece |
+| ART-06 | Localized injury feedback + modest cosmetic gore (default on) with reduced/off and non-gory equivalents | I | Bruises + flash (creature.gdshader), detachable gore piece on KO (Full), Reduced = no piece, Off = no bruises; non-gory KO stars at every level (access.gore) |
 | ART-07 | Original satire, memorable announcer, fictional PED theme, coherent tone | ~ | GAME_PITCH.md |
 | ART-08 | Editable source assets and reproducible import/export steps | I | Editable sources: tools/forge defs, tools/audio scores, assets/ui/source; rebuild commands in docs/ART_PIPELINE.md, docs/AUDIO.md |
 | AUD-01 | Menu/combat music, impact/ability/creature sounds, UI feedback, ambience, mixing | I T | Synthesized score (8 tracks), 312 SFX ids, voices, announcer (tools/audio, docs/AUDIO.md); audio bridge attached per match; tests test/audio |
@@ -183,11 +183,11 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 ## Verification gates [17, 19]
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
-| VER-01 | Unit/property tests: damage, effects, resources, modifiers, rewards, progression, unlocks, seeds, rule validation, playlists, serialization/migrations, AI contracts | — | |
+| VER-01 | Unit/property tests: damage, effects, resources, modifiers, rewards, progression, unlocks, seeds, rule validation, playlists, serialization/migrations, AI contracts | ~ | Unit tests: persistence/migrations, schema, elements, combat rules (infinites, ranges, determinism), modes, mods, rules validation/presets, tutorial, spectator, audio, UI; campaign/net/lab pending merges |
 | VER-02 | Integration: campaign transitions, victory/defeat, co-op decisions/recovery, save/resume, mod loading, authored arenas, policy training/loading, hosted/dedicated networking | — | |
 | VER-03 | Runtime (packaged Windows): fresh profile, tutorial, every mode, full runs both variants, both co-op formats, controller/menu navigation, sound/graphics, settings, error flows | — | |
 | VER-04 | Multiplayer: independent clients + headless server, latency/jitter/loss, disconnect/rejoin, incompatible content, playlist transitions, authoritative outcomes (loopback labeled) | — | |
 | VER-05 | Stability/performance: repeated matches, extended spectator/playlist, Lab resource limits, server soak, busy scenes, loading, memory trends, frame times | — | |
-| VER-06 | Asset/content: missing refs, imports, rigs/materials, schemas, safe spawns/bounds, reachable rewards/routes, licenses/credits | — | |
+| VER-06 | Asset/content: missing refs, imports, rigs/materials, schemas, safe spawns/bounds, reachable rewards/routes, licenses/credits | ~ | test_content_audit (content errors, assets, weapons/chains/windows, safe spawns, presets/tutorial/achievements, example mods); portability_check.py; audio bank validation |
 | VER-07 | Independent review of significant changes; final integrated audit against the whole brief | — | |
 | PRC-01 | Records maintained (this ledger, DESIGN, DECISIONS, PROGRESS, VERIFICATION, AGENTS.md) | ~ | |

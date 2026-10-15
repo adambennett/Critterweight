@@ -128,10 +128,14 @@ func _default_music() -> String:
 
 
 func _exit_tree() -> void:
-	Engine.time_scale = 1.0          # spectator speed control never leaks out of the match
 	if hud and Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.disconnect(hud.subtitle)
-	Audio.end_match()
+	# A rematch starts the new scene before this one is freed: only tear down shared state
+	# (audio bridge, playback speed) when no newer match has taken over.
+	var newer := App.current_scene != null and is_instance_valid(App.current_scene) and App.current_scene != self and App.current_scene is MatchScene
+	if not newer:
+		Engine.time_scale = 1.0          # spectator/accessibility speed never leaks out of the match
+		Audio.end_match()
 
 
 func _make_view(i: int) -> void:
@@ -320,7 +324,8 @@ func _on_event(ev: Dictionary) -> void:
 		"round_intro":
 			hud.callout("ROUND %d" % int(ev["round"]), 1.8)
 			for v2 in views:
-				v2.clear_bruises()
+				if v2 != null:
+					(v2 as CreatureView).clear_bruises()
 		"round_start":
 			hud.callout("FIGHT!", 1.0, Color(1.0, 0.85, 0.3))
 		"round_end":
@@ -329,6 +334,7 @@ func _on_event(ev: Dictionary) -> void:
 		"timeout":
 			hud.callout("TIME!", 1.2)
 		"match_end":
+			Engine.time_scale = 1.0
 			var w2 := int(ev["winner"])
 			hud.callout("DRAW!" if w2 < 0 else "%s WINS!" % _team_label(w2), 3.0, Color(1.0, 0.85, 0.3))
 		"round_reset":

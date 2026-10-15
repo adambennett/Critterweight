@@ -82,6 +82,7 @@ static var values := {
 	"soft_lock_range": 7.0,
 	"soft_lock_arc_deg": 110.0,
 	"attack_snap_deg": 70.0,
+	"strike_height_follow": 1.0,     # 0..1: how much strikes re-aim to the target's size (CMB-09)
 	"target_sticky": 1.0,
 	# debug toggles for rig tuning
 	"dbg_ff": 1.0,
