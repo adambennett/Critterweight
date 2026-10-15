@@ -377,7 +377,7 @@
  ],
  "audio": {},
  "ai": {"personality": "trapper", "aggression": -0.12, "block": 0.08, "dodge": 0.04, "ability": 0.3, "grab": -0.04,
-  "reach": 1.4, "range": [2.8, 5.5], "range_needs_tools": true, "charge_heavy": 0.5, "avoid_zones": true,
+  "attack_range": 1.4, "range": [2.8, 5.5], "range_needs_tools": true, "charge_heavy": 0.5, "avoid_zones": true,
   "abilities": {"ability1": {"min": 2.5, "max": 9.0, "chance": 0.63},
                 "ability2": {"max": 2.6, "chance": 1.0, "when": [{"self_poise_below": 0.4}], "stick": "away"}}},
  "art": {

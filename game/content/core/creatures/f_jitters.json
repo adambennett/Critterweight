@@ -201,7 +201,7 @@
   ],
   "audio": {},
   "ai": {"personality": "pest", "aggression": 0.08, "dodge": 0.08, "ability": 0.2,
-         "reach": 0.85, "range": [0.7, 1.4], "charge_heavy": 0.5, "avoid_zones": true,
+         "attack_range": 0.85, "range": [0.7, 1.4], "charge_heavy": 0.5, "avoid_zones": true,
          "abilities": {"ability1": {"min": 2.2, "max": 7.0, "chance": 1.4},
                        "ability2": {"min": 1.8, "max": 4.2, "chance": 1.0}},
          "heavy_vs_windup": 0.55, "heavy_reach": 2.4,

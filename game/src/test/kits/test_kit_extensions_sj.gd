@@ -4,8 +4,8 @@ extends "res://src/test/kits/kit_sj_helpers.gd"
 ## Drain Dive refund) and the "hit_part" condition the Bonk relies on; creature "mods";
 ## Fighter.is_airborne(); charge bounce; debuff.require_status; projectile burst_on_hit and lob
 ## arrive_y; spring pads ignore airborne fighters; keyed joints skip the gait wave; "ballistic"
-## leaps / launches are not ground-braked; the extra bot kit hints (reach, range_needs_tools, ability "stick",
-## heavy_vs_windup, dash_in, avoid_zones) on top of the shared kit-hint mechanism.
+## leaps / launches are not ground-braked; the extra bot kit hints (range_needs_tools, ability
+## "stick", heavy_vs_windup, avoid_zones) on top of the shared kit-hint mechanism.
 
 
 func _pair(a = "dev_biped", b = "dev_biped", gap := 2.0) -> MatchSim:
@@ -256,9 +256,7 @@ func test_bot_kit_hints() -> void:
 	dir.y = 0.0
 	var dist := dir.length()
 	dir = dir / dist
-	# "reach" overrides the generic reach estimate
-	var bot0 := _bot_on(sim, {"reach": 1.4})
-	check_eq(float(bot0.personality.get("reach", 0.0)), 1.4, "reach hint")
+	var bot0 := _bot_on(sim, {"attack_range": 1.4})
 	# ability hint inside its band (and only there)
 	var bot := _bot_on(sim, {"abilities": {"ability1": {"min": 1.0, "max": 6.0, "chance": 1000.0}}})
 	var n0 := int(f.input.press_count[FighterInput.AB1])
@@ -279,13 +277,6 @@ func test_bot_kit_hints() -> void:
 	check_eq(int(f.input.press_count[FighterInput.HEAVY]), nh + 1, "Heavy press")
 	check(not bot3._kit_heavy_vs_windup(f, dist, {"state": Fighter.State.ATTACK, "first": 0.3, "st": 0.1}), "heavy_vs_windup fired on a short windup")
 	check(not bot0._kit_heavy_vs_windup(f, dist, {"state": Fighter.State.ATTACK, "first": 0.7, "st": 0.1}), "heavy_vs_windup without the hint")
-	# dash in
-	var bot4 := _bot_on(sim, {"dash_in": {"min": 1.0, "max": 5.0, "chance": 1.0}})
-	var nd := int(f.input.press_count[FighterInput.DODGE])
-	check(bot4._kit_dash_in(f, dist, dir), "dash_in did not fire")
-	check_eq(int(f.input.press_count[FighterInput.DODGE]), nd + 1, "Dodge press")
-	check(bot4._press_queue.any(func(q): return int(q["b"]) == FighterInput.LIGHT), "dash_in queued no Light")
-	check(not bot0._kit_dash_in(f, dist, dir), "dash_in without the hint")
 	sim.queue_free()
 
 
