@@ -14,7 +14,14 @@ held-out episodes), but strength grows with training time. Short runs learn habi
 
 ## 1. Workflow in the game
 
-Open the **AI Lab** screen (main menu → AI Lab; App screen `lab`). Everything works with a
+Open the **AI Lab** screen (main menu → AI Lab; App screen `lab`). Three sample policies ship
+with the game (`content/core/policies/`):
+
+- *Drill Hitter (ES)*
+- *Regular Clone (BC)*
+- *Regular Clone + ES (Aggressive)*
+
+Their training runs are in `docs/evidence/lab/`. Everything works with a
 controller (D-pad/stick, A/B, **LB/RB** switch tabs) and with mouse/keyboard (**Q/E** or
 **PageUp/PageDown** switch tabs; the footer prompts are clickable). The screen uses the shared
 UiTheme text styles, so the text-size and UI-scale settings apply to it.
@@ -277,6 +284,18 @@ fighters ≤ 0.25 ms (1.5 % of a 60 fps frame), decisions staggered at 15 Hz. Th
 compiled into 4×4 `Projection` blocks (one native mat×vec = 16 multiply-adds per interpreted
 step, zero input blocks skipped). Tested by `test_policy_inference.gd`.
 
+Measured on 2026-10-15. The PC was shared with other build and test jobs, so these numbers are
+pessimistic.
+
+| What | Result |
+|---|---|
+| Inference, 8 fighters, 32×32 network | 138.5 µs per tick (136.5 µs per decision: 80.8 encode + 42.9 forward) |
+| Inference, 8 fighters, 64×64 network | 168.6 µs per tick |
+| Throughput, 1 worker process × 2 worlds | 16.3 simulated seconds per wall second, 5,520 ten-second episodes per hour |
+| Throughput, 3 worker processes | 30–33× real time: 18,340 six-second drill episodes or ~6,500 twenty-second matches per hour |
+| Behaviour cloning | about 7 s per epoch over 20k recorded decisions (64×64 network) |
+| Lab screen polling while a run trains | 1.8 ms every 0.5 s; game frame-time median unchanged at 16.7 ms (60 fps) |
+
 ## 10. Reproducible small examples
 
 ```powershell
@@ -302,10 +321,17 @@ seed reproduces the same run (fixed-step worker processes).
 | test_lab_bc.gd | dataset shards round trip + damaged shard handling, BC overfits a tiny dataset, BC generalises on held-out episodes and beats the majority baseline |
 | test_lab_recording.gd | a normal MatchScene match with the recording switch on, driven by simulated device input, writes human-labelled light/guard/move samples; with the switch off nothing changes |
 | test_policy_inference.gd | 8 policy fighters in a live match stay within the inference budget |
-| test_lab_worker.gd | the real worker process: pause/resume/cancel, kill + resume from the newest checkpoint with an unbroken curve, ES improves on the drill on held-out test seeds |
+| test_lab_worker.gd | the real worker process: pause/resume/cancel, kill + resume from the newest checkpoint with an unbroken curve, ES improves on the drill on held-out test seeds with no helper share dropped, the helper heartbeat rule, a silent worker whose process still runs is neither "interrupted" nor resumable twice |
+| test_policy_samples.gd | the shipped sample policies validate, are listed and usable by their fighter, and the drill sample lands hits on fresh standing-dummy episodes where an untrained network does not |
 
-`lab_ui_capture.gd` (windowed, not part of `--test`) drives the Lab screen, starts a real run,
-measures UI frame times while it trains and exercises pause/resume/cancel through the UI.
+Windowed tools (not part of `--test`):
+
+- `lab_ui_capture.gd` drives the Lab screen. It measures frame times without and with a
+  training run started from the Train tab, and exercises pause/resume/cancel through the
+  screen's buttons. `--static` captures every tab; `--runs` captures the Runs tab of every run
+  folder.
+- `lab_match_capture.gd` spectates and fights a policy through the Policies tab.
+- `lab_evidence_summary.gd` collects run folders into `summary.json`.
 
 ## 12. Limitations and known gaps
 
@@ -315,8 +341,12 @@ measures UI frame times while it trains and exercises pause/resume/cancel throug
 - obs_v1 describes fighters, walls, projectiles and zones — not bonus-mode objectives (balls,
   spotlights, waves). Policies play standard fights; in objective modes they fight but ignore
   the objective (an obs_v2 with mode features would be needed).
-- Training speed is bound by the physics simulation (~14 simulated seconds per wall second per
-  worker process). Hours of training are needed for strong play against the harder bot tiers.
+- Training speed is bound by the physics simulation (~14–16 simulated seconds per wall second
+  per worker process; ~30× real time with 3 processes on a 4-core PC). Hours of training are
+  needed for strong play against the harder bot tiers.
+- A low-priority worker yields to everything else. On a PC whose cores are all busy it can wait
+  minutes for CPU. The Runs tab then says so; the run is not shown as interrupted and cannot be
+  started twice, and it continues when CPU frees up.
 - ES with small populations learns coarse behaviours; fine timing (parries) is rare without
   long runs or a technician-style reward. BC copies its teacher's mistakes and cannot exceed it.
 - Bit-exact reproducibility holds for a fresh fixed-step worker process (same build, machine,

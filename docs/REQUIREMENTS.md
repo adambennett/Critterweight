@@ -112,16 +112,16 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | AI-02 | AI-vs-AI spectating with camera/HUD controls | I T | SpectatorDirector auto-director, viewer focus lock, free camera, hide HUD, 0.25x-2x speed; tests core/test_spectator; --spectate |
 | AI-03 | Bookie's Table autobattler: player picks fighter/route/upgrades/build, AI fights, shared campaign systems | — | |
 | AI-04 | Unattended mode with auto decisions, pause, speed/camera, take-over; extended unattended run tested | — | |
-| LAB-01 | Actual local learning (parameters change from experience) | — | |
-| LAB-02 | ≥2 distinct training approaches (evolution strategies RL + behaviour cloning) documented | — | |
-| LAB-03 | Lab UI: fighter, approach, objectives/styles, opponents/scenarios, seed, resource/time limits | — | |
-| LAB-04 | Real combat rules, headless accelerated simulation, same observation/action contract in training and matches | ~ | headless multi-world probe (D-002) |
-| LAB-05 | CPU defaults, modest workloads, optional GPU documented, no paid services | — | |
-| LAB-06 | Progress/episodes/time/resources/metrics; pause/resume, checkpoints, cancel, failure recovery; game stays responsive | — | |
-| LAB-07 | Save/version/name/export/import/load policies; compatibility validation; never executes code | — | |
-| LAB-08 | Evaluation vs fixed baselines and held-out seeds, separate from training; honest reports | — | |
-| LAB-09 | Saved bots can be fought/spectated; hosts can use compatible policies; inference budget measured | — | |
-| LAB-10 | Docs, reproducible small examples, sample policies; controlled learnable task with recorded improvement | — | |
+| LAB-01 | Actual local learning (parameters change from experience) | I T W | ES and behaviour cloning train MLP weights in worker processes (src/lab/lab_es.gd, lab_bc.gd); test_lab_worker (ES beats its start on held-out drill seeds), test_lab_bc; docs/evidence/lab: 3 ES seeds +28..+48 test reward, BC validation loss 4.7 → 1.5 / 0.33. W: editor binary, not a packaged build |
+| LAB-02 | ≥2 distinct training approaches (evolution strategies RL + behaviour cloning) documented | I T | evolution strategies (reward), behaviour cloning (imitation), BC → ES; docs/AI_LAB.md §2; test_policy_mlp, test_lab_bc, test_lab_worker |
+| LAB-03 | Lab UI: fighter, approach, objectives/styles, opponents/scenarios, seed, resource/time limits | I W | src/lab/ui/lab_screen.gd (Train/Runs/Policies/Recording tabs, controller + mouse/keyboard, per-term reward weights, seed, limits); captures docs/evidence/lab/ui via lab_ui_capture.gd (editor binary) |
+| LAB-04 | Real combat rules, headless accelerated simulation, same observation/action contract in training and matches | I T W | LabEpisode = MatchSim + standard MatchMode in its own World3D; workers --headless --fixed-fps 120 (~16x real time per process); one PolicyInputSource/obs_v1/act_v1 for training, recording and MatchScene; test_policy_contract, test_lab_recording |
+| LAB-05 | CPU defaults, modest workloads, optional GPU documented, no paid services | I | CPU only, pure GDScript; defaults 1 worker (UI suggests min(3, cores/2-1)), low priority, 20-minute limit; GPU not used and why, no paid services/accounts/Python: docs/AI_LAB.md §8 |
+| LAB-06 | Progress/episodes/time/resources/metrics; pause/resume, checkpoints, cancel, failure recovery; game stays responsive | I T W | progress/metrics/checkpoint/control files; test_lab_worker (pause/resume/cancel, kill + resume from checkpoint, helper heartbeat, starved-but-alive worker); UI pause/resume/cancel and frame times (median 16.7 ms while a worker trains): docs/evidence/lab/ui/ui_report.json |
+| LAB-07 | Save/version/name/export/import/load policies; compatibility validation; never executes code | I T | PolicyData/PolicyIO/PolicyLibrary (versioned JSON, checksum, atomic writes, .bak recovery, JSON + base64 only); test_policy_io (damaged, tampered, oversized, newer, incompatible files; import id collision) |
+| LAB-08 | Evaluation vs fixed baselines and held-out seeds, separate from training; honest reports | I T W | LabEval + eval jobs; disjoint train/val/test seed streams; every episode reported with n, mean, 95% CI and Wilson win intervals, scripted reference on the same episodes; docs/evidence/lab/runs/*/report.json (a non-significant BC → ES gain is reported as such) |
+| LAB-09 | Saved bots can be fought/spectated; hosts can use compatible policies; inference budget measured | I T W | MatchScene fighter kind "policy" (PolicyInputSource.for_match, scripted fallback); Lab Fight/Spectate this bot (docs/evidence/lab/match); lookup API PolicyLibrary.get_policy for hosts/servers; inference 138.5 us per tick for 8 fighters (budget 250): test_policy_inference, docs/evidence/lab/bench |
+| LAB-10 | Docs, reproducible small examples, sample policies; controlled learnable task with recorded improvement | I T W | docs/AI_LAB.md; docs/evidence/lab (jobs, runs, curves, README); 3 sample policies in content/core/policies (test_policy_samples); drill task improvement on 3 seeds |
 
 ## Art, animation, graphics, audio, tone [12]
 | ID | Requirement / acceptance | State | Evidence |
