@@ -25,6 +25,24 @@ extends Node
 ##                         resume a suspended co-op party run through the lobby (NetPartyRuns):
 ##                         a host offers it from its party save, a member claims its seat by run
 ##                         id; both vote the first route and stop once the run moved on
+##   --party-ui            play an online party run through the REAL UI: the lobby screen, OnlineFlow,
+##                         CoopFlow and the campaign screens, with PartyPilot pressing their buttons
+##                         (fights: the scripted inputs above). Host: --party-new <variant>:<format>
+##                         [--party-seed n --party-difficulty d --host-start-after-players n] deals a
+##                         run, or --party-offer <run id> offers a saved one; it starts once every seat
+##                         is taken. Member: takes its seat from the lobby. Per-player choices:
+##                         --party-route s1,s2,.. (per stop: a node type wanted or an exact node id,
+##                         in map order), --party-pick first|last|skip, --party-shop buy|leave,
+##                         --party-event first|last [--party-event-wait s].
+##                         Scripted moments (fight n = the n-th fight this process plays in):
+##                         --party-forfeit-fight n (host forfeits fight n),
+##                         --party-drop-in-fight n (member drops mid-fight n), --party-ref-timeout-fight
+##                         n (calls a ref timeout from the pause menu in fight n, ends it 3 s later),
+##                         --party-suspend-after n (host suspends at the map after n fights),
+##                         --party-host-leave-in-fight n (the host leaves the session 8 s into fight n),
+##                         --party-quit-after-fights n, --party-meta id=level,.. (this player's Cannery
+##                         levels), --party-pace s, --party-capture <dir> (windowed: a JPG of every
+##                         screen and fight)
 
 const RESULT_EVERY_MS := 500
 
@@ -58,9 +76,11 @@ var _server: NetServer = null
 var _party = null                   ## NetPartyTransport (--party)
 var _party_sent := false
 var _prun: NetPartyRuns = null      ## --party-run
+var _pilot: PartyPilot = null       ## --party-ui
 var _rng := RandomNumberGenerator.new()
 var _wander := Vector3.ZERO
 var _wander_t := 0.0
+var _bench_t := 0.0
 
 
 func arg(flag: String, fallback := "") -> String:
@@ -94,6 +114,18 @@ func run(a: PackedStringArray) -> void:
 	var mod_dir := arg("--net-test-mod", "")
 	if mod_dir != "":
 		_load_test_mod(mod_dir)
+	if args.has("--party-ui"):
+		# the name the lobby shows and party seats are matched by (NetPartyRuns.seat_for)
+		Settings.set_value("network.player_name", arg("--name", "Tester"))
+		if args.has("--party-meta"):
+			var ups := {}
+			for pair in arg("--party-meta").split(",", false):
+				var kv := pair.split("=")
+				if kv.size() == 2:
+					ups[kv[0]] = int(kv[1])
+			CampaignProgression.ensure_fields(Profiles.current)
+			Profiles.current["camp"]["upgrades"] = ups
+		result["party_ui"] = {}
 	if args.has("--net-host"):
 		_start_host()
 	else:
@@ -158,15 +190,20 @@ func _start_client() -> void:
 	var err := Net.join(host, port, arg("--password", ""), opts)
 	_client = Net.client
 	if _client:
-		_client.present = args.has("--present")
-		_client.install_scene = args.has("--present")
+		_client.present = args.has("--present") or args.has("--party-ui")
+		_client.install_scene = _client.present
 		_client.input_sampler = _sample_input
 		_client.notice_received.connect(func(_t: String) -> void: pass)
 	result["join_error"] = err
+	if args.has("--party-ui"):
+		OnlineFlow.begin()      # what the Online screen does after join()
+		_pilot = PartyPilot.new(self, false)
 
 
 func _on_joined(w: Dictionary) -> void:
 	_start_party()
+	if args.has("--party-ui") and (App.top_screen() == null or App.top_screen().screen_name != "lobby"):
+		App.goto("lobby")
 	result["connected"] = true
 	result["welcome"] = w
 	result["player_id"] = Net.local_peer_id()
@@ -195,7 +232,17 @@ func _on_disconnected(r: Dictionary) -> void:
 	result["disconnect"] = r
 	if int(r.get("code", 0)) in [NetProtocol.R_KICKED, NetProtocol.R_VIOLATION, NetProtocol.R_FLOOD]:
 		result["kicked"] = r
-	_end("disconnected: %s" % NetProtocol.reason_name(int(r.get("code", 0))))
+	var why := "disconnected: %s" % NetProtocol.reason_name(int(r.get("code", 0)))
+	if _pilot != null:
+		# --party-ui: let the UI react first (OnlineFlow's dialog), the pilot records what the player
+		# was told, then ends (unless it is already ending for its own scripted reason). This runs
+		# before OnlineFlow's handler (connected first): the run's last state is recorded here.
+		_pilot._record()
+		if _pilot._end_t < 0.0:
+			_pilot.info["end_reason"] = why
+			_pilot._end_t = 2.0
+		return
+	_end(why)
 
 
 func _on_lobby(l: Dictionary) -> void:
@@ -306,6 +353,23 @@ func _sample_input(fi: FighterInput) -> void:
 			best = i
 	var dt := 1.0 / float(Engine.physics_ticks_per_second)
 	_press_t += dt
+	if int(fl[me]["state"]) == Fighter.State.INACTIVE and script_name == "aggressive":
+		# a tag partner on the bench (co-op campaign): assists, cheers, then tags back in - like a
+		# player, at a moment the teammate in the cage is free to tag out (not mid-attack)
+		_bench_t += dt
+		if fmod(_bench_t, 2.5) < dt:
+			fi.press(FighterInput.AB1)
+		if fmod(_bench_t, 4.0) < dt:
+			fi.press(FighterInput.TAUNT)
+		if _bench_t > 3.0 and fmod(_bench_t, 0.25) < dt:
+			for i in fl.size():
+				if i == me or int(fl[i]["gen"]) == 0 or int(_client.replica.roster.get(i, {}).get("team", i)) != my_team:
+					continue
+				if int(fl[i]["state"]) in [Fighter.State.NEUTRAL, Fighter.State.GUARD]:
+					fi.press(FighterInput.TARGET)
+					break
+		return
+	_bench_t = 0.0
 	match script_name:
 		"aggressive":
 			if best < 0:
@@ -429,6 +493,10 @@ func _start_host() -> void:
 	result["player_id"] = 1
 	if arg("--party-run", "") != "":
 		_party_run_host_open()
+	if args.has("--party-ui"):
+		OnlineFlow.begin()      # what the Online screen does after host()
+		App.goto("lobby")
+		_pilot = PartyPilot.new(self, true)
 	var ov := {}
 	if args.has("--rounds"):
 		ov["rounds"] = int(arg("--rounds"))
@@ -465,6 +533,7 @@ class HostScript:
 	extends InputSource
 	var mode := "aggressive"
 	var _t := 0.0
+	var _bench := 0.0
 
 	func _init(m: String) -> void:
 		mode = m
@@ -478,6 +547,21 @@ class HostScript:
 		f.input.held = 0
 		if mode != "aggressive":
 			return
+		if f.state == Fighter.State.INACTIVE:
+			# a tag partner on the bench (co-op campaign): assists, cheers, then tags back in when
+			# the teammate in the cage is free to tag out (not mid-attack)
+			_bench += dt
+			if fmod(_bench, 2.5) < dt:
+				f.input.press(FighterInput.AB1)
+			if fmod(_bench, 4.0) < dt:
+				f.input.press(FighterInput.TAUNT)
+			if _bench > 3.0 and fmod(_bench, 0.25) < dt:
+				for o: Fighter in (sim as MatchSim).fighters:
+					if o != f and o.team == f.team and not o.is_out() and o.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD]:
+						f.input.press(FighterInput.TARGET)
+						break
+			return
+		_bench = 0.0
 		var best: Fighter = null
 		var bd := INF
 		for o: Fighter in (sim as MatchSim).fighters:
@@ -507,7 +591,7 @@ func _physics_process(_dt: float) -> void:
 		return
 	var t := Time.get_ticks_msec() - started_ms
 	# a host offering a party run never starts versus matches on its own
-	if hosting and _server and _server.phase == NetServer.PHASE_LOBBY and arg("--party-run", "") == "":
+	if hosting and _server and _server.phase == NetServer.PHASE_LOBBY and arg("--party-run", "") == "" and not args.has("--party-ui"):
 		var remote := 0
 		var unready := 0
 		for p in _server.players.values():
@@ -620,6 +704,8 @@ func _process(dt: float) -> void:
 		result["events_total"] = _client.replica.events_received
 	if arg("--party-run", "") != "" and not _ended:
 		_party_run_step(dt)
+	if _pilot != null and not _ended:
+		_pilot.step(dt)
 
 
 # =====================================================================================
@@ -743,3 +829,585 @@ func _write(_force: bool) -> void:
 		g.store_string(text)
 		g.close()
 	DirAccess.remove_absolute(tmp)
+
+
+# =====================================================================================
+# --party-ui: an online party run played through the real lobby and campaign screens
+# =====================================================================================
+
+## Presses the real screens' buttons like a player would (one action every --party-pace s): the
+## lobby's seat / start / offer, the map's route vote, reward picks, events, the shop, rest and the
+## run summary; scripted moments (forfeit, drop, suspend) at given fights. Records what it saw and
+## did into result["party_ui"] for the multi-process tests.
+class PartyPilot:
+	extends RefCounted
+	var tc = null                       ## the NetTestClient node
+	var host := false
+	var pace := 0.6
+	var info := {"screens": [], "decisions": [], "fights": [], "notes": []}
+	var dealt := false
+	var started := false
+	var finished := false
+	var _wait := 1.0
+	var _record_t := 0.0
+	var _bought := {}
+	var _event_seen := {}
+	var _claim_ms := -100000
+	var _ready_ms := -1
+	var _offer_seen_ms := -1
+	var _voted_at := ""
+	var _match_seen := -1
+	var _fight_t := 0.0
+	var _ev_cursor := 0
+	var _camp_events := {}
+	var _start_ms := 0
+	var _dropped := false
+	var _forfeited := false
+	var _suspended := false
+	var _left := false
+	var _timeout_at := -1.0
+	var _timeout_done := false
+	var _end_t := -1.0
+	var _shots := 0
+	var _shot_screen := ""
+
+	func _init(client, is_host: bool) -> void:
+		tc = client
+		host = is_host
+		pace = float(tc.arg("--party-pace", "0.6"))
+		_start_ms = Time.get_ticks_msec()
+		info["role"] = "host" if host else "member"
+		App.screen_changed.connect(_on_screen)
+
+	func _on_screen(screen_name: String) -> void:
+		var arr: Array = info["screens"]
+		if arr.is_empty() or str(arr.back()) != screen_name:
+			arr.append(screen_name)
+		# capturing: let the new screen be photographed before this player acts on it
+		_wait = maxf(_wait, 2.0 if str(tc.arg("--party-capture", "")) != "" else pace)
+		_capture(screen_name, 1.4)
+
+	func _note(text: String) -> void:
+		(info["notes"] as Array).append({"t_ms": Time.get_ticks_msec() - _start_ms, "text": text})
+
+	func _decide(kind: String, detail: String) -> void:
+		var c := _ctrl()
+		(info["decisions"] as Array).append({"kind": kind, "detail": detail, "position": str(c.state.get("position", "")) if c else "",
+			"t_ms": Time.get_ticks_msec() - _start_ms})
+
+	func _ctrl() -> RunController:
+		var pr: NetPartyRuns = OnlineFlow.party
+		return pr.session.ctrl if pr != null and pr.session != null else null
+
+	func step(dt: float) -> void:
+		_record_t -= dt
+		if _record_t <= 0.0:
+			_record_t = 0.5
+			_record()
+		if _end_t >= 0.0:
+			_end_t -= dt
+			if _end_t < 0.0:
+				_record()
+				tc._end(str(info.get("end_reason", "done")))
+			return
+		if host:
+			_host_lobby()
+		else:
+			_member_lobby()
+		_fight_moments(dt)
+		_scripted_ends()
+		_wait -= dt
+		if _wait > 0.0:
+			return
+		_wait = pace
+		var top: Screen = App.top_screen()
+		if top == null:
+			return
+		var modal := _modal(top)
+		if modal != null:
+			var bs: Array = modal.get("_buttons")
+			if not bs.is_empty():
+				_note("modal: pressed %s" % (bs[0] as Button).text)
+				(bs[0] as Button).pressed.emit()
+				_capture(top.screen_name, 1.0)
+			return
+		match top.screen_name:
+			"run_map":
+				_vote(top)
+			"reward":
+				_reward(top)
+			"event":
+				_event(top)
+			"shop":
+				_shop(top)
+			"rest":
+				_rest(top)
+			"run_summary":
+				_summary(top)
+			"dialog":
+				# a message box (e.g. a refused seat): read it, press its first button
+				var bs := _buttons_under(top)
+				if not bs.is_empty():
+					_note("dialog: %s - %s" % [str(top.params.get("title", "")), str(top.params.get("body", "")).left(160)])
+					info["dialog"] = {"title": str(top.params.get("title", "")), "body": str(top.params.get("body", ""))}
+					(bs[0] as Button).pressed.emit()
+
+	func _buttons_under(n: Node) -> Array:
+		var out: Array = []
+		var stack: Array = [n]
+		while not stack.is_empty():
+			var c: Node = stack.pop_front()
+			if c is Button and not (c as Button).disabled:
+				out.append(c)
+			stack.append_array(c.get_children())
+		return out
+
+	func _modal(top: Node) -> Node:
+		for c in top.get_children():
+			if c is CampaignUI.Modal and not (c as CampaignUI.Modal).closing:
+				return c
+		return null
+
+	# --- lobby ---------------------------------------------------------------------------
+
+	func _host_lobby() -> void:
+		if dealt:
+			var pr: NetPartyRuns = OnlineFlow.party
+			if not started and pr != null and pr.role == "host":
+				var waited := (Time.get_ticks_msec() - _start_ms) / 1000.0
+				if pr.missing_seats().is_empty() or waited > float(tc.arg("--party-wait", "150")):
+					info["started_with_missing"] = pr.missing_seats()
+					var top: Screen = App.top_screen()
+					if top != null and top.screen_name == "lobby":
+						top.call("_start_match")       # the lobby's Start (Y / R) starts the party run
+					else:
+						pr.start_host()
+					started = pr.is_live()
+					info["start_ms"] = Time.get_ticks_msec() - _start_ms
+			return
+		var top2: Screen = App.top_screen()
+		if top2 == null or top2.screen_name != "lobby":
+			return
+		var offer := str(tc.arg("--party-offer", ""))
+		if offer != "":
+			top2.call("_offer_saved", offer)          # the lobby's "Offer this run"
+			dealt = OnlineFlow.party != null
+			info["offer_error"] = "" if dealt else "the lobby could not offer the run"
+			if dealt:
+				info["run_id"] = OnlineFlow.party.run_id
+			return
+		var need := int(tc.arg("--host-start-after-players", "2"))
+		var here := 0
+		for p in Net.lobby().get("players", []):
+			if bool((p as Dictionary).get("connected", false)) and not bool((p as Dictionary).get("spectator", false)):
+				here += 1
+		if here < need:
+			_ready_ms = -1
+			return
+		# like a host who looks at the lobby first: the players' Cannery levels arrive with their join
+		if _ready_ms < 0:
+			_ready_ms = Time.get_ticks_msec()
+		if Time.get_ticks_msec() - _ready_ms < 3000:
+			return
+		var spec := str(tc.arg("--party-new", "off_the_street:simultaneous")).split(":")
+		var cat := CampaignFlow.make_catalog(false)
+		var cfg := LobbyScreen.party_config(cat, spec[0], spec[1] if spec.size() > 1 else "simultaneous", str(tc.arg("--party-difficulty", "sparring")))
+		cfg["seed"] = int(tc.arg("--party-seed", "1"))
+		cfg["seeded"] = true
+		var pr2 := NetPartyRuns.new(cat, RunStore.new(), Profiles.current)
+		var err := pr2.start_new_as_host(cfg)
+		info["deal_error"] = err
+		if err == "":
+			OnlineFlow.set_party(pr2)
+			dealt = true
+			info["dealt_players"] = cfg["players"]
+			info["run_id"] = pr2.run_id
+			top2.call("_refresh", true)
+
+	func _member_lobby() -> void:
+		if OnlineFlow.party != null or finished:
+			return
+		var top: Screen = App.top_screen()
+		if top == null or top.screen_name != "lobby" or Net.party().is_empty():
+			return
+		if Time.get_ticks_msec() - _claim_ms < 3000:
+			return
+		if _offer_seen_ms < 0:
+			# the offer just appeared: (captures) show it with its seats for a moment first
+			_offer_seen_ms = Time.get_ticks_msec()
+			top.call("_refresh", true)
+			_capture("lobby_offer", 1.2)
+		if str(tc.arg("--party-capture", "")) != "" and Time.get_ticks_msec() - _offer_seen_ms < 2500:
+			return
+		_claim_ms = Time.get_ticks_msec()
+		top.call("_claim_seat")                 # the lobby's "Take my seat" / "Rejoin this run"
+		if OnlineFlow.party != null:
+			info["claimed"] = OnlineFlow.party.seat
+			_note("claimed seat %s" % OnlineFlow.party.seat)
+
+	# --- campaign screens --------------------------------------------------------------------
+
+	func _route_want(c: RunController) -> String:
+		var route := str(tc.arg("--party-route", "fight")).split(",", false)
+		var k := (c.state.get("path", []) as Array).size()
+		return str(route[k]) if k < route.size() else "fight"
+
+	func _vote(top: Screen) -> void:
+		var flow: CampaignFlow = top.get("flow")
+		var c := flow.ctrl
+		if c.phase() != "map":
+			return
+		var vv := flow.vote_view()
+		if vv.is_empty():
+			return
+		var key := "%d/%s" % [int(c.state.get("act", 1)), str(c.state.get("position", ""))]
+		if _voted_at == key:
+			return
+		var want := _route_want(c)
+		var opts: Array = vv.get("options", [])
+		var pick := want if opts.has(want) else ""     # an exact stop (a1r2l1) or a node type
+		for o in opts:
+			if pick == "" and c.visible_type(str(o)) == want:
+				pick = str(o)
+				break
+		if pick == "":
+			for o2 in opts:
+				if c.visible_type(str(o2)) == "fight":
+					pick = str(o2)
+					break
+		if pick == "" and not opts.is_empty():
+			pick = str(opts[0])
+		var btn = (top.get("_node_buttons") as Dictionary).get(pick)
+		if btn is Button and not (btn as Button).disabled:
+			(btn as Button).pressed.emit()
+			_voted_at = key
+			_decide("vote", "%s:%s" % [pick, c.visible_type(pick)])
+
+	func _first_enabled(arr: Array, last := false) -> Button:
+		var list := arr.duplicate()
+		if last:
+			list.reverse()
+		for b in list:
+			if b is Button and is_instance_valid(b) and not (b as Button).disabled:
+				return b
+		return null
+
+	func _reward(top: Screen) -> void:
+		var mode := str(tc.arg("--party-pick", "first"))
+		var b: Button = null
+		if mode == "skip":
+			for a in top.get("_actions"):
+				if a is Button and (a as Button).text == "SKIP" and not (a as Button).disabled:
+					b = a
+		else:
+			b = _first_enabled(top.get("_cards"), mode == "last")
+		if b == null:
+			b = _first_enabled(top.get("_actions"), true)
+		if b != null:
+			var entry: Dictionary = top.get("_entry")
+			_decide("pick", "%s:%s" % [str(entry.get("rid", "")), b.tooltip_text if b.tooltip_text != "" else b.text])
+			b.pressed.emit()
+
+	func _event(top: Screen) -> void:
+		var bs: Array = top.get("_buttons")
+		if bool(top.get("_showing")):
+			var cont := _first_enabled(bs)
+			if cont != null:
+				_decide("event_continue", cont.text)
+				cont.pressed.emit()
+			return
+		# --party-event-wait: let the other player answer a personal event first
+		var c := _ctrl()
+		var key := str(c.state.get("position", "")) if c else ""
+		if not _event_seen.has(key):
+			_event_seen[key] = Time.get_ticks_msec()
+		if Time.get_ticks_msec() - int(_event_seen[key]) < int(float(tc.arg("--party-event-wait", "0")) * 1000.0):
+			return
+		var b := _first_enabled(bs, str(tc.arg("--party-event", "first")) == "last")
+		if b != null:
+			_decide("event", _label_of(b).left(80))
+			b.pressed.emit()
+
+	## A button's text, or the labels of a card button (event choices are cards).
+	## Opens the pause menu the way the Pause button does and presses one of its entries by label.
+	func _pause_menu_press(entry: String) -> String:
+		MatchFlow.open_pause()
+		var top: Screen = App.top_screen()
+		if top == null or top.screen_name != "pause":
+			return "no pause menu"
+		var seen: Array = []
+		for b in _buttons_under(top):
+			var lt := _label_of(b as Button)
+			seen.append(lt)
+			if lt.to_lower().contains(entry.to_lower()):
+				(b as Button).pressed.emit()
+				return "pressed %s" % entry
+		App.pop()
+		return "no '%s' in the pause menu: %s" % [entry, str(seen)]
+
+	func _label_of(b: Button) -> String:
+		if b.text != "":
+			return b.text
+		var parts: Array = []
+		var stack: Array = [b]
+		while not stack.is_empty() and parts.size() < 3:
+			var n: Node = stack.pop_front()
+			if n is Label and (n as Label).text != "":
+				parts.append((n as Label).text)
+			stack.append_array(n.get_children())
+		return " ".join(PackedStringArray(parts))
+
+	func _shop(top: Screen) -> void:
+		var c := _ctrl()
+		var node := str(c.state.get("position", "")) if c else ""
+		if str(tc.arg("--party-shop", "leave")) == "buy" and not _bought.has(node):
+			_bought[node] = true
+			var card := _first_enabled(top.get("_cards"))
+			if card != null:
+				_decide("buy", card.tooltip_text)
+				card.pressed.emit()
+				return
+			_note("nothing affordable at the shop")
+		for b in top.get("_buttons"):
+			if b is Button and (b as Button).text.begins_with("LEAVE") and not (b as Button).disabled:
+				_decide("leave_shop", node)
+				(b as Button).pressed.emit()
+				return
+
+	func _rest(top: Screen) -> void:
+		var b := _first_enabled(top.get("_cards"))
+		if b != null:
+			_decide("rest", _label_of(b).left(40))
+			b.pressed.emit()
+
+	func _summary(top: Screen) -> void:
+		if finished:
+			return
+		finished = true
+		var flow: CampaignFlow = top.get("flow")
+		info["summary"] = flow.ctrl.summary().duplicate(true)
+		info["report"] = flow.report.duplicate(true)
+		_note("run summary shown")
+		if tc.args.has("--party-stay"):
+			return
+		info["end_reason"] = "run summary"
+		_end_t = 3.0
+
+	# --- fights and scripted moments ------------------------------------------------------
+
+	func _fight_moments(dt: float) -> void:
+		var in_match := Net.session_state() in ["match", "results"]
+		var mid := -1
+		var phase := -1
+		if host and Net.server != null:
+			mid = Net.server.match_id if in_match else -1
+			if Net.server.sim != null and Net.server.sim.mode != null:
+				phase = Net.server.sim.mode.phase
+				_scan_events(Net.server.sim)
+		elif Net.client != null and in_match:
+			mid = int(Net.client.match_info.get("match_id", -1))
+			var m: Dictionary = Net.client.replica.latest().get("mode", {})
+			phase = int(m.get("phase", -1))
+		if in_match and mid >= 0 and mid != _match_seen:
+			_match_seen = mid
+			_fight_t = 0.0
+			_ev_cursor = 0
+			var mi: Dictionary = Net.server.match_info if host else Net.client.match_info
+			var f := {"match_id": mid, "campaign": mi.get("campaign", {}), "you": Net.local_fighter(), "t_ms": Time.get_ticks_msec() - _start_ms}
+			if host and Net.server.sim != null:
+				var kinds: Array = []
+				for fi in Net.server.sim.fighters:
+					kinds.append({"kind": (fi as Fighter).controller_kind, "creature": (fi as Fighter).creature.id, "team": (fi as Fighter).team})
+				f["fighters"] = kinds
+			(info["fights"] as Array).append(f)
+			_capture("fight_early", 4.0)
+			_capture("fight", 8.0)
+			_capture("fight_late", 16.0)
+		# what a ref timeout looked like here: the host's match frozen, the REF TIMEOUT banner
+		if in_match:
+			if host and Net.server != null and Net.server.frozen:
+				info["frozen_seen"] = true
+			var ov = OnlineFlow.coop.get("_overlay") if OnlineFlow.coop != null else null
+			if ov is Node and is_instance_valid(ov):
+				var bl := (ov as Node).get_node_or_null("Banner") as Label
+				if bl != null and bl.visible and bl.text != "":
+					info["ref_banner"] = bl.text
+		if not in_match or phase != MatchMode.Phase.FIGHT:
+			return
+		_fight_t += dt
+		# fight n = the n-th fight this player fights in (an event's spar may leave them watching)
+		var n := 0
+		for fd in info["fights"]:
+			if int((fd as Dictionary).get("you", -1)) >= 0:
+				n += 1
+		if (info["fights"] as Array).is_empty() or int((info["fights"] as Array).back().get("you", -1)) < 0:
+			return
+		# member: drop the connection mid-fight (crash / pulled cable); the test restarts us
+		if not host and not _dropped and n == int(tc.arg("--party-drop-in-fight", "0")) and _fight_t > 3.0 and Net.client != null:
+			_dropped = true
+			_note("dropping the connection in fight %d" % n)
+			tc._write(true)
+			Net.client.drop()
+			return
+		# a ref timeout (pause menu > Call a ref timeout) in fight n, ended early by the caller
+		if n == int(tc.arg("--party-ref-timeout-fight", "0")) and OnlineFlow.coop != null:
+			if _timeout_at < 0.0 and _fight_t > 5.0:
+				_timeout_at = _fight_t
+				_note("calling a ref timeout in fight %d: %s" % [n, _pause_menu_press("Call a ref timeout")])
+				_capture("fight_timeout", 1.0)
+			elif _timeout_at >= 0.0 and not _timeout_done and _fight_t > _timeout_at + 3.0:
+				_timeout_done = true
+				_note("ending my ref timeout: %s" % _pause_menu_press("End my ref timeout"))
+		# host departure mid-fight n (SESSION > Leave / closing the game): the match ends unscored,
+		# the session ends for everyone, the run stays at this fight in every party save
+		if host and not _left and n == int(tc.arg("--party-host-leave-in-fight", "0")) and _fight_t > 8.0:
+			_left = true
+			_note("leaving the session in fight %d" % n)
+			_record()
+			OnlineFlow.leave()
+			info["end_reason"] = "the host left the session"
+			_end_t = 3.0
+			return
+		# host: forfeit fight n (pause menu > Forfeit this fight), once every member is back
+		if host and not _forfeited and n == int(tc.arg("--party-forfeit-fight", "0")) and _fight_t > float(tc.arg("--party-forfeit-after", "6")):
+			var everyone_back := true
+			if Net.server.sim != null:
+				for fi2 in Net.server.sim.fighters:
+					var role := str((fi2 as Fighter).flags.get("campaign_role", ""))
+					if role == "player" and (fi2 as Fighter).controller_kind == "bot":
+						everyone_back = false
+			if everyone_back or _fight_t > float(tc.arg("--party-forfeit-max", "150")):
+				_forfeited = true
+				info["forfeit_with_everyone_back"] = everyone_back
+				_note("forfeiting fight %d" % n)
+				OnlineFlow.coop.forfeit_fight()
+
+	func _scan_events(sim: MatchSim) -> void:
+		for ev in sim.events_since(_ev_cursor):
+			_ev_cursor = int(ev["seq"])
+			var t := str(ev.get("type", ""))
+			if not t in ["tag", "assist", "cheer", "downed", "downed_timer", "revived", "revive", "elimination", "ko"]:
+				continue
+			var fi := int(ev.get("fighter", -1))
+			var who := "enemy"
+			if fi >= 0 and fi < sim.fighters.size():
+				var f: Fighter = sim.fighters[fi]
+				if str(f.flags.get("campaign_role", "")) == "player":
+					who = "host" if fi == Net.local_fighter() else "member"
+			var key := "%s:%s" % [t, who]
+			_camp_events[key] = int(_camp_events.get(key, 0)) + 1
+
+	func _scripted_ends() -> void:
+		var pr: NetPartyRuns = OnlineFlow.party
+		var c := _ctrl()
+		var fights := int(c.state.get("stats", {}).get("fights", 0)) if c else 0
+		var at_map := c != null and c.phase() == "map" and Net.session_state() == "lobby"
+		var top: Screen = App.top_screen()
+		var on_map := top != null and top.screen_name == "run_map"
+		if host and not _suspended and pr != null and started and at_map and on_map and fights >= int(tc.arg("--party-suspend-after", "999")):
+			_suspended = true
+			_note("suspending the party run after %d fights" % fights)
+			_record()
+			OnlineFlow.coop.suspend()           # the map's "SUSPEND PARTY RUN (everyone)"
+			info["end_reason"] = "suspended"
+			_end_t = 4.0
+			return
+		if at_map and on_map and fights >= int(tc.arg("--party-quit-after-fights", "999")):
+			info["end_reason"] = "quit after %d fights" % fights
+			_record()
+			_end_t = 2.0
+			return
+		# a member whose host suspended the run is back in the lobby
+		if not host and started and pr == null and not finished and tc.args.has("--party-quit-when-ended"):
+			info["end_reason"] = "the host ended the party run"
+			_end_t = 2.0
+		if not host and pr != null and pr.is_live():
+			started = true
+
+	# --- records ---------------------------------------------------------------------------
+
+	func _record() -> void:
+		var pr: NetPartyRuns = OnlineFlow.party
+		info["camp_events"] = _camp_events.duplicate()
+		info["t_ms"] = Time.get_ticks_msec() - _start_ms
+		info["session_state"] = Net.session_state()
+		var top: Screen = App.top_screen()
+		info["top"] = top.screen_name if top != null else ""
+		if top != null and top.screen_name == "dialog":
+			info["dialog"] = {"title": str(top.params.get("title", "")), "body": str(top.params.get("body", ""))}
+		if pr != null:
+			info["seat"] = pr.seat
+			info["run_id"] = pr.run_id
+			info["live"] = pr.is_live()
+			info["fights_played"] = pr.fights_played
+			info["fight_error"] = pr.fight_error
+		var c := _ctrl()
+		if c != null:
+			var st: Dictionary = c.state
+			var ps: Array = []
+			for p in c.players():
+				var pd: Dictionary = p
+				var sups: Array = []
+				for s in pd.get("supplements", []):
+					sups.append(str((s as Dictionary).get("id", "")))
+				ps.append({"id": str(pd.get("id", "")), "name": str(pd.get("name", "")), "bot": bool(pd.get("bot", false)),
+					"connected": bool(pd.get("connected", true)), "hp": float(pd.get("hp", 0.0)), "scrip": int(pd.get("scrip", 0)),
+					"supplements": sups, "techniques": (pd.get("techniques", []) as Array).duplicate(), "meta": (pd.get("meta", {}) as Dictionary).duplicate()})
+			var lg: Array = []
+			for e in st.get("log", []):
+				var ed: Dictionary = e
+				lg.append({"k": str(ed.get("k", "")), "p": str(ed.get("p", "")), "d": str(ed.get("d", {})).left(160)})
+			info["state"] = {"phase": c.phase(), "position": str(st.get("position", "")), "act": int(st.get("act", 1)),
+				"path": (st.get("path", []) as Array).duplicate(), "log_size": lg.size(), "variant": str(st.get("variant", "")),
+				"coop_format": str(st.get("coop_format", "")), "difficulty": str(st.get("difficulty", "")),
+				"fights": int(st.get("stats", {}).get("fights", 0)), "fights_won": int(st.get("stats", {}).get("fights_won", 0)),
+				"over": c.is_over(), "players": ps, "run_id": str(st.get("run_id", ""))}
+			info["log"] = lg
+			if pr.session != null:
+				info["last_event"] = pr.session.last_event.duplicate()
+				info["is_host"] = pr.session.is_host()
+				info["pause_budget"] = (pr.session.pause_view().get("budget", {}) as Dictionary).duplicate()
+		if OnlineFlow.coop != null and not OnlineFlow.coop.report.is_empty():
+			info["report"] = OnlineFlow.coop.report.duplicate(true)
+		# what this player's own profile holds about the run (memory and the file on disk)
+		var rid := str(info.get("run_id", ""))
+		var seat := str(info.get("seat", ""))
+		if rid != "" and seat != "":
+			var key := "%s:%s" % [rid, seat]
+			var credited: Array = Profiles.current.get("campaign", {}).get("credited_runs", [])
+			info["credited_in_memory"] = credited.count(key)
+			var disk := Saves.read_json(Profiles.call("_profile_path", Profiles.id()), "profile", Profiles.VERSION)
+			var dd = disk.get("data", {})
+			var dcred: Array = (dd as Dictionary).get("campaign", {}).get("credited_runs", []) if typeof(dd) == TYPE_DICTIONARY else []
+			info["credited_on_disk"] = dcred.count(key)
+			var hist := 0
+			for h in (dd as Dictionary).get("history", []) if typeof(dd) == TYPE_DICTIONARY else []:
+				if str((h as Dictionary).get("run_id", "")) == rid:
+					hist += 1
+			info["history_on_disk"] = hist
+			info["party_save"] = FileAccess.file_exists(RunStore.new().slot_path(CampaignFlow.profile_key(), NetPartyRuns.slot_of(rid)))
+		tc.result["party_ui"] = info
+
+	# --- captures (windowed runs only) ---------------------------------------------------------
+
+	func _capture(label_text: String, after: float) -> void:
+		var dir := str(tc.arg("--party-capture", ""))
+		if dir == "" or DisplayServer.get_name() == "headless":
+			return
+		_shots += 1
+		var n := _shots
+		tc.get_tree().create_timer(after).timeout.connect(func() -> void: _shoot(dir, n, label_text))
+
+	func _shoot(dir: String, n: int, label_text: String) -> void:
+		await RenderingServer.frame_post_draw
+		var img: Image = (tc as Node).get_viewport().get_texture().get_image()
+		if img.get_width() > 1600:
+			img.resize(1600, int(1600.0 * img.get_height() / img.get_width()), Image.INTERPOLATE_LANCZOS)
+		DirAccess.make_dir_recursive_absolute(dir)
+		var top: Screen = App.top_screen()
+		var what := label_text if label_text.begins_with("fight") else (top.screen_name if top != null else label_text)
+		var path: String = dir.path_join("%s_%02d_%s.jpg" % ["host" if host else "member", n, what])
+		img.save_jpg(path, 0.85)
+		if not info.has("captures"):
+			info["captures"] = []
+		(info["captures"] as Array).append(path.get_file())

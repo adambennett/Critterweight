@@ -15,6 +15,7 @@ func on_enter(p: Dictionary) -> void:
 
 
 func _build() -> void:
+	ctrl = flow.ctrl
 	for c in get_children():
 		c.queue_free()
 	_buttons.clear()
@@ -43,6 +44,16 @@ func _build() -> void:
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 16)
 	v.add_child(row)
+	if flow.is_party():
+		# an online party run ends together: everyone back to the session's lobby
+		var lb := CampaignUI.button("BACK TO THE LOBBY", _restart.bind(false, 0), 24)
+		row.add_child(lb)
+		_buttons.append(lb)
+		CampaignUI.chain_focus(_buttons, false)
+		var f0 := default_focus()
+		if f0:
+			f0.call_deferred("grab_focus")
+		return
 	var again := CampaignUI.button("RUN IT BACK (same seed)", _restart.bind(true, 0), 24)
 	row.add_child(again)
 	_buttons.append(again)
@@ -120,6 +131,11 @@ func _build_lines(p: Dictionary) -> Array:
 func _reward_lines() -> Array:
 	var rep: Dictionary = flow.report
 	var out := []
+	if flow.is_party():
+		out.append_array(_party_lines())
+		if rep.is_empty():
+			out.append(["Your profile is credited when the host's final result checks out against your own record of the run...", CampaignUI.MUTED])
+			return out
 	if rep.is_empty() or bool(rep.get("duplicate", false)):
 		out.append(["Already credited to your profile.", CampaignUI.MUTED])
 		return out
@@ -151,6 +167,20 @@ func _reward_lines() -> Array:
 	return out
 
 
+## Party runs: every member's line (fighter, KOs, Scrip) - each credits only their own profile.
+func _party_lines() -> Array:
+	var out := []
+	var per: Dictionary = ctrl.summary().get("players", {})
+	for pid in per:
+		var pd: Dictionary = per[pid]
+		var st: Dictionary = pd.get("stats", {})
+		out.append(["%s%s: %s · KOs %d · Scrip %d" % [str(pd.get("name", pid)), " (you)" if str(pid) == flow.me else "",
+			CampaignUI.fighter_name(ctrl.catalog, str(pd.get("fighter", ""))), int(st.get("kos", 0)), int(pd.get("scrip", 0))],
+			CampaignUI.ACCENT if str(pid) == flow.me else CampaignUI.INK])
+	out.append(["Party run: each member's Clout and records go to their own profile, once.", CampaignUI.MUTED])
+	return out
+
+
 func _can_raise(dose: int) -> bool:
 	if bool(ctrl.state.get("custom", false)) or str(ctrl.state.get("mode", "")) == "bookie":
 		return false
@@ -164,6 +194,9 @@ func _restart(same_seed: bool, dose_delta: int) -> void:
 
 
 func _menu() -> void:
+	if flow.is_party():
+		flow.restart(false, 0)      # CoopFlow: back to the session's lobby
+		return
 	App.goto("campaign_menu")
 
 

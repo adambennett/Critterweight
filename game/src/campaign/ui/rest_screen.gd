@@ -18,6 +18,7 @@ func on_enter(p: Dictionary) -> void:
 
 
 func _build() -> void:
+	ctrl = flow.ctrl
 	for c in get_children():
 		c.queue_free()
 	_cards.clear()
@@ -85,10 +86,13 @@ func _hint(id: String, p: Dictionary, mh: float) -> String:
 
 
 func _choose(id: String) -> void:
-	if ctrl.rest_choose(flow.me, id):
-		flow.show_current()
+	if not flow.do_rest(id):
+		_msg.text = flow.error_text()
+		return
+	if flow.is_party():
+		CampaignUI.wait_for_party(self, _msg)
 	else:
-		_msg.text = ctrl.last_error
+		flow.show_current()
 
 
 func on_back() -> bool:

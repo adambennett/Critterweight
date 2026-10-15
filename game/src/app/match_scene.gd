@@ -25,6 +25,7 @@ var config := {}
 var director: SpectatorDirector = null   ## auto-director when spectating (cfg.spectate)
 var _goals_by_me := 0
 var _debug: CombatDebugDraw = null
+var _bench_hint: Label = null   ## campaign tag-team fights: what a benched partner can do
 
 
 ## config: {arena: ArenaDef, rules: {}, seed: int, mode: MatchMode, fighters: [{creature, team, kind:"player"|"bot", difficulty, name}]}
@@ -89,6 +90,9 @@ func start(cfg: Dictionary) -> void:
 	hud = FightHud.new()
 	hud_layer.add_child(hud)
 	hud.setup(sim, player_index)
+	var ctx = cfg.get("context", {})
+	if typeof(ctx) == TYPE_DICTIONARY and bool((ctx as Dictionary).get("campaign", false)):
+		_bench_hint = NetMatchScene.bench_label(hud_layer)
 	sim.finished.connect(_on_finished)
 	_apply_presentation_settings()
 	# audio bridge: impacts, voices, crowd, announcer and music follow the sim (docs/AUDIO.md §6)
@@ -202,6 +206,11 @@ func _camera_focus() -> Array:
 		if not df.is_empty():
 			return df
 	var me := sim.fighters[player_index]
+	if me.state == Fighter.State.INACTIVE or me.pos().y < -3.0:
+		# a tag partner on the bench (parked out of the arena): follow the teammate who is in
+		for f in sim.fighters:
+			if f != me and f.team == me.team and not f.despawned and f.state != Fighter.State.INACTIVE and f.pos().y > -3.0:
+				return [f.pos(), f.target.pos() if f.target else null]
 	return [me.pos(), me.target.pos() if me.target else null]
 
 
@@ -238,6 +247,9 @@ func _process(delta: float) -> void:
 	if sim.mode:
 		mode_view.update_state(sim.mode.view_state(), _dt)
 		_update_pick_panel()
+	if _bench_hint:
+		var mf := sim.fighters[player_index] if player_index < sim.fighters.size() else null
+		_bench_hint.visible = live and mf != null and _is_local_player() and mf.state == Fighter.State.INACTIVE and mf.health > 0.0
 	var props: Array = sim.arena_nodes.get("props", [])
 	for i in props.size():
 		arena_view.set_prop_transform(i, (props[i] as Node3D).global_transform)

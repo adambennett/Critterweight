@@ -112,7 +112,7 @@ func setup(match_sim) -> void:
 			"stamina_regen": 10.0, "swap_below": float(et.get("swap_below", 0.45)), "cooldown": float(et.get("cooldown", 8.0)),
 			"entry_invuln": float(et.get("entry_invuln", 1.5))}
 		for i2 in range(1, enemy_tag.size()):
-			_park(sim.fighters[enemy_tag[i2]])
+			_park(sim.fighters[enemy_tag[i2]], true)
 	if party_tag.size() >= 2:
 		var pt: Dictionary = cfg.get("coop", {}).get("tag", {})
 		_groups["party"] = {"members": party_tag, "active": party_tag[0], "cd_until": 0.0, "regen": float(pt.get("regen", 3.0)),
@@ -121,7 +121,7 @@ func setup(match_sim) -> void:
 			"cheer_cd": float(pt.get("cheer_cooldown", 3.0)), "cheer_hype": float(pt.get("cheer_hype", 5.0)),
 			"assist_ready": {}, "cheer_ready": {}}
 		for i3 in range(1, party_tag.size()):
-			_park(sim.fighters[party_tag[i3]])
+			_park(sim.fighters[party_tag[i3]], true)
 	_granny_available = bool(r.get("granny_assist", false))
 	hazards = CampaignHazards.new(self, r.get("hazards", []), cfg.get("hazard_defs", {}))
 	if _revive_enabled():
@@ -136,10 +136,14 @@ func setup(match_sim) -> void:
 # Parking (waves, tag partners): out of the world, frozen, INACTIVE (not targetable)
 # =============================================================================================
 
-func _park(f: Fighter) -> void:
+## `resting`: a tag partner on the bench (the HUD shows it RESTING, as in the versus Tag Team
+## mode, instead of DOWN; the flag is replicated to network clients with the roster).
+func _park(f: Fighter, resting := false) -> void:
 	if _parked.has(f.index):
 		return
 	_parked[f.index] = true
+	if resting:
+		f.flags["resting"] = true
 	f.set_inactive(true)
 	f.rig.place(Vector3(f.index * 4.0, PARK_DEPTH, 0.0), 0.0)
 	for rb in f.rig.bodies:
@@ -150,6 +154,7 @@ func _unpark(f: Fighter, pos: Vector3, yaw: float, invuln: float) -> void:
 	if not _parked.has(f.index):
 		return
 	_parked.erase(f.index)
+	f.flags.erase("resting")
 	for rb in f.rig.bodies:
 		rb.freeze = false
 	f.rig.place(pos, yaw)
@@ -348,7 +353,7 @@ func _swap(g: Dictionary, incoming: int) -> void:
 	var pos: Vector3 = out_f.ground_pos() if not out_f.is_out() else sim.safe_spawn_for(in_f)[0]
 	var yaw := out_f.facing_yaw
 	if not out_f.is_out():
-		_park(out_f)
+		_park(out_f, true)
 	_unpark(in_f, sim.clamp_to_arena(pos, 0.8), yaw, float(g.get("entry_invuln", 1.5)))
 	_fighter_bell(in_f, true)
 	g["active"] = incoming

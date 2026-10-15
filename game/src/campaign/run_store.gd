@@ -151,6 +151,35 @@ func clear(profile_id: String, slot: String) -> void:
 	if Saves.is_newer(path, KIND, RunState.VERSION):
 		return
 	Saves.delete_save(path)
+	if FileAccess.file_exists(_seat_path(path)):
+		DirAccess.remove_absolute(_seat_path(path))
+
+
+## Party runs: which of the run's players THIS machine is, kept next to its party save
+## (party_<run id>.seat): profile ids are only unique per machine and names can change, so a
+## member resuming the run elsewhere finds its seat by this first (NetPartyRuns).
+func save_party_seat(profile_id: String, slot: String, seat: String) -> void:
+	var p := _seat_path(slot_path(profile_id, slot))
+	if FileAccess.file_exists(p) and FileAccess.get_file_as_string(p).strip_edges() == seat:
+		return
+	DirAccess.make_dir_recursive_absolute(p.get_base_dir())
+	var f := FileAccess.open(p, FileAccess.WRITE)
+	if f:
+		f.store_string(seat)
+		f.close()
+
+
+## The seat save_party_seat() kept for `slot` ("" = none).
+func party_seat(profile_id: String, slot: String) -> String:
+	var p := _seat_path(slot_path(profile_id, slot))
+	if not FileAccess.file_exists(p):
+		return ""
+	var s := FileAccess.get_file_as_string(p).strip_edges()
+	return s if s.length() <= 16 else ""
+
+
+static func _seat_path(save_path: String) -> String:
+	return save_path.trim_suffix(".json") + ".seat"
 
 
 ## Moves an unusable save aside instead of deleting it (abandoning a broken run) — every copy of

@@ -4,12 +4,17 @@ extends Screen
 ## When nothing at all can be taken, MOVE ON passes (EventRunner.PASS) — no softlock.
 ## After a choice: the outcome text and every applied effect line, then CONTINUE (which may
 ## start an event fight, open a pick, or return to the map).
+## Online party runs: a personal event is decided by whoever answers first (fighter-specific ones
+## by that fighter's player); on a group event every member's choice is a vote. Everyone sees the
+## outcome (who chose what) until they press CONTINUE - the shared run waits for nobody, but this
+## screen holds until then (holds_screen).
 
 var flow: CampaignFlow
 var ctrl: RunController
 var _buttons: Array = []
 var _msg: Label
 var _title := ""
+var _showing := false
 
 
 func on_enter(p: Dictionary) -> void:
@@ -18,15 +23,29 @@ func on_enter(p: Dictionary) -> void:
 	_build()
 
 
+## CoopFlow: an outcome on screen is not replaced until the player continues.
+func holds_screen() -> bool:
+	return _showing
+
+
 func _build() -> void:
+	ctrl = flow.ctrl
+	_showing = false
 	for c in get_children():
 		c.queue_free()
 	_buttons.clear()
 	var view := ctrl.event_view(flow.me)
-	if view.is_empty():
-		if flow.current_screen() != "event":
-			flow.show_current.call_deferred()
-		return
+	var shared := flow.party_event()
+	if view.is_empty() or (flow.is_party() and str(view.get("chosen", "")) != "" and not shared.is_empty()):
+		if not shared.is_empty() and str(shared.get("node", "")) == str(ctrl.state.get("position", "")):
+			# a party run: the event at this node was decided (maybe by someone else) - its outcome
+			_title = str(shared.get("title", "Event"))
+			_show_result(_shared_texts(shared))
+			return
+		if view.is_empty():
+			if flow.current_screen() != "event":
+				flow.show_current.call_deferred()
+			return
 	_title = str(view.get("title", "Event"))
 	if str(view.get("chosen", "")) != "":
 		_show_result(ctrl.last_texts if not ctrl.last_texts.is_empty() else view.get("result", []))
@@ -42,6 +61,10 @@ func _build() -> void:
 	bv.add_child(CampaignUI.label(str(view.get("text", "")), 26, CampaignUI.INK, "600"))
 	if bool(view.get("group", false)):
 		bv.add_child(CampaignUI.label("Group event: one decision for the whole party; Scrip costs are split.", 18, CampaignUI.MUTED))
+		if flow.is_party():
+			bv.add_child(CampaignUI.label("Your pick is your vote: the most votes win, the Captain breaks ties.", 18, CampaignUI.MUTED))
+	elif flow.is_party():
+		bv.add_child(CampaignUI.label("Whoever answers first decides for the party.", 18, CampaignUI.MUTED))
 	v.add_child(body)
 	var can_decide := bool(view.get("can_decide", true))
 	if not can_decide:
@@ -113,16 +136,34 @@ func _fit(b: Button, v: VBoxContainer) -> void:
 
 
 func _choose(id: String) -> void:
-	if ctrl.choose_event(flow.me, id):
-		_show_result(ctrl.last_texts)
+	if not flow.do_event(id):
+		_msg.text = flow.error_text()
+		return
+	if flow.is_party():
+		CampaignUI.wait_for_party(self, _msg)
 	else:
-		_msg.text = ctrl.last_error
+		_show_result(ctrl.last_texts)
+
+
+## A shared outcome's lines: who decided what, then what happened.
+func _shared_texts(shared: Dictionary) -> Array:
+	var who := str(shared.get("by", ""))
+	var name_ := "The party" if who == "party" else who
+	for p in ctrl.players():
+		if str(p.get("id", "")) == who:
+			name_ = "You" if who == flow.me else str(p.get("name", who))
+	var out: Array = []
+	var texts: Array = shared.get("texts", [])
+	out.append_array(texts if not texts.is_empty() else ["Nothing happens."])
+	out.append("%s chose: %s" % [name_, str(shared.get("choice", ""))])
+	return out
 
 
 func _show_result(texts: Array) -> void:
 	for c in get_children():
 		c.queue_free()
 	_buttons.clear()
+	_showing = true
 	var v := CampaignUI.scaffold(self, _title.to_upper(), "")
 	var body := CampaignUI.panel()
 	var bv := VBoxContainer.new()
@@ -148,6 +189,8 @@ func _show_result(texts: Array) -> void:
 
 func _continue() -> void:
 	ctrl.last_texts = []
+	_showing = false
+	flow.ack_event()
 	flow.show_current()
 
 

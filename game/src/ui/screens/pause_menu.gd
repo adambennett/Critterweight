@@ -37,7 +37,10 @@ func on_enter(p: Dictionary) -> void:
 	lv.add_child(UiTheme.label("ONLINE MATCH" if _online else "MATCH PAUSED", "Eyebrow"))
 	lv.add_child(UiTheme.label("MENU" if _online else "PAUSED", "H1"))
 	var notice := str(p.get("notice", ""))
-	if _online:
+	var party_fight := _online and OnlineFlow.coop != null and OnlineFlow.coop.in_fight()
+	if party_fight:
+		notice = ("%s\n" % notice if notice != "" else "") + "Co-op fight: the menu does not pause it. A ref timeout freezes the fight for everyone (%d s of yours left this run)." % int(OnlineFlow.coop.session.my_pause_budget())
+	elif _online:
 		notice = ("%s\n" % notice if notice != "" else "") + "Online matches can't be paused — the fight keeps going while this menu is open."
 	if notice != "":
 		var banner := UiTheme.panel("PanelBanner")
@@ -51,6 +54,15 @@ func on_enter(p: Dictionary) -> void:
 		lv.add_child(banner)
 	lv.add_child(UiTheme.spacer(false, 8))
 	_resume = _button(lv, "Resume", "fight", "resume", _resume_match)
+	if party_fight:
+		var pv: Dictionary = OnlineFlow.coop.session.pause_view()
+		if bool(pv.get("paused", false)) and str(pv.get("by", "")) == OnlineFlow.coop.me:
+			_button(lv, "End my ref timeout", "fight", "timeout", _end_timeout)
+		elif not bool(pv.get("paused", false)):
+			var tb := _button(lv, "Call a ref timeout", "info", "timeout", _call_timeout)
+			tb.disabled = OnlineFlow.coop.session.my_pause_budget() <= 0.0
+		if OnlineFlow.coop.is_host():
+			_button(lv, "Forfeit this fight", "close", "forfeit", _ask_forfeit)
 	if not _online and not MatchFlow.last_config.is_empty():
 		_button(lv, "Restart fight", "restart", "restart", _ask_restart)
 	_button(lv, "Settings", "settings", "settings", func() -> void: App.push("settings", {"in_game": true}))
@@ -120,6 +132,29 @@ func default_focus() -> Control:
 func _resume_match() -> void:
 	if is_top():
 		App.pop()
+
+
+## Co-op party fight: freezes the fight for everyone from this player's ref timeout budget.
+func _call_timeout() -> void:
+	if OnlineFlow.coop == null or not OnlineFlow.coop.call_timeout():
+		UiNav.toast("No ref timeout: %s" % (OnlineFlow.coop.error_text() if OnlineFlow.coop else "not in a party fight"), "error")
+		return
+	_resume_match()
+
+
+func _end_timeout() -> void:
+	if OnlineFlow.coop != null:
+		OnlineFlow.coop.end_timeout()
+	_resume_match()
+
+
+## Co-op party fight, host only: the party gives the fight up (a lost fight ends the run).
+func _ask_forfeit() -> void:
+	App.dialog("Forfeit this fight?", "The fight ends now for everyone and counts as lost: the party run is over.",
+		[{"label": "Forfeit", "id": "forfeit", "danger": true}, {"label": "Keep fighting", "id": "stay", "cancel": true, "default": true}],
+		func(id: String) -> void:
+			if id == "forfeit" and OnlineFlow.coop != null:
+				OnlineFlow.coop.forfeit_fight())
 
 
 func _ask_restart() -> void:

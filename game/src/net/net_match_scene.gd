@@ -39,6 +39,7 @@ var _dt := 0.016
 var _spec_label: Label = null
 var _goals_by_me := 0
 var _audio_bridge: Node = null
+var bench_hint: Label = null             ## co-op tag fights: what a benched partner can do
 
 
 ## info: MATCH_START dictionary from the server. Returns "" or an error text.
@@ -101,6 +102,8 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	overlay.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud_layer.add_child(overlay)
+	if info.has("campaign") and my_index >= 0:
+		bench_hint = bench_label(hud_layer)
 	_apply_presentation_settings()
 	# audio bridge on the mirror: impacts, voices, crowd, announcer and music like local play
 	var seed_v := int(info.get("match_id", 1))
@@ -218,6 +221,10 @@ func _process(dt: float) -> void:
 	if mode_view:
 		mode_view.call("update_state", _sample["mode"].get("view", {}), dt)
 	_update_pick_panel()
+	if bench_hint:
+		var mine := _slot(my_index)
+		bench_hint.visible = not mine.is_empty() and _benched(mine) and float(mine.get("health", 0.0)) > 0.0 \
+			and mirror.mode != null and mirror.mode.phase == MatchMode.Phase.FIGHT
 	for ev in replica.pop_due_events():
 		mirror.push_event(ev)
 		_on_event(ev)
@@ -310,11 +317,55 @@ func _camera_focus() -> Array:
 		if not df.is_empty():
 			return df
 	var me := _slot(my_index)
+	if not me.is_empty() and _benched(me):
+		# a tag partner waiting on the bench (parked out of the arena): follow the teammate in
+		me = _slot(_active_teammate())
 	if me.is_empty():
 		var pts := _camera_points()
 		return [pts[0] if not pts.is_empty() else Vector3.ZERO, null]
 	var tgt := _slot(int(me["target"]))
 	return [me["root"], tgt["root"] if not tgt.is_empty() else null]
+
+
+## The tag-team bench hint (co-op campaign fights; MatchScene shows the same one to the listen
+## host): hidden until this player's fighter sits on the bench.
+static func bench_label(parent: Node) -> Label:
+	var l := Label.new()
+	l.name = "BenchHint"
+	l.text = "ON THE BENCH   %s: tag in   ·   %s: cheer (+Hype)   ·   %s: assist" % [Controls.prompt_for("target"),
+		Controls.prompt_for("taunt"), Controls.prompt_for("ability1")]
+	# under the round timer and the controls strip, clear of the fighter cards at the bottom
+	l.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	l.offset_top = 212
+	l.offset_bottom = 252
+	l.offset_left = -560
+	l.offset_right = 560
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.add_theme_font_size_override("font_size", 26)
+	l.add_theme_constant_override("outline_size", 8)
+	l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.95))
+	l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.35))
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.visible = false
+	parent.add_child(l)
+	return l
+
+
+## A fighter parked out of the fight (tag partner on the bench, a later wave): INACTIVE, far below.
+static func _benched(fd: Dictionary) -> bool:
+	return int(fd.get("state", 0)) == Fighter.State.INACTIVE or (fd.get("root", Vector3.ZERO) as Vector3).y < -3.0
+
+
+## The first teammate of this client's fighter who is in the fight (-1 = none).
+func _active_teammate() -> int:
+	var my_team := int(replica.roster.get(my_index, {}).get("team", -99))
+	for i in replica.slot_count():
+		if i == my_index or int(replica.roster.get(i, {}).get("team", -98)) != my_team:
+			continue
+		var fd := _slot(i)
+		if not fd.is_empty() and not _benched(fd):
+			return i
+	return -1
 
 
 ## Spectator controls (same actions as the local SpectatorOverlay): Y / R toggles director and

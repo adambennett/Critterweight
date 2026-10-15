@@ -15,8 +15,11 @@ class_name NetProtocol
 ## 4 = party seats (net.party_claim / net.party_leave requests, party ids stamped on relayed
 ## messages while a party run is open), equipped cosmetics (LQ_COSMETICS, lobby players and
 ## MATCH_START carry them), MATCH_START arena packages and policy hashes; C_LOBBY up to 1 KB.
+## 5 = co-op campaign fights played on the session (MATCH_START "campaign" with the campaign's own
+## rules and mode, checked by campaign_match_problem; the arena's look travels as its variant) and
+## large party payloads packed ({_z, _n}: unpack_party_payload).
 
-const VERSION := 4
+const VERSION := 5
 
 ## ---- channels (ENet) ----
 const CH_CONTROL := 0      ## reliable ordered: handshake, lobby, chat, app messages, match lifecycle
@@ -505,11 +508,11 @@ static func decode_payload(bytes: PackedByteArray) -> Dictionary:
 	return {"ok": true, "value": v}
 
 
-static func _check_value(v, depth: int, budget: Array) -> String:
+static func _check_value(v, depth: int, budget: Array, max_depth := 12) -> String:
 	budget[0] = int(budget[0]) - 1
 	if int(budget[0]) < 0:
 		return "payload has too many values"
-	if depth > 12:
+	if depth > max_depth:
 		return "payload nested too deeply"
 	match typeof(v):
 		TYPE_NIL, TYPE_BOOL, TYPE_INT, TYPE_VECTOR2, TYPE_VECTOR2I, TYPE_VECTOR3, TYPE_VECTOR3I, TYPE_VECTOR4, TYPE_COLOR:
@@ -527,7 +530,7 @@ static func _check_value(v, depth: int, budget: Array) -> String:
 			return ""
 		TYPE_ARRAY:
 			for e in v:
-				var r := _check_value(e, depth + 1, budget)
+				var r := _check_value(e, depth + 1, budget, max_depth)
 				if r != "":
 					return r
 			return ""
@@ -536,8 +539,79 @@ static func _check_value(v, depth: int, budget: Array) -> String:
 			for k in d:
 				if typeof(k) != TYPE_STRING and typeof(k) != TYPE_STRING_NAME and typeof(k) != TYPE_INT:
 					return "dictionary keys must be strings or integers"
-				var r2 := _check_value(d[k], depth + 1, budget)
+				var r2 := _check_value(d[k], depth + 1, budget, max_depth)
 				if r2 != "":
 					return r2
 			return ""
 	return "unsupported value type %s in payload" % type_string(typeof(v))
+
+
+# ---- co-op party payloads (NetPartyTransport) ----
+# A whole run state (CoopSession run_state / ticket / run_end) is ~55 KB and ~5000 values for two
+# players late in a run, and grows with the party: too close to the app channel's 64 KB and
+# 8192-value limits. Party payloads above PARTY_PACK_MIN travel as one deflated byte array
+# {_z, _n} instead (~10% of the size), unpacked and re-validated with larger, still bounded limits.
+
+const PARTY_PACK_MIN := 4096
+const MAX_PARTY_UNPACKED := 1 << 21          ## 2 MB unpacked
+const PARTY_VALUE_BUDGET := 250000
+const PARTY_MAX_DEPTH := 24
+
+
+## A party payload as it travels: unchanged when small, else {_z: deflated var_to_bytes, _n: size}.
+static func pack_party_payload(payload: Dictionary) -> Dictionary:
+	var raw := var_to_bytes(payload)
+	if raw.size() <= PARTY_PACK_MIN:
+		return payload
+	return {"_z": raw.compress(FileAccess.COMPRESSION_DEFLATE), "_n": raw.size()}
+
+
+## The party payload a packed one carries ({ok, value, error}): size-capped inflation, plain data
+## only (bytes_to_var never decodes objects), the same value checks as decode_payload.
+static func unpack_party_payload(p: Dictionary) -> Dictionary:
+	if not p.has("_z"):
+		return {"ok": true, "value": p}
+	var z = p["_z"]
+	var n := int(p.get("_n", 0))
+	if typeof(z) != TYPE_PACKED_BYTE_ARRAY or n < 4 or n > MAX_PARTY_UNPACKED or p.size() != 2:
+		return {"ok": false, "error": "malformed packed party payload"}
+	var raw := (z as PackedByteArray).decompress_dynamic(MAX_PARTY_UNPACKED, FileAccess.COMPRESSION_DEFLATE)
+	if raw.size() != n:
+		return {"ok": false, "error": "packed party payload does not inflate to its size"}
+	var v = bytes_to_var(raw)
+	if typeof(v) != TYPE_DICTIONARY:
+		return {"ok": false, "error": "packed party payload is not a dictionary"}
+	var budget := [PARTY_VALUE_BUDGET]
+	var err := _check_value(v, 0, budget, PARTY_MAX_DEPTH)
+	if err != "":
+		return {"ok": false, "error": err}
+	return {"ok": true, "value": v}
+
+
+## A co-op campaign fight's MATCH_START (host = listen host running the party run): its own
+## mode ("campaign" / "boss", recreated by the mirror only for display) and a fixed, small rules
+## dictionary - checked here instead of the rules editor's validator, which knows only the
+## player-facing modes. Returns "" or why the match is refused.
+static func campaign_match_problem(info: Dictionary) -> String:
+	var mode := str(info.get("mode", ""))
+	if not mode in ["campaign", "boss"]:
+		return "unknown campaign mode '%s'" % mode.left(24)
+	var r = info.get("rules", {})
+	if typeof(r) != TYPE_DICTIONARY:
+		return "campaign rules are not a dictionary"
+	var rules: Dictionary = r
+	for k in rules:
+		if not str(k) in ["rounds", "round_time", "mode", "friendly_fire", "lives"]:
+			return "unexpected campaign rule '%s'" % str(k).left(24)
+	if int(rules.get("rounds", 1)) != 1 or int(rules.get("lives", 1)) != 1:
+		return "campaign fights are one round, one life"
+	var rt := float(rules.get("round_time", 150.0))
+	if not is_finite(rt) or rt < 10.0 or rt > 900.0:
+		return "campaign round time out of range"
+	var c = info.get("campaign", {})
+	if typeof(c) != TYPE_DICTIONARY:
+		return "campaign details are not a dictionary"
+	var si := str((c as Dictionary).get("stand_in", ""))
+	if si != "" and Content.creature(si) == null:
+		return "the host uses development stand-ins ('%s') that are not installed here" % si.left(32)
+	return ""

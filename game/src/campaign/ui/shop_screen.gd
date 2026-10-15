@@ -26,6 +26,7 @@ func on_enter(p: Dictionary) -> void:
 
 
 func _build() -> void:
+	ctrl = flow.ctrl
 	for c in get_children():
 		c.queue_free()
 	_cards.clear()
@@ -43,10 +44,10 @@ func _build() -> void:
 	var v := CampaignUI.scaffold(self, "NEEDLES' POP-UP STALL", "\"Everything's legal somewhere.\"")
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 24)
-	top.add_child(CampaignUI.label("SCRIP %d" % scrip, 32, CampaignUI.ACCENT, "900"))
-	top.add_child(CampaignUI.label("HP %d / %d" % [int(ceil(float(p.get("hp", 0)))), int(ctrl.max_hp(p))], 26, CampaignUI.INK, "700"))
+	top.add_child(CampaignUI.inline_label("SCRIP %d" % scrip, 32, CampaignUI.ACCENT, "900"))
+	top.add_child(CampaignUI.inline_label("HP %d / %d" % [int(ceil(float(p.get("hp", 0)))), int(ctrl.max_hp(p))], 26, CampaignUI.INK, "700"))
 	if float(view.get("coupon", 0.0)) > 0.0:
-		top.add_child(CampaignUI.label("Glandco coupon: -%d%%" % int(round(float(view["coupon"]) * 100.0)), 22, CampaignUI.GOOD, "700"))
+		top.add_child(CampaignUI.inline_label("Glandco coupon: -%d%%" % int(round(float(view["coupon"]) * 100.0)), 22, CampaignUI.GOOD, "700"))
 	v.add_child(top)
 	if float(ctrl.rules_for(flow.me).get("supplement_side_effects", 0.0)) > 0.0:
 		v.add_child(CampaignUI.label("Dose 7: every supplement bought here comes with a side effect.", 20, CampaignUI.DANGER, "700"))
@@ -108,10 +109,10 @@ func _service_row(row: HBoxContainer, view: Dictionary, scrip: int) -> void:
 	var txt: Array = SERVICE_TEXT.get(svc, [svc.to_upper(), ""])
 	if svc == "sell":
 		var frac := int(round(float(ctrl.catalog.rules.get("shop", {}).get("sell_fraction", 0.5)) * 100.0))
-		row.add_child(CampaignUI.label("SELL (%d%%):" % frac, 22, CampaignUI.INK, "900"))
+		row.add_child(CampaignUI.inline_label("SELL (%d%%):" % frac, 22, CampaignUI.INK, "900"))
 		var sellable: Array = view.get("sellable", [])
 		if sellable.is_empty():
-			row.add_child(CampaignUI.label("nothing to sell", 20, CampaignUI.MUTED))
+			row.add_child(CampaignUI.inline_label("nothing to sell", 20, CampaignUI.MUTED))
 		for s in sellable:
 			var sb := CampaignUI.button("%s +%d" % [ctrl.catalog.item_name(str(s["id"])), int(s["value"])], _sell.bind(str(s["id"])), 20)
 			row.add_child(sb)
@@ -124,39 +125,43 @@ func _service_row(row: HBoxContainer, view: Dictionary, scrip: int) -> void:
 		b.tooltip_text += " (you have none)"
 	b.disabled = used or scrip < price
 	row.add_child(b)
-	row.add_child(CampaignUI.label(str(txt[1]) + (" (used)" if used else ""), 18, CampaignUI.MUTED))
+	var desc := CampaignUI.label(str(txt[1]) + (" (used)" if used else ""), 18, CampaignUI.MUTED)
+	desc.size_flags_horizontal = Control.SIZE_EXPAND_FILL     # a wrapping label needs the row's width
+	desc.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(desc)
 	_buttons.append(b)
 
 
 func _buy(slot: String, item_name: String) -> void:
-	if ctrl.shop_buy(flow.me, slot):
-		_note = "Bought %s." % item_name
-	else:
-		_note = "!" + ctrl.last_error
-	_build()
+	_after(flow.do_shop_buy(slot), "Bought %s." % item_name)
 
 
 func _service() -> void:
-	if ctrl.shop_service(flow.me):
-		_note = "Done."
-	else:
-		_note = "!" + ctrl.last_error
-	_build()
+	_after(flow.do_shop_service(), "Done.")
 
 
 func _sell(item_id: String) -> void:
-	if ctrl.shop_sell(flow.me, item_id):
-		_note = "Sold %s." % ctrl.catalog.item_name(item_id)
-	else:
-		_note = "!" + ctrl.last_error
+	_after(flow.do_shop_sell(item_id), "Sold %s." % ctrl.catalog.item_name(item_id))
+
+
+## Solo: the purchase is applied - show the stall again with the note. Party run: the host
+## answers with the new state (CoopFlow rebuilds the stall); until then the stall waits.
+func _after(ok: bool, note: String) -> void:
+	_note = note if ok else "!" + flow.error_text()
+	if ok and flow.is_party():
+		CampaignUI.wait_for_party(self, _msg)
+		return
 	_build()
 
 
 func _leave() -> void:
-	if ctrl.shop_leave(flow.me):
-		flow.show_current()
+	if not flow.do_shop_leave():
+		_msg.text = flow.error_text()
+		return
+	if flow.is_party():
+		CampaignUI.wait_for_party(self, _msg)
 	else:
-		_msg.text = ctrl.last_error
+		flow.show_current()
 
 
 func on_back() -> bool:

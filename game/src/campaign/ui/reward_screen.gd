@@ -3,7 +3,8 @@ extends Screen
 ## reroll (cost / free rerolls / limit), skip, the Scrip alternative (treasure) and the Dose 7
 ## side-effect preview. Picks resolve through RunController.claim (claims are keyed by node, so a
 ## double press or a resumed save can never grant a reward twice). Controller: left/right
-## between cards, down to the action row, A/Enter picks.
+## between cards, down to the action row, A/Enter picks. In an online party run every member picks
+## only their own rewards (flow.do_claim goes to the party's host; the screen waits for its answer).
 
 var flow: CampaignFlow
 var ctrl: RunController
@@ -20,6 +21,7 @@ func on_enter(p: Dictionary) -> void:
 
 
 func _build() -> void:
+	ctrl = flow.ctrl
 	for c in get_children():
 		c.queue_free()
 	_cards.clear()
@@ -62,7 +64,7 @@ func _build() -> void:
 		row.add_child(b)
 		_cards.append(b)
 	if options.is_empty():
-		row.add_child(CampaignUI.label("Nothing left to offer here.", 24, CampaignUI.MUTED))
+		row.add_child(CampaignUI.inline_label("Nothing left to offer here.", 24, CampaignUI.MUTED))
 	var se := str(_entry.get("side_effect", ""))
 	if se != "":
 		var se_text := "Dose 7: this pick also brings a hidden side effect."
@@ -126,20 +128,25 @@ func _banner() -> String:
 
 
 func _pick(choice: String) -> void:
-	if ctrl.claim(flow.me, str(_entry.get("rid", "")), choice):
-		if ctrl.pending_for(flow.me).is_empty():
-			flow.show_current()
-		else:
-			_build()
+	if not flow.do_claim(str(_entry.get("rid", "")), choice):
+		_msg.text = flow.error_text()
+		return
+	if flow.is_party():
+		CampaignUI.wait_for_party(self, _msg)
+	elif ctrl.pending_for(flow.me).is_empty():
+		flow.show_current()
 	else:
-		_msg.text = ctrl.last_error
+		_build()
 
 
 func _reroll() -> void:
-	if ctrl.reroll(flow.me, str(_entry.get("rid", ""))):
-		_build()
+	if not flow.do_reroll(str(_entry.get("rid", ""))):
+		_msg.text = flow.error_text()
+		return
+	if flow.is_party():
+		CampaignUI.wait_for_party(self, _msg)
 	else:
-		_msg.text = ctrl.last_error
+		_build()
 
 
 func on_back() -> bool:

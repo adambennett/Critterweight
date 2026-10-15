@@ -131,8 +131,8 @@ func me() -> Dictionary:
 
 
 func _process(dt: float) -> void:
-	if OnlineFlow.party != null:
-		OnlineFlow.party.tick(dt)
+	# (the party run itself is ticked under Net - NetPartyRuns.start_ticking - whatever the screen)
+	if OnlineFlow.party != null or not Net.party().is_empty():
 		var ps := _party_state_key()
 		if ps != _party_shape:
 			_refresh(true)
@@ -160,7 +160,7 @@ func _on_notice(text: String) -> void:
 
 func _on_claim_failed(reason: String) -> void:
 	if OnlineFlow.party != null and OnlineFlow.party.role == "member" and OnlineFlow.party.session == null:
-		OnlineFlow.party = null
+		OnlineFlow.drop_party()
 	UiNav.toast("Seat refused: %s" % reason, "error")
 	_refresh(true)
 
@@ -187,10 +187,9 @@ func _party_state_key() -> String:
 		seats.append("%s=%d" % [str((s as Dictionary).get("id", "")), int((s as Dictionary).get("session", 0))])
 	var run := ""
 	if pr != null and pr.session != null and pr.session.ctrl != null:
-		var st: Dictionary = pr.session.ctrl.state
-		run = "%s/%s/%d" % [pr.session.ctrl.phase(), str(st.get("position", "")), (st.get("log", []) as Array).size()]
-	return "%s#%s#%s#%s#%s" % [str(pt.get("run_id", "")), ",".join(PackedStringArray(seats)), str(pr != null),
-		str(pr != null and pr.session != null), run]
+		run = "%s/%s" % [str(pr.session.ctrl.state.get("position", "")), str(pr.is_live())]
+	return "%s#%s#%s#%s#%s#%s" % [str(pt.get("run_id", "")), ",".join(PackedStringArray(seats)), str(pr != null),
+		str(pr != null and pr.session != null), run, Net.party_seat()]
 
 
 func _refresh(force: bool) -> void:
@@ -589,6 +588,16 @@ func _pick_fighter() -> void:
 func _start_match() -> void:
 	if not Net.is_host():
 		return
+	if OnlineFlow.party != null and OnlineFlow.party.role == "host":
+		# a party run is on offer / on: Start starts it (or goes back to it), never a versus match
+		if OnlineFlow.party_live():
+			OnlineFlow.coop.show_current()
+			return
+		var pe := OnlineFlow.party.start_host()
+		if pe != "":
+			UiNav.toast(pe, "error")
+		_refresh(true)
+		return
 	var err := Net.host_start()
 	if err != "":
 		Audio.sfx("ui_error")
@@ -626,12 +635,24 @@ func on_back() -> bool:
 
 # --- co-op party run -------------------------------------------------------------------------
 
+const PARTY_VARIANTS := [["off_the_street", "Off the Street"], ["fight_camp", "Fight Camp"]]
+const PARTY_FORMATS := [["simultaneous", "Simultaneous (default)"], ["tag", "Tag-team"]]
+static var party_variant := "off_the_street"    ## the host's choices for the next new party run
+static var party_format := "simultaneous"
+static var party_difficulty := "amateur"
+
+
 func _build_party(c: VBoxContainer) -> void:
 	_section(c, "Co-op party run")
 	var pt := Net.party()
 	var pr := OnlineFlow.party
-	if pr != null and pr.session != null:
-		_build_party_run(c, pr)
+	if OnlineFlow.party_live():
+		_build_party_live(c, pr)
+		return
+	if pr == null and not Net.is_host() and Net.party_seat() != "" and not pt.is_empty():
+		# reconnected while our seat was kept for us: take the run up again at once
+		_claim_seat.call_deferred()
+		c.add_child(UiTheme.label("You still hold your seat: rejoining the run...", "Success", true))
 		return
 	if pt.is_empty():
 		if not Net.is_host():
@@ -652,12 +673,37 @@ func _build_party(c: VBoxContainer) -> void:
 			off.set_help("Offer this run", "Shows the run in everyone's lobby so its members can take their seats again.")
 			off.pressed.connect(func() -> void: _offer_saved(str(sr.get_value())))
 			c.add_child(_keyed(off, "p_offer"))
-		var nw := UiButton.new("Start a new party run", "", "plus")
-		nw.set_help("New party run", "Deals a new Off the Street card for everyone who is not spectating (each with their lobby fighter).")
+		var vr := OptionRow.new("Campaign")
+		vr.setup(PARTY_VARIANTS.map(func(e): return e[0]), _names_of(PARTY_VARIANTS), party_variant)
+		vr.set_help("Campaign", "Off the Street: everyone starts fresh. Fight Camp: each player's own Cannery upgrades apply to their own fighter; Clout goes to each player's own Cannery.")
+		vr.value_changed.connect(func(v) -> void: party_variant = str(v))
+		c.add_child(_keyed(vr, "p_variant"))
+		var fr := OptionRow.new("Co-op format")
+		fr.setup(PARTY_FORMATS.map(func(e): return e[0]), _names_of(PARTY_FORMATS), party_format)
+		fr.set_help("Co-op format", "Simultaneous: everyone fights at once (downed allies are revived by holding Grab next to them). Tag-team: one fighter in at a time; the benched partners tag in, cheer and call assists.")
+		fr.value_changed.connect(func(v) -> void: party_format = str(v))
+		c.add_child(_keyed(fr, "p_format"))
+		var cat := _catalog()
+		var d_ids: Array = cat.difficulty_ids()
+		var d_names: Array[String] = []
+		for did in d_ids:
+			d_names.append(str(cat.difficulty(str(did)).get("name", str(did).capitalize())))
+		if not d_ids.has(party_difficulty) and not d_ids.is_empty():
+			party_difficulty = str(d_ids[0])
+		var dr := OptionRow.new("Difficulty")
+		dr.setup(d_ids, d_names, party_difficulty)
+		dr.set_help("Difficulty", "The whole party plays this difficulty.")
+		dr.value_changed.connect(func(v) -> void: party_difficulty = str(v))
+		c.add_child(_keyed(dr, "p_difficulty"))
+		var nw := UiButton.new("Deal a new party run", "", "plus")
+		nw.set_help("New party run", "Deals a new card for everyone who is not spectating (each with their lobby fighter). They take their seats, then you start the run.")
 		nw.pressed.connect(_new_party_run)
 		c.add_child(_keyed(nw, "p_new"))
 		return
-	# a run is on offer
+	# a run is on offer (dealt or suspended), not started yet
+	var info: Dictionary = pt.get("info", {})
+	c.add_child(UiTheme.label("%s  ·  Act %d  ·  %s%s" % [str(info.get("variant", "")).replace("_", " ").capitalize(), int(info.get("act", 1)),
+		"Tag-team" if str(info.get("format", "")) == "tag" else "Simultaneous", "  ·  new" if bool(info.get("new", false)) else ""], "BodyStrong", true))
 	var seats: Array = pt.get("seats", [])
 	for s in seats:
 		var sd: Dictionary = s
@@ -666,12 +712,12 @@ func _build_party(c: VBoxContainer) -> void:
 			who = "taken" if not bool(sd.get("connected", false)) else "back"
 			for p in lobby().get("players", []):
 				if int((p as Dictionary).get("id", 0)) == int(sd["session"]):
-					who = "%s is back" % str((p as Dictionary).get("name", "?"))
+					who = "%s is here" % str((p as Dictionary).get("name", "?"))
 		var fname := str(Content.get_entry("creatures", str(sd.get("fighter", ""))).get("name", sd.get("fighter", "")))
 		c.add_child(UiTheme.label("%s (%s)  ·  %s" % [str(sd.get("name", "")), fname, who], "Body"))
 	if Net.is_host():
 		var go := UiButton.new("Start the party run", "PrimaryButton", "campaign")
-		go.set_help("Start the party run", "Starts the run with the members who are back; anyone missing is played by a bot until they rejoin.")
+		go.set_help("Start the party run", "Starts the run with the members who are here; anyone missing is played by a bot until they rejoin.")
 		go.pressed.connect(func() -> void:
 			if OnlineFlow.party == null:
 				return
@@ -681,21 +727,18 @@ func _build_party(c: VBoxContainer) -> void:
 			_refresh(true))
 		c.add_child(_keyed(go, "p_start"))
 		var wd := UiButton.new("Withdraw the offer", "", "close")
-		wd.set_help("Withdraw", "Takes the run out of the lobby (it stays in your saves).")
+		wd.set_help("Withdraw", "Takes the run out of the lobby (a suspended run stays in your saves; a new one is dropped).")
 		wd.pressed.connect(func() -> void:
-			if OnlineFlow.party != null:
-				OnlineFlow.party.close()
-			OnlineFlow.party = null
+			OnlineFlow.drop_party()
 			Net.party_close()
 			_refresh(true))
 		c.add_child(_keyed(wd, "p_withdraw"))
 		return
 	if Net.party_seat() != "":
-		c.add_child(UiTheme.label("You have your seat back. The run starts when the host starts it.", "Success", true))
+		c.add_child(UiTheme.label("You have your seat. The run starts when the host starts it.", "Success", true))
 		return
-	var fresh := bool((pt.get("info", {}) as Dictionary).get("new", false))
-	var saved := RunStore.new().load_slot(CampaignFlow.profile_key(), NetPartyRuns.slot_of(str(pt.get("run_id", ""))),
-		CampaignFlow.make_catalog(CampaignFlow.dev_tools()))
+	var fresh := bool(info.get("new", false))
+	var saved := RunStore.new().load_slot(CampaignFlow.profile_key(), NetPartyRuns.slot_of(str(pt.get("run_id", ""))), _catalog())
 	if not fresh and not bool(saved.get("ok", false)):
 		c.add_child(UiTheme.label("This run is not in your saves: only its members can rejoin it.", "BodyMuted", true))
 		return
@@ -705,36 +748,43 @@ func _build_party(c: VBoxContainer) -> void:
 	c.add_child(_keyed(rj, "p_claim"))
 
 
-func _build_party_run(c: VBoxContainer, pr: NetPartyRuns) -> void:
+static func _names_of(pairs: Array) -> Array[String]:
+	var out: Array[String] = []
+	for e in pairs:
+		out.append(str(e[1]))
+	return out
+
+
+## The run is on: the campaign screens play it; the lobby only leads back there.
+func _build_party_live(c: VBoxContainer, pr: NetPartyRuns) -> void:
 	var s := pr.session
-	if s.ctrl == null:
-		c.add_child(UiTheme.label("Waiting for the host's run...", "BodyMuted", true))
-		return
 	var st: Dictionary = s.ctrl.state
-	c.add_child(UiTheme.label("Act %d  ·  %s  ·  %s" % [int(st.get("act", 1)), str(st.get("variant", "")).replace("_", " ").capitalize(),
-		s.ctrl.phase().capitalize()], "BodyStrong", true))
-	for p in s.ctrl.players():
-		var pd: Dictionary = p
-		var tag := "you" if str(pd.get("id", "")) == s.me else ("bot" if bool(pd.get("bot", false)) else "here")
-		c.add_child(UiTheme.label("%s  ·  %s" % [str(pd.get("name", "")), tag], "Caption"))
-	if s.ctrl.phase() == "map":
-		for node in s.ctrl.available_nodes():
-			var b := UiButton.new("Vote: %s" % str(node), "", "forward")
-			b.set_help("Route vote", "Votes for the next stop on the map (most votes win; the Captain breaks ties).")
-			b.pressed.connect(func() -> void:
-				s.act("vote", {"node": str(node)})
-				UiNav.toast("Voted.", "success", 1.5))
-			c.add_child(_keyed(b, "p_vote_%s" % str(node)))
-	else:
-		c.add_child(UiTheme.label("This stop is played in the campaign screens, which do not run online party runs yet: the run waits here and stays in everyone's party save.", "Caption", true))
-	var lv := UiButton.new("Suspend the party run", "", "close")
-	lv.set_help("Suspend", "Leaves the run where it is; it stays in every member's party save to resume later.")
+	c.add_child(UiTheme.label("The party run is on  ·  Act %d  ·  %s" % [int(st.get("act", 1)), str(st.get("variant", "")).replace("_", " ").capitalize()], "BodyStrong", true))
+	var back := UiButton.new("Back to the party run", "PrimaryButton", "campaign")
+	back.set_help("Back to the run", "The run's map, picks, shops and fights (the run went on while you were here).")
+	back.pressed.connect(func() -> void:
+		if OnlineFlow.coop != null:
+			OnlineFlow.coop.show_current())
+	c.add_child(_keyed(back, "p_back"))
+	var lv := UiButton.new("Suspend the party run" if Net.is_host() else "Leave the party run", "", "close")
+	lv.set_help("Suspend" if Net.is_host() else "Leave", "Everyone goes back to the lobby; the run stays in every member's party save to resume later." if Net.is_host()
+		else "A bot plays your fighter until you rejoin (by the run's id).")
 	lv.pressed.connect(func() -> void:
-		if OnlineFlow.party != null:
-			OnlineFlow.party.close()
-		OnlineFlow.party = null
+		if OnlineFlow.coop != null:
+			OnlineFlow.coop.suspend()
+		else:
+			OnlineFlow.drop_party()
 		_refresh(true))
 	c.add_child(_keyed(lv, "p_suspend"))
+
+
+var _cat_cache: CampaignCatalog = null
+
+
+func _catalog() -> CampaignCatalog:
+	if _cat_cache == null:
+		_cat_cache = CampaignFlow.make_catalog(CampaignFlow.dev_tools())
+	return _cat_cache
 
 
 ## The active profile's suspended party runs this machine can offer: [{run_id, label}].
@@ -752,7 +802,7 @@ static func party_saves() -> Array:
 
 
 func _party_runs() -> NetPartyRuns:
-	return NetPartyRuns.new(CampaignFlow.make_catalog(CampaignFlow.dev_tools()), RunStore.new(), Profiles.current)
+	return NetPartyRuns.new(_catalog(), RunStore.new(), Profiles.current)
 
 
 func _offer_saved(run_id: String) -> void:
@@ -762,47 +812,48 @@ func _offer_saved(run_id: String) -> void:
 		Audio.sfx("ui_error")
 		App.dialog("Can't offer this run", err, [{"label": "OK", "id": "ok"}], Callable())
 		return
-	OnlineFlow.party = pr
+	OnlineFlow.set_party(pr)
 	UiNav.toast("Run offered: its members can rejoin now.", "success")
 	_refresh(true)
 
 
+## A new party run for the session's players (2-4, not spectating): the host's campaign, format
+## and difficulty; each player's lobby fighter; for Fight Camp each player's own Cannery levels.
+static func party_config(cat: CampaignCatalog, variant: String, fmt: String, difficulty: String) -> Dictionary:
+	var players := NetPartyRuns.session_party(cat, variant, OnlineScreen.default_creature(), Profiles.current)
+	var reasons: Array = [CampaignFlow.REASON_STAND_INS] if cat.resolver.stand_in != "" else []
+	return {"seed": 0, "variant": variant, "difficulty": difficulty, "dose": 0, "created_at": int(Time.get_unix_time_from_system()),
+		"players": players, "coop_format": fmt, "custom": not reasons.is_empty(), "custom_reasons": reasons}
+
+
 func _new_party_run() -> void:
-	var players: Array = []
-	for p in lobby().get("players", []):
-		var pd: Dictionary = p
-		if bool(pd.get("spectator", false)) or not bool(pd.get("connected", false)):
-			continue
-		var cid := str(pd.get("creature", ""))
-		if cid == "" or not Content.playable_creatures().has(cid):
-			cid = OnlineScreen.default_creature()
-		players.append({"id": str(int(pd.get("id", 0))), "name": str(pd.get("name", "")), "fighter": cid,
-			"profile_id": CampaignFlow.profile_key() if int(pd.get("id", 0)) == Net.local_peer_id() else ""})
-	if players.size() < 2 or players.size() > 4:
+	var cfg := party_config(_catalog(), party_variant, party_format, party_difficulty)
+	var n := (cfg["players"] as Array).size()
+	if n < 2 or n > 4:
 		Audio.sfx("ui_error")
-		App.dialog("Party runs are for 2-4 players", "There are %d players (not spectating) in the session." % players.size(), [{"label": "OK", "id": "ok"}], Callable())
+		App.dialog("Party runs are for 2-4 players", "There are %d players (not spectating) in the session." % n, [{"label": "OK", "id": "ok"}], Callable())
 		return
-	var cfg := {"seed": 0, "variant": "off_the_street", "difficulty": "amateur", "dose": 0,
-		"created_at": int(Time.get_unix_time_from_system()), "players": players, "coop_format": "simultaneous"}
 	var pr := _party_runs()
 	var err := pr.start_new_as_host(cfg)
 	if err != "":
 		Audio.sfx("ui_error")
 		App.dialog("Can't start a party run", err, [{"label": "OK", "id": "ok"}], Callable())
 		return
-	OnlineFlow.party = pr
-	UiNav.toast("Party run dealt: the others take their seats.", "success")
+	OnlineFlow.set_party(pr)
+	UiNav.toast("Party run dealt: the others take their seats, then start it.", "success")
 	_refresh(true)
 
 
 func _claim_seat() -> void:
+	if OnlineFlow.party != null:
+		return
 	var pr := _party_runs()
 	var err := pr.claim()
 	if err != "":
 		Audio.sfx("ui_error")
 		App.dialog("Can't take a seat", err, [{"label": "OK", "id": "ok"}], Callable())
 		return
-	OnlineFlow.party = pr
+	OnlineFlow.set_party(pr)
 	_refresh(true)
 
 

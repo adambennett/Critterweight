@@ -169,6 +169,77 @@ func is_bookie() -> bool:
 	return false
 
 
+## True for an online party run (CoopFlow): decisions travel to the party's host and the screens
+## refresh when the shared run changes, not right after a button press.
+func is_party() -> bool:
+	return false
+
+
+## Party runs: one status line for the screens (who is deciding what, the vote, the Captain).
+func party_text() -> String:
+	return ""
+
+
+## Party runs: the route / group-event vote on screen ({} = none; CoopSession.vote_view).
+func vote_view() -> Dictionary:
+	return {}
+
+
+## Party runs: the latest event outcome at this node (CoopSession.last_event; {} = none).
+func party_event() -> Dictionary:
+	return {}
+
+
+## The player read an event's outcome (CONTINUE).
+func ack_event() -> void:
+	pass
+
+
+# ---------------------------------------------------------------------------------------------
+# This player's decisions. Screens call these; a solo run applies them at once (false + the reason
+# in error_text() when refused). CoopFlow sends them to the party's host instead.
+# ---------------------------------------------------------------------------------------------
+
+func error_text() -> String:
+	return ctrl.last_error
+
+
+func do_claim(rid: String, choice: String) -> bool:
+	return ctrl.claim(me, rid, choice)
+
+
+func do_reroll(rid: String) -> bool:
+	return ctrl.reroll(me, rid)
+
+
+func do_event(choice: String) -> bool:
+	return ctrl.choose_event(me, choice)
+
+
+func do_shop_buy(slot: String) -> bool:
+	return ctrl.shop_buy(me, slot)
+
+
+func do_shop_service() -> bool:
+	return ctrl.shop_service(me)
+
+
+func do_shop_sell(item: String) -> bool:
+	return ctrl.shop_sell(me, item)
+
+
+func do_shop_leave() -> bool:
+	return ctrl.shop_leave(me)
+
+
+func do_rest(option: String) -> bool:
+	return ctrl.rest_choose(me, option)
+
+
+func do_consume(item: String) -> bool:
+	return ctrl.use_consumable(me, item)
+
+
 func profile_id() -> String:
 	return profile_key()
 

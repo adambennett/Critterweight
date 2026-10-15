@@ -382,11 +382,13 @@ list.
 `local_id()`, `send(to, type, payload)` (`to == ""` broadcasts), signals `message_received`,
 `peer_joined`, `peer_left`, emitted from `poll()`. Payloads are JSON-safe dictionaries.
 
-Host → members: `run_state {state, host, reason}`, `ticket {run_id, host, log_size, checksum,
-state}` (replica checkpoint after every node), `vote_open {options, captain, seconds, event?}`,
-`vote_update {votes}`, `vote_result {node, reason, tie, counts}`, `fight_start {encounter, …}`,
-`notice {text}`, `paused {by, seconds}`, `resumed {}`, `host_changed {host}`, `run_end {state}`,
-`error {text, type}`.
+Host → members: `run_state {state, host, reason, live, event?}` (`live`: the run is on - a run
+dealt in a lobby is held until the host starts it; `event`: the latest event outcome at this node
+{node, title, choice, by, texts}, presentation only), `ticket {run_id, host, log_size, checksum,
+state}` (replica checkpoint after every node), `vote_open {options, captain, seconds, voters,
+event?}`, `vote_update {votes}`, `vote_result {node, reason, tie, counts}`, `fight_start
+{encounter, …}`, `notice {text}`, `paused {by, seconds, budget}`, `resumed {budget}`,
+`host_changed {host}`, `run_end {state}`, `error {text, type}`.
 
 Members → host: `hello {player}`, `vote {node}`, `event_choice {choice}`, `pick {rid, choice}`,
 `reroll {rid}`, `shop_buy {slot}`, `shop_service {}`, `shop_sell {item}`, `shop_leave {}`,
@@ -426,12 +428,37 @@ wait 60 s, then the next connected member in Captain order resumes as host from 
 slot. Ref timeouts pause fights for up to 30 s per player per run; menus never pause. At the end
 each member credits only their own profile.
 
+**Views for every machine's screens** (built on a member from the host's messages only):
+`is_live()`, `vote_view()` {open, event, options, votes, voters, captain, left}, `pause_view()`
+{paused, by, left, budget}, `fight_view()`, `last_event`. `act(type, payload)` returns whether the
+intent was accepted (host: applied with a member's rules, `last_error` says why not; member: sent).
+
 `LoopbackTransport` (in-process, serializes every payload to JSON text like a wire) drives the co-op
 tests. `NetPartyTransport` adapts the Net autoload's app-message channel and namespaces types as
-`cmp/<type>`. It expects from Net: `send_app(target_peer, type, payload)` (reliable, ordered;
-`""` = broadcast), `signal app_message(from_peer, type, payload)`, `signal member_joined(peer)`,
-`signal member_left(peer, reason)`, `local_member_id()`, `member_ids()`. Until Net provides
-these, `available()` is false and the menu offers co-op only once it is.
+`cmp/<type>`; payloads above 4 KB (whole run states) travel deflated and are unpacked with bounded
+checks (docs/NETWORKING.md §14). It uses from Net: `send_app(target_peer, type, payload)`
+(reliable, ordered; `""` = broadcast), `signal app_message(from_peer, type, payload)`, `signal
+member_joined(peer)`, `signal member_left(peer, reason)`, `local_member_id()`, `member_ids()`.
+
+### Online party runs
+
+Played through the online lobby (docs/NETWORKING.md §14 "Party runs played online"):
+`NetPartyRuns` (src/net) owns the run on each machine - deal / offer / start on the host, seat
+claims on members, ticking, and the host's **fight driver**: at a fight node it builds the match
+with `RunController.match_config` (members' kinds: host `player`, connected members `net`, absent
+members `bot` at Contender) and plays it on the session (`NetServer.start_campaign_match`); the
+authoritative result goes into `CoopSession.complete_fight` once; an aborted match is played again.
+`CoopFlow` (src/campaign/ui/coop_flow.gd, a `CampaignFlow`) binds the same campaign screens to the
+shared run: decisions go through `CoopSession.act` (the `CampaignFlow.do_*` methods the screens
+call; a solo `CampaignFlow` applies them directly), the route map's buttons are votes, screens are
+rebuilt when this player's part of the run changes and otherwise only refresh their party line,
+an event outcome stays until CONTINUE (`holds_screen`), and while a fight is presented the screens
+wait for the session to return to its lobby (OnlineFlow then calls `show_current`). The host
+alone can suspend the run for everyone or forfeit a fight; members leave (a bot takes over until
+they rejoin). Each machine remembers its seat next to its party save (`RunStore.save_party_seat`),
+so a resumed run finds the right player even when profile ids repeat between machines. Fight Camp
+party runs use each member's own Cannery levels (sent to the host when they join, clamped to the
+installed upgrades); Clout and records go to each member's own profile.
 
 ## The Bookie's Table
 
@@ -475,7 +502,9 @@ HP/Scrip/Hype/build/consumables, suspend/abandon, act intro card), `reward`, `ev
 Raise the Dose), `bookie` (setup, live view, overlay over presented fights), `camp_ledger`.
 Everything is operable with a controller (focus chains, `ui_accept`, `ui_cancel` = back/close
 modal) and with mouse/keyboard. `CampaignFlow` routes phases to screens and launches presented
-fights with `App.start_match(config, on_finished)`.
+fights with `App.start_match(config, on_finished)`; screens make this player's decisions through
+the flow (`do_claim`, `do_event`, `do_shop_buy`, `do_rest`, ...), so `CoopFlow` can play the same
+screens in an online party run (party line under the title, votes on the map, waiting states).
 
 ## Engine hooks used by the campaign
 
@@ -524,14 +553,22 @@ filters such as `-- --test test_campaign_generation` run one file.
 | `test_campaign_bookie.gd` | three unattended complete runs with real fights; pause/take over |
 | `test_campaign_full_runs.gd` | complete runs with real fights: victory and defeat in both variants |
 | `test_campaign_ui.gd` | every screen builds with a focused control; real `ui_accept`/`ui_down` input walks a run to the summary; modals, forfeit, ledger, Bookie controls; Rest → Train without a screen loop (also from a stuck save and at the table), replace-a-suspended-run confirmations (menu, hub sheet), Doses on the hub sheet, party rows, custom re-checks, play time, Bookie speed across presented fights |
+| `test/net/test_net_party_play.gd` | online party runs in-process: CoopSession views on every machine, fights on the network session in both formats (tag-in / assist over the network, a downed ally revived with the member's own Grab), ref timeout freeze, result applied once, per-player picks, drop + reconnect mid-fight, replayed fight |
+| `test/net/test_net_party_campaign.gd` | online party runs between independent processes through the real lobby and campaign screens: Off the Street simultaneous (ref timeout from the member's pause menu, picks, event, shop, drop + rejoin, forfeit, per-member credit) and Fight Camp tag (Cannery levels, tag-ins / assists from the bench, suspend and resume in a new session, event, rest, host leaving mid-fight) - LOOPBACK |
 
 Match outcomes are asserted structurally or statistically (several fights), not bit-exactly;
 generation and content logic are asserted seed-deterministic.
 
 ## Known gaps
 
-* Co-op over the network waits for Net's app-message API (`NetPartyTransport.available()`);
-  loopback is fully tested.
+* Online party runs are tested with two humans between processes on one machine (LOOPBACK);
+  three- and four-player parties only over the loopback transport. With Net the listen host's
+  departure ends the session, so the run is recovered from the party saves (CoopSession's live
+  host election only applies to transports that outlive the host). Members' run-end credit and
+  checkpoints are verified against their own logs, the fights themselves are the host's. A member
+  who is away when the run ends is credited if they reconnect while the host is still on the run
+  summary (the hello reply carries the result); after that their party save keeps the run at the
+  last stop they saw, uncredited.
 * Until the creature owners' kits parse, roster fighters, minions and bosses run as documented
   stand-ins in tests and dev runs (custom).
 * Some techniques approximate their design text with the current effects vocabulary (e.g.

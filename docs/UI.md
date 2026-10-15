@@ -138,7 +138,7 @@ func on_back() -> bool: return false       # true = handled (close a sub-panel, 
 | `character_select` | Cards for `Content.playable_creatures()` + Random; poster: name, epithet, element icon + name + status, weight class, stat bars, playstyle (`blurb`), kit. `{mode: quick|pick, on_pick}` |
 | `tutorial_menu` | Lessons from Content kind `tutorial` or the built-in ten; launching goes through `TutorialHook` |
 | `online` | Tabs HOST / JOIN / LAN (LB/RB), one list per tab + help panel + CONNECTION panel; Y = the tab's action. HOST: session kind (matches / co-op party run), rules (online-capable presets incl. the player's own), arena (incl. user layouts), playlist voting, bots + tier + AI Lab policy, and the `network.*` rows (name, max players, password, LAN discovery, port) via `SettingRows`. JOIN: address (`host:port` parsed), port, password, spectator, name, Join, recent servers (A rejoin, X forget). LAN: discovered sessions (lock / incompatible icons; incompatible ones explain the `Mods.compare` lines in a dialog; password → on-screen keyboard), or a "turn discovery on" button. Hosting/joining calls `OnlineFlow.begin()`; refusals open a dialog with the reason. `{tab}` |
-| `lobby` | Session lobby (host, guests, dedicated-server players). Left list: YOUR fighter (character select in `pick` mode), team, spectate, ready; playlist VOTE; HOST rules / arena / playlist / bots / skill / policy / Start match / Copy invite; CO-OP PARTY RUN (new run, offer a suspended one, seats, rejoin / take a seat, route votes, suspend); SESSION (rules and online restrictions dialog, leave with confirmation). One help line under the list follows focus. Right: players (ProfileFrame name cards, cosmetics, fighter, ready, ping, team chip) and the active rules. Rebuilt only when its shape changes, values updated in place, so focus never jumps |
+| `lobby` | Session lobby (host, guests, dedicated-server players). Left list: YOUR fighter (character select in `pick` mode), team, spectate, ready; playlist VOTE; HOST rules / arena / playlist / bots / skill / policy / Start match / Copy invite; CO-OP PARTY RUN (deal a new run - campaign, co-op format, difficulty -, offer a suspended one, seats, rejoin / take a seat, Start; once the run is on: back to the run, suspend / leave); SESSION (rules and online restrictions dialog, leave with confirmation). One help line under the list follows focus. Right: players (ProfileFrame name cards, cosmetics, fighter, ready, ping, team chip) and the active rules. Rebuilt only when its shape changes, values updated in place, so focus never jumps |
 | `ui_gallery` | Development style guide |
 
 ## 6. Prompt glyphs (button prompts)
@@ -218,6 +218,10 @@ entry, readying with Y, playing the host's match and coming back; refusal dialog
 version, full, nobody answering) and a kick with the host's reason; the LAN tab (listed session, password prompt); a
 dedicated server's lobby joined by a typed `address:port` (playlist vote with A, ready with Y); the same layout audit
 for every tab and a lobby with a guest.
+Online party runs (`src/test/net/test_net_party_campaign.gd`, network owner, LOOPBACK): a host and a member in separate
+processes play through the lobby (deal / offer, take a seat, Start) and the campaign screens under `CoopFlow` - map
+votes, reward cards, event choices and outcomes, the shop, rest, the run summary, the pause menu's ref timeout -
+with a pilot pressing the screens' own buttons; member screen captures in `docs/evidence/coop/`.
 
 Dev flags (handled by the title screen): `--ui-screen <name>` (any screen, plus `practice`, `countdown`, `pause`,
 `ingame_settings`, `match`, `results` = a real 7 s bot round, `gallery`), `--ui-tab <id>`, `--ui-open <category>`,
@@ -243,8 +247,9 @@ machine, so capture late (40–50 s) or an early frame is saved.
 * Audio calls (`Audio.sfx("ui_move")` etc.) are no-ops until the audio owner implements them.
 * Main-menu entries are hidden while their screen does not exist (dev rule); Online now has its screens (`online`,
   `lobby`).
-* Online party runs play the route votes in the lobby; the other campaign stops are not yet played online (see
-  docs/NETWORKING.md "Known gaps").
+* Online party runs play the campaign screens (CoopFlow: map with votes, picks, events, shop, rest, summary) and
+  their fights as session matches; tested with two humans between processes on one PC (LOOPBACK), see
+  docs/NETWORKING.md §14 and "Known gaps".
 * Tutorial lessons are listed but not playable until `TutorialHook.launcher` is wired.
 * Results do not record statistics (`Profiles.record_match`) — the match-flow owner should record exactly once per match.
 * Local multi-human versus is not offered: `Controls` reads all devices for one player; the setup has one "You" slot.
