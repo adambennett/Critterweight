@@ -32,6 +32,10 @@ func _ready() -> void:
 		mode = "check"
 	elif args.has("--server"):
 		mode = "server"
+	elif args.has("--net-client"):
+		mode = "net_client"
+	elif args.has("--connect") or args.has("--host"):
+		mode = "net"
 	elif args.has("--lab-worker"):
 		mode = "lab_worker"
 	elif args.has("--bench"):
@@ -93,6 +97,14 @@ func _start(mode: String) -> void:
 		"server":
 			# Dedicated server (owned by src/net): headless, no UI.
 			Net.call("start_dedicated_from_cli", args)
+		"net_client":
+			# scripted headless client/host used by the multi-process network tests (src/test/net)
+			var nc = load("res://src/test/net/net_test_client.gd").new()
+			add_child(nc)
+			nc.call("run", args)
+		"net":
+			# --connect <host:port> / --host: join or host from the command line (src/net)
+			Net.call("start_from_cli", args)
 		"lab_worker":
 			var worker = load("res://src/lab/lab_worker.gd").new()
 			add_child(worker)
