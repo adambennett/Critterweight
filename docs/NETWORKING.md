@@ -557,19 +557,19 @@ scripted human client through the conditioner relay at 1 ms, whose counters see 
 
 | Scenario | Down per client | Up per client | Packets/s down / up | Snapshot | Sim logic per tick | Net per tick | Server CPU |
 |---|---|---|---|---|---|---|---|
-| Duel, 2 fighters | 6.6-8.5 KB/s (7.6-9.5 wire) | 4.1-5.0 KB/s (5.8-6.9 wire) | 33-38 / 61-71 | 209-259 B | 0.68-1.01 ms (1.30 under load) | 0.23-0.42 ms | 21-27 % of one core |
-| Free-for-all, 8 fighters | 16.8-26.6 KB/s (17.8-27.7 wire) | 4.8-5.0 KB/s (6.9-7.1 wire) | 35-46 / 76-79 | 663-845 B | 2.7-3.7 ms (4.1-4.4 with the CPU saturated by parallel jobs) | 0.44-0.64 ms | 56-68 % of one core |
+| Duel, 2 fighters | 6.5-8.5 KB/s (7.5-9.5 wire) | 4.1-5.0 KB/s (5.8-6.9 wire) | 33-38 / 61-71 | 209-285 B | 0.68-1.01 ms (up to 1.30 under load) | 0.19-0.42 ms | 20-27 % of one core |
+| Free-for-all, 8 fighters | 16.8-28.8 KB/s (17.8-29.9 wire) | 4.4-5.3 KB/s (6.3-7.5 wire) | 35-46 / 69-81 | 663-893 B | 2.7-3.7 ms (4.1-6.8 with the CPU saturated by parallel jobs) | 0.39-0.77 ms | 52-68 % of one core |
 
 * Downstream grows with fighters (a fighter's 13 segment rotations + vitals are most of a
   snapshot); upstream is flat (60 input packets/s, 4 samples each, plus pings and ENet acks).
-  The upper ends of the 8-fighter row (719-845 B snapshots, 23-27 KB/s) are the runs after the
+  The upper ends of the 8-fighter row (719-893 B snapshots, 23-29 KB/s) are the runs after the
   newer roster kits were merged (bot slots draw from the whole playable roster, so the mix of
   fighters, statuses and effects in a snapshot changes from run to run).
 * The longest physics frame (simulation + Jolt step, average of the per-second maxima) was
   2.5-8.2 ms (duel) and 15.6-28.1 ms (8 fighters); the upper ends are runs with other jobs
   saturating the CPU.
 * **Server CPU target not met**: docs/DESIGN.md asks for < 35 % of one core with 8 fighters; the
-  server uses 56-68 %. Networking is about 0.4-0.6 ms of the 8.3 ms tick; the rest is the
+  server uses 52-68 %. Networking is about 0.4-0.8 ms of the 8.3 ms tick; the rest is the
   simulation (fighter logic + physics), which is where optimisation has to happen.
 * `test_net_measure.gd` asserts bandwidth limits and that the 8-fighter server keeps real time
   (simulation + networking under the 8.33 ms tick); the quiet-machine simulation figure is printed
@@ -650,7 +650,7 @@ Also LOOPBACK on one PC.
   (`Net.rejoin()`), a restarted game cannot.
 * No in-game mod download: players install missing mods themselves (the join error names
   them); rules presets travel in full and player-made arenas as checked layout packages (§13).
-* Server CPU with 8 fighters is 56-68 % of one core (target < 35 %); the cost is the simulation,
+* Server CPU with 8 fighters is 52-68 % of one core (target < 35 %); the cost is the simulation,
   not networking (§15).
 * Event types added after the event codec's id table was fixed (arena hazards and props, bosses, ring-out return,
   campaign events; `test_net_parity` lists them) travel with their type name instead of a 1-byte
