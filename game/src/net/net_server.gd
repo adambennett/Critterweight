@@ -54,7 +54,7 @@ var _next_player_id := 2
 var local_player_id := 0
 var phase := PHASE_LOBBY
 var phase_until := 0
-var settings := {"rules": "duel", "arena": "the_gullet", "bots": 0, "bot_difficulty": "regular", "rules_override": {}}
+var settings := {"rules": "duel", "arena": "the_gullet", "bots": 0, "bot_difficulty": "regular", "rules_override": {}, "bot_policy": []}
 var playlist: NetPlaylist = null
 var vote := {}
 var current_entry := {}
@@ -86,6 +86,8 @@ var _bot_serial := 0
 ## A remote player's unanswered mode pick (Chum Rush supplements) is taken for them after this.
 var pick_timeout_ms := PICK_TIMEOUT_MS
 var _pick_since := {}             ## fighter index -> ms its pending pick was first seen
+var _policy_cache: Array = []
+var _policy_cache_ms := 0
 var _roster: Array = []           ## per fighter slot: {gen, obj, rig, creature, scale, despawned, team, name, kind, player}
 var _gens := PackedByteArray()
 
@@ -182,6 +184,30 @@ func set_lan_discovery(on: bool) -> Error:
 	_beacon_ms = 0
 	Log.i("net", "LAN announcements on")
 	return OK
+
+
+## Snapshots per second to each client (listen host: Settings > Network), applied immediately.
+func set_snapshot_rate(rate: int) -> void:
+	cfg["snapshot_rate"] = clampi(rate, 10, mini(60, int(cfg["tick_rate"])))
+	_snap_every = maxi(1, roundi(float(cfg["tick_rate"]) / float(cfg["snapshot_rate"])))
+
+
+## Co-op party relay on/off (listen host: Settings > Network), applied immediately.
+func set_party_relay(on: bool) -> void:
+	cfg["party_relay"] = on
+
+
+## AI Lab policies the host can put into bot slots: [{id, name, creature}] (valid ones, at most
+## 64; refreshed every few seconds because the list reads the user policy folder).
+func _policy_options() -> Array:
+	var now := Time.get_ticks_msec()
+	if _policy_cache_ms == 0 or now - _policy_cache_ms > 5000:
+		_policy_cache_ms = now
+		_policy_cache.clear()
+		for p in PolicyLibrary.list():
+			if typeof(p) == TYPE_DICTIONARY and bool(p.get("valid", false)) and _policy_cache.size() < 64:
+				_policy_cache.append({"id": str(p.get("id", "")), "name": str(p.get("name", "")), "creature": str(p.get("creature", ""))})
+	return _policy_cache.duplicate(true)
 
 
 ## Connection timeout in seconds (application heartbeat and ENet), applied immediately.
@@ -951,8 +977,13 @@ func cast_vote(pid: int, c: int) -> void:
 func host_set(key: String, value) -> String:
 	match key:
 		"rules":
-			if NetPlaylist.resolve_rules(str(value), {}).is_empty():
+			# any preset the host has: core, mods, or the player's own saved presets ("user:...")
+			var r := NetPlaylist.resolve_rules(str(value), settings["rules_override"])
+			if r.is_empty():
 				return "unknown rules preset '%s'" % str(value)
+			var bad := NetProtocol.rules_problem(r)
+			if bad != "":
+				return "rules preset '%s' is invalid: %s" % [str(value), bad]
 			settings["rules"] = str(value)
 		"arena":
 			if Content.arena(str(value)) == null:
@@ -967,7 +998,22 @@ func host_set(key: String, value) -> String:
 		"rules_override":
 			if typeof(value) != TYPE_DICTIONARY:
 				return "rules_override must be a dictionary"
+			var r2 := NetPlaylist.resolve_rules(str(settings["rules"]), value)
+			var bad2 := NetProtocol.rules_problem(r2) if not r2.is_empty() else ""
+			if bad2 != "":
+				return "these rule changes are invalid: %s" % bad2
 			settings["rules_override"] = (value as Dictionary).duplicate(true)
+		"bot_policy":
+			# AI Lab policies for the bot slots (one id or a list, used in turn; "" / [] = scripted bots)
+			var ids: Array = []
+			if typeof(value) == TYPE_ARRAY:
+				ids = (value as Array).map(func(x) -> String: return str(x)).filter(func(x: String) -> bool: return x != "")
+			elif str(value) != "":
+				ids = [str(value)]
+			for pid in ids:
+				if PolicyLibrary.get_policy(str(pid)) == null:
+					return "AI policy '%s' is not available: %s" % [pid, PolicyLibrary.last_error(str(pid))]
+			settings["bot_policy"] = ids
 		_:
 			return "unknown setting '%s'" % key
 	_lobby_dirty = true
@@ -1296,12 +1342,15 @@ func _close_vote_and_start() -> void:
 	notice("Next: %s - %s." % [entry["name"], why])
 	var lim := playlist.limits_for(entry)
 	var bots_allowed := NetPlaylist.bot_allowance(entry, bool(cfg["bots"]))
+	var policies: Array = entry.get("bot_policy", [])
+	if policies.is_empty():
+		policies = NetServerConfig.policy_ids(cfg)
 	var err := start_match(str(entry["rules"]), playlist.rules_for(entry), str(entry["arena"]), lim.x, lim.y, bots_allowed,
-		str(cfg["bot_difficulty"]), playlist.describe_entry(entry))
+		str(cfg["bot_difficulty"]), playlist.describe_entry(entry), 0, policies)
 	if err != "":
 		Log.w("net", "cannot start '%s': %s" % [entry["key"], err])
 		notice("Cannot start %s: %s" % [entry["name"], err])
-		if err.begins_with("missing content"):
+		if err.begins_with("missing content") or err.begins_with("invalid rules"):
 			entry["valid"] = false
 			(entry["errors"] as Array).append(err)
 			playlist.errors.append("entry %d (%s): %s - skipped" % [int(entry["index"]) + 1, entry["key"], err])
@@ -1320,17 +1369,21 @@ func host_start() -> String:
 	return start_match(str(settings["rules"]), rules, str(settings["arena"]), lim.x, lim.y,
 		NetProtocol.MAX_FIGHTERS, str(settings["bot_difficulty"]),
 		{"key": "%s@%s" % [settings["rules"], settings["arena"]], "rules": settings["rules"], "arena": settings["arena"],
-			"name": "%s @ %s" % [str(rules.get("name", settings["rules"])), str(settings["arena"])]}, extra)
+			"name": "%s @ %s" % [str(rules.get("name", settings["rules"])), str(settings["arena"])]}, extra, settings["bot_policy"])
 
 
 ## Starts a match. lo/hi: fighters needed / max human fighters. Returns "" or an error.
 func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int, hi: int, bot_allow: int,
-		bot_difficulty: String, entry_info: Dictionary, extra_bots := 0) -> String:
+		bot_difficulty: String, entry_info: Dictionary, extra_bots := 0, bot_policies: Array = []) -> String:
 	var arena := Content.arena(arena_id)
 	if arena == null:
 		return "missing content: arena '%s' is not installed" % arena_id
 	if rules.is_empty():
 		return "missing content: rules preset '%s' is not installed" % rules_id
+	# the full rules dictionary goes to every client, so it must pass the rules editor's validation
+	var bad_rules := NetProtocol.rules_problem(rules)
+	if bad_rules != "":
+		return "invalid rules '%s': %s" % [rules_id, bad_rules]
 	var mode_id := str(rules.get("mode", "standard"))
 	if not ModeRegistry.ids().has(mode_id):
 		return "missing content: mode '%s' is not installed" % mode_id
@@ -1368,22 +1421,35 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 			p2.input = NetRemoteInput.new(p2.id, p2.name)
 			e["kind"] = "net"
 			e["source"] = p2.input
-			# the remote player's accessibility aim assist (MatchScene does this for local players)
-			e["mods"] = {"assist": p2.assist}
+			# the remote player's accessibility aim assist (MatchScene does this for local players):
+			# one of the setting's levels, or the normal level when the server decides for everyone
+			e["mods"] = {"assist": p2.assist if bool(cfg.get("player_assist", true)) else 1.0}
 		p2.fighter = i
 		fighters.append(e)
 	for b in n_bots:
 		var idx := chosen.size() + b
 		var cid := str(playable[_rng.randi() % playable.size()]) if not playable.is_empty() else ""
+		# AI Lab policies drive their own creature; the server runs them, clients need nothing
+		var pid := str(bot_policies[b % bot_policies.size()]) if not bot_policies.is_empty() else ""
+		var pol: PolicyData = PolicyLibrary.get_policy(pid) if pid != "" else null
+		if pol != null and Content.creature(pol.creature) != null:
+			cid = pol.creature
 		var cdef := Content.creature(cid)
 		if cdef == null:
 			return "missing content: no playable creature for bots"
 		var e2 := {"creature": cdef, "team": teams[idx], "kind": "bot", "difficulty": bot_difficulty,
 			"name": "Bot %d (%s)" % [b + 1, bot_difficulty.capitalize()]}
+		if pid != "":
+			e2["kind"] = "policy"
+			e2["policy_id"] = pid
+			e2["name"] = "%s %d" % [pol.name if pol != null and pol.name != "" else "Lab bot", b + 1]
 		if dedicated:
-			var bb := BotBrain.new(bot_difficulty, seed_v * 31 + idx)
-			bb.set_personality(cdef.ai)
-			e2["source"] = bb
+			if pid != "":
+				e2["source"] = PolicyInputSource.for_match(e2, seed_v * 31 + idx, idx)
+			else:
+				var bb := BotBrain.new(bot_difficulty, seed_v * 31 + idx)
+				bb.set_personality(cdef.ai)
+				e2["source"] = bb
 		fighters.append(e2)
 	for p3 in players.values():
 		var np3: NetPlayer = p3
@@ -1849,7 +1915,7 @@ func lobby_state() -> Dictionary:
 		"settings": {"rules": settings["rules"], "rules_name": str(rules.get("name", settings["rules"])),
 			"arena": settings["arena"], "arena_name": ad.display_name if ad else str(settings["arena"]),
 			"mode": str(rules.get("mode", "standard")), "bots": settings["bots"], "bot_difficulty": settings["bot_difficulty"],
-			"rules_override": settings["rules_override"]},
+			"rules_override": settings["rules_override"], "bot_policy": settings["bot_policy"]},
 		"entry": current_entry, "game_version": NetProtocol.game_version()}
 	if playlist:
 		var errs: Array = playlist.errors.slice(0, 8)
@@ -1857,7 +1923,7 @@ func lobby_state() -> Dictionary:
 			"invalid": playlist.entries.size() - playlist.valid_entries().size(), "errors": errs}
 	if not dedicated:
 		st["options"] = {"creatures": Content.playable_creatures(), "rules": Content.ids("rules"), "arenas": Content.ids("arenas"),
-			"bot_difficulties": BotBrain.PROFILES.keys()}
+			"bot_difficulties": BotBrain.PROFILES.keys(), "bot_policies": _policy_options()}
 	else:
 		st["options"] = {"creatures": Content.playable_creatures()}
 	if not last_result.is_empty() and phase == PHASE_RESULTS:

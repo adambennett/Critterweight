@@ -385,6 +385,8 @@ func test_assist_level_on_the_wire() -> void:
 	check_eq(NetProtocol.assist_from_byte(NetProtocol.assist_to_byte(1.8)), 1.8)
 	check_eq(NetProtocol.assist_from_byte(255), NetProtocol.MAX_ASSIST, "a forged level is clamped to the setting's maximum")
 	check_eq(NetProtocol.assist_to_byte(-3.0), 0)
+	check_eq(NetProtocol.assist_from_byte(70), 0.5, "only the setting's own levels are accepted (0.7 -> low)")
+	check_eq(NetProtocol.assist_from_byte(0), 0.5, "and nothing below the lowest level")
 	var lvl := NetProtocol.local_assist()
 	check(lvl in NetProtocol.ASSIST_LEVELS.values(), "local setting maps to a known level (%.2f)" % lvl)
 
@@ -405,6 +407,11 @@ mods = Moon Rules!
 	var errs: Array[String] = []
 	NetServerConfig.apply_cli(c, PackedStringArray(["--server", "--mods", "moon_rules"]), errs)
 	check_eq(NetServerConfig.mod_ids(c), ["moon_rules"], "--mods on the command line")
+	var pol := NetServerConfig.parse_text("[match]\nbot_policy = dev_biped_es_drill, dev_biped_bc_regular\nplayer_assist = false\n", "p.cfg")
+	check((pol["errors"] as Array).is_empty(), "policy keys parse")
+	check_eq(NetServerConfig.policy_ids(pol["cfg"]), ["dev_biped_es_drill", "dev_biped_bc_regular"], "AI Lab policies for bot slots")
+	check_eq(bool(pol["cfg"]["player_assist"]), false, "the server can decide aim assist for everyone")
+	check_eq(bool(NetServerConfig.defaults()["party_relay"]), true, "party relay on by default")
 
 
 func test_rate_limiter() -> void:

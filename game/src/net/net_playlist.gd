@@ -107,7 +107,7 @@ static func from_dict(d: Dictionary, src: String) -> NetPlaylist:
 
 static func _normalize(raw, i: int) -> Dictionary:
 	var e := {"index": i, "key": "", "name": "", "rules": "", "arena": "", "weight": 1.0, "min_players": 0,
-		"max_players": 0, "bots": -1, "rules_override": {}, "valid": true, "errors": [], "notes": []}
+		"max_players": 0, "bots": -1, "rules_override": {}, "bot_policy": [], "valid": true, "errors": [], "notes": []}
 	if typeof(raw) != TYPE_DICTIONARY:
 		e["valid"] = false
 		(e["errors"] as Array).append("entry is not an object")
@@ -126,6 +126,13 @@ static func _normalize(raw, i: int) -> Dictionary:
 	e["min_players"] = int(d.get("min_players", 0))
 	e["max_players"] = int(d.get("max_players", 0))
 	e["bots"] = int(d.get("bots", -1))
+	var bp = d.get("bot_policy", [])
+	if typeof(bp) == TYPE_STRING:
+		e["bot_policy"] = [str(bp)] if str(bp) != "" else []
+	elif typeof(bp) == TYPE_ARRAY:
+		e["bot_policy"] = (bp as Array).map(func(x) -> String: return str(x)).filter(func(x: String) -> bool: return x != "")
+	else:
+		(e["errors"] as Array).append("bot_policy must be a policy id or a list of ids")
 	var ov = d.get("rules_override", {})
 	if typeof(ov) == TYPE_DICTIONARY:
 		e["rules_override"] = (ov as Dictionary).duplicate(true)
@@ -207,6 +214,9 @@ func validate() -> void:
 					errs.append("min_players %d is outside what '%s' allows (%d-%d fighters)" % [int(ed["min_players"]), ed["rules"], lim.x, lim.y])
 				if int(ed["max_players"]) > 0 and int(ed["max_players"]) > lim.y:
 					errs.append("max_players %d exceeds what '%s' allows (%d)" % [int(ed["max_players"]), ed["rules"], lim.y])
+				var bad := NetProtocol.rules_problem(rules)
+				if bad != "":
+					errs.append("rules '%s' with its overrides are invalid: %s" % [ed["rules"], bad])
 		if str(ed["arena"]) != "":
 			var a := Content.arena(str(ed["arena"]))
 			if a == null:
@@ -221,6 +231,10 @@ func validate() -> void:
 			errs.append("max_players must be at least 1")
 		if int(ed["bots"]) > NetProtocol.MAX_FIGHTERS - 1:
 			errs.append("bots must be at most %d" % (NetProtocol.MAX_FIGHTERS - 1))
+		for pid in ed["bot_policy"]:
+			# a missing AI policy is not fatal: those bots fall back to the scripted AI
+			if PolicyLibrary.get_policy(str(pid)) == null:
+				(ed["notes"] as Array).append("AI policy '%s' unavailable (%s): scripted bots instead" % [pid, PolicyLibrary.last_error(str(pid))])
 		if str(ed["name"]) == "" and errs.is_empty():
 			var rd := Content.get_entry("rules", str(ed["rules"]))
 			var ad := Content.arena(str(ed["arena"]))

@@ -157,6 +157,8 @@ full, so playlists may use mod presets as long as the players have the mod.
 | `results_time` | int | 12 | 2-120 s | Results display before the next lobby |
 | `empty_behavior` | enum | idle | idle/showcase | Without players: no simulation, or bot matches on the rotation |
 | `vote_candidates` | int | 3 | 1-5 | Entries offered per vote (also capped by the playlist) |
+| `bot_policy` | text | (empty) | policy ids, comma separated | AI Lab policies for bot slots (used in turn; each bot fights as its policy's creature; unavailable ones fall back to the scripted AI). Entries can set their own `bot_policy` |
+| `player_assist` | bool | true | | true: each remote player's aim-assist level (low/normal/high, snapped to those) applies to their fighter; false: everyone gets normal |
 
 ### [admin]
 
@@ -189,6 +191,7 @@ A playlist is JSON (schema `game/content/schemas/playlist.schema.json`). Shipped
 | `min_players` | Fighters needed to start (default: the preset's `players` minimum) |
 | `max_players` | Maximum human fighters; extra humans spectate that match and get priority next time |
 | `bots` | Bots this entry may add; `0` = humans only; absent = the server's `bots` setting |
+| `bot_policy` | AI Lab policy id or list of ids for this entry's bots (absent = `match.bot_policy`) |
 | `rules_override` | Rules keys applied on top of the preset (`round_time`, `rounds`, `lives`, `damage_mult`, ...) |
 
 **Selection rules** (implemented in `src/net/net_playlist.gd`, tested in
@@ -212,8 +215,9 @@ A playlist is JSON (schema `game/content/schemas/playlist.schema.json`). Shipped
 7. *Automatic advance*: after `results_time` the next lobby/vote starts by itself.
 
 **Validation**: at startup (and on `playlist reload`), every entry is checked against the loaded
-content - unknown rules preset, unknown arena, mode not installed, impossible player counts,
-negative weight, malformed fields. Invalid entries are skipped and logged with their number, e.g.
+content - unknown rules preset, rules that fail the rules editor's validation (with the entry's
+overrides), unknown arena, mode not installed, impossible player counts, negative weight,
+malformed fields. Invalid entries are skipped and logged with their number, e.g.
 
 ```text
 [WARN] playlist: entry 4 (d_missing_arena): arena 'missing_arena' not found - skipped

@@ -453,8 +453,14 @@ func _on_lobby(d: Dictionary) -> void:
 
 
 func _on_match_start(info: Dictionary) -> void:
-	if not (info.get("fighters") is Array) or not (info.get("arena") is Dictionary):
+	if not (info.get("fighters") is Array) or not (info.get("arena") is Dictionary) or not (info.get("rules") is Dictionary):
 		malformed += 1
+		return
+	# the full rules dictionary is checked again here with the rules editor's validator
+	var bad_rules := NetProtocol.rules_problem(info["rules"])
+	if bad_rules != "":
+		Log.e("net", "the server's rules failed validation: %s" % bad_rules)
+		leave(NetProtocol.describe(NetProtocol.R_CONTENT, ["The server's rules failed validation here: %s" % bad_rules]))
 		return
 	_end_match_presentation()
 	match_info = info

@@ -40,6 +40,8 @@ const SCHEMA := {
 	"match.results_time": {"t": "int", "def": 12, "min": 2, "max": 120},
 	"match.empty_behavior": {"t": "enum", "def": "idle", "opts": ["idle", "showcase"]},
 	"match.vote_candidates": {"t": "int", "def": 3, "min": 1, "max": 5},
+	"match.bot_policy": {"t": "string", "def": "", "max_len": 1024},
+	"match.player_assist": {"t": "bool", "def": true},
 	"admin.console": {"t": "bool", "def": true},
 	"admin.port": {"t": "int", "def": 0, "min": 0, "max": 65535},
 	"admin.token": {"t": "string", "def": "", "max_len": 128},
@@ -57,6 +59,7 @@ const FLAT := {
 	"match.playlist": "playlist", "match.bots": "bots", "match.bot_difficulty": "bot_difficulty",
 	"match.lobby_time": "lobby_time", "match.results_time": "results_time",
 	"match.empty_behavior": "empty_behavior", "match.vote_candidates": "vote_candidates",
+	"match.bot_policy": "bot_policy", "match.player_assist": "player_assist",
 	"admin.console": "admin_console", "admin.port": "admin_port", "admin.token": "admin_token",
 }
 
@@ -214,6 +217,16 @@ static func _cross_check(cfg: Dictionary, errors: Array[String], warnings: Array
 	for id in mod_ids(cfg):
 		if RegEx.create_from_string("^[a-z0-9_]{3,32}$").search(id) == null:
 			errors.append("server.mods: '%s' is not a mod id (3-32 lowercase letters, digits or _)" % id)
+
+
+## AI Lab policy ids named by match.bot_policy ("id1, id2"), in order, without duplicates.
+static func policy_ids(cfg: Dictionary) -> Array:
+	var out: Array = []
+	for part in str(cfg.get("bot_policy", "")).split(",", false):
+		var id := part.strip_edges()
+		if id != "" and not out.has(id):
+			out.append(id)
+	return out
 
 
 ## Mod ids named by server.mods ("id1, id2"), in order, without duplicates.

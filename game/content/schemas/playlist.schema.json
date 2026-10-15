@@ -25,6 +25,7 @@
           "min_players": {"type": "integer", "minimum": 1, "maximum": 8, "description": "Fighters needed to start (default: the rules format minimum). Bots fill when allowed."},
           "max_players": {"type": "integer", "minimum": 1, "maximum": 8, "description": "Maximum human fighters; extra humans spectate this match."},
           "bots": {"type": "integer", "minimum": 0, "maximum": 7, "description": "Bots this entry may add (0 = humans only). Absent: the server's 'bots' setting decides."},
+          "bot_policy": {"type": ["string", "array"], "items": {"type": "string"}, "description": "AI Lab policy id(s) for the bot slots, used in turn; each bot fights as the policy's creature. Missing/incompatible policies fall back to the scripted AI. Absent: the server's match.bot_policy."},
           "rules_override": {"type": "object", "description": "Rules keys applied on top of the preset (e.g. round_time, rounds, lives)."}
         }
       }

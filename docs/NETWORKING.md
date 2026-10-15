@@ -242,11 +242,14 @@ the HUD. Playback speed stays 1x online. KO stars and callouts match local play;
 debug drawing needs the simulation's bodies, so it exists for local players and the
 listen host only.
 
-**Aim assist** (`access.target_assist`: low 0.5, normal 1.0, high 1.8) is part of the fighter's
-modifiers in the authoritative simulation: a client sends its level in HELLO and again
-(`LQ_ASSIST`) when the setting changes (used from the next match); the server clamps it to the
-setting's maximum and puts it into the fighter entry `mods["assist"]`, exactly as `MatchScene`
-does for local players (the listen host's own fighter uses the host's setting).
+**Aim assist** (`access.target_assist`: low 0.5, normal 1.0, high 1.8) is an accessibility option
+that changes how attacks snap toward the target, so it lives in the authoritative simulation
+(fighter entry `mods["assist"]`, exactly as `MatchScene` does for local players) - it cannot be
+presentation-only. A client sends its level in HELLO and again (`LQ_ASSIST`) when the setting
+changes (used from the next match). The server never takes a number from the client: it snaps the
+request to one of the setting's three levels (what any player can pick), and with
+`match.player_assist = false` (or `Net.host({"player_assist": false})`) it gives every remote
+player the normal level instead. Nothing else gameplay-related comes from clients.
 
 Diagnostics overlay: `Settings diag.show_net` shows RTT, loss, snapshot rate, interpolation delay
 and jitter, buffer depth and KB/s in the match; the same values come from `Net.stats()`.
@@ -257,16 +260,22 @@ Lobby state (dictionary, `Net.lobby()` / `lobby_changed`): `phase` (`idle`, `lob
 `results`), `countdown`, `name`, `motd`, `dedicated`, `max_players`, `max_spectators`, `password`,
 `host_id`, `players` [{id, name, slot, team, creature, ready, spectator, host, connected, fighter,
 ping, vote}], `settings` {rules, rules_name, arena, arena_name, mode, bots, bot_difficulty,
-rules_override}, `vote` {open, candidates [{index, key, name, rules_name, arena_name, mode, weight,
-min_players, max_players}], tally}, `playlist` {id, name, valid, invalid, errors}, `entry`,
-`match_id`, `options` {creatures, rules, arenas, bot_difficulties}, `last_result`.
+rules_override, bot_policy}, `vote` {open, candidates [{index, key, name, rules_name, arena_name,
+mode, weight, min_players, max_players}], tally}, `playlist` {id, name, valid, invalid, errors},
+`entry`, `match_id`, `options` {creatures, rules, arenas, bot_difficulties, bot_policies [{id,
+name, creature}]}, `last_result`.
 
 * Players get stable session ids (1 = server/listen host, joiners from 2) and lobby slots; joiners
   beyond `max_players` become spectators when spectator slots are free, otherwise `server_full`.
 * Characters, teams (`-1` = automatic), ready and spectator are per player; the server validates
   creature ids against the playable roster.
 * Match composition: humans who sat out longest first, capped at the entry's `max_players`; bots
-  fill to `min_players` where allowed (listen host: plus the host's bot count). Teams follow the
+  fill to `min_players` where allowed (listen host: plus the host's bot count). Bots are scripted
+  (`BotBrain`) or **AI Lab policies** (`bot_policy`: host setting, playlist entry or
+  `match.bot_policy`; used in turn across bot slots, each bot fights as its policy's creature, a
+  missing or incompatible policy falls back to the scripted AI). Policies run only on the server;
+  clients see a fighter of kind `policy` and need nothing (policies are not gameplay content and
+  not part of the content hash; the creature they drive is). Teams follow the
   local setup: duel/ffa own team each, teams/tag round-robin honouring requests, co-op humans on
   team 0 (bots join them, or oppose them when the preset has 2+ teams). Presets' `players: [min,
   max]` bound everything.
@@ -366,7 +375,12 @@ cost, traffic, memory, objects/nodes/orphans).
   download path would stream the server's `.critmod` (data-only, D-016) into the user `downloads`
   folder and hand it to `Mods.import_package()` after the player confirms, so every package check
   in docs/MODDING.md still applies.
-* Playlists are server-only data and are not part of the hash.
+* Playlists and AI Lab policies are server-only data and are not part of the hash.
+* **Rules are validated twice** with the rules editor's own validator (`RulesValidator`, via
+  `NetProtocol.rules_problem`): the host/server refuses invalid presets or overrides
+  (`host_set` returns the reason, playlist entries are skipped with it, `start_match` refuses), and
+  a client checks the rules dictionary in MATCH_START again and leaves with a clear reason if it
+  fails.
 
 ## 14. API for UI and systems (`Net` autoload)
 
@@ -379,8 +393,11 @@ Settings), `can_rejoin()`, `rejoin()`, `leave()`, `shutdown()` (App.quit), `star
 
 **Settings that act live** (Net listens to `Settings.changed`): `network.interp` (client smoothing),
 `network.timeout` (client and listen host), `network.lan_discovery` (browsing and the listen
-host's beacons), `access.target_assist` (sent to the server for the next match). `network.port`,
-`network.max_players`, `network.password` and `network.player_name` are read when hosting/joining.
+host's beacons), `network.send_rate` (snapshots per second the listen host sends, 20-60),
+`network.party_relay` (the listen host relays co-op party messages), `access.target_assist` (sent
+to the server for the next match). `network.port`, `network.max_players`, `network.password` and
+`network.player_name` are read when hosting/joining. The simulation rate is not a setting: combat
+is tuned at 120 Hz (dedicated servers can change `server.tick_rate`, with a warning).
 
 **Signals**: `status_changed(text)`, `session_state_changed(state)` (`offline`, `connecting`,
 `lobby`, `match`, `results`), `connection_failed(reason)`, `disconnected(reason)`,
@@ -400,8 +417,9 @@ line via `Platform.invite_text`), `local_addresses()` (this PC's IPv4 addresses,
 **Lobby actions** (host or client): `set_ready(bool)`, `set_creature(id)`, `set_team(team)`,
 `set_spectator(bool)`, `send_chat(text)`, `vote(index)`, `set_input_enabled(bool)` (neutral input
 while a menu overlay is open; online matches never pause). **Host only**: `host_set(key, value)`
-(rules, arena, bots, bot_difficulty, rules_override) -> error text, `host_start()` -> error text,
-`host_kick(id, reason)`.
+(rules - any preset the host has, including the player's own `user:` presets; rules_override;
+arena; bots; bot_difficulty; bot_policy - AI Lab policy id or list) -> error text (validated),
+`host_start()` -> error text, `host_kick(id, reason)`.
 
 **LAN**: `start_lan_discovery(port := 7779)` (`ERR_UNAVAILABLE` while the setting is off; starts by
 itself when it is switched on), `stop_lan_discovery()`, `is_lan_discovery_active()`, `lan_sessions()` ->

@@ -84,6 +84,12 @@ func _on_setting_changed(key: String, value) -> void:
 		"access.target_assist":
 			if client:
 				client.send_lobby(NetProtocol.LQ_ASSIST, NetProtocol.local_assist())
+		"network.send_rate":
+			if role == "host" and server:
+				server.set_snapshot_rate(int(value))
+		"network.party_relay":
+			if role == "host" and server:
+				server.set_party_relay(bool(value))
 
 
 # =====================================================================================
@@ -107,8 +113,11 @@ func host(cfg: Dictionary = {}) -> Error:
 	c["timeout"] = int(cfg.get("timeout", Settings.get_value("network.timeout")))
 	c["rejoin_grace"] = int(cfg.get("rejoin_grace", 60))
 	c["results_time"] = int(cfg.get("results_time", 8))
+	c["snapshot_rate"] = clampi(int(cfg.get("snapshot_rate", Settings.get_value("network.send_rate"))), 10, 60)
+	c["party_relay"] = bool(cfg.get("party_relay", Settings.get_value("network.party_relay")))
+	c["player_assist"] = bool(cfg.get("player_assist", true))
 	c["bot_difficulty"] = str(cfg.get("bot_difficulty", "regular"))
-	for k in ["discovery_port", "kick_ban_seconds", "snapshot_rate"]:
+	for k in ["discovery_port", "kick_ban_seconds"]:
 		if cfg.has(k):
 			c[k] = int(cfg[k])
 	server = NetServer.new()
@@ -121,7 +130,7 @@ func host(cfg: Dictionary = {}) -> Error:
 		server = null
 		_fail(reason)
 		return err
-	for k in ["rules", "arena", "bots", "bot_difficulty"]:
+	for k in ["rules", "rules_override", "arena", "bots", "bot_difficulty", "bot_policy"]:
 		if cfg.has(k):
 			server.host_set(k, cfg[k])
 	server.add_local_player(pname, str(cfg.get("creature", "")))

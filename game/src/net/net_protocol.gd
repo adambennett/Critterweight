@@ -209,14 +209,30 @@ static func local_assist() -> float:
 	return float(ASSIST_LEVELS.get(str(Settings.get_value("access.target_assist")), 1.0))
 
 
-## Assist level on the wire: hundredths in one byte. Decoding clamps to [0, MAX_ASSIST], so a
-## modified client cannot ask for more help than the setting offers.
+## Assist level on the wire: hundredths in one byte. Decoding snaps to the nearest level the
+## setting offers (low / normal / high), so a modified client can only pick what every player can.
 static func assist_to_byte(a: float) -> int:
 	return clampi(roundi(a * 100.0), 0, 255)
 
 
 static func assist_from_byte(b: int) -> float:
-	return clampf(float(b) / 100.0, 0.0, MAX_ASSIST)
+	var want := float(b) / 100.0
+	var best := 1.0
+	for v in ASSIST_LEVELS.values():
+		if absf(float(v) - want) < absf(best - want):
+			best = float(v)
+	return best
+
+
+## "" when a rules dictionary passes RulesValidator (the rules editor's own table, after
+## normalising), else its first errors on one line. Hosts start only valid rules; clients check
+## the rules they receive again.
+static func rules_problem(rules: Dictionary) -> String:
+	var errs: Array = []
+	for p in RulesValidator.validate(RulesValidator.normalize(rules)):
+		if typeof(p) == TYPE_DICTIONARY and str(p.get("severity", "")) == "error":
+			errs.append("%s: %s" % [str(p.get("field", "")), str(p.get("text", ""))])
+	return "; ".join(PackedStringArray(errs.slice(0, 3)))
 
 
 ## The packages that matter for joining: gameplay packages only (client_only ones never block, so

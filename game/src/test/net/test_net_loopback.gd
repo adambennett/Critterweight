@@ -472,6 +472,33 @@ func test_party_relay_inprocess() -> void:
 	party.close()
 
 
+## AI Lab policies fill bot slots in a server match (the server runs them; clients only see the
+## fighter), and rules that fail the rules editor's validation never start.
+func test_policy_bots_and_rules_validation_inprocess() -> void:
+	var port := _port()
+	var pid := "dev_biped_es_drill"
+	var server := _server(port, {}, [{"rules": "duel", "arena": "the_gullet", "weight": 1, "min_players": 2,
+		"bot_policy": pid, "rules_override": {"rounds": 1, "round_time": 30}}])
+	var pol := PolicyLibrary.get_policy(pid)
+	check(pol != null, "built-in policy available: %s" % PolicyLibrary.last_error(pid))
+	var a := _client(port, {"name": "Solo"})
+	check(await _until(func() -> bool: return a.state == NetClient.State.LOBBY, 6.0), "admitted")
+	a.send_lobby(NetProtocol.LQ_READY, true)
+	check(await _until(func() -> bool: return server.sim != null and a.my_fighter >= 0, 15.0), "match with a bot started")
+	if server.sim != null and a.my_fighter >= 0 and pol != null:
+		var bot := 1 - a.my_fighter
+		var f := server.sim.fighters[bot]
+		check_eq(f.controller_kind, "policy", "the bot slot runs the AI Lab policy")
+		check_eq(f.creature.id, pol.creature, "as the policy's own creature")
+		check(server.sim.input_sources[bot] is PolicyInputSource, "driven by PolicyInputSource on the server")
+		check(await _until(func() -> bool: return str(a.replica.roster.get(bot, {}).get("kind", "")) == "policy", 3.0), "clients see a policy fighter, nothing to load")
+	# invalid rules are refused by the authority with the validator's reason
+	var bad := {"name": "Broken", "mode": "standard", "format": "duel", "teams": 2, "players": [2, 2], "win": "none"}
+	var err := server.start_match("broken", bad, "the_gullet", 2, 2, 1, "regular", {})
+	check(err.begins_with("invalid rules"), "invalid rules refused: %s" % err)
+	check(NetProtocol.rules_problem(Content.get_entry("rules", "duel")) == "", "shipped presets validate")
+
+
 ## MOD-05 authority: the server repeats the content check on hello, so a client that lies about
 ## its packages (or skipped its own Mods.compare) is refused; client_only extras never block.
 func test_content_check_on_server_inprocess() -> void:
@@ -517,7 +544,7 @@ func test_assist_reaches_server_fighter_inprocess() -> void:
 ## Settings > Network apply live: smoothing to the running replica, timeout to the connection,
 ## LAN discovery to browsing and to the listen host's beacons; invite text for the host.
 func test_network_settings_apply_live() -> void:
-	var keys := ["network.interp", "network.timeout", "network.lan_discovery"]
+	var keys := ["network.interp", "network.timeout", "network.lan_discovery", "network.send_rate", "network.party_relay"]
 	var saved := {}
 	for k in keys:
 		saved[k] = Settings.get_value(k)
@@ -542,6 +569,10 @@ func test_network_settings_apply_live() -> void:
 	Net.stop_lan_discovery()
 	Settings.set_value("network.timeout", 7, false, false)
 	check_eq(int(Net.server.cfg["timeout"]), 7, "host timeout follows the setting")
+	Settings.set_value("network.send_rate", 20, false, false)
+	check_eq(int(Net.server.cfg["snapshot_rate"]), 20, "update rate follows the setting")
+	Settings.set_value("network.party_relay", false, false, false)
+	check(not bool(Net.server.cfg["party_relay"]), "co-op relay can be switched off")
 	Net.leave()
 	# client side: the replica picks up the smoothing mode at once
 	var port2 := port + 5
