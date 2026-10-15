@@ -28,7 +28,7 @@ class MinHeap {
 }
 
 function decimate(positions, tris, zones, targetTris, opts = {}) {
-  const zonePenalty = opts.zonePenalty == null ? 6 : opts.zonePenalty;
+  const seamWeight = opts.seamWeight == null ? 3.0 : opts.seamWeight;
   const n = positions.length / 3;
   const m = tris.length / 3;
   const P = Float64Array.from(positions);
@@ -44,17 +44,55 @@ function decimate(positions, tris, zones, targetTris, opts = {}) {
     const bx = pos[c * 3] - pos[a * 3], by = pos[c * 3 + 1] - pos[a * 3 + 1], bz = pos[c * 3 + 2] - pos[a * 3 + 2];
     return [ay * bz - az * by, az * bx - ax * bz, ax * by - ay * bx];
   };
+  const addPlane = (vi, nx, ny, nz, px, py, pz, w) => {
+    const d = -(nx * px + ny * py + nz * pz);
+    const q = [nx * nx, nx * ny, nx * nz, nx * d, ny * ny, ny * nz, ny * d, nz * nz, nz * d, d * d];
+    for (let k = 0; k < 10; k++) Q[vi * 10 + k] += q[k] * w;
+  };
+  let areaSum = 0;
   for (let f = 0; f < m; f++) {
     const a = F[f * 3], b = F[f * 3 + 1], c = F[f * 3 + 2];
     vfaces[a].push(f); vfaces[b].push(f); vfaces[c].push(f);
     const nrm = faceNormal(f, P);
     const area2 = Math.hypot(nrm[0], nrm[1], nrm[2]);
     if (area2 < 1e-18) continue;
+    areaSum += area2 * 0.5;
     const nx = nrm[0] / area2, ny = nrm[1] / area2, nz = nrm[2] / area2;
-    const d = -(nx * P[a * 3] + ny * P[a * 3 + 1] + nz * P[a * 3 + 2]);
-    const w = area2 * 0.5;
-    const q = [nx * nx, nx * ny, nx * nz, nx * d, ny * ny, ny * nz, ny * d, nz * nz, nz * d, d * d];
-    for (const vi of [a, b, c]) for (let k = 0; k < 10; k++) Q[vi * 10 + k] += q[k] * w;
+    for (const vi of [a, b, c]) addPlane(vi, nx, ny, nz, P[a * 3], P[a * 3 + 1], P[a * 3 + 2], area2 * 0.5);
+  }
+  // Colour seams: a vertex is "on a seam" when any neighbour carries another zone key. Mesh
+  // edges running along a seam (both ends on the seam, same key) get an extra quadric: the
+  // plane through the edge perpendicular to the surface. Sliding along the seam stays cheap,
+  // moving off it is expensive, so seams keep their shape while straight runs still simplify.
+  const seam = new Uint8Array(n);
+  for (let f = 0; f < m; f++) {
+    const a = F[f * 3], b = F[f * 3 + 1], c = F[f * 3 + 2];
+    if (zones[a] !== zones[b]) { seam[a] = 1; seam[b] = 1; }
+    if (zones[b] !== zones[c]) { seam[b] = 1; seam[c] = 1; }
+    if (zones[a] !== zones[c]) { seam[a] = 1; seam[c] = 1; }
+  }
+  const avgArea = areaSum / Math.max(1, m);
+  const seenSeamEdge = new Set();
+  for (let f = 0; f < m; f++) {
+    const nrm = faceNormal(f, P);
+    const l = Math.hypot(nrm[0], nrm[1], nrm[2]);
+    if (l < 1e-18) continue;
+    const fn = [nrm[0] / l, nrm[1] / l, nrm[2] / l];
+    for (let k = 0; k < 3; k++) {
+      const u = F[f * 3 + k], v = F[f * 3 + ((k + 1) % 3)];
+      if (!seam[u] || !seam[v] || zones[u] !== zones[v]) continue;
+      const key = u < v ? u * n + v : v * n + u;
+      if (seenSeamEdge.has(key)) continue;
+      seenSeamEdge.add(key);
+      const ex = P[v * 3] - P[u * 3], ey = P[v * 3 + 1] - P[u * 3 + 1], ez = P[v * 3 + 2] - P[u * 3 + 2];
+      // plane normal = edge x face normal (perpendicular to the surface, containing the edge)
+      let px = ey * fn[2] - ez * fn[1], py = ez * fn[0] - ex * fn[2], pz = ex * fn[1] - ey * fn[0];
+      const pl = Math.hypot(px, py, pz);
+      if (pl < 1e-12) continue;
+      px /= pl; py /= pl; pz /= pl;
+      addPlane(u, px, py, pz, P[u * 3], P[u * 3 + 1], P[u * 3 + 2], avgArea * seamWeight);
+      addPlane(v, px, py, pz, P[u * 3], P[u * 3 + 1], P[u * 3 + 2], avgArea * seamWeight);
+    }
   }
   const edgeKey = (u, v) => (u < v ? u * n + v : v * n + u);
   const version = new Map();
@@ -63,11 +101,13 @@ function decimate(positions, tris, zones, targetTris, opts = {}) {
   const evalQ = (q, x, y, z) => q[0] * x * x + 2 * q[1] * x * y + 2 * q[2] * x * z + 2 * q[3] * x + q[4] * y * y + 2 * q[5] * y * z + 2 * q[6] * y + q[7] * z * z + 2 * q[8] * z + q[9];
 
   function edgeCost(u, v) {
+    // never merge two colour keys: the seam between them would move or vanish
+    if (zones[u] !== zones[v]) return { c: Infinity, p: null };
     for (let k = 0; k < 10; k++) qsum[k] = Q[u * 10 + k] + Q[v * 10 + k];
     const q = qsum;
     let best = null, bestCost = Infinity;
     const cands = [];
-    const sameZone = zones[u] === zones[v];
+    const sameZone = true;
     if (sameZone) {
       // optimal point: solve A x = -b
       const a11 = q[0], a12 = q[1], a13 = q[2], a22 = q[4], a23 = q[5], a33 = q[7];
@@ -89,7 +129,6 @@ function decimate(positions, tris, zones, targetTris, opts = {}) {
       const cost = evalQ(q, c[0], c[1], c[2]);
       if (cost < bestCost) { bestCost = cost; best = c; }
     }
-    if (!sameZone) bestCost = Math.max(bestCost, 0) * zonePenalty + 1e-9;
     return { c: Math.max(bestCost, 0), p: best };
   }
 
@@ -98,6 +137,7 @@ function decimate(positions, tris, zones, targetTris, opts = {}) {
     const ver = (version.get(key) || 0) + 1;
     version.set(key, ver);
     const { c, p } = edgeCost(u, v);
+    if (p === null) return;
     heap.push({ c, u, v, ver, key, p });
   }
   function pushAround(u) {
@@ -156,11 +196,6 @@ function decimate(positions, tris, zones, targetTris, opts = {}) {
     if (flip) continue;
     // collapse v into u
     P[u * 3] = np[0]; P[u * 3 + 1] = np[1]; P[u * 3 + 2] = np[2];
-    if (zones[u] !== zones[v]) {
-      // keep the zone of whichever endpoint the new position coincides with
-      const du = Math.hypot(np[0] - P[v * 3], np[1] - P[v * 3 + 1], np[2] - P[v * 3 + 2]);
-      if (du < 1e-12) zones[u] = zones[v];
-    }
     for (let k = 0; k < 10; k++) Q[u * 10 + k] += Q[v * 10 + k];
     for (const f of vfaces[v]) {
       if (!faceAlive[f]) continue;

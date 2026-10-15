@@ -1,0 +1,60 @@
+{
+  "id": "npc_blister",
+  "name": "Blister",
+  "title": "runoff sac",
+  "element": "sludge",
+  "npc_only": true,
+  "tags": ["minion", "hopper"],
+  "stats": {"health": 20, "walk_speed": 2.8, "accel": 26, "turn_rate": 8, "stamina": 50, "stamina_regen": 12,
+            "poise": 10, "poise_regen": 15, "dodge_speed": 6.0, "dodge_time": 0.25, "power": 1.0, "defense": 1.0, "weight": 1.0},
+  "body": {
+    "id": "npc_blister_body",
+    "name": "Blister",
+    "gait": "hopper",
+    "hover_height": 0.33,
+    "stride": 0.45,
+    "step_height": 0.2,
+    "step_time": 0.3,
+    "segments": [
+      {"id": "core", "pivot": [0, 0.33, 0], "mass": 21, "part": "core", "hurt": 1.0, "w0": 26,
+       "shapes": [{"type": "capsule", "a": [0, 0.28, 0], "b": [0, 0.42, 0], "radius": 0.26}]},
+      {"id": "nub_l", "parent": "core", "pivot": [0.24, 0.48, 0], "mass": 2, "part": "tail", "hurt": 0.8, "w0": 18, "zeta": 0.6,
+       "shapes": [{"type": "capsule", "a": [0.25, 0.5, 0], "b": [0.36, 0.6, -0.04], "radius": 0.05}]},
+      {"id": "nub_r", "parent": "core", "pivot": [-0.24, 0.48, 0], "mass": 2, "part": "tail", "hurt": 0.8, "w0": 18, "zeta": 0.6,
+       "shapes": [{"type": "capsule", "a": [-0.25, 0.5, 0], "b": [-0.36, 0.6, -0.04], "radius": 0.05}]}
+    ],
+    "chains": {},
+    "weapons": {
+      "body": {"segment": "core", "point": [0, 0.33, 0.1], "radius": 0.3},
+      "nub_l": {"segment": "nub_l", "point": [0.36, 0.6, -0.04], "radius": 0.07},
+      "nub_r": {"segment": "nub_r", "point": [-0.36, 0.6, -0.04], "radius": 0.07}
+    },
+    "poses": {
+      "stance": {"joints": {"nub_l": [0, 0, 10], "nub_r": [0, 0, -10]}, "height": 0.0},
+      "guard": {"joints": {"nub_l": [0, 0, 40], "nub_r": [0, 0, -40]}, "height": -0.06}
+    }
+  },
+  "moves": {
+    "l1": {"_stub": true, "name": "Hop Bump", "duration": 0.5, "cancel": 0.4, "damage": 2, "knockback": 1.2, "stun": 0.15, "poise": 5, "stamina": 3,
+           "vmin": 1.0, "vref": 4.0, "lunge": [[0.1, 0.3, 3.0]], "move_mult": 0.2, "element": "sludge", "buildup": 5,
+           "hit": [{"t0": 0.12, "t1": 0.34, "weapons": ["body"]}],
+           "keys": [{"t": 0.0, "height": -0.1}, {"t": 0.12, "height": 0.25}, {"t": 0.34, "height": 0.1}, {"t": 0.5}]},
+    "heavy": {"_stub": true, "name": "Inflate & Pop", "duration": 1.4, "damage": 12, "knockback": 3.5, "stun": 0.4, "poise": 20, "stamina": 0,
+              "vmin": 0.0, "vref": 2.0, "move_mult": 0.0, "element": "sludge", "buildup": 40,
+              "hit": [{"t0": 1.2, "t1": 1.3, "weapons": ["body"]}],
+              "keys": [{"t": 0.0}, {"t": 1.2, "height": 0.15, "joints": {"nub_l": [0, 0, 60], "nub_r": [0, 0, -60]}}, {"t": 1.4}]},
+    "grab": {"_stub": true, "name": "Cling", "kind": "grab", "duration": 0.5, "damage": 0, "stamina": 3, "lunge": [[0.05, 0.2, 2.0]],
+             "hit": [{"t0": 0.1, "t1": 0.3, "weapons": ["body"]}],
+             "keys": [{"t": 0.0}, {"t": 0.5}]}
+  },
+  "abilities": {},
+  "art": {
+    "model": "res://assets/models/creatures/npc_blister.glb",
+    "palette": {"primary": "#8BD426", "secondary": "#4F7F1A", "accent": "#C7E66B"},
+    "roughness": 0.3,
+    "outline": 0.01,
+    "gore_piece": {"segment": "nub_l", "offset": [0.08, 0.08, -0.03], "size": 0.05, "shape": "nub", "color": "#8BD426"}
+  },
+  "audio": {},
+  "ai": {}
+}

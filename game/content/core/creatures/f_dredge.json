@@ -380,7 +380,7 @@
    "claw_crusher": {
     "segment": "claw_r",
     "point": [-0.5, 0.66, 1.04],
-    "radius": 0.17
+    "radius": 0.11
    },
    "claw_cutter": {
     "segment": "claw_l",
@@ -406,16 +406,6 @@
     "segment": "head",
     "point": [0, 0.95, 0.42],
     "radius": 0.14
-   },
-   "leg_tip_fl": {
-    "segment": "lleg_fl",
-    "point": [1, 0.06, 0.36],
-    "radius": 0.08
-   },
-   "leg_tip_fr": {
-    "segment": "lleg_fr",
-    "point": [-1, 0.06, 0.36],
-    "radius": 0.08
    }
   },
   "poses": {

@@ -3,7 +3,7 @@ extends SceneTree
 ##
 ##   godot --headless --path game --script res://src/view/model_preview.gd -- --inspect res://assets/models/creatures/f_stoke.glb
 ##   godot --path game --script res://src/view/model_preview.gd -- --models a.glb,b.glb [--spacing 1.4] [--yaw 30]
-##         [--creatures res://content/core/creatures/f_stoke.json,...] --capture out.png [--size 1600x900]
+##         [--creatures res://content/core/creatures/f_stoke.json,...] [--hype 0..1] [--detach] --capture out.png
 ##
 ## --inspect prints the imported scene tree, skeleton bones (name, parent, rest translation),
 ## mesh surfaces and materials. The windowed mode lines the models up on a floor under the
@@ -13,6 +13,7 @@ extends SceneTree
 var _args: PackedStringArray
 var _frames := 0
 var _capture := ""
+var _detach_views: Array[CreatureView] = []
 
 
 func _init() -> void:
@@ -137,6 +138,9 @@ func _build_preview() -> void:
 					xf.append(Transform3D(Basis.IDENTITY, s.pivot))
 				v.snap_transforms(xf)
 				v.render(1.0)
+				v.hype = float(_arg("--hype", "0"))
+				if _args.has("--detach"):
+					_detach_views.append(v)
 				max_h = maxf(max_h, c.body.height)
 				continue
 			print("preview: invalid creature ", creatures[i], " ", c.errors)
@@ -164,7 +168,14 @@ func _scene_aabb(n: Node) -> AABB:
 	var box := AABB()
 	var first := true
 	for mi in _meshes(n):
-		var b := mi.global_transform * mi.get_aabb()
+		# transform relative to the model root (nodes may not be inside the tree yet)
+		var xf := Transform3D.IDENTITY
+		var walk: Node = mi
+		while walk != null and walk != n:
+			if walk is Node3D:
+				xf = (walk as Node3D).transform * xf
+			walk = walk.get_parent()
+		var b := xf * mi.get_aabb()
 		if first:
 			box = b
 			first = false
@@ -184,6 +195,13 @@ func _meshes(n: Node) -> Array[MeshInstance3D]:
 
 func _process(_delta: float) -> bool:
 	_frames += 1
+	if _frames == 2:
+		# --detach: pop every creature's forged gore piece (KO gag) so it shows in the capture
+		for v in _detach_views:
+			var piece := v.detach_piece(Vector3(0.6, 0, 1))
+			if piece:
+				piece.linear_velocity = Vector3(0.3, 1.2, 0.8)
+				piece.angular_velocity = Vector3(2, 3, 1)
 	if _frames == 12 and _capture != "":
 		await RenderingServer.frame_post_draw
 		var img := root.get_viewport().get_texture().get_image()
