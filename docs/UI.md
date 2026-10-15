@@ -214,8 +214,8 @@ online pause does not pause; every screen opens focused and B returns; text/UI s
 Online screens (`src/test/net/test_online_ui.gd`, network owner, LOOPBACK): tabs/focus/back; hosting through the Online
 screen, a guest joining, copy invite, the rules dialog, Y starts a match, the online results card, the automatic return
 to the lobby, leaving with the confirmation; joining a host in **another process** through the Join tab's recent-server
-entry, readying with Y, playing the host's match and coming back; refusal dialogs (wrong password, full, nobody
-answering) and a kick with the host's reason; the LAN tab (listed session, password prompt); the same layout audit for
+entry, readying with Y, playing the host's match and coming back; refusal dialogs (wrong password, another game
+version, full, nobody answering) and a kick with the host's reason; the LAN tab (listed session, password prompt); the same layout audit for
 every tab and a lobby with a guest.
 
 Dev flags (handled by the title screen): `--ui-screen <name>` (any screen, plus `practice`, `countdown`, `pause`,

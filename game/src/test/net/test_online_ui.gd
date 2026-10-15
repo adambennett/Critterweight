@@ -3,9 +3,9 @@ extends TestCase
 ## and keyboard events through the engine's input pipeline, focus checked after every step:
 ## tabs, back, hosting through the Online screen, the lobby with a real guest, starting a match,
 ## the online results card, the automatic return to the lobby, leaving; error dialogs for a
-## refused join (wrong password, full session, timeout) and for being kicked; joining a host
-## running in ANOTHER process through the Join tab (recent server); layout at 1280x800 and
-## 1920x1080. Everything runs over 127.0.0.1 on this machine.
+## refused join (wrong password, another game version, full session, timeout) and for being
+## kicked; the LAN tab; joining a host running in ANOTHER process through the Join tab (recent
+## server); layout at 1280x800 and 1920x1080. Everything runs over 127.0.0.1 on this machine.
 
 const U := preload("res://src/test/net/net_test_util.gd")
 
@@ -288,8 +288,8 @@ func test_join_other_process_through_screens() -> void:
 	check(Net.recent_servers().any(func(e: Dictionary) -> bool: return int(e["port"]) == port), "the server stays in the recent list")
 
 
-## Refused joins explain themselves in a dialog: wrong password, full session, nobody answering;
-## and a kicked player lands on the Online screen with the reason.
+## Refused joins explain themselves in a dialog: wrong password, another game version, full
+## session, nobody answering; and a kicked player lands on the Online screen with the reason.
 func test_join_errors_and_kick_show_reasons() -> void:
 	await wait_frames(2)
 	var port := _port()
