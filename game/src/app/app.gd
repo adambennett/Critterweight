@@ -153,6 +153,53 @@ func set_scene(n: Node) -> void:
 		world.add_child(n)
 
 
+## Resolves a match config that may contain content ids into concrete defs.
+## cfg: {arena: id|ArenaDef, rules: preset id|Dictionary, seed, context,
+##       fighters: [{creature: id|CreatureDef, team, kind: player|bot|policy|net, difficulty, name, mods}]}
+func resolve_match_config(cfg: Dictionary) -> Dictionary:
+	var out := cfg.duplicate()
+	var a = cfg.get("arena", "the_gullet")
+	out["arena"] = a if a is ArenaDef else Content.arena(str(a))
+	if out["arena"] == null:
+		out["arena"] = Content.arena("the_gullet")
+	var r = cfg.get("rules", "duel")
+	var rules: Dictionary = r if typeof(r) == TYPE_DICTIONARY else Content.get_entry("rules", str(r))
+	out["rules"] = rules.duplicate(true)
+	if not out.has("mode"):
+		out["mode"] = ModeRegistry.create(str(rules.get("mode", "standard")))
+	var fs := []
+	for f in cfg.get("fighters", []):
+		var e: Dictionary = f.duplicate()
+		var c = f.get("creature")
+		e["creature"] = c if c is CreatureDef else Content.creature(str(c))
+		if e["creature"] == null:
+			Log.e("app", "unknown creature %s" % str(c))
+			continue
+		fs.append(e)
+	out["fighters"] = fs
+	if not out.has("seed"):
+		out["seed"] = randi()
+	return out
+
+
+## Starts a local authoritative match with presentation. Menus are cleared; when the match
+## ends the results screen is shown (or `on_finished` is called if given).
+func start_match(cfg: Dictionary, on_finished: Callable = Callable()) -> MatchScene:
+	var resolved := resolve_match_config(cfg)
+	clear_screens()
+	var scene := MatchScene.new()
+	set_scene(scene)
+	scene.start(resolved)
+	scene.match_finished.connect(func(result: Dictionary):
+		match_ended.emit(result)
+		if on_finished.is_valid():
+			on_finished.call(result)
+		elif has_screen("results"):
+			push("results", {"result": result, "config": cfg}))
+	match_started.emit(scene)
+	return scene
+
+
 func quit() -> void:
 	if quitting:
 		return

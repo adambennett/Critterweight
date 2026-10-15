@@ -1,0 +1,14 @@
+{
+  "id": "the_gullet",
+  "name": "The Gullet",
+  "base": "octagon",
+  "radius": 5.0,
+  "wall_height": 2.4,
+  "theme": "can",
+  "author": "Critterweight",
+  "version": 1,
+  "spawns": [[0, -1.8, 0], [0, 1.8, 180], [-1.8, 0, 90], [1.8, 0, 270], [-1.4, -1.4, 45], [1.4, 1.4, 225], [1.4, -1.4, 315], [-1.4, 1.4, 135]],
+  "props": [],
+  "hazards": [],
+  "markers": {}
+}
