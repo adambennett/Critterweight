@@ -368,6 +368,7 @@ func _build_base_hazards() -> void:
 			"crane_magnet":
 				var dia := float(h.get("radius", 3.0)) * 2.0
 				var m4 := ArenaPropVisuals.decal(Color("#E04FB0"), 3, Vector2(dia, dia), ArenaPropVisuals.ICONS["magnet"], {"icon_spacing": 1.3, "base_alpha": 0.0})
+				m4.render_priority = 2     # over the plate-grid decals it crosses
 				var node := ArenaPropVisuals.decal_quad(_hazard_root, m4, Vector2(dia, dia))
 				node.visible = false
 				_hz_decals[id] = {"mats": [m4], "node": node}
@@ -738,7 +739,8 @@ func _magnet_anim(hz: Dictionary, deco: Dictionary, phase: String, t: float, dt:
 			target = mg.get("rest", Vector2.ZERO) if not mg.is_empty() else Vector2.ZERO
 	if node:
 		node.visible = phase != "idle"
-		node.position = Vector3(target.x, 0.0, target.y)
+		# just above the plate-grid decals (a y of 0 sank the ring into the floor)
+		node.position = Vector3(target.x, 0.02, target.y)
 		for m in mats:
 			(m as ShaderMaterial).set_shader_parameter("base_alpha", 0.4 if phase != "idle" else 0.0)
 			(m as ShaderMaterial).set_shader_parameter("glow", 1.0 if phase == "telegraph" else 0.0)
@@ -915,15 +917,18 @@ func _sparks(pos: Vector3, col: Color) -> void:
 	pm.initial_velocity_min = 2.0
 	pm.initial_velocity_max = 5.0
 	pm.gravity = Vector3(0, -9, 0)
-	pm.scale_min = 0.03
-	pm.scale_max = 0.07
+	pm.scale_min = 0.6
+	pm.scale_max = 1.4
 	pm.color = col
 	gp.process_material = pm
+	# the quad itself is spark-sized: a full-size quad scaled down by the process material turned
+	# into large overexposed squares when many bursts overlapped (magnet pull)
 	var q := QuadMesh.new()
+	q.size = Vector2(0.06, 0.06)
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	m.albedo_color = col * 3.0
+	m.albedo_color = col.lightened(0.45)
 	q.material = m
 	gp.draw_pass_1 = q
 	add_child(gp)

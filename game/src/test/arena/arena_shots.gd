@@ -40,6 +40,11 @@ func _start() -> void:
 	else:
 		_start_match()
 	await get_tree().create_timer(at, true, false, true).timeout
+	if scene != null:
+		# first frames compile shaders and the sim lags wall time: also wait for `at` sim seconds
+		var cap := Time.get_ticks_msec() + 30000
+		while scene.sim.time < at and Time.get_ticks_msec() < cap:
+			await get_tree().process_frame
 	var when := _arg("--when")   # "<hazard type>:<phase>[:<min seconds into phase>]"
 	if when != "" and scene != null:
 		var w := when.split(":")
