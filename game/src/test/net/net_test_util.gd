@@ -12,6 +12,9 @@ extends RefCounted
 ## such - they say nothing about off-machine internet connectivity.
 
 const KEEP_OUTPUT := 512 * 1024
+## How long a spawned server may take to print "ready:". It is normally up in 1-2 s; on a shared
+## machine saturated by parallel jobs, engine start alone was seen taking 10 s.
+const SERVER_READY_S := 30.0
 
 var tc: Node                       ## the running TestCase (for awaits)
 var root := ""                     ## per-test working folder
@@ -204,7 +207,8 @@ func wait_json(p: String, pred: Callable, timeout_s: float) -> Dictionary:
 			if pred.call(d):
 				return d
 		await tc.get_tree().create_timer(0.25).timeout
-	return last
+	var final := read_json(p)    # one last read after the deadline (a busy runner can wake late)
+	return final if not final.is_empty() else last
 
 
 func wait_until(pred: Callable, timeout_s: float) -> bool:
@@ -214,7 +218,9 @@ func wait_until(pred: Callable, timeout_s: float) -> bool:
 		if pred.call():
 			return true
 		await tc.get_tree().create_timer(0.2).timeout
-	return false
+	# one last look: a busy runner can wake up after the deadline with the condition already met
+	pump()
+	return bool(pred.call())
 
 
 func wait_exit(pid: int, timeout_s: float) -> bool:

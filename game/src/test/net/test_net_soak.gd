@@ -80,7 +80,7 @@ func test_soak_server_with_bots() -> void:
 	var cfg: String = u.write_cfg("srv.cfg", u.server_sections(port, {"server": {"stats_interval": 30},
 		"match": {"playlist": pl, "lobby_time": 5, "results_time": 3, "empty_behavior": "showcase"}}))
 	var srv: int = u.spawn("srv", ["--server", "--config", cfg])
-	check(await u.wait_until(func() -> bool: return u.out(srv).contains("ready:"), 15.0), "server ready")
+	check(await u.wait_until(func() -> bool: return u.out(srv).contains("ready:"), U.SERVER_READY_S), "server ready")
 	var q := str(int(seconds + 60))
 	var fighter: int = u.spawn("fighter", u.client_args(port, "Grinder", "wander", ["--ready", "--vote", "0", "--quit-after", q]))
 	var watcher: int = u.spawn("watcher", u.client_args(port, "Watcher", "idle", ["--spectate", "--present", "--quit-after", q]))

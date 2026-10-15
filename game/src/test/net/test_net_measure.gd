@@ -27,7 +27,7 @@ func _measure(name_: String, rules: String, fighters: int, seconds: float) -> Di
 	var cfg: String = u.write_cfg("srv.cfg", u.server_sections(port, {"server": {"stats_interval": 5},
 		"match": {"playlist": pl, "lobby_time": 3, "bots": "true", "bot_difficulty": "pro"}}))
 	var srv: int = u.spawn("srv", ["--server", "--config", cfg])
-	check(await u.wait_until(func() -> bool: return u.out(srv).contains("ready:"), 15.0), "server ready")
+	check(await u.wait_until(func() -> bool: return u.out(srv).contains("ready:"), U.SERVER_READY_S), "server ready")
 	var cli: int = u.spawn("probe", u.client_args(port, "Probe", "wander", ["--ready", "--present", "--net-latency", "1",
 		"--quit-after", str(int(seconds + 40))]))
 	var status_path: String = u.path("srv").path_join("server").path_join("status.json")

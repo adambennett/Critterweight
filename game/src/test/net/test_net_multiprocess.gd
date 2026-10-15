@@ -21,7 +21,7 @@ func _start_server(name_: String, sections: Dictionary, piped := false) -> int:
 	var cfg: String = u.write_cfg("%s.cfg" % name_, sections)
 	var pid: int = u.spawn(name_, ["--server", "--config", cfg], piped)
 	check(pid > 0, "server process spawned")
-	var log_ok: bool = await u.wait_until(func() -> bool: return u.out(pid).contains("ready:"), 15.0)
+	var log_ok: bool = await u.wait_until(func() -> bool: return u.out(pid).contains("ready:"), U.SERVER_READY_S)
 	check(log_ok, "server reports ready")
 	return pid
 
