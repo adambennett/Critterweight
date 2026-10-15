@@ -223,7 +223,7 @@ func test_grab_reach_pummel_and_throws() -> void:
 		for ev in r["events"]:
 			if ev["type"] == "hit" and str(ev.get("slot", "")) == "pummel":
 				pummels += 1
-				check_near(float(ev["damage"]), 4.0, 0.01, "pummel squeeze 4 dmg")
+				check_near(float(ev["damage"]), 4.0 * Content.creature(ID).stat("power"), 0.01, "pummel squeeze 4 dmg (x power)")
 			if ev["type"] == "hit" and str(ev.get("slot", "")) == "throw":
 				throw_dmg = float(ev["damage"])
 		var throws := []
@@ -233,7 +233,7 @@ func test_grab_reach_pummel_and_throws() -> void:
 		check(pummels == 2, "%s: two pummels landed (%d)" % [kind[0], pummels])
 		check(throws == [kind[0]], "%s thrown (%s)" % [kind[0], str(throws)])
 		var expected: float = {"throw_fwd": 12.0, "throw_side": 9.0, "throw_back": 8.0}[kind[0]]
-		check_near(throw_dmg, expected, 0.01, "%s damage" % kind[0])
+		check_near(throw_dmg, expected * Content.creature(ID).stat("power"), 0.01, "%s damage (x power)" % kind[0])
 		check(float(b.statuses.buildup.get("brine", 0.0)) > 0.0 or b.statuses.has_element("brine"), "%s: pummels add Brine build-up" % kind[0])
 		var land := b.pos() - Vector3(r["b_start"])
 		var a_fwd := Vector3(0, 0, 1)
@@ -362,6 +362,10 @@ func test_heavy_variant_still_charges() -> void:
 			slots.append(str(ev["slot"]))
 	check(slots.has("heavy@juiced") and slots.has("heavy_charged"), "juiced slam charges into Hull Breaker (%s)" % str(slots))
 	release(sim)
+
+
+func test_charge_hold_is_stationary() -> void:
+	await check_charge_hold_stationary(ID)
 
 
 func test_zy_measure_table() -> void:

@@ -229,6 +229,21 @@ func check_sane(res: Dictionary, label: String) -> void:
 	check(float(res["max_w"]) < 60.0, "%s: no segment spins wildly (max |w| %.1f rad/s)" % [label, res["max_w"]])
 
 
+## Holding Heavy freezes the heavy at 0.7 x its startup while it charges: nothing may keep pushing
+## the fighter forward during the hold (a lunge window covering the freeze point would).
+func check_charge_hold_stationary(cid: String) -> void:
+	var sim := kit_sim(cid, dummy(), 6.0, InputSource.Scripted.new([{"t0": 0.4, "t1": 0.43, "press": ["heavy"]},
+		{"t0": 0.4, "t1": 1.3, "hold": ["heavy"]}]), null, {}, 8.0)
+	var a := sim.fighters[0]
+	await run(sim, 0.65)
+	var p0 := a.pos()
+	await run(sim, 0.55)
+	check(a.move_slot == "heavy" and a._charging, "%s: still charging the heavy" % cid)
+	var drift := Vector2(a.pos().x - p0.x, a.pos().z - p0.z).length()
+	check(drift < 0.25, "%s: holding Heavy does not drift the fighter (%.2f m)" % [cid, drift])
+	release(sim)
+
+
 ## Prints one measurement line per move against a 100 kg dummy (docs numbers) and checks that
 ## each move's measured knockback is within tolerance of the ROSTER metres (kb_m) when given.
 ## rows: [slot, gap, roster_kb_m (or -1), via (optional Scripted steps)]

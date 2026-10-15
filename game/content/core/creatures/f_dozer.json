@@ -130,14 +130,14 @@
     "heavy": {
       "name": "Horn Lunge", "duration": 0.78, "damage": 13, "knockback": 5.8, "stun": 0.6, "poise": 30, "stamina": 12,
       "vmin": 1.5, "vref": 6, "speed": 1.6, "charge_time": 0.9, "charge_damage": 0.2, "move_mult": 0.2,
-      "lunge": [[0.13, 0.3, 4.8]], "element": "grit", "buildup": 30, "armor": [[0, 0.38]],
+      "lunge": [[0.19, 0.31, 5.4]], "element": "grit", "buildup": 30, "armor": [[0, 0.38]],
       "hit": [{"t0": 0.26, "t1": 0.38, "weapons": ["horn", "head"]}],
       "keys": [
         {"t": 0},
         {"t": 0.13, "joints": {"neck": [-14, 0, 0], "head": [-12, 0, 0]}, "lean": [-8, 0, 0], "height": 0.04},
         {"t": 0.18, "joints": {"neck": [-14, 0, 0], "head": [-12, 0, 0]}, "lean": [-8, 0, 0], "height": 0.04},
-        {"t": 0.28, "joints": {"neck": [14, 0, 0], "head": [22, 0, 0]}, "lean": [8, 0, 0], "height": 0},
-        {"t": 0.42, "joints": {"neck": [14, 0, 0], "head": [22, 0, 0]}, "lean": [8, 0, 0]},
+        {"t": 0.28, "joints": {"neck": [20, 0, 0], "head": [26, 0, 0]}, "lean": [9, 0, 0], "height": -0.02},
+        {"t": 0.42, "joints": {"neck": [20, 0, 0], "head": [26, 0, 0]}, "lean": [9, 0, 0], "height": -0.02},
         {"t": 0.78}
       ]
     },
@@ -146,7 +146,7 @@
       "stun": 0.8, "poise": 50, "stamina": 16, "vmin": 1.5, "vref": 6.5, "speed": 1.6, "move_mult": 0, "turn_rate": 1.5,
       "lunge": [[0, 0.5, 6]], "element": "grit", "buildup": 45, "armor": [[0, 1.35]], "guard_break": 2,
       "on_hit": [{"if": {"target_guarding": true}, "do": [{"type": "guard_crush", "mult": 2}]}],
-      "hit": [{"t0": 0.3, "t1": 0.8, "weapons": ["horn", "head", "snout"]}],
+      "hit": [{"t0": 0.12, "t1": 0.8, "weapons": ["horn", "head", "snout"]}],
       "keys": [
         {"t": 0, "joints": {"neck": [-14, 0, 0], "head": [-12, 0, 0]}, "lean": [-8, 0, 0], "height": 0.04},
         {"t": 0.12, "joints": {"neck": [2, 0, 0], "head": [-4, 0, 0]}, "lean": [5, 0, 0], "height": -0.03},

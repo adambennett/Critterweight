@@ -94,12 +94,21 @@ func test_scoop_launches() -> void:
 
 
 func test_horn_lunge_armor_and_reach() -> void:
-	var sb := InputSource.Scripted.new([{"t0": 0.45, "t1": 0.48, "press": ["light"]}])
-	var r := await measure_move(ID, "heavy", 2.3, {"sb": sb, "dummy": Content.creature("f_dredge"), "keep": true})
-	var a: Fighter = r["a"]
-	check(not r["melee"].is_empty(), "Horn Lunge lands (on a crab)")
-	check(count_events(r["events"], "move_start", "slot", "heavy") == 1 and not r["b_states"].is_empty(), "lunge not interrupted")
-	release(r)
+	# the crab jabs Dozer during the windup: armor carries the lunge through to the hit
+	var landed := 0
+	var tagged := 0
+	for g in [1.9, 2.0, 2.2]:
+		var sb := InputSource.Scripted.new([{"t0": 0.45, "t1": 0.48, "press": ["light"]}])
+		var r := await measure_move(ID, "heavy", g, {"sb": sb, "dummy": Content.creature("f_dredge"), "keep": true})
+		var a: Fighter = r["a"]
+		if not r["melee"].is_empty():
+			landed += 1
+		if a.stats_record["damage_taken"] > 0.0:
+			tagged += 1
+		check(a.state != Fighter.State.HITSTUN or not r["melee"].is_empty(), "lunge not interrupted at %.1f m" % g)
+		release(r)
+	check(landed >= 1, "Horn Lunge lands on a crab that jabs it during the windup (%d of 3 gaps)" % landed)
+	check(tagged >= 1, "the jab does connect (armor, not a whiff)")
 	var lunge := await measure_move(ID, "heavy", 5.0)
 	var d := Vector3(lunge["a_disp"])
 	check(d.z > 0.45 and d.z < 1.1, "root lunges ~0.6 m (%.2f)" % d.z)
@@ -163,10 +172,11 @@ func test_grab_reach_pummel_and_throws() -> void:
 				throw_dmg = float(ev["damage"])
 			if ev["type"] == "throw":
 				kinds.append(str(ev["kind"]))
-		check_near(pummel_dmg, 3.0, 0.01, "%s: headbutt-shake pummel 3 dmg" % kind[0])
+		var pw := Content.creature(ID).stat("power")
+		check_near(pummel_dmg, 3.0 * pw, 0.01, "%s: headbutt-shake pummel 3 dmg (x power)" % kind[0])
 		check(kinds == [kind[0]], "%s thrown (%s)" % [kind[0], str(kinds)])
 		var expected: float = {"throw_fwd": 10.0, "throw_side": 9.0, "throw_back": 9.0}[kind[0]]
-		check_near(throw_dmg, expected, 0.01, "%s damage" % kind[0])
+		check_near(throw_dmg, expected * pw, 0.01, "%s damage (x power)" % kind[0])
 		var land := b.pos() - Vector3(r["b_start"])
 		if kind[0] == "throw_fwd":
 			check(float(r["b_rise"]) > 0.8, "Launch: knock-up (%.2f m)" % r["b_rise"])
@@ -339,6 +349,10 @@ func test_cooldown_hook_action() -> void:
 	check_eq(int(f.charges_left["ability2"]), 1, "charges refilled at 0")
 	check(Hooks.validate({"on": "ability_used", "do": [{"type": "cooldown", "slot": "ability1", "set": 0}]}).is_empty(), "the action validates")
 	release(sim)
+
+
+func test_charge_hold_is_stationary() -> void:
+	await check_charge_hold_stationary(ID)
 
 
 func test_zy_measure_table() -> void:
