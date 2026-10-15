@@ -5,8 +5,10 @@
   "element": "grit",
   "npc_only": false,
   "tags": ["fighter", "quadruped", "lunker"],
-  "stats": {"health": 130, "walk_speed": 3.0, "accel": 24, "turn_rate": 4.5, "stamina": 95, "stamina_regen": 12,
-            "poise": 85, "poise_regen": 15, "dodge_speed": 10.6, "dodge_time": 0.3, "power": 1.0, "defense": 1.0, "weight": 1.0},
+  "stats": {
+    "health": 130, "walk_speed": 3, "accel": 24, "turn_rate": 4.5, "stamina": 95, "stamina_regen": 12, "poise": 85,
+    "poise_regen": 15, "dodge_distance": 3.2, "dodge_time": 0.3, "power": 1, "defense": 1, "weight": 1
+  },
   "body": {
     "id": "f_dozer_body",
     "name": "Dozer",
@@ -73,31 +75,291 @@
     }
   },
   "moves": {
-    "l1": {"_stub": true, "name": "Snout Jab", "duration": 0.44, "cancel": 0.24, "damage": 5, "knockback": 1.8, "stun": 0.3, "poise": 10, "stamina": 5,
-           "vmin": 1.2, "vref": 4.5, "speed": 1.5, "lunge": [[0.06, 0.18, 2.2]], "move_mult": 0.35, "element": "grit", "buildup": 12,
-           "hit": [{"t0": 0.12, "t1": 0.26, "weapons": ["snout"]}],
-           "keys": [{"t": 0.0},
-                    {"t": 0.06, "joints": {"neck": [-14, 0, 0], "head": [-10, 0, 0]}, "lean": [-4, 0, 0]},
-                    {"t": 0.16, "joints": {"neck": [10, 0, 0], "head": [14, 0, 0]}, "lean": [10, 0, 0]},
-                    {"t": 0.26, "joints": {"neck": [10, 0, 0], "head": [14, 0, 0]}, "lean": [10, 0, 0]},
-                    {"t": 0.44}]},
-    "heavy": {"_stub": true, "name": "Horn Lunge", "duration": 0.8, "cancel": 0.62, "cancel_on_hit": true, "damage": 13, "knockback": 3.4, "stun": 0.6, "poise": 30, "stamina": 12,
-              "vmin": 1.5, "vref": 6.0, "speed": 1.4, "charge_time": 0.8, "charge_damage": 0.35, "lunge": [[0.24, 0.4, 3.6]], "element": "grit", "buildup": 30,
-              "armor": [[0.0, 0.42]],
-              "hit": [{"t0": 0.26, "t1": 0.42, "weapons": ["horn", "snout"]}],
-              "keys": [{"t": 0.0},
-                       {"t": 0.2, "joints": {"neck": [22, 0, 0], "head": [20, 0, 0]}, "lean": [8, 0, 0], "height": -0.1},
-                       {"t": 0.34, "joints": {"neck": [-28, 0, 0], "head": [-20, 0, 0]}, "lean": [-10, 0, 0], "height": 0.08},
-                       {"t": 0.46, "joints": {"neck": [-30, 0, 0], "head": [-22, 0, 0]}, "lean": [-8, 0, 0], "height": 0.06},
-                       {"t": 0.8}]},
-    "grab": {"_stub": true, "name": "Snout Hook", "kind": "grab", "duration": 0.68, "damage": 0, "stamina": 6, "speed": 1.3, "lunge": [[0.06, 0.2, 2.2]],
-             "hit": [{"t0": 0.14, "t1": 0.34, "weapons": ["snout", "horn"]}],
-             "keys": [{"t": 0.0},
-                      {"t": 0.14, "joints": {"neck": [16, 0, 0], "head": [12, 0, 0]}, "lean": [8, 0, 0], "height": -0.08},
-                      {"t": 0.34, "joints": {"neck": [-10, 0, 0], "head": [-16, 0, 0]}, "lean": [-6, 0, 0], "height": 0.04},
-                      {"t": 0.68}]}
+    "l1": {
+      "name": "Snout Jab", "duration": 0.44, "cancel": 0.21, "damage": 5, "knockback": 3.1, "stun": 0.3, "poise": 10,
+      "stamina": 5, "vmin": 1, "vref": 3.8, "speed": 2.2, "lunge": [[0.03, 0.17, 4.2]], "move_mult": 0.3,
+      "element": "grit", "buildup": 12,
+      "hit": [{"t0": 0.14, "t1": 0.22, "weapons": ["snout"]}],
+      "keys": [
+        {"t": 0},
+        {"t": 0.07, "joints": {"neck": [-12, 0, 0], "head": [-20, 0, 0]}, "lean": [-6, 0, 0], "height": 0.03},
+        {"t": 0.14, "joints": {"neck": [-2, 0, 0], "head": [-14, 0, 0]}, "lean": [4, 0, 0], "height": 0.06},
+        {"t": 0.23, "joints": {"neck": [-2, 0, 0], "head": [-14, 0, 0]}, "lean": [4, 0, 0], "height": 0.06},
+        {"t": 0.44}
+      ]
+    },
+    "l2": {
+      "name": "Hoof Stomp", "duration": 0.49, "cancel": 0.22, "stamina": 5, "speed": 1.8, "lunge": [[0.06, 0.2, 2.6]],
+      "move_mult": 0.3,
+      "keys": [
+        {"t": 0},
+        {
+          "t": 0.09, "chains": {"leg_fl": [0.3, 0.6, 0.86]},
+          "joints": {"neck": [-16, 6, 0], "head": [-8, 0, 0]},
+          "lean": [-8, 0, 0], "height": 0.06
+        },
+        {
+          "t": 0.18, "chains": {"leg_fl": [0.26, 0.03, 1.04]}, "joints": {"neck": [2, 4, 0]}, "lean": [4, 0, 0],
+          "height": -0.03
+        },
+        {"t": 0.3, "chains": {"leg_fl": [0.26, 0.04, 1]}, "lean": [3, 0, 0], "height": -0.03},
+        {"t": 0.49}
+      ],
+      "effects": [
+        {
+          "t": 0.19, "type": "area", "radius": 0.8, "damage": 5, "knockback": 2.55, "stun": 0.3, "poise": 12,
+          "element": "grit", "buildup": 17, "class": "light", "parryable": true, "at": "weapon:hoof_fl",
+          "vfx": "stomp_pulse"
+        }
+      ]
+    },
+    "l3": {
+      "name": "Scoop", "duration": 0.65, "cancel": 0.28, "damage": 7, "knockback": 1, "kb_dir": "up", "launch": 4.9,
+      "stun": 0.5, "poise": 16, "stamina": 7, "vmin": 1.3, "vref": 5, "speed": 1.7, "lunge": [[0.12, 0.3, 1.8]],
+      "move_mult": 0.3, "element": "grit", "buildup": 18,
+      "hit": [{"t0": 0.2, "t1": 0.3, "weapons": ["snout"]}],
+      "keys": [
+        {"t": 0},
+        {"t": 0.13, "joints": {"neck": [26, 0, 0], "head": [24, 0, 0]}, "lean": [10, 0, 0], "height": -0.12},
+        {"t": 0.18, "joints": {"neck": [26, 0, 0], "head": [24, 0, 0]}, "lean": [10, 0, 0], "height": -0.12},
+        {"t": 0.28, "joints": {"neck": [-24, 0, 0], "head": [-22, 0, 0]}, "lean": [-8, 0, 0], "height": 0.06},
+        {"t": 0.4, "joints": {"neck": [-26, 0, 0], "head": [-24, 0, 0]}, "lean": [-8, 0, 0], "height": 0.06},
+        {"t": 0.65}
+      ]
+    },
+    "heavy": {
+      "name": "Horn Lunge", "duration": 0.78, "damage": 13, "knockback": 5.8, "stun": 0.6, "poise": 30, "stamina": 12,
+      "vmin": 1.5, "vref": 6, "speed": 1.6, "charge_time": 0.9, "charge_damage": 0.2, "move_mult": 0.2,
+      "lunge": [[0.13, 0.3, 4.8]], "element": "grit", "buildup": 30, "armor": [[0, 0.38]],
+      "hit": [{"t0": 0.26, "t1": 0.38, "weapons": ["horn", "head"]}],
+      "keys": [
+        {"t": 0},
+        {"t": 0.13, "joints": {"neck": [-14, 0, 0], "head": [-12, 0, 0]}, "lean": [-8, 0, 0], "height": 0.04},
+        {"t": 0.18, "joints": {"neck": [-14, 0, 0], "head": [-12, 0, 0]}, "lean": [-8, 0, 0], "height": 0.04},
+        {"t": 0.28, "joints": {"neck": [14, 0, 0], "head": [22, 0, 0]}, "lean": [8, 0, 0], "height": 0},
+        {"t": 0.42, "joints": {"neck": [14, 0, 0], "head": [22, 0, 0]}, "lean": [8, 0, 0]},
+        {"t": 0.78}
+      ]
+    },
+    "heavy_charged": {
+      "name": "Quarry Ram", "duration": 1.35, "damage": 16, "charge_damage": 0.12, "knockback": 7.7, "launch": 5,
+      "stun": 0.8, "poise": 50, "stamina": 16, "vmin": 1.5, "vref": 6.5, "speed": 1.6, "move_mult": 0, "turn_rate": 1.5,
+      "lunge": [[0, 0.5, 6]], "element": "grit", "buildup": 45, "armor": [[0, 1.35]], "guard_break": 2,
+      "on_hit": [{"if": {"target_guarding": true}, "do": [{"type": "guard_crush", "mult": 2}]}],
+      "hit": [{"t0": 0.5, "t1": 0.8, "weapons": ["horn", "head", "snout"]}],
+      "keys": [
+        {"t": 0, "joints": {"neck": [-14, 0, 0], "head": [-12, 0, 0]}, "lean": [-8, 0, 0], "height": 0.04},
+        {"t": 0.12, "joints": {"neck": [22, 0, 0], "head": [20, 0, 0]}, "lean": [10, 0, 0], "height": -0.06},
+        {"t": 0.46, "joints": {"neck": [24, 0, 0], "head": [22, 0, 0]}, "lean": [10, 0, 0], "height": -0.08},
+        {"t": 0.62, "joints": {"neck": [-28, 0, 0], "head": [-24, 0, 0]}, "lean": [-12, 0, 0], "height": 0.1},
+        {"t": 0.85, "joints": {"neck": [-30, 0, 0], "head": [-26, 0, 0]}, "lean": [-12, 0, 0], "height": 0.1},
+        {"t": 1.35}
+      ]
+    },
+    "finisher": {
+      "name": "Gravel Toss", "duration": 0.75, "damage": 10, "knockback": 6.6, "kb_dir": "side", "kb_side": 1,
+      "stun": 0.6, "poise": 25, "stamina": 10, "vmin": 1.3, "vref": 5, "speed": 1.7, "lunge": [[0.04, 0.2, 2.4]],
+      "move_mult": 0.2, "element": "grit", "buildup": 25,
+      "hit": [{"t0": 0.18, "t1": 0.3, "weapons": ["snout"]}],
+      "keys": [
+        {"t": 0},
+        {"t": 0.1, "joints": {"neck": [20, -26, 0], "head": [18, -10, 0]}, "lean": [6, -8, 0], "height": -0.08},
+        {"t": 0.24, "joints": {"neck": [-6, 30, 0], "head": [-14, 14, 0]}, "lean": [-4, 14, 0], "height": 0.03},
+        {"t": 0.36, "joints": {"neck": [-12, 34, 0], "head": [-18, 18, 0]}, "lean": [-4, 16, 0]},
+        {"t": 0.75}
+      ],
+      "effects": [
+        {
+          "t": 0.26, "type": "area", "shape": "cone", "radius": 2, "cone_deg": 60, "damage": 3, "knockback": 0.6,
+          "stun": 0.15, "poise": 4, "element": "grit", "buildup": 20, "class": "heavy", "vfx": "gravel_spray"
+        }
+      ]
+    },
+    "dash_attack": {
+      "name": "Shoulder Barge", "duration": 0.56, "damage": 7, "knockback": 6.4, "stun": 0.4, "poise": 15, "stamina": 8,
+      "vmin": 1.5, "vref": 5.5, "move_mult": 0.3, "lunge": [[0, 0.26, 5]], "element": "grit", "buildup": 12,
+      "hit": [{"t0": 0.06, "t1": 0.26, "weapons": ["shoulder_r", "shoulder_l", "body_slam", "head", "snout"]}],
+      "keys": [
+        {"t": 0, "joints": {"neck": [18, -24, 0], "head": [12, 0, 0]}, "lean": [6, 34, 0], "height": -0.05},
+        {"t": 0.26, "joints": {"neck": [18, -24, 0], "head": [12, 0, 0]}, "lean": [6, 34, 0], "height": -0.05},
+        {"t": 0.56}
+      ]
+    },
+    "grab": {
+      "name": "Snout Hook", "kind": "grab", "duration": 0.68, "damage": 0, "stamina": 6, "speed": 1.5,
+      "lunge": [[0.08, 0.26, 1.2]], "move_mult": 0.2,
+      "hit": [{"t0": 0.25, "t1": 0.37, "weapons": ["horn", "head"]}],
+      "keys": [
+        {"t": 0},
+        {"t": 0.12, "joints": {"neck": [20, 0, 0], "head": [18, 0, 0]}, "lean": [6, 0, 0], "height": -0.06},
+        {"t": 0.26, "joints": {"neck": [-8, 0, 0], "head": [-14, 0, 0]}, "lean": [2, 0, 0], "height": 0.03},
+        {"t": 0.38, "joints": {"neck": [-8, 0, 0], "head": [-14, 0, 0]}, "lean": [2, 0, 0]},
+        {"t": 0.68}
+      ]
+    },
+    "pummel": {"name": "Headbutt Shake", "damage": 3, "element": "grit", "buildup": 10, "interval": 0.4},
+    "taunt": {
+      "name": "Snuffle", "kind": "taunt", "duration": 1.5, "stamina": 0, "move_mult": 0,
+      "keys": [
+        {"t": 0},
+        {"t": 0.25, "joints": {"neck": [30, 0, 0], "head": [20, 0, 0]}, "lean": [6, 0, 0], "height": -0.05},
+        {"t": 0.4, "joints": {"neck": [30, 14, 0], "head": [22, 0, 0]}, "lean": [6, 0, 0], "height": -0.05},
+        {"t": 0.55, "joints": {"neck": [30, -14, 0], "head": [22, 0, 0]}, "lean": [6, 0, 0], "height": -0.05},
+        {"t": 0.75, "chains": {"leg_fr": [-0.31, 0.22, 0.62]}, "joints": {"neck": [6, 0, 0]}},
+        {"t": 0.9, "chains": {"leg_fr": [-0.31, 0.03, 0.2]}, "joints": {"neck": [6, 0, 0]}},
+        {"t": 1.1, "joints": {"neck": [-18, 0, 0], "head": [-16, 0, 0]}, "lean": [-6, 0, 0], "height": 0.04},
+        {"t": 1.22, "joints": {"neck": [24, 0, 0], "head": [18, 0, 0]}, "lean": [8, 0, 0], "height": -0.06},
+        {"t": 1.5}
+      ]
+    }
   },
-  "abilities": {},
+  "throws": {
+    "throw_fwd": {"name": "Launch", "distance": 3, "damage": 10, "up": 3, "knockdown": true},
+    "throw_side": {"name": "Rake", "distance": 2.5, "damage": 9, "knockdown": true},
+    "throw_back": {"name": "Buck", "distance": 3, "damage": 9, "up": 4.5, "knockdown": true}
+  },
+  "abilities": {
+    "ability1": {
+      "name": "Bulldoze", "cooldown": 8, "duration": 1.58, "damage": 11, "knockback": 6, "stun": 0.6, "poise": 35,
+      "stamina": 14, "vmin": 1.5, "vref": 6, "speed": 1.4, "move_mult": 0, "turn_rate": 0.35, "element": "grit",
+      "buildup": 35, "armor": [[0, 1.58]],
+      "hit": [{"t0": 0.3, "t1": 1.18, "weapons": ["snout", "head", "horn", "body_slam", "shoulder_l", "shoulder_r"]}],
+      "keys": [
+        {"t": 0},
+        {
+          "t": 0.08, "chains": {"leg_fr": [-0.31, 0.22, 0.64]}, "joints": {"neck": [18, 0, 0], "head": [10, 0, 0]},
+          "lean": [6, 0, 0], "height": -0.04
+        },
+        {
+          "t": 0.18, "chains": {"leg_fr": [-0.31, 0.03, 0.16]}, "joints": {"neck": [18, 0, 0], "head": [10, 0, 0]},
+          "lean": [6, 0, 0], "height": -0.06
+        },
+        {"t": 0.28, "joints": {"neck": [10, 0, 0], "head": [8, 0, 0]}, "lean": [7, 0, 0], "height": -0.05},
+        {"t": 1.18, "joints": {"neck": [10, 0, 0], "head": [8, 0, 0]}, "lean": [7, 0, 0], "height": -0.05},
+        {"t": 1.58}
+      ],
+      "effects": [
+        {
+          "t": 0.3, "type": "charge", "speed": 7, "distance": 6, "steer_deg": 20, "carry": true, "wall_stagger": 0.6,
+          "recovery": 0.4,
+          "splat": {"damage": 5, "stun": 0.4, "knockdown": true}
+        }
+      ]
+    },
+    "ability1@juiced": {
+      "name": "Bulldoze (Landslide)", "cooldown": 8, "duration": 2.15, "damage": 11, "knockback": 6, "stun": 0.6,
+      "poise": 35, "stamina": 14, "vmin": 1.5, "vref": 6, "speed": 1.4, "move_mult": 0, "turn_rate": 0.35,
+      "element": "grit", "buildup": 35, "armor": [[0, 2.15]],
+      "hit": [{"t0": 0.3, "t1": 1.75, "weapons": ["snout", "head", "horn", "body_slam", "shoulder_l", "shoulder_r"]}],
+      "keys": [
+        {"t": 0},
+        {
+          "t": 0.08, "chains": {"leg_fr": [-0.31, 0.22, 0.64]}, "joints": {"neck": [18, 0, 0], "head": [10, 0, 0]},
+          "lean": [6, 0, 0], "height": -0.04
+        },
+        {
+          "t": 0.18, "chains": {"leg_fr": [-0.31, 0.03, 0.16]}, "joints": {"neck": [18, 0, 0], "head": [10, 0, 0]},
+          "lean": [6, 0, 0], "height": -0.06
+        },
+        {"t": 0.28, "joints": {"neck": [10, 0, 0], "head": [8, 0, 0]}, "lean": [7, 0, 0], "height": -0.05},
+        {"t": 1.75, "joints": {"neck": [10, 0, 0], "head": [8, 0, 0]}, "lean": [7, 0, 0], "height": -0.05},
+        {"t": 2.15}
+      ],
+      "effects": [
+        {
+          "t": 0.3, "type": "charge", "speed": 7, "distance": 10, "steer_deg": 20, "carry": true, "wall_stagger": 0.6,
+          "recovery": 0.4,
+          "splat": {"damage": 5, "stun": 0.4, "knockdown": true}
+        }
+      ],
+      "on_hit": [{"do": [{"type": "prop", "prop": "boulder", "radius": 0.8, "hp": 40, "duration": 20, "at": "forward:-1.9"}]}]
+    },
+    "ability2": {
+      "name": "Dust Bowl", "cooldown": 11, "duration": 0.5, "stamina": 10, "move_mult": 0.2,
+      "keys": [
+        {"t": 0},
+        {
+          "t": 0.12,
+          "chains": {"leg_fl": [0.32, 0.3, 0.5], "leg_fr": [-0.32, 0.3, 0.5]},
+          "lean": [-8, 0, 0], "height": 0.08
+        },
+        {
+          "t": 0.24,
+          "chains": {
+            "leg_fl": [0.33, 0.03, 0.46], "leg_fr": [-0.33, 0.03, 0.46], "leg_bl": [0.31, 0.03, -0.5],
+            "leg_br": [-0.31, 0.03, -0.5]
+          },
+          "lean": [4, 0, 0], "height": -0.08
+        },
+        {
+          "t": 0.3,
+          "chains": {
+            "leg_fl": [0.33, 0.03, 0.46], "leg_fr": [-0.33, 0.03, 0.46], "leg_bl": [0.31, 0.03, -0.5],
+            "leg_br": [-0.31, 0.03, -0.5]
+          },
+          "height": -0.08
+        },
+        {"t": 0.5}
+      ],
+      "effects": [
+        {
+          "t": 0.3, "type": "zone", "element": "grit", "radius": 2.5, "duration": 4, "tick": 0.25, "buildup": 3,
+          "follow_owner": true, "owner_immune": true, "affects_allies": false, "skip_zone_reaction": true,
+          "vfx": "dust_bowl",
+          "status": {"id": "dust_choked", "name": "Dust Choked", "duration": 0.35, "poise_regen": 0}
+        },
+        {
+          "t": 0.3, "type": "buff",
+          "status": {
+            "id": "dust_bowl", "name": "Dust Bowl", "duration": 4, "armor_lights": true,
+            "hooks": [{"on": "tick", "every": 0.08, "do": [{"type": "destroy_projectiles", "radius": 2.5}]}]
+          }
+        }
+      ]
+    },
+    "juice": {
+      "name": "Landslide", "duration": 0.6,
+      "keys": [
+        {"t": 0},
+        {
+          "t": 0.25,
+          "chains": {"leg_fl": [0.32, 0.45, 0.62], "leg_fr": [-0.32, 0.45, 0.62]},
+          "joints": {"neck": [-20, 0, 0], "head": [-10, 0, 0]},
+          "lean": [-22, 0, 0], "height": 0.16
+        },
+        {
+          "t": 0.34,
+          "chains": {"leg_fl": [0.32, 0.45, 0.62], "leg_fr": [-0.32, 0.45, 0.62]},
+          "joints": {"neck": [-20, 0, 0], "head": [-10, 0, 0]},
+          "lean": [-22, 0, 0], "height": 0.16
+        },
+        {
+          "t": 0.46,
+          "chains": {"leg_fl": [0.33, 0.03, 0.62], "leg_fr": [-0.33, 0.03, 0.62]},
+          "joints": {"neck": [14, 0, 0], "head": [10, 0, 0]}, "lean": [10, 0, 0], "height": -0.1
+        },
+        {"t": 0.6}
+      ],
+      "effects": [
+        {
+          "t": 0.47, "type": "area", "shape": "line", "length": 6, "width": 2, "damage": 14, "knockback": 4.5,
+          "stun": 0.6, "poise": 60, "element": "grit", "buildup": 60, "knockdown": true, "class": "juice",
+          "vfx": "landslide"
+        },
+        {
+          "t": 0.48, "type": "juice_state", "duration": 6, "armor": "all",
+          "hooks": [
+            {
+              "on": "ability_used", "if": {"slot": "ability1"},
+              "do": [{"type": "cooldown", "slot": "ability1", "set": 0}]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "juice": {"duration": 6},
+  "passives": [],
   "art": {
     "model": "res://assets/models/creatures/f_dozer.glb",
     "palette": {"primary": "#6E6A66", "secondary": "#C7A160", "accent": "#FFE066", "snout": "#9FA6AD", "dust": "#D9C7A3", "eyes": "#111111"},
@@ -107,5 +369,12 @@
     "gore_piece": {"segment": "head", "offset": [0, 0.27, 0.32], "size": 0.05, "shape": "horn", "color": "#D8D3C8"}
   },
   "audio": {},
-  "ai": {}
+  "ai": {
+    "personality": "linebacker", "aggression": 0.12, "block": -0.08, "grab": -0.04, "dodge": -0.06, "ability": 0.1,
+    "range": [1.2, 1.5], "charge_heavy": 0.35,
+    "abilities": {
+      "ability1": {"min": 3, "max": 6.5, "when": [{"wall_behind_target": 3}, {"min": 4}]},
+      "ability2": {"max": 7, "when": [{"target_ranged": true, "min": 3}, {"self_poise_below": 0.5, "max": 2.5}]}
+    }
+  }
 }
