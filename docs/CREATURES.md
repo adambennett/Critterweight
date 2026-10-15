@@ -65,7 +65,7 @@ snout 1.27 m, Bilge 2.4 m). Use `--gap 3.2` (fighters) / `--gap 6` (bosses) when
 ### Stoke — biped, 12 segments, 85 kg, 1.5 m (crest to 1.65)
 Root `pelvis` (hover 0.62). `chest` carries the boiler + shoulders, `head` the stovepipe crest. Chains
 `arm_l/arm_r` (`uarm_*` + `farm_*`, fists at the effector), `leg_l/leg_r`. Weapons `fist_l/fist_r`
-(r 0.13 — oversized wraps), `knee_l/r`, `foot_l/r`, `head`, `belly` (furnace door, Steam Vent origin),
+(hit spheres r 0.18 around the 0.12 m wraps — kit pass, see docs/kits/f_stoke.md), `knee_l/r`, `foot_l/r`, `head`, `belly` (furnace door, Steam Vent origin),
 `shoulder_l/r`. Stance = boxing guard (fists chin-high, 5° forward lean); guard = fists in front of the
 face, −6 cm crouch. Fist reach from the root ≈ 1.0 m straight (shoulder 0.38 m out, arm 0.65 m) — the
 ROSTER's 1.0–1.1 m with the chest turn/lunge; within the 1.6 m cap. Gore: a tooth.
@@ -345,8 +345,8 @@ Chain bone lengths, effector distances and every weapon's rest / maximum distanc
 
 | Weapon | Segment | Radius | Rest distance from root | Max distance from root |
 |---|---|---|---|---|
-| `fist_l` | farm_l | 0.13 m | 0.38 m | 1.16 m |
-| `fist_r` | farm_r | 0.13 m | 0.38 m | 1.16 m |
+| `fist_l` | farm_l | 0.18 m | 0.38 m | 1.16 m |
+| `fist_r` | farm_r | 0.18 m | 0.38 m | 1.16 m |
 | `knee_l` | shin_l | 0.11 m | 0.19 m | 0.78 m |
 | `knee_r` | shin_r | 0.11 m | 0.19 m | 0.78 m |
 | `foot_l` | shin_l | 0.10 m | 0.23 m | 0.82 m |

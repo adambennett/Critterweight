@@ -133,7 +133,7 @@ func test_guard_blocks_and_parry_staggers() -> void:
 
 ## The charged heavy shrugs off lights while it winds up (armor vs lights) and still lands.
 func test_charged_heavy_armor_shrugs_lights() -> void:
-	var r := await shoot(KID, DUMMY, 1.0, hold("heavy", 0.0, 1.1), 3.0, at([{"t0": 0.5, "t1": 1.3, "press": ["light"], "every": 0.35}]))
+	var r := await shoot(KID, DUMMY, 1.2, hold("heavy", 0.0, 1.1), 3.0, at([{"t0": 0.5, "t1": 1.3, "press": ["light"], "every": 0.35}]))
 	var taken := 0
 	for ev in r["events"]:
 		if str(ev["type"]) == "hit" and int(ev["fighter"]) == 1 and int(ev["target"]) == 0:

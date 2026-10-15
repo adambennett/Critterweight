@@ -21,7 +21,7 @@ const ENTRIES := [
 		"children": [
 			{"id": "off_the_street", "label": "Off the Street", "icon": "campaign", "screen": "campaign_menu", "params": {"variant": "off_the_street"},
 				"desc": "A fresh run with nothing carried over. Climb The Dosage on skill alone."},
-			{"id": "fight_camp", "label": "Fight Camp", "icon": "trophy", "screen": "campaign_menu", "params": {"variant": "fight_camp"},
+			{"id": "fight_camp", "label": "Fight Camp", "icon": "trophy", "screen": "hub", "params": {"from": "menu"},
 				"desc": "Train between runs at The Cannery and keep your permanent upgrades."},
 			{"id": "bookie", "label": "Bookie's Table", "icon": "random", "screen": "bookie", "params": {},
 				"desc": "Teddy Two-Tooth's autobattler: build the fighter, pick the route, let the bots throw the punches."},
@@ -75,7 +75,18 @@ func on_enter(_p: Dictionary) -> void:
 	_report_once()
 	play_intro()
 	Profiles.profile_changed.connect(_update_record)
-	Audio.music("menu_theme", 1.0)
+	Audio.music(menu_track(), 1.0)
+
+
+## Menu music (docs/AUDIO.md): the fight-night poster theme; Title Night once the profile has
+## cleared a run.
+static func menu_track() -> String:
+	var records: Dictionary = Profiles.current.get("records", {})
+	var runs: Dictionary = records.get("runs", {})
+	for v in runs.values():
+		if v is Dictionary and int((v as Dictionary).get("clears", 0)) > 0:
+			return "title_night"
+	return "fight_night_poster"
 
 
 func _build() -> void:

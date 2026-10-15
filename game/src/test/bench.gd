@@ -35,8 +35,10 @@ func run(scene: String, a: PackedStringArray) -> void:
 			await _soak(int(_arg("--matches", "20")))
 		"roster":
 			await _roster(int(_arg("--bouts", "4")), _arg("--tier", "pro"), float(_arg("--round", "60")))
+		"tiers":
+			await _tiers(int(_arg("--bouts", "12")), float(_arg("--round", "60")))
 		_:
-			print("unknown bench '%s' (busy, duel, sim, soak)" % scene)
+			print("unknown bench '%s' (busy, duel, sim, soak, roster, tiers)" % scene)
 			get_tree().quit(2)
 			return
 	_finish()
@@ -278,6 +280,68 @@ func _roster(bouts: int, tier: String, round_time: float) -> void:
 	report["bouts_per_pair"] = bouts
 	report["pairs"] = pairs
 	report["fighters"] = summary
+
+
+## Bot skill ladder (AI-01): each tier against the one below, plus Punching Bag against
+## Hall-of-Famer. Mirror matches cycle through the roster (fighter strength cancels out) and the
+## sides alternate; the higher tier should win clearly more often.
+func _tiers(bouts: int, round_time: float) -> void:
+	var ids := Content.playable_creatures().filter(func(c): return not str(c).begins_with("dev_"))
+	if ids.is_empty():
+		ids = ["dev_biped"]
+	var tiers := BotTiers.ids()
+	var pairs := []
+	for i in tiers.size() - 1:
+		pairs.append([tiers[i], tiers[i + 1]])
+	pairs.append([tiers[0], tiers[tiers.size() - 1]])
+	var dt := 1.0 / Engine.physics_ticks_per_second
+	var out := {}
+	for pi in pairs.size():
+		var lo := str(pairs[pi][0])
+		var hi := str(pairs[pi][1])
+		var rec := {"higher_wins": 0, "lower_wins": 0, "draws": 0}
+		for k in bouts:
+			var cid := str(ids[k % ids.size()])
+			var c := Content.creature(cid)
+			var hi_team := k % 2
+			var entries := []
+			for team in 2:
+				var tier := hi if team == hi_team else lo
+				var brain := BotBrain.new(BotTiers.brain_tier(tier), 3000 + k * 2 + team + pi * 100)
+				brain.set_personality(c.ai)
+				entries.append({"creature": c, "team": team, "source": brain, "kind": "bot"})
+			var sv := SubViewport.new()
+			sv.own_world_3d = true
+			sv.render_target_update_mode = SubViewport.UPDATE_DISABLED
+			add_child(sv)
+			var sim := MatchSim.new()
+			sim.running = false
+			sv.add_child(sim)
+			if not Engine.is_in_physics_frame():
+				await get_tree().physics_frame
+			sim.setup({"arena": Content.arena("the_gullet"), "rules": {"mode": "standard", "rounds": 1, "round_time": round_time},
+				"seed": 70 + k * 13 + pi * 5, "fighters": entries, "mode": ModeRegistry.create("standard")})
+			var t := 0.0
+			while t < round_time + 8.0 and not sim.is_finished:
+				sim.step(dt)
+				t += dt
+				await get_tree().physics_frame
+			var wt := int(sim.result.get("winner_team", -1)) if sim.is_finished else -1
+			if wt < 0:
+				rec["draws"] = int(rec["draws"]) + 1
+			elif wt == hi_team:
+				rec["higher_wins"] = int(rec["higher_wins"]) + 1
+			else:
+				rec["lower_wins"] = int(rec["lower_wins"]) + 1
+			sv.queue_free()
+			await get_tree().process_frame
+		var decided := maxi(1, int(rec["higher_wins"]) + int(rec["lower_wins"]))
+		rec["higher_win_rate"] = snappedf(float(rec["higher_wins"]) / decided, 0.01)
+		out["%s vs %s" % [hi, lo]] = rec
+		print("tiers: %s vs %s -> %s" % [hi, lo, rec])
+	report["bouts_per_pair"] = bouts
+	report["round_time"] = round_time
+	report["tiers"] = out
 
 
 static func _to_f(a: PackedInt32Array) -> PackedFloat32Array:

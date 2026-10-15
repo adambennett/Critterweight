@@ -11,6 +11,10 @@ extends Screen
 const TABLE_NAME := "BookieTable"
 const SPEEDS := [1.0, 2.0, 3.0, 4.0]
 
+## Opened from Teddy's table in the Cannery's Boiler Room (params.from_hub): leaving walks back
+## there instead of the campaign menu. Kept while the table's own screens come and go.
+static var return_to_hub := false
+
 var overlay := false
 var table: BookieTable
 var bflow: BookieFlow
@@ -41,6 +45,7 @@ func on_enter(p: Dictionary) -> void:
 		catalog = table.catalog
 		_connect_table()
 	else:
+		return_to_hub = bool(p.get("from_hub", false))
 		stand_ins = bool(p.get("stand_ins", false)) or OS.get_cmdline_user_args().has("--campaign-stand-ins")
 		catalog = CampaignFlow.make_catalog(stand_ins)
 		var fs := catalog.available_fighters()
@@ -212,7 +217,7 @@ func _set_keep(id: String) -> void:
 
 
 func _enable_stand_ins() -> void:
-	App.goto("bookie", {"stand_ins": true})
+	App.goto("bookie", {"stand_ins": true, "from_hub": return_to_hub})
 
 
 func _start_table() -> void:
@@ -446,6 +451,10 @@ func _leave() -> void:
 			t.queue_free()
 		table = null
 	SimSpeed.restore()
+	if return_to_hub and App.has_screen("hub"):
+		return_to_hub = false
+		App.goto("hub", {"spot": "boiler_room", "from": "bookie"})
+		return
 	App.goto("campaign_menu")
 
 
