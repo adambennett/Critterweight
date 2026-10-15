@@ -18,6 +18,8 @@ extends Node
 ##   --user-rules <name>  host with a player-made rules preset (saved on this machine only, "user:...")
 ##   --assist <f>         aim-assist multiplier sent with the join (default: from Settings)
 ##   --app-request <type>  send one app request once in the lobby (app channel test)
+##   --party               run the campaign's NetPartyTransport: broadcast one "hello" once another
+##                         member is present and record the party messages received
 
 const RESULT_EVERY_MS := 500
 
@@ -48,6 +50,8 @@ var _kick_seen_ms := -1
 var _events := {}
 var _client: NetClient = null
 var _server: NetServer = null
+var _party = null                   ## NetPartyTransport (--party)
+var _party_sent := false
 var _rng := RandomNumberGenerator.new()
 var _wander := Vector3.ZERO
 var _wander_t := 0.0
@@ -80,7 +84,7 @@ func run(a: PackedStringArray) -> void:
 		"notices": [], "chat": [], "lobby_phases": [], "hits_dealt": 0, "hits_taken": 0, "damage_dealt": 0.0,
 		"damage_taken": 0.0, "my_health_min": -1.0, "my_health_min_before_kick": -1.0, "health_seen": {}, "votes": [],
 		"candidates_seen": [], "forged_sent": 0, "kicked": {}, "stats": {}, "snapshots": 0, "max_snapshot_slots": 0,
-		"app_messages": [], "roster_updates": 0, "done": false, "exit_reason": ""}
+		"app_messages": [], "roster_updates": 0, "done": false, "exit_reason": "", "party_messages": [], "party_events": []}
 	var mod_dir := arg("--net-test-mod", "")
 	if mod_dir != "":
 		_load_test_mod(mod_dir)
@@ -153,6 +157,7 @@ func _start_client() -> void:
 
 
 func _on_joined(w: Dictionary) -> void:
+	_start_party()
 	result["connected"] = true
 	result["welcome"] = w
 	result["player_id"] = Net.local_peer_id()
@@ -389,6 +394,7 @@ func _start_host() -> void:
 		_end("host failed")
 		return
 	_server = Net.server
+	_start_party()
 	result["connected"] = true
 	result["player_id"] = 1
 	var ov := {}
@@ -539,7 +545,22 @@ func _count_event(ev: Dictionary) -> void:
 			result["damage_taken"] = float(result["damage_taken"]) + float(ev.get("damage", 0.0))
 
 
+func _start_party() -> void:
+	if _party != null or not args.has("--party"):
+		return
+	_party = NetPartyTransport.new()
+	_party.message_received.connect(func(f: String, t: String, p: Dictionary) -> void:
+		_append_bounded("party_messages", {"from": f, "type": t, "payload": p}))
+	_party.peer_joined.connect(func(peer: String) -> void: _append_bounded("party_events", "joined:" + peer))
+	_party.peer_left.connect(func(peer: String, r: String) -> void: _append_bounded("party_events", "left:%s:%s" % [peer, r]))
+
+
 func _process(dt: float) -> void:
+	if _party != null and not _party_sent and not (_party.peers() as Array).is_empty():
+		_party_sent = true
+		result["party_local_id"] = _party.local_id()
+		result["party_peers"] = _party.peers()
+		_party.send("", "hello", {"name": str(result["name"])})
 	if _client and _client.present and _client.scene:
 		# presentation consumes events itself; count them from the replica's stats instead
 		result["events_total"] = _client.replica.events_received

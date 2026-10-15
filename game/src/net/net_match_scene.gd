@@ -38,6 +38,7 @@ var _pick_key := ""
 var _dt := 0.016
 var _spec_label: Label = null
 var _goals_by_me := 0
+var _audio_bridge: Node = null
 
 
 ## info: MATCH_START dictionary from the server. Returns "" or an error text.
@@ -101,7 +102,7 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	# audio bridge on the mirror: impacts, voices, crowd, announcer and music like local play
 	var seed_v := int(info.get("match_id", 1))
 	var ctx := "coop" if str((info.get("rules", {}) as Dictionary).get("format", "")) == "coop" else "versus"
-	Audio.attach_match(mirror.sim, my_index, {"context": ctx, "seed": seed_v})
+	_audio_bridge = Audio.attach_match(mirror.sim, my_index, {"context": ctx, "seed": seed_v})
 	Audio.music(_default_music(), 1.5, {"seed": seed_v})
 	if not Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.connect(hud.subtitle)
@@ -125,7 +126,10 @@ func _apply_presentation_settings() -> void:
 func _exit_tree() -> void:
 	if hud and Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.disconnect(hud.subtitle)
-	Audio.end_match()
+	# the next match's scene may already have attached its own audio bridge (it starts before
+	# this one is freed): only end the audio match while ours is still the active one
+	if _audio_bridge != null and is_instance_valid(_audio_bridge) and not _audio_bridge.is_queued_for_deletion():
+		Audio.end_match()
 	if mirror:
 		mirror.free_all()
 		mirror = null

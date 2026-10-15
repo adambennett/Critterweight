@@ -20,6 +20,8 @@ signal match_started(info: Dictionary)
 signal match_finished(result: Dictionary)
 signal returned_to_lobby()
 signal app_request(from_id: int, type: String, payload: Dictionary)
+## A party message relayed to the listen host's own member (see relay_app).
+signal app_relayed(from_id: int, type: String, payload: Dictionary)
 signal chat_message(from_id: int, from_name: String, text: String)
 signal notice_sent(text: String)
 signal closed(code: int, message: String)
@@ -804,6 +806,17 @@ func _handle_app(p: NetPlayer, data: PackedByteArray) -> void:
 	if not bool(dec["ok"]):
 		_violation(p, 5.0, "bad app payload: %s" % dec["error"])
 		return
+	if t == NetProtocol.APP_RELAY:
+		var v: Dictionary = dec["value"]
+		var it := str(v.get("type", ""))
+		var ip = v.get("payload", {})
+		var to := str(v.get("to", ""))
+		if typeof(ip) != TYPE_DICTIONARY or not NetProtocol.valid_app_type(it) or it.begins_with("net.") or it.begins_with("mode.") or to.length() > 12:
+			_violation(p, 1.0, "bad relay request")
+			return
+		if not p.spectator:
+			relay_app(p.id, to, it, ip)
+		return
 	if t.begins_with("mode."):
 		handle_mode_request(p.id, t, dec["value"])
 		return
@@ -1007,6 +1020,35 @@ func send_app(target: int, type: String, payload: Dictionary) -> bool:
 			transport.send(np.peer, NetProtocol.CH_CONTROL, data, true)
 			sent = true
 	return sent
+
+
+## Party relay (co-op transport): a member's message to one other member ("<id>") or to every
+## other member (""), passed on with the original sender id. Recipients are connected players
+## (spectators are not party members); the listen host's own member gets it via `app_relayed`.
+## Reserved types (net.*, mode.*) are never relayed. Returns how many members it reached.
+func relay_app(from_id: int, to: String, type: String, payload: Dictionary) -> int:
+	if not NetProtocol.valid_app_type(type) or type.begins_with("net.") or type.begins_with("mode."):
+		return 0
+	var bytes := NetProtocol.encode_payload(payload)
+	if bytes.size() > NetProtocol.MAX_APP_PAYLOAD:
+		return 0
+	var w := NetWriter.new(NetProtocol.S_APP)
+	w.u32(from_id)
+	w.text(type, NetProtocol.MAX_APP_TYPE)
+	w.blob(bytes, true)
+	var data := w.data()
+	var n := 0
+	for p in players.values():
+		var np: NetPlayer = p
+		if np.id == from_id or np.spectator or not np.connected or (to != "" and str(np.id) != to):
+			continue
+		if np.peer == -1:
+			app_relayed.emit.call_deferred(from_id, type, payload.duplicate(true))
+			n += 1
+		elif np.peer > 0:
+			transport.send(np.peer, NetProtocol.CH_CONTROL, data, true)
+			n += 1
+	return n
 
 
 # =====================================================================================

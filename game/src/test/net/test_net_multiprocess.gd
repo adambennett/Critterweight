@@ -283,11 +283,11 @@ func test_listen_host_with_remote_client() -> void:
 	# the host plays a rules preset it made itself ("user:..."): only it has that preset
 	var host: int = u.spawn("host", ["--net-client", "--net-host", "--port", port, "--name", "Hosty", "--script", "aggressive",
 		"--host-start-after-players", "2", "--rules", "duel", "--user-rules", "Spicy Duel", "--arena", "the_gullet", "--rounds", "1",
-		"--round-time", "75", "--stop-after-matches", "1", "--quit-after", "110", "--result", u.result_path("Hosty")])
+		"--round-time", "75", "--party", "--stop-after-matches", "1", "--quit-after", "110", "--result", u.result_path("Hosty")])
 	var r0: Dictionary = await u.wait_json(u.result_path("Hosty"), func(d: Dictionary) -> bool: return bool(d.get("connected", false)), 15.0)
 	check(bool(r0.get("connected", false)), "listen server up")
 	var g: int = u.spawn("guest", u.client_args(port, "Guest", "passive", ["--ready", "--app-request", "coop.hello", "--assist", "1.8",
-		"--stop-after-matches", "1", "--quit-after", "110"]))
+		"--party", "--stop-after-matches", "1", "--quit-after", "110"]))
 	var rg: Dictionary = await u.wait_json(u.result_path("Guest"), _done, 120.0)
 	var rh: Dictionary = await u.wait_json(u.result_path("Hosty"), _done, 20.0)
 	check_eq((rg.get("results", []) as Array).size(), 1, "remote client got the listen server's result")
@@ -320,7 +320,20 @@ func test_listen_host_with_remote_client() -> void:
 			host_assist = float(fm.get("assist", -1.0))
 	check_eq(guest_assist, 1.8, "guest's aim assist applied on the host")
 	check(host_assist in NetProtocol.ASSIST_LEVELS.values(), "host's own fighter uses its local setting (%.2f)" % host_assist)
+	# co-op party transport (the campaign's NetPartyTransport) over the real network path
+	var gid := str(int(rg.get("player_id", 0)))
+	check_eq(str(rh.get("party_local_id", "")), "1", "host is party member 1")
+	check_eq(str(rg.get("party_local_id", "")), gid, "guest's member id is its session player id")
+	check(_party_from(rg, "1"), "guest's party transport got the host's broadcast: %s" % str(rg.get("party_messages", [])))
+	check(_party_from(rh, gid), "host's party transport got the guest's broadcast: %s" % str(rh.get("party_messages", [])))
 	_no_child_errors([host, g])
+
+
+func _party_from(r: Dictionary, sender: String) -> bool:
+	for m in r.get("party_messages", []):
+		if typeof(m) == TYPE_DICTIONARY and str(m.get("from", "")) == sender and str(m.get("type", "")) == "hello":
+			return true
+	return false
 
 
 ## Bonus modes change the fighter list mid-match (Chum Rush minions spawn and despawn into

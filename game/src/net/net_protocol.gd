@@ -100,6 +100,9 @@ const TOKEN_BYTES := 16
 const NONCE_BYTES := 16
 const MAX_APP_TYPE := 64
 const MAX_APP_PAYLOAD := 65536
+## App type a client uses to have the authority relay a party message to other members
+## (payload {to: "" | "<member id>", type, payload}); see Net.send_app with a String target.
+const APP_RELAY := "net.relay"
 const MAX_PACKAGES := 64      ## content packages listed in the handshake (core + mods)
 ## Aim-assist multipliers of the accessibility setting "access.target_assist" (same table as
 ## MatchScene). Remote players send theirs; the server clamps to MAX_ASSIST.

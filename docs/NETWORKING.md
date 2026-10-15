@@ -378,13 +378,15 @@ host's beacons), `access.target_assist` (sent to the server for the next match).
 `joined(welcome)`, `lobby_changed(lobby)`, `chat_received(from_id, name, text)`, `notice(text)`,
 `match_starting(info)`, `match_started(scene)`, `match_ended(result)`, `returned_to_lobby()`,
 `peer_joined(info)`, `peer_left(info, reason)`, `app_message(from_id, type, payload)`,
-`app_request(from_id, type, payload)`, `lan_sessions_changed(sessions)`.
+`app_request(from_id, type, payload)`, `lan_sessions_changed(sessions)`, `member_joined(id)`,
+`member_left(id, reason)` (party membership, below).
 
 **Queries**: `role` (`offline`/`host`/`client`/`dedicated`), `is_online()`, `is_authority()`
 (offline, host, dedicated), `is_server()`, `is_client()`, `is_host()`, `is_dedicated()`,
 `local_peer_id()` (1 for server/host), `local_fighter()`, `peers()`, `player(id)`, `lobby()`,
 `stats()`, `session_state()`, `last_failure`, `invite_text(address := "")` (host: copyable invite
-line via `Platform.invite_text`), `local_addresses()` (this PC's IPv4 addresses, LAN first).
+line via `Platform.invite_text`), `local_addresses()` (this PC's IPv4 addresses, LAN first),
+`local_member_id()`, `member_ids()` (party members, below).
 
 **Lobby actions** (host or client): `set_ready(bool)`, `set_creature(id)`, `set_team(team)`,
 `set_spectator(bool)`, `send_chat(text)`, `vote(index)`, `set_input_enabled(bool)` (neutral input
@@ -415,6 +417,14 @@ authority:
 * Clients cannot message each other directly; the authority validates and relays (route voting,
   reward picks, checkpoint sync and party resume are built this way: clients request, the server
   decides and broadcasts). `mode.*` request types are reserved for modes (`mode.pick`).
+* **Party messages** (the co-op campaign's transport contract, `NetPartyTransport`):
+  `send_app("" | "<member id>", type, payload)` with a String target reaches every other
+  connected member or one member, from any member - clients send it to the authority
+  (`net.relay`), which passes it on with the sender's id; receivers get
+  `app_message(sender id, type, payload)`, never an echo. Member ids are the session player ids
+  as strings (`local_member_id()`, `member_ids()` = the other connected players, spectators
+  excluded); `member_joined(id)` / `member_left(id, "disconnected" | "left")` follow the lobby.
+  Delivery is reliable and ordered per sender; `net.*` and `mode.*` types are never relayed.
 
 ## 15. Measured bandwidth and server cost
 

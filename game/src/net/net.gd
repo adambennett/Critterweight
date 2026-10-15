@@ -6,7 +6,9 @@ extends Node
 ##
 ## UI contract: call host()/join()/leave(); react to the signals below; read lobby() and
 ## stats(). Failure/disconnect reasons are UI-ready dictionaries {code, title, message, details}.
-## Campaign/co-op contract: send_app()/request()/broadcast_app() + app_message/app_request.
+## Campaign/co-op contract: send_app()/request()/broadcast_app() + app_message/app_request;
+## party transport (CoopSession via NetPartyTransport): send_app("" | "<member id>", ...),
+## local_member_id(), member_ids(), member_joined / member_left.
 
 signal status_changed(text: String)
 ## "offline" | "connecting" | "lobby" | "match" | "results"
@@ -23,11 +25,16 @@ signal match_ended(result: Dictionary)
 signal returned_to_lobby()
 signal peer_joined(info: Dictionary)
 signal peer_left(info: Dictionary, reason: String)
-## Client side: a message from the server (from_id = 1, the authority).
+## A message for this participant: from the authority (from_id = 1), or a party message relayed
+## from member `from_id` (send_app with a String target).
 signal app_message(from_id: int, type: String, payload: Dictionary)
 ## Authority side (listen host / dedicated): a request from participant `from_id`.
 signal app_request(from_id: int, type: String, payload: Dictionary)
 signal lan_sessions_changed(sessions: Array)
+## Party membership (connected players other than this one; ids are session player ids as
+## strings): co-op transports use these, the lobby UI uses peer_joined / lobby_changed.
+signal member_joined(peer: String)
+signal member_left(peer: String, reason: String)
 
 const SERVER_ID := 1
 const ALL := 0
@@ -43,6 +50,7 @@ var _state := "offline"
 var _rejoin := {}                 ## {address, port, token, name, until_ms}
 var _lan_wanted := false          ## the UI asked to browse (kept while the setting is off)
 var _lan_port := DISCOVERY_PORT
+var _members := {}                ## other connected members (party peers): id string -> true
 
 
 func _ready() -> void:
@@ -280,6 +288,8 @@ func _fail(reason: Dictionary) -> void:
 
 
 func _set_state(s: String) -> void:
+	if s == "offline":
+		_members.clear()
 	if _state != s:
 		_state = s
 		session_state_changed.emit(s)
@@ -294,7 +304,11 @@ func session_state() -> String:
 # =====================================================================================
 
 func _connect_server_signals() -> void:
-	server.lobby_changed.connect(func() -> void: lobby_changed.emit(server.lobby_state()))
+	server.lobby_changed.connect(func() -> void:
+		var l := server.lobby_state()
+		_update_members(l)
+		lobby_changed.emit(l))
+	server.app_relayed.connect(func(id: int, t: String, p: Dictionary) -> void: app_message.emit(id, t, p))
 	server.player_joined.connect(func(i: Dictionary) -> void: peer_joined.emit(i))
 	server.player_left.connect(func(i: Dictionary, r: String) -> void: peer_left.emit(i, r))
 	server.chat_message.connect(func(id: int, n: String, t: String) -> void: chat_received.emit(id, n, t))
@@ -339,7 +353,9 @@ func _connect_client_signals() -> void:
 		role = "offline"
 		_set_state("offline")
 		_drop_client.call_deferred())
-	client.lobby_updated.connect(func(l: Dictionary) -> void: lobby_changed.emit(l))
+	client.lobby_updated.connect(func(l: Dictionary) -> void:
+		_update_members(l)
+		lobby_changed.emit(l))
 	client.chat_received.connect(func(id: int, n: String, t: String) -> void: chat_received.emit(id, n, t))
 	client.notice_received.connect(func(t: String) -> void: notice.emit(t))
 	client.match_starting.connect(func(i: Dictionary) -> void:
@@ -556,24 +572,78 @@ func host_kick(player_id: int, reason := "kicked by the host") -> bool:
 ## * On the authority (host/dedicated): delivers to that player / everyone as `app_message`
 ##   (the listen host's own player receives it locally too).
 ## * On a client: target must be SERVER_ID; the authority receives it as `app_request`.
+## target as a String = party message (co-op transport contract): "" = every other connected
+## member, "<member id>" = that member; any member may send (clients through the authority's
+## relay) and receivers get `app_message(sender id, type, payload)`.
 ## Payloads are plain data (no objects), <= 64 KB; types match [a-z0-9_.:/-]{1,64}.
-func send_app(target: int, type: String, payload: Dictionary = {}) -> bool:
+func send_app(target, type: String, payload: Dictionary = {}) -> bool:
 	if not NetProtocol.valid_app_type(type):
 		push_warning("Net.send_app: invalid type '%s'" % type)
 		return false
+	if typeof(target) == TYPE_STRING or typeof(target) == TYPE_STRING_NAME:
+		return _send_party(str(target), type, payload)
+	var to := int(target)
 	match role:
 		"host", "dedicated":
-			var sent := server.send_app(target, type, payload)
-			if role == "host" and (target == ALL or target == SERVER_ID):
+			var sent := server.send_app(to, type, payload)
+			if role == "host" and (to == ALL or to == SERVER_ID):
 				app_message.emit.call_deferred(SERVER_ID, type, payload.duplicate(true))
 				sent = true
 			return sent
 		"client":
-			if target != SERVER_ID:
-				push_warning("Net.send_app: clients can only message the server (use a server-side relay)")
+			if to != SERVER_ID:
+				push_warning("Net.send_app: clients message the server, or other members with a String target")
 				return false
 			return client.send_app(type, payload)
 	return false
+
+
+func _send_party(to: String, type: String, payload: Dictionary) -> bool:
+	if type.begins_with("net.") or type.begins_with("mode."):
+		push_warning("Net.send_app: '%s' is reserved" % type)
+		return false
+	match role:
+		"host", "dedicated":
+			server.relay_app(SERVER_ID, to, type, payload)
+			return true
+		"client":
+			return client.send_app(NetProtocol.APP_RELAY, {"to": to, "type": type, "payload": payload})
+	return false
+
+
+## This participant's party member id ("" offline, connecting, or on a dedicated server).
+func local_member_id() -> String:
+	var id := local_peer_id()
+	return str(id) if id > 0 and role != "dedicated" else ""
+
+
+## The other connected members (players, not spectators) as member ids, sorted.
+func member_ids() -> Array:
+	var out: Array = _members.keys()
+	out.sort()
+	return out
+
+
+func _update_members(l: Dictionary) -> void:
+	var me := local_member_id()
+	var now := {}
+	var known := {}
+	for p in l.get("players", []):
+		if typeof(p) != TYPE_DICTIONARY:
+			continue
+		var pd: Dictionary = p
+		var id := str(pd.get("id", ""))
+		known[id] = true
+		if bool(pd.get("connected", false)) and not bool(pd.get("spectator", false)) and id != me:
+			now[id] = true
+	for id in now:
+		if not _members.has(id):
+			_members[id] = true
+			member_joined.emit(str(id))
+	for id in _members.keys():
+		if not now.has(id):
+			_members.erase(id)
+			member_left.emit(str(id), "disconnected" if known.has(id) else "left")
 
 
 ## Client -> authority request (on the listen host it is delivered locally as app_request).
