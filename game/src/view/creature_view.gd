@@ -6,18 +6,30 @@ extends Node3D
 ## hit flash, localized bruises, JUICE glow, status tint and the end-of-fight gore gag.
 ##
 ## The node itself stays at the world origin; bones/segments carry world transforms.
+##
+## Forged models (tools/forge, docs/ART_PIPELINE.md): a Skeleton3D whose bone NAMES are segment
+## ids (bind pose = segment pivot in fighter rest space), one surface per material class
+## (skin/iron/cloth/eye/ember/team...) with LINEAR vertex colours as albedo and PBR hints read
+## from the imported materials, an optional unskinned "gore_piece" mesh (used by detach_piece)
+## and vertex alpha = emissive strength on glowing surfaces (the fighter's "Hype feature").
 
 const MAX_BRUISES := 8
 
 var creature: CreatureDef
 var body: BodyDef
 var team_color := Color.WHITE
+var hype := 0.0                           ## 0..1, drives the emissive "Hype feature" brightness
 var _prev: Array[Transform3D] = []
 var _curr: Array[Transform3D] = []
 var _seg_nodes: Array[Node3D] = []        ## fallback mode: one node per segment
 var _skeleton: Skeleton3D = null
 var _bone_of_seg: PackedInt32Array = PackedInt32Array()
+var _bone_order: PackedInt32Array = PackedInt32Array()   ## bones sorted parents-first
+var _seg_of_bone: PackedInt32Array = PackedInt32Array()
+var _bone_global: Array[Transform3D] = []
 var _materials: Array[ShaderMaterial] = []
+var _glow_materials: Array[ShaderMaterial] = []
+var _gore_mesh: Mesh = null
 var _bruises: Array = []                  ## [{seg, local: Vector3, s: float}]
 var _flash := 0.0
 var juice_amount := 0.0
@@ -48,13 +60,17 @@ func _palette(key: String, fallback: Color) -> Color:
 	return fallback
 
 
-func _make_material(color: Color) -> ShaderMaterial:
+func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := false) -> ShaderMaterial:
 	var m := Materials.creature_material()
 	m.set_shader_parameter("tint", color)
-	m.set_shader_parameter("roughness_v", float(creature.art.get("roughness", 0.65)))
+	m.set_shader_parameter("roughness_v", float(creature.art.get("roughness", 0.65)) if roughness < 0.0 else roughness)
+	m.set_shader_parameter("metallic_v", metallic)
+	m.set_shader_parameter("vertex_glow", 1.0 if glow else 0.0)
 	m.set_shader_parameter("time_offset", randf() * 10.0)
 	m.next_pass = Materials.outline_material(float(creature.art.get("outline", 0.012)))
 	_materials.append(m)
+	if glow:
+		_glow_materials.append(m)
 	return m
 
 
@@ -73,13 +89,50 @@ func _try_load_model(path: String) -> bool:
 	if _skeleton == null:
 		inst.queue_free()
 		return false
+	var nb := _skeleton.get_bone_count()
 	_bone_of_seg.resize(body.segments.size())
+	_seg_of_bone.resize(nb)
+	_seg_of_bone.fill(-1)
+	var missing := 0
 	for s: BodyDef.Seg in body.segments:
-		_bone_of_seg[s.index] = _skeleton.find_bone(s.id)
+		var bi := _skeleton.find_bone(s.id)
+		_bone_of_seg[s.index] = bi
+		if bi >= 0:
+			_seg_of_bone[bi] = s.index
+		else:
+			missing += 1
+	if missing > 0:
+		push_warning("%s: model %s is missing %d segment bone(s)" % [creature.id, path, missing])
+	# parents-first bone order so hierarchical skeletons (any importer layout) pose correctly
+	_bone_order = PackedInt32Array()
+	_bone_global.resize(nb)
+	var pending: Array[int] = []
+	for b in _skeleton.get_parentless_bones():
+		pending.append(b)
+	while not pending.is_empty():
+		var b: int = pending.pop_front()
+		_bone_order.append(b)
+		for c in _skeleton.get_bone_children(b):
+			pending.append(c)
 	for mi in _find_meshes(inst):
-		var m := _make_material(Color.WHITE)
+		if mi.name == "gore_piece":
+			_gore_mesh = mi.mesh
+			mi.visible = false
+			continue
 		for si in mi.mesh.get_surface_count():
-			mi.set_surface_override_material(si, m)
+			var src := mi.mesh.surface_get_material(si)
+			var rough := -1.0
+			var metal := 0.0
+			var glow := false
+			var tint := Color.WHITE
+			if src is BaseMaterial3D:
+				var bm := src as BaseMaterial3D
+				rough = bm.roughness
+				metal = bm.metallic
+				glow = bm.emission_enabled
+				if bm.resource_name == "team":
+					tint = team_color
+			mi.set_surface_override_material(si, _make_material(tint, rough, metal, glow))
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	return true
 
@@ -198,17 +251,32 @@ func snap_transforms(xf: Array[Transform3D]) -> void:
 
 func render(alpha: float) -> void:
 	var n := _curr.size()
-	for i in n:
-		var a := _prev[i]
-		var b := _curr[i]
-		var t := Transform3D(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha), a.origin.lerp(b.origin, alpha))
-		if _skeleton:
-			var bi := _bone_of_seg[i]
-			if bi >= 0:
-				_skeleton.set_bone_pose_position(bi, t.origin)
-				_skeleton.set_bone_pose_rotation(bi, t.basis.get_rotation_quaternion())
-		elif i < _seg_nodes.size():
-			_seg_nodes[i].global_transform = t
+	if _skeleton:
+		# Desired GLOBAL pose of every segment bone = the segment's interpolated world transform
+		# (the skeleton sits at the world origin). Converted to parent-relative poses parents-first,
+		# so both flat and nested bone layouts end up with the same world placement.
+		for bi in _bone_order:
+			var si := _seg_of_bone[bi]
+			var parent := _skeleton.get_bone_parent(bi)
+			var parent_global := _bone_global[parent] if parent >= 0 else Transform3D.IDENTITY
+			var global: Transform3D
+			if si >= 0 and si < n:
+				var a := _prev[si]
+				var b := _curr[si]
+				global = Transform3D(Basis(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha)), a.origin.lerp(b.origin, alpha))
+			else:
+				global = parent_global * _skeleton.get_bone_rest(bi)
+			_bone_global[bi] = global
+			var local := parent_global.affine_inverse() * global
+			_skeleton.set_bone_pose_position(bi, local.origin)
+			_skeleton.set_bone_pose_rotation(bi, local.basis.get_rotation_quaternion())
+	else:
+		for i in n:
+			var a := _prev[i]
+			var b := _curr[i]
+			var t := Transform3D(Basis(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha)), a.origin.lerp(b.origin, alpha))
+			if i < _seg_nodes.size():
+				_seg_nodes[i].global_transform = t
 	_update_materials()
 
 
@@ -256,6 +324,10 @@ func _update_materials() -> void:
 		m.set_shader_parameter("juice", juice_amount)
 		m.set_shader_parameter("status_color", status_color)
 		m.set_shader_parameter("bruises", arr)
+	# ART_DIRECTION §4: emissive accents run 0.3 at 0 Hype -> 1.0 at 100 Hype (full while juiced)
+	var glow := 0.3 + 0.7 * clampf(maxf(hype, juice_amount), 0.0, 1.0)
+	for g in _glow_materials:
+		g.set_shader_parameter("vertex_glow", glow)
 
 
 ## The cosmetic end-of-fight gag: a creature-specific piece pops off and bounces away.
@@ -279,18 +351,27 @@ func detach_piece(impulse_dir: Vector3) -> RigidBody3D:
 	cs.shape = sp
 	piece.add_child(cs)
 	var mi := MeshInstance3D.new()
-	match str(g.get("shape", "tooth")):
-		"horn", "spike":
-			var cyl := CylinderMesh.new()
-			cyl.top_radius = 0.0
-			cyl.bottom_radius = size
-			cyl.height = size * 3.0
-			mi.mesh = cyl
-		_:
-			var bm := BoxMesh.new()
-			bm.size = Vector3(size, size * 1.4, size * 0.9)
-			mi.mesh = bm
-	mi.material_override = Materials.toon(Color.from_string(str(g.get("color", "#f4efe2")), Color.WHITE), 0.3)
+	if _gore_mesh != null:
+		# the forged piece (vertex-coloured, modelled per creature: tooth, claw tip, feathers...)
+		mi.mesh = _gore_mesh
+		var pm := Materials.creature_material()
+		pm.set_shader_parameter("tint", Color.WHITE)
+		pm.set_shader_parameter("roughness_v", 0.35)
+		pm.next_pass = Materials.outline_material(float(creature.art.get("outline", 0.012)) * 0.6)
+		mi.material_override = pm
+	else:
+		match str(g.get("shape", "tooth")):
+			"horn", "spike":
+				var cyl := CylinderMesh.new()
+				cyl.top_radius = 0.0
+				cyl.bottom_radius = size
+				cyl.height = size * 3.0
+				mi.mesh = cyl
+			_:
+				var bm := BoxMesh.new()
+				bm.size = Vector3(size, size * 1.4, size * 0.9)
+				mi.mesh = bm
+		mi.material_override = Materials.toon(Color.from_string(str(g.get("color", "#f4efe2")), Color.WHITE), 0.3)
 	piece.add_child(mi)
 	get_parent().add_child(piece)
 	piece.global_position = xf * MathX.vec3(g.get("offset", [0, 0, 0.1]))

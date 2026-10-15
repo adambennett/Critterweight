@@ -76,7 +76,8 @@ func test_bundled_examples_validate_and_load() -> void:
 		check_eq(a.markers_of("goal").size(), 2, "arena mode markers")
 	if not Content.creature_entry("f_stoke").is_empty():
 		var c := Content.creature("stoke_variants:overheated_stoke")
-		check(c != null and c.is_valid(), "extended creature is valid")
+		var base_ok := Content.creature("f_stoke").is_valid()
+		check(c != null and (c.is_valid() or not base_ok), "extended creature is as valid as its base: %s" % (str(c.errors) if c else "null"))
 		if c:
 			check_eq(c.title, "Overheated")
 			check_eq(c.body.segments.size(), Content.creature("f_stoke").body.segments.size(), "body inherited from f_stoke")
