@@ -8,15 +8,15 @@ body (hops, slams, leaps) and Static effects.
 
 ## Stats
 
-| HP | Walk | Accel | Turn | Stamina | Poise | Dodge | Mass | Power / Defense | Kit mods |
+| HP | Walk | Accel | Turn | Stamina | Poise | Dodge | Mass | Power / Defense | Trait stats |
 |---|---|---|---|---|---|---|---|---|---|
-| 80 | 3.8 m/s | 36 | 12 rad/s | 100 | 45 | 3.4 m / 0.3 s | 45 kg (body) | **1.2** / 1.0 | `getup_speed 1.3`, `held_time_mult 0.7` |
+| 80 | 3.8 m/s | 36 | 12 rad/s | 100 | 45 | 3.4 m / 0.3 s | 45 kg (body) | **1.25** / 1.0 | `getup_speed 1.3`, `held_time 0.7` |
 
 ## Moves (final numbers)
 
 S/A/R = startup / active / recovery (first hit window or effect time). Damage is the base before
-power ×1.2 and the engine's contact-quality / hurt-part / combo scaling (melee); effects deal it ×1.2
-flat. KB is the engine impulse (m/s); "seen" is the measured dummy displacement 0.45 s after the hit
+power ×1.25 and the engine's contact-quality / hurt-part / combo scaling (melee); effects deal it
+×1.25 flat. KB is the engine impulse (m/s); "seen" is the measured dummy displacement 0.45 s after the hit
 in the kit test. Ranges are root-to-root gaps in the test setup (dev_biped = tall biped dummy,
 Slurry = serpent).
 
@@ -26,7 +26,7 @@ Slurry = serpent).
 | L2 | Double Slap | right arm | 0.06/0.11/0.17 | 4 | 2.6 (0.62 m) | 0.20 | 5 | 3 | — | 12 | dev_biped 0.7–0.9, Slurry 0.7–1.1 | mirrored slap, leaning 16°, 5.8 m/s lunge |
 | L3 | Headbonk | body + cap | 0.14/0.32/0.12 | 7 | 4.6 (0.97 m) | 0.40 | 14 | 6 | — | 20 | Slurry 0.8–1.4, dev_biped 0.8–1.1 | 1.0 m hop into the target; **bounces back** on contact (dash −3.4 m/s) |
 | Heavy | Squash | body | 0.32/0.76/0.27 | 12 (+3 Bonk) | 5.0 radial (0.97 m) | 0.60 | 28 | 11 | — | 30 | dev_biped 1.0–2.0, Slurry 1.0–2.5 | leap ≤ 2.0 m to the target, apex 0.7 m; **landing circle r 1.0 m 4 dmg Static 10** (reaches ~3 m); **Bonk +3 on a head hit** |
-| Heavy (pad) | Squash | body | 0.06/0.79/0.25 | 12 | 5.0 radial | 0.60 | 28 | **0** | — | 30 | — | used automatically while `pad_launched`: the free Squash off a Spring Pad |
+| Heavy (pad) | Squash | body | 0.06/1.14/0.15 | 12 (+3 Bonk) | 5.0 radial | 0.60 | 28 | **0** | — | 30 | — | used automatically while `pad_launched`: the free Squash off a Spring Pad; it starts in mid-air, so the slam stays live until the landing ~1.0–1.4 s later |
 | Charged Heavy | Super Squash | body | 0.52/0.96/0.27 | 16 (+3 Bonk) | 6.5 radial + **launch 4.0** (1.7 m) | 0.80 | 45 | 15 | — | 45 | dev_biped 1.5–3.0, Slurry 1.5–3.5 | leap ≤ 3.0 m, apex 1.1 m; **landing circle r 1.6 m 6 dmg Static 20**; **guard-crush**; **knock-up**; no armor |
 | Finisher | Static Cling | discharge circle | 0.14/—/0.46 | 9 | 1.2 (0.10 m) | 0.50 | 18 | 9 | — | 35 | ≤ 1.8 m after a Slap | presses in (2.6 m/s) and discharges at `forward:0.55` r 0.35; **+10 Hype if it triggers Jolted** |
 | Dash Attack | Pinball | body | 0.06/0.28/0.28 | 6 | 6.0 (2.1 m) | 0.40 | 12 | 7 (+dodge) | — | 15 | dev_biped / Slurry 2.0–3.5 (from a dodge) | spinning 7 m/s charge 1.8 m; **bounces once off a wall toward the lock-on target** (~1.5 m second leg); **×2 damage when pad-launched** |
@@ -38,7 +38,7 @@ Slurry = serpent).
 
 Throws (from Suction Hug): **Spit-Bounce** (forward) 2.5 m, 8 dmg · **Fling** (side) 2.5 m, 8 dmg ·
 **Over-the-Top** (back) 7 dmg, an arc over Jitters' own body (1.3 m throw + 2.2 m/s extra lift ≈ 2 m)
-(all ×1.2 power, all knock down).
+(all ×1.25 power, all knock down).
 
 **Overcharge (JUICE)**: 0.6 s activation with full armor and 0.3 s invulnerability (engine), Hype →
 0; at 0.42 s the burst (10 dmg, Static 50, KB 6.4, r 3 m). Then 8 s of JUICE state:
@@ -61,36 +61,56 @@ damage ×2).
 | Static Cling +10 Hype on Jolted | passives `static_cling_window` + `static_cling_hype` (`status_applied`, element static + flag). Test: +10.0 Hype when a pre-charged dummy is Jolted by it. |
 | Pinball wall bounce toward the target, ×2 from a pad | `charge` with `bounce 1, bounce_distance 2.2` (charge-bounce extension) and the shared `recovery 0.32` (the spin and hit window play out after the charge) + passive `pad_pinball`. Tests: one bounce, Jitters turns to face the target and travels > 1.1 m back; damage ratio 2.00 with `pad_launched`. |
 | Fastest pummel (0.25 s) | `pummel` move `interval: 0.25` (the shared pummel cadence field). Test: 3 zaps 0.24–0.34 s apart, 2.4 dmg each. |
-| Grabs on Jitters hold 30 % shorter | creature `mods.held_time_mult 0.7`. Test: an unescaped hold auto-throws after 1.40 s (2.00 s without the mod). |
-| Knockdown recovery +30 % | creature `mods.getup_speed 1.3`. Test: knockdown → up in < 85 % of the unmodded time. |
+| Grabs on Jitters hold 30 % shorter | trait stat `held_time 0.7` (× any run `held_time_mult` mod). Test: an unescaped hold auto-throws after 1.40 s (2.00 s without the trait). |
+| Knockdown recovery +30 % | trait stat `getup_speed 1.3` (× any run `getup_speed` mod, e.g. Rubber Core). Test: knockdown → up in < 85 % of the time without the trait. |
 | Arc Lash homing, expiry pulse, reflectable | projectile `homing_deg 90`, `on_expire area arc_lash_pulse`, `burst_on_hit false`. Tests: hits a strafing target, no pulse after a direct hit, pulse hits a target 10.2 m away, reflect flag bounces it, 6 s cooldown blocks a second cast. |
-| Spring Pad launches / stun / free Squash / max 2 | effect `prop spring_pad` (`launch_up 2.5, launch_forward 3, enemy_stun 0.4, max_active 2`) + `heavy@pad_launched` variant with 0 stamina. Tests: enemy launched > 1.2 m and stunned on landing, 3 placements leave 2 pads, Jitters bounces off its own pad and its Heavy becomes `heavy@pad_launched` at no stamina. |
+| Spring Pad launches / stun / free Squash / max 2 | effect `prop spring_pad` (`launch_up 2.5, launch_forward 3, enemy_stun 0.4, max_active 2`) + `heavy@pad_launched` variant with 0 stamina. Tests: enemy launched > 1.2 m and stunned on landing, 3 placements leave 2 pads, Jitters bounces off its own pad and its Heavy becomes `heavy@pad_launched` at no stamina; the pad Squash slam connects at the bottom of its arc. |
 | Overcharge: Light-stagger immunity, landing pulses, chain arcs | `juice_state armor lights`, hooks `land → area overcharge_pulse`, `hit_dealt move_class light → chain_arc`. Tests: no hitstun from jabs, pulse after a Squash landing, arc hits a second dummy. |
 | Taunt 1.5 s, +8 Hype | `taunt` move 1.5 s; Hype from the engine. |
 
 ## AI (bots)
 
 Personality **pest**, written as kit hints on the shared bot mechanism (`ai` block): aggression
-+0.08, dodge +0.08, ability +0.20; `attack_range` 0.85 m; `range` **[0.7, 1.4]** (keeps hopping in
++0.08, dodge +0.08, ability +0.20; `attack_range` 0.85 m; `range` **[0.6, 1.1]** (keeps hopping in
 close). Ability hints: **Arc Lash** at 2.2–7 m (chance 1.4 × 0.35 × skill), **Spring Pad** at
 1.8–4.2 m (chance 1.0 × 0.35 × skill), placed toward the target. **Squash against long windups**
 (`heavy_vs_windup 0.55`: a target showing > 0.3 s of startup within 2.4 m), **Pinball in**
-(`dash_in`: dodge-in + Light from 2.0–3.4 m, chance 0.5 × aggression), `charge_heavy` 0.5 and
+(`dash_in`: dodge-in + Light from 2.0–4.5 m, chance 0.7 × aggression), `charge_heavy` 0.5 and
 `avoid_zones`. The generic bot adds the Static Cling finisher off Slap strings and JUICE at 100 Hype.
 
 ## Verification
 
 `& $g --headless --path game --fixed-fps 120 -- --test test_kit_f_jitters` →
-`game/src/test/kits/test_kit_f_jitters.gd` (16 tests, ~25 s, **all pass**; the first checks the creature parses with zero errors). Every move connects at
+`game/src/test/kits/test_kit_f_jitters.gd` (18 tests, ~40 s, **all pass**; the first checks the creature parses with zero errors). Every move connects at
 its range against dev_biped and Slurry and whiffs outside it, with damage, knockback, stagger,
 Static build-up, active-weapon reach ≤ 1.6 m (max seen 0.66 m), no tipping, no spin-out, no floor
 clipping, no cage exit, upright at the end. Plus: Headbonk bounce, Squash landing circle, Super
 Squash launch / guard-crush / landing / no armor, Static Cling Jolt Hype, Pinball wall bounce and
 pad ×2, Suction Hug zaps (cadence) and all three throws, slippery hold and quick get-up, Arc Lash
 homing / pulse / reflect / cooldown, Spring Pad enemy launch + stun, max 2, own launch + free
-Squash, Overcharge start / burst / armor / pulses / chain arcs / end / crash, guard and parry
-(Arc Lash: block, never parry), taunt and a bot smoke test. Engine extensions:
+Squash and its slam, Overcharge start / burst / armor / pulses / chain arcs / end / crash, guard
+and parry (Arc Lash: block, never parry), taunt, a bot smoke test and the six campaign techniques
+(below). Engine extensions:
 `test_kit_extensions_sj.gd`.
+
+## Campaign techniques (ROSTER §6 technique table)
+
+`game/content/core/techniques/jitters.json` changes this kit only through data patches, run mods
+and hooks; patches follow how the kit really implements each move, and
+`test_campaign_techniques_deliver` applies each technique the way the campaign does and checks the
+effect (plus `test_technique_lint.gd`: every patch hits a real field).
+
+| Technique | Effect | How it lands on this kit | Measured |
+|---|---|---|---|
+| Capacitor | Hype gain +20 %; Overcharge 8 → 10 s | `juice.duration` and the `juice_state` duration ×1.25, run mod `hype_gain ×1.2` | 10 s state, ×1.2 Hype |
+| Bouncy Castle | Spring Pad max 2 → 3, cooldown 7 → 5 s | `prop.max_active +1`, `cooldown ×0.714` | 4 placements leave 3 pads; 5.0 s |
+| Chain Reaction | hitting a Jolted enemy leaks 10 Static to every enemy within 1.5 m | hook `hit_dealt` + `target_status static` → Static-10 circle r 1.5 m | a bystander ~1 m away gets Static 10 only with the technique |
+| Rubber Core | get-up +50 % on top of the kit's +30 %; poise 45 → 60 | `stats.poise +15`, run mod `getup_speed ×1.5`; the kit's own +30 % is the `getup_speed` **stat**, so the two multiply (×1.95) — as a creature `mods` entry it was overwritten by the run value | poise 60, get-up ×1.95 |
+| Head Hunter | Bonk +3 → +7; Squash leap +0.5 m, target point ≤ 2.5 m | hook slots include `heavy@pad_launched` (pad Squash hits report that slot); leap patches on both Squash variants; slam window, recovery and the two last keys shift +0.24 s so the slam stays live until the later landing | leaps 1.2 m / 2.5 m; head Bonk on Slurry 14.9 → 23.0; still connects at 2.2 m on Jitters (whiffed without the timing shift) and off a pad |
+| Short Fuse | Arc Lash homing 90 → 180°/s, 2 charges; stamina regen −20 % | `homing_deg ×2`, `ability1.charges = 2`, run mod `stamina_regen ×0.8` | data checks |
+
+Head Hunter's higher arc lands more head Bonks on most of the roster (Dozer, Dredge, Gusto, Stoke,
+Slurry: 21–31 dmg) but can clip a raised arm on bipeds (dev_biped, Stoke from 2.2 m: ~4 dmg).
 
 ## Evidence (GUI captures, the_gullet, vs Slurry)
 
@@ -111,23 +131,29 @@ damage-over-time is extra (per bout).
 
 | Pairing | Tier | Bouts | Wins | Win % | Strike dmg/hit | All hits dmg/hit | Gunked DoT / bout |
 |---|---|---|---|---|---|---|---|
-| Slurry vs Jitters | regular | 24 | 13–11 | **54 / 46** | 6.66 vs 7.07 | 3.19 vs 7.07 | 9.1 |
-| Slurry vs Jitters | pro | 24 | 14–10 | **58 / 42** | 6.21 vs 7.03 | 3.36 vs 7.03 | 8.5 |
+| Slurry vs Jitters | regular | 48 | 29–19 | **60 / 40** | 6.80 vs 7.24 | 3.25 vs 7.24 | 9.3 |
+| Slurry vs Jitters | pro | 48 | 30–18 | **62 / 38** | 6.03 vs 6.97 | 3.46 vs 6.96 | 8.9 |
 | Slurry mirror | regular | 20 | 9–11 | 45 / 55 | 6.59 vs 6.72 | 2.94 vs 2.91 | 5.7 vs 7.1 |
-| Jitters mirror | regular | 20 | 11–9 | 55 / 45 | 5.90 vs 6.05 | 5.90 vs 6.05 | — |
+| Jitters mirror | regular | 48 | 22–26 | 46 / 54 | 6.63 vs 6.53 | 6.62 vs 6.52 | — |
 
-Over the four regular 24-bout samples taken while finishing the kit (13–11, 11–13, 15–9, 13–11)
-Slurry won 52 of 96 (54 %); a single 24-bout sample carries about ±10 % noise. No mirror bout timed
-out (the zoner closes in once its lobs are on cooldown). Damage sources (regular, final): Slurry —
-Sludge Lob 462, Venom Spit 237, Head Butt 218, Gunked 219, puddle ticks 198, Rear & Crash 98,
-Tail Flick 86, Tail Sweep 84; Jitters — Arc Lash 473, Static Cling 441, Pinball 247, Squash 231
-(+123 landing circles, +87 pad Squash), Slaps 223, Headbonk 106.
+Final kit (after the campaign-technique pass and the pad Squash fix) on top of main 9533454; the
+same seeds before the pad Squash fix gave 29–19 / 28–20. A 20-bout sample carries about ±11 %
+noise: the first 20 Jitters-mirror bouts alone went 6–14 (14–6 in an earlier run), so the 48-bout
+mirror is the one to read. Time-outs (decided on health fraction): 1 of 48 regular, 6 of 48 pro,
+none in the Slurry mirror (the zoner closes in once its lobs are on cooldown), 1 of 48 in the
+Jitters mirror. Damage sources (regular cross, 48 bouts): Slurry — Sludge Lob 871, Venom Spit 492,
+Gunked 447, Head Butt 439, puddle ticks 379, Rear & Crash 250, Tail Flick 126, Tail Sweep 115;
+Jitters — Arc Lash 831, Static Cling 601, Pinball 508, Squash 439 (+264 landing circles, +296 pad
+Squash), Slaps 475, Headbonk 186.
 
 ## Generic engine extensions this kit relies on
 
 All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_sj.gd`.
-- `creature_def.gd` / `fighter.gd`: creature `mods` (base Fighter.mods: `getup_speed`,
-  `held_time_mult`) — slippery holds and quick get-ups.
+- `creature_def.gd` / `fighter.gd`: trait stats `getup_speed` / `held_time` (default 1.0),
+  multiplied with the run/rules mods `getup_speed` / `held_time_mult` in
+  `Fighter.getup_speed_mult()` / `held_time_mult()` — slippery holds and quick get-ups that stack
+  with campaign bonuses (a spawn entry replaces `Fighter.mods` values, so a kit base kept there was
+  overwritten).
 - `hooks.gd`: condition `hit_part` (the Bonk; main later added an equivalent one, merged).
 - `fighter.gd`: charge `bounce` / `bounce_distance` (Pinball; the move then plays out through the
   shared charge `recovery`), `is_airborne()`.
@@ -142,16 +168,17 @@ All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_
 
 ## Deviations from ROSTER (and why)
 
-- **Power 1.2** (ROSTER lists no power): with 80 HP and 4-damage Lights Jitters lost every trade to
-  Slurry's reach and puddles; ×1.2 on everything brought the cross matchup into 35–65 %.
+- **Power 1.25** (ROSTER lists no power): with 80 HP and 4-damage Lights Jitters lost every trade to
+  Slurry's reach and puddles; ×1.2 on everything brought the cross matchup into 35–65 %, and ×1.25
+  (with the tighter bot range) kept it there after the shared bot hints were unified.
 - **Static Cling is a discharge circle** at `forward:0.55` (r 0.35) instead of a weapon hit: a body
   pressed into the target has no closing speed, so the engine's contact validation never counted it.
 - **Squash / Super Squash leap heights** 0.7 m / 1.1 m (ROSTER 1.8 m / 2.5 m up): the leap effect's
   apex. A 1.8 m apex alone is ~1.2 s of airtime, far beyond the 0.30/0.14/0.40 frame budget and easy
   to walk out of; the lower arcs keep the moves at 1.35 s / 1.75 s in total.
-- **Leaping moves keep the body slam live for the whole flight**: Squash 0.32/0.76/0.27, Super Squash
-  0.52/0.96/0.27, Headbonk 0.14/0.32/0.12 (ROSTER 0.30/0.14/0.40, 0.50/0.16/0.50, 0.16/0.12/0.30),
-  because where the body comes down depends on how the target moves.
+- **Leaping moves keep the body slam live for the whole flight**: Squash 0.32/0.76/0.27, pad Squash
+  0.06/1.14/0.15, Super Squash 0.52/0.96/0.27, Headbonk 0.14/0.32/0.12 (ROSTER 0.30/0.14/0.40,
+  0.50/0.16/0.50, 0.16/0.12/0.30), because where the body comes down depends on how the target moves.
 - **Knockback** values are engine impulses (m/s) tuned by measurement, not ROSTER metres.
 - **Arc Lash flies ≈ 9 m** (6 m/s × 1.5 s); the ROSTER's "range 7 m" contradicts its own speed and
   lifetime — speed and lifetime were kept.
@@ -168,6 +195,10 @@ All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_
   slaps register against thin limbs; points unchanged.
 
 ## Known gaps
+
+- ROSTER technique details the campaign data does not carry: Bouncy Castle's "allies launched from a
+  pad get 0.5 s evasion" (the spring pad has no ally option) and Chain Reaction as a per-second leak
+  (it is an on-hit leak). Both are technique-content choices outside this kit.
 
 - AI does not place the pad *between* itself and the target to bait, seek crowds in FFA / horde, or
   place pads under knocked-down enemies (Headliner+).

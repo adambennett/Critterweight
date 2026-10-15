@@ -41,11 +41,12 @@ Throws (from Coil): **Whip Toss** (forward) 3.0 m, 10 dmg · **Slingshot** (side
 0. At 0.4 s: the ground wave (8 dmg, Sludge 50, class juice) and a **river** of three own puddles
 (r 1.5 m, 8 s) at 1.5 / 4.5 / 7.5 m ahead. Then 6 s of JUICE state:
 - every Light also fires **overflow_spit** (3 dmg, Sludge 10, 14 m/s × 0.26 s ≈ 4 m, aimed);
-- Slurry heals **1 HP every 0.5 s** (2 HP/s) while standing in sludge (`in_zone` sludge);
+- Slurry heals **1 HP every 0.5 s** (2 HP/s) while standing in sludge (`in_zone` sludge; hook id
+  `slurry_overflow_heal`);
 - Gunked enemies anywhere take an extra **Overflowing** 1.5 dps debuff (= 2× Gunked damage);
 - ending downside: the engine JUICE crash (2 s at 0.75× speed, half stamina regen).
 
-Passive **drain_refund**: on `emerge`, if Slurry stands in a Sludge zone, `cooldown ability2 add −3 s`.
+Passive **slurry_dive_refund**: on `emerge`, if Slurry stands in a Sludge zone, `cooldown ability2 add −3 s`.
 
 ## How the ROSTER properties are implemented
 
@@ -62,7 +63,7 @@ Passive **drain_refund**: on `emerge`, if Slurry stands in a Sludge zone, `coold
 | Coil grab, Squeeze pummel 4 dmg / 0.4 s | `grab` move (head tilted down so it wraps short targets) + `pummel` move with `interval: 0.4` (the shared pummel cadence field). |
 | Gulp-and-Spit lands Gunked +30 | throw `buildup: 30` (engine applies the thrower's element). |
 | Sludge Lob, 2 charges, puddle on impact or expiry | `charges: 2`, projectile `lob`, `range 9`, `arrive_y 0.45`, `on_expire zone sludge_puddle owner_immune` (bursts on hits too). Test: 2 shots then empty, one charge back after 7 s, two puddles. |
-| Drain Dive invulnerable, emerge circle, refund 3 s | `blink dir stick 4.5 m delay 0.5` (the engine makes a submerged fighter untouchable), `on_emerge area drain_emerge`, passive `drain_refund` (new `emerge` hook event + the shared `cooldown {add: -3}` action). Test: no hits taken while submerged; travel ≤ 4.5 m; cooldown 3.0 s shorter when emerging in an own puddle. |
+| Drain Dive invulnerable, emerge circle, refund 3 s | `blink dir stick 4.5 m delay 0.5` (the engine makes a submerged fighter untouchable), `on_emerge area drain_emerge`, passive `slurry_dive_refund` (new `emerge` hook event + the shared `cooldown {add: -3}` action). Test: no hits taken while submerged; travel ≤ 4.5 m; cooldown 3.0 s shorter when emerging in an own puddle. |
 | Overflow river 8 m × 3 m, 8 s | three circular own puddles (zones are circles) r 1.5 m spaced 3 m. |
 | Overflow: Light spits, 2× Gunked damage, heals 2 HP/s in sludge | `juice_state` hooks: `move_start move_class light → projectile`, `tick 0.5 → debuff require_status sludge (1.5 dps)`, `tick 0.5 in_zone sludge → heal 1`. Tests cover each. |
 | Own puddles never hurt Slurry | every Slurry zone is `owner_immune` (ELEMENTS §7 "kit says otherwise"). Test: Slurry in its own puddle takes 0 damage while the enemy ticks. |
@@ -83,15 +84,32 @@ puddles). The generic bot adds Venom Spit via the string finisher and JUICE at 1
 ## Verification
 
 `& $g --headless --path game --fixed-fps 120 -- --test test_kit_f_slurry` →
-`game/src/test/kits/test_kit_f_slurry.gd` (14 tests, ~30 s, **all pass**; the first checks the creature parses with zero errors). Every move connects at
+`game/src/test/kits/test_kit_f_slurry.gd` (15 tests, ~45 s, **all pass**; the first checks the creature parses with zero errors). Every move connects at
 its range against both dev_biped and Jitters and whiffs outside it, with damage, knockback (or
 pull), stagger, Sludge build-up, active-weapon reach ≤ 1.6 m (max seen 1.53 m, Tail Flick), no
 tipping (root up > 0.2), no spin-out (< 60 rad/s), no floor clipping, no cage exit, upright at
 the end. Plus: guard / parry, Coil + pummels + all three throws, multi-target and Gunked trip,
 armor / puddle / guard-crush, spit reflect, puddle bonus, lob charges / cooldown / puddles / owner
 immunity, dive invulnerability / distance / refund, Overflow start / river / wave / spit / heal /
-extra Gunked damage / end / crash, taunt, and a bot smoke test. Engine extensions:
+extra Gunked damage / end / crash, taunt, a bot smoke test and the six campaign techniques
+(below). Engine extensions:
 `test_kit_extensions_sj.gd`.
+
+## Campaign techniques (ROSTER §5 technique table)
+
+`game/content/core/techniques/slurry.json` changes this kit only through data patches, run mods and
+hooks; every patch was retargeted to how the kit really implements the move, and
+`test_campaign_techniques_deliver` applies each technique the way the campaign does and checks
+the effect (plus `test_technique_lint.gd`: every patch hits a real field).
+
+| Technique | Effect | How it lands on this kit | Measured |
+|---|---|---|---|
+| Septic Bloom | puddles 50 % larger, +2 s | run mods `zone_size ×2.25` (area) / `zone_duration_add +2`, read by every zone Slurry spawns (lob, Rear & Crash, Overflow) | Rear & Crash puddle r 1.3 → 1.95 m, 4 → 6 s |
+| Lockjaw | Fang Snap pull 0.5 → 1.2 m; Coil reach 1.4 → 1.6 m | `moves.l3.pull ×2.4` **and the delayed yank's knockback ×2.4** (the yank is the kit's real pull); `moves.grab.lunge[*][2] ×1.4` (Coil's reach is its lunge; the drafted extra lunge segment overlapped the kit's own and added ~0.05 m) | pull on dev_biped 0.03 → 0.87 m, on Slurry 0.07 → 1.05 m, on Jitters 0.66 → 0.92 m from 1.6 m (stops against Slurry's body); Coil's longest grab dev_biped 1.45 → 1.65 m, Jitters 1.80 → 2.00 m |
+| Blood Thinner | Gunked 1.5 → 2.25 HP/s; guard lets 35 % through | hooks only: `status_applied` (Sludge) → +0.75 dps bleed; `pre_hit_dealt` blocked hit on a Gunked target ×1.4 | bleed only with the technique; blocked Head Butt chip ×1.40 |
+| Grease Trap | enemies in Slurry's puddles dodge −40 %; Slurry +15 % speed in any Sludge zone | Greased status merged into the lob puddle, the Rear & Crash puddle **and the three Overflow puddles** (added); `tick` hook for the glide | all five puddle sources Grease; an enemy in a puddle is Greased, Slurry is not; Slurry glides in Sludge |
+| Double Dip | lob charges 2 → 3; emerge 5 → 9 dmg, r 1.2 → 1.6 m | `ability1.charges +1`, `blink.on_emerge[type=area]` damage / radius | 3 charges, 9 dmg, r 1.6 m |
+| Hardened Arteries | poise 55 → 80; no dive refund, no Overflow self-heal | the kit tags the refund passive `slurry_dive_refund` and the heal hook `slurry_overflow_heal`; the technique removes both by id | poise 80, both gone (the base kit keeps them) |
 
 ## Evidence (GUI captures, the_gullet, vs Jitters)
 
@@ -112,17 +130,20 @@ damage-over-time is extra (per bout).
 
 | Pairing | Tier | Bouts | Wins | Win % | Strike dmg/hit | All hits dmg/hit | Gunked DoT / bout |
 |---|---|---|---|---|---|---|---|
-| Slurry vs Jitters | regular | 24 | 13–11 | **54 / 46** | 6.66 vs 7.07 | 3.19 vs 7.07 | 9.1 |
-| Slurry vs Jitters | pro | 24 | 14–10 | **58 / 42** | 6.21 vs 7.03 | 3.36 vs 7.03 | 8.5 |
+| Slurry vs Jitters | regular | 48 | 29–19 | **60 / 40** | 6.80 vs 7.24 | 3.25 vs 7.24 | 9.3 |
+| Slurry vs Jitters | pro | 48 | 30–18 | **62 / 38** | 6.03 vs 6.97 | 3.46 vs 6.96 | 8.9 |
 | Slurry mirror | regular | 20 | 9–11 | 45 / 55 | 6.59 vs 6.72 | 2.94 vs 2.91 | 5.7 vs 7.1 |
-| Jitters mirror | regular | 20 | 11–9 | 55 / 45 | 5.90 vs 6.05 | 5.90 vs 6.05 | — |
+| Jitters mirror | regular | 48 | 22–26 | 46 / 54 | 6.63 vs 6.53 | 6.62 vs 6.52 | — |
 
-Over the four regular 24-bout samples taken while finishing the kit (13–11, 11–13, 15–9, 13–11)
-Slurry won 52 of 96 (54 %); a single 24-bout sample carries about ±10 % noise. No mirror bout timed
-out (the zoner closes in once its lobs are on cooldown). Damage sources (regular, final): Slurry —
-Sludge Lob 462, Venom Spit 237, Head Butt 218, Gunked 219, puddle ticks 198, Rear & Crash 98,
-Tail Flick 86, Tail Sweep 84; Jitters — Arc Lash 473, Static Cling 441, Pinball 247, Squash 231
-(+123 landing circles, +87 pad Squash), Slaps 223, Headbonk 106.
+Final kit (after the campaign-technique pass and the pad Squash fix) on top of main 9533454; the
+same seeds before the pad Squash fix gave 29–19 / 28–20. A 20-bout sample carries about ±11 %
+noise: the first 20 Jitters-mirror bouts alone went 6–14 (14–6 in an earlier run), so the 48-bout
+mirror is the one to read. Time-outs (decided on health fraction): 1 of 48 regular, 6 of 48 pro,
+none in the Slurry mirror (the zoner closes in once its lobs are on cooldown), 1 of 48 in the
+Jitters mirror. Damage sources (regular cross, 48 bouts): Slurry — Sludge Lob 871, Venom Spit 492,
+Gunked 447, Head Butt 439, puddle ticks 379, Rear & Crash 250, Tail Flick 126, Tail Sweep 115;
+Jitters — Arc Lash 831, Static Cling 601, Pinball 508, Squash 439 (+264 landing circles, +296 pad
+Squash), Slaps 475, Headbonk 186.
 
 ## Generic engine extensions this kit relies on
 
@@ -164,5 +185,6 @@ All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_
 - AI does not lead lobs onto a predicted position, place puddles between itself and the target,
   pick Fang Snap for targets standing in sludge, lob *behind* targets (Headliner+) or avoid
   spitting near Scorch allies (Flare-Up awareness).
-- Puddles are not 1.5× larger / longer with techniques yet (techniques are another task).
+- Fang Snap's pull is knockback, so it is mass-scaled: 0.4–0.7 m on Jitters but under 0.1 m on
+  heavy bodies (dev_biped, another Slurry) without Lockjaw.
 - Gulp-and-Spit trajectory (above).
