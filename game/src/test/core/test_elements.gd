@@ -61,3 +61,16 @@ func test_self_element_immunity_from_own_attacks() -> void:
 	a.statuses.add_buildup("scorch", 200.0, a)
 	check(not a.statuses.has_element("scorch"), "own element from own source ignored")
 	a.creature.element = ""
+
+
+## A fighter whose element changes mid-fight (a boss's element cycle sets mods.effect_element)
+## re-elements its elemental areas and projectiles; neutral effects stay neutral.
+func test_effect_element_override_follows_the_fighter() -> void:
+	var sim := make_sim("", {"rounds": 1, "round_time": 0}, [{"creature": "dev_biped", "team": 0}, {"creature": "dev_biped", "team": 1}])
+	var f := sim.fighters[0]
+	f.mods["effect_element"] = "static"
+	var n := sim.effects.entities.size()
+	sim.effects.fire(f, {"type": "projectile", "speed": 6.0, "element": "scorch", "damage": 3.0}, null)
+	sim.effects.fire(f, {"type": "projectile", "speed": 6.0, "damage": 3.0}, null)
+	check_eq(str(sim.effects.entities[n]["element"]), "static", "an elemental projectile takes the cycled element")
+	check_eq(str(sim.effects.entities[n + 1]["element"]), "", "a neutral projectile stays neutral")
