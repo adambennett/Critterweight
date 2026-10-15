@@ -17,7 +17,7 @@ const SCREENS := {
 	"arena_editor": "res://src/editor/arena_editor_screen.gd",
 	"online": "res://src/ui/screens/online_screen.gd",
 	"lobby": "res://src/ui/screens/lobby_screen.gd",
-	"campaign_menu": "res://src/ui/screens/campaign_menu.gd",
+	"campaign_menu": "res://src/campaign/ui/campaign_menu_screen.gd",
 	"run_map": "res://src/campaign/ui/run_map_screen.gd",
 	"reward": "res://src/campaign/ui/reward_screen.gd",
 	"event": "res://src/campaign/ui/event_screen.gd",
@@ -31,6 +31,9 @@ const SCREENS := {
 	"dialog": "res://src/ui/screens/dialog.gd",
 	"spectate": "res://src/ui/screens/spectate_setup.gd",
 	"bookie": "res://src/campaign/ui/bookie_screen.gd",
+	"rest": "res://src/campaign/ui/rest_screen.gd",
+	"run_summary": "res://src/campaign/ui/run_summary_screen.gd",
+	"camp_ledger": "res://src/campaign/ui/camp_ledger_screen.gd",
 	"tutorial_menu": "res://src/ui/screens/tutorial_menu.gd",
 }
 

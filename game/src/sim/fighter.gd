@@ -696,7 +696,7 @@ func _start_dodge() -> void:
 	_dodge_cd = Tuning.v("dodge_cooldown") + eff("dodge_time")
 	_set_state(State.DODGE)
 	move_slot = "dodge"
-	evade_until = time + Tuning.v("dodge_evade_end")
+	evade_until = time + Tuning.v("dodge_evade_end") + float(mods.get("dodge_iframes_add", 0.0))
 	hooks.fire("dodge", {})
 	_emit({"type": "dodge"})
 
@@ -736,6 +736,9 @@ func _st_hitstun(dt: float) -> void:
 func knock_down(reason := "hit", by: Fighter = null) -> void:
 	if state == State.KO or is_out():
 		return
+	# modes may replace a knockdown (boss Dazed state, "prevent one knockdown" upgrades)
+	if sim and sim.mode and sim.mode.intercept_knockdown(self, reason, by):
+		return
 	_release_grab()
 	_end_carry()
 	if held_by:
@@ -771,7 +774,7 @@ func _st_down(_dt: float) -> void:
 		_set_state(State.GETUP)
 		rig.hover_enabled = true
 		rig.upright_strength = 0.0
-		invuln_until = time + Tuning.v("getup_time") + Tuning.v("wakeup_invuln")
+		invuln_until = time + Tuning.v("getup_time") + Tuning.v("wakeup_invuln") + float(mods.get("wakeup_invuln_add", 0.0))
 		_emit({"type": "getup"})
 
 
@@ -1093,7 +1096,7 @@ func begin_grab(victim: Fighter, my_seg: int, victim_seg: int) -> void:
 		return
 	holding = victim
 	victim.held_by = self
-	_hold_left = Tuning.v("grab_hold_max") * float(victim.mods.get("held_time_mult", 1.0))
+	_hold_left = Tuning.v("grab_hold_max") * float(victim.mods.get("held_time_mult", 1.0)) + float(mods.get("grab_hold_add", 0.0))
 	victim._escape_presses = 0
 	_pummels = 0
 	_interrupt_move()
@@ -1205,7 +1208,7 @@ func _st_held(_dt: float, presses: int) -> void:
 			n += 1
 	if n > 0:
 		_escape_presses += n
-		if _escape_presses >= int(Tuning.v("grab_escape_presses")):
+		if _escape_presses >= int(Tuning.v("grab_escape_presses")) + int(held_by.mods.get("grab_escape_add", 0.0)):
 			var g := held_by
 			g._release_grab()
 			var away := (pos() - g.pos())

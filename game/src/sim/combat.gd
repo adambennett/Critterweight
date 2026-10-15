@@ -45,6 +45,8 @@ func detect_hits() -> void:
 			continue
 		var weps: PackedStringArray = a.move.windows[widx]["weapons"]
 		for wname in weps:
+			if a.move == null:
+				break  # the move ended mid-scan (grab started, counter/parry stun) — stop scanning
 			var w: BodyDef.Weapon = a.creature.body.weapons.get(wname)
 			if w == null:
 				continue
@@ -54,6 +56,8 @@ func detect_hits() -> void:
 			if a.move.damage > 0.0:
 				sim.effects.hit_props(wp, wr, a.move.damage * 0.5)
 			for b: Fighter in sim.fighters:
+				if a.move == null:
+					break
 				if b == a or not sim.can_hit(a, b):
 					continue
 				if a.move_hits.has(b.index):

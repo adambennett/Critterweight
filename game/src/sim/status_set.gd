@@ -161,7 +161,10 @@ func add(st: Dictionary) -> void:
 		if count >= int(rule("max_statuses", 3.0)) and not oldest.is_empty():
 			_remove(oldest)
 	var copy := st.duplicate()
-	copy["left"] = float(st.get("duration", 3.0))
+	if str(st.get("element", "")) != "":
+		# build modifiers (e.g. a side effect) may lengthen elemental statuses on this fighter
+		copy["duration"] = float(st.get("duration", 3.0)) * float(fighter.mods.get("status_duration_taken", 1.0))
+	copy["left"] = float(copy.get("duration", 3.0))
 	copy["_tick"] = 0.0
 	copy["_pulse"] = 0.0
 	active.append(copy)

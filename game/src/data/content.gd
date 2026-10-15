@@ -11,7 +11,7 @@ extends Node
 signal reloaded()
 
 const KINDS := ["creatures", "arenas", "rules", "modes", "supplements", "techniques", "meta_upgrades",
-	"events", "encounters", "bosses", "minions", "playlists", "announcer", "hub", "props", "ladder", "tutorial", "policies"]
+	"events", "encounters", "bosses", "boss_fights", "minions", "playlists", "announcer", "hub", "props", "ladder", "tutorial", "policies"]
 ## Kinds that change simulation outcomes and therefore the multiplayer content hash.
 const GAMEPLAY_KINDS := ["creatures", "rules", "modes", "supplements", "techniques", "events", "encounters",
 	"bosses", "minions", "props", "ladder", "arenas"]
@@ -52,6 +52,7 @@ func reload(mod_packages: Array) -> void:
 	for p in packages:
 		_load_package(p)
 	_apply_singletons()
+	_run_post_load_validators()
 	_hash = _gameplay_bytes.hex_encode().sha256_text() if not _gameplay_bytes.is_empty() else "empty"
 	_gameplay_bytes = PackedByteArray()
 	if not errors.is_empty():
@@ -209,3 +210,24 @@ func package_list() -> Array:
 	for p in packages:
 		out.append({"id": p["id"], "version": p["version"]})
 	return out
+
+
+## Post-load validators contributed by subsystems: scripts exposing a static
+## `validate_content(content: Node) -> PackedStringArray` that schema-check and cross-check their
+## kinds after every package is loaded (they may drop invalid entries from `tables`). Scripts that
+## are not present in this build are skipped. Campaign: docs/CAMPAIGN_SYSTEMS.md#validation.
+const POST_LOAD_VALIDATORS := ["res://src/campaign/campaign_validator.gd"]
+
+
+func _run_post_load_validators() -> void:
+	for path in POST_LOAD_VALIDATORS:
+		if not ResourceLoader.exists(path):
+			continue
+		var script = load(path)
+		if script == null:
+			errors.append("validator %s failed to load" % path)
+			continue
+		var found = script.call("validate_content", self)
+		if typeof(found) == TYPE_PACKED_STRING_ARRAY or typeof(found) == TYPE_ARRAY:
+			for e in found:
+				errors.append(str(e))

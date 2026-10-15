@@ -235,3 +235,9 @@ func hud_status() -> String:
 ## Bot helper: where should this fighter go / what should it prioritize (null = just fight).
 func bot_objective(_f: Fighter) -> Dictionary:
 	return {}
+
+
+## Called by Fighter.knock_down before a knockdown happens. Return true to cancel it (the mode
+## then applies its own reaction, e.g. a boss's Dazed state). reason: poise|move|throw|hit.
+func intercept_knockdown(_f: Fighter, _reason: String, _by: Fighter) -> bool:
+	return false

@@ -1,0 +1,36 @@
+{
+  "items": [
+    {"id": "sparring", "type": "difficulty", "name": "Sparring", "order": 0,
+     "desc": "Enemies have less HP and hit softer; bots are Punching Bags. Rest heals 50%. Runs are flagged 'Sparring' on the boards.",
+     "enemy_hp": 0.8, "enemy_damage": 0.7, "bot_tier": "punching_bag", "scrip_mult": 0.85, "clout_mult": 0.6,
+     "records": "sparring", "rest_heal": 0.5, "dose_allowed": false},
+    {"id": "amateur", "type": "difficulty", "name": "Amateur", "order": 1,
+     "desc": "The standard card. Journeyman bots, standard rewards and records.",
+     "enemy_hp": 1.0, "enemy_damage": 1.0, "bot_tier": "journeyman", "scrip_mult": 1.0, "clout_mult": 1.0,
+     "records": "standard", "rest_heal": 0.0, "dose_allowed": true},
+    {"id": "pro", "type": "difficulty", "name": "Pro", "order": 2,
+     "desc": "Enemies +20% HP, +25% damage; Contender bots parry. Scrip x1.15, Clout x1.4.",
+     "enemy_hp": 1.2, "enemy_damage": 1.25, "bot_tier": "contender", "scrip_mult": 1.15, "clout_mult": 1.4,
+     "records": "standard", "rest_heal": 0.0, "dose_allowed": true},
+    {"id": "title_shot", "type": "difficulty", "name": "Title Shot", "order": 3,
+     "desc": "Enemies +40% HP, +50% damage; Headliner bots use their techniques well. Scrip x1.3, Clout x2. Required for Dose 6+ records.",
+     "enemy_hp": 1.4, "enemy_damage": 1.5, "bot_tier": "headliner", "scrip_mult": 1.3, "clout_mult": 2.0,
+     "records": "title_shot", "rest_heal": 0.0, "dose_allowed": true},
+
+    {"id": "punching_bag", "type": "bot_tier", "name": "Punching Bag", "order": 0, "profile": "rookie",
+     "desc": "Reaction 0.45 s, 30% mistakes, never parries.",
+     "overrides": {"reaction": 0.45, "mistake": 0.30, "parry": 0.0}},
+    {"id": "journeyman", "type": "bot_tier", "name": "Journeyman", "order": 1, "profile": "regular",
+     "desc": "Reaction 0.32 s, 18% mistakes, rare parries.",
+     "overrides": {"reaction": 0.32, "mistake": 0.18, "parry": 0.04}},
+    {"id": "contender", "type": "bot_tier", "name": "Contender", "order": 2, "profile": "pro",
+     "desc": "Reaction 0.24 s, 10% mistakes, parries a quarter of the time.",
+     "overrides": {"reaction": 0.24, "mistake": 0.10, "parry": 0.25}},
+    {"id": "headliner", "type": "bot_tier", "name": "Headliner", "order": 3, "profile": "champion",
+     "desc": "Reaction 0.18 s, 5% mistakes, parries 40%, uses techniques well.",
+     "overrides": {"reaction": 0.18, "mistake": 0.05, "parry": 0.40, "ability": 0.85}},
+    {"id": "hall_of_famer", "type": "bot_tier", "name": "Hall-of-Famer", "order": 4, "profile": "champion",
+     "desc": "Reaction 0.14 s, 2% mistakes, reads charge-ups. Dose 10 and custom matches only.",
+     "overrides": {"reaction": 0.14, "mistake": 0.02, "parry": 0.45, "dodge": 0.36, "combo": 0.95, "ability": 0.9}}
+  ]
+}
