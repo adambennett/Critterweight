@@ -1,0 +1,26 @@
+{
+  "_doc": "Side effects (docs/design/CAMPAIGN.md §7.4): applied by some events and by Dose 7; removed by the Antidote Lozenge or a Rub-down. 'fight_rolls' re-roll a modifier for every fight from the node's seed.",
+  "items": [
+    {"id": "se_tremors", "type": "side_effect", "name": "Tremors", "effect": "Startup +5% on everything",
+     "apply": {"patches": [{"op": "time_scale", "path": "moves.*", "value": 1.05, "phase": "startup"},
+                           {"op": "time_scale", "path": "abilities.*", "value": 1.05, "phase": "startup"}]}},
+    {"id": "se_bloat", "type": "side_effect", "name": "Bloat", "effect": "Walk speed -5%",
+     "apply": {"mods": [{"key": "speed", "mul": 0.95}]}},
+    {"id": "se_road_rage", "type": "side_effect", "name": "Road Rage", "effect": "Hype decays 1/s while you are not attacking",
+     "apply": {"hooks": [{"on": "tick", "every": 0.5, "if": {"self_attacking": false}, "do": [{"type": "hype", "amount": -0.5}]}]}},
+    {"id": "se_dry_mouth", "type": "side_effect", "name": "Dry Mouth", "effect": "Stamina regen -10%",
+     "apply": {"mods": [{"key": "stamina_regen", "mul": 0.9}]}},
+    {"id": "se_hair_loss", "type": "side_effect", "name": "Hair Loss", "effect": "Cosmetic only: crest, feathers or fin thin out. No effect. The label still warns about it.",
+     "cosmetic": true, "apply": {}},
+    {"id": "se_mood_swings", "type": "side_effect", "name": "Mood Swings", "effect": "Each fight rolls your damage between -10% and +10%",
+     "apply": {"fight_rolls": [{"key": "damage", "min": 0.9, "max": 1.1}]}},
+    {"id": "se_cold_sweats", "type": "side_effect", "name": "Cold Sweats", "effect": "Brine build-up taken +20%",
+     "apply": {"statuses": [{"id": "se_cold_sweats", "name": "Cold Sweats", "duration": 9999, "buildup_received": {"brine": 1.2}}]}},
+    {"id": "se_heartburn", "type": "side_effect", "name": "Heartburn", "effect": "Scorch build-up taken +20%",
+     "apply": {"statuses": [{"id": "se_heartburn", "name": "Heartburn", "duration": 9999, "buildup_received": {"scorch": 1.2}}]}},
+    {"id": "se_ringing_ears", "type": "side_effect", "name": "Ringing Ears", "effect": "Parry window -0.02 s",
+     "apply": {"mods": [{"key": "parry_window_add", "add": -0.02}]}},
+    {"id": "se_itchy_feet", "type": "side_effect", "name": "Itchy Feet", "effect": "Dodge distance +0.3 m but dodges cost +3 stamina",
+     "apply": {"patches": [{"op": "add", "path": "stats.dodge_distance", "value": 0.3, "default": 2.8}], "mods": [{"key": "dodge_cost", "mul": 1.25}]}}
+  ]
+}

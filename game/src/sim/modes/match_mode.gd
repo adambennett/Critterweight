@@ -445,3 +445,9 @@ func bot_objective(_f: Fighter) -> Dictionary:
 		if d.team == _f.team and d != _f and d.pos().y > -0.5 and sim.arena.inside(d.pos(), -0.3):
 			return {"pos": d.pos(), "engage": 1.0, "hold": "grab", "radius": REVIVE_RANGE * 0.7}
 	return {}
+
+
+## Called by Fighter.knock_down before a knockdown happens. Return true to cancel it (the mode
+## then applies its own reaction, e.g. a boss's Dazed state). reason: poise|move|throw|hit.
+func intercept_knockdown(_f: Fighter, _reason: String, _by: Fighter) -> bool:
+	return false

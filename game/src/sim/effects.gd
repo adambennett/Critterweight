@@ -651,7 +651,7 @@ func _update_zone(ent: Dictionary, dt: float) -> void:
 				o.flinch(float(e["flinch_on_entry"]))
 			if e.has("launch"):
 				o.rig.apply_body_impulse(Vector3.UP * float(e["launch"]) * o.rig.total_mass)
-		if inside and float(e.get("push_out", 0.0)) > 0.0 and _zone_affects(ent, f, o):
+		if inside and float(e.get("push_out", 0.0)) != 0.0 and _zone_affects(ent, f, o):  # < 0 pulls inward
 			var away := o.pos() - Vector3(ent["pos"])
 			away.y = 0.0
 			o.rig.apply_body_impulse(away.normalized() * float(e["push_out"]) * dt * o.rig.total_mass * 3.0)
