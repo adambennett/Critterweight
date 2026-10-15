@@ -16,6 +16,9 @@ const PROFILES := {
 		"combo": 0.9, "ability": 0.8, "grab": 0.35, "mistake": 0.04, "spacing": 0.92, "juice": 1.0, "wake": 0.25, "mash_escape": 1.0},
 }
 
+## Chance that a chosen Heavy is held into a Charged Heavy (lower tiers never charge).
+const CHARGE_CHANCE := {"rookie": 0.0, "regular": 0.25, "pro": 0.4, "champion": 0.5}
+
 var difficulty := "regular"
 var p := {}
 var rng := RandomNumberGenerator.new()
@@ -35,6 +38,8 @@ var _last_target: Fighter = null
 var objective_override := {}      ## set by modes / autobattler
 var label_text := ""
 var _hold_until := 0.0
+var _kit_hold_until := 0.0        ## kit rule committed the stick (e.g. dive away): skip thinking
+var _charge_until := 0.0          ## holding Heavy to charge it until this time
 
 
 func _init(diff := "regular", seed_value := 0) -> void:
@@ -70,9 +75,13 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 		if _t >= float(q["at"]):
 			f.input.press(int(q["b"]))
 			_press_queue.erase(q)
+	# presses set their button's held bit; release them after the press tick so a Heavy is only
+	# charged when the bot means to (it holds Heavy while _charge_until is running)
+	f.input.held &= ~((1 << FighterInput.LIGHT) | (1 << FighterInput.HEAVY) | (1 << FighterInput.DODGE))
 	if _t >= _next_think:
 		_next_think = _t + float(p["think"]) * rng.randf_range(0.7, 1.3)
 		_think(f, sim)
+	f.input.set_held(FighterInput.HEAVY, _t < _charge_until)
 	f.input.move = _move
 	f.input.set_held(FighterInput.GUARD, _guard and _t < _guard_until)
 	f.input.set_held(FighterInput.GRAB, _t < _hold_until)
@@ -176,7 +185,9 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	to.y = 0.0
 	var dist := to.length()
 	var dir := to / maxf(dist, 0.01)
-	var my_reach := reach_of(c, "l1")
+	if _t < _kit_hold_until:
+		return
+	var my_reach := float(personality.get("reach", reach_of(c, "l1")))
 	var their_reach := reach_of(tgt.creature, "heavy") if tgt else 1.0
 	var mistake := rng.randf() < float(p["mistake"])
 	# ---- defence: react to a perceived windup ----
@@ -214,12 +225,20 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		f.input.press(FighterInput.JUICE)
 		return
 	# ---- abilities ----
+	if _kit_actions(f, tgt, dist, dir, per):
+		return
+	var rules: Dictionary = personality.get("abilities", {})
 	for slot in ["ability1", "ability2"]:
+		if rules.has(slot):
+			continue   # the kit's own rule (above) decides this slot
 		if c.abilities.has(slot) and float(f.cooldown_left.get(slot, 0.0)) <= 0.0 and rng.randf() < float(p["ability"]) * 0.35:
 			var ar := reach_of(c, slot, true)
 			if dist <= ar and dist >= minf(1.2, ar * 0.3):
 				f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
 				return
+	# ---- don't idle in the opponent's puddles / patches ----
+	if dist > my_reach + 0.4 and _avoid_enemy_zone(f, sim, dir):
+		return
 	# ---- offence ----
 	var stamina_ok := f.stamina > 18.0 or rng.randf() < 0.2
 	var aggression := float(p["aggression"]) * (1.25 if f.health_frac() > tgt.health_frac() else 0.9)
@@ -234,6 +253,8 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 				f.input.press(FighterInput.LIGHT)
 		elif rng.randf() < 0.28:
 			f.input.press(FighterInput.HEAVY)
+			if rng.randf() < float(CHARGE_CHANCE.get(difficulty, 0.25)):
+				_charge_until = _t + rng.randf_range(0.5, 1.0)
 		elif rng.randf() < float(p["grab"]) * 0.4:
 			f.input.press(FighterInput.GRAB)
 		else:
@@ -250,6 +271,14 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		_strafe = -1.0 if rng.randf() < 0.5 else 1.0
 		_strafe_until = _t + rng.randf_range(0.5, 1.6)
 	var side2 := dir.cross(Vector3.UP) * _strafe
+	var band = personality.get("range")
+	if typeof(band) == TYPE_ARRAY and (band as Array).size() == 2 and f.stamina >= 15.0:
+		# kit preferred distance band (zoners keep away, rushdown stays close)
+		var lo := float(band[0])
+		var hi := float(band[1])
+		want = clampf(want, lo, hi) if dist <= my_reach + 0.1 else (lo + hi) * 0.5
+		if dist >= lo and dist <= hi:
+			want = dist
 	if dist > want + 0.25:
 		_move = (dir + side2 * 0.25).normalized()
 		if dist > 4.0 and rng.randf() < float(p["aggression"]) * 0.1:
@@ -309,6 +338,77 @@ func _objective_actions(f: Fighter, obj: Dictionary) -> bool:
 
 func p_think() -> float:
 	return float(p["think"])
+
+
+# =====================================================================================
+# Kit-driven extras (data from the creature "ai" block; generic, never by fighter id)
+#   reach: m                  melee reach of the light string (joint-driven bodies)
+#   range: [lo, hi]           preferred distance band for footwork
+#   abilities: {slot: {min, max, chance, poise_below, target_down, away}}
+#   heavy_vs_windup: p        Heavy when the target shows a long startup (> 0.3 s left)
+#   dash_in: {min, max, chance}  dodge toward the target then Light (dash attack)
+# =====================================================================================
+
+## Steps out of an enemy zone that hurts or builds up (puddles, patches) instead of idling in it,
+## sideways relative to the target so the bot keeps facing the fight. Skill-scaled (spacing).
+func _avoid_enemy_zone(f: Fighter, sim: MatchSim, dir: Vector3) -> bool:
+	if rng.randf() >= float(p["spacing"]):
+		return false
+	var fp := f.pos()
+	for z in sim.effects.entities:
+		if str(z["kind"]) != "zone" or int(z["owner"]) < 0 or int(z["team"]) == f.team:
+			continue
+		var e: Dictionary = z["e"]
+		if float(e.get("tick_damage", 0.0)) <= 0.0 and float(e.get("buildup", 0.0)) <= 0.0:
+			continue
+		var off := Vector3(fp.x - float(z["pos"].x), 0.0, fp.z - float(z["pos"].z))
+		if off.length() > float(z["radius"]) + 0.3:
+			continue
+		var out := off.normalized() if off.length_squared() > 1e-4 else dir.cross(Vector3.UP)
+		var side := dir.cross(Vector3.UP)
+		_move = (out + side * (1.0 if side.dot(out) >= 0.0 else -1.0) * 0.5).normalized()
+		return true
+	return false
+
+
+func _kit_actions(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary) -> bool:
+	var c := f.creature
+	var rules: Dictionary = personality.get("abilities", {})
+	for slot in ["ability1", "ability2"]:
+		if not rules.has(slot) or not c.abilities.has(slot):
+			continue
+		var r: Dictionary = rules[slot]
+		if int(f.charges_left.get(slot, 1)) <= 0:
+			continue
+		if dist < float(r.get("min", 0.0)) or dist > float(r.get("max", 99.0)):
+			continue
+		if r.has("poise_below") and f.poise / maxf(1.0, f.effective_max_poise()) >= float(r["poise_below"]):
+			continue
+		if bool(r.get("target_down", false)) and not tgt.is_down():
+			continue
+		if rng.randf() >= float(r.get("chance", 0.5)) * float(p["ability"]):
+			continue
+		if bool(r.get("away", false)):
+			_move = -dir
+			_kit_hold_until = _t + 0.35
+		f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
+		return true
+	var hw := float(personality.get("heavy_vs_windup", 0.0))
+	if hw > 0.0 and f.state == Fighter.State.NEUTRAL and dist <= float(personality.get("heavy_reach", 2.2)):
+		var st := int(per.get("state", Fighter.State.NEUTRAL))
+		var left := float(per.get("first", 0.0)) - float(per.get("st", 0.0))
+		if (st == Fighter.State.ATTACK or st == Fighter.State.ABILITY) and left > 0.3 and rng.randf() < hw:
+			f.input.press(FighterInput.HEAVY)
+			return true
+	var di: Dictionary = personality.get("dash_in", {})
+	if not di.is_empty() and f.state == Fighter.State.NEUTRAL and dist >= float(di.get("min", 2.0)) and dist <= float(di.get("max", 3.0)):
+		if f.stamina > 25.0 and rng.randf() < float(di.get("chance", 0.2)) * float(p["aggression"]):
+			_move = dir
+			_kit_hold_until = _t + 0.3
+			f.input.press(FighterInput.DODGE)
+			_queue(FighterInput.LIGHT, 0.14)
+			return true
+	return false
 
 
 func _toward(from: Vector3, to: Vector3) -> Vector3:

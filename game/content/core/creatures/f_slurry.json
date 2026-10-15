@@ -204,9 +204,8 @@
  },
 "stats": {"health": 100, "walk_speed": 3.0, "accel": 22, "turn_rate": 5.0, "stamina": 105, "stamina_regen": 12,
   "poise": 55, "poise_regen": 15, "dodge_distance": 3.0, "dodge_time": 0.3, "power": 1.0, "defense": 1.0, "weight": 1.0},
- "string": ["l2", "l1", "l3"],
  "moves": {
-  "l2": {"name": "Head Butt", "duration": 0.44, "cancel": 0.14, "damage": 5, "knockback": 3.0, "stun": 0.3, "poise": 8, "stamina": 5,
+  "l1": {"name": "Head Butt", "duration": 0.44, "cancel": 0.14, "damage": 5, "knockback": 3.0, "stun": 0.3, "poise": 8, "stamina": 5,
    "vmin": 1.2, "vref": 4.5, "speed": 2.0, "move_mult": 0.2, "turn_rate": 6.0, "lunge": [[0.06, 0.22, 4.0]],
    "element": "sludge", "buildup": 12,
    "hit": [{"t0": 0.09, "t1": 0.24, "weapons": ["head", "fang"]}],
@@ -218,7 +217,7 @@
     {"t": 0.27, "lean": [24, 0, 0], "height": -0.12, "joints": {"body2": [40, 0, 0], "body1": [6, 0, 0], "head": [-30, 0, 0], "body4": [-10, 0, 0], "body5": [-4, 0, 0]}},
     {"t": 0.44}
    ]},
-  "l1": {"name": "Tail Flick", "duration": 0.56, "cancel": 0.42, "damage": 4, "knockback": 2.6, "stun": 0.25, "poise": 5, "stamina": 4,
+  "l2": {"name": "Tail Flick", "duration": 0.56, "cancel": 0.42, "damage": 4, "knockback": 2.6, "stun": 0.25, "poise": 5, "stamina": 4,
    "vmin": 1.2, "vref": 5.0, "speed": 2.0, "move_mult": 0.0, "turn_rate": 2.0, "lunge": [[0.0, 0.22, 2.4]],
    "element": "sludge", "buildup": 12,
    "hit": [{"t0": 0.14, "t1": 0.36, "weapons": ["tail_tip"]}],
@@ -278,7 +277,7 @@
     {"t": 0.9, "lean": [46, 0, 0], "height": -0.1, "joints": {"body2": [40, 0, 0], "body1": [26, 0, 0], "head": [6, 0, 0], "body4": [-20, 0, 0], "body5": [-6, 0, 0]}},
     {"t": 1.25}
    ]},
-  "finisher": {"name": "Venom Spit", "duration": 0.54, "damage": 9, "stamina": 9, "move_mult": 0.0, "turn_rate": 8.0,
+  "finisher": {"name": "Venom Spit", "duration": 0.54, "damage": 8, "stamina": 9, "move_mult": 0.0, "turn_rate": 8.0,
    "keys": [
     {"t": 0.0},
     {"t": 0.08, "lean": [-6, 0, 0], "joints": {"body2": [-10, 0, 0], "body1": [-8, 0, 0], "head": [-16, 0, 0]}},
@@ -286,8 +285,8 @@
     {"t": 0.3, "lean": [4, 0, 0], "joints": {"body2": [10, 0, 0], "body1": [8, 0, 0], "head": [10, 0, 0]}},
     {"t": 0.54}
    ],
-   "effects": [{"t": 0.14, "type": "projectile", "from": "fang", "aim": "target", "speed": 14, "life": 0.3, "radius": 0.16,
-    "damage": 9, "knockback": 3.6, "stun": 0.5, "poise": 15, "element": "sludge", "buildup": 40, "class": "heavy", "vfx": "spit"}]},
+   "effects": [{"t": 0.14, "type": "projectile", "id": "venom_spit", "from": "fang", "aim": "target", "speed": 14, "life": 0.3, "radius": 0.16,
+    "damage": 8, "knockback": 3.6, "stun": 0.5, "poise": 15, "element": "sludge", "buildup": 40, "class": "heavy", "vfx": "spit"}]},
   "dash_attack": {"name": "Slither Strike", "duration": 0.54, "damage": 6, "knockback": 3.2, "stun": 0.35, "poise": 10, "stamina": 7,
    "vmin": 1.2, "vref": 5.0, "speed": 1.6, "move_mult": 0.0, "turn_rate": 5.0, "lunge": [[0.0, 0.24, 6.5]],
    "element": "sludge", "buildup": 15,
@@ -327,16 +326,16 @@
   "throw_back": {"name": "Gulp-and-Spit", "distance": 2.0, "damage": 9, "buildup": 30}
  },
  "abilities": {
-  "ability1": {"name": "Sludge Lob", "cooldown": 5.0, "charges": 2, "duration": 0.6, "stamina": 10, "move_mult": 0.0, "turn_rate": 8.0,
+  "ability1": {"name": "Sludge Lob", "cooldown": 6.0, "charges": 2, "duration": 0.6, "stamina": 10, "move_mult": 0.0, "turn_rate": 8.0,
    "keys": [
     {"t": 0.0},
     {"t": 0.15, "lean": [-8, 0, 0], "joints": {"body2": [-14, 0, 0], "body1": [-10, 0, 0], "head": [-24, 0, 0]}},
     {"t": 0.25, "lean": [4, 0, 0], "joints": {"body2": [10, 0, 0], "body1": [6, 0, 0], "head": [-12, 0, 0]}},
     {"t": 0.6}
    ],
-   "effects": [{"t": 0.25, "type": "projectile", "from": "fang", "lob": true, "range": 9.0, "speed": 10, "radius": 0.22, "life": 2.5, "arrive_y": 0.45,
-    "damage": 7, "knockback": 3.2, "stun": 0.3, "poise": 8, "element": "sludge", "buildup": 45, "vfx": "glob",
-    "on_expire": {"type": "zone", "kind": "sludge_puddle", "radius": 1.5, "duration": 6.0, "owner_immune": true}}]},
+   "effects": [{"t": 0.25, "type": "projectile", "id": "sludge_lob", "from": "fang", "lob": true, "range": 9.0, "speed": 10, "radius": 0.22, "life": 2.5, "arrive_y": 0.45,
+    "damage": 6, "knockback": 3.2, "stun": 0.3, "poise": 8, "element": "sludge", "buildup": 40, "vfx": "glob",
+    "on_expire": {"type": "zone", "kind": "sludge_puddle", "radius": 1.3, "duration": 5.0, "owner_immune": true}}]},
   "ability2": {"name": "Drain Dive", "cooldown": 9.0, "duration": 0.95, "stamina": 12, "move_mult": 0.0, "turn_rate": 0.0,
    "keys": [
     {"t": 0.0},
@@ -347,7 +346,7 @@
     {"t": 0.95}
    ],
    "effects": [{"t": 0.2, "type": "blink", "dir": "stick", "distance": 4.5, "delay": 0.5, "invuln": 0.05,
-    "on_emerge": [{"type": "area", "radius": 1.2, "damage": 5, "launch": 3.0, "knockback": 1.5, "stun": 0.3, "poise": 10, "element": "sludge", "buildup": 25, "vfx": "drain"}]}]},
+    "on_emerge": [{"type": "area", "id": "drain_emerge", "radius": 1.2, "damage": 5, "launch": 3.0, "knockback": 1.5, "stun": 0.3, "poise": 10, "element": "sludge", "buildup": 25, "vfx": "drain"}]}]},
   "juice": {"name": "Overflow", "cooldown": 0.0, "duration": 0.6,
    "keys": [
     {"t": 0.0},
@@ -356,13 +355,13 @@
     {"t": 0.6}
    ],
    "effects": [
-    {"t": 0.4, "type": "area", "shape": "line", "length": 4.0, "width": 1.6, "damage": 8, "knockback": 3.6, "stun": 0.4, "poise": 20,
+    {"t": 0.4, "type": "area", "id": "overflow_wave", "shape": "line", "length": 4.0, "width": 1.6, "damage": 8, "knockback": 3.6, "stun": 0.4, "poise": 20,
      "element": "sludge", "buildup": 50, "class": "juice", "vfx": "wave"},
     {"t": 0.4, "type": "zone", "kind": "sludge_puddle", "at": "forward:1.5", "radius": 1.5, "duration": 8.0, "owner_immune": true},
     {"t": 0.4, "type": "zone", "kind": "sludge_puddle", "at": "forward:4.5", "radius": 1.5, "duration": 8.0, "owner_immune": true},
         {"t": 0.4, "type": "zone", "kind": "sludge_puddle", "at": "forward:7.5", "radius": 1.5, "duration": 8.0, "owner_immune": true},
     {"t": 0.45, "type": "juice_state", "duration": 6.0, "hooks": [
-     {"on": "move_start", "if": {"move_class": "light"}, "do": [{"type": "projectile", "from": "fang", "aim": "target", "speed": 14, "life": 0.29, "radius": 0.12,
+     {"on": "move_start", "if": {"move_class": "light"}, "do": [{"type": "projectile", "id": "overflow_spit", "from": "fang", "aim": "target", "speed": 14, "life": 0.29, "radius": 0.12,
       "damage": 3, "knockback": 1.5, "stun": 0.15, "poise": 4, "element": "sludge", "buildup": 10, "class": "light", "vfx": "spit"}]},
      {"on": "tick", "every": 0.5, "if": {"in_zone": "sludge"}, "do": [{"type": "heal", "amount": 1.0}]},
      {"on": "tick", "every": 0.5, "do": [{"type": "debuff", "radius": 40.0, "require_status": "sludge",
@@ -375,7 +374,10 @@
   {"id": "drain_refund", "on": "emerge", "if": {"in_zone": "sludge"}, "do": [{"type": "cooldown", "slot": "ability2", "amount": -3.0}]}
  ],
  "audio": {},
- "ai": {},
+ "ai": {"personality": "trapper", "aggression": -0.12, "block": 0.08, "dodge": 0.04, "ability": 0.3, "grab": -0.04,
+  "reach": 1.4, "range": [2.8, 5.5],
+  "abilities": {"ability1": {"min": 2.5, "max": 9.0, "chance": 0.3},
+                "ability2": {"min": 0.0, "max": 2.6, "chance": 0.7, "poise_below": 0.4, "away": true}}},
  "art": {
   "model": "res://assets/models/creatures/f_slurry.glb",
   "palette": {
