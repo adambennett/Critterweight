@@ -1,0 +1,183 @@
+{
+ "id": "layout_gullet_classic",
+ "name": "Gullet Classic",
+ "base": "gullet",
+ "variant": "night",
+ "format": 2,
+ "version": 1,
+ "author": "Critterweight",
+ "description": "The ranked default and the editor's blank example: no props, 8 spawns, 2 team clusters.",
+ "example": true,
+ "size": [
+  12.0,
+  12.0
+ ],
+ "modes": [
+  "duel",
+  "ffa",
+  "teams",
+  "coop"
+ ],
+ "flags": {},
+ "removed_builtins": [],
+ "props": [],
+ "markers": {
+  "spawn": [
+   {
+    "pos": [
+     0.0,
+     0.0,
+     -3.0
+    ],
+    "yaw": -0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.12,
+     0.0,
+     -2.12
+    ],
+    "yaw": -45.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     3.0,
+     0.0,
+     0.0
+    ],
+    "yaw": -90.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.12,
+     0.0,
+     2.12
+    ],
+    "yaw": -135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     0.0,
+     0.0,
+     3.0
+    ],
+    "yaw": -180.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -2.12,
+     0.0,
+     2.12
+    ],
+    "yaw": 135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -3.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -2.12,
+     0.0,
+     -2.12
+    ],
+    "yaw": 45.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -3.2,
+     0.0,
+     -0.9
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -3.2,
+     0.0,
+     0.9
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -4.4,
+     0.0,
+     -1.6
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -4.4,
+     0.0,
+     1.6
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     3.2,
+     0.0,
+     -0.9
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     3.2,
+     0.0,
+     0.9
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     4.4,
+     0.0,
+     -1.6
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     4.4,
+     0.0,
+     1.6
+    ],
+    "yaw": -90.0,
+    "team": 1
+   }
+  ],
+  "boss": [
+   {
+    "pos": [
+     0,
+     0.0,
+     1.6
+    ],
+    "yaw": 180.0,
+    "team": -1
+   }
+  ]
+ }
+}

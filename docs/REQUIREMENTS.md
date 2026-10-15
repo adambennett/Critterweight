@@ -54,8 +54,8 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | CNT-02 | Identity, silhouette, element relations, strengths/weaknesses, signatures, counterplay, ≥3 build directions each | ~ | ROSTER.md (design) |
 | CNT-03 | 6 original elements with statuses, 11 reactions, zones, resist/weak; icons+text+colour | ~ | ELEMENTS.md; Elements/StatusSet engine |
 | CNT-04 | Committed numeric content targets (DESIGN.md §Content targets) all met | — | |
-| CNT-05 | Polished primary cage + useful arena customization & saved layouts | ~ | ArenaView (The Gullet look in progress) |
-| CNT-06 | 4 difficulty presets + The Dosage ladder (10 levels, distinct modifiers, progressive unlock) | I T | content/core/ladder/{difficulty,doses}.json: Sparring/Amateur/Contender/Title Shot + 5 bot tiers, 10 cumulative Doses with distinct modifiers; unlock rule in CampaignProgression; test_campaign_run (ladder, difficulty/Dose modifiers), test_campaign_generation (Dose 10) |
+| CNT-05 | Polished primary cage + useful arena customization & saved layouts | I T | 4 bases (Gullet day/night/title night, Drydock, Crusher, Rooftop) with hazards/quirks, 30-entry prop catalog, 6 example layouts, saved layouts (docs/ARENAS_AND_EDITOR.md); tests arena/*; docs/evidence/arenas |
+| CNT-06 | 4 difficulty presets + The Dosage ladder (10 levels, distinct modifiers, progressive unlock) | I T | content/core/ladder/{difficulty,doses}.json: Sparring/Amateur/Pro/Title Shot + 5 bot tiers (Punching Bag/Journeyman/Contender/Headliner/Hall-of-Famer), 10 cumulative Doses with distinct modifiers; unlock rule in CampaignProgression; test_campaign_run (ladder, difficulty/Dose modifiers), test_campaign_generation (Dose 10) |
 | CNT-07 | Visibly different seeded runs (events/upgrades/enemies) | I T | seeded MapGenerator/EncounterBuilder/RewardRoller/EventRunner via RunRng streams (29 events, 45 encounters, 50 supplements, 36 techniques); test_campaign_generation (same seed = same card, varied cards, 500 seeds valid) |
 | CNT-08 | 3 bosses with 2 phases | ~ T | BossMode + boss_fights/{bilge,conduit,snappington}.json: 2 phases, telegraphed attacks, Dazed (test_campaign_fights). Real boss creature kits do not parse yet, so fights run on documented stand-in bodies |
 
@@ -85,11 +85,11 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | MCH-04 | ≥3 genuinely different bonus modes (4 designed) with NPCs and documented player/team counts | I T | Spotlight Hog, Chumball, Absolute Unit, Chum Rush, Tag Team (src/sim/modes); tests core/test_modes, test_modes_extra, test_containment; captures/mode2_*.png |
 | MCH-05 | Rules editor: format, teams, rounds, timers, score/win, health/resources, damage/knockback, respawn/revive, ability limits, hazards, bots, mode options; validation + explanations | I T | RulesValidator (every rule: range, help, per-mode options, validation with explanations) + rules_editor screen; tests core/test_rules_presets |
 | MCH-06 | Presets: save/duplicate/rename/import/export/share, versioned; usable locally, hosted, in dedicated playlists, with compatible mods | ~ | RulePresets: save/version/duplicate/rename/delete/export/import, registered in Content (local + host lists); hosted/playlist use pending net merge |
-| ARN-01 | Arena editor: choose base; place/adjust props, obstacles, hazards, spawns, boundaries within limits | — | |
-| ARN-02 | Select, move/rotate, delete, undo/redo, save/load, validate, test-play | — | |
-| ARN-03 | Mouse/keyboard and controller operation | — | |
-| ARN-04 | Validation: spawn safety, bounds, budget, required mode markers | — | |
-| ARN-05 | Authored arenas playable in normal matches; export/import as content packages usable by compatible peers; examples shipped | — | |
+| ARN-01 | Arena editor: choose base; place/adjust props, obstacles, hazards, spawns, boundaries within limits | I T | src/editor/arena_editor_screen.gd (Create › Arena Editor): base + look, palette with costs, grid/free placement, boundary within the base range, base hazards/built-ins/pits toggles; tests arena/test_arena_editor_screen; docs/evidence/arenas/11-12 |
+| ARN-02 | Select, move/rotate, delete, undo/redo, save/load, validate, test-play | I T | ArenaEditCommands stack (bounded, dirty tracking), ArenaLibrary saves (v2, v1 migration), live validation with clickable issues, test play round trip; tests arena/test_arena_editor*, test_arena_editor_screen |
+| ARN-03 | Mouse/keyboard and controller operation | I T X | full mouse/keyboard and controller maps (docs/ARENAS_AND_EDITOR.md §3), PromptBar glyphs; injected-event tests; physical controller unverified (X) |
+| ARN-04 | Validation: spawn safety, bounds, budget, required mode markers | I T | src/editor/arena_validator.gd (budget 100, 24 props, 8 hazards, 4 pickups, 45% clear floor, spawn 1.5 m, walls/edges/pits, clusters 6 m, mode markers); tests arena/test_arena_validation |
+| ARN-05 | Authored arenas playable in normal matches; export/import as content packages usable by compatible peers; examples shipped | ~ | (implemented + tested except the lobby transfer) saved layouts registered in Content (`user:` ids) and resolved by App; zip packages with manifest, sha256, content/package hashes and hardened import (import_bytes for peers); 6 example layouts; lobby transfer of user layouts not wired (~) |
 
 ## Multiplayer, servers, playlists [10]
 | ID | Requirement / acceptance | State | Evidence |

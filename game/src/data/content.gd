@@ -66,6 +66,7 @@ func reload(mod_packages: Array) -> void:
 			Log.w("content", e2)
 	# the player's own presets sit on top of packages (never part of the content hash)
 	RulePresets.register_all()
+	ArenaLibrary.register_all()     # saved/imported arena layouts, ids "user:<slug>"
 	reloaded.emit()
 
 

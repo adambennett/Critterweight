@@ -997,13 +997,17 @@ func ambience(id: String, fade := 1.5) -> void:
 	tw2.tween_property(_ambience, "volume_db", float(e.get("gain", 0.0)), fade)
 
 
-## Arena: ambience + crowd reverb character. Known ids: the_gullet, drydock, crusher, rooftop (or arena theme names).
-func set_arena(arena_id: String) -> void:
+## Arena: ambience + crowd reverb character. `base` is the arena's base (gullet/drydock/crusher/
+## rooftop, which user layouts keep whatever they are named); without one the id is matched.
+func set_arena(arena_id: String, base := "") -> void:
 	_arena_id = arena_id
 	var key := "gullet"
-	for k in ["drydock", "crusher", "rooftop"]:
-		if arena_id.contains(k):
-			key = k
+	if base in ["gullet", "drydock", "crusher", "rooftop"]:
+		key = base
+	else:
+		for k in ["drydock", "crusher", "rooftop"]:
+			if arena_id.contains(k):
+				key = k
 	ambience("amb_" + key)
 	if not enabled:
 		return
@@ -1067,7 +1071,7 @@ func begin_match(ctx: Dictionary) -> void:
 	crowd_heat = 0.15
 	if enabled:
 		crowd_start()
-		set_arena(str(ctx.get("arena", "")))
+		set_arena(str(ctx.get("arena", "")), str(ctx.get("arena_base", "")))
 
 
 func end_match() -> void:
@@ -1091,6 +1095,7 @@ func attach_match(sim: Node, player_index: int, ctx := {}) -> Node:
 	if not c.has("arena") and sim.get("arena") != null:
 		c["arena"] = str(sim.get("arena").id)
 		c["arena_name"] = str(sim.get("arena").display_name)
+		c["arena_base"] = str(sim.get("arena").base)
 	if not c.has("seed"):
 		c["seed"] = int(sim.get("seed_value"))
 	begin_match(c)

@@ -18,13 +18,16 @@ func game_version() -> String:
 	return str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
 
 
+const MAX_EXACT_INT := 9007199254740991.0   ## 2^53 - 1: every whole number up to here is an exact double
+
+
 ## Canonical form for hashing: JSON parsing turns every number into a float, so integral floats
 ## are normalized to ints (recursively) and keys are sorted before hashing.
 static func canonical(v):
 	match typeof(v):
 		TYPE_FLOAT:
 			var f: float = v
-			if is_finite(f) and floorf(f) == f and absf(f) < 9.0e15:
+			if is_finite(f) and floorf(f) == f and absf(f) <= MAX_EXACT_INT:
 				return int(f)
 			return f
 		TYPE_DICTIONARY:
@@ -47,11 +50,13 @@ static func checksum(data) -> String:
 ## Data exactly as it will read back: Godot's JSON text round trip is not exact for every double
 ## (small numbers lose trailing digits), so saves store and hash the round-trip fixed point. A
 ## checksum computed on the in-memory values would otherwise flag good files as damaged.
+## Whole numbers are kept as integer text: the parser reads "N" exactly but misreads a large
+## "N.0" by one, which would silently change 53-bit run seeds.
 static func stabilize(data):
-	var d = data
+	var d = canonical(data)
 	for i in 4:
 		var t1 := JSON.stringify(d, "", true, true)
-		var d2 = JSON.parse_string(t1)
+		var d2 = canonical(JSON.parse_string(t1))
 		if JSON.stringify(d2, "", true, true) == t1:
 			return d2
 		d = d2
