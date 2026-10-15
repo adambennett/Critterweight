@@ -8,6 +8,7 @@ extends RefCounted
 const PAD := 10
 
 
+## Paragraph text (wraps). Use `caption` for inline labels next to controls.
 static func label(text: String, size := 0, color := Color(0, 0, 0, 0)) -> Label:
 	var l := Label.new()
 	l.text = text
@@ -16,6 +17,13 @@ static func label(text: String, size := 0, color := Color(0, 0, 0, 0)) -> Label:
 	if color.a > 0.0:
 		l.add_theme_color_override("font_color", color)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	return l
+
+
+## Single-line label that never wraps (safe inside HBoxContainers).
+static func caption(text: String, size := 0, color := Color(0, 0, 0, 0)) -> Label:
+	var l := label(text, size, color)
+	l.autowrap_mode = TextServer.AUTOWRAP_OFF
 	return l
 
 

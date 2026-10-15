@@ -183,10 +183,20 @@ func publish_policy(p: PolicyData, file_name: String, to_library: bool) -> Strin
 	return p.id
 
 
-## Loads an initial policy file for a job (same creature required).
+## Loads an initial policy (a file path, or a library/built-in policy id) for a job; the policy
+## must belong to the job's creature.
 func load_init_policy(path: String) -> PolicyData:
 	if path == "":
 		return null
+	if not path.is_absolute_path() and not path.ends_with(PolicyIO.EXT):
+		var lib := PolicyLibrary.get_policy(path)
+		if lib == null:
+			note("initial policy '%s' not found: %s" % [path, PolicyLibrary.last_error(path)])
+			return null
+		if lib.creature != str(job["creature"]):
+			note("initial policy '%s' is for %s, not %s" % [path, lib.creature, str(job["creature"])])
+			return null
+		return lib
 	var r := PolicyIO.read_file(path, str(job["creature"]))
 	if not r["ok"]:
 		note("initial policy rejected: %s" % "; ".join(r["errors"]))

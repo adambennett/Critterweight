@@ -104,6 +104,8 @@ static func effective_state(run_dir: String) -> String:
 
 
 static func has_checkpoint(run_dir: String) -> bool:
+	if not DirAccess.dir_exists_absolute(run_dir.path_join("checkpoints")):
+		return false
 	for fn in DirAccess.get_files_at(run_dir.path_join("checkpoints")):
 		if str(fn).begins_with("ckpt_") and str(fn).ends_with(".json"):
 			return true
@@ -135,12 +137,15 @@ static func list_runs() -> Array:
 
 static func checkpoints(run_dir: String) -> Array:
 	var out := []
+	if not DirAccess.dir_exists_absolute(run_dir.path_join("checkpoints")):
+		return out
 	for fn in DirAccess.get_files_at(run_dir.path_join("checkpoints")):
 		var f := str(fn)
 		if f.begins_with("ckpt_") and f.ends_with(".json"):
 			var path := run_dir.path_join("checkpoints").path_join(f)
+			var fa := FileAccess.open(path, FileAccess.READ)
 			out.append({"file": f, "n": int(f.trim_prefix("ckpt_").trim_suffix(".json")), "time": FileAccess.get_modified_time(path),
-				"size_kb": FileAccess.get_file_as_bytes(path).size() / 1024})
+				"size_kb": (fa.get_length() / 1024) if fa != null else 0})
 	out.sort_custom(func(a, b): return int(a["n"]) > int(b["n"]))
 	return out
 
@@ -167,16 +172,8 @@ static func evaluate_policy(policy_id: String, opponents: Array, episodes: int, 
 	var p := PolicyLibrary.get_policy(policy_id)
 	if p == null:
 		return {"ok": false, "errors": PackedStringArray([PolicyLibrary.last_error(policy_id)]), "run_dir": ""}
-	var path := p.path
-	if p.source != "user":
-		# built-in policies live inside the game package; give the worker a plain copy
-		path = runs_dir().path_join("_eval_%s.policy.json" % PolicyLibrary.file_stem(policy_id))
-		var f := FileAccess.open(path, FileAccess.WRITE)
-		if f != null:
-			f.store_string(PolicyIO.to_text(p))
-			f.close()
 	var r := create_run({"kind": "eval", "name": "Evaluate %s" % p.name, "creature": p.creature, "seed": 1000,
-		"target": {"policy": path, "compare": "random_init"}, "objective": {"preset": str((p.training.get("objective", {}) as Dictionary).get("preset", "aggressive")) if typeof(p.training.get("objective")) == TYPE_DICTIONARY else "aggressive"},
+		"target": {"policy": policy_id, "compare": "random_init"}, "objective": {"preset": str((p.training.get("objective", {}) as Dictionary).get("preset", "aggressive")) if typeof(p.training.get("objective")) == TYPE_DICTIONARY else "aggressive"},
 		"eval": {"opponents": opponents, "episodes": episodes, "standard_spawns": true}, "scenario": {"preset": "bots_low"},
 		"limits": {"workers": workers}})
 	if r["ok"]:

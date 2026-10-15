@@ -79,7 +79,6 @@ var _lag_block := PackedFloat32Array()      ## opponent features captured at the
 var _lag_target: Fighter = null
 var _lag_other := PackedFloat32Array()      ## [enemies_other, enemy_other_dist, proj x5]
 var _prev_self_health := -1.0
-var _prev_tgt_health := -1.0
 var _lag_tgt_health := -1.0
 var _ray := PhysicsRayQueryParameters3D.new()
 
@@ -95,15 +94,15 @@ func reset() -> void:
 	_lag_target = null
 	_lag_other = PackedFloat32Array()
 	_prev_self_health = -1.0
-	_prev_tgt_health = -1.0
 	_lag_tgt_health = -1.0
 
 
 ## Builds the observation for fighter `f` at a decision tick. prev_move / prev_button are the
 ## classes this fighter used during the previous window (0/0 at the start).
+## (Blocks are built separately and concatenated natively: per-element copies are slow in GDScript.)
 func encode(f: Fighter, sim: MatchSim, prev_move: int, prev_button: int) -> PackedFloat32Array:
 	var o := PackedFloat32Array()
-	o.resize(SIZE)
+	o.resize(TARGET_START)
 	var yaw := f.facing_yaw
 	var fwd := MathX.forward_of_yaw(yaw)
 	var left := Vector3(fwd.z, 0.0, -fwd.x)
@@ -121,20 +120,22 @@ func encode(f: Fighter, sim: MatchSim, prev_move: int, prev_button: int) -> Pack
 	_lag_block = cur_block
 	_lag_other = cur_other
 	_lag_target = tgt
-	for k in TARGET_SIZE:
-		o[TARGET_START + k] = use_block[k]
-	_encode_env(o, f, p, fwd, left, sim, use_other)
-	# history
-	var h := HIST_START
-	o[h + clampi(prev_move, 0, PolicyActions.MOVE_COUNT - 1)] = 1.0
-	o[h + PolicyActions.MOVE_COUNT + clampi(prev_button, 0, PolicyActions.BUTTON_COUNT - 1)] = 1.0
+	o.append_array(use_block)
+	# environment + history in one block
+	var tail := PackedFloat32Array()
+	tail.resize(SIZE - ENV_START)
+	_encode_env(tail, f, p, fwd, left, sim, use_other)
+	var h := HIST_START - ENV_START
+	tail[h + clampi(prev_move, 0, PolicyActions.MOVE_COUNT - 1)] = 1.0
+	tail[h + PolicyActions.MOVE_COUNT + clampi(prev_button, 0, PolicyActions.BUTTON_COUNT - 1)] = 1.0
 	var sh := f.health_frac()
-	o[h + 21] = clampf((_prev_self_health - sh) * 5.0, 0.0, 1.0) if _prev_self_health >= 0.0 else 0.0
+	tail[h + 21] = clampf((_prev_self_health - sh) * 5.0, 0.0, 1.0) if _prev_self_health >= 0.0 else 0.0
 	_prev_self_health = sh
 	# target damage uses the (possibly lagged) target health so it never runs ahead of perception
 	var th := use_block[10] if use_block[0] > 0.5 else -1.0
-	o[h + 22] = clampf((_lag_tgt_health - th) * 5.0, 0.0, 1.0) if (_lag_tgt_health >= 0.0 and th >= 0.0) else 0.0
+	tail[h + 22] = clampf((_lag_tgt_health - th) * 5.0, 0.0, 1.0) if (_lag_tgt_health >= 0.0 and th >= 0.0) else 0.0
 	_lag_tgt_health = th
+	o.append_array(tail)
 	return o
 
 
@@ -327,8 +328,9 @@ func _other_block(f: Fighter, t: Fighter, p: Vector3, fwd: Vector3, left: Vector
 	return b
 
 
+## Writes the environment block at index 0 of `o`.
 func _encode_env(o: PackedFloat32Array, f: Fighter, p: Vector3, fwd: Vector3, left: Vector3, sim: MatchSim, other: PackedFloat32Array) -> void:
-	var e := ENV_START
+	var e := 0
 	var arena: ArenaDef = sim.arena if sim != null else null
 	var radius := arena.radius if arena != null else 5.0
 	var max_d := radius * 2.0

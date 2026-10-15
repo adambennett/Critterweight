@@ -11,13 +11,23 @@ var _submitted := false
 
 func begin() -> void:
 	var tj: Dictionary = job["target"]
-	var r := PolicyIO.read_file(str(tj["policy"]))
-	if not r["ok"]:
-		finished = true
-		final_state = "failed"
-		message = "policy rejected: %s" % "; ".join(r["errors"])
-		return
-	target = r["policy"]
+	var ref := str(tj["policy"])
+	if not ref.is_absolute_path() and not ref.ends_with(PolicyIO.EXT):
+		# a library / built-in policy id
+		target = PolicyLibrary.get_policy(ref)
+		if target == null:
+			finished = true
+			final_state = "failed"
+			message = "policy '%s' unavailable: %s" % [ref, PolicyLibrary.last_error(ref)]
+			return
+	else:
+		var r := PolicyIO.read_file(ref)
+		if not r["ok"]:
+			finished = true
+			final_state = "failed"
+			message = "policy rejected: %s" % "; ".join(r["errors"])
+			return
+		target = r["policy"]
 	job["creature"] = target.creature
 	if str(job["opponent_creature"]) == "":
 		job["opponent_creature"] = target.creature

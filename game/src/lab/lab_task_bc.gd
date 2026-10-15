@@ -28,8 +28,12 @@ func begin() -> void:
 	var units := PackedInt32Array()
 	var count := 0
 	var unit_base := 0
-	for dpath in bcj["datasets"]:
-		var r := PolicyDataset.load_all(str(dpath))
+	for dref in bcj["datasets"]:
+		# a folder path, or a dataset id inside the datasets folder
+		var dpath := str(dref)
+		if not dpath.is_absolute_path():
+			dpath = PolicyDataset.dir_for(dpath)
+		var r := PolicyDataset.load_all(dpath)
 		for e in r["errors"]:
 			note("dataset %s: %s" % [str(dpath).get_file(), str(e)])
 		if not r["ok"]:

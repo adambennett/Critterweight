@@ -87,6 +87,7 @@ var _delete_pol_armed := ""
 
 # ---- recording ----
 var _rec_toggle: CheckBox
+var _rec_fighter: Label
 var _ds_list: ItemList
 var _dss: Array = []
 var _ds_rename: LineEdit
@@ -209,6 +210,10 @@ func _select_tab(i: int) -> void:
 	for k in _panels.size():
 		_panels[k].visible = k == _tab
 		_tab_buttons[k].button_pressed = k == _tab
+	# keep controller focus on something visible (e.g. after Start switches to Runs)
+	var fo := get_viewport().gui_get_focus_owner() if is_inside_tree() else null
+	if fo == null or not fo.is_visible_in_tree():
+		_tab_buttons[_tab].grab_focus.call_deferred()
 	match _tab:
 		1:
 			_refresh_runs()
@@ -474,7 +479,7 @@ func _start_training() -> void:
 			if pol == null:
 				_set_status("Starting policy unavailable: " + PolicyLibrary.last_error(pid))
 				return
-			job["model"]["init_policy"] = pol.path
+			job["model"]["init_policy"] = pid
 	var r := LabManager.create_run(job)
 	if not r["ok"]:
 		_set_status("Cannot start: " + "; ".join(r["errors"]))
@@ -653,8 +658,9 @@ func _refresh_run_detail(full: bool) -> void:
 		return
 	_update_chart(kind)
 	_ckpts.clear()
+	var bias := int(Time.get_time_zone_from_system().get("bias", 0)) * 60
 	for ck: Dictionary in LabManager.checkpoints(_run_dir):
-		_ckpts.add_item("#%d  %s  (%d KB)" % [int(ck["n"]), Time.get_datetime_string_from_unix_time(int(ck["time"]), true), int(ck["size_kb"])])
+		_ckpts.add_item("#%d  %s  (%d KB)" % [int(ck["n"]), Time.get_datetime_string_from_unix_time(int(ck["time"]) + bias, true), int(ck["size_kb"])])
 	_report.text = _report_text(LabManager.report(_run_dir))
 
 
@@ -776,6 +782,7 @@ func _build_policies() -> Control:
 	root.add_child(right)
 	var info_panel := LabUi.panel_box()
 	info_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	info_panel.custom_minimum_size = Vector2(0, 260)
 	right.add_child(info_panel)
 	_pol_info = LabUi.rich()
 	info_panel.add_child(_pol_info)
@@ -783,16 +790,20 @@ func _build_policies() -> Control:
 	play.add_theme_constant_override("separation", 8)
 	right.add_child(play)
 	_player_creature = LabUi.option([])
-	play.add_child(LabUi.label("You play:"))
+	var you := LabUi.caption("You play:")
+	you.custom_minimum_size = Vector2(140, 0)
+	play.add_child(you)
 	play.add_child(_player_creature)
-	play.add_child(LabUi.button("FIGHT THIS BOT", _fight, 220))
+	play.add_child(LabUi.button("FIGHT THIS BOT", _fight, 260))
 	var spec := HBoxContainer.new()
 	spec.add_theme_constant_override("separation", 8)
 	right.add_child(spec)
 	_spectate_opp = LabUi.option([])
-	spec.add_child(LabUi.label("Opponent:"))
+	var vs := LabUi.caption("Opponent:")
+	vs.custom_minimum_size = Vector2(140, 0)
+	spec.add_child(vs)
 	spec.add_child(_spectate_opp)
-	spec.add_child(LabUi.button("SPECTATE THIS BOT", _spectate, 220))
+	spec.add_child(LabUi.button("SPECTATE THIS BOT", _spectate, 260))
 	var actions := HBoxContainer.new()
 	actions.add_theme_constant_override("separation", 8)
 	right.add_child(actions)
@@ -1031,6 +1042,8 @@ func _build_recording() -> Control:
 	left.add_child(_rec_toggle)
 	left.add_child(LabUi.label("While this is on, every match you play stores what you saw (the same observations a policy sees) and what you did, in the dataset \"My <fighter> matches\". Matches play exactly as usual. Then pick Behaviour cloning on the Train tab.", 18, Color(0.78, 0.75, 0.85)))
 	left.add_child(LabUi.header("Record a teacher bot"))
+	_rec_fighter = LabUi.caption("")
+	LabUi.row(left, "Fighter", _rec_fighter, "The fighter selected on the Train tab.")
 	_teacher = LabUi.option(["Bot: Rookie", "Bot: Regular", "Bot: Pro", "Bot: Champion", "Scripted jabber", "Scripted turtle"], 1)
 	LabUi.row(left, "Teacher", _teacher)
 	_teacher_opp = LabUi.option(["Bot: Rookie", "Bot: Regular", "Standing dummy", "Scripted jabber"], 0)
@@ -1071,7 +1084,9 @@ func _refresh_datasets() -> void:
 		_ds_list.add_item("%s · %s · %d samples in %d sessions · %s%s" % [str(d["name"]), str(d["creature"]), int(d["samples"]), int(d["shards"]), str(d["source"]), bad])
 	if _dss.is_empty():
 		_ds_list.add_item("(no datasets yet)")
-	_rec_toggle.button_pressed = LabRecording.is_enabled()
+	_rec_toggle.set_pressed_no_signal(LabRecording.is_enabled())
+	var c := Content.creature(_creature_id())
+	_rec_fighter.text = "%s (%s)" % [c.display_name if c else _creature_id(), _creature_id()]
 
 
 func _selected_dataset() -> Dictionary:

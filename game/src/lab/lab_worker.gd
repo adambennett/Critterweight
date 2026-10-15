@@ -60,6 +60,9 @@ func run_from_cli(a: PackedStringArray) -> void:
 		add_child(bench)
 		bench.run(_arg("--lab-bench", "inference"), _arg("--lab-out", ""))
 		return
+	if args.has("--lab-publish"):
+		get_tree().quit(publish(_arg("--lab-publish", ""), _arg("--id", ""), _arg("--name", ""), _arg("--description", ""), _arg("--lab-out", "")))
+		return
 	var job_path := _arg("--lab-worker", "")
 	var loaded := LabJob.load_file(job_path)
 	job = loaded["job"]
@@ -117,6 +120,31 @@ func run_from_cli(a: PackedStringArray) -> void:
 	_t_start = Time.get_ticks_msec()
 	_wall_mark_us = Time.get_ticks_usec()
 	set_physics_process(true)
+
+
+## `--lab-worker --lab-publish <trained.policy.json> --id <id> --name <name> --lab-out <file>`:
+## re-labels a trained policy (new id/name/description, re-signed, validated) — used to ship
+## sample policies as content. Returns a process exit code.
+static func publish(src: String, id: String, display_name: String, description: String, dest: String) -> int:
+	var r := PolicyIO.read_file(src)
+	if not r["ok"]:
+		printerr("cannot publish %s: %s" % [src, "; ".join(r["errors"])])
+		return 2
+	var p: PolicyData = r["policy"]
+	if id != "":
+		p.id = id
+	if display_name != "":
+		p.name = display_name
+	if description != "":
+		p.description = description
+	p.updated = PolicyData.now_iso()
+	var err := PolicyIO.write_file(dest, p)
+	if err != OK:
+		printerr("cannot write %s: %s" % [dest, error_string(err)])
+		return 1
+	PolicyIO.delete_file(dest + ".bak")
+	print("published %s as %s -> %s" % [src.get_file(), p.id, dest])
+	return 0
 
 
 func _resolve_run_dir(job_path: String) -> String:

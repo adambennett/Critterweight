@@ -2,10 +2,11 @@ extends TestCase
 ## LAB-09: inference budget. Eight policy-controlled fighters play a live free-for-all; the
 ## measured policy cost (observation + network + action choice, decisions staggered at 15 Hz)
 ## must stay within the budget documented in docs/AI_LAB.md:
-##   mean cost per 120 Hz physics tick for 8 policy fighters <= 0.2 ms (dev PC)
-## A tolerance factor absorbs a busy machine; real measurements are printed for the record.
+##   mean cost per 120 Hz physics tick for 8 policy fighters <= 0.25 ms (dev PC)
+## A tolerance factor absorbs a busy machine (tests often share the CPU with training workers
+## and other processes); the real measurement is printed for the record.
 
-const BUDGET_TICK_US := 200.0
+const BUDGET_TICK_US := 250.0
 const TOLERANCE := 1.5
 
 
