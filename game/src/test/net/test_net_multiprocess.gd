@@ -45,7 +45,7 @@ func test_dedicated_match_two_clients() -> void:
 	var a: int = u.spawn("alice", u.client_args(port, "Alice", "aggressive", ["--ready", "--creature", "f_stoke", "--cosmetics",
 		"piece=hub_gold_tooth,juice=hub_juice_sizzle,frame=hub_frame_soaked,back=made_up_item", "--stop-after-matches", "1", "--quit-after", "110"]))
 	var b: int = u.spawn("bob", u.client_args(port, "Bob", "passive", ["--ready", "--creature", "f_jitters", "--present", "--stop-after-matches", "1", "--quit-after", "110"]))
-	var ra: Dictionary = await u.wait_json(u.result_path("Alice"), _done, 120.0)
+	var ra: Dictionary = await u.wait_json(u.result_path("Alice"), _done, U.SERVER_READY_S + 120.0)
 	var rb: Dictionary = await u.wait_json(u.result_path("Bob"), _done, 20.0)
 	check(bool(ra.get("connected", false)) and bool(rb.get("connected", false)), "both clients joined")
 	# cosmetics: Bob's lobby row for Alice and Bob's rendered match show her equipped items
@@ -144,7 +144,7 @@ func test_server_mods_and_join_compare() -> void:
 	check_eq(missing, ["moon_rules", "rust_bucket"], "structured: missing")
 	var modded: int = u.spawn("modded", u.client_args(port, "Moony", "aggressive", ["--mods", "moon_rules,rust_bucket", "--ready",
 		"--present", "--stop-after-matches", "1", "--quit-after", "100"]))
-	var rm: Dictionary = await u.wait_json(u.result_path("Moony"), _done, 110.0)
+	var rm: Dictionary = await u.wait_json(u.result_path("Moony"), _done, U.SERVER_READY_S + 110.0)
 	check(bool(rm.get("connected", false)), "client with the same mods joined")
 	var ms: Array = rm.get("matches", [])
 	check(not ms.is_empty() and str(ms[0].get("rules_id", "")) == "moon_rules:moon_brawl", "played the mod's rules preset")
@@ -163,7 +163,7 @@ func test_client_cannot_inject_damage() -> void:
 	# roster fighters named explicitly (npc_only stand-ins such as dev_biped cannot be picked online)
 	var victim: int = u.spawn("victim", u.client_args(port, "Victim", "passive", ["--ready", "--creature", "f_dozer", "--quit-after", "45"]))
 	var cheat: int = u.spawn("cheater", u.client_args(port, "Cheater", "cheater", ["--ready", "--creature", "f_stoke", "--quit-after", "45"]))
-	var rc: Dictionary = await u.wait_json(u.result_path("Cheater"), _done, 60.0)
+	var rc: Dictionary = await u.wait_json(u.result_path("Cheater"), _done, U.SERVER_READY_S + 60.0)
 	check(int(rc.get("forged_sent", 0)) >= 7, "cheater sent forged traffic (%d messages)" % int(rc.get("forged_sent", 0)))
 	var kicked: Dictionary = rc.get("kicked", {})
 	check_eq(int(kicked.get("code", -1)), NetProtocol.R_VIOLATION, "cheater kicked for protocol violations")
@@ -182,21 +182,24 @@ func test_client_cannot_inject_damage() -> void:
 func test_disconnect_and_rejoin() -> void:
 	u = U.new(self, "rejoin")
 	var port: int = u.base_port
-	var pl: String = u.playlist("duel.json", [{"rules": "duel", "arena": "the_gullet", "weight": 1, "rules_override": {"rounds": 1, "round_time": 90}}])
-	var srv := await _start_server("srv", u.server_sections(port, {"server": {"rejoin_grace": 40}, "match": {"playlist": pl}}))
+	# budgets allow for slow process starts (35 s each was seen in a full suite on a loaded PC): the
+	# reservation outlasts the start of Ann's second process, and a long results phase means she
+	# still gets this match's result if the bot holding her fighter has already won it
+	var pl: String = u.playlist("duel.json", [{"rules": "duel", "arena": "the_gullet", "weight": 1, "rules_override": {"rounds": 1, "round_time": 120}}])
+	var srv := await _start_server("srv", u.server_sections(port, {"server": {"rejoin_grace": 120}, "match": {"playlist": pl, "results_time": 90}}))
 	var ann: int = u.spawn("ann", u.client_args(port, "Ann", "aggressive", ["--ready", "--creature", "f_stoke", "--drop-at", "11", "--quit-after", "40"]))
-	var ben: int = u.spawn("ben", u.client_args(port, "Ben", "passive", ["--ready", "--creature", "f_dozer", "--stop-after-matches", "1", "--quit-after", "120"]))
-	var r1: Dictionary = await u.wait_json(u.result_path("Ann"), _done, 40.0)
+	var ben: int = u.spawn("ben", u.client_args(port, "Ben", "passive", ["--ready", "--creature", "f_dozer", "--stop-after-matches", "1", "--quit-after", "240"]))
+	var r1: Dictionary = await u.wait_json(u.result_path("Ann"), _done, U.SERVER_READY_S + 40.0)
 	check(int(r1.get("dropped_at_ms", -1)) > 0, "Ann dropped abruptly mid-match")
 	var token := str(r1.get("token_hex", ""))
 	check(token.length() == 32, "rejoin token issued")
 	var you := -1
 	if not (r1.get("matches", []) as Array).is_empty():
 		you = int(r1["matches"][0]["you"])
-	var slog_ok: bool = await u.wait_until(func() -> bool: return u.out(srv).contains("slot reserved"), 10.0)
+	var slog_ok: bool = await u.wait_until(func() -> bool: return u.out(srv).contains("slot reserved"), 20.0)
 	check(slog_ok, "server reserved the slot")
-	var ann2: int = u.spawn("ann2", u.client_args(port, "Ann", "aggressive", ["--token", token, "--stop-after-matches", "1", "--quit-after", "110"], "Ann2"))
-	var r2: Dictionary = await u.wait_json(u.result_path("Ann2"), _done, 120.0)
+	var ann2: int = u.spawn("ann2", u.client_args(port, "Ann", "aggressive", ["--token", token, "--stop-after-matches", "1", "--quit-after", "200"], "Ann2"))
+	var r2: Dictionary = await u.wait_json(u.result_path("Ann2"), _done, U.SERVER_READY_S + 150.0)
 	var w: Dictionary = r2.get("welcome", {})
 	check(bool(w.get("rejoined", false)), "server recognised the rejoin")
 	check_eq(int(r2.get("player_id", -1)), int(r1.get("player_id", -2)), "same player id")
@@ -294,7 +297,7 @@ func test_conditioner_profile_still_completes_match() -> void:
 	var lag := ["--net-latency", "80", "--net-jitter", "20", "--net-loss", "0.02"]
 	var a: int = u.spawn("lag1", u.client_args(port, "Lag1", "aggressive", ["--ready", "--creature", "f_stoke", "--stop-after-matches", "1", "--quit-after", "150"] + lag))
 	var b: int = u.spawn("lag2", u.client_args(port, "Lag2", "passive", ["--ready", "--creature", "f_dozer", "--present", "--stop-after-matches", "1", "--quit-after", "150"] + lag))
-	var ra: Dictionary = await u.wait_json(u.result_path("Lag1"), _done, 160.0)
+	var ra: Dictionary = await u.wait_json(u.result_path("Lag1"), _done, U.SERVER_READY_S + 160.0)
 	var rb: Dictionary = await u.wait_json(u.result_path("Lag2"), _done, 20.0)
 	check_eq((ra.get("results", []) as Array).size(), 1, "match completed under 80 +- 20 ms one-way, 2% loss (each direction)")
 	check_eq((rb.get("results", []) as Array).size(), 1, "second client also got the result")
@@ -322,7 +325,7 @@ func test_listen_host_with_remote_client() -> void:
 	check(bool(r0.get("connected", false)), "listen server up")
 	var g: int = u.spawn("guest", u.client_args(port, "Guest", "passive", ["--ready", "--creature", "f_jitters", "--app-request", "coop.hello", "--assist", "1.8",
 		"--party", "--stop-after-matches", "1", "--quit-after", "110"]))
-	var rg: Dictionary = await u.wait_json(u.result_path("Guest"), _done, 120.0)
+	var rg: Dictionary = await u.wait_json(u.result_path("Guest"), _done, U.SERVER_READY_S + 120.0)
 	var rh: Dictionary = await u.wait_json(u.result_path("Hosty"), _done, 20.0)
 	check_eq((rg.get("results", []) as Array).size(), 1, "remote client got the listen server's result")
 	check_eq((rh.get("results", []) as Array).size(), 1, "host finished the match")
@@ -453,7 +456,7 @@ func test_bonus_modes_over_network() -> void:
 	var srv := await _start_server("srv", u.server_sections(port, {"match": {"playlist": pl, "results_time": 2}}))
 	var a: int = u.spawn("brawler", u.client_args(port, "Brawler", "aggressive", ["--ready", "--stop-after-matches", "2", "--quit-after", "200"]))
 	var b: int = u.spawn("viewer", u.client_args(port, "Viewer", "wander", ["--ready", "--present", "--stop-after-matches", "2", "--quit-after", "200"]))
-	var ra: Dictionary = await u.wait_json(u.result_path("Brawler"), _done, 210.0)
+	var ra: Dictionary = await u.wait_json(u.result_path("Brawler"), _done, U.SERVER_READY_S + 210.0)
 	var rb: Dictionary = await u.wait_json(u.result_path("Viewer"), _done, 20.0)
 	var modes: Array = []
 	for m in ra.get("matches", []):
@@ -513,7 +516,7 @@ func test_playlist_rotation_voting_and_restart() -> void:
 	check(slog0.contains("entry 5 (e_missing_rules): rules preset 'no_such_rules' not found - skipped"), "missing rules reported")
 	var v1: int = u.spawn("v1", u.client_args(port, "V1", "idle", ["--ready", "--vote", "0", "--stop-after-matches", "3", "--quit-after", "150"]))
 	var v2: int = u.spawn("v2", u.client_args(port, "V2", "idle", ["--ready", "--vote", "1", "--stop-after-matches", "3", "--quit-after", "150"]))
-	var r1: Dictionary = await u.wait_json(u.result_path("V1"), _done, 160.0)
+	var r1: Dictionary = await u.wait_json(u.result_path("V1"), _done, U.SERVER_READY_S + 160.0)
 	var results: Array = r1.get("results", [])
 	check_eq(results.size(), 3, "three matches ran and advanced automatically")
 	var keys: Array = []
