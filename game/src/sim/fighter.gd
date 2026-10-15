@@ -80,6 +80,7 @@ var _grab_joint: Joint3D = null
 var _hold_left := 0.0
 var _escape_presses := 0
 var _pummels := 0
+var _pummel_ready := 0.0
 var thrown_speed := 0.0
 var _seg_stagger: PackedFloat32Array = PackedFloat32Array()
 var timed_flags := {}            ## name -> expiry time (hovering, juiced, shield, reflect, ...)
@@ -1229,9 +1230,11 @@ func _st_grabbing(dt: float) -> void:
 	var throw_dir := Vector3.ZERO
 	if _consume(FighterInput.HEAVY) or _consume(FighterInput.GRAB):
 		throw_dir = input.move if input.move.length() > 0.3 else forward()
-	elif _consume(FighterInput.LIGHT) and _pummels < int(Tuning.v("pummel_max")):
+	elif _peek(FighterInput.LIGHT) and _pummels < int(Tuning.v("pummel_max")) and time >= _pummel_ready:
+		_consume(FighterInput.LIGHT)
 		_pummels += 1
 		var pm: MoveDef = creature.moves.get("pummel")
+		_pummel_ready = time + (pm.duration if pm else 0.0)   # per-fighter cadence (pummel move duration)
 		var pdmg := pm.damage if pm else Tuning.v("pummel_damage")
 		if sim:
 			var hp := {"attacker": self, "damage": pdmg, "point": holding.pos(), "normal": Vector3.UP, "seg": 0, "part": "core",

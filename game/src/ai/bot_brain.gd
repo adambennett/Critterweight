@@ -20,7 +20,7 @@ const PROFILES := {
 }
 
 ## Chance that a chosen Heavy is held into a Charged Heavy (lower tiers never charge).
-const CHARGE_CHANCE := {"rookie": 0.0, "regular": 0.25, "pro": 0.4, "champion": 0.5}
+const CHARGE_CHANCE := {"rookie": 0.0, "regular": 0.25, "pro": 0.4, "champion": 0.5, "hall_of_famer": 0.55}
 
 var difficulty := "regular"
 var p := {}
