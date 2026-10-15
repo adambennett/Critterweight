@@ -1,0 +1,18 @@
+{
+  "items": [
+    {"id": "ach_first_win", "name": "First Purse", "description": "Win your first match.", "hidden": false},
+    {"id": "ach_tutorial", "name": "Granny's Seal of Approval", "description": "Finish all ten of Granny Haymaker's exercises.", "hidden": false},
+    {"id": "ach_juice_ko", "name": "Overdose", "description": "Knock someone out while your JUICE is running.", "hidden": false},
+    {"id": "ach_full_card", "name": "Full Card", "description": "Win a match with each of the six fighters.", "hidden": false},
+    {"id": "ach_house_rules", "name": "House Rules", "description": "Win a match with rules you made yourself.", "hidden": false},
+    {"id": "ach_hat_trick", "name": "Hat Trick", "description": "Score three goals in one Chumball match.", "hidden": false},
+    {"id": "ach_last_call", "name": "Last Call Survivor", "description": "Reach wave 20 in Chum Rush.", "hidden": false},
+    {"id": "ach_off_the_street", "name": "Off the Street", "description": "Clear an Off the Street run.", "hidden": false},
+    {"id": "ach_made_camp", "name": "Made Camp", "description": "Clear a Fight Camp run.", "hidden": false},
+    {"id": "ach_fully_dosed", "name": "Fully Dosed", "description": "Clear The Dosage at level 10.", "hidden": false},
+    {"id": "ach_order_in_court", "name": "Order in the Court", "description": "Defeat Commissioner Snappington.", "hidden": false},
+    {"id": "ach_confidant", "name": "Ludlow's Confidant", "description": "Find a secret in The Cannery.", "hidden": true},
+    {"id": "ach_mad_scientist", "name": "Mad Scientist", "description": "Train an AI Lab policy that beats its baseline.", "hidden": false},
+    {"id": "ach_ringside", "name": "Ringside Regular", "description": "Watch a full bot fight from start to finish.", "hidden": false}
+  ]
+}

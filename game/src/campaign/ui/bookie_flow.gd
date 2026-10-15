@@ -75,6 +75,7 @@ func run_fight(t: BookieTable, config: Dictionary) -> Dictionary:
 		return await HeadlessFightRunner.run(t, config, 420.0, t._is_paused, t.is_stopping)
 	_fight_done = false
 	_fight_result = {}
+	MatchFlow.last_config = {}     # no "Restart fight" into an unrelated earlier match
 	_scene = App.start_match(config, _on_presented_finished)
 	App.push("bookie", {"overlay": true})
 	var space := _scene.get_world_3d().space if _scene.get_world_3d() else RID()

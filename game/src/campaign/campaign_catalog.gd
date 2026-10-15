@@ -377,7 +377,7 @@ func validate() -> PackedStringArray:
 			if pe != "":
 				_err(id, pe)
 		if not resolver.exists(str(lo.get("base", ""))) and resolver.raw_entry(id).is_empty():
-			_warn(id, "minion base '%s' not found (creature content pending)" % lo.get("base", ""))
+			_warn(id, "minion base %s" % _pending_text(str(lo.get("base", ""))))
 	for id in encounters:
 		_check_encounter(id, encounters[id])
 	for id in boss_fights:
@@ -396,8 +396,16 @@ func validate() -> PackedStringArray:
 			_err("act_%d" % a, "act boss encounter '%s' missing" % acts[a].get("boss", ""))
 	for fid in rules.get("roster", {}):
 		if not resolver.exists(str(fid)):
-			_warn(str(fid), "roster fighter creature not found (creature content pending)")
+			_warn(str(fid), "roster fighter %s" % _pending_text(str(fid)))
 	return errors
+
+
+## "not installed" vs "installed but not usable yet (first parse problem)".
+func _pending_text(cid: String) -> String:
+	var probs := resolver.problems(cid)
+	if resolver.raw_entry(cid).is_empty() or probs.is_empty():
+		return "creature '%s' not installed yet (creature content pending)" % cid
+	return "creature '%s' is installed but not usable yet: %s" % [cid, probs[0]]
 
 
 func _err(id, msg: String) -> void:
@@ -619,7 +627,7 @@ func _check_boss_fight(id: String, b: Dictionary) -> void:
 	if str(b.get("creature", "")) == "":
 		_err(id, "boss fight needs a creature id")
 	elif not resolver.exists(str(b["creature"])):
-		_warn(id, "boss creature '%s' not installed yet" % b["creature"])
+		_warn(id, "boss %s" % _pending_text(str(b["creature"])))
 	var phases: Array = b.get("phases", [])
 	if phases.size() < 1:
 		_err(id, "boss fight needs phases")

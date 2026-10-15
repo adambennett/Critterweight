@@ -95,8 +95,8 @@ func test_tag_bout_swaps_and_regenerates() -> void:
 	check(plan["rule_tags"].size() > 0, "rule tags shown for the tag bout")
 
 
-func test_boss_fight_two_phases_and_daze() -> void:
-	var ctrl := strong_run()
+func _boss_sim(seed_value: int) -> MatchSim:
+	var ctrl := strong_run({"seed": seed_value})
 	fight_plan(ctrl, "boss_a1")
 	var built := ctrl.match_config({"bot_tier_players": "headliner", "player_kinds": {"p0": "bot"}})
 	check((built["errors"] as PackedStringArray).is_empty(), "boss builds")
@@ -105,34 +105,68 @@ func test_boss_fight_two_phases_and_daze() -> void:
 	sim.running = false
 	sv.add_child(sim)
 	sim.setup(built["config"])
+	return sim
+
+
+func test_poise_break_dazes_the_boss_and_only_then_grabbable() -> void:
+	var sim := _boss_sim(4321)
 	check(sim.mode is BossMode, "boss fights use BossMode")
 	var bm: BossMode = sim.mode
 	check(bm.boss != null, "boss found")
+	if bm.boss == null:
+		return
 	check(bool(bm.boss.flags.get("boss_ungrabbable", false)), "bosses start ungrabbable")
-	SimSpeed.set_scale(SPEED)
-	var dt := SimSpeed.step_dt()
-	var cursor := 0
-	var events := {}
-	var telegraph_ok := true
-	while not sim.is_finished and sim.time < 400.0:
-		sim.step(dt)
-		await get_tree().physics_frame
-		for ev in sim.events_since(cursor):
-			cursor = int(ev["seq"])
-			var t := str(ev["type"])
-			events[t] = int(events.get(t, 0)) + 1
-			if t == "boss_telegraph" and float(ev.get("time", 0.0)) < 0.5:
-				telegraph_ok = false
-			if t == "boss_dazed":
-				check(not bool(bm.boss.flags.get("boss_ungrabbable", true)), "a Dazed boss can be grabbed")
-	check(sim.is_finished, "boss fight finishes")
-	check(int(events.get("boss_telegraph", 0)) > 0, "boss used telegraphed special attacks")
-	check(telegraph_ok, "every telegraph >= 0.5 s")
-	check_eq(int(events.get("boss_phase", 0)), 1, "exactly one phase transition")
-	check_eq(bm.phase_no, 2, "phase 2 reached")
-	check(int(events.get("boss_dazed", 0)) > 0, "poise break dazed the boss")
-	var camp: Dictionary = sim.result.get("campaign", {})
-	check_eq(int(camp.get("boss", {}).get("phase", 0)), 2, "result reports the phase")
+	bm.phase = MatchMode.Phase.FIGHT
+	var cursor := sim.events_since(0).size()
+	bm.boss.knock_down("move", sim.fighters[0])
+	check(bm.dazed_until < 0.0, "a move knockdown does not daze a boss (only poise breaks do)")
+	check(bm.boss.state != Fighter.State.KNOCKDOWN, "bosses are never knocked down")
+	bm.boss.poise = 0.0
+	bm.boss.knock_down("poise", sim.fighters[0])
+	var dazed := false
+	for ev in sim.events_since(cursor):
+		if str(ev["type"]) == "boss_dazed":
+			dazed = true
+	check(dazed, "a poise break dazes the boss")
+	check(not bool(bm.boss.flags.get("boss_ungrabbable", true)), "a Dazed boss can be grabbed")
+	bm._end_daze()
+	check(bool(bm.boss.flags.get("boss_ungrabbable", false)), "ungrabbable again after the daze")
+
+
+## Real fights (bots on both sides): the structure always holds; the daze is statistical — a
+## strong build may drop the boss before its poise breaks, so at least one of three fights.
+func test_boss_fights_two_phases_telegraphs_and_daze() -> void:
+	var dazes := 0
+	for attempt in 3:
+		var sim := _boss_sim(4321 + attempt)
+		var bm: BossMode = sim.mode
+		SimSpeed.set_scale(SPEED)
+		var dt := SimSpeed.step_dt()
+		var cursor := 0
+		var events := {}
+		var telegraph_ok := true
+		while not sim.is_finished and sim.time < 400.0:
+			sim.step(dt)
+			await get_tree().physics_frame
+			for ev in sim.events_since(cursor):
+				cursor = int(ev["seq"])
+				var t := str(ev["type"])
+				events[t] = int(events.get(t, 0)) + 1
+				if t == "boss_telegraph" and float(ev.get("time", 0.0)) < 0.5:
+					telegraph_ok = false
+				if t == "boss_dazed":
+					check(not bool(bm.boss.flags.get("boss_ungrabbable", true)), "a Dazed boss can be grabbed")
+		check(sim.is_finished, "boss fight finishes")
+		check(int(events.get("boss_telegraph", 0)) > 0, "boss used telegraphed special attacks")
+		check(telegraph_ok, "every telegraph >= 0.5 s")
+		check_eq(int(events.get("boss_phase", 0)), 1, "exactly one phase transition")
+		check_eq(bm.phase_no, 2, "phase 2 reached")
+		var camp: Dictionary = sim.result.get("campaign", {})
+		check_eq(int(camp.get("boss", {}).get("phase", 0)), 2, "result reports the phase")
+		dazes += int(events.get("boss_dazed", 0))
+		if dazes > 0:
+			break
+	check(dazes > 0, "poise breaks dazed the boss in real fights")
 
 
 func test_boss_cannot_skip_phase_two() -> void:
@@ -174,6 +208,58 @@ func test_rematch_elite_is_phase_one_only() -> void:
 	check(bm.boss.is_out(), "phase-1-only bosses can be KO'd")
 
 
+func _plain_sim(encounter := "enc_a1_open_tryout") -> MatchSim:
+	var ctrl := strong_run()
+	fight_plan(ctrl, encounter)
+	var built := ctrl.match_config({"bot_tier_players": "headliner", "player_kinds": {"p0": "bot"}})
+	var sv := fresh_world()
+	var sim := MatchSim.new()
+	sim.running = false
+	sv.add_child(sim)
+	sim.setup(built["config"])
+	return sim
+
+
+## Bots can land hits before the bell; a fight whose enemies are all out by then ends at the bell
+## (it used to run to the time limit).
+func test_knockouts_before_the_bell_end_the_fight() -> void:
+	var sim := _plain_sim()
+	var mode: CampaignMatchMode = sim.mode
+	check_eq(mode.phase, MatchMode.Phase.INTRO, "starts in the intro")
+	var foe: Fighter = sim.fighters[1]
+	foe.health = 0.0
+	mode.on_depleted(foe, sim.fighters[0], {})
+	check_eq(mode.outcome, "", "nothing is decided during the intro")
+	var dt := 1.0 / 120.0
+	for i in 120 * 4:
+		sim.step(dt)
+		await get_tree().physics_frame
+		if mode.outcome != "":
+			break
+	check_eq(mode.outcome, "win", "the bell finds every enemy out and ends the fight")
+	check(sim.time < 4.0, "right at the bell (%.1f s)" % sim.time)
+
+
+## Time up: everyone drops to 1 HP ("first hit wins"); a decision after the grace period judges
+## the health everyone had when time ran out, and the 1-HP drop does not carry into the run.
+func test_sudden_death_judges_time_up_health_and_keeps_hp() -> void:
+	var sim := _plain_sim()
+	var mode: CampaignMatchMode = sim.mode
+	mode.phase = MatchMode.Phase.FIGHT
+	var me: Fighter = sim.fighters[0]
+	var foe: Fighter = sim.fighters[1]
+	me.health = me.max_health * 0.6
+	foe.health = foe.max_health * 0.4
+	mode.on_timeout()
+	check(mode.sudden_death, "time up starts sudden death")
+	check_near(me.health, 1.0, 0.001, "everyone drops to 1 HP")
+	check_near(foe.health, 1.0, 0.001, "enemies too")
+	mode._decide_by_health()
+	check_eq(mode.outcome, "win", "decided by the health at time up (60% vs 40%), not by 1 HP / max HP")
+	var res := mode.build_result()
+	check_near(float(res["campaign"]["players"]["p0"]["hp"]), me.max_health * 0.6, 0.01, "the 1-HP rule does not carry over")
+
+
 func test_downed_and_revive_in_coop() -> void:
 	var cfg := run_cfg("f_stoke", {"seed": 99})
 	cfg["players"].append({"id": "p1", "name": "Two", "profile_id": "t2", "fighter": "f_dozer"})
@@ -193,21 +279,27 @@ func test_downed_and_revive_in_coop() -> void:
 	mode.on_depleted(a, null, {})
 	check_eq(a.state, Fighter.State.DOWNED, "a co-op player at 0 HP is Downed, not out")
 	check_eq(mode.outcome, "", "the fight goes on while an ally stands")
-	# the bot ally walks over and revives (hold Grab within 1.5 m for 2 s)
+	check(mode.downed_time_left(a) > 14.0, "15 s to be revived the first time")
+	# an ally next to them holds Grab for 2 s (MatchMode's revive machinery; bots get this as
+	# their objective from MatchMode.bot_objective)
+	check(not mode.bot_objective(b).is_empty(), "the bot ally is sent to revive")
 	b.rig.place(a.pos() + Vector3(0.8, 0, 0), 0.0)
-	SimSpeed.set_scale(SPEED)
-	var dt := SimSpeed.step_dt()
+	b.input.set_held(FighterInput.GRAB, true)
+	var dt := 1.0 / 120.0
 	var revived := false
 	for i in 120 * 4:
-		mode._tick_downed(dt)
+		mode._tick_revives(dt)
 		if a.state != Fighter.State.DOWNED:
 			revived = true
 			break
+	b.input.set_held(FighterInput.GRAB, false)
 	check(revived, "the ally revived the downed player")
 	check_near(a.health / a.max_health, 0.3, 0.01, "revived at 30% HP")
-	# all down = defeat
+	# a second down gets a shorter timer (15 s - 5 s)
 	a.health = 0.0
 	mode.on_depleted(a, null, {})
+	check_near(mode.downed_time_left(a), 10.0, 0.05, "the timer shrinks with every down")
+	# all down = defeat
 	b.health = 0.0
 	mode.on_depleted(b, null, {})
 	check_eq(mode.outcome, "loss", "everyone down ends the fight")

@@ -1,21 +1,27 @@
 class_name MatchSim
 extends Node3D
-## One authoritative match: arena physics, fighters, effect entities, rules/mode and the event
-## stream. Runs identically offline, on a listen/dedicated server, and (many at once, in their
-## own World3D) inside AI Lab training workers. It never touches rendering, input devices or UI.
+## One authoritative match: arena physics, fighters, effect entities, hittable mode objects,
+## rules/mode and the event stream. Runs identically offline, on a listen/dedicated server, and
+## (many at once, in their own World3D) inside AI Lab training workers. It never touches
+## rendering, input devices or UI.
 ##
 ## Tick order (every physics tick, 120 Hz):
-##   1. input sources write each fighter's FighterInput
-##   2. fighters advance their state machines, poses and muscles
-##   3. Combat validates weapon contacts -> hits
-##   4. effects (projectiles/zones/hazards) update
-##   5. environment checks (ring-outs, wall slams)
-##   6. the mode advances phases/scoring
+##   1. the mode publishes per-fighter focus points (objectives worth facing)
+##   2. input sources write each fighter's FighterInput
+##   3. fighters advance their state machines, poses and muscles
+##   4. Combat validates weapon contacts -> hits (fighters and hittable objects)
+##   5. effects (projectiles/zones/props) and arena hazards update
+##   6. environment checks (ring-outs, wall slams)
+##   7. the mode advances phases/scoring
 ## then Godot steps the physics world.
+##
+## Fighter indices are stable for the whole match. Despawned fighters (e.g. dead minions) keep
+## their slot in an inactive state until a later spawn reuses it ("fighter_spawned" event).
 
 signal finished(result: Dictionary)
 
 const MAX_EVENTS := 512
+const MAX_FIGHTERS := 24
 
 var fighters: Array[Fighter] = []
 var combat: Combat
@@ -36,7 +42,11 @@ var result := {}
 var input_sources: Array = []    ## per fighter: object with poll(fighter, sim, dt)
 var events: Array = []           ## ring of recent events (Dictionaries with "seq")
 var event_seq := 0
-var _neutral_input := FighterInput.new()
+var hittables: Array = []        ## mode objects weapons can strike (see register_hittable)
+var hazards = null               ## optional ArenaHazards runner (timed hazards, pickups)
+var gravity := 9.81              ## arena gravity_mult x rules gravity_mult (low-grav rules)
+var profiling := false           ## bench: accumulate per-section costs (usec) into `prof`
+var prof := {}
 var _prev_speed := {}            ## fighter index -> root speed last tick (slam detection)
 var _fighter_root: Node3D
 
@@ -47,7 +57,7 @@ func _init() -> void:
 
 
 ## config: {arena: ArenaDef, rules: Dictionary, seed: int, mode: MatchMode (optional),
-##          fighters: [{creature: CreatureDef, team: int, source: InputSource, name: String}]}
+##          fighters: [{creature: CreatureDef, team: int, source: InputSource, name: String, kind, mods}]}
 func setup(config: Dictionary) -> void:
 	name = "MatchSim"
 	arena = config["arena"]
@@ -55,6 +65,9 @@ func setup(config: Dictionary) -> void:
 	seed_value = int(config.get("seed", 1))
 	rng.seed = seed_value
 	arena_nodes = ArenaBuilder.build(self, arena)
+	gravity = 9.81 * arena.gravity_mult * clampf(float(rules.get("gravity_mult", 1.0)), 0.3, 2.0)
+	if is_inside_tree():
+		PhysicsServer3D.area_set_param(get_world_3d().space, PhysicsServer3D.AREA_PARAM_GRAVITY, gravity)
 	_fighter_root = Node3D.new()
 	_fighter_root.name = "Fighters"
 	add_child(_fighter_root)
@@ -62,17 +75,7 @@ func setup(config: Dictionary) -> void:
 	for i in entries.size():
 		var e: Dictionary = entries[i]
 		var sp := arena.spawn_point(i, entries.size())
-		var f := Fighter.new()
-		_fighter_root.add_child(f)
-		f.setup(e["creature"], i, int(e.get("team", i)), self, sp[0], sp[1])
-		f.display_name = str(e.get("name", f.creature.display_name))
-		f.controller_kind = str(e.get("kind", "bot"))
-		for k in e.get("mods", {}):
-			f.mods[k] = float(e["mods"][k])
-		f.reset_vitals()
-		_apply_rule_mods(f)
-		fighters.append(f)
-		input_sources.append(e.get("source"))
+		_create_fighter(i, e, sp[0], sp[1])
 	ArenaBuilder.spawn_hazards(self, arena)
 	mode = config.get("mode", null)
 	if mode == null:
@@ -81,17 +84,98 @@ func setup(config: Dictionary) -> void:
 	emit_event({"type": "match_start", "arena": arena.id, "mode": mode.id(), "seed": seed_value})
 
 
+func _create_fighter(idx: int, e: Dictionary, pos: Vector3, yaw: float) -> Fighter:
+	var f := Fighter.new()
+	_fighter_root.add_child(f)
+	f.setup(e["creature"], idx, int(e.get("team", idx)), self, pos, yaw)
+	f.rig.gravity = gravity
+	f.display_name = str(e.get("name", f.creature.display_name))
+	f.controller_kind = str(e.get("kind", "bot"))
+	for k in e.get("mods", {}):
+		var mv = e["mods"][k]
+		f.mods[k] = mv if typeof(mv) == TYPE_STRING or typeof(mv) == TYPE_BOOL else float(mv)
+	for h in e.get("hooks", []):
+		f.hooks.add(h, "loadout")
+	f.reset_vitals()
+	_apply_rule_mods(f)
+	if idx < fighters.size():
+		fighters[idx] = f
+		input_sources[idx] = e.get("source")
+	else:
+		fighters.append(f)
+		input_sources.append(e.get("source"))
+	return f
+
+
 func _apply_rule_mods(f: Fighter) -> void:
 	f.mods["damage"] = float(f.mods["damage"]) * float(rules.get("damage_mult", 1.0))
 	f.mods["knockback_taken"] = float(f.mods["knockback_taken"]) * float(rules.get("knockback_mult", 1.0))
 	f.mods["cooldown"] = float(f.mods["cooldown"]) * float(rules.get("cooldown_rate", 1.0))
 	f.mods["hype_gain"] = float(f.mods["hype_gain"]) * float(rules.get("hype_mult", 1.0))
 	f.mods["max_health"] = float(f.mods.get("max_health", 1.0)) * float(rules.get("health_mult", 1.0))
+	f.mods["stamina_regen"] = float(f.mods["stamina_regen"]) * float(rules.get("regen_mult", 1.0))
+	if rules.has("start_hype"):
+		f.mods["start_hype"] = float(rules["start_hype"])
+	if not bool(rules.get("abilities", true)):
+		f.mods["no_abilities"] = true
+	if not bool(rules.get("juice", true)):
+		f.mods["no_juice"] = true
+	if not bool(rules.get("grabs", true)):
+		f.mods["no_grabs"] = true
+	# data-driven rule extensions (custom rules and rule/mode mods): stat mods and hooks for all
+	var fm = rules.get("fighter_mods", {})
+	if typeof(fm) == TYPE_DICTIONARY:
+		for k in fm:
+			var v = fm[k]
+			if typeof(v) == TYPE_BOOL or typeof(v) == TYPE_STRING:
+				f.mods[k] = v
+			elif f.mods.has(k) and typeof(f.mods[k]) == TYPE_FLOAT:
+				f.mods[k] = float(f.mods[k]) * float(v)
+			else:
+				f.mods[k] = float(v)
+	var fh = rules.get("fighter_hooks", [])
+	if typeof(fh) == TYPE_ARRAY:
+		for h in fh:
+			if typeof(h) == TYPE_DICTIONARY:
+				f.hooks.add(h, "rules")
 	f.reset_vitals()
+
+
+## Adds a fighter mid-match (waves, reinforcements, late joiners). Reuses a despawned slot when
+## one exists so indices stay small and stable. Returns the new Fighter.
+func spawn_fighter(entry: Dictionary, pos: Vector3, yaw: float) -> Fighter:
+	var idx := -1
+	for i in fighters.size():
+		if fighters[i].despawned:
+			idx = i
+			break
+	if idx < 0:
+		if fighters.size() >= MAX_FIGHTERS:
+			return null
+		idx = fighters.size()
+	elif idx < fighters.size():
+		var old := fighters[idx]
+		old.queue_free()
+	var f := _create_fighter(idx, entry, pos, yaw)
+	f.invuln_until = f.time + float(entry.get("spawn_invuln", 0.5))
+	emit_event({"type": "fighter_spawned", "fighter": idx, "creature": f.creature.id, "team": f.team})
+	return f
+
+
+## Removes a fighter's body from the world; its slot stays reserved until reused.
+func despawn_fighter(f: Fighter) -> void:
+	if f.despawned:
+		return
+	f.despawn()
+	emit_event({"type": "fighter_despawned", "fighter": f.index})
 
 
 func set_input_source(i: int, src) -> void:
 	input_sources[i] = src
+
+
+func active_fighters() -> Array:
+	return fighters.filter(func(f: Fighter): return not f.despawned)
 
 
 func are_enemies(a: Fighter, b: Fighter) -> bool:
@@ -101,7 +185,7 @@ func are_enemies(a: Fighter, b: Fighter) -> bool:
 
 
 func can_hit(a: Fighter, b: Fighter) -> bool:
-	if a == b:
+	if a == b or b.despawned:
 		return false
 	if a.team == b.team:
 		return bool(rules.get("friendly_fire", false))
@@ -110,6 +194,16 @@ func can_hit(a: Fighter, b: Fighter) -> bool:
 
 func clamp_to_arena(p: Vector3, margin: float) -> Vector3:
 	return arena.clamp_point(p, margin) if arena else p
+
+
+## Hittable objects (balls, bags, mode targets). entry: {id, body: RigidBody3D, radius,
+## on_hit: Callable(attacker: Fighter, dir: Vector3, speed: float, element: String, point: Vector3)}
+func register_hittable(entry: Dictionary) -> void:
+	hittables.append(entry)
+
+
+func unregister_hittable(id: String) -> void:
+	hittables = hittables.filter(func(h): return str(h["id"]) != id)
 
 
 func emit_event(ev: Dictionary) -> void:
@@ -136,44 +230,74 @@ func _physics_process(dt: float) -> void:
 	step(dt)
 
 
+func _exit_tree() -> void:
+	# the world outlives the match (menus, the hub): put its gravity back
+	if gravity != 9.81 and get_world_3d():
+		PhysicsServer3D.area_set_param(get_world_3d().space, PhysicsServer3D.AREA_PARAM_GRAVITY,
+			float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)))
+
+
 func step(dt: float) -> void:
 	tick_count += 1
 	time += dt
+	var t0 := Time.get_ticks_usec() if profiling else 0
+	for f in fighters:
+		if not f.despawned:
+			f.focus_point = mode.focus_point(f) if mode else null
 	for i in fighters.size():
 		var f := fighters[i]
+		if f.despawned:
+			continue
 		var src = input_sources[i]
-		if src != null and input_enabled and not is_finished:
+		if src != null:
 			src.poll(f, self, dt)
-		elif not input_enabled or is_finished:
-			# keep press counters in sync so presses during intros are not replayed later
-			if src != null:
-				src.poll(f, self, dt)
-			var held_counts := f.input.press_count
+		if not input_enabled or is_finished:
 			f.input.move = Vector3.ZERO
 			f.input.held = 0
-			f.input.press_count = held_counts
 			f._buffer.clear()
+	var t1 := Time.get_ticks_usec() if profiling else 0
 	for f in fighters:
-		f.sim_tick(dt)
+		if not f.despawned:
+			f.sim_tick(dt)
+	var t2 := Time.get_ticks_usec() if profiling else 0
 	combat.detect_hits()
+	var t3 := Time.get_ticks_usec() if profiling else 0
 	effects.update(dt)
+	if hazards != null:
+		hazards.update(dt)
 	_environment_checks()
 	if mode and not is_finished:
 		mode.tick(dt)
+	if profiling:
+		var t4 := Time.get_ticks_usec()
+		prof["input"] = float(prof.get("input", 0.0)) + (t1 - t0)
+		prof["fighters"] = float(prof.get("fighters", 0.0)) + (t2 - t1)
+		prof["combat"] = float(prof.get("combat", 0.0)) + (t3 - t2)
+		prof["effects_mode"] = float(prof.get("effects_mode", 0.0)) + (t4 - t3)
+		prof["ticks"] = float(prof.get("ticks", 0.0)) + 1.0
 
 
 func _environment_checks() -> void:
 	for f in fighters:
-		if f.state == Fighter.State.INACTIVE:
+		if f.state == Fighter.State.INACTIVE or f.despawned:
 			continue
 		var p := f.pos()
-		# ring-out: fell off an open platform
-		if arena.ringout and p.y < -2.5 and not f.is_out():
+		# containment: a walled cage never loses a fighter. The collision walls are tall, but an
+		# extreme impulse can still tunnel a rig through; pull it back and report it.
+		if arena.wall_height > 0.01 and p.y > -1.0 and not arena.inside(p, -0.45):
+			var back := arena.clamp_point(p, 0.75)
+			f.rig.shift(Vector3(back.x - p.x, 0.0, back.z - p.z))
+			emit_event({"type": "escaped", "fighter": f.index, "pos": p})
+			Log.w("sim", "fighter %d left the cage at (%.2f, %.2f, %.2f); pulled back" % [f.index, p.x, p.y, p.z])
+			p = f.pos()
+		# ring-out: fell off an open edge
+		if p.y < -2.5 and not f.is_out():
 			emit_event({"type": "ringout", "fighter": f.index})
-			on_fighter_depleted(f, _last_attacker(f), {"ringout": true})
-		if p.y < -12.0 and not f.flags.get("void_reset", false):
-			f.flags["void_reset"] = true
-		# wall slam: a knocked-down / thrown body stopping hard next to the fence
+			if mode:
+				mode.on_ringout(f, _last_attacker(f))
+			else:
+				on_fighter_depleted(f, _last_attacker(f), {"ringout": true})
+		# cage slam: a knocked-down / thrown body stopping hard against the fence
 		var spd := f.rig.root().linear_velocity.length()
 		var prev := float(_prev_speed.get(f.index, 0.0))
 		_prev_speed[f.index] = spd
@@ -188,8 +312,14 @@ func _last_attacker(f: Fighter) -> Fighter:
 	for k in range(events.size() - 1, -1, -1):
 		var ev: Dictionary = events[k]
 		if ev["type"] == "hit" and int(ev.get("target", -1)) == f.index and int(ev.get("fighter", -1)) >= 0:
-			return fighters[int(ev["fighter"])]
+			var a := int(ev["fighter"])
+			if a < fighters.size() and not fighters[a].despawned:
+				return fighters[a]
 	return null
+
+
+func last_attacker_of(f: Fighter) -> Fighter:
+	return _last_attacker(f)
 
 
 func on_fighter_depleted(f: Fighter, attacker: Fighter, hit: Dictionary) -> void:
@@ -199,16 +329,22 @@ func on_fighter_depleted(f: Fighter, attacker: Fighter, hit: Dictionary) -> void
 
 
 ## A spawn point away from enemies (respawns).
-func safe_spawn_for(f: Fighter) -> Array:
-	var best: Array = arena.spawn_point(f.index, fighters.size())
+func safe_spawn_for(f: Fighter, avoid: Vector3 = Vector3.INF, min_dist := 0.0) -> Array:
+	var best: Array = arena.spawn_point(f.index % maxi(1, arena.spawns.size()), fighters.size())
 	var best_d := -1.0
 	var n := maxi(arena.spawns.size(), 8)
 	for i in n:
 		var sp := arena.spawn_point(i, n)
 		var dmin := INF
 		for o in fighters:
-			if o != f and not o.is_out():
+			if o != f and not o.is_out() and not o.despawned and are_enemies(f, o):
 				dmin = minf(dmin, o.pos().distance_to(sp[0]))
+		if avoid != Vector3.INF:
+			var da := Vector2(sp[0].x - avoid.x, sp[0].z - avoid.z).length()
+			if da < min_dist:
+				dmin = minf(dmin, da - 100.0)
+			else:
+				dmin = minf(dmin, da)
 		if dmin > best_d:
 			best_d = dmin
 			best = sp
@@ -218,12 +354,17 @@ func safe_spawn_for(f: Fighter) -> Array:
 ## Puts every fighter back at its spawn with full vitals (between rounds).
 func reset_round() -> void:
 	effects.entities = effects.entities.filter(func(e): return e["e"].has("hazard"))
+	var alive := active_fighters()
 	for i in fighters.size():
 		var f := fighters[i]
-		var sp := arena.spawn_point(i, fighters.size())
+		if f.despawned:
+			continue
+		var sp := arena.spawn_point(i, alive.size())
 		f.respawn(sp[0], sp[1])
 		f.lives = int(rules.get("lives", 1))
 		f.invuln_until = -1.0
+	if mode:
+		mode.on_round_reset()
 	emit_event({"type": "round_reset"})
 
 

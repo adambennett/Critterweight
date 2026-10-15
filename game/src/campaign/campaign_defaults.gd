@@ -74,7 +74,7 @@ static func rules() -> Dictionary:
 			"enemy_hp_per_player": 0.35, "enemy_damage_per_player": 0.10, "boss_hp_per_player": 0.6,
 			"tag_boss_hp": 1.3, "max_fighters": 8,
 			"vote_time": 10.0, "host_wait": 60.0, "absent_time": 60.0, "pause_budget": 30.0,
-			"downed_time": 15.0, "downed_shrink": 5.0, "revive_radius": 1.5, "revive_hold": 2.0,
+			"downed_time": 15.0, "downed_shrink": 5.0,
 			"revive_frac": 0.30, "out_return_frac": 0.5,
 			"tag": {"regen": 3.0, "stamina_regen": 10.0, "cooldown": 8.0, "entry_invuln": 1.5,
 				"assist_cooldown": 20.0, "cheer_cooldown": 3.0, "cheer_hype": 5.0},

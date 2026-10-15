@@ -14,6 +14,9 @@ const PROFILES := {
 		"combo": 0.75, "ability": 0.65, "grab": 0.28, "mistake": 0.09, "spacing": 0.75, "juice": 0.9, "wake": 0.4, "mash_escape": 0.85},
 	"champion": {"reaction": 0.17, "think": 0.07, "aggression": 0.68, "block": 0.62, "parry": 0.3, "dodge": 0.32,
 		"combo": 0.9, "ability": 0.8, "grab": 0.35, "mistake": 0.04, "spacing": 0.92, "juice": 1.0, "wake": 0.25, "mash_escape": 1.0},
+	# Hall-of-Famer (CAMPAIGN.md difficulty tiers): 0.14 s reactions, 2% mistakes, reads charge-ups
+	"hall_of_famer": {"reaction": 0.14, "think": 0.06, "aggression": 0.7, "block": 0.68, "parry": 0.4, "dodge": 0.38,
+		"combo": 0.95, "ability": 0.85, "grab": 0.38, "mistake": 0.02, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0},
 }
 
 var difficulty := "regular"
@@ -34,6 +37,7 @@ var _reach_cache := {}
 var _last_target: Fighter = null
 var objective_override := {}      ## set by modes / autobattler
 var label_text := ""
+var _hold_until := 0.0
 
 
 func _init(diff := "regular", seed_value := 0) -> void:
@@ -74,6 +78,7 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 		_think(f, sim)
 	f.input.move = _move
 	f.input.set_held(FighterInput.GUARD, _guard and _t < _guard_until)
+	f.input.set_held(FighterInput.GRAB, _t < _hold_until)
 	if f.state == Fighter.State.HELD:
 		if rng.randf() < float(p["mash_escape"]) * 0.5:
 			f.input.press(FighterInput.LIGHT if rng.randf() < 0.5 else FighterInput.HEAVY)
@@ -154,6 +159,12 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 				f.input.press(FighterInput.HEAVY if rng.randf() < 0.7 else FighterInput.LIGHT)
 			return
 	var obj: Dictionary = objective_override if not objective_override.is_empty() else (sim.mode.bot_objective(f) if sim.mode else {})
+	if obj.has("target"):
+		var ti := int(obj["target"])
+		if ti >= 0 and ti < sim.fighters.size() and not sim.fighters[ti].is_out():
+			f.target = sim.fighters[ti]
+	if _objective_actions(f, obj):
+		return
 	var tgt := f.target
 	if tgt == null or tgt.is_out():
 		_guard = false
@@ -254,6 +265,53 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		_move = _move.rotated(Vector3.UP, rng.randf_range(-1.0, 1.0))
 	if rng.randf() < 0.01 and f.hype < 100.0 and dist > 3.0:
 		f.input.press(FighterInput.TAUNT)
+
+
+## Mode objectives that are not plain fighting: hold a button at a spot (revives), strike an
+## object toward an aim point (balls), throw a carried object, or just stand on a point.
+## Returns true when the objective fully decided this think step.
+func _objective_actions(f: Fighter, obj: Dictionary) -> bool:
+	if obj.is_empty() or not obj.has("pos"):
+		return false
+	var p: Vector3 = obj["pos"]
+	var to := p - f.pos()
+	to.y = 0.0
+	var dist := to.length()
+	var rad := float(obj.get("radius", 0.5))
+	if obj.has("hold"):
+		if dist > rad:
+			_move = to.normalized()
+			return true
+		_move = Vector3.ZERO
+		f.input.set_held(FighterInput.GRAB, true)
+		_hold_until = _t + float(p_think()) * 2.0
+		return true
+	if bool(obj.get("throw", false)) and f.has_flag("carrying"):
+		var aim: Vector3 = obj.get("aim", p)
+		var ad := aim - f.pos()
+		ad.y = 0.0
+		_move = ad.normalized()
+		f.input.press(FighterInput.GRAB)
+		return true
+	if bool(obj.get("strike", false)) and dist < 1.6:
+		var aim2: Vector3 = obj.get("aim", p)
+		var from_ball := aim2 - p
+		from_ball.y = 0.0
+		_move = (to.normalized() * 0.6 + from_ball.normalized() * 0.4).normalized()
+		if rng.randf() < 0.75:
+			f.input.press(FighterInput.HEAVY if rng.randf() < 0.3 else FighterInput.LIGHT)
+		elif bool(obj.get("grab_ball", false)):
+			f.input.press(FighterInput.GRAB)
+		return true
+	if f.target == null or f.target.pos().distance_to(f.pos()) > float(obj.get("engage", 3.0)):
+		if dist > rad:
+			_move = to.normalized()
+			return true
+	return false
+
+
+func p_think() -> float:
+	return float(p["think"])
 
 
 func _toward(from: Vector3, to: Vector3) -> Vector3:

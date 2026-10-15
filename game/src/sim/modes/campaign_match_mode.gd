@@ -10,8 +10,8 @@ extends MatchMode
 ##   * enemy tag bouts (one active, partners regenerate, swap on low HP / KO) and the party
 ##     tag-team format (Switch Target = tag, benched Taunt = Cheer, benched Ability 1 = Assist);
 ##     the solo player's one free Granny cameo in tag bouts;
-##   * simultaneous co-op downed/revive (15 s timer shrinking 5 s per prior down, hold Grab
-##     within 1.5 m for 2 s, revive at 30% with 1 s invulnerability, timer expiry = Out);
+##   * simultaneous co-op downed/revive on MatchMode's revive machinery (hold Grab next to the
+##     downed ally for 2 s; revive at 30%; the 15 s timer shrinks 5 s per prior down; expiry = Out);
 ##   * timed sudden death (everyone to 1 HP, decision after a grace period), low gravity,
 ##     hype x2, puddles x2, ffa enemies, hazards (CampaignHazards);
 ##   * per-fighter campaign stats (biggest hit, KOs, minion KOs, knockdowns suffered, taunts,
@@ -26,7 +26,6 @@ var roles: Array = []
 var hazards: CampaignHazards
 var stats := {}                  ## fighter index -> campaign stats
 var outcome := ""                ## "win" | "loss" once decided
-var sudden_death := false
 var _sd_time := 0.0
 var _event_cursor := 0
 var _waves: Array = []           ## wave index -> [fighter indices]
@@ -35,12 +34,11 @@ var _wave_trigger := 1
 var _parked := {}                ## fighter index -> true
 var _groups := {}                ## "enemy" / "party" -> tag group state
 var _trackers := {}              ## fighter index -> FighterInput.PressTracker (mode-side press detection)
-var _downed := {}                ## fighter index -> {until}
-var _down_counts := {}
-var _revive := {}                ## downed index -> {by, t}
+var _down_counts := {}           ## fighter index -> times downed this fight (shrinks the timer)
 var _granny_available := false
 var _zone_seen := {}
 var _bell_done := false
+var _sd_hp := {}                 ## fighter index -> health when sudden death began
 
 
 func _init(config := {}) -> void:
@@ -126,6 +124,12 @@ func setup(match_sim) -> void:
 			_park(sim.fighters[party_tag[i3]])
 	_granny_available = bool(r.get("granny_assist", false))
 	hazards = CampaignHazards.new(self, r.get("hazards", []), cfg.get("hazard_defs", {}))
+	if _revive_enabled():
+		# downed / revive run on MatchMode's machinery (_downed_at, _tick_revives, bot_objective)
+		var coop: Dictionary = cfg.get("coop", {})
+		rules["revive"] = true
+		rules["downed_time"] = float(coop.get("downed_time", 15.0))
+		rules["revive_health"] = float(coop.get("revive_frac", 0.3))
 
 
 # =============================================================================================
@@ -179,10 +183,13 @@ func _on_bell() -> void:
 		_fighter_bell(f)
 	hazards.on_bell()
 	sim.emit_event({"type": "campaign_rules", "tags": cfg.get("rule_tags", [])})
+	# knockouts during the intro (bots may fire abilities before the bell) end the fight now
+	check_round_over()
 
 
-## Per-fighter start-of-fight effects (also run when a parked fighter first enters).
-func _fighter_bell(f: Fighter) -> void:
+## Per-fighter start-of-fight effects (also run when a parked fighter first enters; `late`
+## fighters also get the "round_start" hooks then — MatchMode fires them for everyone at the bell).
+func _fighter_bell(f: Fighter, late := false) -> void:
 	if f.flags.get("_belled", false):
 		return
 	f.flags["_belled"] = true
@@ -199,7 +206,8 @@ func _fighter_bell(f: Fighter) -> void:
 		f.statuses.add(soak)
 	if bool(nr.get("waive_knockdown", false)):
 		f.mods["prevent_knockdowns"] = float(f.mods.get("prevent_knockdowns", 0.0)) + 1.0
-	f.hooks.fire("round_start", {})
+	if late:
+		f.hooks.fire("round_start", {})
 
 
 func tick_fight(dt: float) -> void:
@@ -207,10 +215,10 @@ func tick_fight(dt: float) -> void:
 	_tick_zone_lifetimes()
 	_tick_waves()
 	_tick_groups(dt)
-	_tick_downed(dt)
 	hazards.tick(dt)
 	if sudden_death and sim.time - _sd_time > float(cfg.get("rules", {}).get("sudden_death_grace", 45.0)):
 		_decide_by_health()
+	check_round_over()
 
 
 func _scan_events() -> void:
@@ -277,7 +285,7 @@ func _tick_waves() -> void:
 			var f2: Fighter = sim.fighters[idx[i]]
 			var sp: Array = sim.safe_spawn_for(f2)
 			_unpark(f2, sp[0], sp[1], 0.6)
-			_fighter_bell(f2)
+			_fighter_bell(f2, true)
 		sim.emit_event({"type": "wave", "wave": _wave + 1, "count": idx.size()})
 
 
@@ -342,7 +350,7 @@ func _swap(g: Dictionary, incoming: int) -> void:
 	if not out_f.is_out():
 		_park(out_f)
 	_unpark(in_f, sim.clamp_to_arena(pos, 0.8), yaw, float(g.get("entry_invuln", 1.5)))
-	_fighter_bell(in_f)
+	_fighter_bell(in_f, true)
 	g["active"] = incoming
 	g["cd_until"] = sim.time + float(g.get("cooldown", 8.0))
 	sim.emit_event({"type": "tag", "fighter": incoming, "out": out_f.index})
@@ -406,83 +414,28 @@ func _assist_hit(from: Fighter, active: Fighter, pkg: Dictionary, label_text: St
 # ---------------------------------------------------------------------------------------------
 
 func _revive_enabled() -> bool:
-	return str(cfg.get("party", "solo")) == "coop" and not bool(cfg.get("spar", false))
+	return str(cfg.get("party", "solo")) == "coop" and not bool(cfg.get("spar", false)) and not _groups.has("party")
 
 
+## Downs a party member. MatchMode._tick_revives then handles reviving (an ally holding Grab
+## next to them; bots get the revive objective from MatchMode.bot_objective) and bleeding out;
+## a shorter timer for repeat downs is expressed as an earlier "downed at" time.
 func _down(f: Fighter) -> void:
 	var coop: Dictionary = cfg.get("coop", {})
 	var prior := int(_down_counts.get(f.index, 0))
 	_down_counts[f.index] = prior + 1
-	var t := maxf(5.0, float(coop.get("downed_time", 15.0)) - float(coop.get("downed_shrink", 5.0)) * prior)
-	_downed[f.index] = {"until": sim.time + t}
+	var full := float(rules.get("downed_time", 15.0))
+	var t := maxf(5.0, full - float(coop.get("downed_shrink", 5.0)) * prior)
 	f.set_downed()
+	_downed_at[f.index] = sim.time - (full - t)
+	_revive.erase(f.index)
 	sim.emit_event({"type": "downed_timer", "fighter": f.index, "seconds": t})
 
 
-func _tick_downed(dt: float) -> void:
-	if _downed.is_empty():
-		return
-	var coop: Dictionary = cfg.get("coop", {})
-	var radius := float(coop.get("revive_radius", 1.5))
-	for i in _downed.keys():
-		var f: Fighter = sim.fighters[i]
-		if f.state != Fighter.State.DOWNED:
-			_downed.erase(i)
-			_revive.erase(i)
-			continue
-		if sim.time >= float(_downed[i]["until"]):
-			_downed.erase(i)
-			_revive.erase(i)
-			f.knock_out(null)
-			sim.emit_event({"type": "out", "fighter": i})
-			check_round_over()
-			continue
-		# a standing ally holding Grab (bots: standing close) revives
-		var reviver: Fighter = null
-		for o: Fighter in sim.fighters:
-			if o == f or not is_party(o) or o.is_out() or _parked.has(o.index):
-				continue
-			if o.pos().distance_to(f.pos()) > radius:
-				continue
-			var holding := o.input.is_held(FighterInput.GRAB) or (sim.input_sources[o.index] is BotBrain)
-			if holding and o.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD, Fighter.State.GRABBING]:
-				reviver = o
-				break
-		var rv: Dictionary = _revive.get(i, {})
-		if reviver == null or (not rv.is_empty() and int(rv["by"]) != reviver.index):
-			_revive.erase(i)
-			continue
-		var need := float(coop.get("revive_hold", 2.0)) / maxf(0.1, float(reviver.mods.get("revive_speed", 1.0)))
-		var prog := float(rv.get("t", 0.0)) + dt
-		_revive[i] = {"by": reviver.index, "t": prog}
-		if prog >= need:
-			_downed.erase(i)
-			_revive.erase(i)
-			f.revive(float(coop.get("revive_frac", 0.3)))
-			f.invuln_until = f.time + 1.0
-			sim.emit_event({"type": "revive", "fighter": i, "by": reviver.index})
-	_steer_bots_to_downed()
-
-
-## Bot-controlled party members walk to a downed ally (the nearest bot per downed fighter).
-func _steer_bots_to_downed() -> void:
-	for f: Fighter in sim.fighters:
-		var src = sim.input_sources[f.index]
-		if not (src is BotBrain) or not is_party(f) or f.is_out():
-			continue
-		var bb: BotBrain = src
-		var best := INF
-		var goal = null
-		for i in _downed:
-			var d: Fighter = sim.fighters[i]
-			var dist := f.pos().distance_to(d.pos())
-			if dist < best:
-				best = dist
-				goal = d.pos()
-		if goal != null:
-			bb.objective_override = {"pos": goal, "engage": 0.0, "revive": true}
-		elif bool(bb.objective_override.get("revive", false)):
-			bb.objective_override = {}
+## Campaign sudden death: everyone drops to 1 HP and a decision follows after a grace period
+## (tick_fight); MatchMode's "next clean hit wins" check does not apply.
+func tick_sudden_death() -> void:
+	pass
 
 
 # ---------------------------------------------------------------------------------------------
@@ -556,9 +509,9 @@ func on_timeout() -> void:
 		sudden_death = true
 		_sd_time = sim.time
 		for f: Fighter in sim.fighters:
-			if not f.is_out() and not _parked.has(f.index):
-				f.health = minf(f.health, 1.0)
-			elif _parked.has(f.index) and f.health > 0.0:
+			var standing := (not f.is_out() and not _parked.has(f.index)) or (_parked.has(f.index) and f.health > 0.0)
+			if standing:
+				_sd_hp[f.index] = f.health
 				f.health = minf(f.health, 1.0)
 		sim.emit_event({"type": "sudden_death"})
 		round_timer = 0.0
@@ -572,10 +525,14 @@ func _decide_by_health() -> void:
 	for f: Fighter in sim.fighters:
 		if f.is_out() and not _parked.has(f.index):
 			continue
+		# after sudden death everyone sits at 1 HP: judge by the health they had when time ran out
+		var frac := f.health_frac()
+		if _sd_hp.has(f.index):
+			frac = float(_sd_hp[f.index]) / maxf(1.0, f.max_health)
 		if is_party(f):
-			party_hp += f.health_frac()
+			party_hp += frac
 		elif is_enemy_side(f):
-			enemy_hp += f.health_frac()
+			enemy_hp += frac
 	sim.emit_event({"type": "decision", "party": party_hp, "enemy": enemy_hp})
 	_finish(party_hp > enemy_hp)
 
@@ -601,7 +558,10 @@ func build_result() -> Dictionary:
 		var st: Dictionary = stats.get(f.index, {})
 		if is_party(f):
 			var out := f.is_out() and not _parked.has(f.index)
-			players[str(role.get("player_id", ""))] = {"hp": maxf(0.0, f.health) if not out else 0.0, "max_hp": f.max_health,
+			var hp := maxf(0.0, f.health)
+			if _sd_hp.has(f.index) and outcome == "win":
+				hp = maxf(hp, float(_sd_hp[f.index]))      # the 1-HP drop is a rule of this fight only
+			players[str(role.get("player_id", ""))] = {"hp": hp if not out else 0.0, "max_hp": f.max_health,
 				"hype": f.hype, "out": out, "knockdowns": int(st.get("knockdowns", 0)), "kos": int(st.get("kos", 0)),
 				"minion_kos": int(st.get("minion_kos", 0)), "damage_dealt": float(st.get("damage_dealt", 0.0)),
 				"damage_taken": float(st.get("damage_taken", 0.0)), "biggest_hit": float(st.get("biggest_hit", 0.0)),

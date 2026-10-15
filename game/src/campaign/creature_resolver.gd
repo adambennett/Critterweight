@@ -19,12 +19,14 @@ var roster_info := {}             ## fighter id -> {element, class, name} (campa
 var standin_stats := {}           ## creature id -> stats overrides used for stand-ins (bosses)
 var stand_in := ""                ## stand-in creature id; "" disables stand-ins
 var stand_ins_used := {}          ## id -> true (diagnostics)
+var _checked := {}                ## id -> PackedStringArray of parse problems ([] = usable)
 
 
 func _init(content_src = null) -> void:
 	content = content_src
 
 
+## The installed creature entry for `id` (any of the creature tables), usable or not.
 func raw_entry(id: String) -> Dictionary:
 	if content == null:
 		return {}
@@ -35,12 +37,32 @@ func raw_entry(id: String) -> Dictionary:
 	return {}
 
 
-## True when `id` resolves from real content (no stand-in).
+## The installed entry only if it also parses into a valid CreatureDef: a creature whose kit is
+## still being authored (missing moves, newer stat names) is installed but not usable yet, and
+## is treated like a missing one (stand-ins in tests/dev runs; excluded from generation).
+func usable_entry(id: String) -> Dictionary:
+	var d := raw_entry(id)
+	if d.is_empty():
+		return {}
+	if not _checked.has(id):
+		var errs := PackedStringArray()
+		parse(_clean(d), errs)
+		_checked[id] = errs
+	return d if (_checked[id] as PackedStringArray).is_empty() else {}
+
+
+## Why an installed creature is not usable ([] when it is, or when it is not installed).
+func problems(id: String) -> PackedStringArray:
+	usable_entry(id)
+	return _checked.get(id, PackedStringArray())
+
+
+## True when `id` resolves from real, valid content (no stand-in).
 func exists(id: String) -> bool:
-	if not raw_entry(id).is_empty():
+	if not usable_entry(id).is_empty():
 		return true
 	if loadouts.has(id):
-		return not raw_entry(str(loadouts[id].get("base", ""))).is_empty()
+		return not usable_entry(str(loadouts[id].get("base", ""))).is_empty()
 	return false
 
 
@@ -51,7 +73,7 @@ func resolvable(id: String) -> bool:
 
 ## Deep copy of the creature dictionary for `id` ({} if unresolvable).
 func creature_dict(id: String) -> Dictionary:
-	var d := raw_entry(id)
+	var d := usable_entry(id)
 	if not d.is_empty():
 		return _clean(d)
 	if loadouts.has(id):
@@ -74,7 +96,7 @@ func creature_dict(id: String) -> Dictionary:
 		base["tags"] = tags
 		return base
 	if stand_in != "" and stand_in != id:
-		var s := raw_entry(stand_in)
+		var s := usable_entry(stand_in)
 		if s.is_empty():
 			return {}
 		stand_ins_used[id] = true

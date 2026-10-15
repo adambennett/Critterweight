@@ -96,6 +96,8 @@ var _counter_until := -1.0
 var _counter := {}
 var _submerge := {}
 var _splat := {}
+var despawned := false           ## body parked off-world; slot reserved for reuse (see MatchSim)
+var focus_point = null           ## Vector3 objective worth facing (set by the mode each tick) or null
 
 # ---- modifiers (upgrades, modes). Multiplicative unless noted. ----
 var mods := {"damage": 1.0, "defense": 1.0, "speed": 1.0, "stamina_regen": 1.0, "knockback_taken": 1.0,
@@ -172,6 +174,51 @@ func respawn(pos: Vector3, yaw: float) -> void:
 	_splat = {}
 	reset_vitals()
 	invuln_until = time + 1.5
+
+
+## Parks the body off-world and deactivates the fighter (dead minions, departed players).
+func despawn() -> void:
+	_release_grab()
+	_end_carry()
+	if held_by:
+		held_by._release_grab()
+	_interrupt_move()
+	_set_state(State.INACTIVE)
+	despawned = true
+	rig.place(Vector3(0.0, -300.0 - index * 5.0, 0.0), 0.0)
+	for rb in rig.bodies:
+		rb.freeze = true
+		rb.collision_layer = 0
+		rb.collision_mask = 0
+
+
+## Swaps the physical body for another creature definition (e.g. a rescaled "Absolute Unit")
+## while keeping identity, team, hooks and statistics.
+func rebuild(c: CreatureDef, at: Vector3, yaw: float) -> void:
+	_release_grab()
+	_end_carry()
+	if held_by:
+		held_by._release_grab()
+	_interrupt_move()
+	var old := rig
+	old.place(Vector3(0.0, -400.0, 0.0), 0.0)
+	for rb in old.bodies:
+		rb.freeze = true
+		rb.collision_layer = 0
+		rb.collision_mask = 0
+	old.queue_free()
+	creature = c
+	rig = Rig.new()
+	rig.mass_scale = c.stat("weight")
+	add_child(rig)
+	rig.build(c.body, index, at, yaw)
+	motor = FighterMotor.new(c.body, rig)
+	_seg_stagger.resize(c.body.segments.size())
+	_seg_stagger.fill(0.0)
+	facing_yaw = yaw
+	motor.reset_feet()
+	_set_state(State.NEUTRAL)
+	_emit({"type": "fighter_rebuilt", "creature": c.id, "scale": c.body.scale})
 
 
 # =====================================================================================
@@ -306,6 +353,14 @@ func sim_tick(dt: float) -> void:
 	if _hover_until > time:
 		rig.hover_height += _hover_extra
 		motor.tuck = true
+	if sim and sim.profiling:
+		var a := Time.get_ticks_usec()
+		motor.update(dt)
+		var b := Time.get_ticks_usec()
+		rig.step(dt)
+		sim.prof["motor"] = float(sim.prof.get("motor", 0.0)) + (b - a)
+		sim.prof["rig"] = float(sim.prof.get("rig", 0.0)) + (Time.get_ticks_usec() - b)
+		return
 	motor.update(dt)
 	rig.step(dt)
 
@@ -417,6 +472,18 @@ func _update_target(dt: float) -> void:
 		_target_sticky = Tuning.v("target_sticky")
 
 
+## True when the mode's objective (ball, light...) should win facing over the nearest enemy.
+func _focus_preferred() -> bool:
+	if focus_point == null:
+		return false
+	var fd := Vector2((focus_point as Vector3).x - pos().x, (focus_point as Vector3).z - pos().z).length()
+	if fd > Tuning.v("soft_lock_range"):
+		return false
+	if target == null or not _target_in_lock_range():
+		return true
+	return fd < target.pos().distance_to(pos()) * 0.8
+
+
 func _target_in_lock_range() -> bool:
 	return target != null and target.pos().distance_to(pos()) <= Tuning.v("soft_lock_range")
 
@@ -450,7 +517,10 @@ func _locomote(dt: float, mult: float, face_target: bool) -> void:
 		spd = lerpf(spd, side_speed * mult * speed_mult(), sideness)
 	rig.desired_vel = mv * spd
 	rig.max_accel = eff("accel")
-	if face_target and _target_in_lock_range():
+	if face_target and _focus_preferred():
+		var to_f: Vector3 = focus_point - pos()
+		_turn_toward(atan2(to_f.x, to_f.z), eff("turn_rate"), dt)
+	elif face_target and _target_in_lock_range():
 		_turn_toward(_yaw_to_target(), eff("turn_rate"), dt)
 	elif mv.length() > 0.2:
 		_turn_toward(atan2(mv.x, mv.z), eff("turn_rate"), dt)
@@ -495,7 +565,9 @@ func _move_variant(slot: String, abilities := false) -> Array:
 
 ## Starts whatever buffered action is allowed. `from_cancel` = called from a move's cancel window.
 func _try_actions(from_cancel: bool) -> bool:
-	if _peek(FighterInput.JUICE) and hype >= 100.0 and creature.abilities.has("juice"):
+	if sim and sim.mode and sim.mode.intercept_actions(self):
+		return true
+	if _peek(FighterInput.JUICE) and hype >= 100.0 and creature.abilities.has("juice") and not bool(mods.get("no_juice", false)):
 		_consume(FighterInput.JUICE)
 		_start_juice()
 		return true
@@ -517,7 +589,10 @@ func _try_actions(from_cancel: bool) -> bool:
 				hooks.fire("ability_used", {"slot": slot})
 				_emit({"type": "ability", "slot": slot, "id": ab.id})
 				return true
-	if _peek(FighterInput.GRAB) and creature.moves.has("grab") and not from_cancel:
+	if _peek(FighterInput.GRAB) and sim and sim.mode and sim.mode.on_grab_pressed(self):
+		_consume(FighterInput.GRAB)
+		return true
+	if _peek(FighterInput.GRAB) and creature.moves.has("grab") and not from_cancel and not bool(mods.get("no_grabs", false)):
 		_consume(FighterInput.GRAB)
 		var gv: Array = _move_variant("grab")
 		_start_move(gv[0], gv[1], State.ATTACK)
@@ -584,7 +659,10 @@ func _start_move(m: MoveDef, slot: String, st: int) -> void:
 	spend_stamina(m.stamina * float(mods.get("stamina_cost", 1.0)))
 	# targeting assistance: snap toward the target if roughly in front, else toward input
 	var snap := Tuning.v("attack_snap_deg") * float(mods.get("assist", 1.0))
-	if _target_in_lock_range():
+	if _focus_preferred():
+		var to_fp: Vector3 = focus_point - pos()
+		facing_yaw = atan2(to_fp.x, to_fp.z)
+	elif _target_in_lock_range():
 		var want := _yaw_to_target()
 		if absf(MathX.wrap_angle(want - facing_yaw)) < deg_to_rad(snap) or input.move.length() < 0.2:
 			facing_yaw = want
@@ -802,7 +880,12 @@ func _st_celebrate(_dt: float) -> void:
 
 func _st_out(_dt: float) -> void:
 	rig.desired_vel = Vector3.ZERO
-	motor.tuck = true
+	# resting tag partners stand and bounce on the apron; everyone else lies there
+	var resting := bool(flags.get("resting", false))
+	motor.tuck = not resting
+	if resting:
+		_clear_overlay()
+		motor.overlay_height = absf(sin(time * 3.0)) * 0.04
 
 
 func knock_out(by: Fighter = null) -> void:
@@ -1177,7 +1260,7 @@ func _do_throw(throw_dir: Vector3) -> void:
 	var mass_ratio := clampf(sqrt(Tuning.v("ref_mass") / maxf(20.0, v.rig.total_mass)), 0.5, 1.6)
 	var air := 0.55
 	var horiz := rel * (dist * mass_ratio / air)
-	var vy := 9.81 * air * 0.5 + float(td.get("up", 0.0))
+	var vy := (sim.gravity if sim else 9.81) * air * 0.5 + float(td.get("up", 0.0))
 	v.rig.apply_body_impulse((horiz + Vector3.UP * vy - v.rig.com_velocity()) * v.rig.total_mass)
 	if sim:
 		var dmg := float(td.get("damage", Tuning.v("throw_damage")))

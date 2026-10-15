@@ -31,7 +31,11 @@ persist (atomic versioned JSON) ◄── settings, profiles, runs, presets, are
 - `MatchSim.setup({arena, rules, seed, mode, fighters:[{creature, team, source, name, kind, mods}]})`; `step(dt)` at 120 Hz.
 - Inputs only through `FighterInput` (world-space move vector, held bitmask, per-button press counters).
 - Outputs: `fighters[i]` state (vitals, `state`, `rig.segment_transforms()`), `effects.entities`, `events` (append-only with `seq`).
-- Determinism: same build + same seed + same input stream ⇒ same outcome on the same machine (tested). Cross-machine float determinism is NOT assumed; networking is server-authoritative.
+- Determinism: same build + same seed + same input stream ⇒ identical outcome **in a fresh process stepped at a
+  fixed rate** (`--fixed-fps 120`; test `test_fixed_step_runs_are_reproducible_across_processes`). Several sims
+  created one after another inside a single real-time-paced process can diverge slightly (Godot/Jolt body
+  bookkeeping), so tests that need exact reproducibility use child processes. Cross-machine float determinism is
+  NOT assumed; networking is server-authoritative.
 - Content types consumed: `CreatureDef` (body + moves + abilities), `ArenaDef`, rules dictionaries, `MatchMode` subclasses.
 
 ## Content packages (game/content/<id>/ or user mods/<id>/)

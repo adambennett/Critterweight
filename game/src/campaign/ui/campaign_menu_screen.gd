@@ -23,6 +23,8 @@ var _dose_label: Label
 func on_enter(p: Dictionary) -> void:
 	stand_ins = bool(p.get("stand_ins", false)) or OS.get_cmdline_user_args().has("--campaign-stand-ins")
 	catalog = CampaignFlow.make_catalog(stand_ins)
+	if CampaignCatalog.VARIANTS.has(str(p.get("variant", ""))):
+		variant = str(p["variant"])     # the main menu opens the menu for one variant
 	var d = Settings.get_value("gameplay.difficulty")
 	difficulty = str(d) if d != null and catalog.difficulties.has(str(d)) else "amateur"
 	var fs := catalog.available_fighters()
@@ -69,7 +71,18 @@ func _build_rows() -> void:
 		var info := catalog.fighter_info(str(fid))
 		fs.append(["%s  ·  %s" % [info.get("name", fid), Elements.display_name(str(info.get("element", "")))], str(fid)])
 	if fs.is_empty():
-		_rows.add_child(CampaignUI.label("No roster fighters are installed yet. Enable development stand-ins to try the campaign (runs are marked custom).", 20, CampaignUI.DANGER))
+		var pending := 0
+		var first_problem := ""
+		for rid in catalog.roster():
+			if not catalog.resolver.raw_entry(str(rid)).is_empty():
+				pending += 1
+				var probs := catalog.resolver.problems(str(rid))
+				if first_problem == "" and not probs.is_empty():
+					first_problem = probs[0]
+		var why := "No roster fighters are installed yet."
+		if pending > 0:
+			why = "%d roster fighters are installed but their kits are not usable yet (%s)." % [pending, first_problem]
+		_rows.add_child(CampaignUI.label(why + " Enable development stand-ins to try the campaign (runs are marked custom).", 20, CampaignUI.DANGER))
 		_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS", func(): App.goto("campaign_menu", {"stand_ins": true})))
 	else:
 		_row("FIGHTER", fs, fighter, _pick_fighter)

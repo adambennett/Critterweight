@@ -16,6 +16,10 @@ uniform vec4 status_color : source_color = vec4(0.0);
 uniform vec4 bruises[8];
 uniform vec4 bruise_color : source_color = vec4(0.45, 0.08, 0.18, 1.0);
 uniform float time_offset = 0.0;
+// Forged models store an emissive strength in vertex alpha (COLOR.a) on glowing surfaces
+// (furnace door, barnacles, coil, headlamp...). vertex_glow scales it: 0 = off (fallback
+// meshes / non-glowing surfaces), 0.3..1.0 = driven by Hype (CreatureView.hype).
+uniform float vertex_glow = 0.0;
 
 varying vec3 world_pos;
 
@@ -45,6 +49,7 @@ void fragment() {
 	float rim = pow(1.0 - ndv, 3.0);
 	vec3 emit = rim_color.rgb * rim * rim_strength;
 	emit += flash_color.rgb * flash * 1.6;
+	emit += COLOR.rgb * COLOR.a * vertex_glow * 2.2;
 	if (juice > 0.0) {
 		float jp = 0.6 + 0.4 * sin(TIME * 9.0 + time_offset);
 		emit += juice_color.rgb * juice * (0.25 + rim * 1.2) * jp;

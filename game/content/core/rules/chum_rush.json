@@ -1,0 +1,25 @@
+{
+  "id": "chum_rush",
+  "name": "Chum Rush",
+  "mode": "chum_rush",
+  "format": "coop",
+  "teams": 1,
+  "players": [
+    1,
+    4
+  ],
+  "rounds": 1,
+  "round_time": 0,
+  "win": "survive",
+  "revive": true,
+  "downed_time": 15.0,
+  "start_wave": 1,
+  "wave_size_mult": 1.0,
+  "headliner_interval": 10,
+  "picks": true,
+  "last_call": false,
+  "night_shift": false,
+  "enemy_health_mult": 1.0,
+  "description": "Survive endless waves of Scraplings and Blisters with a headliner every ten waves. Revive your partners; pick a supplement every fifth break.",
+  "version": 1
+}

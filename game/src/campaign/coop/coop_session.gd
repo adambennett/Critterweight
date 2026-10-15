@@ -443,6 +443,7 @@ func _credit_self(st: Dictionary) -> void:
 		return
 	_credited = true
 	var rep := CampaignProgression.finish_run(catalog, st, me, profile)
+	CampaignProgression.grant_achievements(rep, profile)
 	run_finished.emit(rep)
 
 

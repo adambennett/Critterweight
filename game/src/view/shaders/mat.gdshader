@@ -30,7 +30,7 @@ void fragment() {
 	}
 	float edge = smoothstep(apothem - border - 0.02, apothem - border + 0.02, oct);
 	col = mix(col, line_color.rgb * (0.9 + grain), edge);
-	vec2 luv = p / logo_size + 0.5;
+	vec2 luv = vec2(-p.x, p.y) / logo_size + 0.5;
 	if (luv.x > 0.0 && luv.x < 1.0 && luv.y > 0.0 && luv.y < 1.0) {
 		vec4 l = texture(logo, luv);
 		col = mix(col, l.rgb, l.a * 0.92);

@@ -55,10 +55,11 @@ static func build(parent: Node3D, a: ArenaDef) -> Dictionary:
 			"circle":
 				sides = 24
 		var side_len := 2.0 * a.radius * tan(PI / sides) + 0.2
+		# Collision walls rise well above the visible fence so launches never clear the cage.
+		var wall_h := a.wall_height + 5.0
 		for i in sides:
-			var ang := TAU * i / sides + (PI / sides if a.base == "octagon" else 0.0)
-			if a.base == "square":
-				ang = TAU * i / 4.0
+			# side normals at TAU*i/sides: the same polygon ArenaDef.clamp_point and ArenaView use
+			var ang := TAU * i / sides
 			var n := Vector3(cos(ang), 0.0, sin(ang))
 			var wb := StaticBody3D.new()
 			wb.name = "Wall%d" % i
@@ -67,11 +68,11 @@ static func build(parent: Node3D, a: ArenaDef) -> Dictionary:
 			wb.physics_material_override = wall_mat
 			var cs := CollisionShape3D.new()
 			var bs := BoxShape3D.new()
-			bs.size = Vector3(side_len, a.wall_height + 1.0, 0.3)
+			bs.size = Vector3(side_len, wall_h, 0.3)
 			cs.shape = bs
 			wb.add_child(cs)
 			parent.add_child(wb)
-			wb.global_transform = Transform3D(Basis(Vector3.UP, atan2(n.x, n.z)), n * (a.radius + 0.15) + Vector3.UP * (a.wall_height + 1.0) * 0.5)
+			wb.global_transform = Transform3D(Basis(Vector3.UP, atan2(n.x, n.z)), n * (a.radius + 0.15) + Vector3.UP * wall_h * 0.5)
 			out["walls"].append(wb)
 	for p in a.props:
 		var def: Dictionary = PROP_TYPES.get(p["type"], {})

@@ -111,6 +111,9 @@ func launch_fight() -> void:
 		App.goto("run_map", {"flow": self, "fight_error": "\n".join(built["errors"])})
 		return
 	SimSpeed.restore()
+	# the pause menu's "Restart fight" replays MatchFlow.last_config; a campaign fight must not
+	# restart into an unrelated earlier match (quitting keeps the run at this fight instead)
+	MatchFlow.last_config = {}
 	App.start_match(built["config"], _on_match_finished)
 
 
@@ -156,6 +159,7 @@ func finish() -> void:
 	if report.is_empty():
 		report = CampaignProgression.finish_run(catalog, ctrl.state, me, Profiles.current)
 		Profiles.save()
+		CampaignProgression.grant_achievements(report, Profiles.current)
 		store.clear(profile_id(), RunStore.slot_for(ctrl.state))
 	App.goto("run_summary", {"flow": self})
 

@@ -195,7 +195,24 @@ static func finish_run(catalog: CampaignCatalog, state: Dictionary, pid: String,
 	while hist.size() > 60:
 		hist.pop_back()
 	rep["history_entry"] = entry
+	# platform achievements earned by this run (granted by the caller for the local profile)
+	var ach := []
+	if victory and not custom and not bookie:
+		ach.append("ach_off_the_street" if variant == "off_the_street" else "ach_made_camp")
+		ach.append("ach_order_in_court")     # the title fight is Commissioner Snappington
+		if dose >= 10:
+			ach.append("ach_fully_dosed")
+	rep["achievements"] = ach
 	return rep
+
+
+## Unlocks the achievements a credited run earned — only for the active local profile (tests
+## and remote party members pass other profile dictionaries and get nothing unlocked here).
+static func grant_achievements(rep: Dictionary, profile: Dictionary) -> void:
+	if not is_same(profile, Profiles.current):
+		return
+	for a in rep.get("achievements", []):
+		Platform.unlock_achievement(str(a))
 
 
 ## Records per fighter x board x difficulty x Dose: fastest clear, fewest knockdowns suffered,
