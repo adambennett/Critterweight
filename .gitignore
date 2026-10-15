@@ -16,3 +16,6 @@ captures/
 # Tool dependencies
 tools/**/node_modules/
 __pycache__/
+
+# Agent worktrees and local tool state
+.claude/
