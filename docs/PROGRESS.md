@@ -1,35 +1,62 @@
 # Progress
 
-## Current milestone (2026-10-15)
-M3 — integration: merging the parallel owners' systems into `main`, finishing fighter kits, hub, Linux and
-performance checks, then the packaged-build audit (`docs/REQUIREMENTS.md` is the per-requirement ledger).
+## Status (2026-10-15) — paused for the playtest week
 
-## Integrated on `main`
-- **Engine**: active-ragdoll rig (Jolt 6DOF springs, 120 Hz), IK/gait motor, fighter state machine,
-  contact-validated combat, effects/statuses/elements/reactions/zones, hooks DSL, rule-level hooks, gravity,
-  cage containment (collision walls now match the fence), spawn/despawn with slot reuse.
-- **Modes**: standard rounds/FFA/teams/co-op, Spotlight Hog, Chumball, Absolute Unit, Chum Rush, Tag Team,
-  Practice, Tutorial; 15 core rules presets.
-- **Content/art/audio**: creature forge (6 fighter bodies + models, 2 minions, 3 bosses, 8 hub NPCs, fans);
-  synthesized score, 312 SFX ids, babble voices, announcer bridge wired into every match.
-- **UI**: theme + widget library, title/main menu/settings/profile/credits/pause/results/versus/character
-  select/spectate/tutorial menu, rules editor, mods screen, HUD (≥ 18 px at 1280×800, 5–8 fighter grid).
-- **Systems**: mods (data-only packages, validation, sets, sharing, examples), rules presets, tutorial (10
-  exercises), spectator director, platform boundary + local achievements, packaging script, bench harness.
-- **Tests**: 76 automated tests (`godot --headless --path game --fixed-fps 120 -- --test`), all passing.
+Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
+published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
+"Remaining for the release candidate" must be done before a completion audit can pass.
 
-## In flight (parallel owners, worktree branches)
-- Fighter kits: Stoke+Gusto, Dredge+Dozer, Slurry+Jitters.
-- Networking/servers/playlists, AI Lab, campaign (both variants, co-op, Bookie's Table), arenas + editor.
+## Integrated on `main` (all merged, full suite green before each release)
 
-## Next concrete actions
-1. Merge each finished branch, resolve conflicts, rerun the suite, recapture evidence.
-2. Hub (The Cannery) on top of the campaign services; Kid Lamprey sparring kit; minion/boss kits.
-3. Wire playlists/hosting to user presets and mods compatibility (`Mods.compare`).
-4. Performance captures on a quiet machine (`--bench busy|sim|soak`), Linux checks, packaged-build audit,
-   README/PLAYER_GUIDE/VERIFICATION, final evidence digest.
+- Combat: active-ragdoll rigs, contact-validated hits, guard/parry/dodge, grabs, elements and reactions,
+  knockdowns, ring-outs, containment; string cancels wait for the strike to land (naive mashing works).
+- Roster: six full fighter kits (Stoke, Dredge, Gusto, Dozer, Slurry, Jitters), Kid Lamprey, Scrapling
+  (+ Pelter), Blister, bosses Bilge/Conduit/Snappington; techniques and minion loadouts lint-checked.
+- Modes: versus (1v1 to 8 fighters, teams), practice, spectate (auto-director), tutorial (completable
+  with every fighter), bonus modes Spotlight Hog / Chumball / Absolute Unit / Chum Rush, Tag Team.
+- Campaigns: Off the Street, Fight Camp with The Cannery hub (11 spaces, NPCs, activities, secrets,
+  upgrade stations, cosmetics), The Dosage ladder, The Bookie's Table autobattler + unattended mode,
+  local co-op decisions (CoopSession) in both formats.
+- Online: listen hosting, dedicated server (Windows/Linux packages), Online + Lobby screens, LAN and
+  direct join, playlists with voting, mod/content comparison, arena/preset transfer, policy bots.
+- Creation: rules editor and presets, arena editor with four bases and six example layouts, local mods
+  (three examples, hardened loader), AI Lab (ES + behaviour cloning, workers, evaluation, sample
+  policies for every fighter).
+- Reviews done and fixed: modes, mods/persistence, campaign/co-op, AI Lab, hub (≈80 findings).
+- Tooling: `tools/build/package.ps1` (4 targets + manifest), `tools/build/release.ps1` (tag + GitHub
+  release), `tools/verify/run_verification.ps1` (packaged checks), `tools/dev/run_suite.ps1` (one full
+  suite at a time), `tools/verify/ledger_digest.py`, portability check.
 
-## Blockers / notes
-- Linux runtime checks need a Linux userland (none installed; Docker engine absent). Building the Linux
-  export works here; running it is an external check unless a local Linux environment becomes available.
-- Benchmarks taken while seven agents share the CPU are noisy; final numbers will be re-captured.
+## Remaining for the release candidate (exact next actions)
+
+1. **Online co-op runs end to end** (COOP-01..06, NET-05): fights, shops and events of an online party
+   run must be played over the network in both formats (simultaneous and tag), with disconnect/rejoin
+   and party save/resume through the lobby. State: see the networking branch report in the release
+   notes / `docs/NETWORKING.md`; online party runs currently sync the route votes.
+2. **Bot difficulty** (AI-01, UI-12): the top tiers must beat a button-masher (target: Headliner wins
+   ≥ 70 %, Hall-of-Famer ≥ 80 %, Punching Bag still loses ≥ 65 % to the masher) while keeping the tier
+   ladder monotonic (`--bench tiers --bouts 12`). Test: `test_naive_play` (handoff material in the bots
+   branch).
+3. **Roster balance pass**: cross-roster round robin (`--bench roster --bouts 12 --tier pro`) had Stoke
+   at 25 % and Slurry at 71 % (4 bouts/pair, before the bot changes); target 40–60 % overall, 30–70 % per
+   pairing; plus reliable mashed strings for every kit (snippet: a masher must land l1-l2-l3).
+4. **Server CPU** (PERF-04): 8-fighter server measured 52–68 % of one core vs the 35 % DESIGN target
+   (cost is per-fighter motor/rig GDScript); profile with `--bench sim --n 8` on a quiet machine and
+   optimise without behaviour changes.
+5. **Final verification** (VER-03/04/05/07, PERF-01/02/03/05, DEL-01/06): quiet machine, then
+   `tools/verify/run_verification.ps1 -Build` (packaged suite, captures with exit codes, benches,
+   online session check), portability check, an independent whole-brief audit, `docs/VERIFICATION.md`,
+   README refresh, ledger digest (`python tools/verify/ledger_digest.py --open`), release 1.0.0-rc.1.
+
+## Known issues in the current preview
+
+- Online co-op runs: route votes only (fights/shops/events not yet online).
+- Some matchups lopsided; top bot tiers can be beaten by mashing.
+- Linux packages built and portability-checked but not run on Linux (no Linux environment here; disclosed).
+- Boot to the title is ~7.5 s packaged on this PC (target < 10 s cold).
+
+## Working rules for resuming
+
+- Full test suites only through `tools/dev/run_suite.ps1` (one at a time, below-normal priority).
+- Releases through `tools/build/release.ps1` (`docs/RELEASES.md`).
+- Merge agent branches one at a time, re-import, `--check`, full suite, then commit/push.
