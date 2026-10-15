@@ -3,8 +3,9 @@
   UI-12: runs Granny Haymaker's tutorial course (test_tutorial.gd) once per fighter, in parallel,
   against the Kid the game launches for that fighter, and prints one line per fighter.
 .DESCRIPTION
-  Fighters: every creature in game/content/core/creatures that is not npc_only (dev_biped and the
-  roster), or the ones given with -Fighters (an unknown id stops the script). Each run has its own
+  Fighters: the Test Dummy (dev_biped, npc_only since the roster is complete; test_tutorial's own
+  default) and every creature in game/content/core/creatures that is not npc_only (the roster), or
+  the ones given with -Fighters (an unknown id stops the script). Each run has its own
   user-data root under %TEMP%, deleted when it ends. Exit code = the number of fighters with a
   failing test. See docs/design/ANNOUNCER_AND_TUTORIAL.md section 2.3.
 .EXAMPLE
@@ -25,7 +26,7 @@ foreach ($f in Get-ChildItem (Join-Path $root "game\content\core\creatures") -Fi
 # "-Fighters a,b" arrives as one string through "powershell -File".
 $Fighters = @($Fighters | ForEach-Object { $_ -split "," } | Where-Object { $_ -ne "" })
 if ($Fighters.Count -eq 0) {
-	$Fighters = @($known.Keys | Where-Object { $known[$_] } | Sort-Object)
+	$Fighters = @($known.Keys | Where-Object { $known[$_] -or $_ -eq "dev_biped" } | Sort-Object)
 }
 $unknown = @($Fighters | Where-Object { -not $known.ContainsKey($_) })
 if ($unknown.Count -gt 0) {
