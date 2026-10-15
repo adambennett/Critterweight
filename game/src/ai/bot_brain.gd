@@ -77,13 +77,38 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 	if _t >= _next_think:
 		_next_think = _t + float(p["think"]) * rng.randf_range(0.7, 1.3)
 		_think(f, sim)
-	f.input.move = _move
+	f.input.move = _edge_safe(f, sim, _move)
 	f.input.set_held(FighterInput.GUARD, _guard and _t < _guard_until)
 	f.input.set_held(FighterInput.GRAB, _t < _hold_until)
 	f.input.set_held(FighterInput.HEAVY, _t < _heavy_hold_until)
 	if f.state == Fighter.State.HELD:
 		if rng.randf() < float(p["mash_escape"]) * 0.5:
 			f.input.press(FighterInput.LIGHT if rng.randf() < 0.5 else FighterInput.HEAVY)
+
+
+## Ring-out arenas: a ring-out costs health and time, so bots keep off open edges. Within
+## EDGE_CAUTION of one, the outward part of the intended move is cancelled and an inward pull
+## added (stronger closer to the edge and for better spacing). Dodges use the corrected move, so
+## they never point off the roof. A bot carrying someone still walks them out to throw.
+const EDGE_CAUTION := 1.7
+
+
+func _edge_safe(f: Fighter, sim: MatchSim, mv: Vector3) -> Vector3:
+	if sim == null or sim.arena == null or f.state == Fighter.State.GRABBING:
+		return mv
+	if not bool(sim.rules.get("ringouts", true)) or not sim.arena.has_open_edges():
+		return mv
+	var d := sim.arena.edge_distance(f.pos(), true)
+	if d >= EDGE_CAUTION:
+		return mv
+	var inward := sim.arena.open_edge_inward(f.pos())
+	if inward == Vector3.ZERO:
+		return mv
+	var out := mv.dot(-inward)
+	if out > 0.0:
+		mv += inward * out
+	mv += inward * (1.0 - d / EDGE_CAUTION) * lerpf(0.5, 1.0, float(p["spacing"]))
+	return mv.limit_length(1.0)
 
 
 func _perceived() -> Dictionary:

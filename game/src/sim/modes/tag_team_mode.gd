@@ -116,7 +116,7 @@ func tick_fight(dt: float) -> void:
 			if f.is_out():
 				continue                      # knocked out during the assist: stays out
 			var a: Fighter = active.get(f.team)
-			if a == null or a.is_out():
+			if a == null or is_beaten(a):
 				# the partner went down while we were in: we stay in as the active fighter
 				active[f.team] = f
 				sim.emit_event({"type": "auto_tag", "team": f.team})
