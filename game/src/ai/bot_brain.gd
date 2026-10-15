@@ -59,6 +59,8 @@ func set_personality(ai: Dictionary) -> void:
 
 func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 	_t += dt
+	if _npc_pre_poll(f):
+		return
 	var tgt := f.target
 	if tgt != _last_target:
 		_history.clear()
@@ -212,6 +214,8 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	if obj.has("pos") and dist > float(obj.get("engage", 3.0)):
 		_move = _toward(f.pos(), obj["pos"])
 		return
+	if _npc_think(f, sim, tgt, dist, dir, attacking and not mistake, winding, my_reach, their_reach):
+		return
 	# ---- JUICE ----
 	if f.hype >= 100.0 and rng.randf() < float(p["juice"]) * 0.5 and dist < 3.5:
 		f.input.press(FighterInput.JUICE)
@@ -318,3 +322,193 @@ func _toward(from: Vector3, to: Vector3) -> Vector3:
 	var d := to - from
 	d.y = 0.0
 	return d.normalized() if d.length() > 0.2 else Vector3.ZERO
+
+
+# =====================================================================================
+# Personality extensions for NPC kits (Kid Lamprey, minions, bosses; docs/kits/*.md).
+# Optional keys of a creature's "ai" block:
+#   charge          offset to the tier's chance to HOLD a Heavy into its charged version
+#                   (CHARGE_BY_TIER: Punching Bag never charges)
+#   keep_distance   metres a ranged unit keeps ("prefers": "ranged" alone means 4 m); it fires
+#                   its ranged ability ("ranged_slot", default the longest-reaching one) between
+#   pack            at most this many allies with a "pack" key attack one target at once; the
+#                   rest wait at "pack_ring" m (default 2.2), circling toward the target's flank,
+#                   and raise "pack_guard" (an ability slot, or "guard") when it swings at them
+#   ability_space   {slot: metres}: never start that ability within that distance of an ally
+#                   who is using it (Blisters never inflate next to an inflating Blister)
+#   counter_slot    ability answering a perceived wind-up the generic defence did not answer,
+#                   with probability "counter_chance" (default 0.5) scaled by the tier's block
+#   ally_ko_flinch  seconds the unit freezes after an ally within 3 m is knocked out
+# Momentary buttons are released every tick (pressing alone used to leave Heavy held down for
+# good, turning every bot Heavy into a full charge); Heavy is held only for a deliberate charge.
+# =====================================================================================
+
+const CHARGE_BY_TIER := {"rookie": 0.0, "regular": 0.2, "pro": 0.35, "champion": 0.45, "hall_of_famer": 0.5}
+const MOMENTARY := [FighterInput.LIGHT, FighterInput.HEAVY, FighterInput.DODGE, FighterInput.AB1,
+	FighterInput.AB2, FighterInput.JUICE, FighterInput.TAUNT, FighterInput.TARGET, FighterInput.TAG]
+
+var _charge_move: MoveDef = null     ## the Heavy whose charge decision was made
+var _charge_st := 0.0                ## its state_time when last seen (a drop = a new move)
+var _charge_to := 0.0                ## charge level to hold it to (0 = a tap)
+var _flinch_until := -1.0
+var _ev_cursor := -1
+
+
+## Every tick, before anything else: releases momentary buttons, holds Heavy for deliberate
+## charges and freezes a flinching unit. Returns true when this tick is fully decided.
+func _npc_pre_poll(f: Fighter) -> bool:
+	var keep_heavy := false
+	if f.state == Fighter.State.ATTACK and f.move != null and f.move_slot == "heavy" and f.move.charge_time > 0.0:
+		if f.move != _charge_move or f.state_time + 1e-4 < _charge_st:
+			_charge_move = f.move
+			var chance := float(CHARGE_BY_TIER.get(difficulty, 0.2)) + float(personality.get("charge", 0.0))
+			_charge_to = rng.randf_range(0.45, 1.0) if rng.randf() < chance else 0.0
+		_charge_st = f.state_time
+		keep_heavy = _charge_to > 0.0 and f.move_charge < _charge_to
+	else:
+		_charge_move = null
+	for b in MOMENTARY:
+		if b != FighterInput.HEAVY or not keep_heavy:
+			f.input.set_held(b, false)
+	if keep_heavy:
+		f.input.set_held(FighterInput.HEAVY, true)
+	if _t < _flinch_until:
+		f.input.move = Vector3.ZERO
+		f.input.held = 0
+		return true
+	return false
+
+
+## Personality behaviours that replace the rest of a think step. Returns true when they decided it.
+func _npc_think(f: Fighter, sim: MatchSim, tgt: Fighter, dist: float, dir: Vector3, attacking: bool,
+		winding: bool, my_reach: float, their_reach: float) -> bool:
+	if personality.is_empty():
+		return false
+	var c := f.creature
+	var flinch := float(personality.get("ally_ko_flinch", 0.0))
+	if flinch > 0.0:
+		if _ev_cursor < 0:
+			_ev_cursor = sim.event_seq
+		for ev in sim.events_since(_ev_cursor):
+			_ev_cursor = int(ev["seq"])
+			if str(ev["type"]) != "ko":
+				continue
+			var ki := int(ev.get("fighter", -1))
+			if ki >= 0 and ki < sim.fighters.size() and ki != f.index:
+				var k: Fighter = sim.fighters[ki]
+				if k.team == f.team and k.pos().distance_to(f.pos()) < 3.0:
+					_flinch_until = _t + flinch
+		if _t < _flinch_until:
+			_move = Vector3.ZERO
+			_guard = false
+			return true
+	var cslot := str(personality.get("counter_slot", ""))
+	if cslot != "" and attacking and winding and dist < their_reach + 0.6 and _ability_ready(f, cslot):
+		if rng.randf() < float(personality.get("counter_chance", 0.5)) * (0.4 + float(p["block"])):
+			f.input.press(_ability_button(cslot))
+			_move = Vector3.ZERO
+			return true
+	var space: Dictionary = personality.get("ability_space", {})
+	for slot in space:
+		var s := str(slot)
+		if _ability_ready(f, s) and dist <= reach_of(c, s, true):
+			var busy := _ally_using(f, sim, s, float(space[slot]))
+			if busy != null:
+				var away := f.pos() - busy.pos()
+				away.y = 0.0
+				_move = (away.normalized() + dir.cross(Vector3.UP) * 0.6).normalized()
+				return true
+	var kd := float(personality.get("keep_distance", 4.0 if str(personality.get("prefers", "")) == "ranged" else 0.0))
+	if kd > 0.0:
+		return _keep_distance(f, c, dist, dir, kd, my_reach)
+	var pack := int(personality.get("pack", 0))
+	if pack > 0 and not _pack_attacker(f, sim, tgt, pack):
+		_pack_hold(f, dist, dir, attacking, their_reach)
+		return true
+	return false
+
+
+func _ability_button(slot: String) -> int:
+	return FighterInput.AB1 if slot == "ability1" else FighterInput.AB2
+
+
+func _ability_ready(f: Fighter, slot: String) -> bool:
+	return f.creature.abilities.has(slot) and int(f.charges_left.get(slot, 1)) > 0 and not bool(f.mods.get("no_abilities", false))
+
+
+## An ally within `r` m currently performing ability `slot`, or null.
+func _ally_using(f: Fighter, sim: MatchSim, slot: String, r: float) -> Fighter:
+	for o: Fighter in sim.fighters:
+		if o == f or o.despawned or o.is_out() or o.team != f.team:
+			continue
+		if o.state == Fighter.State.ABILITY and o.move_slot.split("@")[0] == slot and o.pos().distance_to(f.pos()) < r:
+			return o
+	return null
+
+
+## True when `f` is one of the `n` pack members closest to the target (only they attack).
+func _pack_attacker(f: Fighter, sim: MatchSim, tgt: Fighter, n: int) -> bool:
+	var mine := f.pos().distance_to(tgt.pos())
+	var closer := 0
+	for o: Fighter in sim.fighters:
+		if o == f or o.despawned or o.is_out() or o.team != f.team or o.target != tgt:
+			continue
+		var oai: Dictionary = o.creature.ai
+		if int(oai.get("pack", 0)) <= 0 or float(oai.get("keep_distance", 0.0)) > 0.0:
+			continue
+		if o.pos().distance_to(tgt.pos()) < mine:
+			closer += 1
+	return closer < n
+
+
+## Waiting pack member: hold a ring around the target, drift toward its flank, shield up when
+## it swings this way.
+func _pack_hold(f: Fighter, dist: float, dir: Vector3, attacking: bool, their_reach: float) -> void:
+	var ring := float(personality.get("pack_ring", 2.2))
+	if _t >= _strafe_until:
+		_strafe = -1.0 if rng.randf() < 0.5 else 1.0
+		_strafe_until = _t + rng.randf_range(0.6, 1.8)
+	var side := dir.cross(Vector3.UP) * _strafe
+	if dist < ring - 0.3:
+		_move = (-dir + side * 0.6).normalized()
+	elif dist > ring + 0.6:
+		_move = (dir + side * 0.4).normalized()
+	else:
+		_move = side * 0.7
+	if attacking and dist < their_reach + 0.8:
+		var g := str(personality.get("pack_guard", "guard"))
+		if g.begins_with("ability") and _ability_ready(f, g):
+			f.input.press(_ability_button(g))
+		else:
+			_guard = true
+			_guard_until = _t + 0.5
+			f.input.press(FighterInput.GUARD)
+
+
+## Ranged unit: fire the ranged ability between keep-distance footwork; fight back up close.
+func _keep_distance(f: Fighter, c: CreatureDef, dist: float, dir: Vector3, kd: float, my_reach: float) -> bool:
+	var slot := str(personality.get("ranged_slot", ""))
+	if slot == "":
+		var best := 0.0
+		for s in ["ability1", "ability2"]:
+			if c.abilities.has(s) and reach_of(c, s, true) > best:
+				best = reach_of(c, s, true)
+				slot = s
+	if slot != "" and _ability_ready(f, slot) and dist >= 1.5 and dist <= reach_of(c, slot, true) and f.state == Fighter.State.NEUTRAL:
+		if rng.randf() < 0.35 + float(p["ability"]) * 0.5:
+			f.input.press(_ability_button(slot))
+			_move = Vector3.ZERO
+			return true
+	if dist <= my_reach + 0.1 and rng.randf() < float(p["aggression"]) * 0.6:
+		return false
+	if _t >= _strafe_until:
+		_strafe = -1.0 if rng.randf() < 0.5 else 1.0
+		_strafe_until = _t + rng.randf_range(0.5, 1.6)
+	var side := dir.cross(Vector3.UP) * _strafe
+	if dist < kd - 0.6:
+		_move = (-dir + side * 0.35).normalized()
+	elif dist > kd + 0.8:
+		_move = (dir + side * 0.25).normalized()
+	else:
+		_move = side * 0.6
+	return true

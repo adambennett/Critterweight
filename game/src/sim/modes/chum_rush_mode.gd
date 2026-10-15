@@ -140,9 +140,17 @@ func _composition(n: int) -> Array:
 	return out
 
 
+## Spawn specs: "<id>", "<id>@hp:<frac>" (headliners) and "<id>#<variant>" (minion variants):
+## a variant resolves to the creature "<id>_<variant>" (e.g. npc_scrapling#pelter ->
+## npc_scrapling_pelter, docs/kits/minions.md) and falls back to the base creature.
 func _resolve(id_: String) -> CreatureDef:
-	var base := id_.split("@")[0].split("#")[0]
-	var c := Content.creature(base)
+	var spec := id_.split("@")[0]
+	var base := spec.split("#")[0]
+	var c: CreatureDef = null
+	if spec.contains("#"):
+		c = Content.creature(spec.replace("#", "_"))
+	if c == null:
+		c = Content.creature(base)
 	if c == null:
 		c = Content.creature("dev_biped")
 	return c

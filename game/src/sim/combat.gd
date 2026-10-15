@@ -226,6 +226,7 @@ func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 		else:
 			h["blocked"] = true
 			var gd_mult := Tuning.v("guard_damage_mult") * float(b.mods.get("guard_absorb_mult", 1.0))
+			gd_mult = b.shield_damage_mult(gd_mult)   # shield statuses (Fighter NPC-kit block)
 			h["damage"] = float(h["damage"]) * gd_mult
 			h["knockback"] = (h["knockback"] as Vector3) * 0.35
 			h["stun"] = 0.0
