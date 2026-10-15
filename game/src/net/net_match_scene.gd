@@ -28,6 +28,7 @@ var hud_layer: CanvasLayer = null
 var mode_view: Node3D = null
 var mirror: NetHudMirror = null
 var my_index := -1
+var director: SpectatorDirector = null   ## auto-director camera when this client spectates
 var overlay: Label = null
 var stats_provider: Callable
 var _sample := {}
@@ -35,6 +36,8 @@ var _result := {}
 var _pick_panel: Control = null
 var _pick_key := ""
 var _dt := 0.016
+var _spec_label: Label = null
+var _goals_by_me := 0
 
 
 ## info: MATCH_START dictionary from the server. Returns "" or an error text.
@@ -73,6 +76,17 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	hud = FightHud.new()
 	hud_layer.add_child(hud)
 	hud.setup(mirror.sim, my_index)
+	if my_index < 0:
+		# spectators get the broadcast auto-director like local AI-vs-AI spectating
+		director = SpectatorDirector.new(mirror.sim)
+		camera.mode = FightCamera.Mode.SPECTATE
+		_spec_label = Label.new()
+		_spec_label.position = Vector2(16, 104)
+		_spec_label.add_theme_font_size_override("font_size", 18)
+		_spec_label.add_theme_constant_override("outline_size", 6)
+		_spec_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+		_spec_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hud_layer.add_child(_spec_label)
 	overlay = Label.new()
 	overlay.position = Vector2(16, 140)
 	overlay.add_theme_font_size_override("font_size", 16)
@@ -184,6 +198,12 @@ func _process(dt: float) -> void:
 	for ev in replica.pop_due_events():
 		mirror.push_event(ev)
 		_on_event(ev)
+		if director:
+			director.on_event(ev)
+	if director:
+		director.update(dt)
+		if _spec_label:
+			_spec_label.text = "SPECTATING  -  %s" % ("Free camera" if camera.mode == FightCamera.Mode.FREE else director.label())
 	if overlay:
 		overlay.visible = bool(Settings.get_value("diag.show_net"))
 		if overlay.visible and stats_provider.is_valid():
@@ -243,6 +263,10 @@ func _display_name(i: int) -> String:
 
 
 func _camera_points() -> Array:
+	if director and camera.mode == FightCamera.Mode.SPECTATE:
+		var dp := director.points()
+		if not dp.is_empty():
+			return dp
 	var pts := []
 	if _sample.is_empty():
 		return pts
@@ -258,12 +282,43 @@ func _camera_points() -> Array:
 
 
 func _camera_focus() -> Array:
+	if director and camera.mode == FightCamera.Mode.SPECTATE:
+		var df := director.focus()
+		if not df.is_empty():
+			return df
 	var me := _slot(my_index)
 	if me.is_empty():
 		var pts := _camera_points()
 		return [pts[0] if not pts.is_empty() else Vector3.ZERO, null]
 	var tgt := _slot(int(me["target"]))
 	return [me["root"], tgt["root"] if not tgt.is_empty() else null]
+
+
+## Spectator controls (same actions as the local SpectatorOverlay): Y / R toggles director and
+## free camera, LB/RB (Q/E) lock the director on a fighter (past either end = auto again),
+## X / Delete hides the HUD. Ignored while a menu screen is open.
+func _unhandled_input(event: InputEvent) -> void:
+	if director == null or camera == null:
+		return
+	if get_node_or_null("/root/App") != null and App.top_screen() != null:
+		return
+	if event.is_action_pressed("ui_alt"):
+		get_viewport().set_input_as_handled()
+		if camera.mode == FightCamera.Mode.FREE:
+			camera.mode = FightCamera.Mode.SPECTATE
+		else:
+			camera.free_pos = camera.global_position
+			camera.free_yaw = camera.global_rotation.y
+			camera.free_pitch = clampf(camera.global_rotation.x, -1.2, 0.2)
+			camera.mode = FightCamera.Mode.FREE
+	elif event.is_action_pressed("ui_tab_next") or event.is_action_pressed("ui_tab_prev"):
+		get_viewport().set_input_as_handled()
+		director.cycle_lock(1 if event.is_action_pressed("ui_tab_next") else -1)
+		if camera.mode == FightCamera.Mode.FREE:
+			camera.mode = FightCamera.Mode.SPECTATE
+	elif event.is_action_pressed("ui_extra"):
+		get_viewport().set_input_as_handled()
+		hud.visible = not hud.visible
 
 
 func show_result(result: Dictionary) -> void:
@@ -390,6 +445,8 @@ func _on_event(ev: Dictionary) -> void:
 				vfx.word(p + Vector3.UP * 0.3, "COUNTER!", Color(1.0, 0.75, 0.2))
 			if ti == my_index or fi == my_index:
 				Controls.rumble(clampf(dmg / 20.0, 0.1, 0.6), clampf(dmg / 30.0, 0.0, 0.8), 0.12)
+			if bool(Settings.get_value("gameplay.damage_numbers")) and dmg >= 0.5:
+				vfx.word(p + Vector3.UP * 0.25, "%d" % roundi(dmg), Color(0.75, 0.85, 1.0) if bool(ev.get("blocked", false)) else Color(1.0, 0.95, 0.8), 40)
 		"parry":
 			var pp: Vector3 = ev.get("pos", root_pos(fi))
 			vfx.word(pp + Vector3.UP * 1.2, "PARRY!", Color(0.5, 0.9, 1.0))
@@ -416,6 +473,12 @@ func _on_event(ev: Dictionary) -> void:
 			if str(ev.get("effect", "")) == "area":
 				vfx.ring(pe + Vector3.UP * 0.05, 2.2, (Elements.color(el2) if el2 != "" else Color(1, 0.9, 0.6)) * Color(1, 1, 1, 0.8), 0.35)
 				vfx.emit("dust", pe, Vector3.UP, Color(0.85, 0.8, 0.7, 0.6))
+		"elimination":
+			# achievements follow the server's events for this player's own fighter
+			if fi != my_index and int(ev.get("by", -1)) == my_index and my_index >= 0:
+				var me := _slot(my_index)
+				if not me.is_empty() and int(me["flags"]) & NetSnapshot.F_JUICED:
+					Platform.unlock_achievement("ach_juice_ko")
 		"reaction":
 			var pr: Vector3 = ev.get("pos", Vector3.ZERO)
 			vfx.word(pr + Vector3.UP * 1.6, str(ev.get("name", "REACTION")).to_upper() + "!", Color(1, 1, 1), 72)
@@ -444,12 +507,18 @@ func _on_event(ev: Dictionary) -> void:
 			sync_roster()  # views follow the replicated roster (S_ROSTER precedes these events)
 		"goal":
 			hud.callout("GOAL!", 2.0, TeamColors.color(int(ev.get("team", 0))).lightened(0.3))
+			if my_index >= 0 and int(ev.get("scorer", -1)) == my_index and not bool(ev.get("own_goal", false)):
+				_goals_by_me += 1
+				if _goals_by_me >= 3:
+					Platform.unlock_achievement("ach_hat_trick")
 			Audio.announce_trigger("mode", {"mode": "chumball_goal"})
 		"unit_crowned":
 			hud.callout("%s IS THE ABSOLUTE UNIT" % _display_name(fi).to_upper(), 2.2, Color("#8BD426"))
 			Audio.announce_trigger("mode", {"mode": "new_unit"}, {"p": _display_name(fi)})
 		"wave_start":
 			hud.callout("WAVE %d" % int(ev.get("wave", 1)), 1.6, Color(1.0, 0.6, 0.3))
+			if int(ev.get("wave", 1)) >= 20 and my_index >= 0:
+				Platform.unlock_achievement("ach_last_call")
 			Audio.announce_trigger("mode", {"mode": "rush_wave"}, {"n": int(ev.get("wave", 1))})
 		"wave_cleared":
 			hud.callout("WAVE CLEARED", 1.4, Color(0.6, 1.0, 0.6))

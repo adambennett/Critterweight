@@ -51,11 +51,12 @@ Linux:    ./CritterweightServer.x86_64 --headless -- --server --config server.cf
 * Command-line overrides (validated like the file): `--port N`, `--name "Text"`, `--password X`,
   `--max-players N`, `--playlist <id|path>`, `--log-level <level>`, `--admin-port N`,
   `--admin-token X`, `--bind <ip>`, `--discovery-port N`, `--lobby-time S`, `--results-time S`,
-  `--empty idle|showcase`, `--user-root <dir>`.
+  `--empty idle|showcase`, `--mods id1,id2`, `--mods-dir <dir>`, `--user-root <dir>`.
 * Debug network conditioner for testing (adds delay/jitter/loss in both directions on the server's
   public port): `--net-latency <ms one-way> --net-jitter <ms> --net-loss <0..1>`.
 * Exit codes: `0` normal shutdown, `2` invalid configuration (errors are printed with file and
-  line), `3` the UDP port could not be bound (in use, or not permitted).
+  line) or a configured mod that is not installed / cannot load, `3` the UDP port could not be
+  bound (in use, or not permitted).
 
 Running as a service: start the command above from your service manager (Task Scheduler / NSSM on
 Windows, a systemd unit on Linux). Stop it gracefully through the TCP admin (`shutdown`, see §6)
@@ -116,6 +117,20 @@ mistyped values stop the server with `file:line` errors.
 | `log_level` | enum | info | debug/info/warn/error | Log detail |
 | `kick_ban_seconds` | int | 300 | 0-86400 | Kicked/violating players cannot rejoin for this long |
 | `stats_interval` | int | 60 | 5-3600 s | Period of the `stats:` log line |
+| `mods` | text | (empty) | mod ids, comma separated | Exactly the mods this server loads (core is always loaded); see below |
+| `mods_dir` | text | (empty) | folder | Mods folder to use instead of `<user data>/mods` |
+
+**Mods.** A server loads exactly the mods named by `mods` (or `--mods id1,id2`) - never a player's
+mod set - from `mods_dir` when given, else from the `mods` folder of its user-data directory
+(install packages there as `.critmod` files or folders; the bundled examples such as `moon_rules`
+are always available). Mods are data only (docs/MODDING.md: no scripts, archives checked before
+extraction). A listed mod that is missing or fails to load stops the server with exit code 2 and
+the reason. The log names the loaded packages and the gameplay hash (`content: core 1.0.0,
+moon_rules 1.0.0; gameplay hash ...`), and `status` lists them. Players need the same gameplay
+mods in the same versions: a client without them is refused before it joins, with lines like
+"Missing mod: moon_rules 1.0.0 (install it, then enable it)" (NETWORKING.md §5); presentation-only
+(`client_only`) mods never matter. Rules presets and arenas a server uses are sent to clients in
+full, so playlists may use mod presets as long as the players have the mod.
 
 ### [match]
 
@@ -205,7 +220,7 @@ Commands (stdin console and TCP admin share one whitelist; nothing else is reach
 
 | Command | Effect |
 |---|---|
-| `status` | Phase, uptime, players, current entry, tick cost, traffic, memory |
+| `status` | Phase, uptime, players, current entry, tick cost, traffic, memory, loaded content packages |
 | `players` | Players with id, slot, team, fighter, ping, loss, connection state, address |
 | `kick <id\|name> [reason]` | Remove a player; they see the reason; temporary ban (`kick_ban_seconds`) |
 | `next` | Lobby: start now - Match: end now (no winner) - Results: continue now |
@@ -280,7 +295,8 @@ the last second (logic + Jolt step).
 | Exit code 3, "cannot bind UDP port" | Another server/game uses the port; pick another `port` |
 | Exit code 2 with `file:line` errors | Invalid config value; fix the named line |
 | Clients: "Could not reach the server" | Wrong address/port, firewall, or the port is not forwarded (internet) |
-| Clients: "Content mismatch" with a package list | Client and server have different mods/content; match the listed packages |
+| Clients: "Content mismatch" with a package list | Client and server have different gameplay mods; the lines name each missing / extra / different package - install or enable the same ones (`mods` here, Mods screen or `--mods` on the client) |
+| Exit code 2, "mods: not installed in ..." | A `mods` entry is not in the mods folder (or `mods_dir`); install the package or fix the id |
 | Clients: "Incompatible build" | Different game version or network protocol; update both sides |
 | Playlist entries "skipped" in the log | Entry references content that is not installed; fix or remove it |
 | Lobby says "Waiting for players" | No entry can start with this many humans (bots disallowed); lower `min_players` or allow bots |

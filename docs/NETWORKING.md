@@ -44,12 +44,14 @@ Code: `game/src/net/`. Tests: `game/src/test/net/`. Dedicated server operation: 
   so rejoining never creates phantom presses.
 * Client clock (`NetReplica`): the largest recent (snapshot time - arrival time) offset estimates
   server time; `render_time = server_time - target_delay`, advanced at local rate with +-10 %
-  drift correction (re-sync on > 0.25 s error). `target_delay` (setting `network.interp`):
-  `low` = 1 interval + median jitter; `auto` = 1 interval + 95th-percentile jitter + 5 ms;
-  `high` = 2 intervals + 99th-percentile jitter + 10 ms (clamped 25-500 ms).
+  drift correction (re-sync on > 0.25 s error). `target_delay` (setting `network.interp`, applied
+  live to the running connection): `low` = 1 interval + median jitter; `auto` = 1 interval +
+  95th-percentile jitter + 5 ms; `high` = 2 intervals + 99th-percentile jitter + 10 ms (clamped
+  25-500 ms). The listen host's own view never interpolates, so the setting does not apply there.
 * Heartbeat: clients ping every second (unreliable); the server answers. Both sides declare the
-  link dead after `timeout` seconds without any packet (setting `network.timeout` / `server.timeout`);
-  ENet's own retransmission timeout is a backstop.
+  link dead after `timeout` seconds without any packet (setting `network.timeout`, applied live to
+  a running client or listen host / `server.timeout`); ENet's own retransmission timeout is a
+  backstop.
 
 ## 4. Transport
 
@@ -67,7 +69,7 @@ fighter in a slot before any event refers to them; snapshots carry the match id 
 when they belong to another match. Disconnects carry a reason code (ENet disconnect data) as a
 fallback when the reason message itself could not be delivered.
 
-## 5. Protocol (version 2)
+## 5. Protocol (version 3)
 
 Every packet: `[u8 message id][payload]`. Ids 1-63 client->server, 64-127 server->client; the wrong
 direction, an unknown id, the wrong channel, an oversized payload or a failed bounds-checked decode
@@ -76,15 +78,15 @@ is a **protocol violation**. Layouts are documented in `src/net/net_protocol.gd`
 
 | Id | Name | Dir | Max | Payload |
 |---|---|---|---|---|
-| 1 | HELLO | C->S | 4 KB | protocol, game version, content hash, packages [{id, version}], name, password proof, rejoin token, flags, creature |
+| 1 | HELLO | C->S | 16 KB | protocol, game version, gameplay content hash, packages (<= 64) [{id, version, hash, client_only}], name, password proof, rejoin token, flags, creature, aim assist (x100) |
 | 2 | LEAVE | C->S | 16 B | - (graceful leave: no rejoin reservation) |
-| 3 | LOBBY | C->S | 512 B | kind (ready, creature, team, spectate) + value |
+| 3 | LOBBY | C->S | 512 B | kind (ready, creature, team, spectate, assist) + value |
 | 4 | CHAT | C->S | 600 B | text (<= 200 chars after cleaning) |
 | 5 | VOTE | C->S | 16 B | candidate index (-1 = none) |
 | 6 | INPUT | C->S | 256 B | seq, last snapshot tick, n (1-8), n x sample (4 + BUTTON_COUNT bytes) |
 | 7 | APP | C->S | 64 KB | type, payload (plain data) |
 | 8 | PING | C->S | 32 B | client ms |
-| 64 | CHALLENGE | S->C | | protocol, game version, server name, 16-byte nonce, flags, players |
+| 64 | CHALLENGE | S->C | | protocol, game version, server name, 16-byte nonce, flags, players, max players, gameplay content hash, packages [{id, version, hash, client_only}] |
 | 65 | WELCOME | S->C | | player id, rejoin token, flags (rejoined, spectator, dedicated), name, tick/snapshot rate, motd |
 | 66 | REJECT | S->C | | reason code, message, detail lines |
 | 67 | LOBBY | S->C | | lobby state (dictionary) |
@@ -100,12 +102,30 @@ is a **protocol violation**. Layouts are documented in `src/net/net_protocol.gd`
 | 77 | PONG | S->C | | echo, server ms |
 | 78 | ROSTER | S->C (ch 1) | | tick, changed slots (§6) |
 
-**Handshake.** ENet connect -> server sends CHALLENGE (with a fresh nonce) -> client checks the
-protocol version, answers HELLO with `sha256(nonce + "critterweight:" + password)` (the password
-never travels in clear) -> server checks, in order: protocol version, game version, content hash
-(with a package diff), kick bans, password, capacity (players, then spectators) -> WELCOME or REJECT.
-A valid rejoin token skips the capacity check and rebinds the player's reserved slot.
-Handshakes must finish within 5 s; at most 24 pending (8 per address).
+**Handshake.** ENet connect -> server sends CHALLENGE (a fresh nonce, plus its gameplay content
+hash and package list) -> the client checks the protocol version, then compares content on its own
+side with `Mods.compare(server packages)` (MOD-05, below). If that fails it stops right there with
+`content_mismatch` and the Mods wording ("Missing mod: moon_rules 1.0.0 (install it, then enable
+it)", "You have X enabled but the host does not (disable it to join)", "Different version of X: you
+have A, the host has B") and closes with that reason code, which the server logs. Otherwise it
+answers HELLO with `sha256(nonce + "critterweight:" + password)` (the password never travels in
+clear) -> the server checks, in order: protocol version, game version, content (the same verdict
+over `Mods.compare(client packages)` - the authority, so a modified client cannot skip it; its
+REJECT lists the differences from the player's side), kick bans, password, capacity (players, then
+spectators) -> WELCOME or REJECT. A valid rejoin token skips the capacity check and rebinds the
+player's reserved slot. Handshakes must finish within 5 s; at most 24 pending (8 per address). The
+challenge prefix (protocol, game version, name, nonce, flags) is the same in every protocol
+version, so a mismatched protocol is always recognised and never misread as a content problem.
+
+**Content verdict** (`NetProtocol.content_verdict(Mods.compare(theirs), theirs, same_gameplay_hash)`,
+symmetric, unit-tested): a gameplay package that is missing, extra or of another version blocks;
+`client_only` (presentation-only) packages never count; a package with the same version but a
+different package hash (a folder install vs. the same package as an archive, edited textures)
+passes only when both gameplay content hashes are equal - the simulation cannot diverge - and is
+logged; identical package lists with different gameplay hashes are refused as "same packages and
+versions, but their gameplay files differ". The client's `connection_failed` reason then carries
+`details` (the UI lines above) and `mods` {`missing`, `extra`, `mismatched`, `modified`} (ids, e.g.
+for a button that opens the Mods screen).
 
 **Rejection and disconnect reasons** (`NetProtocol.describe(code, details)` returns
 `{code, title, message, details}` ready for a dialog):
@@ -114,7 +134,7 @@ Handshakes must finish within 5 s; at most 24 pending (8 per address).
 |---|---|---|---|
 | 1 | incompatible_protocol | Incompatible build: different network protocol | both versions |
 | 2 | incompatible_build | Incompatible build: different game version | both versions |
-| 3 | content_mismatch | Content mismatch | per package: missing on your side / not on the server / different version, or "same packages, different files" |
+| 3 | content_mismatch | Content mismatch | `Mods.compare` lines per package (missing / enabled here but not on the host / different version / modified copy), or "same packages, different files"; plus `mods` {missing, extra, mismatched, modified} |
 | 4 | server_full | Server full | player/spectator counts |
 | 5 | bad_password | Wrong password | |
 | 6 | kicked | Kicked (with reason); also returned while banned | seconds until rejoin allowed |
@@ -204,7 +224,18 @@ effect entities, a rig stand-in (root position and velocity) and the replicated 
 mirrors `MatchScene._on_event`; `test_net_parity.gd` fails if `MatchScene` reacts to an event that
 `NetMatchScene` does not. Large jumps (> 2.5 m between snapshots: respawn, round reset, blink) snap
 instead of sliding. Mode choices offered to the local player (Chum Rush supplement picks) open the
-same pick panel and are sent as a `mode.pick` request that the server validates.
+same pick panel and are sent as a `mode.pick` request that the server validates. Damage numbers
+follow `gameplay.damage_numbers`; achievements tied to the local player's own fighter (JUICE KO,
+hat trick, wave 20) unlock from the server's events, like local play. **Spectators** get the
+broadcast auto-director (`SpectatorDirector` on the mirror) and the same controls as local
+AI-vs-AI spectating: Y / R director or free camera, LB/RB (Q/E) lock on a fighter, X / Delete hide
+the HUD. Playback speed stays 1x online.
+
+**Aim assist** (`access.target_assist`: low 0.5, normal 1.0, high 1.8) is part of the fighter's
+modifiers in the authoritative simulation: a client sends its level in HELLO and again
+(`LQ_ASSIST`) when the setting changes (used from the next match); the server clamps it to the
+setting's maximum and puts it into the fighter entry `mods["assist"]`, exactly as `MatchScene`
+does for local players (the listen host's own fighter uses the host's setting).
 
 Diagnostics overlay: `Settings diag.show_net` shows RTT, loss, snapshot rate, interpolation delay
 and jitter, buffer depth and KB/s in the match; the same values come from `Net.stats()`.
@@ -261,6 +292,15 @@ min_players, max_players}], tally}, `playlist` {id, name, valid, invalid, errors
   by the server's random instance id, mark incompatible builds/content, and expire silent entries
   after 4.5 s. Beacons are untrusted: bounded, validated, display only.
 * **Remote user-hosted server**: forward the UDP port (§11) and share the public address.
+* **Invites**: `Net.invite_text(address := "")` returns `Platform.invite_text(address, port,
+  has_password)` for the session this machine hosts, ready to copy into a chat; without an address
+  it uses the first LAN address of `Net.local_addresses()` (private IPv4 first, loopback and
+  link-local left out). The public internet address belongs to the router and is not known
+  locally: for internet play the host passes it (or a DNS name) explicitly.
+* **Setting `network.lan_discovery`** (applied live): off = a listen host stops announcing at once
+  and `Net.start_lan_discovery()` returns `ERR_UNAVAILABLE` (status text says the setting is off);
+  switching it on resumes the host's beacons and starts the browsing the UI asked for. Dedicated
+  servers use `server.lan_discovery`.
 
 ## 11. NAT and port forwarding (limits)
 
@@ -293,16 +333,26 @@ cost, traffic, memory, objects/nodes/orphans).
 
 ## 13. Version compatibility
 
-* `NetProtocol.VERSION` (now **2**: 11-button input samples, roster generations, mode view/HUD
-  state) must match exactly; it is bumped whenever any layout changes.
+* `NetProtocol.VERSION` (now **3**: content package lists with hashes in the challenge and hello,
+  aim assist; 2 = 11-button input samples, roster generations, mode view/HUD state) must match
+  exactly; it is bumped whenever any layout changes.
 * The game version (`application/config/version`) must match exactly.
-* `Content.content_hash()` (all gameplay content of every loaded package) must match. Content that
-  only affects presentation (models, audio, textures) does not enter the hash, so client-only
-  presentation mods are allowed; any mod with gameplay data (creatures, rules, modes, arenas,
-  upgrades, ...) is required on both sides. On mismatch the client gets the package diff.
-* Custom rules presets and authored arenas used by a server travel inside MATCH_START (rules and
-  arena dictionaries), so clients do not need those files to watch or play; creatures must exist
-  locally (they are content-hash checked).
+* Content: the content verdict above over `Mods.compare()` (gameplay packages, ids, versions,
+  package hashes) and `Content.content_hash()` (all gameplay kinds of every loaded package).
+  Presentation-only (`client_only`) packages are allowed on either side; any package with gameplay
+  data (creatures, rules, modes, arenas, upgrades, ...) is required on both sides in the same
+  version. Players enable the same mods (Mods screen, or `--mods id1,id2`); dedicated servers load
+  exactly `server.mods` (SERVER.md).
+* **Player-made rules presets** (`user:<name>`, saved on one machine and registered as runtime
+  content) and arenas are not part of the content hash: MATCH_START carries the full rules and
+  arena dictionaries, so clients never need those files (tested: a listen host plays its own
+  `user:` preset with a guest that does not have it). Creatures must exist locally.
+* **No content downloads.** Servers never send package files: rules presets and arenas already
+  travel in full, and mod packages must be installed by the player (the join error names each one).
+  The former setting `network.allow_downloads` did nothing and was removed from Settings. A future
+  download path would stream the server's `.critmod` (data-only, D-016) into the user `downloads`
+  folder and hand it to `Mods.import_package()` after the player confirms, so every package check
+  in docs/MODDING.md still applies.
 * Playlists are server-only data and are not part of the hash.
 
 ## 14. API for UI and systems (`Net` autoload)
@@ -310,9 +360,14 @@ cost, traffic, memory, objects/nodes/orphans).
 **Lifecycle**: `host(cfg) -> Error` (cfg keys: name, port, max_players, max_spectators, password,
 lan_discovery, player_name, creature, rules, arena, bots, bot_difficulty, rejoin_grace,
 results_time, timeout; defaults from Settings `network.*`), `join(address, port, password, options)
--> Error` (options: name, spectator, creature, timeout_s, conditioner_args), `can_rejoin()`,
-`rejoin()`, `leave()`, `shutdown()` (App.quit), `start_dedicated(cfg)`,
+-> Error` (options: name, spectator, creature, timeout_s, conditioner_args, assist - default from
+Settings), `can_rejoin()`, `rejoin()`, `leave()`, `shutdown()` (App.quit), `start_dedicated(cfg)`,
 `start_dedicated_from_cli(args)`, `start_from_cli(args)`.
+
+**Settings that act live** (Net listens to `Settings.changed`): `network.interp` (client smoothing),
+`network.timeout` (client and listen host), `network.lan_discovery` (browsing and the listen
+host's beacons), `access.target_assist` (sent to the server for the next match). `network.port`,
+`network.max_players`, `network.password` and `network.player_name` are read when hosting/joining.
 
 **Signals**: `status_changed(text)`, `session_state_changed(state)` (`offline`, `connecting`,
 `lobby`, `match`, `results`), `connection_failed(reason)`, `disconnected(reason)`,
@@ -324,7 +379,8 @@ results_time, timeout; defaults from Settings `network.*`), `join(address, port,
 **Queries**: `role` (`offline`/`host`/`client`/`dedicated`), `is_online()`, `is_authority()`
 (offline, host, dedicated), `is_server()`, `is_client()`, `is_host()`, `is_dedicated()`,
 `local_peer_id()` (1 for server/host), `local_fighter()`, `peers()`, `player(id)`, `lobby()`,
-`stats()`, `session_state()`, `last_failure`.
+`stats()`, `session_state()`, `last_failure`, `invite_text(address := "")` (host: copyable invite
+line via `Platform.invite_text`), `local_addresses()` (this PC's IPv4 addresses, LAN first).
 
 **Lobby actions** (host or client): `set_ready(bool)`, `set_creature(id)`, `set_team(team)`,
 `set_spectator(bool)`, `send_chat(text)`, `vote(index)`, `set_input_enabled(bool)` (neutral input
@@ -332,7 +388,8 @@ while a menu overlay is open; online matches never pause). **Host only**: `host_
 (rules, arena, bots, bot_difficulty, rules_override) -> error text, `host_start()` -> error text,
 `host_kick(id, reason)`.
 
-**LAN**: `start_lan_discovery(port := 7779)`, `stop_lan_discovery()`, `lan_sessions()` ->
+**LAN**: `start_lan_discovery(port := 7779)` (`ERR_UNAVAILABLE` while the setting is off; starts by
+itself when it is switched on), `stop_lan_discovery()`, `is_lan_discovery_active()`, `lan_sessions()` ->
 [{name, address, port, players, max_players, spectators, max_spectators, password, dedicated,
 in_match, rules, arena, phase, game_version, compatible, incompatible_reason}].
 
@@ -366,18 +423,18 @@ soak); add `--soak-minutes 10` for the requirement-level soak:
 
 ```powershell
 $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
-& $g --headless --path game -- --test net                       # whole suite, 2-minute soak
-& $g --headless --path game -- --test net --soak-minutes 10     # whole suite, 10-minute soak
-& $g --headless --path game -- --test test_net_soak --soak-minutes 10   # soak only
+& $g --headless --path game --fixed-fps 120 -- --test net                    # whole suite, 2-minute soak
+& $g --headless --path game --fixed-fps 120 -- --test net --soak-minutes 10  # whole suite, 10-minute soak
+& $g --headless --path game --fixed-fps 120 -- --test test_net_soak --soak-minutes 10   # soak only
 ```
 
 | File | Covers |
 |---|---|
-| `test_net_codec.gd` | Writer/reader, bounds, quantization error, event codec round trip, 3000-buffer fuzz + every truncation, input clamping, remote-input redundancy/jitter buffer, payload sanitizer, beacons, reasons, password proof, config parser, rate limiter |
+| `test_net_codec.gd` | Writer/reader, bounds, quantization error, event codec round trip, 3000-buffer fuzz + every truncation, input clamping, remote-input redundancy/jitter buffer, payload sanitizer, beacons, reasons, password proof, config parser (incl. `server.mods`), package-list codec, content verdict over `Mods.compare`, assist clamping, rate limiter |
 | `test_net_playlist.gd` | Weight distribution (10 000 draws), distinct candidates, repeat avoidance + relaxation, vote/tie/no-vote rules, min players + bot fill, invalid entries/missing content messages, persistence, shipped playlists |
 | `test_net_snapshot.gd` | FK reconstruction vs live sim, snapshot sizes, roster generations, interpolation/teleport/generation switch, event scheduling, mirror driving the real FightHud |
-| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, timeout, LAN discovery |
-| `test_net_multiprocess.gd` | Independent processes: dedicated match (hits, KO, results, presenting client), rejections (password, full, protocol, build, content with package diff), damage injection, disconnect + rejoin, stdin console shutdown, TCP admin auth/kick/ban/shutdown, 80 +- 20 ms / 2 % loss match, listen host + remote client + app round trip, bonus modes (Chum Rush, Absolute Unit), LAN discovery, playlist rotation + votes + invalid entries + restart persistence |
+| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, timeout, LAN discovery, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (+ clamp, `LQ_ASSIST`), live network settings + invite text |
+| `test_net_multiprocess.gd` | Independent processes: dedicated match (hits, KO, results, presenting client), rejections (password, full, protocol, build, content refused on the client with Mods.compare wording), server mods (`server.mods` + client `--mods`, vanilla client refused, modded client plays the mod's preset, admin status lists packages), damage injection, disconnect + rejoin, stdin console shutdown, TCP admin auth/kick/ban/shutdown, 80 +- 20 ms / 2 % loss match, listen host (own `user:` rules preset sent in full to a guest without it, guest aim assist applied) + remote client + app round trip, bonus modes (Chum Rush, Absolute Unit), LAN discovery, playlist rotation + votes + invalid entries + restart persistence |
 | `test_net_parity.gd` | NetMatchScene handles every event MatchScene reacts to; reports event types without a codec id |
 | `test_net_server_examples.gd` | Example configs and the playlist template stay valid |
 | `test_net_measure.gd` | Bandwidth and server cost (duel, 8-fighter FFA) |
@@ -394,3 +451,5 @@ $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 * No host migration: when a listen host leaves, the session ends with a clear reason.
 * Rejoin tokens live in memory: a restarted client within the same game session can rejoin
   (`Net.rejoin()`), a restarted game cannot.
+* No in-game content download: players install missing mods themselves (the join error names
+  them); rules presets and arenas need none (sent in full).

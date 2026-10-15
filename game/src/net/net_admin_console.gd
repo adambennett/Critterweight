@@ -92,6 +92,7 @@ func _status(server: NetServer) -> String:
 		float(s["physics_frame_max_ms_avg"]), float(s["net_ms_avg"])])
 	lines.append("traffic out %.1f KB/s in %.1f KB/s | snapshot %.0f B avg | mem %.1f MB | objects %d nodes %d orphans %d" % [
 		float(s["out_kbps"]), float(s["in_kbps"]), float(s["snapshot_bytes_avg"]), float(s["mem_static_mb"]), s["objects"], s["nodes"], s["orphans"]])
+	lines.append("content %s | packages %s" % [s["content_hash"], ", ".join(PackedStringArray(s["packages"]))])
 	return "\n".join(lines)
 
 

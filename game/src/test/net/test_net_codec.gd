@@ -316,6 +316,91 @@ mystery = 1
 	check_eq(str(d["password"]), "", "open by default but documented")
 
 
+func test_package_list_codec() -> void:
+	var pk := [{"id": "core", "version": "1.0.0", "hash": "", "client_only": false},
+		{"id": "moon_rules", "version": "1.0.0", "hash": "ab".repeat(32), "client_only": false},
+		{"id": "fancy_hats", "version": "2.1.0", "hash": "cd".repeat(32), "client_only": true}]
+	var w := NetWriter.new(NetProtocol.S_CHALLENGE)
+	NetProtocol.write_packages(w, pk)
+	var r := NetReader.new(w.data(), 1)
+	var back := NetProtocol.read_packages(r)
+	check(r.ok and r.expect_end(), "package list decodes exactly")
+	check_eq(back, pk, "package list round trip (id, version, hash, client_only)")
+	var many: Array = []
+	for i in 80:
+		many.append({"id": "mod_%d" % i, "version": "1.0.0", "hash": "", "client_only": false})
+	var w2 := NetWriter.new(NetProtocol.S_CHALLENGE)
+	NetProtocol.write_packages(w2, many)
+	check_eq(NetProtocol.read_packages(NetReader.new(w2.data(), 1)).size(), NetProtocol.MAX_PACKAGES, "capped at MAX_PACKAGES")
+	var bad := w.data()
+	bad[1] = 200
+	var r3 := NetReader.new(bad, 1)
+	check(NetProtocol.read_packages(r3).is_empty() and not r3.ok, "count over the limit is refused")
+	var cut := w.data().slice(0, 40)
+	var r4 := NetReader.new(cut, 1)
+	check(NetProtocol.read_packages(r4).is_empty() and not r4.ok, "truncated list is refused")
+
+
+## MOD-05: the join verdict over Mods.compare() is symmetric and explains itself in UI lines.
+func test_content_verdict() -> void:
+	var mine := Content.package_list()
+	var same := NetProtocol.content_verdict(Mods.compare(mine), mine, true)
+	check(bool(same["ok"]) and (same["details"] as Array).is_empty(), "identical packages join")
+	var theirs := mine.duplicate(true)
+	theirs.append({"id": "moon_rules", "version": "1.0.0", "hash": "ab".repeat(32), "client_only": false})
+	var v1 := NetProtocol.content_verdict(Mods.compare(theirs), theirs, false)
+	check(not bool(v1["ok"]), "host has a mod we lack: refused")
+	check_eq(v1["missing"], ["moon_rules"])
+	check(str(v1["details"]).contains("Missing mod: moon_rules 1.0.0"), "Mods.compare wording: %s" % str(v1["details"]))
+	var cosmetic := mine.duplicate(true)
+	cosmetic.append({"id": "fancy_hats", "version": "2.1.0", "hash": "cd".repeat(32), "client_only": true})
+	check(bool(NetProtocol.content_verdict(Mods.compare(cosmetic), cosmetic, true)["ok"]), "client_only packages never block")
+	var core_v := str(mine[0]["version"])
+	# synthetic Mods.compare results: same-version hash differences pass only with equal gameplay hashes
+	var hash_cmp := {"compatible": false, "missing": [], "extra": [], "mismatched": ["core"],
+		"messages": ["Different version of core: you have %s, the host has %s" % [core_v, core_v]]}
+	var v2 := NetProtocol.content_verdict(hash_cmp, [{"id": "core", "version": core_v}], true)
+	check(bool(v2["ok"]), "same version, different package files, same gameplay: allowed")
+	check_eq(v2["hash_only"], ["core"])
+	var v3 := NetProtocol.content_verdict(hash_cmp, [{"id": "core", "version": core_v}], false)
+	check(not bool(v3["ok"]), "...but not when the gameplay hash differs")
+	check(str(v3["details"]).contains("Your copy of core") and not str(v3["details"]).contains("Different version of core"),
+		"explained as a modified copy: %s" % str(v3["details"]))
+	var ver_cmp := {"compatible": false, "missing": [], "extra": [], "mismatched": ["core"],
+		"messages": ["Different version of core: you have %s, the host has 9.9.9" % core_v]}
+	var v4 := NetProtocol.content_verdict(ver_cmp, [{"id": "core", "version": "9.9.9"}], false)
+	check(not bool(v4["ok"]) and v4["mismatched"] == ["core"], "different versions block")
+	var v5 := NetProtocol.content_verdict(Mods.compare(mine), mine, false)
+	check(not bool(v5["ok"]) and str(v5["details"]).contains("gameplay files differ"), "same lists, different gameplay hash: refused with an explanation")
+
+
+func test_assist_level_on_the_wire() -> void:
+	check_eq(NetProtocol.assist_from_byte(NetProtocol.assist_to_byte(0.5)), 0.5)
+	check_eq(NetProtocol.assist_from_byte(NetProtocol.assist_to_byte(1.8)), 1.8)
+	check_eq(NetProtocol.assist_from_byte(255), NetProtocol.MAX_ASSIST, "a forged level is clamped to the setting's maximum")
+	check_eq(NetProtocol.assist_to_byte(-3.0), 0)
+	var lvl := NetProtocol.local_assist()
+	check(lvl in NetProtocol.ASSIST_LEVELS.values(), "local setting maps to a known level (%.2f)" % lvl)
+
+
+func test_server_mods_config() -> void:
+	var res := NetServerConfig.parse_text("[server]
+mods = moon_rules, rust_bucket ,moon_rules
+mods_dir = C:/srv/mods
+", "m.cfg")
+	check((res["errors"] as Array).is_empty(), "mods keys parse: %s" % str(res["errors"]))
+	check_eq(NetServerConfig.mod_ids(res["cfg"]), ["moon_rules", "rust_bucket"], "ids trimmed, order kept, duplicates dropped")
+	check_eq(str(res["cfg"]["mods_dir"]), "C:/srv/mods")
+	var bad := NetServerConfig.parse_text("[server]
+mods = Moon Rules!
+", "b.cfg")
+	check(str(bad["errors"]).contains("not a mod id"), "invalid mod id refused: %s" % str(bad["errors"]))
+	var c := NetServerConfig.defaults()
+	var errs: Array[String] = []
+	NetServerConfig.apply_cli(c, PackedStringArray(["--server", "--mods", "moon_rules"]), errs)
+	check_eq(NetServerConfig.mod_ids(c), ["moon_rules"], "--mods on the command line")
+
+
 func test_rate_limiter() -> void:
 	var rl := NetRateLimiter.new(10.0, 5.0)
 	var ok := 0

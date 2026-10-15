@@ -54,6 +54,11 @@ func run(args: PackedStringArray) -> int:
 			Log.e("server", "config: " + e)
 		printerr("Server configuration is invalid; not starting. Fix the errors above.")
 		return 2
+	var mod_err := _apply_mods()
+	if mod_err != "":
+		Log.e("server", "mods: " + mod_err)
+		printerr("Server mods could not be loaded; not starting. %s" % mod_err)
+		return 2
 	Engine.physics_ticks_per_second = int(cfg["tick_rate"])
 	Engine.max_fps = int(cfg["tick_rate"])
 	Engine.max_physics_steps_per_frame = 8
@@ -82,6 +87,40 @@ func run(args: PackedStringArray) -> int:
 		", password protected" if str(cfg["password"]) != "" else ""])
 	_write_status("running")
 	return 0
+
+
+## Servers load exactly the mods their configuration names (server.mods / --mods), from
+## server.mods_dir (--mods-dir) when given, else from the user mods folder of this server's data
+## directory - never a player's mod set. Mods are data only (docs/MODDING.md). Returns "" or why
+## the configured set cannot be loaded (the server then refuses to start).
+func _apply_mods() -> String:
+	var want := NetServerConfig.mod_ids(cfg)
+	var dir := str(cfg.get("mods_dir", ""))
+	if dir != "":
+		if not DirAccess.dir_exists_absolute(dir):
+			return "server.mods_dir '%s' does not exist" % dir
+		Mods.use_root(dir)
+	var have: Array = Mods.load_order.duplicate()
+	var sorted_want: Array = []
+	sorted_want.append_array(want)
+	sorted_want.sort()
+	have.sort()
+	if dir != "" or sorted_want != have:
+		var res := Mods.enable_only(want)
+		if not (res["missing"] as Array).is_empty():
+			return "not installed in %s: %s" % [Mods.mods_dir(), ", ".join(PackedStringArray(res["missing"]))]
+	var problems: Array[String] = []
+	for id in want:
+		if not Mods.load_order.has(id):
+			var why: Array = Mods.load_report.get(id, [])
+			problems.append("%s (%s)" % [id, "; ".join(PackedStringArray(why)) if not why.is_empty() else ("safe mode" if Mods.safe_mode else "not loaded")])
+	if not problems.is_empty():
+		return "cannot load: %s" % ", ".join(PackedStringArray(problems))
+	var pk: Array[String] = []
+	for p in Content.package_list():
+		pk.append("%s %s%s" % [p["id"], p["version"], " (client only)" if bool(p["client_only"]) else ""])
+	Log.i("server", "content: %s; gameplay hash %s" % [", ".join(PackedStringArray(pk)), Content.content_hash().substr(0, 12)])
+	return ""
 
 
 func _load_playlist(ref: String) -> NetPlaylist:

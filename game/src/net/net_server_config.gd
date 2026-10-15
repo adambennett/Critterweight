@@ -11,7 +11,7 @@ class_name NetServerConfig
 ## (and ignored), invalid values are errors (the server refuses to start rather than silently
 ## running with something else). Values are plain data only: nothing in a config is executed.
 ## Command-line flags (--port, --name, --password, --max-players, --playlist, --log-level,
-## --admin-port, --admin-token) override the file.
+## --admin-port, --admin-token, --mods, --mods-dir, ...; see CLI) override the file.
 
 const SCHEMA := {
 	"server.name": {"t": "string", "def": "Critterweight Server", "max_len": 40},
@@ -30,6 +30,8 @@ const SCHEMA := {
 	"server.log_level": {"t": "enum", "def": "info", "opts": ["debug", "info", "warn", "error"]},
 	"server.kick_ban_seconds": {"t": "int", "def": 300, "min": 0, "max": 86400},
 	"server.stats_interval": {"t": "int", "def": 60, "min": 5, "max": 3600},
+	"server.mods": {"t": "string", "def": "", "max_len": 1024},
+	"server.mods_dir": {"t": "string", "def": "", "max_len": 260},
 	"match.playlist": {"t": "string", "def": "fight_night", "max_len": 260},
 	"match.bots": {"t": "bool", "def": true},
 	"match.bot_difficulty": {"t": "enum", "def": "regular", "opts": ["rookie", "regular", "pro", "champion"]},
@@ -50,6 +52,7 @@ const FLAT := {
 	"server.timeout": "timeout", "server.rejoin_grace": "rejoin_grace", "server.tick_rate": "tick_rate",
 	"server.snapshot_rate": "snapshot_rate", "server.log_level": "log_level",
 	"server.kick_ban_seconds": "kick_ban_seconds", "server.stats_interval": "stats_interval",
+	"server.mods": "mods", "server.mods_dir": "mods_dir",
 	"match.playlist": "playlist", "match.bots": "bots", "match.bot_difficulty": "bot_difficulty",
 	"match.lobby_time": "lobby_time", "match.results_time": "results_time",
 	"match.empty_behavior": "empty_behavior", "match.vote_candidates": "vote_candidates",
@@ -60,7 +63,8 @@ const CLI := {"--port": "server.port", "--name": "server.name", "--password": "s
 	"--max-players": "server.max_players", "--playlist": "match.playlist", "--log-level": "server.log_level",
 	"--admin-port": "admin.port", "--admin-token": "admin.token", "--bind": "server.bind",
 	"--discovery-port": "server.discovery_port", "--lobby-time": "match.lobby_time",
-	"--results-time": "match.results_time", "--empty": "match.empty_behavior"}
+	"--results-time": "match.results_time", "--empty": "match.empty_behavior", "--mods": "server.mods",
+	"--mods-dir": "server.mods_dir"}
 
 
 ## Flat config with every default.
@@ -206,6 +210,19 @@ static func _cross_check(cfg: Dictionary, errors: Array[String], warnings: Array
 		warnings.append("server.tick_rate = %d: combat is tuned and tested at 120 Hz; other rates change physics behaviour" % int(cfg["tick_rate"]))
 	if int(cfg["snapshot_rate"]) > int(cfg["tick_rate"]):
 		errors.append("server.snapshot_rate cannot exceed server.tick_rate")
+	for id in mod_ids(cfg):
+		if RegEx.create_from_string("^[a-z0-9_]{3,32}$").search(id) == null:
+			errors.append("server.mods: '%s' is not a mod id (3-32 lowercase letters, digits or _)" % id)
+
+
+## Mod ids named by server.mods ("id1, id2"), in order, without duplicates.
+static func mod_ids(cfg: Dictionary) -> Array[String]:
+	var out: Array[String] = []
+	for part in str(cfg.get("mods", "")).split(",", false):
+		var id := part.strip_edges()
+		if id != "" and not out.has(id):
+			out.append(id)
+	return out
 
 
 ## Re-validates a complete flat config (e.g. a listen-server config built from Settings).

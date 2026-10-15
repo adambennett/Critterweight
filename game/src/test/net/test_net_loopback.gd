@@ -315,3 +315,108 @@ func test_lan_discovery_inprocess() -> void:
 		check(bool(found["compatible"]), "same build is compatible")
 		check(bool(found["dedicated"]), "dedicated flag")
 	browser.stop()
+
+
+## A listen host whose match scene is removed by another path (a menu changing scenes) ends the
+## match for everyone with an aborted result instead of touching a freed simulation.
+func test_host_scene_removed_mid_match() -> void:
+	var port := _port()
+	check_eq(Net.host({"port": port, "player_name": "Hosty", "lan_discovery": false, "max_players": 4, "results_time": 2}), OK, "listen server up")
+	var c := _client(port, {"name": "Guest"})
+	check(await _until(func() -> bool: return c.state == NetClient.State.LOBBY, 6.0), "guest admitted")
+	check_eq(Net.host_start(), "", "host starts the match")
+	check(await _until(func() -> bool: return c.state == NetClient.State.MATCH and Net.server != null and Net.server.sim != null, 8.0), "match running")
+	var ended: Array = []
+	c.match_ended.connect(func(r: Dictionary) -> void: ended.append(r))
+	App.set_scene(null)
+	check(await _until(func() -> bool: return not ended.is_empty(), 4.0), "guest told the match ended")
+	if not ended.is_empty():
+		check(bool(ended[0].get("aborted", false)), "aborted result")
+	check(Net.is_session_active(), "the session itself continues")
+	check(await _until(func() -> bool: return c.state == NetClient.State.LOBBY, 6.0), "back in the lobby")
+	Net.leave()
+
+
+## MOD-05 authority: the server repeats the content check on hello, so a client that lies about
+## its packages (or skipped its own Mods.compare) is refused; client_only extras never block.
+func test_content_check_on_server_inprocess() -> void:
+	var port := _port()
+	_server(port)
+	var pk := Content.package_list()
+	var liar := _client(port, {"name": "Liar",
+		"test_packages": pk + [{"id": "phantom_mod", "version": "1.0.0", "hash": "ab".repeat(32), "client_only": false}]})
+	var f: Array = []
+	liar.failed.connect(func(r: Dictionary) -> void: f.append(r))
+	check(await _until(func() -> bool: return not f.is_empty(), 6.0), "server refused the hello")
+	if not f.is_empty():
+		check_eq(int(f[0]["code"]), NetProtocol.R_CONTENT)
+		check(str(f[0]["details"]).contains("phantom_mod 1.0.0"), "the extra package is named: %s" % str(f[0]["details"]))
+	var dandy := _client(port, {"name": "Dandy",
+		"test_packages": pk + [{"id": "fancy_hats", "version": "2.0.0", "hash": "cd".repeat(32), "client_only": true}]})
+	check(await _until(func() -> bool: return dandy.state == NetClient.State.LOBBY, 6.0), "client_only packages never block joining")
+	check(bool(dandy.content_check.get("ok", false)), "the client compared against the server's list first")
+	check_eq(dandy.server_packages.size(), pk.size(), "the challenge carried the server's package list")
+
+
+## A remote player's aim-assist setting travels with the join (and LQ_ASSIST) into the fighter
+## modifiers of the authoritative simulation; forged levels are clamped.
+func test_assist_reaches_server_fighter_inprocess() -> void:
+	var port := _port()
+	var server := _server(port)
+	var a := _client(port, {"name": "Steady", "assist": 1.8})
+	var b := _client(port, {"name": "Shaky", "assist": 9.0})
+	check(await _until(func() -> bool: return a.state == NetClient.State.LOBBY and b.state == NetClient.State.LOBBY, 8.0), "both admitted")
+	check(await _until(func() -> bool: return server.players.has(a.player_id) and server.players.has(b.player_id), 3.0), "players registered")
+	check_eq((server.players[a.player_id] as NetPlayer).assist, 1.8, "hello carried the assist level")
+	check_eq((server.players[b.player_id] as NetPlayer).assist, NetProtocol.MAX_ASSIST, "forged level clamped")
+	b.send_lobby(NetProtocol.LQ_ASSIST, 0.5)
+	check(await _until(func() -> bool: return is_equal_approx((server.players[b.player_id] as NetPlayer).assist, 0.5), 3.0), "LQ_ASSIST updates it")
+	a.send_lobby(NetProtocol.LQ_READY, true)
+	b.send_lobby(NetProtocol.LQ_READY, true)
+	check(await _until(func() -> bool: return server.sim != null and a.my_fighter >= 0 and b.my_fighter >= 0, 10.0), "match started")
+	if server.sim != null and a.my_fighter >= 0 and b.my_fighter >= 0:
+		check_eq(float(server.sim.fighters[a.my_fighter].mods.get("assist", -1.0)), 1.8, "fighter mods carry the player's assist")
+		check_eq(float(server.sim.fighters[b.my_fighter].mods.get("assist", -1.0)), 0.5, "updated level used for the match")
+
+
+## Settings > Network apply live: smoothing to the running replica, timeout to the connection,
+## LAN discovery to browsing and to the listen host's beacons; invite text for the host.
+func test_network_settings_apply_live() -> void:
+	var keys := ["network.interp", "network.timeout", "network.lan_discovery"]
+	var saved := {}
+	for k in keys:
+		saved[k] = Settings.get_value(k)
+	var port := _port()
+	var dport := 32950 + randi() % 40
+	Settings.set_value("network.lan_discovery", true, false, false)
+	check_eq(Net.host({"port": port, "player_name": "Hosty", "lan_discovery": true, "discovery_port": dport, "max_players": 4,
+		"password": "pw"}), OK, "listen server up")
+	check(Net.server.lan != null, "host announces on the LAN")
+	var inv := Net.invite_text()
+	check(inv.contains(":%d" % port) and inv.contains("password"), "invite line names the port and the password hint: %s" % inv)
+	check(Net.invite_text("example.org").contains("example.org:%d" % port), "invite with an explicit public address")
+	var c := _client(port, {"name": "Guest", "password": "pw"})
+	check(await _until(func() -> bool: return c.state == NetClient.State.LOBBY, 6.0), "guest admitted")
+	Settings.set_value("network.lan_discovery", false, false, false)
+	check(Net.server.lan == null, "switching LAN discovery off stops the host's beacons")
+	check_eq(Net.start_lan_discovery(dport), ERR_UNAVAILABLE, "browsing refused while the setting is off")
+	check(not Net.is_lan_discovery_active(), "no browser")
+	Settings.set_value("network.lan_discovery", true, false, false)
+	check(Net.server.lan != null, "switching it on resumes beacons")
+	check(Net.is_lan_discovery_active(), "browsing the UI asked for starts by itself")
+	Net.stop_lan_discovery()
+	Settings.set_value("network.timeout", 7, false, false)
+	check_eq(int(Net.server.cfg["timeout"]), 7, "host timeout follows the setting")
+	Net.leave()
+	# client side: the replica picks up the smoothing mode at once
+	var port2 := port + 5
+	_server(port2)
+	check_eq(Net.join("127.0.0.1", port2, "", {"name": "Joiner"}), OK, "joining")
+	check(await _until(func() -> bool: return Net.client != null and Net.client.state == NetClient.State.LOBBY, 6.0), "joined")
+	Settings.set_value("network.interp", "high", false, false)
+	check_eq(Net.client.replica.interp_mode, "high", "smoothing applied to the running connection")
+	Settings.set_value("network.timeout", 9, false, false)
+	check_eq(Net.client.transport.timeout_ms, 9000, "timeout applied to the running connection")
+	Net.leave()
+	for k in keys:
+		Settings.set_value(k, saved[k], false, false)

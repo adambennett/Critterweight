@@ -17,6 +17,7 @@ var tc: Node                       ## the running TestCase (for awaits)
 var root := ""                     ## per-test working folder
 var procs := {}                    ## pid -> {label, log, stdio, stderr, out, err}
 var base_port := 0
+var _spawned := {}                 ## label -> processes started with it
 
 
 func _init(test_case: Node, name_: String) -> void:
@@ -51,7 +52,11 @@ func path(rel: String) -> String:
 ## Spawns `game --headless --log-file .. -- <args> --user-root <root>/<label>`. `piped` = with
 ## stdin/stdout pipes (for console tests). Returns the pid (or -1).
 func spawn(label: String, args: Array, piped := false) -> int:
-	var logf := path("%s.engine.log" % label)
+	# a restarted process (same label) logs to a new file: on Windows the previous log can still be
+	# locked for a moment after its process exited, and stale lines must never be read as new
+	var n := int(_spawned.get(label, 0)) + 1
+	_spawned[label] = n
+	var logf := path("%s.engine.log" % label) if n == 1 else path("%s.%d.engine.log" % [label, n])
 	if FileAccess.file_exists(logf):
 		DirAccess.remove_absolute(logf)
 	var full := PackedStringArray(["--headless", "--log-file", logf, "--path", project_dir(), "--"])
@@ -177,8 +182,14 @@ func write_json(rel: String, data) -> String:
 static func read_json(p: String) -> Dictionary:
 	if not FileAccess.file_exists(p):
 		return {}
-	var v = JSON.parse_string(FileAccess.get_file_as_string(p))
-	return v if typeof(v) == TYPE_DICTIONARY else {}
+	var text := FileAccess.get_file_as_string(p)
+	if text.strip_edges() == "":
+		return {}
+	# JSON.parse() (unlike parse_string) stays quiet: a child may be rewriting the file right now
+	var j := JSON.new()
+	if j.parse(text) != OK:
+		return {}
+	return j.data if typeof(j.data) == TYPE_DICTIONARY else {}
 
 
 ## Waits until `pred.call(result_dict)` is true for the JSON file at `p` (or timeout).

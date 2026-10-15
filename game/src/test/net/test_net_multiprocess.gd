@@ -93,12 +93,44 @@ func test_handshake_rejections() -> void:
 		check_eq(int(fail.get("code", -1)), int(expect[n]), "%s rejected as %s (%s)" % [n, NetProtocol.reason_name(int(expect[n])), str(fail.get("message", ""))])
 		check(str(fail.get("title", "")) != "" and str(fail.get("message", "")) != "", "%s got a UI-ready reason" % n)
 		if n == "Modded":
-			check(str(fail.get("details", [])).contains("netcheck_mod 0.3.0") and str(fail.get("details", [])).contains("Not on the server"),
+			# refused on the client's side (Mods.compare against the challenge's package list)
+			check(str(fail.get("details", [])).contains("netcheck_mod 0.3.0") and str(fail.get("details", [])).contains("enabled but the host does not"),
 				"content mismatch lists the differing package: %s" % str(fail.get("details", [])))
+			check_eq(fail.get("mods", {}).get("extra", []), ["netcheck_mod"], "structured mod differences for the UI")
 		if n == "Newer":
 			check(str(fail.get("details", [])).contains("9.9.9"), "version mismatch shows both versions")
 	check(u.running(srv), "server unaffected by the rejected clients")
 	_no_child_errors([srv, first])
+
+
+## MOD-05 end to end: a dedicated server loads exactly the mods its config names (server.mods);
+## a client without them is refused on its own side with Mods.compare() wording and structured
+## lists for the UI; a client started with `--mods` (the same package) joins and plays the mod's
+## rules preset.
+func test_server_mods_and_join_compare() -> void:
+	u = U.new(self, "server_mods")
+	var port: int = u.base_port
+	var pl: String = u.playlist("moon.json", [{"rules": "moon_rules:moon_brawl", "arena": "the_gullet", "weight": 1,
+		"rules_override": {"round_time": 40}}])
+	var srv := await _start_server("srv", u.server_sections(port, {"server": {"mods": "moon_rules"},
+		"match": {"playlist": pl, "lobby_time": 3}}))
+	check(u.out(srv).contains("moon_rules 1.0.0"), "server log lists the loaded mod")
+	u.spawn("vanilla", u.client_args(port, "Vanilla", "idle", ["--quit-after", "20"]))
+	var rv: Dictionary = await u.wait_json(u.result_path("Vanilla"), _done, 25.0)
+	var fail: Dictionary = rv.get("failure", {})
+	check_eq(int(fail.get("code", -1)), NetProtocol.R_CONTENT, "client without the mod refused (%s)" % str(fail.get("message", "")))
+	check(str(fail.get("details", [])).contains("Missing mod: moon_rules 1.0.0"), "Mods.compare wording: %s" % str(fail.get("details", [])))
+	check_eq(fail.get("mods", {}).get("missing", []), ["moon_rules"], "structured: missing")
+	var modded: int = u.spawn("modded", u.client_args(port, "Moony", "aggressive", ["--mods", "moon_rules", "--ready",
+		"--stop-after-matches", "1", "--quit-after", "100"]))
+	var rm: Dictionary = await u.wait_json(u.result_path("Moony"), _done, 110.0)
+	check(bool(rm.get("connected", false)), "client with the same mod joined")
+	var ms: Array = rm.get("matches", [])
+	check(not ms.is_empty() and str(ms[0].get("rules_id", "")) == "moon_rules:moon_brawl", "played the mod's rules preset")
+	check_eq((rm.get("results", []) as Array).size(), 1, "match finished with a result")
+	var st: String = await u.admin(port + 1, ["AUTH " + U.admin_token(), "status"])
+	check(st.contains("moon_rules@1.0.0"), "admin status lists the packages: %s" % st.right(200))
+	_no_child_errors([srv, modded])
 
 
 func test_client_cannot_inject_damage() -> void:
@@ -244,12 +276,14 @@ func test_conditioner_profile_still_completes_match() -> void:
 func test_listen_host_with_remote_client() -> void:
 	u = U.new(self, "listen_host")
 	var port: int = u.base_port
+	# the host plays a rules preset it made itself ("user:..."): only it has that preset
 	var host: int = u.spawn("host", ["--net-client", "--net-host", "--port", port, "--name", "Hosty", "--script", "aggressive",
-		"--host-start-after-players", "2", "--rules", "duel", "--arena", "the_gullet", "--rounds", "1", "--round-time", "75",
-		"--stop-after-matches", "1", "--quit-after", "110", "--result", u.result_path("Hosty")])
+		"--host-start-after-players", "2", "--rules", "duel", "--user-rules", "Spicy Duel", "--arena", "the_gullet", "--rounds", "1",
+		"--round-time", "75", "--stop-after-matches", "1", "--quit-after", "110", "--result", u.result_path("Hosty")])
 	var r0: Dictionary = await u.wait_json(u.result_path("Hosty"), func(d: Dictionary) -> bool: return bool(d.get("connected", false)), 15.0)
 	check(bool(r0.get("connected", false)), "listen server up")
-	var g: int = u.spawn("guest", u.client_args(port, "Guest", "passive", ["--ready", "--app-request", "coop.hello", "--stop-after-matches", "1", "--quit-after", "110"]))
+	var g: int = u.spawn("guest", u.client_args(port, "Guest", "passive", ["--ready", "--app-request", "coop.hello", "--assist", "1.8",
+		"--stop-after-matches", "1", "--quit-after", "110"]))
 	var rg: Dictionary = await u.wait_json(u.result_path("Guest"), _done, 120.0)
 	var rh: Dictionary = await u.wait_json(u.result_path("Hosty"), _done, 20.0)
 	check_eq((rg.get("results", []) as Array).size(), 1, "remote client got the listen server's result")
@@ -263,6 +297,25 @@ func test_listen_host_with_remote_client() -> void:
 	check_eq(float(rg.get("my_health_min", -1.0)), 0.0, "remote fighter knocked out by the host")
 	check(str(rh.get("app_messages", [])).contains("coop.hello"), "host received the client's app request")
 	check(str(rg.get("app_messages", [])).contains("echo.coop_hello"), "client received the host's reply")
+	# user rules preset: sent in full, the guest never had it
+	var preset := str(rh.get("user_rules", {}).get("id", ""))
+	check(preset.begins_with("user:"), "host saved a user preset (%s)" % preset)
+	var gm: Array = rg.get("matches", [])
+	if not gm.is_empty():
+		check_eq(str(gm[0].get("rules_id", "")), preset, "match ran with the host's own preset")
+		check_eq(str(gm[0].get("rules_name", "")), "Spicy Duel", "full rules dictionary arrived")
+		check_eq(float(gm[0].get("damage_mult", 0.0)), 1.25, "custom values arrived")
+		check(not bool(gm[0].get("rules_known_here", true)), "the guest does not have that preset installed")
+	# aim assist of the remote player is part of its authoritative fighter
+	var guest_assist := -1.0
+	var host_assist := -1.0
+	for fm in rh.get("fighter_mods", []):
+		if str(fm.get("kind", "")) == "net":
+			guest_assist = float(fm.get("assist", -1.0))
+		elif str(fm.get("kind", "")) == "player":
+			host_assist = float(fm.get("assist", -1.0))
+	check_eq(guest_assist, 1.8, "guest's aim assist applied on the host")
+	check(host_assist in NetProtocol.ASSIST_LEVELS.values(), "host's own fighter uses its local setting (%.2f)" % host_assist)
 	_no_child_errors([host, g])
 
 

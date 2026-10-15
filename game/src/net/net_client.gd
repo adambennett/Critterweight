@@ -38,6 +38,8 @@ var server_dedicated := false
 var server_tick_rate := 120
 var motd := ""
 var joined_as_spectator := false
+var server_packages: Array = []     ## the server's package list from the challenge
+var content_check := {}             ## NetProtocol.content_verdict() result of the last challenge
 var lobby := {}
 var match_info := {}
 var my_fighter := -1
@@ -155,7 +157,8 @@ func _finish(reason: Dictionary, as_failure: bool) -> void:
 	_closed_emitted = true
 	var was := state
 	_end_match_presentation()
-	transport.close(NetProtocol.R_LEFT)
+	# a content refusal on our side tells the server why we never said hello (its log shows it)
+	transport.close(NetProtocol.R_CONTENT if int(reason.get("code", 0)) == NetProtocol.R_CONTENT else NetProtocol.R_LEFT)
 	if conditioner:
 		conditioner.stop()
 	_set_state(State.CLOSED)
@@ -372,21 +375,32 @@ func _on_challenge(r: NetReader) -> void:
 		_fail_now(NetProtocol.describe(NetProtocol.R_PROTOCOL, ["Server: game %s, network protocol %d" % [gv, proto],
 			"You: game %s, network protocol %d" % [NetProtocol.game_version(), my_proto]]))
 		return
+	r.u8()  # players (shown by LAN beacons; the lobby state follows)
+	r.u8()  # max players
+	var server_hash := r.text(80)
+	server_packages = NetProtocol.read_packages(r)
+	if not r.ok:
+		_fail_now(NetProtocol.describe(NetProtocol.R_VIOLATION, ["The server sent an invalid challenge (%s)." % r.error]))
+		return
+	# content check on our side first (Mods.compare wording for the join error), MOD-05
+	content_check = NetProtocol.content_verdict(Mods.compare(server_packages), server_packages, server_hash == Content.content_hash())
+	if not bool(content_check["ok"]):
+		var reason := NetProtocol.describe(NetProtocol.R_CONTENT, content_check["details"])
+		reason["mods"] = {"missing": content_check["missing"], "extra": content_check["extra"],
+			"mismatched": content_check["mismatched"], "modified": content_check["hash_only"]}
+		_fail_now(reason)
+		return
 	var w := NetWriter.new(NetProtocol.C_HELLO)
 	w.u16(my_proto)
 	w.text(str(opts.get("test_game_version", NetProtocol.game_version())), 32)
 	w.text(Content.content_hash(), 80)
-	var pkgs := Content.package_list()
-	var n := mini(pkgs.size(), 64)
-	w.u8(n)
-	for i in n:
-		w.text(str(pkgs[i]["id"]), 64)
-		w.text(str(pkgs[i]["version"]), 32)
+	NetProtocol.write_packages(w, opts.get("test_packages", Content.package_list()))
 	w.text(NetProtocol.clean_name(str(opts.get("name", Settings.get_value("network.player_name")))), 80)
 	w.blob(NetProtocol.password_proof(nonce, str(opts.get("password", ""))))
 	w.blob(token)
 	w.u8(1 if bool(opts.get("spectator", false)) else 0)
 	w.text(str(opts.get("creature", "")), 64)
+	w.u8(NetProtocol.assist_to_byte(float(opts.get("assist", NetProtocol.local_assist()))))
 	transport.send(1, NetProtocol.CH_CONTROL, w.data(), true)
 
 
@@ -528,6 +542,8 @@ func send_lobby(kind: int, value) -> void:
 			w.text(str(value), 64)
 		NetProtocol.LQ_TEAM:
 			w.i8(int(value))
+		NetProtocol.LQ_ASSIST:
+			w.u8(NetProtocol.assist_to_byte(float(value)))
 	transport.send(1, NetProtocol.CH_CONTROL, w.data(), true)
 
 

@@ -150,6 +150,34 @@ func set_playlist(p: NetPlaylist) -> void:
 	_lobby_dirty = true
 
 
+## Turns LAN beacons on/off while running (listen host: Settings > Network > LAN discovery).
+func set_lan_discovery(on: bool) -> Error:
+	cfg["lan_discovery"] = on
+	if not on:
+		if lan:
+			lan.stop()
+			lan = null
+			Log.i("net", "LAN announcements off")
+		return OK
+	if lan or not transport.is_open():
+		return OK
+	lan = NetLanDiscovery.new()
+	var err := lan.start_announcer(int(cfg["discovery_port"]))
+	if err != OK:
+		Log.w("net", "LAN discovery announcer unavailable")
+		lan = null
+		return err
+	_beacon_ms = 0
+	Log.i("net", "LAN announcements on")
+	return OK
+
+
+## Connection timeout in seconds (application heartbeat and ENet), applied immediately.
+func set_timeout(seconds: int) -> void:
+	cfg["timeout"] = clampi(seconds, 5, 60)
+	transport.set_timeout_ms(int(cfg["timeout"]) * 1000)
+
+
 ## Listen host: registers the local player (id 1) who plays through LocalPlayerInput.
 func add_local_player(player_name: String, creature_id := "") -> NetPlayer:
 	var p := NetPlayer.new()
@@ -337,6 +365,9 @@ func _on_connect(peer: int) -> void:
 	w.u8(flags)
 	w.u8(_count_players(false))
 	w.u8(int(cfg["max_players"]))
+	# v3: what the joining side compares with Mods.compare() before it says hello
+	w.text(Content.content_hash(), 80)
+	NetProtocol.write_packages(w, Content.package_list())
 	transport.send(peer, NetProtocol.CH_CONTROL, w.data(), true)
 
 
@@ -362,32 +393,33 @@ func _handle_hello(peer: int, data: PackedByteArray) -> void:
 	var r := NetReader.new(data, 1)
 	var proto := r.u16()
 	var gv := r.text(32)
+	# the rest of the layout depends on the protocol: check it before reading further
+	if r.ok and proto != NetProtocol.VERSION:
+		_reject(peer, NetProtocol.R_PROTOCOL, "server protocol %d, client protocol %d" % [NetProtocol.VERSION, proto],
+			["Server game version: %s" % NetProtocol.game_version(), "Your game version: %s" % gv])
+		return
 	var chash := r.text(80)
-	var npk := r.count(64)
-	var pkgs: Array = []
-	for i in npk:
-		var pid := r.text(64)
-		var pver := r.text(32)
-		pkgs.append({"id": pid, "version": pver})
+	var pkgs := NetProtocol.read_packages(r)
 	var pname := r.text(80)
 	var proof := r.blob(64)
 	var token := r.blob(32)
 	var flags := r.u8()
 	var creature := r.text(64)
+	var assist := NetProtocol.assist_from_byte(r.u8())
 	if not r.ok or not r.expect_end():
 		_reject(peer, NetProtocol.R_VIOLATION, "malformed hello (%s)" % r.error)
-		return
-	if proto != NetProtocol.VERSION:
-		_reject(peer, NetProtocol.R_PROTOCOL, "server protocol %d, client protocol %d" % [NetProtocol.VERSION, proto],
-			["Server game version: %s" % NetProtocol.game_version(), "Your game version: %s" % gv])
 		return
 	if gv != NetProtocol.game_version():
 		_reject(peer, NetProtocol.R_GAME_VERSION, "server runs %s, you run %s" % [NetProtocol.game_version(), gv],
 			["Server game version: %s" % NetProtocol.game_version(), "Your game version: %s" % gv])
 		return
-	if chash != Content.content_hash():
+	# authority check (the client already compared on its side; a modified one may not have)
+	var verdict := NetProtocol.content_verdict(Mods.compare(pkgs), pkgs, chash == Content.content_hash())
+	if not bool(verdict["ok"]):
 		_reject(peer, NetProtocol.R_CONTENT, "content differs", content_diff(pkgs))
 		return
+	if not (verdict["hash_only"] as Array).is_empty():
+		Log.i("net", "%s: package(s) %s differ only outside gameplay files; allowed" % [str(pend["addr"]), str(verdict["hash_only"])])
 	var addr := str(pend["addr"])
 	var clean := NetProtocol.clean_name(pname)
 	var ban := _ban_for(token, addr, clean)
@@ -410,6 +442,7 @@ func _handle_hello(peer: int, data: PackedByteArray) -> void:
 				break
 	if rejoin:
 		_pending.erase(peer)
+		rejoin.assist = assist
 		_bind_rejoin(rejoin, peer, addr)
 		return
 	var want_spectate := flags & 1 != 0
@@ -427,6 +460,7 @@ func _handle_hello(peer: int, data: PackedByteArray) -> void:
 	p2.peer = peer
 	p2.name = _unique_name(clean, p2.id)
 	p2.creature = _valid_creature(creature)
+	p2.assist = assist
 	p2.spectator = as_spectator
 	p2.slot = -1 if as_spectator else _free_slot()
 	p2.token = NetProtocol.random_bytes(NetProtocol.TOKEN_BYTES)
@@ -499,27 +533,34 @@ func _bind_rejoin(p: NetPlayer, peer: int, addr: String) -> void:
 		_send_match_start(p)
 
 
-## Human-readable explanation of a content mismatch (MOD-05).
+## Human-readable explanation of a content mismatch from the joining player's side (MOD-05),
+## used when the server refuses a hello (clients normally refuse first, with Mods.compare()).
+## Presentation-only (client_only) packages never count.
 func content_diff(client_pkgs: Array) -> Array:
 	var mine := {}
 	for p in Content.package_list():
-		mine[str(p["id"])] = str(p["version"])
+		if not bool(p.get("client_only", false)):
+			mine[str(p["id"])] = p
 	var theirs := {}
 	for p in client_pkgs:
-		theirs[str(p["id"])] = str(p["version"])
+		if typeof(p) == TYPE_DICTIONARY and not bool(p.get("client_only", false)):
+			theirs[str(p.get("id", ""))] = p
 	var lines: Array = []
 	var ids: Array = mine.keys()
 	ids.sort()
 	for id in ids:
+		var mv := str(mine[id]["version"])
 		if not theirs.has(id):
-			lines.append("Missing on your side: %s %s (the server uses it)" % [id, mine[id]])
-		elif str(theirs[id]) != str(mine[id]):
-			lines.append("Different version of %s: server %s, yours %s" % [id, mine[id], theirs[id]])
+			lines.append("Missing on your side: %s %s (the server uses it)" % [id, mv])
+		elif str(theirs[id].get("version", "")) != mv:
+			lines.append("Different version of %s: server %s, yours %s" % [id, mv, str(theirs[id].get("version", ""))])
+		elif str(mine[id].get("hash", "")) != "" and str(theirs[id].get("hash", "")) != "" and str(mine[id]["hash"]) != str(theirs[id]["hash"]):
+			lines.append("Your copy of %s %s differs from the server's (same version, different files)" % [id, mv])
 	var tids: Array = theirs.keys()
 	tids.sort()
 	for id in tids:
 		if not mine.has(id):
-			lines.append("Not on the server: %s %s (disable it to join)" % [id, theirs[id]])
+			lines.append("Not on the server: %s %s (disable it to join)" % [id, str(theirs[id].get("version", ""))])
 	if lines.is_empty():
 		lines.append("Same packages and versions, but their gameplay files differ (an installed package was modified). Reinstall the packages on both sides.")
 	return lines
@@ -717,6 +758,10 @@ func _handle_lobby(p: NetPlayer, data: PackedByteArray) -> void:
 			var s := r.boolean()
 			if r.expect_end():
 				set_spectator(p.id, s)
+		NetProtocol.LQ_ASSIST:
+			var a := r.u8()
+			if r.expect_end():
+				p.assist = NetProtocol.assist_from_byte(a)
 		_:
 			# host-only requests never come over the network (the listen host is local)
 			_violation(p, 2.0, "lobby request %d not allowed" % kind)
@@ -939,6 +984,8 @@ func send_app(target: int, type: String, payload: Dictionary) -> bool:
 
 func _on_peer_disconnected(peer: int, code: int) -> void:
 	if _pending.has(peer):
+		if code == NetProtocol.R_CONTENT:
+			Log.i("net", "%s did not join: their content differs (they compared before saying hello)" % str(_pending[peer]["addr"]))
 		_pending.erase(peer)
 		return
 	var pid := int(_peer_player.get(peer, 0))
@@ -1221,6 +1268,8 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 			p2.input = NetRemoteInput.new(p2.id, p2.name)
 			e["kind"] = "net"
 			e["source"] = p2.input
+			# the remote player's accessibility aim assist (MatchScene does this for local players)
+			e["mods"] = {"assist": p2.assist}
 		p2.fighter = i
 		fighters.append(e)
 	for b in n_bots:
@@ -1360,6 +1409,9 @@ func _viewers() -> Array:
 
 func _replicate() -> void:
 	if sim == null:
+		return
+	if not is_instance_valid(sim):
+		_lost_match_scene()
 		return
 	var changed := _check_roster()
 	if not changed.is_empty():
@@ -1501,6 +1553,27 @@ func _on_sim_finished(result: Dictionary) -> void:
 	_lobby_dirty = true
 	Log.i("net", "match %d finished: winner team %d%s" % [match_id, int(result.get("winner_team", -2)),
 		(" (aborted: %s)" % _aborting) if _aborting != "" else ""])
+	match_finished.emit(last_result)
+
+
+## Listen host: its MatchScene (and with it the simulation) was removed by something other than
+## Net (a menu changed scenes). End the match for everyone with an aborted result instead of
+## touching a freed simulation; the session continues in the lobby.
+func _lost_match_scene() -> void:
+	Log.w("net", "match %d: the host's match scene was removed; ending the match" % match_id)
+	sim = null
+	scene = null
+	if phase != PHASE_MATCH:
+		return
+	_aborting = "the host left the match"
+	last_result = {"match_id": match_id, "winner_team": -1, "aborted": true, "abort_reason": _aborting,
+		"entry": current_entry.duplicate(true), "players": {}, "next_in": int(cfg["results_time"]), "fighters": []}
+	phase = PHASE_RESULTS
+	phase_until = Time.get_ticks_msec() + int(cfg["results_time"]) * 1000
+	for v in _viewers():
+		_send_match_end_to(v)
+	_lobby_dirty = true
+	notice("The host left the match.")
 	match_finished.emit(last_result)
 
 
@@ -1719,7 +1792,15 @@ func status() -> Dictionary:
 		"objects": int(Performance.get_monitor(Performance.OBJECT_COUNT)),
 		"nodes": int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
 		"orphans": int(Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT)),
-		"playlist": playlist.id if playlist else "", "matches_played": playlist.matches_played if playlist else match_id}
+		"playlist": playlist.id if playlist else "", "matches_played": playlist.matches_played if playlist else match_id,
+		"content_hash": Content.content_hash().substr(0, 12), "packages": _package_labels()}
+
+
+func _package_labels() -> Array:
+	var out: Array = []
+	for p in Content.package_list():
+		out.append("%s@%s" % [p["id"], p["version"]])
+	return out
 
 
 func stats_line() -> String:

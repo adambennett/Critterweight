@@ -10,6 +10,7 @@ var name := "Rookie"
 var slot := -1                   ## lobby slot (0..max_players-1), -1 for spectators
 var team := -1                   ## requested team (-1 = automatic)
 var creature := ""
+var assist := 1.0                ## aim-assist multiplier from the player's settings (fighter mods)
 var ready := false
 var spectator := false
 var is_host := false

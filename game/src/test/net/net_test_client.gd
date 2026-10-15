@@ -15,6 +15,8 @@ extends Node
 ##   --test-protocol N --test-game-version X --net-test-mod <dir>   incompatible-build simulation
 ##   --net-latency ms --net-jitter ms --net-loss f       network conditioner
 ##   host only: --host-start-after-players N --rules id --arena id --bots n --rounds n --round-time s
+##   --user-rules <name>  host with a player-made rules preset (saved on this machine only, "user:...")
+##   --assist <f>         aim-assist multiplier sent with the join (default: from Settings)
 ##   --app-request <type>  send one app request once in the lobby (app channel test)
 
 const RESULT_EVERY_MS := 500
@@ -129,6 +131,8 @@ func _start_client() -> void:
 		opts["token"] = tok.hex_decode()
 	if args.has("--timeout"):
 		opts["timeout_s"] = int(arg("--timeout"))
+	if args.has("--assist"):
+		opts["assist"] = float(arg("--assist"))
 	Net.joined.connect(_on_joined)
 	Net.connection_failed.connect(_on_failed)
 	Net.disconnected.connect(_on_disconnected)
@@ -220,8 +224,11 @@ func _on_notice(t: String) -> void:
 
 
 func _on_match_starting(info: Dictionary) -> void:
+	var rules: Dictionary = info.get("rules", {})
 	(result["matches"] as Array).append({"match_id": info.get("match_id"), "you": info.get("you"), "rules_id": info.get("rules_id"),
 		"arena_id": info.get("arena_id"), "mode": info.get("mode"), "entry": info.get("entry", {}), "fighters": (info.get("fighters", []) as Array).size(),
+		"rules_name": str(rules.get("name", "")), "damage_mult": float(rules.get("damage_mult", 1.0)),
+		"rules_known_here": not Content.get_entry("rules", str(info.get("rules_id", ""))).is_empty(),
 		"t_ms": Time.get_ticks_msec() - started_ms})
 	_phase_fight_since = -1
 
@@ -366,6 +373,15 @@ func _start_host() -> void:
 			cfg[k] = arg("--" + k)
 	if args.has("--discovery-port"):
 		cfg["discovery_port"] = int(arg("--discovery-port"))
+	if args.has("--user-rules"):
+		# a player-made preset (MCH-06) exists only on this machine: hosting sends it in full
+		var base: Dictionary = Content.get_entry("rules", str(cfg.get("rules", "duel"))).duplicate(true)
+		base["name"] = arg("--user-rules")
+		base["damage_mult"] = 1.25
+		base.erase("override")
+		var saved := RulePresets.save(base)
+		result["user_rules"] = saved
+		cfg["rules"] = str(saved.get("id", ""))
 	var err := Net.host(cfg)
 	result["host_error"] = err
 	if err != OK:
@@ -393,6 +409,12 @@ func _start_host() -> void:
 func _on_host_match_started(info: Dictionary) -> void:
 	(result["matches"] as Array).append({"match_id": info.get("match_id"), "rules_id": info.get("rules_id"),
 		"arena_id": info.get("arena_id"), "fighters": (info.get("fighters", []) as Array).size(), "t_ms": Time.get_ticks_msec() - started_ms})
+	# fighter modifiers as the authoritative simulation applies them (aim assist of remote players)
+	if _server and _server.sim:
+		var mods: Array = []
+		for f in _server.sim.fighters:
+			mods.append({"name": f.display_name, "kind": f.controller_kind, "assist": float(f.mods.get("assist", 1.0))})
+		result["fighter_mods"] = mods
 	var me := Net.local_fighter()
 	if me >= 0 and _server.sim and script_name != "idle":
 		_server.sim.set_input_source(me, HostScript.new(script_name))

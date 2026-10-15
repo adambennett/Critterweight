@@ -41,10 +41,41 @@ var lan_browser: NetLanDiscovery = null
 var last_failure := {}
 var _state := "offline"
 var _rejoin := {}                 ## {address, port, token, name, until_ms}
+var _lan_wanted := false          ## the UI asked to browse (kept while the setting is off)
+var _lan_port := DISCOVERY_PORT
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	Settings.changed.connect(_on_setting_changed)
+
+
+## Network settings apply live (Settings > Network): smoothing and timeout to the running
+## connection, LAN discovery to browsing and to the listen host's announcements, aim assist to
+## the player's next matches.
+func _on_setting_changed(key: String, value) -> void:
+	match key:
+		"network.interp":
+			if client:
+				client.replica.interp_mode = str(value)
+		"network.timeout":
+			if client:
+				client.transport.set_timeout_ms(int(value) * 1000)
+			if role == "host" and server:
+				server.set_timeout(int(value))
+		"network.lan_discovery":
+			var on := bool(value)
+			if role == "host" and server:
+				server.set_lan_discovery(on)
+			if not on and lan_browser:
+				lan_browser.stop()
+				lan_browser = null
+				lan_sessions_changed.emit([])
+			elif on and _lan_wanted and lan_browser == null:
+				start_lan_discovery(_lan_port)
+		"access.target_assist":
+			if client:
+				client.send_lobby(NetProtocol.LQ_ASSIST, NetProtocol.local_assist())
 
 
 # =====================================================================================
@@ -395,6 +426,41 @@ func local_fighter() -> int:
 	return -1
 
 
+## This computer's IPv4 addresses other players could use, LAN addresses first (192.168.x,
+## 10.x, 172.16-31.x), then any others; loopback and link-local (169.254.x) are left out. The
+## public internet address is not known locally (it belongs to the router): see the invite help.
+func local_addresses() -> Array[String]:
+	var lan: Array[String] = []
+	var other: Array[String] = []
+	for a in IP.get_local_addresses():
+		var s := str(a)
+		if not s.is_valid_ip_address() or s.contains(":") or s.begins_with("127.") or s.begins_with("169.254."):
+			continue
+		var p := s.split(".")
+		var private := s.begins_with("10.") or s.begins_with("192.168.") or (p[0] == "172" and int(p[1]) >= 16 and int(p[1]) <= 31)
+		if private:
+			if not lan.has(s):
+				lan.append(s)
+		elif not other.has(s):
+			other.append(s)
+	lan.sort()
+	other.sort()
+	return lan + other
+
+
+## Copyable invite line for the session this machine hosts (Platform.invite_text), e.g. for a
+## chat or the clipboard. `address` defaults to the first LAN address; pass the public address
+## (or a host name) for internet play. "" when not hosting.
+func invite_text(address := "") -> String:
+	if not is_server() or server == null:
+		return ""
+	var addr := address
+	if addr == "":
+		var all := local_addresses()
+		addr = all[0] if not all.is_empty() else "127.0.0.1"
+	return Platform.invite_text(addr, int(server.cfg["port"]), str(server.cfg["password"]) != "")
+
+
 ## Live diagnostics: RTT, loss, snapshot rate, bytes/s, interpolation, server tick cost...
 func stats() -> Dictionary:
 	var s := {"role": role, "state": _state}
@@ -529,9 +595,17 @@ func broadcast_app(type: String, payload: Dictionary = {}) -> bool:
 # LAN discovery (browser side; servers announce themselves when lan_discovery is on)
 # =====================================================================================
 
+## Starts listening for LAN beacons. Honours Settings > Network > LAN discovery: while it is off
+## this returns ERR_UNAVAILABLE (and status_changed says so), and browsing starts by itself when
+## the setting is switched on again (until stop_lan_discovery()).
 func start_lan_discovery(port := DISCOVERY_PORT) -> Error:
+	_lan_wanted = true
+	_lan_port = port
 	if lan_browser:
 		return OK
+	if not bool(Settings.get_value("network.lan_discovery")):
+		status_changed.emit("LAN discovery is off (Settings > Network)")
+		return ERR_UNAVAILABLE
 	lan_browser = NetLanDiscovery.new()
 	var err := lan_browser.start_listener(port)
 	if err != OK:
@@ -541,9 +615,14 @@ func start_lan_discovery(port := DISCOVERY_PORT) -> Error:
 
 
 func stop_lan_discovery() -> void:
+	_lan_wanted = false
 	if lan_browser:
 		lan_browser.stop()
 	lan_browser = null
+
+
+func is_lan_discovery_active() -> bool:
+	return lan_browser != null and lan_browser.is_listening()
 
 
 ## [{name, address, port, players, max_players, spectators, max_spectators, password,

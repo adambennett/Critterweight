@@ -61,7 +61,6 @@ const SCHEMA := [
 	{"key": "network.max_players", "cat": "network", "t": "int", "def": 4, "min": 2, "max": 8, "step": 1, "label": "Max players (hosting)", "help": ""},
 	{"key": "network.password", "cat": "network", "t": "string", "def": "", "max_len": 32, "label": "Session password", "help": "Players must enter it to join your session. Empty = open."},
 	{"key": "network.lan_discovery", "cat": "network", "t": "bool", "def": true, "label": "LAN discovery", "help": "Announce/see sessions on the local network."},
-	{"key": "network.allow_downloads", "cat": "network", "t": "enum", "def": "ask", "opts": ["ask", "never"], "label": "Content downloads", "help": "Whether servers may offer missing arenas/presets/mods (you always confirm each one)."},
 	{"key": "network.interp", "cat": "network", "t": "enum", "def": "auto", "opts": ["auto", "low", "high"], "label": "Network smoothing", "help": "Low = less delay but more jitter on bad connections."},
 	{"key": "network.timeout", "cat": "network", "t": "int", "def": 10, "min": 5, "max": 60, "step": 1, "label": "Connection timeout (s)", "help": ""},
 	{"key": "diag.show_fps", "cat": "diagnostics", "t": "bool", "def": false, "label": "Show FPS", "help": ""},
