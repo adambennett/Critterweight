@@ -15,6 +15,7 @@ var stats := {
 	"health": 100.0, "walk_speed": 3.4, "side_speed": 0.0, "accel": 26.0, "turn_rate": 9.0,
 	"stamina": 100.0, "stamina_regen": 12.0, "poise": 60.0, "poise_regen": 15.0,
 	"dodge_distance": 2.8, "dodge_time": 0.3, "power": 1.0, "defense": 1.0, "weight": 1.0,
+	"dodge_side_distance": 0.0,   ## > 0: dash length of a sideways dodge (crabs); see Fighter.dodge_distance_now
 }
 var moves := {}                 ## slot -> MoveDef (plus any extra ids used by abilities)
 var abilities := {}             ## slot -> MoveDef (kind "ability") with cooldown
