@@ -202,11 +202,11 @@ static func from_dict(d, expect_creature := "") -> Dictionary:
 		return res
 	var p := PolicyData.new()
 	p.id = _str_field(dd, "id", 96, errors)
-	if p.id != "" and not RegEx.create_from_string(ID_REGEX).search(p.id):
+	if p.id != "" and not Schema.full_match(ID_REGEX, p.id):
 		errors.append("invalid id '%s' (letters, digits, _ . : - only)" % p.id)
 	p.name = _str_field(dd, "name", 64, errors).strip_escapes()
 	p.creature = _str_field(dd, "creature", 96, errors)
-	if p.creature != "" and not RegEx.create_from_string(ID_REGEX).search(p.creature):
+	if p.creature != "" and not Schema.full_match(ID_REGEX, p.creature):
 		errors.append("invalid creature id '%s'" % p.creature)
 	p.created = _str_field(dd, "created", 40, errors, false)
 	p.updated = _str_field(dd, "updated", 40, errors, false)

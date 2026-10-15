@@ -637,8 +637,8 @@ func _refresh_run_detail(full: bool) -> void:
 	var rs := LabManager.run_state(_run_dir, st, pr)
 	var state := str(rs["state"])
 	var kind := str(job.get("kind", ""))
-	var t := "[b]%s[/b]  [color=%s]%s[/color]\n" % [str(job.get("name", "")) if str(job.get("name", "")) != "" else str(job.get("id", "")), LabUi.state_color(state), state.to_upper()]
-	t += "%s · %s · seed %d\n" % [str(LabJob.KIND_NAMES.get(kind, kind)), str(job.get("creature", "")), int(job.get("seed", 0))]
+	var t := "[b]%s[/b]  [color=%s]%s[/color]\n" % [LabUi.esc(job.get("name", "")) if str(job.get("name", "")) != "" else LabUi.esc(job.get("id", "")), LabUi.state_color(state), state.to_upper()]
+	t += "%s · %s · seed %d\n" % [LabUi.esc(LabJob.KIND_NAMES.get(kind, kind)), LabUi.esc(job.get("creature", "")), int(job.get("seed", 0))]
 	if kind in ["es", "bc"]:
 		t += "Objective: %s · scenario: %s\n" % [str((job.get("objective", {}) as Dictionary).get("preset", "")), str((job.get("scenario", {}) as Dictionary).get("preset", ""))]
 	if not pr.is_empty():
@@ -659,7 +659,7 @@ func _refresh_run_detail(full: bool) -> void:
 	if silent > 0.0 and state in ["running", "paused", "starting"]:
 		t += "\n[i]No report for %d s: the worker process is alive but waiting for CPU (a low-priority worker yields to other programs on a busy PC).[/i]\n" % int(silent)
 	if str(st.get("message", "")) != "":
-		t += "\n[i]%s[/i]\n" % str(st["message"])
+		t += "\n[i]%s[/i]\n" % LabUi.esc(st["message"])
 	if _run_info.text != t:   # re-laying out rich text is the expensive part: only on change
 		_run_info.text = t
 	_btn_pause.disabled = state != "running"
@@ -753,11 +753,11 @@ func _report_text(rep: Dictionary) -> String:
 		t += "%s\n" % LabEval.one_line(rep["target"])
 		t += _per_opponent(rep["target"])
 		if rep.has("compare"):
-			t += "Comparison (%s): %s\n" % [str(rep.get("compare_label", "")), LabEval.one_line(rep["compare"])]
+			t += "Comparison (%s): %s\n" % [LabUi.esc(rep.get("compare_label", "")), LabEval.one_line(rep["compare"])]
 	if rep.has("samples") and rep.has("dataset"):
-		t += "Recorded %d samples into %s\n" % [int(rep["samples"]), str(rep["dataset"]).get_file()]
+		t += "Recorded %d samples into %s\n" % [int(rep["samples"]), LabUi.esc(str(rep["dataset"]).get_file())]
 	if str(rep.get("policy_id", "")) != "":
-		t += "\nSaved policy: [b]%s[/b]" % str(rep["policy_id"])
+		t += "\nSaved policy: [b]%s[/b]" % LabUi.esc(rep["policy_id"])
 	return t
 
 
@@ -766,7 +766,7 @@ func _per_opponent(s: Dictionary) -> String:
 	for o: Dictionary in s.get("per_opponent", []):
 		var dd: Dictionary = o["damage_dealt"]
 		var dt: Dictionary = o["damage_taken"]
-		t += "  vs %s: win %.0f%% (n=%d) · damage dealt %.1f ± %.1f · taken %.1f ± %.1f\n" % [str(o["name"]), 100.0 * float(o["win_rate"]), int(o["n"]),
+		t += "  vs %s: win %.0f%% (n=%d) · damage dealt %.1f ± %.1f · taken %.1f ± %.1f\n" % [LabUi.esc(o["name"]), 100.0 * float(o["win_rate"]), int(o["n"]),
 			float(dd["mean"]), float(dd["std"]), float(dt["mean"]), float(dt["std"])]
 	return t
 
@@ -931,27 +931,28 @@ func _show_policy() -> void:
 	for x: Dictionary in _pols:
 		if str(x.get("id", "")) == id:
 			s = x
+	# policy files come from mods, imports and the player: every field is escaped for BBCode
 	if not bool(s.get("valid", false)):
-		_pol_info.text = "[b]%s[/b]\n[color=#ff8a7a]This file cannot be used:[/color]\n%s" % [id, str(s.get("error", ""))]
+		_pol_info.text = "[b]%s[/b]\n[color=#ff8a7a]This file cannot be used:[/color]\n%s" % [LabUi.esc(id), LabUi.esc(s.get("error", ""))]
 		return
 	var p := PolicyLibrary.get_policy(id)
 	if p == null:
-		_pol_info.text = PolicyLibrary.last_error(id)
+		_pol_info.text = LabUi.esc(PolicyLibrary.last_error(id))
 		return
 	var tr := p.training
-	var t := "[b]%s[/b]   v%d   (%s)\n" % [p.name, p.version, p.source]
-	t += "id: %s\nfighter: %s · approach: %s · decisions: %s at %d Hz\n" % [p.id, p.creature, str(tr.get("approach", "?")), p.act_mode, p.decision_hz]
-	t += "network: MLP %s %s, %d parameters · obs %s / act %s\n" % [str(Array(p.net.hidden)), p.net.activation, p.param_count(), PolicyObs.VERSION, PolicyActions.VERSION]
-	t += "created %s · updated %s\n" % [p.created, p.updated]
+	var t := "[b]%s[/b]   v%d   (%s)\n" % [LabUi.esc(p.name), p.version, LabUi.esc(p.source)]
+	t += "id: %s\nfighter: %s · approach: %s · decisions: %s at %d Hz\n" % [LabUi.esc(p.id), LabUi.esc(p.creature), LabUi.esc(tr.get("approach", "?")), LabUi.esc(p.act_mode), p.decision_hz]
+	t += "network: MLP %s %s, %d parameters · obs %s / act %s\n" % [LabUi.esc(str(Array(p.net.hidden))), LabUi.esc(p.net.activation), p.param_count(), PolicyObs.VERSION, PolicyActions.VERSION]
+	t += "created %s · updated %s\n" % [LabUi.esc(p.created), LabUi.esc(p.updated)]
 	if p.description != "":
-		t += "[i]%s[/i]\n" % p.description
+		t += "[i]%s[/i]\n" % LabUi.esc(p.description)
 	if str(tr.get("approach", "")) == "bc" and tr.has("samples"):
 		t += "trained on %d recorded decisions (%s), %d epochs · %d test matches · %s wall time\n" % [int(tr["samples"]),
-			", ".join(PackedStringArray(tr.get("datasets", []))), int(tr.get("epochs", 0)), int(tr.get("episodes", 0)), LabUi.fmt_time(float(tr.get("wall_time_s", 0.0)))]
+			LabUi.esc(", ".join(PackedStringArray(tr.get("datasets", [])))), int(tr.get("epochs", 0)), int(tr.get("episodes", 0)), LabUi.fmt_time(float(tr.get("wall_time_s", 0.0)))]
 	elif tr.has("episodes"):
 		t += "trained on %d episodes, %.0f s simulated, %s wall time\n" % [int(tr["episodes"]), float(tr.get("sim_seconds", 0.0)), LabUi.fmt_time(float(tr.get("wall_time_s", 0.0)))]
 	if typeof(tr.get("objective")) == TYPE_DICTIONARY:
-		t += "objective: %s\n" % str((tr["objective"] as Dictionary).get("preset", ""))
+		t += "objective: %s\n" % LabUi.esc((tr["objective"] as Dictionary).get("preset", ""))
 	if typeof(tr.get("test_eval")) == TYPE_DICTIONARY:
 		var te: Dictionary = tr["test_eval"]
 		t += "\n[b]Held-out test evaluation[/b]\n  before training: %s\n  after training:  %s\n" % [LabEval.one_line(te.get("initial", {})), LabEval.one_line(te.get("trained", {}))]
@@ -959,7 +960,7 @@ func _show_policy() -> void:
 		var va: Dictionary = tr["val_accuracy"]
 		t += "\n[b]Imitation accuracy (held-out)[/b] move %.0f%% · button %.0f%% · both %.0f%%\n" % [100.0 * float(va.get("move", 0)), 100.0 * float(va.get("button", 0)), 100.0 * float(va.get("joint", 0))]
 	for w in PolicyLibrary.warnings_for(p):
-		t += "\n[color=#f0d070]%s[/color]" % w
+		t += "\n[color=#f0d070]%s[/color]" % LabUi.esc(w)
 	if p.source != "user":
 		t += "\n[color=#a8a0b0]Built-in policy: read-only (export it to make an editable copy).[/color]"
 	_pol_info.text = t
@@ -989,7 +990,7 @@ func _import_policy() -> void:
 		_set_status("Imported as %s%s" % [str(r["id"]), (" — " + w) if w != "" else ""])
 	else:
 		_set_status("Import refused: " + "; ".join(r["errors"]))
-		_pol_info.text = "[b]Import refused[/b]\n[color=#ff8a7a]%s[/color]" % "\n".join(r["errors"])
+		_pol_info.text = "[b]Import refused[/b]\n[color=#ff8a7a]%s[/color]" % LabUi.esc("\n".join(r["errors"]))
 		return
 	_refresh_policies()
 

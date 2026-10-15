@@ -3,6 +3,9 @@ extends Screen
 ## set, see validation problems with actionable text, grant consent for core overrides, import
 ## (file dialog, drag & drop, or the Downloads folder for controller users), export/share,
 ## uninstall, and manage named mod sets. Fully operable with a controller or mouse/keyboard.
+## Invariant: every mod-supplied string (name, author, description, ids, versions, file names,
+## errors, warnings, load reports) goes through esc() before it reaches the BBCode details panel,
+## so a package can never hide or fake the screen's own warnings.
 
 var _list: VBoxContainer
 var _details: RichTextLabel
@@ -86,6 +89,9 @@ func _build() -> void:
 	_notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_notice.text = "Mods are data-only packages: they never run code. Changes apply to new matches and runs right away. Online games need the same gameplay mods as the host; presentation-only mods never block joining."
 	_notice.modulate = Color(1, 1, 1, 0.75)
+	if Mods.sets_error != "":
+		_notice.text = Mods.sets_error
+		_notice.modulate = Color(1.0, 0.9, 0.6)
 	root.add_child(_notice)
 
 	var body := HBoxContainer.new()
@@ -154,7 +160,7 @@ func _build() -> void:
 	_file_dialog.filters = PackedStringArray(["*.critmod, *.zip ; Mod packages"])
 	_file_dialog.title = "Import a mod package"
 	_file_dialog.use_native_dialog = false
-	_file_dialog.file_selected.connect(_import_path)
+	_file_dialog.file_selected.connect(_import_file)
 	add_child(_file_dialog)
 
 
@@ -258,32 +264,43 @@ func _wire_focus() -> void:
 		t.focus_neighbor_bottom = t.get_path_to(toggles[i + 1]) if i + 1 < toggles.size() else t.get_path_to(_first_button)
 
 
+## Makes mod-supplied text inert in BBCode: "[" becomes the "[lb]" tag, so "[font_size=1]" or
+## "[color=#0000]" in a package's description is shown literally instead of being applied.
+static func esc(v) -> String:
+	return str(v).replace("[", "[lb]")
+
+
 func _show_details(id: String) -> void:
 	var info := Mods.info_of(id)
 	if info.is_empty():
-		_details.text = "[b]%s[/b]\n\nThis mod is part of the set \"%s\" but is not installed. Reinstall it to restore the set, or disable it here to remove it from the set. Nothing else was changed." % [id, Mods.active_set] if id != "" else ""
+		_details.text = "[b]%s[/b]\n\nThis mod is part of the set \"%s\" but is not installed. Reinstall it to restore the set, or disable it here to remove it from the set. Nothing else was changed." % [esc(id), esc(Mods.active_set)] if id != "" else ""
 		return
-	var t := "[font_size=28][b]%s[/b][/font_size]  %s\n" % [info["name"], info["version"]]
-	t += "[color=#aab]id[/color] %s   [color=#aab]by[/color] %s   [color=#aab]source[/color] %s\n\n" % [id, info["author"] if str(info["author"]) != "" else "unknown", {"example": "bundled example", "archive": str(info["path"]).get_file(), "folder": "folder " + str(info["path"]).get_file()}.get(str(info["kind"]), "?")]
+	var t := "[font_size=28][b]%s[/b][/font_size]  %s\n" % [esc(info["name"]), esc(info["version"])]
+	t += "[color=#aab]id[/color] %s   [color=#aab]by[/color] %s   [color=#aab]source[/color] %s\n\n" % [esc(id), esc(info["author"]) if str(info["author"]) != "" else "unknown", esc({"example": "bundled example", "archive": str(info["path"]).get_file(), "folder": "folder " + str(info["path"]).get_file()}.get(str(info["kind"]), "?"))]
 	if str(info["description"]) != "":
-		t += "%s\n\n" % info["description"]
-	t += "[color=#aab]Changes:[/color] %s\n" % (", ".join(info["kinds"]) if not (info["kinds"] as Array).is_empty() else "nothing recognised")
+		t += "%s\n\n" % esc(info["description"])
+	t += "[color=#aab]Changes:[/color] %s\n" % (esc(", ".join(info["kinds"])) if not (info["kinds"] as Array).is_empty() else "nothing recognised")
 	t += "[color=#aab]Multiplayer:[/color] %s\n" % ("presentation only — never blocks joining" if bool(info["client_only"]) else "gameplay — everyone in a match needs the same version")
 	var reqs: Array = (info["requires"] as Array).map(func(r): return "%s %s" % [r.get("id", "?"), r.get("version", "")] if typeof(r) == TYPE_DICTIONARY else str(r))
 	if not reqs.is_empty():
-		t += "[color=#aab]Requires:[/color] %s\n" % ", ".join(reqs)
+		t += "[color=#aab]Requires:[/color] %s\n" % esc(", ".join(reqs))
 	if not (info["capabilities"] as Array).is_empty():
-		t += "[color=#aab]Capabilities:[/color] %s\n" % ", ".join(info["capabilities"])
-	t += "[color=#aab]Size:[/color] %.1f KB in %d files   [color=#aab]hash[/color] %s\n" % [float(info["size"]) / 1024.0, int(info["files"]), str(info["hash"]).substr(0, 12)]
+		t += "[color=#aab]Capabilities:[/color] %s\n" % esc(", ".join(info["capabilities"]))
+	t += "[color=#aab]Size:[/color] %.1f KB in %d files   [color=#aab]hash[/color] %s\n" % [float(info["size"]) / 1024.0, int(info["files"]), esc(str(info["hash"]).substr(0, 12))]
 	if "replaces_core" in info["capabilities"]:
 		t += "\n[color=#ffbf4d]Replaces core content.[/color] Matches and runs using it are marked Modded; you are asked before it is enabled.\n"
 	for e in info["errors"]:
-		t += "\n[color=#ff6b5e]Problem:[/color] %s" % e
+		t += "\n[color=#ff6b5e]Problem:[/color] %s" % esc(e)
 	for w in info["warnings"]:
-		t += "\n[color=#ffbf4d]Note:[/color] %s" % w
+		t += "\n[color=#ffbf4d]Note:[/color] %s" % esc(w)
 	for e2 in Mods.load_report.get(id, []):
-		t += "\n[color=#ffbf4d]While loading:[/color] %s" % e2
+		t += "\n[color=#ffbf4d]While loading:[/color] %s" % esc(e2)
 	_details.text = t
+
+
+## The details text currently shown (tests and accessibility read-outs).
+func details_text() -> String:
+	return _details.text if _details else ""
 
 
 func _toggle(id: String, on: bool, toggle: CheckButton) -> void:
@@ -388,10 +405,10 @@ func _import_dialog() -> void:
 	_file_dialog.popup_centered_ratio(0.7)
 
 
-func _import_path(path: String, downgrade := false) -> void:
+func _import_file(path: String, downgrade := false) -> void:
 	var r := Mods.import_package(path, downgrade)
 	if not r["ok"] and bool(r.get("downgrade", false)):
-		_ask(str(r["message"]), [["Downgrade", func(): _import_path(path, true)], ["Cancel", func(): pass]])
+		_ask(str(r["message"]), [["Downgrade", func(): _import_file(path, true)], ["Cancel", func(): pass]])
 		return
 	if not r["ok"]:
 		var errs: Array = r.get("errors", [])
@@ -404,7 +421,7 @@ func _import_path(path: String, downgrade := false) -> void:
 
 func _on_files_dropped(files: PackedStringArray) -> void:
 	for f in files:
-		_import_path(f)
+		_import_file(f)
 
 
 ## Controller-friendly import: lists packages sitting in the user Downloads/packages folders.
@@ -423,7 +440,7 @@ func _import_from_downloads() -> void:
 	var choices := []
 	for p in found.slice(0, 8):
 		var pp: String = p
-		choices.append([pp.get_file(), func(): _import_path(pp)])
+		choices.append([pp.get_file(), func(): _import_file(pp)])
 	choices.append(["Cancel", func(): pass])
 	_ask("Import which package?", choices)
 
