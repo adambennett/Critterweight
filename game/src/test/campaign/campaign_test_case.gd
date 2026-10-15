@@ -10,9 +10,22 @@ const STAND_IN := "dev_biped"
 var _cat: CampaignCatalog
 
 
+## Stand-in stats from ROSTER.md / ENEMIES_BOSSES.md so stand-in fights stay representative
+## (bosses get theirs from boss_fights/*.json standin_stats).
+const STANDIN_STATS := {
+	"f_stoke": {"health": 110, "walk_speed": 3.4, "poise": 60}, "f_dredge": {"health": 140, "walk_speed": 2.6, "poise": 90},
+	"f_gusto": {"health": 85, "walk_speed": 4.3, "poise": 40}, "f_dozer": {"health": 130, "walk_speed": 3.0, "poise": 85},
+	"f_slurry": {"health": 100, "walk_speed": 3.0, "poise": 55}, "f_jitters": {"health": 80, "walk_speed": 3.8, "poise": 45},
+	"npc_scrapling": {"health": 30, "walk_speed": 3.2, "poise": 20}, "npc_blister": {"health": 20, "walk_speed": 2.8, "poise": 10},
+}
+
+
 func cat() -> CampaignCatalog:
 	if _cat == null:
 		_cat = CampaignCatalog.new(Content, STAND_IN)
+		for id in STANDIN_STATS:
+			if not _cat.resolver.standin_stats.has(id):
+				_cat.resolver.standin_stats[id] = STANDIN_STATS[id]
 	return _cat
 
 

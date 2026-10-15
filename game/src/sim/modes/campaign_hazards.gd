@@ -12,7 +12,7 @@ extends RefCounted
 ## Every telegraphed hazard emits {"type": "hazard_telegraph", kind, pos, radius, shape, time}
 ## at least `telegraph` seconds before it acts (presentation draws the decal).
 
-var mode                          ## CampaignMatchMode
+var _mode_ref: WeakRef             ## CampaignMatchMode (weak: the mode owns this runner)
 var sim: MatchSim
 var defs := {}
 var list: Array = []              ## active hazards: {kind, def, next, state...}
@@ -24,7 +24,7 @@ var rng := RandomNumberGenerator.new()
 
 
 func _init(m, hazards: Array, hazard_defs: Dictionary) -> void:
-	mode = m
+	_mode_ref = weakref(m)
 	sim = m.sim
 	defs = hazard_defs
 	rng.seed = sim.seed_value * 7 + 3
@@ -43,7 +43,7 @@ func add(h: Dictionary) -> void:
 	var every := float(def.get("every", 0.0))
 	var e := {"kind": kind, "def": def, "next": sim.time + (every * 0.6 if every > 0.0 else 0.0), "state": {}, "setup": false}
 	list.append(e)
-	if mode._bell_done:
+	if _mode()._bell_done:
 		_setup_static(e)
 
 
@@ -71,6 +71,10 @@ static func _has_num(arr: Array, v: int) -> bool:
 		if int(x) == v:
 			return true
 	return false
+
+
+func _mode():
+	return _mode_ref.get_ref() if _mode_ref else null
 
 
 func radius() -> float:
@@ -135,7 +139,7 @@ func tick(dt: float) -> void:
 		if sim.time < float(pk["ready_at"]):
 			continue
 		for f: Fighter in sim.fighters:
-			if f.is_out() or mode.is_parked(f):
+			if f.is_out() or _mode().is_parked(f):
 				continue
 			var pp: Vector3 = pk["pos"]
 			if Vector2(f.pos().x - pp.x, f.pos().z - pp.z).length() <= float(pk["radius"]):
@@ -159,9 +163,9 @@ func _later(t: float, fn: Callable, args: Array) -> void:
 func _random_fighter_pos(prefer_party := true) -> Vector3:
 	var cands := []
 	for f: Fighter in sim.fighters:
-		if f.is_out() or mode.is_parked(f):
+		if f.is_out() or _mode().is_parked(f):
 			continue
-		if prefer_party and not mode.is_party(f):
+		if prefer_party and not _mode().is_party(f):
 			continue
 		cands.append(f)
 	if cands.is_empty() and prefer_party:
@@ -225,7 +229,7 @@ func _continuous(e: Dictionary, dt: float) -> void:
 			var until := float(e["state"].get("pull_until", -1.0))
 			if sim.time < until:
 				for f: Fighter in sim.fighters:
-					if f.is_out() or mode.is_parked(f) or f.flags.get("boss", false):
+					if f.is_out() or _mode().is_parked(f) or f.flags.get("boss", false):
 						continue
 					var to := -f.pos()
 					to.y = 0.0
@@ -241,14 +245,14 @@ func _continuous(e: Dictionary, dt: float) -> void:
 			if t >= float(d.get("tick", 1.0)):
 				t = 0.0
 				for f2: Fighter in sim.fighters:
-					if f2.is_out() or mode.is_parked(f2) or _on_block(f2):
+					if f2.is_out() or _mode().is_parked(f2) or _on_block(f2):
 						continue
 					f2.statuses.add_buildup("brine", float(d.get("buildup", 15.0)), null)
 			e["state"]["t"] = t
 		"juice_vat":
 			var r := float(d.get("radius", 2.5))
 			for f3: Fighter in sim.fighters:
-				if f3.is_out() or mode.is_parked(f3):
+				if f3.is_out() or _mode().is_parked(f3):
 					continue
 				if Vector2(f3.pos().x, f3.pos().z).length() <= r:
 					f3.hype = clampf(f3.hype + float(d.get("hype_per_s", 15.0)) * dt, 0.0, 100.0)
@@ -291,7 +295,7 @@ func _magnet_start(d: Dictionary) -> void:
 
 func _wind(dir: Vector3, d: Dictionary) -> void:
 	for f: Fighter in sim.fighters:
-		if f.is_out() or mode.is_parked(f):
+		if f.is_out() or _mode().is_parked(f):
 			continue
 		var k := float(d.get("winded_mult", 2.0)) if f.statuses.has_element("gale") else 1.0
 		f.rig.apply_body_impulse(dir * float(d.get("push", 1.5)) * 2.0 * k * f.rig.total_mass * f.statuses.mult("push_taken"))

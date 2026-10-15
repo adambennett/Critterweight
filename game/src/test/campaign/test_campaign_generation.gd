@@ -11,8 +11,11 @@ func test_same_seed_same_card() -> void:
 
 
 func test_seed_text_round_trip() -> void:
-	for s in [1, 777, 123456789012345, RunRng.derive(5, "x")]:
+	for s in [1, 777, 123456789012345, RunRng.normalize_seed(RunRng.derive(5, "x")), RunRng.fresh_seed()]:
 		check_eq(RunRng.text_to_seed(RunRng.seed_to_text(s)), s, "seed text round trip for %d" % s)
+		check(s <= RunRng.SEED_MASK, "run seeds fit in 53 bits")
+		var back = JSON.parse_string(JSON.stringify({"seed": s}, "", false, true))
+		check_eq(int(back["seed"]), s, "a run seed survives a JSON round trip exactly")
 	check(RunRng.text_to_seed("hello world") != 0, "free text seeds hash to a seed")
 	check_eq(RunRng.text_to_seed("hello world"), RunRng.text_to_seed("hello world"), "free text seeds are stable")
 

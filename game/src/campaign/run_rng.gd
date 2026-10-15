@@ -14,6 +14,14 @@ extends RefCounted
 const FNV_OFFSET := 2166136261
 const FNV_PRIME := 16777619
 const SEED_ALPHABET := "0123456789ABCDEFGHJKMNPQRSTVWXYZ"   ## Crockford-ish base32, no I/L/O/U
+## Run seeds are stored in JSON (saves, party tickets), whose numbers are doubles: keep them
+## within 53 bits so they survive every round trip exactly.
+const SEED_MASK := (1 << 53) - 1
+
+
+static func normalize_seed(s: int) -> int:
+	var v := s & SEED_MASK
+	return v if v != 0 else 1
 
 var rng := RandomNumberGenerator.new()
 
@@ -40,40 +48,40 @@ static func stream(seed_value: int, key: String) -> RunRng:
 	return r
 
 
-## Human-friendly seed text ("7F3A-91C2-0B44-D1E"), and its parser. Arbitrary text is hashed so
+## Human-friendly seed text ("7F3A-91C2-0B4"), and its parser. Arbitrary text is hashed so
 ## players can type words as seeds.
 static func seed_to_text(seed_value: int) -> String:
-	var v: int = seed_value & 0x7FFFFFFFFFFFFFFF
+	var v: int = seed_value & SEED_MASK
 	var out := ""
-	for i in 13:
+	for i in 11:
 		out = SEED_ALPHABET[v & 31] + out
 		v = v >> 5
-	return "%s-%s-%s-%s" % [out.substr(0, 4), out.substr(4, 3), out.substr(7, 3), out.substr(10, 3)]
+	return "%s-%s-%s" % [out.substr(0, 4), out.substr(4, 4), out.substr(8, 3)]
 
 
 static func text_to_seed(text: String) -> int:
 	var t := text.strip_edges().to_upper().replace("-", "").replace(" ", "")
 	if t == "":
 		return 0
-	# 13 symbols carry 65 bits; only texts produced by seed_to_text (top symbol < 8) round-trip
-	var ok := t.length() < 13 or (t.length() == 13 and SEED_ALPHABET.find(t[0]) >= 0 and SEED_ALPHABET.find(t[0]) < 8)
+	var ok := t.length() <= 11
 	var v := 0
-	for ch in t:
-		var d := SEED_ALPHABET.find(ch)
-		if d < 0:
-			ok = false
-			break
-		v = (v << 5) | d
 	if ok:
-		return v & 0x7FFFFFFFFFFFFFFF
-	return derive(0, "text:" + text.strip_edges())
+		for ch in t:
+			var d := SEED_ALPHABET.find(ch)
+			if d < 0:
+				ok = false
+				break
+			v = (v << 5) | d
+	if ok and v > 0 and v <= SEED_MASK:
+		return v
+	return normalize_seed(derive(0, "text:" + text.strip_edges()))
 
 
 ## A new random seed for a fresh run (not reproducible by design).
 static func fresh_seed() -> int:
 	var r := RandomNumberGenerator.new()
 	r.randomize()
-	return ((r.randi() & 0x7FFFFFFF) << 32) | r.randi()
+	return normalize_seed(((r.randi() & 0x7FFFFFFF) << 32) | r.randi())
 
 
 # ---------------------------------------------------------------------------------------------

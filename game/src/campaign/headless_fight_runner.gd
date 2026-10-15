@@ -10,7 +10,7 @@ extends RefCounted
 
 ## Returns the MatchSim result (with result["campaign"]); on the safety time cap the mode is
 ## asked for a decision so a run can never hang on a stalemate.
-static func run(host: Node, config: Dictionary, max_seconds := 420.0) -> Dictionary:
+static func run(host: Node, config: Dictionary, max_seconds := 420.0, is_paused: Callable = Callable()) -> Dictionary:
 	var sv := SubViewport.new()
 	sv.own_world_3d = true
 	sv.render_target_update_mode = SubViewport.UPDATE_DISABLED
@@ -22,9 +22,21 @@ static func run(host: Node, config: Dictionary, max_seconds := 420.0) -> Diction
 	sim.setup(config)
 	var dt := SimSpeed.step_dt()
 	var tree := host.get_tree()
+	var space := sv.world_3d.space if sv.world_3d else RID()
+	var frozen := false
 	while not sim.is_finished and sim.time < max_seconds:
+		var hold := is_paused.is_valid() and bool(is_paused.call())
+		if hold != frozen and space.is_valid():
+			# a real pause: the fight's own physics space stops stepping too
+			PhysicsServer3D.space_set_active(space, not hold)
+			frozen = hold
+		if hold:
+			await tree.physics_frame
+			continue
 		sim.step(dt)
 		await tree.physics_frame
+	if frozen and space.is_valid():
+		PhysicsServer3D.space_set_active(space, true)
 	var res: Dictionary = sim.result
 	if not sim.is_finished:
 		var m = sim.mode

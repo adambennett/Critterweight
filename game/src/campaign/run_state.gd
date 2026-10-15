@@ -45,8 +45,7 @@ static func new_player(catalog: CampaignCatalog, cfg: Dictionary, p: Dictionary,
 ##       players: [{id, name, profile_id, fighter, meta, bot}], run_id, created_at}
 static func create(catalog: CampaignCatalog, cfg: Dictionary) -> Dictionary:
 	var seed_value := int(cfg.get("seed", 0))
-	if seed_value == 0:
-		seed_value = RunRng.fresh_seed()
+	seed_value = RunRng.fresh_seed() if seed_value == 0 else RunRng.normalize_seed(seed_value)
 	var players := []
 	var plist: Array = cfg.get("players", [])
 	for i in plist.size():
