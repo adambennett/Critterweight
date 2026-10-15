@@ -75,7 +75,18 @@ func on_enter(_p: Dictionary) -> void:
 	_report_once()
 	play_intro()
 	Profiles.profile_changed.connect(_update_record)
-	Audio.music("menu_theme", 1.0)
+	Audio.music(menu_track(), 1.0)
+
+
+## Menu music (docs/AUDIO.md): the fight-night poster theme; Title Night once the profile has
+## cleared a run.
+static func menu_track() -> String:
+	var records: Dictionary = Profiles.current.get("records", {})
+	var runs: Dictionary = records.get("runs", {})
+	for v in runs.values():
+		if v is Dictionary and int((v as Dictionary).get("clears", 0)) > 0:
+			return "title_night"
+	return "fight_night_poster"
 
 
 func _build() -> void:
