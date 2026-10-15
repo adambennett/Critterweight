@@ -105,8 +105,9 @@ for a few seconds, then everyone is back in the lobby. B leaves (asks first); wh
 lobby the session ends for everyone.
 
 **Co-op party runs** (host, in the lobby): *Start a new party run* deals an Off the Street run for the 2–4
-players who are not spectating, or pick a suspended party run and *Offer this run*; its members take their
-seats again (*Rejoin this run*) and the host starts it. The online party run currently plays the route
+players who are not spectating, or pick a suspended party run and *Offer this run*; the members take their
+seats (*Take my seat* for a new run, *Rejoin this run* for a suspended one, checked against their own save)
+and the host starts it. The online party run currently plays the route
 votes; the other campaign stops are played in the campaign screens, which do not run online party runs
 yet — the run waits and stays in everyone's party save.
 
