@@ -14,11 +14,51 @@ const NAMES := {
 static func display_name(kind: String) -> String:
 	if kind.begins_with("policy:"):
 		return "Policy " + kind.substr(7).get_file().trim_suffix(PolicyIO.EXT)
+	if kind.begins_with(BUILD_PREFIX):
+		return build_label(build_of(kind))
 	return str(NAMES.get(kind, kind))
 
 
 static func is_valid(kind: String) -> bool:
+	if kind.begins_with(BUILD_PREFIX):
+		return str(build_of(kind).get("fighter", "")) != ""
 	return BASELINES.has(kind) or kind.begins_with("policy:")
+
+
+# ---- your saved builds (the Cannery's Boiler Room Key) ------------------------------------------
+## "build:<json>" plays one of the profile's saved campaign builds (profile.campaign.saved_builds:
+## the fighter with the techniques and supplements it finished a run with) piloted by a bot of the
+## build's tier. The whole build travels inside the opponent kind, so jobs and worker processes
+## rebuild it exactly; LabEpisode composes the fighter with the campaign's BuildApplier.
+const BUILD_PREFIX := "build:"
+const BUILD_TIER := "pro"
+
+
+static func build_kind(build: Dictionary, tier := BUILD_TIER) -> String:
+	var b := {"fighter": str(build.get("fighter", "")), "techniques": (build.get("techniques", []) as Array).duplicate(),
+		"supplements": (build.get("supplements", []) as Array).duplicate(true), "victory": bool(build.get("victory", false)),
+		"dose": int(build.get("dose", 0)), "run_id": str(build.get("run_id", "")), "tier": tier}
+	return BUILD_PREFIX + JSON.stringify(b, "", true)
+
+
+static func build_of(kind: String) -> Dictionary:
+	if not kind.begins_with(BUILD_PREFIX):
+		return {}
+	var d = JSON.parse_string(kind.substr(BUILD_PREFIX.length()))
+	return d if typeof(d) == TYPE_DICTIONARY else {}
+
+
+static func build_label(b: Dictionary) -> String:
+	var fid := str(b.get("fighter", ""))
+	var tree := Engine.get_main_loop() as SceneTree
+	var content: Node = tree.root.get_node_or_null("Content") if tree != null else null
+	var nm := fid.trim_prefix("f_").capitalize()
+	if content != null:
+		nm = str((content.call("get_entry", "creatures", fid) as Dictionary).get("name", nm))
+	var how := "title" if bool(b.get("victory", false)) else "run"
+	var extras := (b.get("techniques", []) as Array).size() + (b.get("supplements", []) as Array).size()
+	var dose := int(b.get("dose", 0))
+	return "Your build: %s (%s%s, %d picks)" % [nm, how, (", Dose %d" % dose) if dose > 0 else "", extras]
 
 
 ## Builds the input source for an opponent kind. Returns null for an unknown kind.
@@ -37,6 +77,13 @@ static func create(kind: String, seed_value: int, c: CreatureDef) -> InputSource
 			if c != null:
 				bb.set_personality(c.ai)
 			return bb
+	if kind.begins_with(BUILD_PREFIX):
+		# a saved build is piloted by a shipped bot tier (`c` is the build's composed fighter)
+		var bt := str(build_of(kind).get("tier", BUILD_TIER))
+		var bb2 := BotBrain.new(bt if bt in ["rookie", "regular", "pro", "champion"] else BUILD_TIER, maxi(1, seed_value))
+		if c != null:
+			bb2.set_personality(c.ai)
+		return bb2
 	if kind.begins_with("policy:"):
 		var r := PolicyIO.read_file(kind.substr(7))
 		if r["ok"]:

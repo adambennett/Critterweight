@@ -270,7 +270,8 @@ func _start_lesson(i: int) -> void:
 	if scene != null:
 		fid = scene.call("player").creature.id
 	Profiles.save()
-	Tutorial.start(i, fid, func() -> void: Cannery.enter({"spot": "main_floor", "from": "tutorial"}))
+	# a plain route back (App screen "hub"), never a lambda: the tutorial keeps it in a static
+	Tutorial.start(i, fid, {"screen": "hub", "params": {"spot": "main_floor", "from": "tutorial"}})
 
 
 func _build_shop() -> void:

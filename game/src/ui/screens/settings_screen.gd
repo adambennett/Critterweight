@@ -38,7 +38,9 @@ func on_enter(p: Dictionary) -> void:
 	if _in_game:
 		var chip := UiTheme.panel("PanelChip")
 		chip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		chip.add_child(UiTheme.label("ONLINE MATCH — STILL RUNNING" if MatchFlow.is_online() else "MATCH PAUSED", "Value"))
+		# (opened over the Cannery hub: a local world whose clocks stop while a board is open)
+		var notice := "ONLINE MATCH — STILL RUNNING" if MatchFlow.is_online() else ("MATCH PAUSED" if MatchFlow.current_match() != null else "PAUSED")
+		chip.add_child(UiTheme.label(notice, "Value"))
 		header.add_child(chip)
 	var body: VBoxContainer = f["body"]
 	_tabs = TabStrip.new()

@@ -53,6 +53,7 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	# static Callables outliving their scripts crash the engine at exit
 	TutorialHook.launcher = Callable()
+	Tutorial.clear_exit_route()
 
 
 func _on_boot_screen(screen: String) -> void:

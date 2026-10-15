@@ -213,3 +213,77 @@ func test_injected_backend_is_used() -> void:
 	check(bool(sv.buy_upgrade("meta_heavy_bag").get("ok", false)), "purchase goes through the backend")
 	check_eq(fb.bought, ["meta_heavy_bag"], "the backend saw the purchase")
 	check(bool(sv.start_run({"fighter": "f_stoke"}).get("ok", false)), "run start goes through the backend")
+
+
+## Hub review #4: the Boiler Room Key (100 Clout at Teddy's ledger) does what it promises — the AI
+## Lab offers "My saved builds": your own campaign builds (fighter + techniques + supplements, saved
+## at the end of every run) as training opponents, piloted by a Pro bot.
+func test_boiler_room_key_trains_against_saved_builds() -> void:
+	var sv := _services(150)
+	var prof: Dictionary = state.profile
+	CampaignProgression.ensure_fields(prof)
+	var cat := CampaignCatalog.shared()
+	var tech := ""
+	for tid in cat.techniques:
+		if not ((cat.techniques[tid] as Dictionary).get("apply", {}) as Dictionary).is_empty():
+			tech = str(tid)
+			break
+	var sup := ""
+	for sid in cat.supplements:
+		if not (((cat.supplements[sid] as Dictionary).get("apply", {}) as Dictionary).get("mods", []) as Array).is_empty():
+			sup = str(sid)
+			break
+	check(tech != "" and sup != "", "the catalog has a technique and a supplement to build with")
+	prof["campaign"]["saved_builds"] = [{"run_id": "r1", "fighter": "f_dredge", "techniques": [tech], "supplements": [{"id": sup, "stacks": 1}],
+		"dose": 2, "victory": true, "variant": "fight_camp"}]
+	check(LabScenarios.saved_build_opponents(prof).is_empty(), "without the key the Lab offers no saved builds")
+	check(not LabScenarios.preset_ids_for(prof).has("my_builds"), "...and no 'My saved builds' scenario")
+	# bought at Teddy's ledger, through the hub's one adapter
+	check(bool(sv.buy_upgrade("meta_boiler_room_key").get("ok", false)), "the key is bought for 100 Clout")
+	check(LabScenarios.boiler_room_key(prof), "the profile holds the key")
+	var kinds := LabScenarios.saved_build_opponents(prof)
+	check_eq(kinds.size(), 1, "the saved build is a training opponent")
+	if kinds.is_empty():
+		return
+	var kind := str(kinds[0])
+	check(LabOpponents.is_valid(kind), "a valid Lab opponent")
+	check(LabOpponents.display_name(kind).contains("Dredge"), "named after its fighter (%s)" % LabOpponents.display_name(kind))
+	check(LabScenarios.preset_ids_for(prof).has("my_builds"), "the 'My saved builds' scenario is offered")
+	# a job against it is valid as written (what the Lab hands its worker processes)
+	var nj := LabJob.normalize({"creature": "f_stoke", "scenario": {"preset": "my_builds", "opponents": kinds}})
+	check((nj["errors"] as PackedStringArray).is_empty(), "the training job is valid (%s)" % "; ".join(nj["errors"]))
+	check_eq((nj["job"]["scenario"]["opponents"] as Array), kinds, "and keeps the build as its opponent")
+	# an episode against it fights the build: its fighter, with its picks applied
+	var comp := LabEpisode.compose_build(LabOpponents.build_of(kind))
+	check(comp.get("creature") != null, "the build composes into a fighter")
+	var sources: Array = comp.get("sources", [])
+	check(sources.has(tech) and sources.has(sup), "with its technique and supplement (%s)" % str(sources))
+	var ep := LabScenarios.episode(LabScenarios.PRESETS["my_builds"], kind, 11, "f_stoke", "f_stoke")
+	var e := LabEpisode.new()
+	var err := e.start(fresh_world(), {"i": 0, "episode": ep, "learner": {"type": "scripted", "kind": "idle"}}, null)
+	check_eq(err, "", "the episode starts")
+	if err == "":
+		check_eq(e.sim.fighters[1].creature.id, "f_dredge", "the opponent is the build's fighter")
+		var want: Dictionary = comp.get("mods", {})
+		for k in want:
+			check_near(float(e.sim.fighters[1].mods.get(k, -999.0)), float(want[k]), 0.0001, "with the build's %s" % k)
+		check(e.sim.input_sources[1] is BotBrain, "piloted by a bot")
+	# the Lab screen itself lists the scenario and the build (opened from the terminal)
+	if App.has_screen("lab"):
+		var old_profile := Profiles.current
+		Profiles.current = prof
+		App.push("lab", {"from_hub": true})
+		await wait_frames(4)
+		var lab := App.top_screen()
+		var texts := []
+		for n in lab.find_children("*", "", true, false):
+			if n is CheckBox:
+				texts.append((n as CheckBox).text)
+			elif n is OptionButton:
+				for i in (n as OptionButton).item_count:
+					texts.append((n as OptionButton).get_item_text(i))
+		check(texts.has("My saved builds"), "the Lab offers 'My saved builds'")
+		check(texts.has(LabOpponents.display_name(kind)), "and the build as an opponent to tick")
+		App.clear_screens()
+		Profiles.current = old_profile
+		await wait_frames(2)

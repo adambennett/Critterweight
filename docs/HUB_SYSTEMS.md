@@ -15,7 +15,7 @@ Code lives in `game/src/hub/**`, data in `game/content/core/hub/*.json`, tests i
 | `App.goto("hub", params)` | App screen `"hub"` (`ui/hub_entry_screen.gd`) defers to `Cannery.enter(params)`, so any menu can open the hub. |
 | Main menu → **Fight Camp** | `App.goto("hub", {"from": "menu"})`. |
 | Run summary (Fight Camp) → **BACK TO THE CANNERY** | `App.goto("hub", {"from": "run"})`; the run's result changes the time of day and adds a Wall of Fame photo. |
-| End of a spar / lesson / tape, leaving the Bookie's Table or the AI Lab | Back into the hub where you were (`from` = `spar`, `tutorial`, `tape`, `bookie`, `lab`). |
+| End of a spar / lesson / tape, leaving the Bookie's Table, the AI Lab or the campaign menu opened at the desk | Back into the hub where you were (`from` = `spar`, `tutorial`, `tape`, `bookie`, `lab`, `campaign`): a cage spar to the Main Floor, rooftop practice to the roof, a lesson to Granny's corner (`Tutorial.start(i, fighter, {"screen": "hub", "params": …})` — a plain route, never a stored lambda), the campaign menu to Snappington's desk. |
 | Command line | `godot --path game -- --hub [--hub-spot <space>] [--hub-fighter <id>] [--hub-demo <presets>] [--hub-board <board>] [--hub-cam-yaw <deg>] [--hub-pos x,y,z[,yaw]] [--hub-zoom <f>] [--hub-pitch <deg>] [--hub-juice]` |
 | `Cannery.leave()` | Saves and returns to the main menu (pause board → Leave the Cannery). |
 
@@ -101,6 +101,12 @@ The hub is a real `MatchSim` with the player's real fighter (rig, motor, fight c
   shoving you. Other NPCs are static colliders.
 - The mode emits `hub_*` events; `HubScene` turns them into boards, sounds, VFX and HUD — the mode
   never opens UI itself.
+- **Boards stop the clocks**: while any board or menu is open over the hub (PAUSED included)
+  `HubMode.frozen` holds the activities (a drill bucket can't hit you, a bag challenge can't run
+  out), the secrets' timers and Ludlow's round; what you carry stays in your hands.
+- **Match audio**: the hub attaches its own match audio bridge (footsteps, hits); a scene swap
+  starts the new scene before the old one is freed, so the hub and every match end only their OWN
+  audio (`Audio.end_match(sim)`) — a spar, lesson, the tape or a resumed campaign fight keeps theirs.
 
 After a board closes the fighter gets no input for 0.26 s of simulated time, so the B that closed a
 board never also grabs.
@@ -135,10 +141,10 @@ fighter per bag**).
 
 | Activity | Start | Rules | Rewards |
 |---|---|---|---|
-| Heavy Bag Score Challenge (`HubBagChallenge`) | the bag signs or Granny | 3 s countdown, 30 s. Every weapon hit on the bag is scored with the combat damage formula: move damage × (0.55 + 0.6 q) × (0.75 + 0.25 clean) × charge bonus, × 3 points, × 1.5 Heavy / × 2 Finisher, × combo (+0.1 per hit within 0.6 s, max × 2). Light bag: flat bonus, faster combo; Heavy bag: quality weighted; Body bag (Snappington-shaped): only head/shell zones count | 300 / 600 / 1000 → 10 / 25 / 50; Heavy 600 wakes the Scrapling (#3); Body 1000 → Granny's hint about #1 |
+| Heavy Bag Score Challenge (`HubBagChallenge`) | the bag signs or Granny | 3 s countdown, 30 s. Every weapon hit on the bag is scored with the combat damage formula: move damage × (0.55 + 0.6 q) × (0.75 + 0.25 clean) × charge bonus, × 3 points, × 1.5 Heavy / × 2 Finisher, × combo (+0.1 per hit within 0.6 s, max × 2). Light bag: flat bonus, faster combo; Heavy bag: quality weighted; Body bag (Snappington-shaped): only head/shell zones count | 300 / 600 / 1000 → 10 / 25 / 50 for the fighter who started it (a locker switch calls a running challenge off); Heavy 600 wakes the Scrapling (#3); Body 1000 → Granny's hint about #1 |
 | Chum Cannon Dodge Drill (`HubChumDrill`) | Ludlow's cannon sign | 45 s in the painted 4 × 4 m square; buckets are ballistic projectiles aimed at where you're heading, faster over time. Resolved with the real combat checks: dodge i-frames pass, a parry pops it (+5), a front guard blocks, else a hit costs 3 drill HP (never health) and the streak. Leaving the square or 0 drill HP ends it | streak 15 / 30 / 50 → 10 / 25 / 50; 50 unlocks the "Soaked" frame |
 | Crate Toss (`HubCrateToss`) | the crate pile | 10 crates, picked up with Grab and thrown from behind the line (Grab/Light toss, hold Heavy to heave). Where a crate first lands scores 5 / 10 / 20 (rings at 3 / 5 / 8 m); over the line is a foul | 30 / 60 / 100 → 10 / 25 / 50; 100 with Jitters → Ludlow's hint about #8 |
-| Ring Sparring (`HubSparring`) | Kid Lamprey or the cage gate | A real match in the shared `practice_cage` arena (`Tutorial.practice_cage()`): Kid Lamprey or any roster fighter, any bot tier, Spar (one round) or Practice (no KO, HUD telemetry), optional low gravity / hazards. Not recorded (`no_record`); back to the cage afterwards. Kid Lamprey fights with his own kit (`npc_kid_lamprey`) as soon as it parses cleanly for the campaign resolver (`HubSparring.kid_ready()`); until then a roster fighter stands in under his name | first win vs Kid at Contender: 25 Clout; a per-fighter "beat a Headliner" badge |
+| Ring Sparring (`HubSparring`) | Kid Lamprey or the cage gate | A real match in the shared `practice_cage` arena (`Tutorial.practice_cage()`): Kid Lamprey or any roster fighter, any bot tier, Spar (one round) or Practice (no KO, HUD telemetry), optional low gravity / hazards. Not recorded (`no_record`); back to the cage afterwards (rooftop practice: back on the roof). Launched through `MatchFlow`, so the pause menu's *Restart fight* restarts the spar and still walks back in; a practice dummy's tier is in the config (`dummy_behavior`/`dummy_tier`). Kid Lamprey fights with his own kit (`npc_kid_lamprey`) as soon as it parses cleanly for the campaign resolver (`HubSparring.kid_ready()`); until then a roster fighter stands in under his name | first win vs Kid at Contender: 25 Clout; a per-fighter "beat a Headliner" badge |
 | The Bookie's Table | Teddy | the campaign's autobattler screen (`bookie`) | as the campaign defines (Clout at 50%) |
 
 Also on the Main Floor: **Granny's corner → Lessons in the cage** (`Tutorial.start(index, fighter,
@@ -188,6 +194,11 @@ silhouettes) and Ludlow drops **one hint per visit** about the nearest unfound o
 | 9 `sec_boiler_face` | Ten **Scorch** hits on the boiler (other elements don't count) | Sizzle JUICE colour; Teddy's "don't do that again" |
 | 10 `sec_doc_dumpster` | Stand in the ice bath for 30 s (the screen frosts), then press A | Frozen Blister pet, 50 Clout |
 
+Props a secret needs never get lost: the letter A or an elevator part thrown off the roof or the
+pier (or left resting where nobody can reach it) goes back where it was found (`hub_item_returned`).
+Hidden items (the red button before the Scouting Report, the lid before the Scrapling drops it) are
+neither drawn nor solid until revealed.
+
 ## 8. HUD and boards
 
 `HubHud`: the space and time of day, Clout (animated gains), the activity panel (time, score/streak),
@@ -223,14 +234,21 @@ object with the same calls.
   one button away. The campaign's **development stand-ins** (a custom run, no records) are a developer
   tool: the sheet (like the campaign menu and the Bookie's Table) offers them only behind the dev flag
   (`CampaignFlow.dev_tools()`: `--dev`, `--campaign-stand-ins` or Settings → Diagnostics → Developer
-  tools) and only while some roster kit is still unusable. The Dosage row only offers Doses the
+  tools) and only while some roster kit is still unusable; a stand-in sheet gets its own services
+  object, so the stand-ins apply to that one sign-up only. The Dosage row only offers Doses the
   chosen difficulty takes (Sparring: the base card). A profile has ONE suspended Fight Camp run:
   while one is on file the sheet says so, and signing asks first (`HubServices.start_run` answers
   `{needs_confirm, suspended}` and starts nothing) — *Abandon it, sign new* (`replace_suspended`: the
   old run is credited as an abandoned defeat), *Resume it* (`HubServices.resume_run()`) or *Keep it*.
+  The campaign menu opened here (`from_hub`) says **BACK TO THE CANNERY** and walks back to the desk.
 - **Bookie's Table**: `App.goto("bookie", {from_hub})`; leaving the table walks you back to Teddy.
-- **AI Lab terminal**: `App.goto("lab", {from_hub, boiler_room_key})`; Back returns to the terminal.
-  Without the screen installed, Teddy says the terminal is dark.
+- **AI Lab terminal**: `App.goto("lab", {from_hub})`; Back returns to the terminal. Without the
+  screen installed, Teddy says the terminal is dark. The **Boiler Room Key** (100 Clout) adds the
+  Lab's *My saved builds* scenario: your own saved campaign builds as training opponents
+  (`LabScenarios.saved_build_opponents`, docs/AI_LAB.md §4). The Office's **Title Contender** (500
+  Clout) makes Fight Camp Dose clears count toward the Dosage cosmetics shared with Off the Street
+  (`CampaignProgression.title_contender`, docs/CAMPAIGN_SYSTEMS.md). No Cannery upgrade is a dead
+  purchase.
 - Needles' **shop preview** and Doc's **rest preview** read the campaign catalog (prices in Scrip);
   they are previews — buying happens on the run.
 
@@ -259,19 +277,20 @@ Building the hub takes ~10 ms (sim) + 0.2–0.35 s (view) on that machine.
 
 ## 12. Tests and evidence
 
-`godot --headless --path game --fixed-fps 120 -- --test test_hub_` — 54 tests:
+`godot --headless --path game --fixed-fps 120 -- --test test_hub_` — 70 tests:
 
 | File | Covers |
 |---|---|
 | `test_hub_geometry` | layout data consistency; **every space reachable on foot** (a real fighter walks the nav graph through all 11 spaces, taking stairs, hatch, ladders, elevator, pier ladder); walls/blockers hold; a thrown crate flies over the dock-edge blocker; stairs up/down |
 | `test_hub_interactions` | every interactable fires its event; **A interacts instead of dodging** (and still dodges in the open); carry/heave a crate; **the throw rule** for every roster fighter (kit's best throw / roster average × body factor) and its consequences (Dredge and Dozer out-heave Stoke, Stoke out-heaves Jitters, Stoke reaches the 8 m ring and Jitters only the 5 m one, a quick toss is short); hits on NPCs are shrugged off, nobody goes down; transitions and Fast walk |
-| `test_hub_activities` | bag points formula; bag challenge with real hits pays Clout tiers per fighter; chum drill counts dodges/guards/parries/hits; crate toss rings, tiers, foul, Jitters hint; sparring config |
-| `test_hub_secrets` | all ten secrets through their real triggers, Ludlow's one hint per visit, found secrets persisting into the world |
-| `test_hub_services` | every station lists its upgrades (24 at 6 stations, each with a world change); purchase flow spends Clout and respects gates; purchases change the world (12+ lights, 24 banner); run options/config; **run start hands over to the campaign's run screens**; **the Bookie's Table and the AI Lab open for real and return to the Boiler Room**; injected backend |
+| `test_hub_activities` | bag points formula; bag challenge with real hits pays Clout tiers per fighter; chum drill counts dodges/guards/parries/hits; crate toss rings, tiers, foul, Jitters hint; a bag tier belongs to the fighter who started it; sparring config |
+| `test_hub_secrets` | all ten secrets through their real triggers, Ludlow's one hint per visit, found secrets persisting into the world; the letter A and the parts come back when thrown off the roof/pier; hidden items are not solid |
+| `test_hub_services` | every station lists its upgrades (24 at 6 stations, each with a world change); purchase flow spends Clout and respects gates; purchases change the world (12+ lights, 24 banner); run options/config; **run start hands over to the campaign's run screens**; **the Bookie's Table and the AI Lab open for real and return to the Boiler Room**; **the Boiler Room Key trains against your saved builds** (Lab scenario, job, episode); injected backend |
 | `test_hub_wander` | **two minutes of scripted wandering with every roster fighter** (biped, crab, quadruped, avian, serpent, hopper; least-visited goals, hatch/ladder/elevator rides, fight buttons mashed at a player's pace): never below the floor, never off the map, never left down, no damage, no ring-out, rarely stuck (≤ 2 legs timed out, ≤ 8 waypoints given up on). `HUB_WANDER_ONLY=f_dredge` runs one |
 | `test_hub_cosmetics` | the locker's wearables on all six roster bodies and the dev biped: fitted to the forged model (vertices collected per segment; on the skin, rings hugging the body, nothing over the mouth), on the right part, following the body, no collision, lid and belt put away mid-round; the gold tooth pops as the gag piece; in a headless `MatchScene` only the profile owner is dressed, Sizzle recolours Stoke only, the frame wraps the owner's HUD card; frames on results and profile; the locker only offers what shows; the can shelf |
 | `test_hub_unlocks` | Rooftop full neon replaces the night look once unlocked (dead A before), Pier Night is a hidden Chum Rush look in the versus setup's Look row; Vintage Bellows calls matches when selected; dev stand-ins hidden in normal play; Kid Lamprey's real kit is picked up automatically |
 | `test_hub_ui` | the real `HubScene` via `Cannery.enter()`: **every board** (all stations, every NPC's conversation, map, locker, records, booth, run, spar, lessons, shop, rest, pause) opens with focus inside, D-pad moves it, **B closes back to walking** without grabbing; boards and HUD fit and read ≥ 18 px at 1280×800; Enter / pad A talk instead of dodging; the **first secret unlocks ach_confidant** |
+| `test_hub_flow` | the hub among the game's other scenes (real `HubScene`): **match audio survives every hub <-> match swap** (spar, tape, lesson, rooftop practice, a match started over the hub); lessons return by a plain route that quitting to the menu forgets; **boards freeze the hub's clocks**; *Restart fight* restarts the spar and still walks back in (the tape offers none); rooftop practice returns to the roof; the campaign menu from the desk goes back to it; the hub is not an online match; the pet's *None* hides it; a fighter switch calls a challenge off; dev stand-ins apply to one sign-up only |
 
 Screenshots (`docs/evidence/hub/`, captured with `--hub --hub-demo ... --capture`): every space,
 the secret Roof (night, sign fixed) and Pier, time-of-day and upgrade states, your banner after all
@@ -336,6 +355,13 @@ Sizzle, the profile screen's frame, the can shelf, Rooftop night vs full neon, P
 | `src/view/arena_set_dressing.gd`, `src/view/arena_view.gd`, `content/core/arenas/arena_rooftop.json`, `arena_drydock.json` | per-letter GLANDCO sign (dead A unless `sign_full`), the neon border; Drydock night sky; the `night_neon` and `pier_night` variants | the two arena variants |
 | `src/audio/audio.gd`, `content/core/announcer/barnaby_vintage.json` (new) | announcer line packs (`pack` lines, `set_announcer_pack`, profile `announcer_pack` read at `begin_match`) | Vintage Bellows in matches |
 | `src/campaign/campaign_flow.gd`, `src/campaign/ui/campaign_menu_screen.gd`, `src/campaign/ui/bookie_screen.gd`, `src/persist/settings.gd` | `CampaignFlow.dev_tools()`; stand-in switches behind it; `diag.dev_tools` setting | dev stand-ins hidden in normal play |
+| `src/audio/audio.gd` (`end_match(owner_sim)`), `src/app/match_scene.gd` | a leaving scene ends only its own match audio | spars, lessons, the tape and resumed fights started from the hub keep their audio; the hub keeps its own after them |
+| `src/tutorial/tutorial.gd`, `src/app/main.gd`, `src/ui/match_flow.gd` | `Tutorial.start(…, exit_to)` takes a plain route (`_exit_route`, cleared by `clear_exit_route()` in `main.gd` `_exit_tree` and `MatchFlow.quit_to_menu`) | no lambda in a static: quitting during a hub lesson crashed the engine |
+| `src/ui/match_flow.gd`, `src/app/app.gd`, `src/ui/screens/pause_menu.gd` | `MatchFlow.launch(cfg, on_finished)`, `MatchFlow.restart()` (the match keeps its `on_finished` as node meta) | *Restart fight* restarts a hub spar and still returns to the hub |
+| `src/ui/match_flow.gd` (`is_online`), `src/ui/screens/settings_screen.gd` | a scene that says `is_online() == false` (the hub) is not an online match; the in-game notice says PAUSED outside matches | Settings from the hub's pause board |
+| `src/campaign/ui/campaign_menu_screen.gd` | `from_hub`: BACK TO THE CANNERY | the campaign menu opened at the desk walks back to it |
+| `src/campaign/campaign_progression.gd` | `title_contender()`; Fight Camp Dose cosmetics need it | Title Contender did nothing |
+| `src/lab/lab_opponents.gd`, `lab_scenarios.gd`, `lab_episode.gd`, `lab/ui/lab_screen.gd` | `build:<json>` opponents (saved campaign builds, composed by `BuildApplier`), the *My saved builds* scenario with the Boiler Room Key | the Boiler Room Key did nothing |
 
 ## 16. What the locker unlocks, in the game
 
