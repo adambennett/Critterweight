@@ -491,16 +491,20 @@ scripted human client through the conditioner relay at 1 ms, whose counters see 
 
 | Scenario | Down per client | Up per client | Packets/s down / up | Snapshot | Sim logic per tick | Net per tick | Server CPU |
 |---|---|---|---|---|---|---|---|
-| Duel, 2 fighters | 7.6-8.5 KB/s (8.6-9.5 wire) | 4.1-5.0 KB/s (5.8-6.9 wire) | 37-38 / 61-71 | 233-259 B | 0.85-1.01 ms | 0.34-0.42 ms | 24-26 % of one core |
-| Free-for-all, 8 fighters | 18.2-22.1 KB/s (19.2-23.4 wire) | 4.8-4.9 KB/s (6.9-7.0 wire) | 38-46 / 76-77 | 689-701 B | 3.1-3.7 ms | 0.58-0.63 ms | 61-65 % of one core |
+| Duel, 2 fighters | 6.7-8.5 KB/s (7.7-9.5 wire) | 4.1-5.0 KB/s (5.8-6.9 wire) | 34-38 / 61-71 | 213-259 B | 0.68-1.01 ms | 0.23-0.42 ms | 22-27 % of one core |
+| Free-for-all, 8 fighters | 16.8-22.1 KB/s (17.8-23.4 wire) | 4.8-4.9 KB/s (6.9-7.0 wire) | 35-46 / 76-77 | 663-733 B | 2.9-3.7 ms (4.4 with the CPU saturated by parallel jobs) | 0.48-0.64 ms | 56-65 % of one core |
 
 * Downstream grows with fighters (a fighter's 13 segment rotations + vitals are most of a
   snapshot); upstream is flat (60 input packets/s, 4 samples each, plus pings and ENet acks).
-* The longest physics frame (simulation + Jolt step, average of the per-second maxima) was 8.2 ms
-  (duel) and 17.2 ms (8 fighters) on a quiet machine and 15-21 ms under the extra load.
+* The longest physics frame (simulation + Jolt step, average of the per-second maxima) was
+  2.5-8.2 ms (duel) and 15.6-28.1 ms (8 fighters); the upper ends are runs with other jobs
+  saturating the CPU.
 * **Server CPU target not met**: docs/DESIGN.md asks for < 35 % of one core with 8 fighters; the
-  server uses 61-65 %. Networking is about 0.6 ms of the 8.3 ms tick; the rest is the simulation
-  (fighter logic + physics), which is where optimisation has to happen.
+  server uses 56-65 %. Networking is about 0.5-0.6 ms of the 8.3 ms tick; the rest is the
+  simulation (fighter logic + physics), which is where optimisation has to happen.
+* `test_net_measure.gd` asserts bandwidth limits and that the 8-fighter server keeps real time
+  (simulation + networking under the 8.33 ms tick); the quiet-machine simulation figure is printed
+  as a reference, because parallel jobs on a shared machine inflate wall-clock tick times.
 
 **Snapshot encoding** (`test_net_snapshot.gd`): positions rebuilt by forward kinematics are within
 2 mm (1.96-1.99 mm) / 0.125 deg of the live simulation; snapshot bodies are 259 B with 2 fighters
@@ -508,7 +512,8 @@ and 889 B with 8 (13-segment test creature, every vital and status filled).
 
 **Smoothing and degraded links** (`test_net_multiprocess.gd`, adaptive interpolation): plain
 loopback duel 39-89 ms interpolation delay depending on machine load; packaged release builds
-(`tools/verify/net_session_check.ps1`) 30 snapshots/s and 49-90 ms; with the conditioner at
+(`tools/verify/net_session_check.ps1`, last run on fresh exports of the final tree: 7/7 steps,
+RTT 11 ms, 29.9 snapshots/s, 60 ms) 30 snapshots/s and 49-90 ms over all runs; with the conditioner at
 80 +- 20 ms one-way and 2 % loss: RTT max 180-250 ms, interpolation 80-116 ms, jitter p95 34-76 ms,
 about 2 % of packets dropped (as configured), 1-2 % of rendered frames starved - the match still
 completes with the correct result.
@@ -576,7 +581,7 @@ Also LOOPBACK on one PC.
   (`Net.rejoin()`), a restarted game cannot.
 * No in-game mod download: players install missing mods themselves (the join error names
   them); rules presets travel in full and player-made arenas as checked layout packages (§13).
-* Server CPU with 8 fighters is 61-65 % of one core (target < 35 %); the cost is the simulation,
+* Server CPU with 8 fighters is 56-65 % of one core (target < 35 %); the cost is the simulation,
   not networking (§15).
 * Co-op: the party message channel the campaign's `NetPartyTransport` needs is in place and
   tested between processes, but starting a co-op campaign run from an online lobby is not wired

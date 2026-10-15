@@ -28,7 +28,7 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | PERF-01 | Stable 60 fps combat at 1080p on the documented PC baseline (measured here: i7-7700K + RTX 4070 Ti SUPER); frame-time distribution recorded for busy scenes | — | |
 | PERF-02 | Deck-class preset for 1280x800 @ 60 fps; layout/readability checked at 1280x800; real Deck test = X | — | |
 | PERF-03 | Loading time and memory use measured | ~ | --boot-report: 7.7 s to title in the editor binary on a loaded machine; bench reports match load (~0.25 s) and memory; packaged quiet-machine numbers pending |
-| PERF-04 | Server simulation cost measured (8-fighter busy scene, playlist soak) | I T | test_net_measure (dedicated server, LOOPBACK, i7-7700K): duel 0.85-1.01 ms sim + 0.34-0.42 ms net per 120 Hz tick, 24-26 % of one core; 8-fighter FFA 3.1-3.7 ms sim + 0.58-0.63 ms net, 61-65 % of one core - the DESIGN.md target (< 35 %) is NOT met, the cost is the simulation; 10-minute playlist soak (test_net_soak) CPU and memory trends in NETWORKING.md §15 |
+| PERF-04 | Server simulation cost measured (8-fighter busy scene, playlist soak) | I T | test_net_measure (dedicated server, LOOPBACK, i7-7700K): duel 0.68-1.01 ms sim + 0.23-0.42 ms net per 120 Hz tick, 22-27 % of one core; 8-fighter FFA 2.9-3.7 ms sim (4.4 with the CPU saturated by parallel jobs) + 0.48-0.64 ms net, 56-65 % of one core - the DESIGN.md target (< 35 %) is NOT met, the cost is the simulation; 10-minute playlist soak (test_net_soak) CPU and memory trends in NETWORKING.md §15 |
 | PERF-05 | Quality presets scale expensive effects while keeping combat readable; benchmarks run at stated settings | — | |
 
 ## Combat & controls [6]
