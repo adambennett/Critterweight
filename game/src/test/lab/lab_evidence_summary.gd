@@ -16,7 +16,8 @@ func _initialize() -> void:
 		quit(2)
 		return
 	var runs := []
-	var pooled_gain := []
+	var pooled_gain := []        ## trained − initial of approach "es", one per job seed
+	var pooled_seeds := {}
 	for d in args[i + 1].split(";", false):
 		var dir := d.strip_edges().replace("\\", "/")
 		var rep := _json(dir.path_join("report.json"))
@@ -43,7 +44,11 @@ func _initialize() -> void:
 				r["reference"] = _brief(rep["reference"])
 				r["reference_kind"] = rep.get("reference_kind", "")
 				r["paired_reference"] = rep.get("paired_reference", {})
-			pooled_gain.append(float(r["trained"]["reward_mean"]) - float(r["initial"]["reward_mean"]))
+			r["approach"] = rep.get("approach", "")
+			if str(rep.get("approach", "")) == "es" and not pooled_seeds.has(int(job.get("seed", 0))):
+				# a repeat of the same job seed (e.g. the one-process determinism run) is not pooled
+				pooled_seeds[int(job.get("seed", 0))] = true
+				pooled_gain.append(float(r["trained"]["reward_mean"]) - float(r["initial"]["reward_mean"]))
 			var curve := []
 			for l: Dictionary in lines:
 				var pt := {"gen": l.get("gen", 0)}
@@ -88,7 +93,8 @@ func _initialize() -> void:
 		runs.append(r)
 	var out := {"created": Time.get_datetime_string_from_system(true), "runs": runs}
 	if not pooled_gain.is_empty():
-		out["es_reward_gain"] = {"per_run": pooled_gain, "mean": _mean(pooled_gain), "min": pooled_gain.min(), "max": pooled_gain.max()}
+		out["es_reward_gain"] = {"per_run": pooled_gain, "seeds": pooled_seeds.keys(), "mean": _mean(pooled_gain), "min": pooled_gain.min(),
+			"max": pooled_gain.max(), "note": "trained minus initial test reward of approach es, one run per job seed"}
 	var f := FileAccess.open(args[j + 1], FileAccess.WRITE)
 	f.store_string(JSON.stringify(out, "  "))
 	f.close()

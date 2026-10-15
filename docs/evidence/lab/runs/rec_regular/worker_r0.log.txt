@@ -1,0 +1,6 @@
+2026-10-15 09:57:05 r0 recording 90 episodes of bot_regular into ../runs/home/lab/datasets/ev_teacher_regular_vs_rookie (indices 0..89)
+2026-10-15 09:57:05 r0 run rec_regular: record, creature dev_biped, 3 worker process(es) x 2 world(s)
+2026-10-15 09:57:05 r0 helper rank 1 started (pid 54548)
+2026-10-15 09:57:05 r0 helper rank 2 started (pid 54560)
+2026-10-15 09:58:41 r0 recorded 26912 samples from 90 episodes
+2026-10-15 09:58:41 r0 finished: completed — recorded 26912 samples from 90 episodes

@@ -413,7 +413,7 @@ func _update_train_help() -> void:
 	t += "[b]Objective:[/b] %s\n%s\n\n" % [str(LabRewards.PRESETS[pid]["name"]), str(LabRewards.PRESETS[pid]["help"])]
 	t += "[b]Scenario:[/b] %s\n%s\n\n" % [str(LabScenarios.PRESETS[sid]["name"]), str(LabScenarios.PRESETS[sid]["help"])]
 	t += "[b]Evaluation[/b] is separate from training: fixed baseline opponents, held-out seeds and the standard corner spawns (jittered, so no episode repeats); reports show mean ± std, 95% intervals and paired comparisons on the same episodes.\n\n"
-	t += "[b]Speed on this PC[/b]: one worker simulates ~14 seconds of fighting per second (~1 short episode/s); add workers for more. The game stays responsive — training runs in background processes and can be paused, cancelled or resumed after a crash.\n\n"
+	t += "[b]Speed[/b]: one worker simulates roughly 8–16 seconds of fighting per second, depending on the PC and what else is running; add workers for more. The game stays responsive — training runs in background processes and can be paused, cancelled or resumed after a crash.\n\n"
 	t += "[color=#a8a0b0]Learning is real but not magic: short runs learn simple habits (approach, hit, guard). Beating strong players needs long training and is not guaranteed.[/color]"
 	_train_help.text = t
 

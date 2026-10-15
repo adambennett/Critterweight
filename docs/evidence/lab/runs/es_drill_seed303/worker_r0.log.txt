@@ -1,0 +1,43 @@
+2026-10-15 09:25:08 r0 ES: 5557 params, 24 candidates x 1 episodes per generation, sigma 0.050, lr 0.020
+2026-10-15 09:25:08 r0 run es_drill_seed303: es, creature dev_biped, 3 worker process(es) x 2 world(s)
+2026-10-15 09:25:08 r0 helper rank 1 started (pid 22348)
+2026-10-15 09:25:08 r0 helper rank 2 started (pid 66596)
+2026-10-15 09:25:19 r0 validation at gen 0: n=8 reward 10.18 ± 3.82 (95% CI 6.99..13.38) win 100% [68–100%] (new best: initial)
+2026-10-15 09:25:26 r0 gen 1: fitness 6.32 ± 14.40 (max 44.11), pop damage 5.4, |step| 1.4909
+2026-10-15 09:25:34 r0 gen 2: fitness 7.60 ± 15.04 (max 57.82), pop damage 6.8, |step| 1.0606
+2026-10-15 09:25:45 r0 gen 3: fitness 13.80 ± 19.36 (max 51.28), pop damage 11.8, |step| 0.8599
+2026-10-15 09:25:57 r0 gen 4: fitness 14.34 ± 16.36 (max 55.29), pop damage 12.1, |step| 0.7615
+2026-10-15 09:26:09 r0 gen 5: fitness 22.85 ± 19.34 (max 68.42), pop damage 18.8, |step| 0.6862
+2026-10-15 09:26:18 r0 validation at gen 5: n=8 reward 42.18 ± 6.19 (95% CI 37.00..47.35) win 100% [68–100%] | elite 35.81 (new best: theta)
+2026-10-15 09:26:29 r0 gen 6: fitness 32.21 ± 17.84 (max 57.37), pop damage 27.2, |step| 0.6310
+2026-10-15 09:26:40 r0 gen 7: fitness 33.25 ± 18.17 (max 59.62), pop damage 28.4, |step| 0.5810
+2026-10-15 09:26:49 r0 gen 8: fitness 28.56 ± 14.00 (max 61.65), pop damage 23.4, |step| 0.5483
+2026-10-15 09:26:57 r0 gen 9: fitness 33.31 ± 18.12 (max 70.42), pop damage 27.9, |step| 0.5204
+2026-10-15 09:27:04 r0 gen 10: fitness 37.44 ± 15.46 (max 72.03), pop damage 29.9, |step| 0.5065
+2026-10-15 09:27:09 r0 validation at gen 10: n=8 reward 42.67 ± 4.78 (95% CI 38.67..46.67) win 100% [68–100%] | elite 38.71 (new best: theta)
+2026-10-15 09:27:17 r0 gen 11: fitness 43.59 ± 12.38 (max 66.03), pop damage 36.3, |step| 0.4905
+2026-10-15 09:27:25 r0 gen 12: fitness 44.84 ± 9.19 (max 68.75), pop damage 37.3, |step| 0.4736
+2026-10-15 09:27:33 r0 gen 13: fitness 35.96 ± 13.58 (max 57.61), pop damage 28.9, |step| 0.4615
+2026-10-15 09:27:41 r0 gen 14: fitness 45.66 ± 8.30 (max 69.24), pop damage 38.2, |step| 0.4419
+2026-10-15 09:27:49 r0 gen 15: fitness 45.49 ± 9.30 (max 60.01), pop damage 38.1, |step| 0.4257
+2026-10-15 09:27:55 r0 validation at gen 15: n=8 reward 42.67 ± 4.78 (95% CI 38.67..46.67) win 100% [68–100%] | elite 42.51
+2026-10-15 09:28:04 r0 gen 16: fitness 44.07 ± 12.06 (max 71.32), pop damage 36.6, |step| 0.4188
+2026-10-15 09:28:12 r0 gen 17: fitness 44.11 ± 9.05 (max 58.59), pop damage 36.3, |step| 0.4047
+2026-10-15 09:28:19 r0 gen 18: fitness 48.61 ± 6.43 (max 65.74), pop damage 40.0, |step| 0.3868
+2026-10-15 09:28:27 r0 gen 19: fitness 44.30 ± 12.36 (max 67.21), pop damage 36.1, |step| 0.3901
+2026-10-15 09:28:34 r0 gen 20: fitness 45.29 ± 9.45 (max 67.62), pop damage 37.1, |step| 0.3773
+2026-10-15 09:28:40 r0 validation at gen 20: n=8 reward 46.98 ± 4.30 (95% CI 43.38..50.57) win 100% [68–100%] | elite 43.33 (new best: theta)
+2026-10-15 09:28:46 r0 gen 21: fitness 51.20 ± 11.64 (max 69.29), pop damage 43.2, |step| 0.3703
+2026-10-15 09:28:53 r0 gen 22: fitness 48.97 ± 11.71 (max 75.64), pop damage 41.4, |step| 0.3741
+2026-10-15 09:29:00 r0 gen 23: fitness 39.52 ± 20.03 (max 70.63), pop damage 33.0, |step| 0.3824
+2026-10-15 09:29:07 r0 gen 24: fitness 44.97 ± 9.15 (max 66.64), pop damage 38.4, |step| 0.3803
+2026-10-15 09:29:14 r0 gen 25: fitness 50.06 ± 10.74 (max 69.81), pop damage 43.9, |step| 0.3811
+2026-10-15 09:29:18 r0 validation at gen 25: n=8 reward 57.85 ± 14.36 (95% CI 45.85..69.85) win 100% [68–100%] | elite 58.93 (new best: elite)
+2026-10-15 09:29:18 r0 stopping: generation limit (25)
+2026-10-15 09:29:35 r0 test: initial n=20 reward 10.27 ± 3.35 (95% CI 8.70..11.83) win 100% [84–100%]
+2026-10-15 09:29:35 r0 test: trained n=20 reward 46.93 ± 20.30 (95% CI 37.43..56.43) win 100% [84–100%]
+2026-10-15 09:29:35 r0 test: trained − initial, paired difference +36.67 (95% CI 27.26..46.07, t = 8.16, n = 20 episodes) — significant
+2026-10-15 09:29:35 r0 test: scripted reference (jabber) n=20 reward 50.70 ± 7.71 (95% CI 47.09..54.30) win 100% [84–100%]
+2026-10-15 09:29:35 r0 test: trained − reference, paired difference -3.76 (95% CI -13.78..6.26, t = -0.79, n = 20 episodes) — not significant
+2026-10-15 09:29:35 r0 saved policy 'Drill ES (seed 303)' (u_dev_biped_tmyatb007) to the library
+2026-10-15 09:29:35 r0 finished: completed — completed (generation limit (25)): trained policy n=20 reward 46.93 ± 20.30 (95% CI 37.43..56.43) win 100% [84–100%]; vs its start: paired difference +36.67 (95% CI 27.26..46.07, t = 8.16, n = 20 episodes) — significant

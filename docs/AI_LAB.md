@@ -367,17 +367,18 @@ fighters ≤ 0.25 ms (1.5 % of a 60 fps frame), decisions staggered at 15 Hz. Th
 compiled into 4×4 `Projection` blocks (one native mat×vec = 16 multiply-adds per interpreted
 step, zero input blocks skipped). Tested by `test_policy_inference.gd`.
 
-Measured on 2026-10-15. The PC was shared with other build and test jobs, so these numbers are
-pessimistic.
+Measured on 2026-10-15 with the PC saturated by other build and test jobs (CPU 40–100 %), so
+these numbers are pessimistic; wall-clock timings in particular inflate under load.
 
 | What | Result |
 |---|---|
-| Inference, 8 fighters, 32×32 network | 138.5 µs per tick (136.5 µs per decision: 80.8 encode + 42.9 forward) |
-| Inference, 8 fighters, 64×64 network | 168.6 µs per tick |
-| Throughput, 1 worker process × 2 worlds | 16.3 simulated seconds per wall second, 5,520 ten-second episodes per hour |
-| Throughput, 3 worker processes | 30–33× real time: 18,340 six-second drill episodes or ~6,500 twenty-second matches per hour |
-| Behaviour cloning | about 7 s per epoch over 20k recorded decisions (64×64 network) |
-| Lab screen polling while a run trains | 1.8 ms every 0.5 s; game frame-time median unchanged at 16.7 ms (60 fps) |
+| Inference, 8 fighters, 32×32 network | 263 µs per tick at 86 % load (211–326 µs over eight runs; the build before the review fixes measured the same under the same load; 138.5 µs earlier on a quieter PC) |
+| Inference, 8 fighters, 64×64 network | 340 µs per tick at 93 % load |
+| Throughput, 1 worker process × 2 worlds | 7.4–9.1 simulated seconds per wall second (2,400 ten-second or 5,480 six-second episodes per hour) |
+| Throughput, 3 worker processes | 15–19× real time: ~10,000 six-second drill episodes or ~3,300 twenty-second matches per hour |
+| Behaviour cloning | about 11 s per epoch over 16k recorded decisions (64×64 network, with the validation pass) |
+| CPU share 50 % / 25 % | main-thread duty 0.50 / 0.25, episodes per minute halved at 50 % (process CPU incl. engine threads: 1.31 / 0.44 / 0.19 cores at 100 / 50 / 25 %) |
+| Lab screen polling while a run trains | 1.9 ms every 0.5 s; game frame-time median unchanged at 16.7 ms (60 fps) |
 
 ## 10. Reproducible small examples
 
@@ -411,7 +412,7 @@ into a fresh `--user-root`, since a dataset that already holds episodes continue
 | test_lab_worker.gd | the real worker process: pause/resume/cancel, kill + resume from the newest checkpoint with an unbroken curve, ES improves on the drill on held-out test seeds with no helper share dropped, the helper heartbeat rule, a silent worker whose process still runs is neither "interrupted" nor resumable twice |
 | test_lab_worker_faults.gd | a long pause keeps the helpers, a helper that never delivers cannot hang a run, evaluation/recording stop at the time limit with a partial report, ES validates the last generations before selecting, evaluation plays a policy as saved and with its own objective, BC starts helpers only for the rollouts, idle helpers back off, helpers exit when the coordinator dies, the CPU share holds over the long run, straggler and grace rules |
 | test_lab_docs.gd | every documented `--path game` command resolves its paths from the game folder |
-| test_policy_samples.gd | the shipped sample policies validate, are listed and usable by their fighter, and the drill sample lands hits on fresh standing-dummy episodes where an untrained network does not |
+| test_policy_samples.gd | the shipped sample policies validate, are listed and usable by their fighter, and the drill sample lands clearly more hits on fresh standing-dummy episodes than an untrained network of the same shape |
 
 Windowed tools (not part of `--test`):
 
@@ -430,8 +431,9 @@ Windowed tools (not part of `--test`):
 - obs_v1 describes fighters, walls, projectiles and zones — not bonus-mode objectives (balls,
   spotlights, waves). Policies play standard fights; in objective modes they fight but ignore
   the objective (an obs_v2 with mode features would be needed).
-- Training speed is bound by the physics simulation (~14–16 simulated seconds per wall second
-  per worker process; ~30× real time with 3 processes on a 4-core PC). Hours of training are
+- Training speed is bound by the physics simulation (7–9 simulated seconds per wall second per
+  worker process on the busy dev PC, more on idle cores; 15–19× real time with 3 processes on
+  that 4-core PC). Hours of training are
   needed for strong play against the harder bot tiers.
 - CPU share below 100 %: each worker measures whole frames (its script, the physics step and
   engine overhead) and sleeps off the accumulated difference in whole milliseconds, counting the
