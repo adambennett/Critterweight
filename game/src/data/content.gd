@@ -14,7 +14,8 @@ extends Node
 signal reloaded()
 
 const KINDS := ["creatures", "arenas", "rules", "modes", "supplements", "techniques", "meta_upgrades",
-	"events", "encounters", "bosses", "boss_fights", "minions", "playlists", "announcer", "hub", "props", "ladder", "tutorial", "policies"]
+	"events", "encounters", "bosses", "boss_fights", "minions", "playlists", "announcer", "hub", "props", "ladder", "tutorial", "policies",
+	"achievements"]
 ## Kinds that change simulation outcomes and therefore the multiplayer content hash.
 const GAMEPLAY_KINDS := ["creatures", "rules", "modes", "supplements", "techniques", "events", "encounters",
 	"bosses", "boss_fights", "minions", "props", "ladder", "arenas"]

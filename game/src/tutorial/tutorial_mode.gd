@@ -179,6 +179,7 @@ func _finish_all() -> void:
 	state_t = 0.0
 	_save_progress(true)
 	sim.emit_event({"type": "tutorial_complete"})
+	Platform.unlock_achievement("ach_tutorial")
 
 
 func _save_progress(all_done: bool) -> void:

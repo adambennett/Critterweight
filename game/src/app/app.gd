@@ -208,6 +208,8 @@ func start_match(cfg: Dictionary, on_finished: Callable = Callable()) -> MatchSc
 ## spectated, tutorial and online-client matches are not recorded here). Custom rules / mods
 ## mark the result custom so records stay separate (CMP-07, UI-11).
 func _record_match(cfg: Dictionary, scene: MatchScene, result: Dictionary) -> void:
+	if bool(cfg.get("spectate", false)) and float(result.get("time", 0.0)) > 20.0:
+		Platform.unlock_achievement("ach_ringside")
 	if bool(cfg.get("no_record", false)) or str(result.get("mode", "")) in ["tutorial", "practice"]:
 		return
 	var me := -1
@@ -220,7 +222,17 @@ func _record_match(cfg: Dictionary, scene: MatchScene, result: Dictionary) -> vo
 	var f := scene.sim.fighters[me]
 	var wt := int(result.get("winner_team", -2))
 	var custom := bool(cfg.get("custom", false)) or not Mods.load_order.is_empty()
-	Profiles.record_match(wt == f.team, wt == -1, f.creature.id, f.stats_record, float(result.get("time", 0.0)), custom)
+	var won := wt == f.team
+	Profiles.record_match(won, wt == -1, f.creature.id, f.stats_record, float(result.get("time", 0.0)), custom)
+	if won:
+		Platform.unlock_achievement("ach_first_win")
+		var rid := str((cfg.get("rules") as Dictionary).get("id", "")) if typeof(cfg.get("rules")) == TYPE_DICTIONARY else str(cfg.get("rules", ""))
+		if bool(cfg.get("custom", false)) or RulePresets.is_user(rid):
+			Platform.unlock_achievement("ach_house_rules")
+		var pf: Dictionary = (Profiles.current["stats"] as Dictionary).get("per_fighter", {})
+		var roster := Content.playable_creatures().filter(func(c): return str(c).begins_with("f_"))
+		if not roster.is_empty() and roster.all(func(c): return int((pf.get(c, {}) as Dictionary).get("wins", 0)) > 0):
+			Platform.unlock_achievement("ach_full_card")
 
 
 func quit() -> void:

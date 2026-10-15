@@ -20,6 +20,7 @@ var player_index := 0
 var _event_cursor := 0
 var config := {}
 var director: SpectatorDirector = null   ## auto-director when spectating (cfg.spectate)
+var _goals_by_me := 0
 
 
 ## config: {arena: ArenaDef, rules: {}, seed: int, mode: MatchMode, fighters: [{creature, team, kind:"player"|"bot", difficulty, name}]}
@@ -276,6 +277,10 @@ func _on_event(ev: Dictionary) -> void:
 			var pr: Vector3 = ev["pos"]
 			vfx.word(pr + Vector3.UP * 1.6, str(ev.get("name", "REACTION")).to_upper() + "!", Color(1, 1, 1), 72)
 			vfx.emit("burst", pr + Vector3.UP * 0.8, Vector3.UP, Elements.color(str(ev["a"])), 1.4)
+		"elimination":
+			var by := int(ev.get("by", -1))
+			if by == player_index and _is_local_player() and by < sim.fighters.size() and sim.fighters[by].time < sim.fighters[by].juiced_until:
+				Platform.unlock_achievement("ach_juice_ko")
 		"slam":
 			camera.add_trauma(0.4)
 			vfx.word(ev["pos"] + Vector3.UP * 1.0, "CAGE SLAM!", Color(1.0, 0.8, 0.3))
@@ -306,12 +311,18 @@ func _on_event(ev: Dictionary) -> void:
 				views[di] = null
 		"goal":
 			hud.callout("GOAL!", 2.0, TeamColors.color(int(ev["team"])).lightened(0.3))
+			if int(ev.get("scorer", -1)) == player_index and _is_local_player() and not bool(ev.get("own_goal", false)):
+				_goals_by_me += 1
+				if _goals_by_me >= 3:
+					Platform.unlock_achievement("ach_hat_trick")
 			Audio.announce_trigger("mode", {"mode": "chumball_goal"})
 		"unit_crowned":
 			hud.callout("%s IS THE ABSOLUTE UNIT" % sim.fighters[int(ev["fighter"])].display_name.to_upper(), 2.2, Color("#8BD426"))
 			Audio.announce_trigger("mode", {"mode": "new_unit"}, {"p": sim.fighters[int(ev["fighter"])].display_name})
 		"wave_start":
 			hud.callout("WAVE %d" % int(ev["wave"]), 1.6, Color(1.0, 0.6, 0.3))
+			if int(ev["wave"]) >= 20 and _is_local_player():
+				Platform.unlock_achievement("ach_last_call")
 			Audio.announce_trigger("mode", {"mode": "rush_wave"}, {"n": int(ev["wave"])})
 		"wave_cleared":
 			hud.callout("WAVE CLEARED", 1.4, Color(0.6, 1.0, 0.6))
@@ -325,6 +336,10 @@ func _on_event(ev: Dictionary) -> void:
 		"sudden_death":
 			hud.callout("SUDDEN DEATH", 1.8, Color(1.0, 0.35, 0.3))
 			Audio.announce_trigger("time", {"kind": "sudden_death"})
+
+
+func _is_local_player() -> bool:
+	return player_index < sim.fighters.size() and sim.fighters[player_index].controller_kind == "player"
 
 
 func _team_label(team: int) -> String:
