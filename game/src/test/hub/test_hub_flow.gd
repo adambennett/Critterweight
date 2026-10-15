@@ -26,6 +26,8 @@ func before_each() -> void:
 	CampaignFlow.force_dev_tools = false
 
 
+## Synchronous on purpose: the runner does not await after_each and frees the test right after, so
+## anything after an await here would never run (the user root would stay redirected).
 func after_each() -> void:
 	MatchFlow.set_paused(false)
 	App.clear_screens()
@@ -34,7 +36,6 @@ func after_each() -> void:
 	Tutorial.clear_exit_route()
 	MatchFlow.last_config = {}
 	CampaignFlow.force_dev_tools = false
-	await wait_frames(2)
 	Paths.root = _root
 	Profiles.current = _profile
 
