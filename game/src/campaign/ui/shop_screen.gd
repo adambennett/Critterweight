@@ -32,7 +32,11 @@ func _build() -> void:
 	_buttons.clear()
 	var view := ctrl.shop_view(flow.me)
 	if view.is_empty() or bool(view.get("done", false)):
-		flow.show_current.call_deferred()
+		# never hand back to a flow that would show this very screen again
+		if flow.current_screen() != "shop":
+			flow.show_current.call_deferred()
+		else:
+			CampaignUI.scaffold(self, "NEEDLES' POP-UP STALL", "Waiting for the rest of the party...")
 		return
 	var p := ctrl.player(flow.me)
 	var scrip := int(view.get("scrip", 0))

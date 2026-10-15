@@ -4,6 +4,9 @@ extends RefCounted
 ## Snappington's ledger, Ludlow's workbench, Teddy's ledger) and Snappington's fight-card sign-up
 ## sheet (run start). Data and purchases go through HubServices (FightCamp). A purchase saves the
 ## profile, plays the NPC's thanks and changes the Cannery at once (HubUpgradeProps).
+## The sign-up sheet offers Doses only on difficulties that take them (never Sparring) and asks
+## before a new card replaces the profile's suspended Fight Camp run (abandon it / resume it /
+## keep it).
 
 const NPC_OF := {"gym_floor": "granny", "med_bay": "doc", "juice_bar": "needles", "office": "snappington", "loading_dock": "ludlow", "boiler_room": "teddy"}
 ## What each purchase changes in the world (shown on the board).
@@ -153,8 +156,9 @@ static func build_run(b: HubBoard, p: Dictionary) -> void:
 	dr.set_help("Difficulty", "Sparring, Amateur, Pro or Title Shot. Harder cards pay more Clout.")
 	b.list.content.add_child(dr)
 	var doses: Array = o.get("doses", [{"level": 0, "name": "Base card"}])
-	var dose_r := OptionRow.new("The Dosage").setup(doses.map(func(d): return int(d["level"])), doses.map(func(d): return str(d["name"])), 0)
-	dose_r.set_help("The Dosage", "Ten Doses of extra trouble. Clear a run on Amateur or harder to open it.")
+	var dose_r := OptionRow.new("The Dosage")
+	fill_doses(dose_r, doses, dose_allowed(diffs, str(dr.get_value())), 0)
+	dr.value_changed.connect(func(v) -> void: fill_doses(dose_r, doses, dose_allowed(diffs, str(v)), int(dose_r.get_value())))
 	b.list.content.add_child(dose_r)
 	var cr := OptionRow.new("Co-op format").setup(["simultaneous", "tag"], ["Simultaneous", "Tag-team"], "simultaneous")
 	cr.set_help("Co-op format", "Used when you host a party from Online; solo runs ignore it.")
@@ -167,13 +171,72 @@ static func build_run(b: HubBoard, p: Dictionary) -> void:
 	start.set_help("Sign the waiver", "\"Sign here. And here. The waiver is mostly decorative.\"")
 	start.custom_minimum_size = Vector2(0, 76)
 	start.pressed.connect(func() -> void:
-		var r := sv.start_run({"fighter": str(fr.get_value()), "difficulty": str(dr.get_value()), "dose": int(dose_r.get_value()),
-			"coop_format": str(cr.get_value()), "seed_text": seed_row.get_value()})
-		if not bool(r.get("ok", false)):
-			Audio.ui("ui_error")
-			b.set_status(str(r.get("error", "The Commission refused.")), "Danger"))
+		sign_up(b, sv, {"fighter": str(fr.get_value()), "difficulty": str(dr.get_value()), "dose": int(dose_r.get_value()),
+			"coop_format": str(cr.get_value()), "seed_text": seed_row.get_value()}))
 	b.list.content.add_child(start)
+	var held := sv.suspended_run()
+	if bool(held.get("newer", false)):
+		b.text_line("On file: a Fight Camp run saved by a newer version of the game. It stays as it is, so no new card can be signed here.", "Warning")
+	elif not held.is_empty():
+		b.text_line("On file: a suspended Fight Camp run (%s). Signing a new card abandons it — you'll be asked first." %
+			CampaignFlow.describe_suspended(sv.catalog(), held.get("summary", {})), "Warning")
 	b.button("Campaign menu (suspended runs, co-op lobby)", sv.open_campaign_menu, "Campaign menu",
 		"Resume a suspended Fight Camp run, host co-op, or open the Cannery Ledger.", "", "campaign")
 	b.set_status("Clout %d  ·  Cannery upgrades owned %d / 24 (they apply to this run)." % [st.clout(), st.upgrades_owned()])
 	b.focus_first()
+
+
+## Whether a difficulty takes Doses (run_options rows carry `dose_allowed`; default yes).
+static func dose_allowed(diffs: Array, id: String) -> bool:
+	for d in diffs:
+		if str((d as Dictionary).get("id", "")) == id:
+			return bool((d as Dictionary).get("dose_allowed", true))
+	return true
+
+
+## The Dosage row offers only what the chosen difficulty allows (Sparring: the base card only).
+static func fill_doses(row: OptionRow, doses: Array, allowed: bool, current: int) -> void:
+	var offer := doses.filter(func(d): return allowed or int(d["level"]) == 0)
+	if offer.is_empty():
+		offer = [{"level": 0, "name": "Base card"}]
+	var levels: Array = offer.map(func(d): return int(d["level"]))
+	row.setup(levels, offer.map(func(d): return str(d["name"])), current if levels.has(current) else 0)
+	row.set_help("The Dosage", "Ten Doses of extra trouble. Clear a run on Amateur or harder to open it." if allowed
+		else "Sparring never takes a Dose: the base card only.")
+
+
+## SIGN THE WAIVER: starts the card, or — when a suspended Fight Camp run is on file — asks first.
+static func sign_up(b: HubBoard, sv: HubServices, choices: Dictionary) -> void:
+	var r := sv.start_run(choices)
+	if bool(r.get("ok", false)):
+		return
+	if bool(r.get("needs_confirm", false)):
+		_confirm_replace(b, sv, choices, r.get("suspended", {}))
+		return
+	Audio.ui("ui_error")
+	b.set_status(str(r.get("error", "The Commission refused.")), "Danger")
+
+
+static func _confirm_replace(b: HubBoard, sv: HubServices, choices: Dictionary, held: Dictionary) -> void:
+	var buttons := [{"label": "Abandon it, sign new", "id": "replace", "danger": true}]
+	if bool(held.get("ok", false)):
+		buttons.append({"label": "Resume it", "id": "resume"})
+	buttons.append({"label": "Keep it", "id": "keep", "cancel": true, "default": true})
+	App.dialog("Replace your suspended run?", "On file: %s.\nSigning a new card abandons it — it counts as a defeat in your history." %
+		CampaignFlow.describe_suspended(sv.catalog(), held.get("summary", {})), buttons,
+		func(id: String) -> void:
+			var r2 := {}
+			match id:
+				"replace":
+					var c2: Dictionary = choices.duplicate()
+					c2["replace_suspended"] = true
+					r2 = sv.start_run(c2)
+				"resume":
+					r2 = sv.resume_run()
+				_:
+					r2 = {"ok": true}
+					if is_instance_valid(b):
+						b.set_status("Your suspended run stays on file. Resume it from the campaign menu, or sign up again.")
+			if not bool(r2.get("ok", false)) and is_instance_valid(b):
+				Audio.ui("ui_error")
+				b.set_status(str(r2.get("error", "The Commission refused.")), "Danger"))

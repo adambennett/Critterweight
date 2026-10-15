@@ -55,6 +55,23 @@ a defeat flagged `abandoned`. `RunController.phase()` is the single source of tr
 * **Claims.** Rewards, purchases, rest choices, event decisions and fight results are recorded
   under `claims[node_id][player_id]`; a resent message, a double click or a resumed save that
   tries the same claim is rejected (`last_error`).
+* **Pending picks come first.** A pick can outlive the activity that granted it (Train at a rest,
+  an event's technique/reward pick, a consumable's pick in a shop): the node completes only once
+  every pick is claimed, and `CampaignFlow.current_screen()` routes to the reward screen whenever
+  this player has a pick pending (any phase but a fight). Screens hand back to the flow only when
+  it would show something else, so no screen can bounce to itself; `RunController.advance_if_done()`
+  completes a node whose activity is done (it also repairs runs saved mid-transition by older
+  builds — e.g. "rest, Train taken, pick pending" resumes straight into the pick).
+* **Events never softlock.** When no choice can be taken (requirements, Scrip — for a group event,
+  every member must cover their share), the decider passes (`EventRunner.PASS`, "MOVE ON" on the
+  event screen, chosen by the autopilot too); a pass is logged like any choice.
+* **Everything that changes the outcome is logged** (decisions, fight results, a run turning
+  custom), so `RunController.verify(catalog, state)` can rebuild any state from its own
+  `start_cfg` + `log` and compare (floats to 1e-4; connected/bot flags and elapsed time are not
+  logged); `verify_from(catalog, verified_ctrl, state)` replays only the decisions since a run
+  verified earlier.
+* **Play time** = time in menus + each fight's simulated time, once: `CampaignFlow` stops its wall
+  clock while a presented fight runs (`begin_fight`) and restarts it when the result is applied.
 * **Pacing.** The generator keeps 2–3 fights in rows 2–5 per route (12–15 fights per run with
   bosses, never more than 3 in a row); `campaign_rules.pacing` estimates 25–40 minutes per run and
   the generation tests check every route of 500 seeds against it.
@@ -68,15 +85,28 @@ a defeat flagged `abandoned`. `RunController.phase()` is the single source of tr
   match that visibly enables "Gym Bonuses", `FightCamp.gym_bonus_package`). The hub uses the
   `FightCamp` API: `stations()`, `list_upgrades()`, `buy_upgrade()`, `run_options()`,
   `run_config()`, `services()`.
-* **The Dosage** (`ladder/doses.json`, 10 levels, cumulative). Clearing the highest unlocked Dose
-  unlocks the next (max 10); a Dose-0 clear on Amateur or harder opens The Dosage. Ladder progress
-  is per variant (`profile.ladder`).
+* **The Dosage** (`ladder/doses.json`, 10 levels, cumulative). The first clear on Amateur or
+  harder opens The Dosage (Dose 1). Clearing the highest unlocked Dose unlocks the next (max 10)
+  — only on the profile's OWN open ladder: a Dose above it (a co-op host's card) or below it
+  unlocks nothing. Ladder progress is per variant (`profile.ladder`).
+  `CampaignProgression.dose_cap(catalog, profile, variant, difficulty)` is the highest Dose a
+  profile may play AND be credited for (0 while closed, 0 on difficulties without
+  `dose_allowed` — Sparring); run creation clamps to it (`clamp_dose`: campaign menu, hub sign-up
+  sheet, "Raise the Dose", a co-op host's own profile), and the hub sheet only offers Doses the
+  chosen difficulty takes. Dose records, Dose badges/cosmetics, `best_dose`, ladder progress and
+  `ach_fully_dosed` are credited only when the run's Dose is within the crediting profile's cap;
+  otherwise the report carries `dose_ineligible` (the clear itself, fighter title and history
+  still count) and the summary card says why.
 * **Difficulty presets** (`ladder/difficulty.json`): Sparring, Amateur, Contender, Title Shot —
   enemy HP/damage, bot tier, reward multipliers, rest heal; Sparring records on its own board and
   disallows Doses. Bot tiers: `punching_bag … hall_of_famer` map to BotBrain profiles.
 * **Custom runs** (dev stand-ins, reduced game speed, test builds, custom rules) count for
-  statistics and history but never for records, ladder unlocks, cosmetics or achievements; Clout
-  at 50%. The UI says so on the summary card.
+  statistics and history but never for records, ladder unlocks, cosmetics, achievements or Fight
+  Camp milestone flags; Clout at 50%. The UI says so on the summary card. The live reasons
+  (`CampaignFlow.LIVE_REASONS`: reduced game speed, development stand-ins) are re-checked before
+  every presented fight (`RunController.mark_custom`, logged); a run that became custom stays
+  custom. "Run it back" / "New card" decide afresh: live reasons as they are now, fixed reasons
+  (a test build, custom rules) carried over.
 * **Achievements** (Platform): `ach_off_the_street` / `ach_made_camp` (clear the variant),
   `ach_order_in_court` (beat Commissioner Snappington = clear a run), `ach_fully_dosed` (clear
   Dose 10). Granted for the active local profile only, never from The Bookie's Table.
@@ -203,7 +233,10 @@ decided once for a party (vote), costs split evenly. Outcome rolls use the node'
 ```
 
 Enemy entries: `{"minion": loadout, count}`, `{"fighter": id|"random"|"mirror", pool, techniques,
-build, techniques_list, hp_mult, count}`, `{"boss_fight": id}`. Special rules (`special`):
+build, techniques_list, hp_mult, count}`, `{"boss_fight": id}`. A spar (event fight with
+`"spar": true`, e.g. Kid Lamprey's) is a copy of your fighter at the template's own `hp_mult`
+(x0.6) and is never scaled by difficulty, Dose (no extra technique / start Hype) or party size.
+Special rules (`special`):
 `handicap`, `waves` (`{trigger_alive}`), `sequential`, `tag_bout` (`{regen, …}`; solo players get
 one Granny Haymaker cameo), `sudden_death` (timed: round time then 1-HP sudden death), `gravity`,
 `hype_mult`, `zone_duration_mult` (puddles last longer), `ffa`, `hazards` (`[{kind, every?, …}]`),
@@ -234,9 +267,11 @@ scrapling_leaky_pipe, blister_sludge, blister_ember, blister_fuse`.
    "element_cycle": {"every": 8.0, "order": ["scorch", "static"]}, "attacks": [...]}]}
 ```
 
-`BossMode` (extends `CampaignMatchMode`): two phases (phase 2 cannot be skipped; 2 s invulnerable
-transition), telegraphed attacks (every telegraph ≥ 0.5 s, emitted as `boss_telegraph` with decal
-data), actions from the effects vocabulary plus `grab_throw`, `withdraw`, `aim`,
+`BossMode` (extends `CampaignMatchMode`): two phases (phase 2 at the boss's own `phase2_at`; a run
+modifier such as Dose 8 "No Mercy" only brings it sooner — `EncounterBuilder.boss_phase2_at`;
+phase 2 cannot be skipped; 2 s invulnerable transition), telegraphed attacks (every telegraph
+≥ 0.5 s, emitted as `boss_telegraph` with decal data), actions from the effects vocabulary plus
+`grab_throw`, `withdraw`, `aim`,
 `telegraph_only`, `rush`; any action may carry `yaw_offset`. **Dazed**: a poise break gives a 3 s
 stagger (damage taken ×1.2, throws ×2) and is the only time a boss can be grabbed; other
 knockdowns never floor a boss. Arena interplay: leash (Bilge), damage-triggered repositioning
@@ -307,8 +342,20 @@ real time. Pausing freezes the fight's physics space.
 slots `off_the_street`, `fight_camp`, `bookie`, `party_<run id>`. Writes go through `Saves`
 (temp → verify → `.bak` rotate → rename, checksummed). Loading never deletes anything: damaged,
 newer-format or content-incompatible saves return a clear error (missing content is listed per id
-so the player can re-enable the mod); abandoning a damaged save moves it aside (quarantine).
-`RunStore.migrate` chains format migrations (v0 → v1 included).
+so the player can re-enable the mod); abandoning a damaged save moves every copy of the slot
+(`.json`, `.tmp`, `.bak`) aside (quarantine). `RunStore.list` shows a slot as soon as any copy
+exists — also when a crash left only the verified `.tmp` and/or the `.bak`, which `load_slot`
+recovers from. `RunStore.migrate` chains format migrations (v0 → v1 included).
+
+**One suspended run per variant.** A new run never silently replaces the one in its slot: the
+campaign menu's START RUN and the hub's sign-up sheet ask first (abandon it and start / resume
+it / cancel), and abandoning credits the old run as an abandoned defeat
+(`CampaignFlow.abandon_suspended`: history, attempts; a run that cannot be loaded is
+quarantined). `CampaignFlow.start` itself does the same for anything still in the slot, so no
+caller can destroy a suspended run without a trace. A run saved by a newer game version is never
+replaced, moved or deleted: the menus explain and deal no card over it. Party slots (`party_<run id>`) are listed
+by the campaign menu but never resumed as a solo run (the co-op lobby resumes them through
+`CoopSession.host_resume`); host and members clear them when the run ends.
 
 Godot's JSON reader does not read every 17-digit double back exactly (about 1 in 7 random values
 returns one ulp off), which would fail checksum verification for real fight results.
@@ -338,6 +385,30 @@ Members → host: `hello {player}`, `vote {node}`, `event_choice {choice}`, `pic
 `reroll {rid}`, `shop_buy {slot}`, `shop_service {}`, `shop_sell {item}`, `shop_leave {}`,
 `rest {option}`, `consume {item}`, `pause {}`, `resume {}`, `rejoin {player}`, `move_on {}`.
 
+**Trust.** The sender of a message is the transport's peer id (`from` of `message_received`),
+never a payload field (payload `host`/`player` fields are informational). The host acts on a
+member's intents only for that member's own player. Members accept host-only messages
+(`run_state`, `ticket`, `run_end`, `notice`, `error`, `paused`, `resumed`, votes) only from the
+current host; `host_changed` only from the successor the election rule picks (next connected
+member in Captain order after the departed host, from the member's checkpoint) and only once the
+old host is gone from the member's view — a claim that overtakes the departure is held until it.
+A `run_state`, `ticket` or `run_end` must belong to the party's run (run id + seed of the host's
+first state). Tickets and the final result must also follow from their own decision log
+(`RunController.verify_from` the last accepted ticket — a node's worth of replay; a full replay
+when it is not a plain continuation): only then is a ticket saved as the member's replica, and a
+result credited — from the rebuilt run, never from the numbers in the message (elapsed: the
+larger of the logged fight time and the host's). The ticket checksum only detects damage.
+Rebuilding needs the same campaign content as the host (the run's `content_hash`); a member
+with different content sees the checkpoints rejected with a notice instead of trusting them.
+
+**Group events.** Every member's `event_choice` on a group event is a vote (never the decision);
+the ballot holds only the choices the Captain may take and every member can pay their share of.
+A pick that still fails at resolution (Scrip spent meanwhile) is dropped from the next ballot and
+the error is broadcast; when nothing is left the party passes (`EventRunner.PASS`), so a group
+event always resolves — also with everyone idle or disconnected. `vote_result {event: true,
+choice, reason, tie, counts}` announces the outcome. A co-op host deals only Doses its own
+profile may play; each member's Dose credit follows that member's own ladder.
+
 Rules: the host owns the authoritative `RunController`; route votes (10 s, majority, Captain
 breaks ties, abstainers ignored); per-player picks, inventories and Scrip; simultaneous format by
 default, tag-team as a setting; downed/revive; scaling per party size; a disconnected member's
@@ -362,9 +433,12 @@ bout and either the player or "Teddy" (`CampaignAutoPilot`) makes the decisions.
 `pause()/resume()` (also freezes a fight in progress), `set_speed(1..4)` (tests use more),
 `take_over()/hand_back()`, `stop()`, `deal()`. `fight_runner` is pluggable: the Bookie screen
 plugs in a presented match (`BookieFlow.run_fight` via `App.start_match` with an overlay control
-bar) or the headless fast-forward runner. Attended decisions reuse the normal campaign screens
-through `BookieFlow`. Results go to the `bookie` record board with Clout at 50%; the table never
-unlocks Doses or achievements.
+bar) or the headless fast-forward runner. Every presented fight re-applies the table's speed
+(`SimSpeed.set_scale`: k × physics ticks at the fixed 1/120 s step) — a finished `MatchScene`
+resets `Engine.time_scale` when it ends and leaves the tree. Attended decisions reuse the normal
+campaign screens through `BookieFlow` (same routing as `CampaignFlow`, pending picks first).
+Results go to the `bookie` record board with Clout at 50%; the table never unlocks Doses or
+achievements.
 
 ## Autopilot
 
@@ -377,7 +451,8 @@ tests (deterministic for a given state):
 * **Rewards** — rarity + tag synergy (with owned supplements and technique build tags) − risk
   when HP is low; techniques complete a build direction; Treasure takes the Scrip when the best
   supplement is weak.
-* **Events** — expected value of each available choice's weighted outcomes.
+* **Events** — expected value of each available choice's weighted outcomes (a group choice is
+  available only if every member can pay their share); nothing available → pass.
 * **Shop** — best affordable item above a threshold keeping 30 Scrip; Rub-down with 2+ side
   effects; leave.
 * **Rest** — Patch up below 60% HP, Rub-down with 2+ side effects, Train if a technique is left,
@@ -435,13 +510,13 @@ filters such as `-- --test test_campaign_generation` run one file.
 | File | Covers |
 |---|---|
 | `test_campaign_generation.gd` | 500-seed generation validity, determinism, pacing, guarantees, Dose 10 |
-| `test_campaign_run.gd` | run state machine, rewards, shop, rest, events, claims, replay, ladder, variants |
+| `test_campaign_run.gd` | run state machine, rewards, shop, rest (Train pick), events (group costs, pass), claims, replay/verify (incl. incremental, tampering), ladder and Dose eligibility, custom runs and camp milestones, spar scaling, boss phase-2 threshold, variants |
 | `test_campaign_fights.gd` | encounters → real MatchSim fights: plain, waves/timer, tag bout, boss phases/telegraphs/Daze, co-op downed/revive |
-| `test_campaign_persistence.gd` | suspend/resume, crash recovery, duplicate claims across resumes, damaged/missing/newer saves, removed content, migration, tickets, unstable floats |
-| `test_campaign_coop.gd` | loopback co-op: votes, ties, picks, disconnect/rejoin, host departure, pause budget, tag format, per-player credit |
+| `test_campaign_persistence.gd` | suspend/resume, crash recovery (also slots left with only `.tmp`/`.bak`), duplicate claims across resumes, damaged/missing/newer saves, removed content, migration, tickets, unstable floats |
+| `test_campaign_coop.gd` | loopback co-op: votes, ties, picks, disconnect/rejoin, host departure, pause budget, tag format, per-player credit; forged member messages, tampered host results, host-change election rule, group-event ballots (affordable only, failed picks dropped, member choice = vote), party slots cleared at the end, host Dose clamp |
 | `test_campaign_bookie.gd` | three unattended complete runs with real fights; pause/take over |
 | `test_campaign_full_runs.gd` | complete runs with real fights: victory and defeat in both variants |
-| `test_campaign_ui.gd` | every screen builds with a focused control; real `ui_accept`/`ui_down` input walks a run to the summary; modals, forfeit, ledger, Bookie controls |
+| `test_campaign_ui.gd` | every screen builds with a focused control; real `ui_accept`/`ui_down` input walks a run to the summary; modals, forfeit, ledger, Bookie controls; Rest → Train without a screen loop (also from a stuck save and at the table), replace-a-suspended-run confirmations (menu, hub sheet), Doses on the hub sheet, party rows, custom re-checks, play time, Bookie speed across presented fights |
 
 Match outcomes are asserted structurally or statistically (several fights), not bit-exactly;
 generation and content logic are asserted seed-deterministic.
