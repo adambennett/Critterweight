@@ -56,6 +56,15 @@ $t = RunExe @("--headless", "--fixed-fps", "120", "--", "--user-root", $userRoot
 $sum = ($t.text | Select-String "^tests: ").Line
 if ($t.code -eq 0) { Record "packaged test suite" "pass" $sum } else { Record "packaged test suite" "fail" "$sum (exit $($t.code))" }
 
+# 1b. cold-ish boot time to the first menu screen + memory (PERF-03)
+$boot = Join-Path $out "boot_report.json"
+$bp = Start-Process -FilePath $exe -ArgumentList @("--", "--user-root", $userRoot, "--windowed", "--size", "1600x900", "--boot-report", $boot) -PassThru -Wait
+if (Test-Path $boot) {
+	$br = Get-Content $boot | ConvertFrom-Json
+	$st = if ($br.ms_since_start -lt 10000) { "pass" } else { "fail" }
+	Record "boot to first menu (< 10 s)" $st ("{0} ms to '{1}', {2:N0} MB static memory" -f $br.ms_since_start, $br.screen, $br.static_memory_mb)
+} else { Record "boot to first menu" "fail" "no report (exit $($bp.ExitCode))" }
+
 # 2. runtime captures from the packaged game (real rendering, isolated user data)
 $captures = @(
 	@{ name = "title"; args = @("--ui-screen", "title"); at = 4 },

@@ -39,12 +39,27 @@ func _ready() -> void:
 		mode = "bench"
 	if args.has("--capture"):
 		_setup_capture()
+	if args.has("--boot-report"):
+		# PERF-03: time from process start until the first menu screen is shown, then quit
+		App.screen_changed.connect(_on_boot_screen, CONNECT_ONE_SHOT)
 	call_deferred("_start", mode)
 
 
 func _exit_tree() -> void:
 	# static Callables outliving their scripts crash the engine at exit
 	TutorialHook.launcher = Callable()
+
+
+func _on_boot_screen(screen: String) -> void:
+	await RenderingServer.frame_post_draw
+	var rep := {"screen": screen, "ms_since_start": Time.get_ticks_msec(), "static_memory_mb": OS.get_static_memory_usage() / 1048576.0,
+		"video_memory_mb": Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0}
+	var f := FileAccess.open(arg_value("--boot-report", "user://boot_report.json"), FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(rep, "  "))
+		f.close()
+	print("BOOT ", JSON.stringify(rep))
+	get_tree().quit(0)
 
 
 func arg_value(flag: String, fallback := "") -> String:
