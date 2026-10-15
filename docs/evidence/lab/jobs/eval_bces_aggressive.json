@@ -1,0 +1,11 @@
+{
+  "kind": "eval",
+  "name": "Evaluate shipped Regular Clone + ES vs the clone",
+  "creature": "dev_biped",
+  "seed": 5003,
+  "target": {"policy": "dev_biped_bces_aggressive", "compare": "res://content/core/policies/dev_biped_bc_regular.policy.json"},
+  "objective": {"preset": "aggressive"},
+  "scenario": {"preset": "spar_jabber", "opponents": ["bot_rookie"], "round_time": 20},
+  "eval": {"opponents": ["bot_rookie"], "episodes": 15, "standard_spawns": true, "reference": "bot_regular"},
+  "limits": {"workers": 3, "worlds": 2, "low_priority": false, "max_wall_s": 3600}
+}

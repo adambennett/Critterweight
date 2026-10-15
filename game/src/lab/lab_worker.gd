@@ -3,18 +3,61 @@ extends Node
 ## AI Lab training worker: a separate, headless game process, so the game UI never stalls.
 ##   <game> --headless --fixed-fps 120 -- --lab-worker <job.json> [--lab-out <run dir>]
 ##          [--lab-rank k --lab-parent-pid pid] [--user-root <dir>]
-## Rank 0 (the coordinator) owns the job: it spawns `limits.workers - 1` helper processes
-## (ranks 1..n, same binary), runs the task (ES / BC / evaluation / recording), distributes
-## episodes through LabBatch, writes progress/metrics/checkpoints, and obeys the control file
-## (pause / resume / cancel / snapshot). Helpers only run episodes they are handed and exit when
-## the coordinator is gone. Every rank steps its episodes in its own physics worlds with the
-## real combat rules; --fixed-fps 120 makes each frame exactly one 120 Hz tick, as fast as the
-## CPU allows.
+## Rank 0 (the coordinator) owns the job: it runs the task (ES / BC / evaluation / recording),
+## starts `limits.workers - 1` helper processes (ranks 1..n, same binary) when the task first
+## needs them, distributes episodes through LabBatch, writes progress/metrics/checkpoints, and
+## obeys the control file (pause / resume / cancel / snapshot). Helpers only run episodes they
+## are handed (and keep heart-beating while paused) and exit when the coordinator is gone. Every
+## rank steps its episodes in its own physics worlds with the real combat rules; --fixed-fps 120
+## makes each frame exactly one 120 Hz tick, as fast as the CPU allows.
+## Liveness of the parent process: a helper reads the coordinator's progress heartbeat (a file
+## stat); only when that is stale does it ask the OS. The coordinator's parent is the game, which
+## writes no heartbeat: it is checked through the OS every PARENT_CHECK_MS (on Windows that spawns
+## `tasklist`, ~0.1 s), so a closed game stops its workers within that time.
+## CPU share (limits.cpu_share < 1): the worker measures whole frames (its own work, the physics
+## step and engine overhead) and sleeps off the accumulated "sleep debt" in whole milliseconds,
+## subtracting the time it really slept, so the long-run share matches the setting even though
+## the OS sleeps in coarse steps (see CpuThrottle).
 ## Exit codes: 0 completed/cancelled/interrupted, 1 failed, 2 bad job.
 
 const CONTROL_EVERY_MS := 200
 const PROGRESS_EVERY_MS := 500
-const PARENT_CHECK_MS := 5000
+const PARENT_CHECK_MS := 15000
+## helpers: how often the coordinator's progress heartbeat is looked at, and how old it may be
+const COORD_CHECK_MS := 2000
+const COORD_STALE_S := 20
+## idle frames sleep this long (a helper without work; a coordinator waiting for helpers)
+const IDLE_SLEEP_HELPER_MS := 20
+const IDLE_SLEEP_COORD_MS := 4
+
+
+## Long-run CPU share by sleep debt: every frame adds work × (1/share − 1) of debt, sleeping pays
+## it off by the time really slept (the OS may sleep longer than asked, especially below 2 ms on
+## Windows); the debt is clamped so a hitch or a pause never causes a long sleep or a long burst.
+class CpuThrottle:
+	extends RefCounted
+	const MAX_DEBT_US := 200000.0
+	const MAX_CREDIT_US := 50000.0
+	const MIN_SLEEP_US := 1500.0
+	var share := 1.0
+	var debt_us := 0.0
+
+	func _init(p_share := 1.0) -> void:
+		share = clampf(p_share, 0.05, 1.0)
+
+	## Adds a frame's work; returns the milliseconds to sleep now (0 = none).
+	func plan(work_us: int) -> int:
+		if share >= 0.999:
+			return 0
+		debt_us = clampf(debt_us + float(work_us) * (1.0 / share - 1.0), -MAX_CREDIT_US, MAX_DEBT_US)
+		if debt_us < MIN_SLEEP_US:
+			return 0
+		return int(debt_us / 1000.0)
+
+	## Time actually not working (a throttle sleep or an idle sleep) pays off the debt.
+	func slept(us: int) -> void:
+		if share < 0.999:
+			debt_us = maxf(debt_us - float(us), -MAX_CREDIT_US)
 
 var args := PackedStringArray()
 var job := {}
@@ -42,6 +85,11 @@ var _control_seen := false
 var _log: FileAccess
 var _finished := false
 var _last_parent_check := 0
+var _last_coord_check := 0
+var _throttle: CpuThrottle
+var _frame_start_us := 0
+var _slept_us := 0
+var _last_work_us := 0
 
 
 func _arg(flag: String, fallback := "") -> String:
@@ -68,6 +116,10 @@ func run_from_cli(a: PackedStringArray) -> void:
 	var loaded := LabJob.load_file(job_path)
 	job = loaded["job"]
 	var errors: PackedStringArray = loaded["errors"]
+	if not FileAccess.file_exists(job_path) and job_path.is_relative_path():
+		# `--path game` makes the game folder the working directory: say so
+		errors.append("relative paths are resolved from %s (Godot's --path sets the working directory; from the repository root use ../<path> or an absolute path)" %
+			ProjectSettings.globalize_path("res://").trim_suffix("/"))
 	run_dir = _resolve_run_dir(job_path)
 	if run_dir == "":
 		printerr("lab worker: cannot determine a run folder for %s" % job_path)
@@ -96,8 +148,13 @@ func run_from_cli(a: PackedStringArray) -> void:
 	add_child(runner)
 	batch = LabBatch.new()
 	batch.setup(run_dir.path_join("gen"), rank, runner)
+	batch.heartbeat_timeout_s = int(job["limits"]["heartbeat_s"])
+	batch.straggler_min_s = float(job["limits"]["straggler_s"])
+	_throttle = CpuThrottle.new(float(job["limits"]["cpu_share"]))
 	if rank == 0:
 		DirAccess.remove_absolute(run_dir.path_join("gen").path_join("stop"))
+		# helpers start when the task first hands out episodes (not during e.g. BC epochs)
+		batch.spawner = _spawn_helpers
 		task = _make_task(str(job["kind"]))
 		task.job = job
 		task.run_dir = run_dir
@@ -110,7 +167,6 @@ func run_from_cli(a: PackedStringArray) -> void:
 		if task.finished:
 			_finish()
 			return
-		_spawn_helpers()
 		state = "running"
 		_write_status("running", "")
 		_note("run %s: %s, creature %s, %d worker process(es) x %d world(s)" % [str(job["id"]), str(job["kind"]), str(job["creature"]),
@@ -251,7 +307,14 @@ func _lower_priority() -> void:
 func _physics_process(dt: float) -> void:
 	if _finished:
 		return
+	# the previous frame, measured start to start, includes this script's work, the physics step
+	# and engine overhead; what this worker slept in it is not work
 	var t0 := Time.get_ticks_usec()
+	if _frame_start_us > 0:
+		_last_work_us = maxi(int(t0 - _frame_start_us) - _slept_us, 0)
+		_busy_us += _last_work_us
+	_frame_start_us = t0
+	_slept_us = 0
 	var now := Time.get_ticks_msec()
 	if now - _last_control >= CONTROL_EVERY_MS:
 		_last_control = now
@@ -260,12 +323,16 @@ func _physics_process(dt: float) -> void:
 			return
 	if state == "paused":
 		runner.set_frozen(true)
-		if rank == 0 and now - _last_progress >= PROGRESS_EVERY_MS:
-			_last_progress = now
-			_write_progress()
-		OS.delay_msec(40)
+		if rank == 0:
+			if now - _last_progress >= PROGRESS_EVERY_MS:
+				_last_progress = now
+				_write_progress()
+		else:
+			batch.heartbeat(_stats())   # a long pause must not look like a dead helper
+		_sleep_ms(40, false)
 		return
 	runner.set_frozen(false)
+	var work_this := _last_work_us
 	if rank == 0:
 		task.elapsed_s = elapsed_s()
 		_check_limits()
@@ -276,16 +343,24 @@ func _physics_process(dt: float) -> void:
 	else:
 		batch.helper_poll(_stats())
 	runner.step(dt)
-	var work := Time.get_ticks_usec() - t0
-	_busy_us += work
 	if rank == 0 and now - _last_progress >= PROGRESS_EVERY_MS:
 		_last_progress = now
 		_write_progress()
-	var share := float(job["limits"]["cpu_share"])
-	if share < 0.999:
-		OS.delay_usec(int(float(work) * (1.0 / share - 1.0)))
-	elif not runner.busy():
-		OS.delay_msec(3)
+	var ms := _throttle.plan(work_this)
+	if ms > 0:
+		_sleep_ms(ms, true)
+	elif not runner.busy() and (rank > 0 or not task.busy()):
+		_sleep_ms(IDLE_SLEEP_HELPER_MS if rank > 0 and batch.helper_idle() else IDLE_SLEEP_COORD_MS, true)
+
+
+## Sleeps and accounts for it (not work; pays off CPU-share debt when `counts`).
+func _sleep_ms(ms: int, counts: bool) -> void:
+	var t := Time.get_ticks_usec()
+	OS.delay_msec(ms)
+	var us := int(Time.get_ticks_usec() - t)
+	_slept_us += us
+	if counts:
+		_throttle.slept(us)
 
 
 func elapsed_s() -> float:
@@ -326,18 +401,47 @@ static func process_alive(pid: int, image := "") -> bool:
 	return c2 == 0
 
 
+## Whether the coordinator's progress heartbeat (rewritten every 0.5 s, also while paused) is
+## recent: `mtime` its file time (0 = missing), `now_s` the current unix time.
+static func heartbeat_fresh(mtime: int, now_s: int, stale_s := COORD_STALE_S) -> bool:
+	return mtime > 0 and now_s - mtime <= stale_s
+
+
+## Whether the parent process (the game for the coordinator, the coordinator for a helper) still
+## runs. A helper trusts the coordinator's fresh progress heartbeat (a stat, every
+## COORD_CHECK_MS) and asks the OS only when it is stale; the coordinator asks the OS every
+## PARENT_CHECK_MS (the game writes no heartbeat). A child process is checked directly.
+func _parent_alive(now: int) -> bool:
+	if parent_pid <= 0:
+		return true
+	if rank > 0:
+		if now - _last_coord_check < COORD_CHECK_MS:
+			return true
+		_last_coord_check = now
+		var hb := run_dir.path_join("progress.json")
+		var mt := int(FileAccess.get_modified_time(hb)) if FileAccess.file_exists(hb) else 0
+		if heartbeat_fresh(mt, int(Time.get_unix_time_from_system())):
+			return true
+		if now - _last_parent_check < COORD_CHECK_MS:
+			return true
+		_last_parent_check = now
+		return process_alive(parent_pid)
+	if now - _last_parent_check < PARENT_CHECK_MS:
+		return true
+	_last_parent_check = now
+	return process_alive(parent_pid)
+
+
 func _check_control() -> void:
 	var now := Time.get_ticks_msec()
-	if parent_pid > 0 and now - _last_parent_check >= PARENT_CHECK_MS:
-		_last_parent_check = now
-		if not process_alive(parent_pid):
-			if rank == 0:
-				_note("the game process exited; stopping (resume from the Lab later)")
-				_finish_interrupted("interrupted: the game was closed (resumable)")
-			else:
-				_note("coordinator gone; helper exiting")
-				_quit(0)
-			return
+	if not _parent_alive(now):
+		if rank == 0:
+			_note("the game process exited; stopping (resume from the Lab later)")
+			_finish_interrupted("interrupted: the game was closed (resumable)")
+		else:
+			_note("coordinator gone; helper exiting")
+			_quit(0)
+		return
 	if rank > 0 and FileAccess.file_exists(run_dir.path_join("gen").path_join("stop")):
 		_quit(0)
 		return
@@ -364,10 +468,13 @@ func _check_control() -> void:
 			_write_progress()
 	elif desired != "pause" and state == "paused":
 		state = "running"
-		_paused_total += Time.get_ticks_msec() - _pause_started
+		var paused_ms := Time.get_ticks_msec() - _pause_started
+		_paused_total += paused_ms
 		runner.set_frozen(false)
 		if rank == 0:
-			_note("resumed")
+			# deadlines skip the pause; helpers get a fresh heartbeat grace period
+			batch.on_resume(paused_ms)
+			_note("resumed after %.0f s" % (float(paused_ms) / 1000.0))
 			_write_status("running", "")
 	var snap := int(c.get("snapshot_seq", 0))
 	if rank == 0 and snap > _snapshot_seq:
@@ -428,7 +535,7 @@ func _write_progress() -> void:
 		"state": state, "phase": task.phase, "pid": OS.get_process_id(), "elapsed_s": el, "max_wall_s": float(job["limits"]["max_wall_s"]),
 		"episodes": task.episodes, "sim_s": sim_s, "sim_speed": sim_s / maxf(el, 0.001), "eps_per_hour": float(task.episodes) / maxf(el / 3600.0, 1e-6),
 		"util": st["util"], "mem_mb": st["mem_mb"], "mem_peak_mb": st["mem_peak_mb"], "workers": 1 + helpers.size(), "helpers_alive": alive,
-		"helpers": helpers, "reassigned": batch.reassigned, "batch_done": batch.done_count(), "batch_size": batch.items.size(),
+		"helpers": helpers, "reassigned": batch.reassigned, "late": batch.late, "batch_done": batch.done_count(), "batch_size": batch.items.size(),
 		"limits": job["limits"], "updated": Time.get_unix_time_from_system(), "message": task.message}
 	for k in task.progress:
 		p[k] = task.progress[k]
@@ -450,6 +557,7 @@ func _finish() -> void:
 	task.elapsed_s = elapsed_s()
 	state = task.final_state
 	_stop_helpers()
+	batch.cleanup()
 	_write_progress()
 	_write_status(task.final_state, task.message, {"report": task.report_path, "policy_id": task.policy_id, "final": true})
 	_note("finished: %s — %s" % [task.final_state, task.message])
