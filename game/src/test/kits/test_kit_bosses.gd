@@ -54,6 +54,18 @@ func test_zz_quick_balance() -> void:
 				print("    %s dmg/bout by slot: %s" % [side, ", ".join(parts)])
 
 
+## `--kit-campaign-warnings`: campaign references still waiting for content (debug aid).
+func test_zz_campaign_warnings() -> void:
+	if not OS.get_cmdline_user_args().has("--kit-campaign-warnings"):
+		return
+	var cat := CampaignCatalog.new(Content)
+	cat.validate()
+	for w in cat.warnings:
+		print("WARN ", w)
+	for e in cat.errors:
+		print("ERR ", e)
+
+
 ## `--kit-bout <boss> <fighter> <tier> [seed]`: one bout as a timeline (tuning aid).
 func test_zz_debug_bout() -> void:
 	var args := OS.get_cmdline_user_args()

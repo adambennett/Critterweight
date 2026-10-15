@@ -50,7 +50,7 @@
                {"t": 0.95, "joints": {"body3": [40, 0, 0], "body2": [36, 0, 0], "body1": [30, 0, 0], "head": [22, 0, 0]}, "lean": [10, 0, 0]},
                {"t": 1.4}]},
     "l2": {"name": "Whip Tail", "duration": 1.45, "cancel": 1.2, "damage": 0, "stamina": 10, "move_mult": 0.0, "turn_rate": 2.0, "armor": [[0.0, 0.6]], "armor_level": "lights",
-      "effects": [{"t": 0.66, "type": "area", "shape": "cone", "cone_deg": 180, "radius": 2.4, "damage": 12, "knockback": 3.6, "poise": 25, "stun": 0.35, "element": "static", "buildup": 25, "class": "light", "vfx": "tail_whip"}],
+      "effects": [{"t": 0.66, "type": "area", "shape": "cone", "cone_deg": 180, "radius": 2.4, "damage": 9, "knockback": 3.6, "poise": 25, "stun": 0.35, "element": "static", "buildup": 25, "class": "light", "vfx": "tail_whip"}],
       "keys": [{"t": 0.0},
                {"t": 0.5, "joints": {"body5": [-14, -30, 0], "body6": [-12, -30, 0], "body7": [-10, -25, 0], "plug": [-10, -15, 0]}, "lean": [0, -8, 0]},
                {"t": 0.6, "joints": {"body5": [-14, -36, 0], "body6": [-12, -34, 0], "body7": [-10, -28, 0], "plug": [-10, -18, 0]}, "lean": [0, -10, 0]},
@@ -58,7 +58,7 @@
                {"t": 0.95, "joints": {"body5": [0, 55, 0], "body6": [0, 45, 0], "body7": [0, 30, 0], "plug": [0, 15, 0]}, "lean": [0, 16, 0]},
                {"t": 1.45}]},
     "heavy": {"name": "Coil Slam", "duration": 2.15, "cancel": 1.9, "damage": 0, "stamina": 12, "move_mult": 0.0, "turn_rate": 1.5, "armor": [[0.0, 0.95]], "armor_level": "all_but_heavy", "lunge": [[0.9, 1.05, 3.0]],
-      "effects": [{"t": 1.0, "type": "area", "at": "forward:2.0", "radius": 2.0, "damage": 18, "knockback": 4.0, "poise": 45, "stun": 0.5, "element": "static", "buildup": 45, "class": "heavy", "vfx": "coil_slam"}],
+      "effects": [{"t": 1.0, "type": "area", "at": "forward:2.0", "radius": 2.0, "damage": 14, "knockback": 4.0, "poise": 45, "stun": 0.5, "element": "static", "buildup": 45, "class": "heavy", "vfx": "coil_slam"}],
       "keys": [{"t": 0.0},
                {"t": 0.7, "joints": {"body3": [-10, 0, 0], "body2": [-16, 0, 0], "body1": [-14, 0, 0], "head": [-18, 0, 0]}, "lean": [-6, 0, 0], "height": 0.12},
                {"t": 0.9, "joints": {"body3": [-10, 0, 0], "body2": [-16, 0, 0], "body1": [-14, 0, 0], "head": [-18, 0, 0]}, "lean": [-6, 0, 0], "height": 0.12},
@@ -85,7 +85,7 @@
   },
   "abilities": {
     "ability1": {"name": "Arc Spit", "cooldown": 6.0, "duration": 1.4, "stamina": 10, "damage": 0, "move_mult": 0.0, "turn_rate": 3.0,
-      "effects": [{"t": 0.82, "type": "projectile", "count": 2, "spread_deg": 30, "speed": 6, "life": 1.6, "radius": 0.3, "homing_deg": 120, "aim": "target", "from": "jaws", "damage": 7, "knockback": 1.5, "poise": 10, "stun": 0.2, "element": "static", "buildup": 40, "vfx": "arc_orb"}],
+      "effects": [{"t": 0.82, "type": "projectile", "count": 2, "spread_deg": 30, "speed": 6, "life": 1.6, "radius": 0.3, "homing_deg": 120, "aim": "target", "from": "jaws", "damage": 5, "knockback": 1.5, "poise": 10, "stun": 0.2, "element": "static", "buildup": 40, "vfx": "arc_orb"}],
       "keys": [{"t": 0.0},
                {"t": 0.6, "joints": {"body2": [-6, 0, 0], "body1": [-8, 0, 0], "head": [-16, 0, 0]}, "lean": [-4, 0, 0]},
                {"t": 0.8, "joints": {"body2": [-6, 0, 0], "body1": [-8, 0, 0], "head": [-16, 0, 0]}, "lean": [-4, 0, 0]},
@@ -98,7 +98,7 @@
                {"t": 0.9, "joints": {"body3": [20, 0, 0], "body2": [24, 0, 0], "body1": [20, 0, 0], "head": [16, 0, 0]}, "height": -0.25},
                {"t": 1.2}]},
     "juice": {"name": "Overvolt", "duration": 2.5, "stamina": 0, "move_mult": 0.0, "turn_rate": 1.0,
-      "effects": [{"t": 1.0, "type": "area", "radius": 3.5, "damage": 20, "knockback": 5.0, "poise": 50, "stun": 0.6, "element": "static", "buildup": 60, "class": "juice", "vfx": "discharge"},
+      "effects": [{"t": 1.0, "type": "area", "radius": 3.5, "damage": 15, "knockback": 5.0, "poise": 50, "stun": 0.6, "element": "static", "buildup": 60, "class": "juice", "vfx": "discharge"},
                   {"t": 1.05, "type": "juice_state", "duration": 6.0, "armor": "lights", "status": {"name": "Plugged In", "speed": 1.15}, "hooks": [{"on": "hit_dealt", "do": [{"type": "buildup", "element": "static", "amount": 15}]}], "end": [{"type": "stamina", "amount": -30}]}],
       "keys": [{"t": 0.0},
                {"t": 0.6, "joints": {"body3": [-4, 0, 0], "body2": [-8, 0, 0], "body1": [-8, 0, 0], "head": [-24, 0, 0]}, "height": 0.1},
@@ -108,7 +108,7 @@
   },
   "art": {"model": "res://assets/models/creatures/boss_conduit.glb", "palette": {"primary": "#1E1E24", "secondary": "#F7E04A", "accent": "#CFF4FF", "copper": "#B87333"}, "roughness": 0.5, "outline": 0.014, "hype_feature": "seam glow", "gore_piece": {"segment": "head", "offset": [0.06, -0.1, 0.6], "size": 0.07, "shape": "tooth", "color": "#CFF4FF"}},
   "audio": {"voice": "conduit", "material": "chitin", "plan": "serpent", "juice": "juice_generic", "drip": "serpent_tick"},
-  "ai": {"style": "ambusher", "aggression": 0.05, "grab": 0.06, "ability": 0.15, "counter_slot": "ability2", "counter_chance": 0.25, "block": -1.0, "dodge": -1.0, "charge": -1.0, "reach": {"l1": 2.4, "grab": 2.4}, "rest": [1.4, 2.4], "bulky": true},
+  "ai": {"style": "ambusher", "aggression": 0.05, "grab": 0.06, "ability": 0.15, "counter_slot": "ability2", "counter_chance": 0.25, "block": -1.0, "dodge": -1.0, "charge": -1.0, "reach": {"l1": 2.4, "grab": 2.4}, "rest": [1.8, 3.0], "bulky": true},
   "string": ["l1", "l2"],
   "throws": {
     "throw_fwd": {"distance": 2.5, "damage": 8, "knockdown": true, "buildup": 30},
@@ -117,6 +117,6 @@
   },
   "juice": {"duration": 6.0},
   "passives": [
-    {"id": "clamp_discharge", "on": "throw", "do": [{"type": "area", "radius": 1.5, "damage": 8, "knockback": 3.0, "poise": 15, "stun": 0.3, "element": "static", "buildup": 30, "vfx": "discharge"}]}
+    {"id": "clamp_discharge", "on": "throw", "do": [{"type": "area", "radius": 1.5, "damage": 6, "knockback": 3.0, "poise": 15, "stun": 0.3, "element": "static", "buildup": 30, "vfx": "discharge"}]}
   ]
 }
