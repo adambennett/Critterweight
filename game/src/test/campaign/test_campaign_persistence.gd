@@ -29,7 +29,7 @@ func test_suspend_and_resume_mid_run() -> void:
 	var r := store.load_slot("tester", "off_the_street", cat())
 	check(bool(r["ok"]), "resume ok: %s" % r["error"])
 	var resumed := RunController.from_state(cat(), r["state"])
-	check_eq(Saves.checksum(resumed.state), Saves.checksum(ctrl.state), "resumed state equals the suspended one")
+	check_eq(sig(resumed.state), sig(ctrl.state), "resumed state equals the suspended one")
 	play_synthetic(resumed)
 	check_eq(resumed.phase(), "victory", "a resumed run plays to the end")
 	var listed := store.list("tester", cat())
@@ -47,7 +47,7 @@ func test_fresh_seed_run_resumes_identically() -> void:
 	var a := RunController.from_state(cat(), r["state"])
 	_advance(a, 3)
 	_advance(ctrl, 3)
-	check_eq(Saves.checksum(a.state), Saves.checksum(ctrl.state), "the resumed run continues exactly like the original")
+	check_eq(sig(a.state), sig(ctrl.state), "the resumed run continues exactly like the original")
 
 
 func test_resume_after_crash_during_write() -> void:
@@ -56,7 +56,7 @@ func test_resume_after_crash_during_write() -> void:
 	store.save(ctrl.state, "tester")
 	var path := store.slot_path("tester", "off_the_street")
 	_advance(ctrl, 1)
-	var expected := Saves.checksum(ctrl.state)
+	var expected := sig(ctrl.state)
 	Saves.simulate_crash_after_tmp = true
 	store.save(ctrl.state, "tester")      # "crashes" after the verified temp file
 	Saves.simulate_crash_after_tmp = false
@@ -64,19 +64,19 @@ func test_resume_after_crash_during_write() -> void:
 	var r := store.load_slot("tester", "off_the_street", cat())
 	check(bool(r["ok"]), "recovered: %s" % r["error"])
 	check_eq(str(r["recovered_from"]), "tmp", "recovered from the newer temp copy")
-	check_eq(Saves.checksum(r["state"]), expected, "nothing lost")
+	check_eq(sig(r["state"]), expected, "nothing lost")
 
 
 func test_fight_in_progress_reruns_from_start() -> void:
 	var ctrl := new_run({"seed": 608})
 	ctrl.choose_node(str(ctrl.available_nodes()[0]), "p0")
 	check_eq(ctrl.phase(), "fight", "in a fight")
-	var plan := Saves.checksum(ctrl.current_plan())
+	var plan := sig(ctrl.current_plan())
 	store.save(ctrl.state, "tester")
 	var r := store.load_slot("tester", "off_the_street", cat())
 	var resumed := RunController.from_state(cat(), r["state"])
 	check_eq(resumed.phase(), "fight", "the fight is pending again after resume")
-	check_eq(Saves.checksum(resumed.current_plan()), plan, "same enemies, same arena")
+	check_eq(sig(resumed.current_plan()), plan, "same enemies, same arena")
 	check(resumed.complete_fight(fake_result(resumed)), "the re-run fight applies once")
 	check(not resumed.complete_fight(fake_result(resumed)), "and only once")
 
@@ -186,3 +186,37 @@ func test_party_ticket_integrity() -> void:
 	check(RunStore.ticket_valid(t), "fresh ticket valid")
 	t["state"]["players"][0]["scrip"] = 99999
 	check(not RunStore.ticket_valid(t), "a tampered ticket is rejected")
+
+
+## Godot's JSON reader brings some 17-digit floats back one ulp off; real fight results produce
+## such values all the time. Saves and tickets must still verify (RunStore.json_stable).
+func test_floats_json_cannot_round_trip_still_save_and_travel() -> void:
+	# find such a value (about 1 in 7 random doubles; a source literal is already "parsed")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 5
+	var nasty := 0.0
+	for i in 1000:
+		var x := rng.randf_range(10.0, 900.0)
+		if float(JSON.parse_string(JSON.stringify([x], "", false, true))[0]) != x:
+			nasty = x
+			break
+	check(nasty != 0.0, "precondition: found a float that does not survive one JSON round trip")
+	var ctrl := new_run({"seed": 616})
+	_advance(ctrl, 2)
+	ctrl.state["elapsed"] = nasty
+	ctrl.player("p0")["hp"] = nasty * 0.7
+	ctrl.player("p0")["hype_carry"] = 1.0 / 3.0
+	check_eq(store.save(ctrl.state, "tester"), OK, "the save verifies")
+	var r := store.load_slot("tester", "off_the_street", cat())
+	check(bool(r["ok"]), "and loads: %s" % r["error"])
+	check_near(float(r["state"]["elapsed"]), nasty, 0.000001, "value kept (to the ulp)")
+	var t := RunStore.make_ticket(ctrl.state, "p0")
+	var wire = JSON.parse_string(JSON.stringify(t, "", false, true))
+	check(RunStore.ticket_valid(wire), "a ticket survives the wire")
+	var prof := Profiles.default_profile("t", "T")
+	ctrl.abandon()
+	ctrl.state["result"]["elapsed"] = nasty
+	CampaignProgression.finish_run(cat(), ctrl.state, "p0", prof)
+	var h: Dictionary = prof["history"][0]
+	var back := float(JSON.parse_string(JSON.stringify([h["time"]], "", false, true))[0])
+	check_eq(back, float(h["time"]), "profile history times survive JSON exactly")

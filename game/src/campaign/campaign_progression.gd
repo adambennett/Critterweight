@@ -188,7 +188,7 @@ static func finish_run(catalog: CampaignCatalog, state: Dictionary, pid: String,
 	# history
 	var entry := {"kind": "campaign", "run_id": str(state.get("run_id", "")), "variant": variant, "mode": str(state.get("mode", "")),
 		"fighter": fighter, "victory": victory, "act": int(res.get("act", 1)), "dose": dose, "difficulty": str(state.get("difficulty", "")),
-		"custom": custom, "time": float(res.get("elapsed", 0.0)), "clout": clout, "party": (state.get("players", []) as Array).size(),
+		"custom": custom, "time": RunStore.stable_float(snappedf(float(res.get("elapsed", 0.0)), 0.01)), "clout": clout, "party": (state.get("players", []) as Array).size(),
 		"seed": str(state.get("seed_text", "")), "kos": int(p.get("stats", {}).get("kos", 0))}
 	var hist: Array = profile["history"]
 	hist.push_front(entry)
@@ -208,7 +208,8 @@ static func _update_records(state: Dictionary, p: Dictionary, profile: Dictionar
 	var boards: Dictionary = profile["campaign"]["boards"]
 	var rec: Dictionary = boards.get(key, {"fastest_clear": 0.0, "fewest_knockdowns": -1, "best_scrip": 0, "no_hit_bosses": [], "standard": standard})
 	var st: Dictionary = p.get("stats", {})
-	var t := float(state.get("result", {}).get("elapsed", 0.0))
+	# profile floats must survive the JSON round trip exactly (see RunStore.json_stable)
+	var t := RunStore.stable_float(snappedf(float(state.get("result", {}).get("elapsed", 0.0)), 0.01))
 	if victory:
 		if float(rec["fastest_clear"]) <= 0.0 or (t > 0.0 and t < float(rec["fastest_clear"])):
 			rec["fastest_clear"] = t

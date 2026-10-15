@@ -33,6 +33,29 @@ func after_each() -> void:
 	SimSpeed.restore()
 
 
+## Checksum with floats rounded to 1e-6: compares a state with its saved / loaded / sent copy
+## (a JSON round trip may move a float by one ulp — see RunStore.json_stable).
+func sig(v) -> String:
+	return Saves.checksum(_rounded(v))
+
+
+func _rounded(v):
+	match typeof(v):
+		TYPE_FLOAT:
+			return snappedf(float(v), 0.000001)
+		TYPE_DICTIONARY:
+			var out := {}
+			for k in v:
+				out[str(k)] = _rounded(v[k])
+			return out
+		TYPE_ARRAY:
+			var arr := []
+			for e in v:
+				arr.append(_rounded(e))
+			return arr
+	return v
+
+
 func run_cfg(fighter := "f_stoke", extra := {}) -> Dictionary:
 	var c := {"seed": 12345, "variant": "off_the_street", "difficulty": "amateur", "dose": 0, "created_at": 1,
 		"players": [{"id": "p0", "name": "Tester", "profile_id": "test", "fighter": fighter}]}

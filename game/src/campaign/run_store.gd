@@ -32,7 +32,36 @@ static func slot_for(state: Dictionary) -> String:
 
 func save(state: Dictionary, profile_id: String, slot := "") -> Error:
 	var s := slot if slot != "" else slot_for(state)
-	return Saves.write_json(slot_path(profile_id, s), KIND, RunState.VERSION, state)
+	return Saves.write_json(slot_path(profile_id, s), KIND, RunState.VERSION, json_stable(state))
+
+
+## Godot's JSON reader does not read every 17-digit float back exactly (measured: about 1 value
+## in 7 comes back one ulp off), so a checksum over in-memory floats can fail Saves' verification
+## after a write, or a ticket check after a network hop. Round-tripping the data until its text
+## is a fixed point (usually 2 passes; at most 8 seen over 200k random values) yields data that
+## survives JSON bit-exactly. Numbers come back as floats, exactly like a loaded save.
+static func json_stable(data):
+	var text := JSON.stringify(data, "", false, true)
+	var cur = JSON.parse_string(text)
+	for i in 24:
+		var t2 := JSON.stringify(cur, "", false, true)
+		if t2 == text:
+			return cur
+		text = t2
+		cur = JSON.parse_string(text)
+	push_warning("RunStore.json_stable: data did not reach a JSON fixed point")
+	return cur
+
+
+## One float that survives a JSON round trip exactly (for values written into profiles).
+static func stable_float(x: float) -> float:
+	var cur := x
+	for i in 24:
+		var nx := float(JSON.parse_string(JSON.stringify([cur], "", false, true))[0])
+		if nx == cur:
+			return cur
+		cur = nx
+	return cur
 
 
 ## Loads and validates a suspended run. Returns {ok, state, error, problems, recovered_from,
@@ -138,8 +167,9 @@ static func migrate(data, from_version: int):
 # ---------------------------------------------------------------------------------------------
 
 static func make_ticket(state: Dictionary, host: String) -> Dictionary:
+	var st: Dictionary = json_stable(state)
 	return {"run_id": str(state.get("run_id", "")), "host": host, "log_size": (state.get("log", []) as Array).size(),
-		"checksum": Saves.checksum(state), "state": state.duplicate(true)}
+		"checksum": Saves.checksum(st), "state": st}
 
 
 static func ticket_valid(t: Dictionary) -> bool:
@@ -147,4 +177,4 @@ static func ticket_valid(t: Dictionary) -> bool:
 
 
 func save_ticket(profile_id: String, ticket: Dictionary) -> Error:
-	return Saves.write_json(slot_path(profile_id, "party_%s" % ticket.get("run_id", "run")), KIND, RunState.VERSION, ticket["state"])
+	return Saves.write_json(slot_path(profile_id, "party_%s" % ticket.get("run_id", "run")), KIND, RunState.VERSION, json_stable(ticket["state"]))
