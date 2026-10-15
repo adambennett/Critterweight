@@ -274,6 +274,8 @@ func test_drain_dive_invuln_distance_refund() -> void:
 	var start := Vector3.ZERO
 	var evading_mid := false
 	var dt := 1.0 / Engine.physics_ticks_per_second
+	if not Engine.is_in_physics_frame():   # step in phase with physics (AGENTS.md, D-026)
+		await get_tree().physics_frame
 	for i in int(1.6 / dt):
 		sim.step(dt)
 		await get_tree().physics_frame

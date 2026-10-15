@@ -289,6 +289,8 @@ func test_spring_pad_launches() -> void:
 	var launched_at := -1.0
 	var dt := 1.0 / Engine.physics_ticks_per_second
 	var cursor := 0
+	if not Engine.is_in_physics_frame():   # step in phase with physics (AGENTS.md, D-026)
+		await get_tree().physics_frame
 	for i in int(2.4 / dt):
 		sim2.step(dt)
 		await get_tree().physics_frame
