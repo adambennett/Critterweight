@@ -1,0 +1,13 @@
+{
+  "id": "cannery_coop",
+  "name": "Cannery Co-op",
+  "version": 1,
+  "description": "Co-op nights: Chum Rush survival for 1-4 humans, alternating with an Allied Brawl where bots fill the opposing side. No vote: the next entry is drawn by weight right after results.",
+  "voting": {"enabled": false, "candidates": 1},
+  "repeat_avoidance": 1,
+  "entries": [
+    {"id": "rush_gullet", "name": "Chum Rush @ The Gullet", "rules": "chum_rush", "arena": "the_gullet", "weight": 4, "bots": 0},
+    {"id": "brawl_gullet", "name": "Allied Brawl (vs bots)", "rules": "allied_brawl", "arena": "the_gullet", "weight": 2,
+      "min_players": 4}
+  ]
+}

@@ -1,0 +1,33 @@
+2026-10-15 10:00:16 r0 BC: 26912 samples in 90 episodes -> train 54 / validation 18 / test 18 episodes (16117 / 5400 / 5395 samples), 13141 params
+2026-10-15 10:00:19 r0 run bc_regular: bc, creature dev_biped, 3 worker process(es) x 2 world(s)
+2026-10-15 10:00:33 r0 epoch 1: train 2.4403, val 1.8688, acc move 64.3% button 82.0% joint 52.3%
+2026-10-15 10:00:45 r0 epoch 2: train 1.7211, val 1.7473, acc move 65.9% button 81.7% joint 53.7%
+2026-10-15 10:00:57 r0 epoch 3: train 1.6448, val 1.7074, acc move 66.9% button 82.1% joint 55.0%
+2026-10-15 10:01:10 r0 epoch 4: train 1.6102, val 1.6675, acc move 67.2% button 82.3% joint 55.4%
+2026-10-15 10:01:22 r0 epoch 5: train 1.5821, val 1.6636, acc move 67.3% button 82.6% joint 55.7%
+2026-10-15 10:01:33 r0 epoch 6: train 1.5697, val 1.6458, acc move 67.2% button 82.7% joint 55.6%
+2026-10-15 10:01:45 r0 epoch 7: train 1.5514, val 1.6496, acc move 67.1% button 82.6% joint 55.5%
+2026-10-15 10:01:56 r0 epoch 8: train 1.5436, val 1.6475, acc move 67.1% button 82.8% joint 55.6%
+2026-10-15 10:02:08 r0 epoch 9: train 1.5272, val 1.6379, acc move 67.2% button 82.9% joint 55.9%
+2026-10-15 10:02:20 r0 epoch 10: train 1.5269, val 1.6273, acc move 67.3% button 82.8% joint 55.8%
+2026-10-15 10:02:33 r0 epoch 11: train 1.5135, val 1.6406, acc move 66.8% button 83.1% joint 55.8%
+2026-10-15 10:02:45 r0 epoch 12: train 1.5038, val 1.6318, acc move 67.1% button 82.6% joint 55.5%
+2026-10-15 10:02:56 r0 epoch 13: train 1.4961, val 1.6136, acc move 67.3% button 82.8% joint 55.7%
+2026-10-15 10:03:08 r0 epoch 14: train 1.4896, val 1.6423, acc move 67.1% button 82.9% joint 55.8%
+2026-10-15 10:03:18 r0 epoch 15: train 1.4843, val 1.6197, acc move 67.5% button 83.0% joint 56.2%
+2026-10-15 10:03:28 r0 epoch 16: train 1.4752, val 1.6189, acc move 66.9% button 82.8% joint 55.6%
+2026-10-15 10:03:40 r0 epoch 17: train 1.4686, val 1.6392, acc move 66.7% button 82.3% joint 55.4%
+2026-10-15 10:03:50 r0 epoch 18: train 1.4596, val 1.6185, acc move 67.3% button 82.8% joint 56.1%
+2026-10-15 10:04:02 r0 epoch 19: train 1.4544, val 1.6243, acc move 67.2% button 82.7% joint 55.7%
+2026-10-15 10:04:11 r0 epoch 20: train 1.4469, val 1.6411, acc move 66.9% button 82.3% joint 55.1%
+2026-10-15 10:04:20 r0 epoch 21: train 1.4442, val 1.6223, acc move 67.0% button 82.6% joint 55.9%
+2026-10-15 10:04:20 r0 stopping: early stopping (no validation improvement for 8 epochs)
+2026-10-15 10:04:20 r0 helper rank 1 started (pid 40928)
+2026-10-15 10:04:20 r0 helper rank 2 started (pid 10292)
+2026-10-15 10:04:52 r0 clone vs teacher action distribution: TVD move 0.093, button 0.063
+2026-10-15 10:04:52 r0 clone rollouts: n=12 reward 83.03 ± 34.57 (95% CI 61.07..105.00) win 67% [39–86%]
+2026-10-15 10:04:52 r0 teacher rollouts: n=12 reward 63.97 ± 26.54 (95% CI 47.11..80.84) win 67% [39–86%]
+2026-10-15 10:04:52 r0 clone − teacher, paired difference +19.06 (95% CI -9.88..48.00, t = 1.45, n = 12 episodes) — not significant
+2026-10-15 10:04:52 r0 test episodes: accuracy move 67.4% button 82.7% both 55.6% (majority-class baseline 39.6% / 75.8% / 28.5%)
+2026-10-15 10:04:52 r0 saved policy 'Bot Regular clone (BC)' (u_dev_biped_tmycg4899) to the library
+2026-10-15 10:04:52 r0 finished: completed — completed: test-episode accuracy move 67%, button 83% (majority baseline 40% / 76%)

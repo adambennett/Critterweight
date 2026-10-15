@@ -1,0 +1,1 @@
+{"state":"completed","message":"evaluated: n=30 reward 78.85 ± 28.54 (95% CI 68.20..89.51) win 83% [66–93%]","pid":35284,"kind":"eval","run_id":"eval_bc_regular","updated":1792074893.6459999,"report":"../runs/eval_bc_regular/report.json","policy_id":"","final":true}

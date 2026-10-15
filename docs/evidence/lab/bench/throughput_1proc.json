@@ -1,11 +1,11 @@
 {
   "bench": "throughput",
-  "episodes": 46,
-  "episodes_per_hour": 5520.0,
+  "episodes": 20,
+  "episodes_per_hour": 2399.92000266658,
   "note": "one worker process; total throughput scales with worker processes",
   "processor_count": 8,
-  "sim_speed_total": 16.3133333333333,
-  "wall_s": 30.0,
-  "world_sim_seconds": 489.4,
+  "sim_speed_total": 7.41141961934602,
+  "wall_s": 30.001,
+  "world_sim_seconds": 222.35,
   "worlds": 2
 }

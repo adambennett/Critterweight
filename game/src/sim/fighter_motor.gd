@@ -141,10 +141,11 @@ func update(dt: float) -> void:
 		if s.parent < 0 or _in_limb(s.index):
 			continue
 		var local := _joint_local(s.index, gb)
-		if s.part == "tail":
+		var keyed := overlay_joints.has(s.index)   # a move that keys a joint owns it: no gait wave
+		if s.part == "tail" and not keyed:
 			var amp := 0.18 + spd2 * 0.05
 			local = Quaternion(Vector3.UP, sin(_wave_phase - s.index * 0.7) * amp) * local
-		elif def.gait == "serpent" and s.part == "core":
+		elif def.gait == "serpent" and s.part == "core" and not keyed:
 			var amp2 := minf(0.45, 0.1 + spd2 * 0.12)
 			local = Quaternion(Vector3.UP, sin(_wave_phase * 1.4 - s.index * 1.1) * amp2) * local
 		var parent_q := rig.bodies[s.parent].global_basis.get_rotation_quaternion()

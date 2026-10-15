@@ -72,6 +72,10 @@ static func open_pause(notice := "") -> void:
 ## the main menu then installs the menu backdrop (skipped in headless runs).
 static func quit_to_menu() -> void:
 	set_paused(false)
+	# online: quitting the match leaves the session (a listen host closes it for everyone with
+	# "The host left"); Net removes its match scene itself
+	if Net.has_method("is_session_active") and bool(Net.call("is_session_active")):
+		Net.call("leave")
 	if current_match() != null:
 		App.set_scene(null)
 	App.goto("main_menu")

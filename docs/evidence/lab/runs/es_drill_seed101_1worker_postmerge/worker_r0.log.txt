@@ -1,0 +1,22 @@
+2026-10-15 10:22:42 r0 ES: 5557 params, 24 candidates x 1 episodes per generation, sigma 0.050, lr 0.020
+2026-10-15 10:22:42 r0 run es_drill_seed101_1worker_postmerge: es, creature dev_biped, 1 worker process(es) x 2 world(s)
+2026-10-15 10:22:47 r0 validation at gen 0: n=8 reward -0.68 ± 0.06 (95% CI -0.73..-0.63) win 0% [0–32%] (new best: initial)
+2026-10-15 10:23:04 r0 gen 1: fitness 3.07 ± 6.40 (max 20.46), pop damage 3.1, |step| 1.4909
+2026-10-15 10:23:22 r0 gen 2: fitness 9.50 ± 15.07 (max 54.57), pop damage 8.2, |step| 1.0573
+2026-10-15 10:23:42 r0 gen 3: fitness 15.29 ± 17.39 (max 54.99), pop damage 13.3, |step| 0.8670
+2026-10-15 10:24:00 r0 gen 4: fitness 13.83 ± 16.60 (max 48.76), pop damage 11.4, |step| 0.7435
+2026-10-15 10:24:27 r0 gen 5: fitness 25.33 ± 20.48 (max 70.24), pop damage 21.6, |step| 0.6617
+2026-10-15 10:24:41 r0 validation at gen 5: n=8 reward 38.62 ± 12.40 (95% CI 28.24..48.99) win 100% [68–100%] | elite 63.85 (new best: elite)
+2026-10-15 10:24:55 r0 gen 6: fitness 27.80 ± 23.13 (max 67.99), pop damage 23.1, |step| 0.6109
+2026-10-15 10:25:08 r0 gen 7: fitness 36.99 ± 17.40 (max 65.51), pop damage 31.1, |step| 0.5683
+2026-10-15 10:25:28 r0 gen 8: fitness 38.06 ± 16.88 (max 58.53), pop damage 31.0, |step| 0.5349
+2026-10-15 10:25:44 r0 gen 9: fitness 40.74 ± 13.76 (max 68.67), pop damage 33.7, |step| 0.5223
+2026-10-15 10:26:06 r0 gen 10: fitness 40.10 ± 12.86 (max 58.53), pop damage 32.3, |step| 0.4984
+2026-10-15 10:26:26 r0 validation at gen 10: n=8 reward 45.75 ± 4.23 (95% CI 42.21..49.29) win 100% [68–100%] | elite 59.41
+2026-10-15 10:26:26 r0 stopping: generation limit (10)
+2026-10-15 10:27:07 r0 test: initial n=20 reward -0.82 ± 0.22 (95% CI -0.92..-0.72) win 0% [0–16%]
+2026-10-15 10:27:07 r0 test: trained n=20 reward 47.63 ± 12.20 (95% CI 41.92..53.34) win 100% [84–100%]
+2026-10-15 10:27:07 r0 test: trained − initial, paired difference +48.45 (95% CI 42.77..54.13, t = 17.86, n = 20 episodes) — significant
+2026-10-15 10:27:07 r0 test: scripted reference (jabber) n=20 reward 51.83 ± 7.24 (95% CI 48.44..55.22) win 100% [84–100%]
+2026-10-15 10:27:07 r0 test: trained − reference, paired difference -4.20 (95% CI -9.63..1.23, t = -1.62, n = 20 episodes) — not significant
+2026-10-15 10:27:07 r0 finished: completed — completed (generation limit (10)): trained policy n=20 reward 47.63 ± 12.20 (95% CI 41.92..53.34) win 100% [84–100%]; vs its start: paired difference +48.45 (95% CI 42.77..54.13, t = 17.86, n = 20 episodes) — significant

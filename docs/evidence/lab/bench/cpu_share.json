@@ -1,0 +1,26 @@
+{
+  "note": "one ES worker (1 process, 2 worlds, drill episodes), CPU time of the worker process from the OS over 20 s per setting; reported_util = the worker main thread work (script, physics step, engine) per wall time; 2026-10-15 10:43, machine load from other jobs 60-87 percent",
+  "runs": [
+    {
+      "share": 1.0,
+      "cpu_of_one_core": 1.306,
+      "reported_util": 1.0,
+      "episodes_per_min": 72.0,
+      "machine_load_pct": 87
+    },
+    {
+      "share": 0.5,
+      "cpu_of_one_core": 0.44,
+      "reported_util": 0.501,
+      "episodes_per_min": 36.0,
+      "machine_load_pct": 83
+    },
+    {
+      "share": 0.25,
+      "cpu_of_one_core": 0.187,
+      "reported_util": 0.25,
+      "episodes_per_min": 0.0,
+      "machine_load_pct": 60
+    }
+  ]
+}

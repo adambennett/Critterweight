@@ -1,6 +1,9 @@
 extends TestCase
 ## LAB-02 (imitation): datasets round-trip and reject damage; behaviour cloning drives the loss
-## down and can overfit a tiny dataset (the optimiser and gradients really learn).
+## down and can overfit a tiny dataset (the optimiser and gradients really learn). Review
+## findings 4 and 12: the split is by whole episodes into train / validation (early stopping) /
+## test (reported), a dataset too small for that is refused with a clear message (no fallback
+## that trains on held-out data), and the job reports test-episode accuracy and its split.
 
 var dir := ""
 
@@ -121,3 +124,91 @@ func test_bc_generalises_on_held_out_episodes() -> void:
 	check(float(v1["loss"]) < float(v0["loss"]), "validation loss decreased (%.3f -> %.3f)" % [float(v0["loss"]), float(v1["loss"])])
 	check(float(v1["acc_joint"]) > float(base["acc_joint"]) + 0.15, "beats the majority baseline (%.2f vs %.2f)" % [float(v1["acc_joint"]), float(base["acc_joint"])])
 	check(bc.best_epoch >= 1 and not bc.best_params.is_empty(), "best weights tracked (epoch %d, early stop %s)" % [bc.best_epoch, str(stopped)])
+
+
+func test_bc_refuses_datasets_with_too_few_episodes() -> void:
+	var d := _data(5 * 30, 4)
+	var units := PackedInt32Array()
+	for k in 5 * 30:
+		units.append(k / 30)          # 5 recorded episodes of 30 decisions
+	d["units"] = units
+	var net := PolicyMLP.create(PolicyObs.SIZE, PackedInt32Array([8]), PolicyActions.OUTPUTS, "tanh", 1)
+	var bc := LabBC.new()
+	var why := bc.setup(d, net, PolicyActions.button_mask(null), {"seed": 1, "val_frac": 0.2})
+	check(why.contains("episode"), "refused with a reason: %s" % why)
+	check(bc.train_idx.is_empty() and bc.val_idx.is_empty(), "no fallback split (the old one cut episodes into blocks and could train on validation)")
+	# the job fails with that message instead of training
+	var ddir := PolicyDataset.ensure("few", "Few episodes", "dev_biped", "test")
+	PolicyDataset.write_shard(ddir, d["obs"], d["moves"], d["buttons"], units, "t")
+	var run := dir.path_join("run_few")
+	var task := LabTaskBC.new()
+	task.job = LabJob.normalize({"kind": "bc", "creature": "dev_biped", "bc": {"datasets": [ddir], "rollouts": 0},
+		"output": {"save_to_library": false}})["job"]
+	task.run_dir = run
+	task.begin()
+	check(task.finished and task.final_state == "failed", "the BC job refuses the dataset")
+	check(task.message.contains("at least %d" % LabBC.MIN_EPISODES), "and says how many episodes are needed: %s" % task.message)
+
+
+func test_bc_split_is_by_whole_episodes_three_ways() -> void:
+	var d := _data(400, 5)
+	var net := PolicyMLP.create(PolicyObs.SIZE, PackedInt32Array([8]), PolicyActions.OUTPUTS, "tanh", 1)
+	var bc := LabBC.new()
+	check_eq(bc.setup(d, net, PolicyActions.button_mask(null), {"seed": 9, "val_frac": 0.2, "test_frac": 0.2}), "", "50 episodes split")
+	var part := {}
+	var mixed := 0
+	for pair in [[bc.train_idx, "train"], [bc.val_idx, "val"], [bc.test_idx, "test"]]:
+		for k in (pair[0] as PackedInt32Array):
+			var u := int(d["units"][k])
+			if part.has(u) and str(part[u]) != str(pair[1]):
+				mixed += 1
+			part[u] = pair[1]
+	check_eq(mixed, 0, "no episode is in two splits")
+	check_eq(bc.train_idx.size() + bc.val_idx.size() + bc.test_idx.size(), 400, "every sample in exactly one split")
+	var si := bc.split_info
+	check_eq(str(si["mode"]), "episodes")
+	check_eq(int(si["val_episodes"]), 10, "20% of 50 episodes validate")
+	check_eq(int(si["test_episodes"]), 10, "20% test")
+	check_eq(int(si["train_episodes"]), 30, "the rest train")
+	# the smallest accepted dataset still holds out one validation and one test episode
+	var small := _data(6 * 20, 6)
+	var su := PackedInt32Array()
+	for k in 6 * 20:
+		su.append(k / 20)
+	small["units"] = su
+	var bc2 := LabBC.new()
+	check_eq(bc2.setup(small, PolicyMLP.create(PolicyObs.SIZE, PackedInt32Array([8]), PolicyActions.OUTPUTS, "tanh", 1), PolicyActions.button_mask(null), {"seed": 1}), "")
+	check(bc2.val_idx.size() == 20 and bc2.test_idx.size() == 20 and bc2.train_idx.size() == 80, "6 episodes: 4 train / 1 validation / 1 test")
+
+
+## The BC job end to end (in-process, no rollouts): early stopping on validation episodes, test
+## accuracy reported on other episodes, split shown in the report and the policy metadata.
+func test_bc_job_reports_test_episode_accuracy() -> void:
+	var d := _data(400, 7)
+	var ddir := PolicyDataset.ensure("bcjob", "BC job", "dev_biped", "test")
+	PolicyDataset.write_shard(ddir, d["obs"], d["moves"], d["buttons"], d["episodes"], "t")
+	var run := dir.path_join("run_bc")
+	DirAccess.make_dir_recursive_absolute(run)
+	var task := LabTaskBC.new()
+	task.job = LabJob.normalize({"kind": "bc", "creature": "dev_biped", "seed": 2, "model": {"hidden": [16]},
+		"bc": {"datasets": [ddir], "rollouts": 0, "patience": 3, "lr": 0.01, "batch": 32}, "limits": {"max_epochs": 6},
+		"output": {"save_to_library": false}})["job"]
+	task.run_dir = run
+	task.begin()
+	check(not task.finished, "training starts: %s" % task.message)
+	var guard := 0
+	while not task.finished and guard < 2000:
+		task.frame(1.0 / 120.0)
+		guard += 1
+	check_eq(task.final_state, "completed", "job completed: %s" % task.message)
+	var rep := LabIO.read_json(run.path_join("report.json"))
+	check(rep.has("test") and rep.has("final_val"), "report has test and validation accuracy")
+	var sp: Dictionary = rep.get("split", {})
+	check_eq(str(sp.get("mode", "")), "episodes", "split mode reported")
+	check(int(sp.get("test_episodes", 0)) >= 1 and int(rep.get("test_samples", 0)) > 0, "test episodes held out")
+	check(task.message.contains("test-episode accuracy"), "the run's message names the metric honestly: %s" % task.message)
+	var pol := PolicyIO.read_file(run.path_join("best.policy.json"))
+	check(pol["ok"], "clone saved")
+	if pol["ok"]:
+		var tr: Dictionary = (pol["policy"] as PolicyData).training
+		check(tr.has("test_accuracy") and tr.has("split"), "policy metadata carries the test accuracy and the split")

@@ -1,0 +1,11 @@
+{
+  "kind": "eval",
+  "name": "Evaluate shipped Regular Clone (BC)",
+  "creature": "dev_biped",
+  "seed": 5002,
+  "target": {"policy": "dev_biped_bc_regular", "compare": "random_init"},
+  "objective": {"preset": "aggressive"},
+  "scenario": {"preset": "spar_jabber", "opponents": ["bot_rookie"], "round_time": 20},
+  "eval": {"opponents": ["bot_rookie"], "episodes": 15, "standard_spawns": true, "reference": "bot_regular"},
+  "limits": {"workers": 3, "worlds": 2, "low_priority": false, "max_wall_s": 3600}
+}

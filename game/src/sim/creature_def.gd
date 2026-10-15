@@ -16,6 +16,9 @@ var stats := {
 	"stamina": 100.0, "stamina_regen": 12.0, "poise": 60.0, "poise_regen": 15.0,
 	"dodge_distance": 2.8, "dodge_time": 0.3, "power": 1.0, "defense": 1.0, "weight": 1.0,
 	"dodge_side_distance": 0.0,   ## > 0: dash length of a sideways dodge (crabs); see Fighter.dodge_distance_now
+	# kit traits (multipliers; run/rules mods of the same name multiply on top, see Fighter.getup_speed_mult)
+	"getup_speed": 1.0,           ## knockdown recovery speed (1.3 = 30% faster)
+	"held_time": 1.0,             ## how long grabs can hold this fighter (0.7 = 30% shorter)
 }
 var moves := {}                 ## slot -> MoveDef (plus any extra ids used by abilities)
 var abilities := {}             ## slot -> MoveDef (kind "ability") with cooldown

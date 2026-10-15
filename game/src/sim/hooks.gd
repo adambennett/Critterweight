@@ -8,7 +8,8 @@ extends RefCounted
 ## Events (`on`): pre_hit_dealt, pre_hit_taken (may modify the pending hit), hit_dealt, hit_taken,
 ##   blocked, parried, parry_success, knockdown_dealt, knocked_down, ko_dealt, dodge, taunt,
 ##   ability_used, juice_start, juice_end, move_start, land, grab_start, throw, wall_splat,
-##   status_applied, status_received, reaction, round_start, tick (with "every": seconds).
+##   status_applied, status_received, reaction, round_start, tick (with "every": seconds),
+##   emerge (a delayed blink resurfaced).
 ## Conditions (`if`, all must hold): slot / slots, move_class (light|heavy|ability|juice|grab),
 ##   charged, target_status / self_status (status id or element id), target_element,
 ##   self_health_below / above, target_health_below, target_guarding, target_down,
@@ -29,7 +30,7 @@ const MAX_ACTIONS := 16
 const EVENTS := ["pre_hit_dealt", "pre_hit_taken", "hit_dealt", "hit_taken", "blocked", "parried",
 	"parry_success", "knockdown_dealt", "knocked_down", "ko_dealt", "dodge", "taunt", "ability_used",
 	"juice_start", "juice_end", "move_start", "land", "grab_start", "throw", "wall_splat",
-	"status_applied", "status_received", "reaction", "round_start", "tick"]
+	"status_applied", "status_received", "reaction", "round_start", "tick", "emerge"]
 const HIT_MODIFIERS := ["damage_add", "damage_mult", "knockback_mult", "launch", "knockdown", "stun_add",
 	"poise_mult", "guard_crush", "buildup", "refresh_status"]
 

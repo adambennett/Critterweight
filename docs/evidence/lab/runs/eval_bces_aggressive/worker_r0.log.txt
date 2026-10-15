@@ -1,0 +1,7 @@
+2026-10-15 10:34:59 r0 run eval_bces_aggressive: eval, creature dev_biped, 3 worker process(es) x 2 world(s)
+2026-10-15 10:34:59 r0 helper rank 1 started (pid 66780)
+2026-10-15 10:34:59 r0 helper rank 2 started (pid 68532)
+2026-10-15 10:36:54 r0 evaluation: n=30 reward 83.38 ± 27.23 (95% CI 73.21..93.54) win 87% [70–95%]
+2026-10-15 10:36:54 r0 policy − res://content/core/policies/dev_biped_bc_regular.policy.json, paired difference +2.71 (95% CI -10.73..16.16, t = 0.41, n = 30 episodes) — not significant
+2026-10-15 10:36:54 r0 policy − bot_regular, paired difference +13.74 (95% CI -0.80..28.27, t = 1.93, n = 30 episodes) — not significant
+2026-10-15 10:36:54 r0 finished: completed — evaluated: n=30 reward 83.38 ± 27.23 (95% CI 73.21..93.54) win 87% [70–95%]

@@ -35,6 +35,13 @@ Add `--capture <png> --capture-at <s>` to any windowed run to save a real render
 - `class_name` for shared types; after adding one run the `--import` command above.
 - Fighter space convention: +Z forward, +Y up, +X = creature's LEFT. Units: metres, kg, seconds.
 - Keep files cohesive; document invariants at the top of each file; no hidden global state beyond autoloads.
+- Never keep a lambda (or a Callable bound to a node that may be freed) in a `static var`: Godot 4.5.1
+  crashes at exit (signal 11). Use `Callable(SomeClass, "static_method")` or an instance member, and
+  clear static Callables in `_exit_tree` / when the flow ends.
+- Simulations stepped from a coroutine must start in phase with physics (`HeadlessFightRunner`,
+  `TestCase.step_sim`; D-026), or the same seed can play out differently.
+- JSON saves go through `Saves` (`Saves.stabilize` keeps whole numbers exact; D-025). Don't hand-roll
+  JSON round trips for persisted data.
 
 ## Verification rules
 - Tie checks to requirement IDs in `docs/REQUIREMENTS.md`; update its state columns honestly
