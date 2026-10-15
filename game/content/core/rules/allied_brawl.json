@@ -1,0 +1,18 @@
+{
+  "id": "allied_brawl",
+  "name": "Allied Brawl",
+  "mode": "standard",
+  "format": "coop",
+  "teams": 2,
+  "players": [
+    2,
+    8
+  ],
+  "rounds": 1,
+  "round_time": 0,
+  "win": "ko",
+  "revive": true,
+  "downed_time": 15.0,
+  "description": "Players team up against bot groups (the default co-op format).",
+  "version": 1
+}

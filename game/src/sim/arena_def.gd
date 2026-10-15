@@ -122,13 +122,13 @@ static func from_dict(d: Dictionary, src := "") -> ArenaDef:
 			if typeof(md[k]) != TYPE_ARRAY:
 				continue
 			for m in md[k]:
-				# accepted forms: [x, z] | [x, z, y] | {"pos": [x, y, z], "yaw": deg, "team": n, "size": [w, h, d]}
+				# accepted forms: [x, z] | [x, z, y] | {"pos": [x, y, z] or [x, z], "yaw": deg, "team": n, "size": [w, h, d]}
 				if typeof(m) == TYPE_ARRAY and m.size() >= 2:
 					var p3 := Vector3(float(m[0]), float(m[2]) if m.size() > 2 else 0.0, float(m[1]))
 					pts.append(p3)
 					entries.append({"pos": p3, "yaw": 0.0, "team": -1, "size": Vector3.ZERO})
 				elif typeof(m) == TYPE_DICTIONARY:
-					var p4 := MathX.vec3(m.get("pos", [0, 0, 0]))
+					var p4 := marker_pos(m.get("pos", [0, 0, 0]))
 					pts.append(p4)
 					var me := {"pos": p4, "yaw": deg_to_rad(float(m.get("yaw", 0.0))), "team": int(m.get("team", -1)), "size": MathX.vec3(m.get("size", [0, 0, 0]))}
 					if m.has("uid"):
@@ -144,6 +144,13 @@ static func from_dict(d: Dictionary, src := "") -> ArenaDef:
 	if a.id == "":
 		a.errors.append("arena without id")
 	return a
+
+
+## A marker's "pos": [x, y, z], or the older floor form [x, z] (format-1 files and mods).
+static func marker_pos(v) -> Vector3:
+	if typeof(v) == TYPE_ARRAY and (v as Array).size() == 2:
+		return Vector3(float(v[0]), 0.0, float(v[1]))
+	return MathX.vec3(v if typeof(v) == TYPE_ARRAY else [], Vector3.ZERO)
 
 
 static func _parse_prop(p: Dictionary, fallback_id: String) -> Dictionary:

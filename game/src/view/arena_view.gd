@@ -11,14 +11,16 @@ extends Node3D
 ## MatchScene's legacy set_prop_transform(i, xf) contract is kept: index i matches
 ## sim.arena_nodes["props"][i] (ArenaBuilder body order).
 
+## Audio.sfx ids (assets/audio/bank.json) per hazard / timed-prop transition. Ring-outs, wall
+## slams and KOs are voiced by Audio's own match bridge, so they are not repeated here.
 const AUDIO := {
-	"tidal_gutter": {"telegraph": "arena_gutter_gurgle", "active": "arena_gutter_flood", "end": "arena_gutter_drain"},
-	"crane_hook": {"telegraph": "arena_crane_rattle", "active": "arena_crane_hook", "end": "arena_crane_drop"},
-	"plate_grid": {"telegraph": "arena_plate_buzz", "active": "arena_plate_zap", "end": ""},
-	"crane_magnet": {"telegraph": "arena_magnet_hum", "active": "arena_magnet_pull", "end": "arena_scrap_drop"},
-	"wind_gust": {"telegraph": "arena_wind_flags", "active": "arena_wind_gust", "end": ""},
-	"steam_vent": {"telegraph": "arena_vent_hiss", "active": "arena_vent_burst", "end": ""},
-	"electric_plate": {"telegraph": "arena_plate_buzz", "active": "arena_plate_zap", "end": ""},
+	"tidal_gutter": {"telegraph": "hazard_gutter_telegraph", "active": "hazard_gutter_flood", "end": ""},
+	"crane_hook": {"telegraph": "hazard_crane_telegraph", "active": "hazard_crane_drop", "end": ""},
+	"plate_grid": {"telegraph": "hazard_plate_telegraph", "active": "hazard_plate_live", "end": ""},
+	"crane_magnet": {"telegraph": "hazard_magnet_telegraph", "active": "hazard_magnet_pull", "end": "prop_break_metal"},
+	"wind_gust": {"telegraph": "hazard_wind_telegraph", "active": "hazard_wind_gust", "end": ""},
+	"steam_vent": {"telegraph": "zone_steam", "active": "react_steam_burst", "end": ""},
+	"electric_plate": {"telegraph": "hazard_plate_telegraph", "active": "hazard_plate_live", "end": ""},
 }
 ## Kept for older callers that pick a theme by name (legacy sandbox --theme).
 const THEMES := {"can": "gullet", "rooftop": "rooftop", "scrapyard": "crusher", "sewer": "drydock"}
@@ -591,9 +593,9 @@ func _process(dt: float) -> void:
 	_animate_ambient(dt)
 
 
-func _sfx(id: String, pos = null) -> void:
+func _sfx(id: String, pos = null, vol_db := 0.0) -> void:
 	if id != "" and not editor_mode:
-		Audio.sfx(id, pos)
+		Audio.sfx(id, pos, vol_db)
 
 
 func _transition(key: String, phase: String) -> String:
@@ -852,19 +854,22 @@ func _spawned_node(e: Dictionary) -> Node3D:
 
 func _debris_burst(pos: Vector3, type: String) -> void:
 	var col := Color("#8C6A4A")
-	var sfx := "arena_break_wood"
+	var sfx := "prop_break_wood"
 	if type.contains("barrel") or type.contains("drum") or type.contains("fan") or type.contains("scrap") or type.contains("bundle"):
 		col = Color("#6E6A66")
-		sfx = "arena_break_metal"
+		sfx = "prop_break_metal"
 	if type.contains("sack"):
 		col = Color("#B8905E")
-		sfx = "arena_break_sack"
+		sfx = "gravel_scatter"
 	if type.contains("battery"):
 		col = Color("#2B2F3A")
-		sfx = "arena_break_battery"
+		sfx = "prop_burst_static"
 	if type.contains("railing"):
 		col = Color("#E0B42A")
-		sfx = "arena_break_railing"
+		sfx = "prop_break_metal"
+	var el := str(ArenaCatalog.prop(type).get("element", ""))
+	if el != "" and Audio.has_sfx("prop_burst_" + el):
+		sfx = "prop_burst_" + el      # elemental destructibles burst into their zone
 	_sfx(sfx, pos)
 	var gp := GPUParticles3D.new()
 	gp.amount = 26
@@ -950,32 +955,27 @@ func _consume_events() -> void:
 				for gp3 in _out.get("pyro", []):
 					(gp3 as GPUParticles3D).restart()
 					(gp3 as GPUParticles3D).emitting = true
-				if not _out.get("pyro", []).is_empty():
-					_sfx("arena_pyro")
 			"arena_bumper":
 				var i := int(ev.get("index", -1))
 				if i >= 0 and i < all_prop_nodes.size() and all_prop_nodes[i].has_meta("lamp"):
 					var lamp: StandardMaterial3D = all_prop_nodes[i].get_meta("lamp")
 					lamp.emission_energy_multiplier = 9.0
-				_sfx("arena_bumper_ding", ev.get("pos"))
+				_sfx("bumper_ding", ev.get("pos"))
 			"arena_pickup":
-				_sfx("arena_pickup_health" if str(ev.get("kind", "")) == "health" else "arena_pickup_hype", ev.get("pos"))
+				_sfx("pickup_health" if str(ev.get("kind", "")) == "health" else "pickup_hype", ev.get("pos"))
 			"arena_drain":
-				_sfx("arena_drain_gulp", ev.get("from"))
+				_sfx("drain_teleport", ev.get("from"))
 			"spring":
-				_sfx("arena_spring_boing", ev.get("pos"))
+				_sfx("spring_pad", ev.get("pos"))
 				_pad_squash(ev.get("pos", Vector3.ZERO))
 			"ringout":
-				_sfx("arena_ringout_fall", ev.get("pos"))
 				_crowd_boost = maxf(_crowd_boost, 0.5)
 			"arena_rebound":
-				_sfx("arena_cage_rattle", ev.get("pos"))
+				_sfx("wall_splat_fence", ev.get("pos"), -6.0)
 			"arena_bounce":
-				_sfx("arena_tire_bounce", ev.get("pos"))
+				_sfx("land_soft", ev.get("pos"))
 			"arena_zap":
 				_sparks(ev.get("pos", Vector3.ZERO) + Vector3(0, 0.5, 0), Color("#F7E04A"))
-			"arena_vent":
-				_sfx("arena_vent_burst", ev.get("pos"))
 
 
 func _pad_squash(pos: Vector3) -> void:

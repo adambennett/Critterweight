@@ -52,7 +52,9 @@ static func build(parent: Node3D, a: ArenaDef) -> Dictionary:
 					out["dynamic_props"].append(body)
 		bodies.append(body)
 	if parent is MatchSim:
-		out["hazards"] = ArenaHazards.new(parent, a, all, bodies)
+		var rt := ArenaHazards.new(parent, a, all, bodies)
+		out["hazards"] = rt
+		(parent as MatchSim).hazards = rt     # MatchSim.step calls hazards.update(dt) after effects
 	return out
 
 
@@ -168,11 +170,14 @@ static func _build_walls(parent: Node3D, a: ArenaDef, out: Dictionary, rules: Di
 	var i := 0
 	for e in a.boundary_edges():
 		var walled := bool(e["wall"])
-		var h := a.wall_height + 1.0
+		# Collision walls rise well above the visible fence so launches never clear the cage
+		# (MatchSim's containment net catches the rest). Edges come from the same polygon that
+		# ArenaDef.clamp_point/inside and ArenaView use, so walls always line up with the fence.
+		var h := a.wall_height + 5.0
 		if not walled:
 			if ringouts:
 				continue
-			h = 1.2   # ring-outs disabled by the rules: invisible guard rail along open edges
+			h = 6.2   # ring-outs disabled by the rules: invisible guard wall along open edges
 		var ea: Vector2 = e["a"]
 		var eb: Vector2 = e["b"]
 		var n: Vector2 = e["n"]

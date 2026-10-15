@@ -7,8 +7,12 @@ extends RefCounted
 ## pads, bumpers, pits, drain pairs, heavy bags, pickups, ramps, breakable railings), ring-outs
 ## with respawn at the nearest edge marker, and team spawn clusters.
 ##
-## Tick: MatchSim.step calls ArenaHazards.step(sim, dt) after effects.update() and before the
-## environment checks, so falls are caught here before MatchSim's legacy ring-out KO.
+## Tick: ArenaBuilder registers this runtime as MatchSim.hazards; MatchSim.step calls update(dt)
+## after effects.update() and before its environment checks, so falls off open edges are caught
+## here (at the base's fall_y) before MatchSim's own deep-fall ring-out check. The mode still
+## decides what a ring-out costs (MatchMode.on_ringout: rules.ringout_damage /
+## ringout_eliminates, mode overrides such as Absolute Unit); this runtime owns the return
+## (nearest edge marker, health kept, short invulnerability).
 ## Determinism: all choices come from `rng`, seeded from (arena id, match seed) and consumed in a
 ## fixed order; timers advance only in the fight phase, in fixed ticks. Nothing here renders or
 ## plays audio: views read view_state() and the "arena_*" events.
@@ -27,7 +31,7 @@ var rng := RandomNumberGenerator.new()
 var clock := 0.0                  ## hazard clock: advances only while the mode is in its fight phase
 var enabled := true               ## rules.hazards
 var timer_mult := 1.0             ## rules.hazard_timer_mult (scales periods)
-var ringout_mode := "respawn"     ## rules.ringout_mode: "respawn" (ARENAS.md §1) or "ko"
+var ringout_ko := false            ## rules.ringout_eliminates (used when the sim has no mode)
 var hazards: Array = []           ## runtime base hazards
 var props: Array = []             ## runtime props: one per ArenaDef.all_props() entry, then spawned bundles
 var areas: Array = []
@@ -42,13 +46,9 @@ var _bundle_serial := 0
 var _parked := 0
 
 
-static func step(match_sim, dt: float) -> void:
-	var nodes = match_sim.get("arena_nodes")
-	if typeof(nodes) != TYPE_DICTIONARY:
-		return
-	var hz = (nodes as Dictionary).get("hazards", null)
-	if hz is ArenaHazards:
-		(hz as ArenaHazards).tick(dt)
+## MatchSim.hazards entry point (one call per sim tick).
+func update(dt: float) -> void:
+	tick(dt)
 
 
 func _init(match_sim: MatchSim, a: ArenaDef, all: Array, bodies: Array) -> void:
@@ -58,7 +58,7 @@ func _init(match_sim: MatchSim, a: ArenaDef, all: Array, bodies: Array) -> void:
 	var rules: Dictionary = match_sim.rules
 	enabled = bool(rules.get("hazards", true))
 	timer_mult = clampf(float(rules.get("hazard_timer_mult", 1.0)), 0.25, 4.0)
-	ringout_mode = str(rules.get("ringout_mode", "respawn"))
+	ringout_ko = bool(rules.get("ringout_eliminates", false))
 	_ringout = a.ringout_params()
 	areas = a.areas()
 	for h in a.hazard_defs():
@@ -346,7 +346,7 @@ func _crane(hz: Dictionary, tr: String, dt: float) -> void:
 			var root := f2.rig.root()
 			var target := Vector3(spot2.x, f2.rig.def.hover_height + float(def.get("height", 2.0)) * lift_t, spot2.y)
 			var err := target - root.global_position
-			var acc := err * 40.0 - f2.rig.com_velocity() * 9.0 + Vector3.UP * 9.81
+			var acc := err * 40.0 - f2.rig.com_velocity() * 9.0 + Vector3.UP * sim.gravity
 			f2.rig.apply_body_impulse(acc * dt * f2.rig.total_mass)
 
 
@@ -934,9 +934,9 @@ func _ramp(rec: Dictionary) -> void:
 			continue
 		if not _ready("ramp%d:%d" % [int(rec["i"]), f.index], 1.0):
 			continue
-		var vy := sqrt(2.0 * 9.81 * float(params.get("lip_air", 0.5)))
+		var vy := sqrt(2.0 * sim.gravity * float(params.get("lip_air", 0.5)))
 		f.rig.apply_body_impulse(Vector3.UP * vy * f.rig.total_mass)
-		f.begin_airborne([], 2.0 * vy / 9.81 + 0.15)
+		f.begin_airborne([], 2.0 * vy / sim.gravity + 0.15)
 		_emit({"type": "arena_ramp", "index": rec["i"], "fighter": f.index, "pos": p})
 
 
@@ -1048,6 +1048,10 @@ func _check_falls() -> void:
 				var sp := respawn_point_near(p)
 				f.rig.place(sp[0], sp[1])
 				f.rig.freeze_motion()
+			elif p.y < -30.0:
+				# a knocked-out body that went over the edge: park it instead of falling forever
+				f.rig.place(Vector3(p.x, -30.0, p.z), f.facing_yaw)
+				f.rig.freeze_motion()
 			continue
 		_ring_out(f, p)
 
@@ -1057,15 +1061,25 @@ func _ring_out(f: Fighter, from: Vector3) -> void:
 	history["ringouts"].append(f.index)
 	_emit({"type": "ringout", "fighter": f.index, "pos": from, "by": by.index if by else -1, "arena": true})
 	_drop_shoves(f)
-	if ringout_mode == "ko":
-		sim.on_fighter_depleted(f, by, {"ringout": true})
-		return
-	sim.combat.apply_dot(by, f, float(_ringout.get("damage_frac", 0.08)) * f.max_health, "ringout", "", false)
-	if f.is_out():
-		return
-	f.set_inactive(true)
-	_mode_hold(f, true)
-	pending_ringouts.append({"f": f, "at": sim.time + float(_ringout.get("out_time", 2.5)), "from": from})
+	var out_time := float(sim.rules.get("ringout_out_time", _ringout.get("out_time", 2.5)))
+	var m = sim.mode
+	if m != null and m.has_method("on_ringout"):
+		# The mode prices the ring-out (rules.ringout_damage / ringout_eliminates, and overrides
+		# such as Absolute Unit's). A fighter it leaves standing is returned by this runtime.
+		m.on_ringout(f, by)
+		if f.state != Fighter.State.INACTIVE:
+			return          # knocked out / downed by it
+		_mode_hold(f, true)
+	else:
+		if ringout_ko:
+			sim.on_fighter_depleted(f, by, {"ringout": true})
+			return
+		var frac := float(sim.rules.get("ringout_damage", _ringout.get("damage_frac", 0.08)))
+		sim.combat.apply_dot(by, f, frac * f.max_health, "ringout", "", false)
+		if f.is_out():
+			return
+		f.set_inactive(true)
+	pending_ringouts.append({"f": f, "at": sim.time + out_time, "from": from})
 
 
 func _tick_ringouts() -> void:
@@ -1094,14 +1108,21 @@ func _tick_ringouts() -> void:
 		_emit({"type": "ringout_return", "fighter": f.index, "pos": sp[0]})
 
 
-## Keeps the parked fighter counted as alive by the mode (it is pending a respawn).
+## Holds a ring-out fighter in the mode's respawn queue while this runtime returns it: the mode
+## keeps counting it as alive but never respawns it itself (MatchMode's respawn() would refill
+## its health and use the fall point instead of the nearest edge marker).
 func _mode_hold(f: Fighter, on: bool) -> void:
 	var m = sim.mode
 	if m == null or not ("_respawns" in m):
 		return
 	var list: Array = m.get("_respawns")
 	if on:
-		list.append({"fighter": f, "at": INF, "arena_ringout": true})
+		for e in list:
+			if e["fighter"] == f:
+				e["at"] = INF
+				e["arena_ringout"] = true
+				return
+		list.append({"fighter": f, "at": INF, "pos": null, "arena_ringout": true})
 	else:
 		for e in list.duplicate():
 			if bool(e.get("arena_ringout", false)) and e["fighter"] == f:

@@ -129,12 +129,19 @@ func test_saved_layouts_are_playable_in_normal_matches() -> void:
 	var a: ArenaDef = cfg["arena"]
 	check(a != null and a.id == m.id, "App resolves a saved layout id for a normal match")
 	check_eq(a.props.size(), m.to_arena().props.size(), "with its props")
-	var listed := false
+	var listed := 0
 	for e in ArenaLibrary.playable_arenas():
 		if str(e["id"]) == m.id and str(e["source"]) == "user":
-			listed = true
-	check(listed, "offered next to the shipped arenas")
-	Saves.delete_save(str(sv["path"]))
+			listed += 1
+	check_eq(listed, 1, "offered once next to the shipped arenas")
+	check(Content.ids("arenas").has(m.id), "registered in Content (versus setup lists Content arenas)")
+	check_eq(Content.origin_of("arenas", m.id), "user", "as a user entry")
+	# Content.reload() re-registers saved layouts (like the user's rules presets)
+	Mods.apply()     # reloads Content with the currently enabled packages
+	check(Content.arena(m.id) != null, "still there after a content reload")
+	check(ArenaLibrary.delete_layout(str(sv["path"])), "deleted (moved aside)")
+	check(Content.arena(m.id) == null, "and unregistered")
+	check(ArenaLibrary.content_id("rust_bucket:the_drain").begins_with("user:"), "imported ids never shadow core/mod ids")
 
 
 func test_package_export_import_round_trip() -> void:

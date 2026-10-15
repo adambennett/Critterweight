@@ -1,0 +1,24 @@
+{
+  "id": "absolute_unit",
+  "name": "Absolute Unit",
+  "mode": "absolute_unit",
+  "format": "ffa",
+  "teams": 0,
+  "players": [
+    3,
+    8
+  ],
+  "rounds": 1,
+  "round_time": 300,
+  "win": "score",
+  "score_target": 90,
+  "respawn": true,
+  "respawn_delay": 4.0,
+  "unit_scale": 1.6,
+  "unit_weight": 3.0,
+  "unit_hp": 2.5,
+  "hot_potato": false,
+  "unit_juice": false,
+  "description": "One fighter drinks the whole crate: huge, armored, slow and unable to dodge. The Unit scores a point a second. KO the Unit to become it.",
+  "version": 1
+}

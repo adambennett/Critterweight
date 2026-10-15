@@ -276,8 +276,8 @@ func test_rooftop_ringout_respawns_at_nearest_edge_marker() -> void:
 	check(_has_event(sim, "ringout") and _has_event(sim, "ringout_return"), "ring-out events")
 
 
-func test_ringout_ko_rule() -> void:
-	var sim := _sim("arena_rooftop", 7, {"rounds": 1, "round_time": 0, "ringout_mode": "ko"})
+func test_ringout_eliminates_rule() -> void:
+	var sim := _sim("arena_rooftop", 7, {"rounds": 1, "round_time": 0, "ringout_eliminates": true})
 	_fight(sim)
 	var f := sim.fighters[0]
 	f.rig.place(Vector3(0.0, 0.0, 7.4), 0.0)
@@ -286,7 +286,35 @@ func test_ringout_ko_rule() -> void:
 		await get_tree().physics_frame
 		if f.is_out():
 			break
-	check(f.state == Fighter.State.KO, "ringout_mode ko eliminates instead")
+	check(f.state == Fighter.State.KO, "rules.ringout_eliminates knocks out instead")
+
+
+## A mode that overrides on_ringout (like Absolute Unit's unit) decides; the arena only returns
+## fighters the mode leaves standing.
+class RingoutKoMode extends MatchMode:
+	func on_ringout(f: Fighter, attacker: Fighter) -> void:
+		f.health = 0.0
+		on_depleted(f, attacker, {"ringout": true})
+
+
+func test_mode_ringout_override_is_honoured() -> void:
+	var sim := MatchSim.new()
+	sim.running = false
+	fresh_world().add_child(sim)
+	var fs := []
+	for i in 2:
+		fs.append({"creature": Content.creature("dev_biped"), "team": i})
+	sim.setup({"arena": Content.arena("arena_rooftop"), "rules": {"rounds": 1, "round_time": 0}, "seed": 3, "fighters": fs, "mode": RingoutKoMode.new()})
+	_fight(sim)
+	var f := sim.fighters[0]
+	f.rig.place(Vector3(0.0, 0.0, 7.4), 0.0)
+	for i in 400:
+		sim.step(DT)
+		await get_tree().physics_frame
+		if f.is_out():
+			break
+	check(f.state == Fighter.State.KO, "the mode's on_ringout override decides (KO)")
+	check(_hz(sim).pending_ringouts.is_empty(), "no arena return queued for an eliminated fighter")
 
 
 func test_team_matches_start_in_team_clusters() -> void:

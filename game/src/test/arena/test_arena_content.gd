@@ -125,3 +125,28 @@ func test_schema_accepts_layouts_and_rejects_bad_base() -> void:
 		check(errs.is_empty(), "%s schema: %s" % [id, str(errs)])
 	check(not Schema.validate_named({"id": "x", "name": "X", "base": "volcano"}, "arena").is_empty(), "unknown core base rejected")
 	check(Schema.validate_named({"id": "m:x", "name": "X", "base": "m:volcano"}, "arena").is_empty(), "namespaced mod base accepted")
+
+
+## Format-1 files (the bundled rust_bucket mod's "The Drain") keep validating and loading:
+## [x, z, yaw] spawns with yaws past 50, and marker objects whose pos is the floor form [x, z].
+func test_format1_mod_arena_still_loads() -> void:
+	var d := {"id": "m:drain", "name": "Drain", "base": "square", "radius": 5.5, "wall_height": 2.2, "theme": "can",
+		"spawns": [[0, -3.0, 0], [0, 3.0, 180], [-3.0, 0, 270]],
+		"props": [{"type": "crate", "pos": [-4.2, 0, -4.2]}, {"type": "low_wall", "pos": [0, 0, -4.6]}],
+		"hazards": [{"type": "shock_plate", "pos": [0, 0, 0], "radius": 1.1}],
+		"markers": {"spotlight": [[-2.5, -2.5]], "goal": [{"pos": [-5.3, 0], "team": 0}, {"pos": [5.3, 1.0], "team": 1}]}}
+	var errs := Schema.validate_named(d, "arena")
+	check(errs.is_empty(), "format-1 file validates: %s" % str(errs))
+	var a := ArenaDef.from_dict(d)
+	check(a.errors.is_empty(), "parses: %s" % str(a.errors))
+	check_eq(a.base, "square", "legacy shape kept")
+	var goals := a.markers_of("goal")
+	check_eq(goals.size(), 2, "goal markers")
+	if goals.size() == 2:
+		check_eq(goals[0]["pos"], Vector3(-5.3, 0, 0), "[x, z] marker pos is a floor point")
+		check_eq(goals[1]["pos"], Vector3(5.3, 0, 1.0), "z comes second in the floor form")
+		check_eq(int(goals[1]["team"]), 1, "marker team kept")
+	check_eq(a.spawn_point(2, 3)[1], deg_to_rad(270.0), "spawn yaw in degrees")
+	var mod_a := Content.arena("rust_bucket:the_drain")
+	if mod_a != null:
+		check_eq(mod_a.markers_of("goal").size(), 2, "the bundled example's goals")

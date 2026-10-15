@@ -28,7 +28,7 @@
     "modes": {"type": "array", "maxItems": 16, "items": {"type": "string", "pattern": "^[a-z0-9_:]{2,40}$"}},
     "flags": {"type": "object", "additionalProperties": {"type": ["boolean", "number", "string"]}},
     "removed_builtins": {"type": "array", "maxItems": 32, "items": {"type": "string", "maxLength": 48}},
-    "spawns": {"type": "array", "maxItems": 16, "items": {"type": "array", "minItems": 2, "maxItems": 3, "items": {"type": "number", "minimum": -50, "maximum": 50}}},
+    "spawns": {"type": "array", "maxItems": 16, "description": "Format 1 only: [x, z] or [x, z, yaw_deg].", "items": {"type": "array", "minItems": 2, "maxItems": 3, "items": {"type": "number", "minimum": -720, "maximum": 720}}},
     "props": {"type": "array", "maxItems": 40, "items": {"$ref": "#/$defs/prop_item"}},
     "hazards": {"type": "array", "maxItems": 16, "items": {"type": "object", "required": ["type", "pos"]}},
     "markers": {"type": "object", "additionalProperties": {"type": "array", "maxItems": 24, "items": {"$ref": "#/$defs/marker_item"}}},
@@ -52,7 +52,7 @@
     "marker_item": {"anyOf": [
       {"type": "array", "minItems": 2, "maxItems": 3, "items": {"type": "number", "minimum": -50, "maximum": 50}},
       {"type": "object", "required": ["pos"], "properties": {
-        "pos": {"$ref": "#/$defs/vec3"},
+        "pos": {"type": "array", "minItems": 2, "maxItems": 3, "description": "[x, y, z], or the format-1 floor form [x, z]", "items": {"type": "number", "minimum": -50, "maximum": 50}},
         "yaw": {"type": "number", "minimum": -720, "maximum": 720},
         "team": {"type": "integer", "minimum": -1, "maximum": 3},
         "size": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number", "minimum": 0, "maximum": 20}}

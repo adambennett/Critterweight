@@ -1,0 +1,19 @@
+{
+  "id": "free_for_all_lives",
+  "name": "Free-for-All (3 Lives)",
+  "mode": "standard",
+  "format": "ffa",
+  "teams": 0,
+  "players": [
+    3,
+    8
+  ],
+  "rounds": 1,
+  "round_time": 240,
+  "win": "ko",
+  "lives": 3,
+  "respawn": true,
+  "respawn_delay": 3.0,
+  "description": "Three lives each, respawns after 3 seconds. Last one with lives left wins.",
+  "version": 1
+}

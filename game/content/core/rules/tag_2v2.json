@@ -1,0 +1,18 @@
+{
+  "id": "tag_2v2",
+  "name": "Tag Team 2v2",
+  "mode": "tag_team",
+  "format": "tag",
+  "teams": 2,
+  "players": [
+    4,
+    4
+  ],
+  "rounds": 3,
+  "round_time": 120,
+  "win": "ko",
+  "tag_cooldown": 4.0,
+  "tagged_regen": 4.0,
+  "description": "One fighter per side in the cage; tag your partner in with D-pad Down. Resting partners recover health and can call one assist.",
+  "version": 1
+}

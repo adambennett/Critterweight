@@ -1,0 +1,23 @@
+{
+  "id": "spotlight_hog_teams",
+  "name": "Spotlight Hog (Teams)",
+  "mode": "spotlight_hog",
+  "format": "teams",
+  "teams": 2,
+  "players": [
+    4,
+    8
+  ],
+  "rounds": 1,
+  "round_time": 300,
+  "win": "score",
+  "score_target": 90,
+  "respawn": true,
+  "respawn_delay": 5.0,
+  "ko_points": 3,
+  "light_radius": 2.5,
+  "dwell": 25.0,
+  "contest": "strict",
+  "description": "Spotlight Hog for two teams: a team scores while only its members are in the light.",
+  "version": 1
+}

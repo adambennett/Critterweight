@@ -1,0 +1,27 @@
+{
+  "id": "rust_bucket:the_drain",
+  "name": "The Drain",
+  "base": "square",
+  "radius": 5.5,
+  "wall_height": 2.2,
+  "theme": "can",
+  "author": "Critterweight examples",
+  "version": 1,
+  "spawns": [[0, -3.0, 0], [0, 3.0, 180], [-3.0, 0, 90], [3.0, 0, 270], [-2.4, -2.4, 45], [2.4, 2.4, 225], [2.4, -2.4, 315], [-2.4, 2.4, 135]],
+  "props": [
+    {"type": "crate", "pos": [-4.2, 0, -4.2]},
+    {"type": "crate", "pos": [4.2, 0, 4.2]},
+    {"type": "barrel", "pos": [4.3, 0, -4.1]},
+    {"type": "barrel", "pos": [-4.3, 0, 4.1]},
+    {"type": "low_wall", "pos": [0, 0, -4.6]},
+    {"type": "low_wall", "pos": [0, 0, 4.6]}
+  ],
+  "hazards": [
+    {"type": "shock_plate", "pos": [0, 0, 0], "radius": 1.1}
+  ],
+  "markers": {
+    "spotlight": [[-2.5, -2.5], [2.5, 2.5], [2.5, -2.5], [-2.5, 2.5]],
+    "goal": [{"pos": [-5.3, 0], "team": 0}, {"pos": [5.3, 0], "team": 1}],
+    "ball_spawn": [[0, 2.0]]
+  }
+}
