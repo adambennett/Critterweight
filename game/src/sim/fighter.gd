@@ -1085,6 +1085,7 @@ func begin_airborne(on_land: Array, air_time: float) -> void:
 func _land() -> void:
 	_airborne = false
 	rig.support = 1.0
+	rig.ballistic = false
 	if not is_down() and not is_out():
 		rig.hover_enabled = true
 		motor.tuck = false

@@ -3,8 +3,8 @@ extends "res://src/test/kits/kit_sj_helpers.gd"
 ## data-driven, none keyed to a fighter id): hooks "emerge" event (with main's cooldown action, the
 ## Drain Dive refund) and the "hit_part" condition the Bonk relies on; creature "mods";
 ## Fighter.is_airborne(); charge bounce; debuff.require_status; projectile burst_on_hit and lob
-## arrive_y; spring pads ignore airborne fighters; keyed joints skip the gait wave; airborne bodies
-## are not ground-braked; the extra bot kit hints (reach, range_needs_tools, ability "stick",
+## arrive_y; spring pads ignore airborne fighters; keyed joints skip the gait wave; "ballistic"
+## leaps / launches are not ground-braked; the extra bot kit hints (reach, range_needs_tools, ability "stick",
 ## heavy_vs_windup, dash_in, avoid_zones) on top of the shared kit-hint mechanism.
 
 
@@ -206,23 +206,35 @@ func test_keyed_joints_skip_gait_wave() -> void:
 	sim.queue_free()
 
 
-func test_airborne_bodies_not_ground_braked() -> void:
+func test_ballistic_flights_not_ground_braked() -> void:
 	var speeds := {}
-	for airborne in [false, true]:
+	for ballistic in [false, true]:
 		var sim := _pair("dev_biped", "dev_biped", 6.0)
 		await run(sim, 0.4)
 		var f := sim.fighters[0]
-		if airborne:
+		if ballistic:
 			f.begin_airborne([], 0.6)
+			f.rig.ballistic = true
 			f.rig.apply_body_impulse(Vector3(3.0, 2.5, 0.0) * f.rig.total_mass)
 		else:
 			f.rig.apply_body_impulse(Vector3(3.0, 0.0, 0.0) * f.rig.total_mass)
 		await run(sim, 0.2)
 		var v := f.rig.com_velocity()
-		speeds[airborne] = Vector2(v.x, v.z).length()
+		speeds[ballistic] = Vector2(v.x, v.z).length()
 		sim.queue_free()
-	check(float(speeds[true]) > 2.4, "airborne body was braked (%.2f m/s)" % float(speeds[true]))
+	check(float(speeds[true]) > 2.4, "ballistic body was braked (%.2f m/s)" % float(speeds[true]))
 	check(float(speeds[true]) > float(speeds[false]) + 0.5, "grounded drive did not brake (%.2f vs %.2f)" % [float(speeds[false]), float(speeds[true])])
+	# the leap option sets the flag for the flight only; landing clears it; leaps without it keep the old rule
+	var sim2 := _pair("dev_biped", "dev_biped", 4.0)
+	await run(sim2, 0.4)
+	var f2 := sim2.fighters[0]
+	sim2.effects.fire(f2, {"type": "leap", "distance": 1.0, "height": 0.3, "to_target": true, "ballistic": true}, null)
+	check(f2.rig.ballistic and f2.is_airborne(), "a ballistic leap did not set the flag")
+	await run(sim2, 1.2)
+	check(not f2.is_airborne() and not f2.rig.ballistic, "landing did not clear the ballistic flag")
+	sim2.effects.fire(f2, {"type": "leap", "distance": 1.0, "height": 0.3, "to_target": true}, null)
+	check(not f2.rig.ballistic, "a plain leap became ballistic")
+	sim2.queue_free()
 
 
 func _bot_on(_sim: MatchSim, personality: Dictionary) -> BotBrain:

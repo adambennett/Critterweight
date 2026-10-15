@@ -10,7 +10,8 @@ extends RefCounted
 ## Kit options: debuff.require_status (only targets carrying that status/element),
 ## projectile.burst_on_hit (false: on_expire fires on timeout/wall/floor but not on a fighter hit),
 ## projectile.arrive_y (lob: height above the floor at which the arc reaches the target point),
-## charge.bounce / bounce_distance / end_move (see Fighter._charge_bounce).
+## charge.bounce / bounce_distance (see Fighter._charge_bounce), leap / spring pad "ballistic" (the
+## flight is not braked by the ground drive near the floor, see Rig.ballistic).
 
 const TYPES := ["projectile", "area", "zone", "buff", "debuff", "heal", "shield", "dash", "leap", "hover",
 	"charge", "counter_stance", "reflect", "pull", "push", "blink", "prop", "delayed", "destroy_projectiles",
@@ -279,6 +280,7 @@ func _leap(f: Fighter, e: Dictionary) -> void:
 	var vy := maxf(sim.gravity * air * 0.5, sqrt(2.0 * sim.gravity * maxf(apex, 0.1)))
 	air = 2.0 * vy / sim.gravity
 	f.begin_airborne(e.get("on_land", []), air)
+	f.rig.ballistic = bool(e.get("ballistic", false))   # kit option: unbraked flight (see Rig.ballistic)
 	f.rig.freeze_motion()
 	f.rig.apply_body_impulse((to / air + Vector3.UP * vy) * f.rig.total_mass)
 
@@ -735,6 +737,7 @@ func _update_prop(ent: Dictionary, _dt: float) -> void:
 			var air := 2.0 * vy / sim.gravity
 			o.rig.freeze_motion()
 			o.begin_airborne([], air)
+			o.rig.ballistic = bool(e.get("ballistic", false))   # kit option: unbraked launch (see Rig.ballistic)
 			o.rig.apply_body_impulse((fwd * float(e.get("launch_forward", 3.0)) / air + Vector3.UP * vy) * o.rig.total_mass)
 			var owner := _owner(ent)
 			if owner and sim.are_enemies(owner, o):
