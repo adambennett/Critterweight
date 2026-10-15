@@ -107,15 +107,20 @@ $captures = @(
 	@{ name = "online"; args = @("--screen", "online"); at = 3 },
 	@{ name = "campaign_menu"; args = @("--screen", "campaign_menu"); at = 3 },
 	@{ name = "spectate_setup"; args = @("--screen", "spectate"); at = 3 },
-	@{ name = "profile"; args = @("--screen", "profile"); at = 3 }
+	@{ name = "profile"; args = @("--screen", "profile"); at = 3 },
+	@{ name = "hub"; args = @("--hub"); at = 8 },
+	@{ name = "bookie"; args = @("--screen", "bookie"); at = 3 },
+	@{ name = "camp_ledger"; args = @("--screen", "camp_ledger"); at = 3 }
 )
 foreach ($c in $captures) {
 	$png = Join-Path $out ("capture_" + $c.name + ".png")
 	$a = @("--", "--user-root", $userRoot, "--windowed", "--size", "1600x900") + $c.args + @("--capture", $png, "--capture-at", "$($c.at)")
 	$p = Start-Process -FilePath $exe -ArgumentList $a -PassThru -Wait -RedirectStandardOutput (Join-Path $out "cap_$($c.name).out") -RedirectStandardError (Join-Path $out "cap_$($c.name).err")
 	$errs = Select-String -Path (Join-Path $out "cap_$($c.name).err") -Pattern "SCRIPT ERROR" -ErrorAction SilentlyContinue
-	if ((Test-Path $png) -and -not $errs) { Record "capture $($c.name)" "pass" (Split-Path $png -Leaf) }
-	elseif (Test-Path $png) { Record "capture $($c.name)" "fail" "rendered but script errors: $($errs[0].Line)" }
+	# a clean quit matters too: a crash at exit (e.g. a static lambda) shows only in the exit code
+	if ((Test-Path $png) -and -not $errs -and $p.ExitCode -eq 0) { Record "capture $($c.name)" "pass" (Split-Path $png -Leaf) }
+	elseif ((Test-Path $png) -and $errs) { Record "capture $($c.name)" "fail" "rendered but script errors: $($errs[0].Line)" }
+	elseif (Test-Path $png) { Record "capture $($c.name)" "fail" "rendered but exited with code $($p.ExitCode)" }
 	else { Record "capture $($c.name)" "fail" "no frame captured (exit $($p.ExitCode))" }
 }
 
