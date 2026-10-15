@@ -38,6 +38,7 @@ var _objective: OptionButton
 var _weights_grid: GridContainer
 var _weight_boxes := {}
 var _scenario: OptionButton
+var _scenario_ids: Array = []           ## the scenario list as offered (LabScenarios.preset_ids_for)
 var _opp_checks := {}
 var _round_time: HBoxContainer
 var _spawn: OptionButton
@@ -266,21 +267,29 @@ func _build_train() -> Control:
 		_weights_grid.add_child(sb)
 		_weight_boxes[t] = sb
 	form.add_child(LabUi.header("Against whom"))
+	# the fixed scenarios, plus "My saved builds" with the Cannery's Boiler Room Key
+	_scenario_ids = LabScenarios.preset_ids_for(Profiles.current)
 	var scn_names := []
-	for sid in LabScenarios.preset_ids():
+	for sid in _scenario_ids:
 		scn_names.append(str(LabScenarios.PRESETS[sid]["name"]))
 	_scenario = LabUi.option(scn_names)
 	_scenario.item_selected.connect(func(_i: int) -> void: _load_scenario())
 	LabUi.row(form, "Scenario", _scenario)
 	var opp_box := GridContainer.new()
 	opp_box.columns = 2
-	for kind in LabOpponents.BASELINES:
+	var kinds: Array = Array(LabOpponents.BASELINES)
+	kinds.append_array(LabScenarios.saved_build_opponents(Profiles.current))
+	for kind in kinds:
 		var cb := CheckBox.new()
-		cb.text = LabOpponents.display_name(kind)
+		cb.text = LabOpponents.display_name(str(kind))
 		cb.focus_mode = Control.FOCUS_ALL
 		opp_box.add_child(cb)
-		_opp_checks[kind] = cb
+		_opp_checks[str(kind)] = cb
 	LabUi.row(form, "Training opponents", opp_box, "Episodes cycle through the checked opponents.")
+	if not LabScenarios.boiler_room_key(Profiles.current):
+		form.add_child(LabUi.label("The Boiler Room Key (Teddy's ledger in the Cannery) unlocks training against your own saved campaign builds.", "Caption"))
+	elif LabScenarios.saved_build_opponents(Profiles.current).is_empty():
+		form.add_child(LabUi.label("Boiler Room Key: finish a campaign run to save a build you can train against here.", "Caption"))
 	_round_time = LabUi.slider(4.0, 99.0, 1.0, 8.0, "%d s")
 	LabUi.row(form, "Round length", _round_time)
 	_spawn = LabUi.option(["Random positions", "Standard corners"])
@@ -366,11 +375,20 @@ func _load_preset_weights() -> void:
 	_update_train_help()
 
 
+## The scenario chosen in the list (an id from _scenario_ids).
+func _scenario_id() -> String:
+	var i := _scenario.selected if _scenario != null else 0
+	return str(_scenario_ids[i]) if i >= 0 and i < _scenario_ids.size() else "drill_dummy"
+
+
 func _load_scenario() -> void:
-	var sid: String = LabScenarios.preset_ids()[_scenario.selected]
+	var sid := _scenario_id()
 	var scn: Dictionary = LabScenarios.PRESETS[sid]
+	var opps: Array = scn["opponents"]
+	if sid == "my_builds":
+		opps = LabScenarios.saved_build_opponents(Profiles.current)
 	for k in _opp_checks:
-		(_opp_checks[k] as CheckBox).button_pressed = (scn["opponents"] as Array).has(k)
+		(_opp_checks[k] as CheckBox).button_pressed = opps.has(k)
 	LabUi.slider_of(_round_time).value = float(scn["round_time"])
 	_spawn.select(0 if str(scn.get("spawn", "random")) == "random" else 1)
 	_update_train_help()
@@ -401,7 +419,7 @@ func _update_train_help() -> void:
 		return
 	var ap: String = APPROACHES[_approach.selected]
 	var pid: String = LabRewards.preset_ids()[_objective.selected]
-	var sid: String = LabScenarios.preset_ids()[_scenario.selected]
+	var sid := _scenario_id()
 	var t := "[b]%s[/b]\n" % APPROACH_NAMES[_approach.selected]
 	match ap:
 		"es":
@@ -434,7 +452,7 @@ func _start_training() -> void:
 	var hidden: Array = NET_SIZES[_net.selected]
 	var job := {"kind": "bc" if ap == "bc" else "es", "name": _run_name.text.strip_edges(), "creature": cid, "seed": _seed,
 		"objective": {"preset": LabRewards.preset_ids()[_objective.selected], "weights": weights},
-		"scenario": {"preset": LabScenarios.preset_ids()[_scenario.selected], "opponents": opps,
+		"scenario": {"preset": _scenario_id(), "opponents": opps,
 			"round_time": LabUi.slider_of(_round_time).value, "spawn": "random" if _spawn.selected == 0 else "standard"},
 		"eval": {"opponents": opps},
 		"model": {"hidden": hidden},

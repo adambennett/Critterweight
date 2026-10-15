@@ -287,3 +287,62 @@ func test_found_secrets_persist_into_the_world() -> void:
 	check(not mode.item_visible("letter_a"), "the A stays in the sign")
 	check(mode.condition("pier_revealed"), "the pier stays open")
 	check(not mode.item_visible("fuse") and not mode.item_visible("cable_spool"), "delivered parts are gone from the world")
+
+
+## Hub review #3: the letter A or an elevator part thrown off the roof or the pier (or left where
+## nobody can reach it) comes back where it was found, so a missed throw never costs a secret for
+## the rest of the visit.
+func test_lost_letter_and_parts_come_back() -> void:
+	# every item's home is a reachable spot in a space (the rule never sends one somewhere it loops)
+	for id in HubLayout.ITEMS:
+		var home: Vector3 = (HubLayout.ITEMS[id] as Dictionary)["pos"]
+		check(HubLayout.space_at(home + Vector3.UP * 0.5) != "", "%s starts inside a space" % id)
+	make_hub("f_stoke", "roof")
+	state.find_secret("sec_freight_elevator")
+	var letter: RigidBody3D = mode.world["items"]["letter_a"]
+	var home_a: Vector3 = (HubLayout.ITEMS["letter_a"] as Dictionary)["pos"]
+	# heave it off the roof's south edge, away from the sign
+	await teleport(Vector3(48.0, 0, -25.6), 0.0)
+	mode.pick_up_item(player(), "letter_a")
+	await run_until(func(): return false, 0.2)
+	player().facing_yaw = 0.0
+	var s0 := last_seq()
+	mode.throw_carried(player(), 1.0)
+	await run_until(func(): return letter.global_position.y < -1.0, 4.0)
+	check(letter.global_position.y < -1.0, "the A sails off the edge of the roof (%s)" % str(letter.global_position))
+	await run_until(func(): return letter.global_position.distance_to(home_a) < 0.05, 6.0)
+	check(letter.global_position.distance_to(home_a) < 0.05 and letter.freeze, "it comes back by the water tower (%s)" % str(letter.global_position))
+	check(not events_of("hub_item_returned", s0).is_empty(), "the hub says so")
+	await teleport(Vector3(51.6, 0, -26.9), 180.0)
+	_face(letter.global_position)
+	check_eq(str(mode._nearest_carryable(player()).get("id", "")), "letter_a", "and it can be picked up again")
+	check(not mode.secrets.sign_fixed(), "secret #7 is still on")
+	# an elevator part dropped into the harbour from the pier goes back to its spot too
+	var fuse: RigidBody3D = mode.world["items"]["fuse"]
+	var home_f: Vector3 = (HubLayout.ITEMS["fuse"] as Dictionary)["pos"]
+	mode.teleport(player(), Vector3(24.0, 0, -42.0), 0.0)
+	await run_until(func(): return false, 0.2)
+	mode.pick_up_item(player(), "fuse")
+	await run_until(func(): return false, 0.2)
+	player().facing_yaw = PI          # south, off the end of the pier
+	mode.throw_carried(player(), 1.0)
+	await run_until(func(): return fuse.global_position.distance_to(home_f) < 0.05, 8.0)
+	check(fuse.global_position.distance_to(home_f) < 0.05, "the fuse is back by the boiler (%s)" % str(fuse.global_position))
+
+
+## Hub review #9: a hidden item (the red button before the Scouting Report) is not drawn and is
+## not solid either — it used to block the walk past the filing cabinets in the Office.
+func test_hidden_items_are_not_solid() -> void:
+	make_hub("f_stoke", "office")
+	var button: RigidBody3D = mode.world["items"]["button"]
+	check(not mode.item_visible("button"), "the button is hidden without the Scouting Report")
+	check_eq(button.collision_layer, 0, "and has no collision while hidden")
+	# walk straight through where it hangs
+	await teleport(Vector3(7.0, 4.0, 11.8), 180.0)
+	driver.set_path([Vector3(7.0, 4.0, 9.2)])
+	await run_until(func(): return player().pos().z < 9.8, 4.0)
+	driver.set_path([])
+	check(player().pos().z < 9.8, "nothing invisible stops you (reached z %.2f)" % player().pos().z)
+	# once revealed it is a real prop again
+	mode.show_item("button")
+	check(mode.item_visible("button") and button.collision_layer == Rig.LAYER_PROPS, "revealed: visible and solid")

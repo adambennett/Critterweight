@@ -11,6 +11,8 @@ const PARTY_RESUME_TEXT := "A co-op party's run: its host resumes it from the co
 
 var catalog: CampaignCatalog
 var stand_ins := false
+## Opened from the Cannery's sign-up sheet (params.from_hub): Back walks back to Snappington's desk.
+var return_to_hub := false
 var variant := "off_the_street"
 var fighter := ""
 var difficulty := "amateur"
@@ -26,6 +28,7 @@ var _dose_label: Label
 
 
 func on_enter(p: Dictionary) -> void:
+	return_to_hub = bool(p.get("from_hub", false))
 	stand_ins = bool(p.get("stand_ins", false)) or OS.get_cmdline_user_args().has("--campaign-stand-ins")
 	catalog = CampaignFlow.make_catalog(stand_ins)
 	if CampaignCatalog.VARIANTS.has(str(p.get("variant", ""))):
@@ -59,9 +62,9 @@ func _build() -> void:
 	_runs_box.add_theme_constant_override("separation", 8)
 	right.add_child(_runs_box)
 	_refresh_runs()
-	right.add_child(CampaignUI.button("THE BOOKIE'S TABLE (autobattler)", func(): App.goto("bookie", {"stand_ins": stand_ins})))
+	right.add_child(CampaignUI.button("THE BOOKIE'S TABLE (autobattler)", func(): App.goto("bookie", {"stand_ins": stand_ins, "from_hub": return_to_hub})))
 	right.add_child(CampaignUI.button("CANNERY LEDGER (Fight Camp upgrades)", func(): App.push("camp_ledger", {"station": ""})))
-	right.add_child(CampaignUI.button("BACK", CampaignUI.leave_campaign, 24, CampaignUI.MUTED))
+	right.add_child(CampaignUI.button("BACK TO THE CANNERY" if return_to_hub else "BACK", _leave, 24, CampaignUI.MUTED))
 	_status = CampaignUI.label("", 20, CampaignUI.MUTED)
 	v.add_child(_status)
 	_update_status()
@@ -90,13 +93,13 @@ func _build_rows() -> void:
 		# development stand-ins are a developer tool (CampaignFlow.dev_tools): hidden in normal play
 		if CampaignFlow.dev_tools():
 			_rows.add_child(CampaignUI.label(why + " Enable development stand-ins to try the campaign (runs are marked custom).", 20, CampaignUI.DANGER))
-			_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS", func(): App.goto("campaign_menu", {"stand_ins": true})))
+			_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS", func(): App.goto("campaign_menu", {"stand_ins": true, "from_hub": return_to_hub})))
 		else:
 			_rows.add_child(CampaignUI.label(why + " The card opens once their fight kits are cleared.", 20, CampaignUI.DANGER))
 	else:
 		_row("FIGHTER", fs, fighter, _pick_fighter)
 		if not stand_ins and CampaignFlow.dev_tools() and catalog.available_fighters().size() < catalog.roster().size():
-			_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS (unfinished kits)", func(): App.goto("campaign_menu", {"stand_ins": true})))
+			_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS (unfinished kits)", func(): App.goto("campaign_menu", {"stand_ins": true, "from_hub": return_to_hub})))
 	var ds := []
 	for did in catalog.difficulty_ids():
 		ds.append([str(catalog.difficulties[did].get("name", did)), str(did)])
@@ -289,8 +292,16 @@ func on_resume() -> void:
 func on_back() -> bool:
 	if CampaignUI.close_modal(self):
 		return true
-	CampaignUI.leave_campaign()
+	_leave()
 	return true
+
+
+## Back: to the Cannery when opened from its sign-up sheet, else the game's menu.
+func _leave() -> void:
+	if return_to_hub and App.has_screen("hub"):
+		App.goto("hub", {"spot": "office", "from": "campaign"})
+		return
+	CampaignUI.leave_campaign()
 
 
 func _start_run() -> void:

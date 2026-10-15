@@ -1125,7 +1125,15 @@ func begin_match(ctx: Dictionary) -> void:
 		set_arena(str(ctx.get("arena", "")), str(ctx.get("arena_base", "")))
 
 
-func end_match() -> void:
+## Ends the match audio. `owner_sim`: the simulation of the scene that is leaving. A scene swap
+## starts the new scene before the old one is freed, so when another scene has already attached
+## its own match (hub -> spar, spar -> hub, a rematch, a resumed campaign fight) that newer match
+## keeps its bridge, crowd and announcer; only the leaving scene's own audio is ended.
+func end_match(owner_sim: Node = null) -> void:
+	if owner_sim != null and _bridge != null and is_instance_valid(_bridge):
+		var live = _bridge.get("sim")
+		if live != null and is_instance_valid(live) and live != owner_sim:
+			return
 	crowd_stop(1.5)
 	stop_announcer()
 	_match = {}

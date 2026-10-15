@@ -91,6 +91,23 @@ func test_bag_tiers_are_per_fighter() -> void:
 	check_eq(state.clout(), 45, "Gusto earns its own tier 1 on the same bag")
 
 
+## Hub review #8: a bag challenge's tier belongs to the fighter who started it, whoever the body is
+## when the clock runs out (HubScene also calls a running challenge off on a fighter switch:
+## test_hub_flow::test_switching_fighters_calls_off_the_challenge).
+func test_bag_tier_belongs_to_who_started_it() -> void:
+	make_hub("f_dredge")
+	mode.bags.start("heavy")
+	check_eq(mode.bags.fighter_id, "f_dredge", "the challenge remembers who started it")
+	mode.bags.phase = "running"
+	mode.bags.score = 1100.0
+	# the body changes under the challenge (what a locker switch would do)
+	player().rebuild(Content.creature("f_jitters"), player().ground_pos(), player().facing_yaw)
+	mode.bags.finish()
+	check_eq(state.tier_of("bag_heavy_f_dredge"), 3, "Dredge's run of hits earned Dredge's tier")
+	check_eq(state.tier_of("bag_heavy_f_jitters"), 0, "nothing for the fighter who only stood there at the end")
+	check_eq(str(mode.bags.result.get("fighter", "")), "f_dredge", "the result names the starter")
+
+
 func test_chum_drill_counts_dodges_guards_and_hits() -> void:
 	make_hub("f_dredge")
 	mode.start_activity("drill")

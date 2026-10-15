@@ -64,6 +64,13 @@ static func max_selectable_dose(profile: Dictionary, variant: String) -> int:
 	return clampi(int(l.get("unlocked", 1)), 1, 10) if bool(l.get("open", false)) else 0
 
 
+## The Cannery's Title Contender (meta_title_contender): Fight Camp Dose clears count toward the
+## Dosage cosmetics shared with Off the Street.
+static func title_contender(profile: Dictionary) -> bool:
+	var camp: Dictionary = profile.get("camp", {})
+	return int((camp.get("upgrades", {}) as Dictionary).get("meta_title_contender", 0)) > 0
+
+
 ## Highest Dose this profile may play — and be credited for — in `variant` on `difficulty`: 0
 ## while its Dosage is closed, or when the difficulty takes no Doses (Sparring).
 static func dose_cap(catalog: CampaignCatalog, profile: Dictionary, variant: String, difficulty: String) -> int:
@@ -196,13 +203,19 @@ static func finish_run(catalog: CampaignCatalog, state: Dictionary, pid: String,
 			new_cos.append(str(c))
 		if victory and not bookie:
 			new_cos.append("title_%s" % fighter)
-			if dose >= 1 and dose_ok:
+			# The Dosage's cosmetics are the track Fight Camp shares with Off the Street: a Fight Camp
+			# card's Dose clears count toward it only once the Cannery's Title Contender is bought
+			# (CAMPAIGN.md §10.1; otherwise they stay on the Camp board)
+			var dose_track := dose_ok and (variant != "fight_camp" or title_contender(profile))
+			if dose >= 1 and dose_track:
 				new_cos.append("badge_dose_%d" % dose)
-			if dose >= 5 and dose_ok:
+			if dose >= 5 and dose_track:
 				new_cos.append("jacket_announcer_alt")
-			if dose >= 10 and dose_ok:
+			if dose >= 10 and dose_track:
 				new_cos.append("badge_lethal_dose")
 				new_cos.append("chant_lethal_dose")
+			if variant == "fight_camp" and dose >= 1 and dose_ok and not dose_track:
+				rep["dose_cosmetics_need"] = "meta_title_contender"
 	for c2 in new_cos:
 		if not cos.has(c2):
 			cos.append(c2)

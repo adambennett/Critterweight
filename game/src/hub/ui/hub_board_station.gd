@@ -122,7 +122,11 @@ static func build_run(b: HubBoard, p: Dictionary) -> void:
 	b.frame("Commission sign-up sheet", "Fight Camp card", 1080.0)
 	var sv := b.services()
 	if bool(p.get("stand_ins", false)):
-		sv.stand_ins = true
+		# a developer's stand-in sheet gets its own services object: the stand-ins apply to the run
+		# signed here only, never to the rest of the visit (stations, the Bookie's Table, later sheets)
+		var dev := HubServices.new(sv.state, sv.backend)
+		dev.stand_ins = true
+		sv = dev
 	var st := b.hub_state()
 	if not sv.available():
 		b.text_line("\"%s\"" % HubContent.keyed_line("snappington", "run_absent"), "H3")

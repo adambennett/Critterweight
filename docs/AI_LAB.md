@@ -127,11 +127,17 @@ farmed), `survival` (seconds), `win`/`loss`/`draw` (KO or decision at the time l
 
 Fixed baselines (`src/lab/lab_opponents.gd`): standing dummy, patrolling dummy, scripted jabber,
 scripted turtle, and the shipped BotBrain tiers Rookie / Regular / Pro / Champion (reaction
-delays and mistakes; never omniscient). `policy:<file>` plays a saved policy.
+delays and mistakes; never omniscient). `policy:<file>` plays a saved policy. `build:<json>`
+plays one of the profile's **saved campaign builds** (`profile.campaign.saved_builds`: the fighter
+with the techniques and supplements it finished a run with, composed by the campaign's
+`BuildApplier`; no Cannery upgrades, no Dose) piloted by a Pro bot — the whole build travels inside
+the opponent kind, so jobs and workers rebuild it exactly.
 Scenario presets (`src/lab/lab_scenarios.gd`): *Drill: standing dummy*, *Drill: patrolling
 dummy*, *Sparring: jabber*, *Sparring: jabber + turtle*, *Bots: Rookie + Regular*, *Bots: Pro +
-Champion*; every field can be overridden (opponents, round length, random vs standard spawns,
-spawn distance, arena). Spawns: *random* puts the learner anywhere in the inner part of the
+Champion*, and — with the Cannery's **Boiler Room Key** (`meta_boiler_room_key`, Teddy's ledger) —
+*My saved builds* (the six most recent saved builds as opponents; `LabScenarios.preset_ids_for`);
+every field can be overridden (opponents, round length, random vs standard spawns, spawn distance,
+arena). Spawns: *random* puts the learner anywhere in the inner part of the
 arena and the opponent `dist` metres away; *standard* uses the arena's standard opposite spawn
 points, jittered per episode seed (±0.35 m, ±25°); *swapped* exchanges the two sides. (Before
 this fix, format-2 arenas such as The Gullet placed the opponent of every random-spawn episode

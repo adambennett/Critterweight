@@ -1,7 +1,8 @@
 class_name HubSparring
 extends RefCounted
-## Ring Sparring (HUB.md §3) and the 1973 tape (secret #5): real matches launched from the hub
-## through App.start_match, returning to the Cannery when they end.
+## Ring Sparring (HUB.md §3) and the 1973 tape (secret #5): real matches launched from the hub,
+## returning to the Cannery when they end (a spar through MatchFlow, so "Restart fight" restarts
+## the spar; the tape offers no restart).
 ##   launch(scene, {opponent, tier, format, low_gravity, hazards, arena}): a 1-round spar in the
 ##     practice cage (a 6 m mini-Gullet) vs Kid Lamprey (npc_kid_lamprey when the creature exists,
 ##     else a roster stand-in named Kid Lamprey) or any fighter at any bot tier; format "practice"
@@ -69,11 +70,18 @@ static func config(me: String, player_name: String, choices: Dictionary) -> Dict
 	var practice := str(choices.get("format", "spar")) == "practice"
 	var rules := {"id": "hub_spar", "name": "Ring Sparring", "mode": "practice" if practice else "standard", "rounds": 1,
 		"round_time": 0.0 if practice else 90.0, "intro_time": 1.5, "lives": 1}
+	if practice:
+		# the practice dummy fights back at the chosen tier (read by PracticeMode at setup, so a
+		# restarted practice spar keeps it)
+		rules["dummy_behavior"] = "bot"
+		rules["dummy_tier"] = BotTiers.brain_tier(tier)
 	if bool(choices.get("low_gravity", false)):
 		rules["gravity_mult"] = 0.5
+	# where you walk back in: the rooftop ring's practice returns to the roof, the cage to the Main Floor
+	var spot := str(choices.get("return_spot", "roof" if str(choices.get("arena", "cage")) == "rooftop" else "main_floor"))
 	return {"arena": arena_for(choices), "rules": rules, "seed": int(Time.get_ticks_msec() % 100000) + 3, "no_record": true,
 		"audio_context": "versus", "music": "combat_a", "overlay_script": OVERLAY,
-		"hub_spar": {"opponent": opp, "tier": tier, "format": "practice" if practice else "spar", "fighter": me},
+		"hub_spar": {"opponent": opp, "tier": tier, "format": "practice" if practice else "spar", "fighter": me, "spot": spot},
 		"fighters": [{"creature": me, "team": 0, "kind": "player", "name": player_name},
 			{"creature": opponent_creature(opp, me), "team": 1, "kind": "bot", "difficulty": BotTiers.brain_tier(tier), "name": opponent_name(opp)}]}
 
@@ -84,19 +92,19 @@ static func launch(scene: Node, choices: Dictionary) -> MatchScene:
 	var cfg := config(me, str(st.profile.get("name", "Rookie")), choices)
 	Profiles.save()
 	var spar: Dictionary = cfg["hub_spar"]
-	var ms := App.start_match(cfg, func(result: Dictionary) -> void: finished(spar, result))
-	if ms and ms.sim and ms.sim.mode is PracticeMode:
-		(ms.sim.mode as PracticeMode).set_behavior("bot", BotTiers.brain_tier(str(spar["tier"])))
-	return ms
+	# through MatchFlow: the pause menu's "Restart fight" restarts THIS spar (not whatever match was
+	# launched before it, a lesson for instance) and the restart walks back into the Cannery too
+	return MatchFlow.launch(cfg, func(result: Dictionary) -> void: finished(spar, result))
 
 
-## Match over (or left early from the overlay): pay the one-time rewards and walk back in.
+## Match over (or left early from the overlay): pay the one-time rewards and walk back in where the
+## spar started (the cage: the Main Floor; the rooftop ring: the roof).
 static func finished(spar: Dictionary, result: Dictionary) -> void:
 	var won := int(result.get("winner_team", -2)) == 0 and not bool(result.get("left", false))
 	var st := HubState.new(Profiles.current)
 	var rec := st.spar_record(str(spar.get("opponent", "")), str(spar.get("tier", "")), won, str(spar.get("fighter", "")))
 	Profiles.save()
-	Cannery.enter({"spot": "main_floor", "from": "spar", "spar": {"won": won, "opponent": str(spar.get("opponent", "")), "tier": str(spar.get("tier", "")),
+	Cannery.enter({"spot": str(spar.get("spot", "main_floor")), "from": "spar", "spar": {"won": won, "opponent": str(spar.get("opponent", "")), "tier": str(spar.get("tier", "")),
 		"clout": int(rec["clout"]), "badge": str(rec["badge"])}})
 
 
@@ -110,6 +118,8 @@ static func play_tape(_scene: Node) -> MatchScene:
 			{"creature": shadow, "team": 1, "kind": "bot", "difficulty": BotTiers.brain_tier("headliner"), "name": "???"}]}
 	Profiles.save()
 	var ms := App.start_match(cfg, func(_r: Dictionary) -> void: Cannery.enter({"spot": "booth", "from": "tape"}))
+	# a tape is watched, not fought: no "Restart fight" (and never into an earlier, unrelated match)
+	MatchFlow.last_config = {}
 	if ms:
 		ms.camera.mode = FightCamera.Mode.SPECTATE
 	return ms
