@@ -405,9 +405,22 @@ func build_config() -> Dictionary:
 		if kind == "bot":
 			fd["difficulty"] = BotTiers.brain_tier(str(s["tier"]))
 		fighters.append(fd)
-	var rules = PRACTICE_RULES.duplicate(true) if mode == "practice" else str(setup["rules"])
-	return {"arena": str(setup["arena"]), "rules": rules, "fighters": fighters, "spectate": mode == "spectate",
+	var rules = str(setup["rules"])
+	var extra := {}
+	if mode == "practice":
+		# the real Practice mode: dummy behaviours, recording/replay, hit telemetry, no KOs
+		var pr: Dictionary = Content.get_entry("rules", "practice").duplicate(true)
+		if pr.is_empty():
+			pr = PRACTICE_RULES.duplicate(true)
+		if fighters.size() > 1 and str(fighters[1]["kind"]) == "bot":
+			pr["dummy_behavior"] = "bot"
+			pr["dummy_tier"] = str(fighters[1].get("difficulty", "regular"))
+		rules = pr
+		extra = {"overlay_script": "res://src/ui/practice_overlay.gd", "no_record": true}
+	var cfg := {"arena": str(setup["arena"]), "rules": rules, "fighters": fighters, "spectate": mode == "spectate",
 		"ui": {"mode": mode, "setup": setup.duplicate(true)}}
+	cfg.merge(extra, true)
+	return cfg
 
 
 func _try_start() -> void:
