@@ -24,13 +24,13 @@ value (m/s on an 80 kg reference); "measured" columns are root displacement of a
 |---|---|---|---|---|---|---|---|---|---|
 | L1 Jab | left fist, chin chamber → straight at head height | 0.12/0.08/0.18 | 4 (6.4 on the head) | 2.0 → 0.29 m | 0.25 | 5 | 4 | Scorch 10 | lunge 0.15 m |
 | L2 Cross | right fist, right shoulder → head height, chest turns 40° | 0.14/0.08/0.22 | 5 (8.0 head) | 2.6 → 0.42 m | 0.30 | 8 | 5 | Scorch 12 | |
-| L3 Lead Hook | left fist from 60° outside-left, horizontal arc at temple height | 0.18/0.10/0.30 | 7 (11.2 head) | 3.2 sideways → 0.82 m to Stoke's right | 0.45 | 14 | 7 | Scorch 18 | `kb_dir: side`, `turn_target: 30` (measured 28°) |
+| L3 Lead Hook | left fist from 60° outside-left, horizontal arc at temple height | 0.18/0.10/0.30 | 7 (11.2 head) | 3.2 sideways → 0.82 m to Stoke's right | 0.45 | 14 | 7 | Scorch 18 | `kb_dir: side`, `kb_side: -1`, `turn_target: 30` (measured 28°) |
 | Heavy: Overhand Boiler | right fist rises beside the head, loops over and down onto the head | 0.27/0.11/0.40 | 12 (19.3 on Gusto's head) | 5.4 → 1.5 m | 0.60 | 25 | 12 | Scorch 30 | armor vs Lights during the active window (`armor [[0.28,0.38]]`, `armor_level: lights`); lunge 2.6 m/s from 0.20 s, after the charge hold point (0.7 × startup), so holding the charge does not slide Stoke forward |
 | Charged: Furnace Haymaker | full torso wind-up (chest −46°, crouch), wide right hook at head height | 0.48/0.14/0.50 | 18 (28.5 head) | 7.6 → 2.6–3.9 m | 0.80 | 45 | 16 | Scorch 45 | Light armor through startup; guard-crush `guard_break: 2.0` (2× stamina drain on a guarding target); on a Sizzling target `on_hit` adds launch 4.9 m/s (knock-up) |
 | Finisher: Gut Furnace | 0.6 m step-in, right fist drives into the belly | 0.14/0.12/0.45 | 10 (11.5 chest) | 6.3 → 2.48 m | 0.60 | 20 | 10 | Scorch 25 | on a Sizzling target `on_hit`: +4 damage and `refresh_status: scorch` |
 | Dash: Stoke Step | slide, left uppercut waist → head | 0.10/0.14/0.35 | 8 | 4.8 + launch 3.9 → 1.0–1.5 m, target rises 0.47 m | 0.50 | 15 | 8 (+12 dodge) | Scorch 15 | launcher |
 | Grab: Clinch | both fists to a collar tie | 0.25/0.11/0.34 | — | — | — | — | 6 | — | connects 0.9–1.6 m root-to-root on the mirror, 0.9–1.2 m on Gusto (size matching lifts the hands toward his taller shoulders); grabs beat guard |
-| Pummel: Clinch Knee | (engine pummel, no animation) | per press | 3 | — | — | 4 | 0 | Scorch 8 | max 3 per hold (engine) |
+| Pummel: Clinch Knee | (engine pummel, no animation) | one per 0.35 s | 3 | — | — | 4 | 0 | Scorch 8 | pummel `interval: 0.35`; max 3 per hold (engine) |
 | Throw fwd: Belly Toss | hip-throw forward | — | 9 | distance 2.0 → > 1.4 m (test) | — | — | — | Scorch 15 | knockdown |
 | Throw back: Dump | high arc over Stoke's head | — | 8 | distance 2.0, up 3.0 → > 1.4 m (test) | — | — | — | — | knockdown |
 | Throw side: Shove-off | spacing shove | — | 4 | distance 2.5 → > 1.8 m (test) | 0.6 | — | — | — | no knockdown (`stun: 0.6` keeps the shove distance) |
@@ -55,8 +55,9 @@ Haymaker 1.0–1.4, Gut Furnace 1.2–1.8 (root to root).
   the active window (`cancel` = startup), Heavy in that window is the Gut Furnace (engine rule).
   Light, Light, Heavy lands the Gut Furnace on the mirror; Gusto (55 kg) slides out of its reach
   after the cross, so Light, Heavy is his string (both tested).
-* **Side-shove + 30° turn (Lead Hook)**: `kb_dir: "side"`, `kb_side: 1` (pushes toward Stoke's right,
-  the direction the left hook travels), `turn_target: 30`.
+* **Side-shove + 30° turn (Lead Hook)**: `kb_dir: "side"`, `kb_side: -1` (main's corrected sign:
+  +1 = attacker's left, so −1 pushes toward Stoke's right, the direction the left hook travels),
+  `turn_target: 30`.
 * **Armor on the Overhand** (active only) and **charged armor** (whole Haymaker startup, plus the
   engine's Light armor while the charge is held): `armor` windows with `armor_level: "lights"`.
 * **Guard-crush**: `guard_break: 2.0` doubles the stamina a guarding target loses (the engine has no
@@ -84,18 +85,25 @@ Generic, data-driven, in clearly marked "Kit extension" blocks; unit tests in
    `"slot": "throw_fwd" | "throw_back" | "throw_side"`, so hooks can filter by direction.
 4. **Throw stun** (`fighter.gd`, `_do_throw()`): a `throws` entry may set `"stun"` (seconds) for
    no-knockdown spacing throws.
-5. **Bots** (`bot_brain.gd`): a Heavy press is a tap (the held bit stayed set, so every bot Heavy
-   charged to full) and the "Kit tactics" block reads the creature `ai` block (below).
+5. **Bot hints** (`bot_brain.gd` "Kit hints", the one mechanism shared with Dredge/Dozer): the
+   Stoke/Gusto keys `attack_range`, `charge_heavy {"chance", "from"}` (profile-gated), `parry_heavy`,
+   `guard_max` / `dodge_for_guard`, `dash_in` / `dash_out`, `juice_when`, `taunt_when` /
+   `taunt_chance`, `commit_when`, and the `when` conditions `target_down`, `target_cornered`,
+   `target_closing`, `projectile_incoming`, `in_enemy_zone`, `self_juiced`, `chance`. (Bots used to
+   keep the Heavy held bit set, so every bot Heavy charged to full; main's hints fix this the same way.)
 
-## AI ("Pressure", `ai` block; bot_brain.gd "Kit tactics")
+## AI ("Pressure", `ai` block; bot_brain.gd "Kit hints")
 
-`range [1.0, 1.2]` and `attack_range 1.35`: walks in and pokes with L1/L2. `commit_if:
-["target_status:scorch"]`: strings into L3 and the Gut Furnace on a Sizzling target. Steam Vent
-only reactively: an enemy projectile within 4 m heading at him (80 %), or poise < 30 % with the target
-within 1.8 m. Stoke the Fire only while the target is knocked down. JUICE when the target is
-cornered (within 1.3 m of the fence and 3 m of him), when he is below 25 % health, or rarely point
-blank. Charged Heavy only from the `pro` profile up (Journeyman and below never charge); Heavy parry
-35 % from `champion` (Headliner) up. Personality offsets: aggression +0.12, dodge −0.04, grab +0.02.
+`range [1.0, 1.2]` and `attack_range 1.35`: walks in and pokes with L1/L2. `commit_when:
+[{"target_status": "scorch"}]`: strings into L3 and the Gut Furnace on a Sizzling target. Ability
+hints (`chance 4.5` scales the skill gate `ability × 0.35` back to roughly the bot's ability stat):
+Steam Vent only reactively — an enemy projectile within 4 m heading at him (80 %), or poise < 30 %
+with the target within 1.8 m (60 %); Stoke the Fire only while the target is down (80 %).
+`juice_when`: the target cornered (within 1.3 m of the fence) and within 3 m, he is below 25 % health
+with the target within 3 m, or 25 % of the time point blank (≤ 1.8 m). `charge_heavy {"from": "pro",
+"chance": 0.33}` (× skill: ~25 % of a Contender's Heavies; Journeyman and below never charge);
+Heavy parry 35 % from `champion` (Headliner) up. Personality offsets: aggression +0.12,
+dodge −0.04, grab +0.02.
 
 ## Tests and evidence
 
@@ -114,10 +122,10 @@ weapon points ≤ 1.6 m from the root, no cage escape. Other tests: knockback sc
 (±50 %) and ordering, hook shove and turn, string/finisher, charge hold (no forward drift while
 holding) + armors (a Light during the Overhand's active window does not stagger, during its windup
 it does), guard-crush and Sizzle knock-up, Gut Furnace Sizzle bonus, Stoke Step from a dodge,
-Clinch through guard + pummel + all three throws, Steam Vent cone/push/projectile destruction/7 s
-cooldown, Stoke the Fire buff/self-burn cannot kill/+5 Scorch/12 s cooldown, Meltdown
-activation/pulse/armor levels/+25 Scorch/patch/6 s/crash/−30 stamina, taunt (1.5 s, +8 Hype, no
-armor), guard and parry.
+Clinch through guard + pummel (one knee per 0.35 s) + all three throws, Steam Vent
+cone/push/projectile destruction/7 s cooldown, Stoke the Fire buff/self-burn cannot kill/+5
+Scorch/12 s cooldown, Meltdown activation/pulse/armor levels/+25 Scorch/patch/6 s/crash/−30
+stamina, taunt (1.5 s, +8 Hype, no armor), guard and parry.
 
 Evidence (rendered match frames, `docs/evidence/kits/`): `f_stoke_haymaker_0.png` (Haymaker
 wind-up), `f_stoke_overhand_1.png` (Overhand landing), `f_stoke_gut_furnace.png`,
@@ -126,30 +134,36 @@ wind-up), `f_stoke_overhand_1.png` (Overhand landing), `f_stoke_gut_furnace.png`
 ## Balance (bot vs bot, The Gullet, 1 round × 60 s, decision on health)
 
 `test_zz_balance` (harness `bout()` / `balance()`): two `BotBrain`s that read each creature's `ai`
-block, The Gullet as merged from main (12 × 12 m, spawns 6 m apart), one 60 s round decided by KO
-or remaining health, spawn sides alternating, bout seeds 100+. Journeyman bots never charge Heavies
-or parry; Contender bots charge (Stoke 25 %, Gusto 20 %) and dodge/parry more.
+block through main's "Kit hints", The Gullet as merged from main (12 × 12 m, spawns 6 m apart), one
+60 s round decided by KO or remaining health, spawn sides alternating, bout seeds 100+ (each mirror
+also with `--kit-seed 200`). Journeyman bots never charge Heavies or parry; Contender bots charge
+(~25 % / ~20 % of Heavies) and dodge/parry more. Measured after merging main 2a5beaa (8381ad3 only
+changed test stepping, which these bouts do not use).
 
 | Pairing | Bots | Bouts | Wins (first named) | KOs | Avg time | Dmg/bout | Dmg/hit | Hits/bout |
 |---|---|---|---|---|---|---|---|---|
-| Stoke vs Gusto | regular (Journeyman) | 40 | 19–21 (47.5 %) | 36 | 45.4 s | 70.5 vs 89.6 | 8.95 vs 3.32 | 7.9 vs 26.9 |
-| Stoke vs Gusto | pro (Contender) | 24 | 11–13 (45.8 %) | 14 | 56.5 s | 62.0 vs 94.6 | 8.50 vs 3.42 | 7.3 vs 27.6 |
-| Stoke mirror | regular | 24 | 12–12 (50.0 %) | 24 | 43.0 s | 97.7 vs 92.4 | 6.79 vs 6.37 | 14.4 vs 14.5 |
-| Gusto mirror | regular | 24 | 16–8 (66.7 %) | 24 | 45.9 s | 80.4 vs 69.4 | 4.20 vs 4.05 | 19.1 vs 17.1 |
+| Stoke vs Gusto | regular (Journeyman) | 40 | 22–18 (55.0 %) | 39 | 45.8 s | 74.4 vs 88.8 | 8.81 vs 3.21 | 8.4 vs 27.7 |
+| Stoke vs Gusto | pro (Contender) | 24 | 9–15 (37.5 %) | 13 | 56.9 s | 61.8 vs 94.1 | 8.89 vs 3.23 | 7.0 vs 29.2 |
+| Stoke mirror | regular | 24 | 18–6 (75.0 %) | 24 | 42.9 s | 106.5 vs 88.7 | 7.20 vs 6.74 | 14.8 vs 13.2 |
+| Stoke mirror (seeds 200+) | regular | 24 | 15–9 (62.5 %) | 24 | 39.8 s | 102.9 vs 91.6 | 7.62 vs 6.98 | 13.5 vs 13.1 |
+| Gusto mirror | regular | 24 | 6–18 (25.0 %) | 23 | 46.6 s | 71.3 vs 84.8 | 4.31 vs 4.23 | 16.5 vs 20.0 |
+| Gusto mirror (seeds 200+) | regular | 24 | 15–9 (62.5 %) | 24 | 47.5 s | 80.7 vs 72.3 | 4.11 vs 4.03 | 19.6 vs 18.0 |
 
-**Cross matchup: Stoke 19–21 over 40 Journeyman bouts (47.5 %) and 11–13 over 24 Contender bouts —
-inside the 35–65 % target.** Mirrors are even within noise (sides alternate, so a mirror split is
-pure variance). Where the damage comes from (regular cross, damage per bout, hits in 40 bouts):
-Stoke — Overhand 34.3 (74), Jab 11.4 (101), Gut Furnace 8.9 (35), Cross 5.0 (44); Gusto — effects
-44.8 (481: Gust Bomb hits and bursts, Downdraft landings, Tailspin burst, JUICE cone), Wing Snap
-14.5 (123), Crosswind 13.2 (109), Beak Peck 8.5 (164).
+**Cross matchup: Stoke 22–18 over 40 Journeyman bouts (55.0 %) and 9–15 over 24 Contender bouts
+(37.5 %) — inside the 35–65 % target.** Mirrors: the same kit and AI on both sides with
+alternating spawns, so "first named" means nothing and the splits are seed variance — 24-bout blocks
+swing widely (Gusto 6–18 with seeds 100+ and 15–9 with seeds 200+; Stoke 18–6 and 15–9 here,
+12–12 / 13–11 / 9–15 in earlier blocks). Where the damage comes from (regular cross, damage per
+bout, hits in 40 bouts): Stoke — Overhand 33.6 (73), Jab 13.2 (111), Gut Furnace 9.4 (37), Cross
+6.0 (50); Gusto — effects 43.9 (477: Gust Bomb hits and bursts, Downdraft landings, Tailspin burst,
+JUICE cone), Wing Snap 15.3 (127), Crosswind 12.4 (111), Beak Peck 8.8 (173).
 
 History (regular cross): ROSTER damage numbers 10–0 (10 bouts, before the `ai` blocks); with the
 `ai` blocks, Gusto's first damage buffs and the 2.6 m/s Overhand lunge 14–10 (24); with a Gusto
 "hop over the Heavy" rule 20–4 (24, rule dropped); after main's size matching on the old 10 m
 Gullet 27–13 (40: Stoke's punches re-aimed to Gusto's head, Gusto's wings to Stoke's guard), then
-Crosswind 8+8 and Gust Bomb 7: 25–15, plus Overhand 12: 25–15 (40); final numbers above on main's
-current Gullet.
+Crosswind 8+8 and Gust Bomb 7: 25–15, plus Overhand 12: 25–15 (40); on main's 12 m Gullet 19–21
+(40); final numbers above after folding the AI into main's Kit hints.
 
 Commands: `--kit-balance 40 regular --kit-pair f_stoke-f_gusto` (one pairing; without
 `--kit-pair` it runs the cross and both mirrors), `--kit-seed 200` for another seed block.
@@ -175,8 +189,7 @@ Commands: `--kit-balance 40 regular --kit-pair f_stoke-f_gusto` (one pairing; wi
   slid 1.2 m forward while charging and fired the Haymaker from point-blank range).
 * Back throw "Dump": the engine throw is an impulse straight back, which drives the victim into
   Stoke's own body; it is thrown in a high arc over his head (`up: 3.0`) to land behind him.
-* Pummel "0.35 s each" is not enforced: the engine pummels once per Light press (max 3 per hold) and
-  does not animate pummels.
+* Pummels are not animated (engine); the ROSTER's 0.35 s per knee is the pummel `interval`.
 * Meltdown Scorch patches: at most one per 1.2 s (hook cooldown) and they do not burn Stoke
   (`owner_immune`); the engine stacks overlapping same-element zone ticks (ELEMENTS.md says they must
   not), so a patch per hit would multiply the burn.

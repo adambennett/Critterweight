@@ -31,7 +31,7 @@ an arm (0.4–0.5× damage) unless they come in at head height.
 | Finisher: Tailspin | whole-body spin (one full turn, wings out at full span), drifting forward | 0.15/0.43/0.42 | 3 × 3 | 1.6 per wing pass → 2.5–2.7 m total | 0.50 | 6 × 3 | 10 | Gale 10 per hit | 2 wing passes (multi-hit) + a closing radial burst (area r 1.6 m, 3 dmg, Gale 10) that pushes everyone around; drift ~0.9 m |
 | Dash: Skid Kick | low slide, foot leads at knee height | 0.10/0.12/0.30 | 6 | 5.0 → 1.25–1.9 m | 0.40 | 10 | 7 (+8 dodge) | Gale 15 | `on_hit` trip (`knockdown`) if the target is Soaked or Winded |
 | Grab: Talon Snatch | hop, talons raised, wing tips clutch the shoulders | 0.24/0.14/0.34 | — | — | — | — | 6 | — | wing-tip grab: connects 0.9–1.4 m on the mirror, 0.9–1.8 m on Stoke |
-| Pummel: Peck | (engine pummel) | per press | 2 | — | — | 4 | 0 | Gale 6 | |
+| Pummel: Peck | (engine pummel) | one per 0.25 s | 2 | — | — | 4 | 0 | Gale 6 | pummel `interval: 0.25`; max 3 per hold (engine) |
 | Throw fwd: Carry-and-Drop | victim launched forward in an arc, Gusto leaps after it | — | 8 | distance 2.5, up 2.0 | — | — | — | Gale 15 | knockdown; passive hook `throw (slot throw_fwd) → leap 2.4 m` |
 | Throw side: Wing Fling | | — | 7 | distance 3.0 | — | — | — | — | knockdown |
 | Throw back: Toss-Over | high arc over Gusto | — | 7 | distance 2.0, up 3.0 | — | — | — | — | knockdown |
@@ -76,17 +76,19 @@ Gusto's own head, and the Scissor Kick a longer, slightly lower extension (1.0�
 * **Hurricane Strut**: `juice_state` status (`speed`, `dodge_cost`) + temporary hooks (`dodge` →
   zone, `taunt` → heal).
 
-## AI ("Showboat", `ai` block; bot_brain.gd "Kit tactics")
+## AI ("Showboat", `ai` block; bot_brain.gd "Kit hints")
 
 `range [1.6, 2.0]`, `attack_range 1.5`: hovers outside Stoke-type reach; `dash_in` (2.3–3.4 m,
 chance 0.7 × aggression): dodges in and presses Light (Skid Kick); `dash_out 0.7`: dodges back out
 when inside 1.6 m. `guard_max 0.5` and `dodge_for_guard 0.6`: never holds guard longer than 0.5 s,
-most guard reactions become sidesteps. Taunts when the target is > 3 m away or knocked down
-(`taunt_chance 0.06`, ×3 for the Punching Bag profile). Gust Bomb when the target is closing in,
-when it winds up a Heavy within 3 m, or occasionally at range. Hang Time when standing in an enemy
-zone (a "hop over the Heavy wind-up" rule was tried and dropped: with it the cross matchup went
-20–4 for Stoke). Charged Heavy from `pro` up, Heavy parry 35 % from `champion` up. Offsets:
-block −0.15, dodge +0.15, ability +0.05, grab −0.04.
+most guard reactions become sidesteps. `taunt_when [{"min": 3.0}, {"target_down": true}]`: taunts
+when the target is > 3 m away or knocked down (`taunt_chance 0.06`, ×3 for the Punching Bag
+profile). Ability hints (`chance 4.5`, see Stoke's doc): Gust Bomb when the target is closing in
+from 1.6–5 m (50 %), against a perceived Heavy windup within 3 m (60 %, also checked while
+defending), or occasionally beyond 2.5 m (12 %); Hang Time when standing in an enemy zone (90 %).
+A "hop over the Heavy wind-up" Hang Time rule was tried and dropped (with it the cross matchup went
+20–4 for Stoke). `charge_heavy {"from": "pro", "chance": 0.27}` (× skill), Heavy parry 35 % from
+`champion` up. Offsets: block −0.15, dodge +0.15, ability +0.05, grab −0.04.
 
 ## Tests and evidence
 
@@ -102,7 +104,7 @@ three Tailspin hits + drift, wind push on a whiff, Winded knock-up, Winded/Soake
 from a dodge, 8-stamina dodges, Downdraft leap/direct hit/landing area/hold-to-charge (no forward
 drift while holding, the held Downdraft lands), Hang Time height, zone immunity, steering,
 landing, cooldown and both aerial variants, Gust Bomb hit/range/burst/reflect/cooldown, Talon
-Snatch through guard + pecks + all throws incl. the Carry-and-Drop leap, Hurricane Strut
+Snatch through guard + pecks (one per 0.25 s) + all throws incl. the Carry-and-Drop leap, Hurricane Strut
 activation/speed/free dodges/vortex/taunt heal/7 s, taunt, guard and parry.
 
 Evidence (`docs/evidence/kits/`): `f_gusto_crosswind_1.png` (wings crossing on Stoke),
@@ -112,12 +114,13 @@ Evidence (`docs/evidence/kits/`): `f_gusto_crosswind_1.png` (wings crossing on S
 ## Balance
 
 Measured together with Stoke's (`test_kit_f_stoke.gd::test_zz_balance`); full table and history in
-`docs/kits/f_stoke.md`. Final: Gusto 21–19 against Stoke over 40 Journeyman bouts (52.5 % for
-Gusto) and 13–11 over 24 Contender bouts; Gusto mirror 16–8 over 24 bouts (sides alternate, so
-that split is variance). Gusto lands ~3.4× as many hits as Stoke (26.9 vs 7.9 per bout) for about
-a third of the damage per hit (3.32 vs 8.95): his wings and kicks mostly meet Stoke's raised
-forearms while Stoke's punches reach his head, and Stoke has 110 HP to his 85. Effect damage
-(mostly Gust Bomb hits and bursts) is half of his output (44.8 of 89.6 per bout).
+`docs/kits/f_stoke.md`. Final (after merging main 2a5beaa): Gusto 18–22 against Stoke over 40
+Journeyman bouts (45.0 % for Gusto) and 15–9 over 24 Contender bouts; Gusto mirror 6–18 over 24
+bouts and 15–9 with seeds 200+ (alternating sides, so the splits are variance). Gusto lands ~3.3×
+as many hits as Stoke (27.7 vs 8.4 per bout) for about 36 % of the damage per hit (3.21 vs 8.81):
+his wings and kicks mostly meet Stoke's raised forearms while Stoke's punches reach his head, and
+Stoke has 110 HP to his 85. Effect damage (mostly Gust Bomb hits and bursts) is 43.9 of his 88.8
+damage per bout.
 
 ## Deviations from ROSTER (with reasons)
 
@@ -143,4 +146,4 @@ forearms while Stoke's punches reach his head, and Stoke has 110 HP to his 85. E
 * Crosswind lunge is split (0.12–0.15 s and 0.17–0.32 s, 6 m/s) around the engine's charge hold
   point (0.7 × startup = 0.168 s): a lunge spanning that time keeps driving while Heavy is held, and
   the first version slid Gusto forward through the whole charge.
-* Pummel "0.25 s each" not enforced (engine pummel per press, max 3, no animation).
+* Pummels are not animated (engine); the ROSTER's 0.25 s per peck is the pummel `interval`.
