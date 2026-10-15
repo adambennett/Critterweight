@@ -287,6 +287,7 @@ func _on_event(ev: Dictionary) -> void:
 				(views[ki] as CreatureView).detach_piece(Vector3(away.x, 0, away.z))
 			hud.callout("K.O.!", 2.0, Color(1.0, 0.35, 0.3))
 			camera.add_trauma(0.5)
+			vfx.stars(_head_of.bind(ki), 2.6)
 		"guard_break":
 			vfx.word(sim.fighters[int(ev["fighter"])].head_pos() + Vector3.UP * 0.3, "GUARD BREAK!", Color(1.0, 0.5, 0.2))
 		"burst":
