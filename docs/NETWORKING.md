@@ -581,8 +581,8 @@ and 889 B with 8 (13-segment test creature, every vital and status filled).
 
 **Smoothing and degraded links** (`test_net_multiprocess.gd`, adaptive interpolation): plain
 loopback duel 39-89 ms interpolation delay depending on machine load; packaged release builds
-(`tools/verify/net_session_check.ps1`, last run on fresh exports of the final tree: 7/7 steps,
-RTT 11 ms, 29.9 snapshots/s, 60 ms) 30 snapshots/s and 49-90 ms over all runs; with the conditioner at
+(`tools/verify/net_session_check.ps1`, last run on fresh exports of the final tree, protocol 4:
+7/7 steps, RTT 14 ms, 30.0 snapshots/s, 58 ms) 30 snapshots/s and 49-90 ms over all runs; with the conditioner at
 80 +- 20 ms one-way and 2 % loss: RTT max 180-250 ms, interpolation 80-116 ms, jitter p95 34-76 ms,
 about 2 % of packets dropped (as configured), 1-2 % of rendered frames starved - the match still
 completes with the correct result.
