@@ -858,9 +858,11 @@ func _react(f: Fighter, tgt: Fighter, per: Dictionary, attacking: bool, dist: fl
 	var threat := attacking and bool(info["threat"]) and in_reach and guard_end > -0.03
 	if int(_answer.get("id", -1)) != int(mv["id"]):
 		_answer = {"id": int(mv["id"]), "kind": "none", "punished": false}
+		# a predictable stream (a read masher) is misread less often by those who read it
+		var err := float(p["mistake"]) * (1.0 - _pv("read") * 0.5 if _mashing() else 1.0)
 		if not threat:
 			_answer["kind"] = "miss" if attacking and (not in_reach or not bool(info["threat"])) else "none"
-		elif rng.randf() < float(p["mistake"]):
+		elif rng.randf() < err:
 			_answer["kind"] = "mistake"
 		else:
 			_answer["kind"] = _choose_answer(f, tgt, per, info, eta, guard_end, dist, dir)
