@@ -136,6 +136,9 @@ func _reward_lines() -> Array:
 		out.append(["New record — %s" % txt, CampaignUI.GOOD])
 	for c in rep.get("cosmetics", []):
 		out.append(["Unlocked: %s" % str(c).replace("_", " ").capitalize(), CampaignUI.GOOD])
+	var ach_defs := Platform.achievement_defs()
+	for a in rep.get("achievements", []):
+		out.append(["Achievement: %s" % str(ach_defs.get(str(a), {}).get("name", a)), CampaignUI.ACCENT])
 	if out.size() == 1:
 		out.append(["Saved to your history.", CampaignUI.MUTED])
 	return out
