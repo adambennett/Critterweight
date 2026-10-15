@@ -311,3 +311,16 @@ func test_bot_avoids_enemy_zones_and_releases_buttons() -> void:
 	bot.poll(f, sim, 1.0 / 120.0)
 	check(f.input.is_held(FighterInput.HEAVY), "charging bot did not hold Heavy")
 	sim.queue_free()
+
+
+func test_bot_band_waits_for_ranged_tools() -> void:
+	var sim := _pair()
+	await run(sim, 0.3)
+	var f := sim.fighters[0]
+	var bot := _bot_on(sim, {"range": [3.0, 5.0], "abilities": {"ability1": {"min": 2.5, "max": 9.0}, "ability2": {"min": 0.0, "max": 2.0}}})
+	check(bot._band_tools_ready(f), "band dropped while a ranged tool is ready")
+	f.charges_left["ability1"] = 0
+	check(not bot._band_tools_ready(f), "band held with every ranged tool on cooldown (a melee-range rule must not count)")
+	var bot2 := _bot_on(sim, {"range": [0.7, 1.4]})
+	check(bot2._band_tools_ready(f), "a kit without ranged rules lost its band")
+	sim.queue_free()

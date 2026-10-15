@@ -206,7 +206,7 @@
   "poise": 55, "poise_regen": 15, "dodge_distance": 3.0, "dodge_time": 0.3, "power": 1.0, "defense": 1.0, "weight": 1.0},
  "moves": {
   "l1": {"name": "Head Butt", "duration": 0.44, "cancel": 0.14, "damage": 5, "knockback": 3.2, "stun": 0.3, "poise": 8, "stamina": 5,
-   "vmin": 1.2, "vref": 4.5, "speed": 2.0, "move_mult": 0.2, "turn_rate": 6.0, "lunge": [[0.06, 0.22, 4.0]],
+   "vmin": 1.2, "vref": 4.5, "speed": 2.0, "move_mult": 0.2, "turn_rate": 6.0, "lunge": [[0.06, 0.22, 3.0]],
    "element": "sludge", "buildup": 12,
    "hit": [{"t0": 0.09, "t1": 0.24, "weapons": ["head", "fang"]}],
    "keys": [

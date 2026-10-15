@@ -275,8 +275,8 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		_strafe_until = _t + rng.randf_range(0.5, 1.6)
 	var side2 := dir.cross(Vector3.UP) * _strafe
 	var band = personality.get("range")
-	if typeof(band) == TYPE_ARRAY and (band as Array).size() == 2 and f.stamina >= 15.0:
-		# kit preferred distance band (zoners keep away, rushdown stays close)
+	if typeof(band) == TYPE_ARRAY and (band as Array).size() == 2 and f.stamina >= 15.0 and _band_tools_ready(f):
+		# kit preferred distance band (zoners keep away while their tools are up, rushdown stays close)
 		var lo := float(band[0])
 		var hi := float(band[1])
 		want = clampf(want, lo, hi) if dist <= my_reach + 0.1 else (lo + hi) * 0.5
@@ -346,7 +346,7 @@ func p_think() -> float:
 # =====================================================================================
 # Kit-driven extras (data from the creature "ai" block; generic, never by fighter id)
 #   reach: m                  melee reach of the light string (joint-driven bodies)
-#   range: [lo, hi]           preferred distance band for footwork
+#   range: [lo, hi]           preferred distance band for footwork (while a ruled ability is ready)
 #   abilities: {slot: {min, max, chance, poise_below, target_down, away}}
 #   heavy_vs_windup: p        Heavy when the target shows a long startup (> 0.3 s left)
 #   dash_in: {min, max, chance}  dodge toward the target then Light (dash attack)
@@ -372,6 +372,22 @@ func _avoid_enemy_zone(f: Fighter, sim: MatchSim, dir: Vector3) -> bool:
 		_move = (out + side * (1.0 if side.dot(out) >= 0.0 else -1.0) * 0.5).normalized()
 		return true
 	return false
+
+
+## The preferred distance band holds while at least one ranged kit tool (an ability rule used from
+## 1.5 m or farther) has a charge: a zoner with its tools on cooldown closes in and fights.
+## Kits without ranged ability rules always keep their band.
+func _band_tools_ready(f: Fighter) -> bool:
+	var rules: Dictionary = personality.get("abilities", {})
+	var ranged := 0
+	for slot in rules:
+		var r: Dictionary = rules[slot]
+		if float(r.get("min", 0.0)) < 1.5 or not f.creature.abilities.has(slot):
+			continue
+		ranged += 1
+		if int(f.charges_left.get(slot, 1)) > 0:
+			return true
+	return ranged == 0
 
 
 func _kit_actions(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary) -> bool:
