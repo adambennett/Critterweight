@@ -179,10 +179,40 @@ func resolve_match_config(cfg: Dictionary) -> Dictionary:
 			Log.e("app", "unknown creature %s" % str(c))
 			continue
 		fs.append(e)
-	out["fighters"] = fs
 	if not out.has("seed"):
 		out["seed"] = randi()
+	_fill_bots(rules, fs, int(out["seed"]))
+	out["fighters"] = fs
 	return out
+
+
+## Rules "bots" (Fill with bots): adds that many bots at the rules' bot skill, never past the
+## maximum fighters. Teams follow the format (co-op bots join the players' side).
+func _fill_bots(rules: Dictionary, fs: Array, seed_value: int) -> void:
+	var extra := int(rules.get("bots", 0))
+	if extra <= 0:
+		return
+	var pl: Array = rules.get("players", [2, 8])
+	var cap := mini(8, int(pl[1]) if pl.size() > 1 else 8)
+	var roster := Content.playable_creatures().filter(func(c): return not str(c).begins_with("dev_"))
+	if roster.is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value * 977 + 13
+	var fmt := str(rules.get("format", "duel"))
+	var teams := maxi(1, int(rules.get("teams", 2)))
+	var tier := BotTiers.brain_tier(str(rules.get("bot_tier", "journeyman")))
+	var n := 0
+	while n < extra and fs.size() < cap:
+		var i := fs.size()
+		var team := i
+		if fmt == "coop":
+			team = 0
+		elif fmt in ["teams", "tag", "duel"]:
+			team = i % teams
+		var c := Content.creature(str(roster[rng.randi_range(0, roster.size() - 1)]))
+		fs.append({"creature": c, "team": team, "kind": "bot", "difficulty": tier, "name": "%s (bot)" % c.display_name})
+		n += 1
 
 
 ## Starts a local authoritative match with presentation. Menus are cleared; when the match

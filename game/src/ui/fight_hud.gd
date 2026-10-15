@@ -227,7 +227,8 @@ func _process(dt: float) -> void:
 		(c["hp"] as ProgressBar).value = frac
 		c["trail_v"] = maxf(frac, float(c["trail_v"]) - dt * 0.35) if float(c["trail_v"]) > frac else frac
 		(c["trail"] as ProgressBar).value = c["trail_v"]
-		(c["hp_text"] as Label).text = "%d" % ceili(f.health) if not f.is_out() else ("KO" if f.state == Fighter.State.KO else "DOWN")
+		var resting := bool(f.flags.get("resting", false)) and f.health > 0.0
+		(c["hp_text"] as Label).text = ("%d  RESTING" % ceili(f.health)) if resting else ("%d" % ceili(f.health) if not f.is_out() else ("KO" if f.state == Fighter.State.KO else "DOWN"))
 		(c["st"] as ProgressBar).value = f.stamina / f.max_stamina
 		(c["hype"] as ProgressBar).value = f.hype / 100.0
 		var juiced := f.time < f.juiced_until
