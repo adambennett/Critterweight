@@ -83,7 +83,19 @@ $captures = @(
 	@{ name = "spotlight_hog"; args = @("--sandbox", "--autoplay", "--rules", "spotlight_hog", "--n", "4"); at = 10 },
 	@{ name = "chumball"; args = @("--sandbox", "--autoplay", "--rules", "chumball", "--n", "4"); at = 10 },
 	@{ name = "absolute_unit"; args = @("--sandbox", "--autoplay", "--rules", "absolute_unit", "--n", "3"); at = 10 },
-	@{ name = "chum_rush"; args = @("--sandbox", "--autoplay", "--rules", "chum_rush", "--n", "2"); at = 20 }
+	@{ name = "chum_rush"; args = @("--sandbox", "--autoplay", "--rules", "chum_rush", "--n", "2"); at = 20 },
+	@{ name = "tag_team"; args = @("--sandbox", "--autoplay", "--rules", "tag_2v2", "--n", "4"); at = 10 },
+	@{ name = "arena_drydock"; args = @("--sandbox", "--autoplay", "--rules", "duel", "--arena", "arena_drydock", "--creature", "f_dredge", "--creature2", "f_dozer"); at = 8 },
+	@{ name = "arena_crusher"; args = @("--sandbox", "--autoplay", "--rules", "duel", "--arena", "arena_crusher", "--creature", "f_gusto", "--creature2", "f_slurry"); at = 8 },
+	@{ name = "arena_rooftop"; args = @("--sandbox", "--autoplay", "--rules", "duel", "--arena", "arena_rooftop", "--creature", "f_jitters", "--creature2", "f_stoke"); at = 8 },
+	@{ name = "character_select"; args = @("--screen", "character_select"); at = 3 },
+	@{ name = "versus_setup"; args = @("--screen", "versus_setup"); at = 3 },
+	@{ name = "arena_editor"; args = @("--screen", "arena_editor"); at = 5 },
+	@{ name = "lab"; args = @("--screen", "lab"); at = 4 },
+	@{ name = "online"; args = @("--screen", "online"); at = 3 },
+	@{ name = "campaign_menu"; args = @("--screen", "campaign_menu"); at = 3 },
+	@{ name = "spectate_setup"; args = @("--screen", "spectate"); at = 3 },
+	@{ name = "profile"; args = @("--screen", "profile"); at = 3 }
 )
 foreach ($c in $captures) {
 	$png = Join-Path $out ("capture_" + $c.name + ".png")

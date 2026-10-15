@@ -82,7 +82,7 @@ func tick_fight(dt: float) -> void:
 	# players all out -> run over
 	var standing := 0
 	for f: Fighter in sim.fighters:
-		if f.team == 0 and not f.despawned and not f.is_out():
+		if f.team == 0 and not is_beaten(f):
 			standing += 1
 	if standing == 0 and player_count > 0:
 		end_round(ENEMY_TEAM)

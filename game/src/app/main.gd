@@ -135,10 +135,15 @@ func _boot_game() -> void:
 ## Dev sandbox: player (or bot with --autoplay) vs bots.
 ##   --rules <preset id> (default duel)   --arena <arena id> (default the_gullet)
 ##   --n <fighters> (default by preset)  --creature/--creature2 <json path or creature id>
+##   (without either, the fighters cycle through the roster)
 ##   --spectate (with --autoplay): auto-director camera + spectator overlay
 func _start_sandbox() -> void:
-	var c1 = _sandbox_creature(arg_value("--creature", "dev_biped"))
-	var c2 = _sandbox_creature(arg_value("--creature2", arg_value("--creature", "dev_biped")))
+	var roster := Content.playable_creatures().filter(func(c): return not str(c).begins_with("dev_"))
+	if roster.is_empty():
+		roster = ["dev_biped"]
+	var c1 = _sandbox_creature(arg_value("--creature", str(roster[0])))
+	var c2 = _sandbox_creature(arg_value("--creature2", arg_value("--creature", str(roster[1 % roster.size()]))))
+	var cycle := not args.has("--creature") and not args.has("--creature2")
 	var rules_id := arg_value("--rules", "duel")
 	var preset := Content.get_entry("rules", rules_id)
 	var n := int(arg_value("--n", "0"))
@@ -155,7 +160,10 @@ func _start_sandbox() -> void:
 		var team := i
 		if str(preset.get("format", "")) in ["teams", "tag", "coop"]:
 			team = i % maxi(teams, 1) if str(preset.get("format", "")) != "coop" else 0
-		fighters.append({"creature": c1 if i == 0 else c2, "team": team, "kind": kind,
+		var ci = c1 if i == 0 else c2
+		if cycle and i > 1:
+			ci = _sandbox_creature(str(roster[i % roster.size()]))
+		fighters.append({"creature": ci, "team": team, "kind": kind,
 			"difficulty": arg_value("--difficulty", "regular") if i > 0 else arg_value("--p1diff", "pro"),
 			"name": "Player" if kind == "player" else "Bot %d" % i})
 	var cfg := {"arena": arg_value("--arena", "the_gullet"), "rules": rules_id, "seed": int(arg_value("--seed", "11")), "fighters": fighters}

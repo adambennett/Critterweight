@@ -47,8 +47,14 @@ func test_fight_camp_victory_with_real_fights() -> void:
 	# a real Fight Camp run copies the profile's upgrade levels at start
 	ctrl.player("p0")["meta"] = FightCamp.meta_levels(prof)
 	SimSpeed.set_scale(SPEED)
-	var out: Dictionary = await CampaignDriver.auto_run(self, ctrl, {"bot_tier_players": "headliner"})
-	check_eq(str(out["phase"]), "victory", "Fight Camp run reaches the title")
+	var trace := []
+	var on_step := func(c: RunController, what: String) -> void:
+		if what == "fight":
+			var node := RunState.node(c.state, str(c.state["position"]))
+			trace.append("%s %s hp %.0f/%.0f" % [str(node.get("type", "")), str(node.get("encounter", node.get("id", ""))),
+				float(c.player("p0")["hp"]), c.max_hp(c.player("p0"))])
+	var out: Dictionary = await CampaignDriver.auto_run(self, ctrl, {"bot_tier_players": "headliner", "on_step": on_step})
+	check_eq(str(out["phase"]), "victory", "Fight Camp run reaches the title (fights: %s)" % [trace])
 	var before := int(prof["camp"]["clout"])
 	var rep := CampaignProgression.finish_run(cat(), ctrl.state, "p0", prof)
 	check(int(prof["camp"]["clout"]) > before, "Clout credited for Cannery upgrades (%d)" % rep["clout"])
