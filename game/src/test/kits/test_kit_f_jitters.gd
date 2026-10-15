@@ -6,7 +6,7 @@ extends "res://src/test/kits/kit_sj_helpers.gd"
 ## weapon past the 1.6 m reach cap. Run: godot --headless --path game --fixed-fps 120 -- --test test_kit_f_jitters
 
 const ID := "f_jitters"
-const POWER := 1.2           ## Jitters' power stat (effect damage scales with it)
+const POWER := 1.25          ## Jitters' power stat (effect damage scales with it)
 
 
 func _rows() -> Array:

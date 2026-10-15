@@ -47,7 +47,7 @@
     }
   },
 "stats": {"health": 80, "walk_speed": 3.8, "accel": 36, "turn_rate": 12, "stamina": 100, "stamina_regen": 12,
-            "poise": 45, "poise_regen": 15, "dodge_distance": 3.4, "dodge_time": 0.3, "power": 1.2, "defense": 1.0, "weight": 1.0},
+            "poise": 45, "poise_regen": 15, "dodge_distance": 3.4, "dodge_time": 0.3, "power": 1.25, "defense": 1.0, "weight": 1.0},
   "mods": {"getup_speed": 1.3, "held_time_mult": 0.7},
   "moves": {
     "l1": {"name": "Slap", "duration": 0.32, "cancel": 0.12, "damage": 4, "knockback": 2.6, "stun": 0.2, "poise": 4, "stamina": 3,
@@ -201,11 +201,11 @@
   ],
   "audio": {},
   "ai": {"personality": "pest", "aggression": 0.08, "dodge": 0.08, "ability": 0.2,
-         "attack_range": 0.85, "range": [0.7, 1.4], "charge_heavy": 0.5, "avoid_zones": true,
+         "attack_range": 0.85, "range": [0.6, 1.1], "charge_heavy": 0.5, "avoid_zones": true,
          "abilities": {"ability1": {"min": 2.2, "max": 7.0, "chance": 1.4},
                        "ability2": {"min": 1.8, "max": 4.2, "chance": 1.0}},
          "heavy_vs_windup": 0.55, "heavy_reach": 2.4,
-         "dash_in": {"min": 2.0, "max": 3.4, "chance": 0.5}},
+         "dash_in": {"min": 2.0, "max": 4.5, "chance": 0.7}},
   "art": {
     "model": "res://assets/models/creatures/f_jitters.glb",
     "palette": {"primary": "#BDEFFF", "secondary": "#B59CE0", "accent": "#FFF27A", "bulbs": "#F7E04A", "cap": "#3C4650", "eyes": "#1F2A33"},

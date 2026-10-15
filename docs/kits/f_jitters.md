@@ -71,7 +71,7 @@ damage ×2).
 ## AI (bots)
 
 Personality **pest**, written as kit hints on the shared bot mechanism (`ai` block): aggression
-+0.08, dodge +0.08, ability +0.20; `reach` 0.85 m; `range` **[0.7, 1.4]** (keeps hopping in
++0.08, dodge +0.08, ability +0.20; `attack_range` 0.85 m; `range` **[0.7, 1.4]** (keeps hopping in
 close). Ability hints: **Arc Lash** at 2.2–7 m (chance 1.4 × 0.35 × skill), **Spring Pad** at
 1.8–4.2 m (chance 1.0 × 0.35 × skill), placed toward the target. **Squash against long windups**
 (`heavy_vs_windup 0.55`: a target showing > 0.3 s of startup within 2.4 m), **Pinball in**
@@ -136,8 +136,9 @@ All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_
 - `rig.gd` / `effects.gd`: leap and spring-pad option `ballistic` — the flight is not braked by
   the ground drive while the body is still within hover range of the floor (Jitters' leaps and pads
   opt in; every other airborne phase keeps the original rule).
-- `bot_brain.gd`: extra optional keys on the shared kit-hint mechanism — `reach`, `heavy_vs_windup`
-  / `heavy_reach`, `dash_in`, `avoid_zones` (plus the shared `abilities`, `range`, `charge_heavy`).
+- `bot_brain.gd`: extra optional keys on the shared kit-hint mechanism — `heavy_vs_windup` /
+  `heavy_reach`, `avoid_zones` (plus the shared `attack_range`, `abilities`, `range`, `dash_in`,
+  `charge_heavy`).
 
 ## Deviations from ROSTER (and why)
 

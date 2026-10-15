@@ -71,7 +71,7 @@ Passive **drain_refund**: on `emerge`, if Slurry stands in a Sludge zone, `coold
 ## AI (bots)
 
 Personality **trapper**, written as kit hints on the shared bot mechanism (`ai` block):
-aggression −0.12, block +0.08, dodge +0.04, ability +0.30, grab −0.04; `reach` 1.4 m;
+aggression −0.12, block +0.08, dodge +0.04, ability +0.30, grab −0.04; `attack_range` 1.4 m;
 `range` **[2.8, 5.5]** (footwork aims between 5.5 m and 2.8 m by skill) with
 `range_needs_tools` — the range only holds while a Sludge Lob charge is ready, so with both lobs
 on cooldown the bot closes in and fights in melee. Ability hints: **Sludge Lob** at 2.5–9 m
@@ -132,9 +132,9 @@ All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_
 - `effects.gd`: `debuff.require_status` (Overflow's extra Gunked damage), lob `arrive_y` (the glob
   arrives at body height instead of the floor).
 - `fighter_motor.gd`: joints keyed by a move skip the serpent gait wave (the head stays on line).
-- `bot_brain.gd`: extra optional keys on the shared kit-hint mechanism — `reach`,
-  `range_needs_tools`, ability `stick`, `avoid_zones` (plus the shared `abilities` / `when`,
-  `range` and `charge_heavy` keys).
+- `bot_brain.gd`: extra optional keys on the shared kit-hint mechanism — `range_needs_tools`,
+  ability `stick`, `avoid_zones` (plus the shared `attack_range`, `abilities` / `when`, `range` and
+  `charge_heavy` keys).
 
 ## Deviations from ROSTER (and why)
 
