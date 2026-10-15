@@ -442,6 +442,10 @@ func _refresh_all() -> void:
 	var vs: Dictionary = model.base_def().get("variants", {})
 	var k := 0
 	for vid in vs:
+		# hidden looks (the Cannery's unlockables) are listed once the profile owns them
+		var vdef: Dictionary = vs[vid]
+		if not ArenaVariants.unlocked(vdef, Profiles.current) and str(vid) != model.variant:
+			continue
 		_variant_opt.add_item(str(vs[vid].get("label", str(vid).capitalize())))
 		_variant_opt.set_item_metadata(k, vid)
 		if str(vid) == model.variant or (model.variant == "" and str(vid) == str(model.base_def().get("default_variant", ""))):

@@ -10,6 +10,9 @@ extends RefCounted
 ##   loss         an Act 1 loss to Bilge (morning)
 ##   secrets      every secret found (roof open, panel off, sign lit, pier open, pet)
 ##   toured       every public space discovered (Fast walk unlocked)
+##   dressed      the locker's wearables unlocked AND equipped: gold tooth, trash-can lid, replica
+##                belt, rooftop scarf, Sign Fixer frame, Sizzle (Stoke); Vintage Bellows on
+##   catches      every fished-up can on the locker-room shelf, plus the two arena looks
 ## --hub-board <kind[:arg]> opens a board after a second (talk:granny, station:gym_floor, run, spar,
 ## lockers, records, booth, map, pause, lessons, shop, rest) or starts an activity (activity:drill,
 ## activity:crates, activity:bag:heavy). --hub-pos x,y,z[,yaw] places the fighter (HubScene).
@@ -45,6 +48,19 @@ static func apply(state: HubState, presets: String) -> void:
 			"toured":
 				for s in HubLayout.TOUR:
 					state.discover(str(s))
+			"dressed":
+				var wear := {"piece": "hub_gold_tooth", "idle_prop": "hub_trash_lid", "back": "hub_replica_belt", "neck": "hub_rooftop_scarf",
+					"frame": "hub_frame_sign_fixer", "juice": "hub_juice_sizzle"}
+				for slot in wear:
+					state.unlock_cosmetic(str(wear[slot]))
+					state.equip(str(slot), str(wear[slot]))
+				state.unlock_cosmetic("hub_pack_vintage_bellows")
+				state.set_pack("vintage_bellows", true)
+			"catches":
+				for c2 in HubSecrets.FISH_POOL:
+					state.unlock_cosmetic(str(c2))
+				state.unlock_cosmetic("hub_pier_night")
+				state.unlock_cosmetic("hub_rooftop_neon")
 	state.dirty = true
 
 

@@ -108,6 +108,11 @@ func start(p: Dictionary) -> void:
 	if str(p.get("cam_yaw", "")) != "":
 		camera.yaw = deg_to_rad(float(p["cam_yaw"]))
 		camera.snap()
+	# QA captures: --hub-zoom <factor> moves the camera closer (0.5 = half the distance)
+	var zoom_arg := Cannery.cli("--hub-zoom")
+	if zoom_arg != "":
+		camera._zoom = clampf(float(zoom_arg), 0.25, 2.0)
+		camera.snap()
 	# QA captures: --hub-pos x,y,z[,yaw_deg] places the fighter inside the arrival space
 	# (never split_floats an empty string: Godot 4.5 aborts on it)
 	var pos_arg := Cannery.cli("--hub-pos")
@@ -165,6 +170,8 @@ func _make_creature_view() -> void:
 	add_child(creature_view)
 	creature_view.setup(f.creature, Color("#f2f2ec"))
 	creature_view.gore_level = int({"full": 2, "reduced": 1, "off": 0}.get(str(Settings.get_value("access.gore")), 2))
+	# the locker's cosmetics (gold tooth, lid, belt, scarf, Sizzle) — all on show in the hub
+	FighterCosmetics.dress(creature_view, state.profile)
 	creature_view.snap_transforms(f.rig.segment_transforms())
 
 
@@ -556,8 +563,10 @@ func _on_state_changed(kind: String, data: Dictionary) -> void:
 		"cosmetic":
 			if str(data.get("id", "")) == "hub_pet_blister":
 				state.equip("pet", "hub_pet_blister")
+			view.props.refresh_world()       # a fished-up can lands on the locker-room shelf
 		"loadout":
-			pass
+			if creature_view:
+				FighterCosmetics.dress(creature_view, state.profile)
 
 
 ## An NPC speaks: a bubble over their head plus their voice (babble for speakers with a grain bank).

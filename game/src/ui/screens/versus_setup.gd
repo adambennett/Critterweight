@@ -191,9 +191,29 @@ func _rebuild(focus_key := "") -> void:
 	ar.set_help("Arena", "Where the fight happens. Custom arenas from the arena editor and mods appear here too.")
 	ar.set_meta("focus_key", "arena")
 	ar.value_changed.connect(func(v) -> void:
+		var had := not _looks().is_empty()
 		setup["arena"] = str(v)
-		_update_poster())
+		setup["look"] = ""
+		if had or not _looks().is_empty():
+			_rebuild("arena")
+		else:
+			_update_poster())
 	c.add_child(ar)
+	# hidden arena looks the profile unlocked (the Cannery's Pier Night for Chum Rush): only shown
+	# when the chosen arena and rules have one
+	var looks := _looks()
+	if not looks.is_empty():
+		var look_ids: Array = [""]
+		var look_names: Array[String] = ["Standard"]
+		for lk in looks:
+			look_ids.append(str(lk["id"]))
+			look_names.append(str(lk["label"]))
+		var lr := OptionRow.new("Look")
+		lr.setup(look_ids, look_names, str(setup.get("look", "")) if look_ids.has(str(setup.get("look", ""))) else "")
+		lr.set_help("Look", "An arena look you unlocked in the Cannery. Lighting and dressing only.")
+		lr.set_meta("focus_key", "look")
+		lr.value_changed.connect(func(v) -> void: setup["look"] = str(v))
+		c.add_child(lr)
 	var sl := slots()
 	for i in sl.size():
 		_add_slot_rows(c, i)
@@ -419,8 +439,20 @@ func build_config() -> Dictionary:
 		extra = {"overlay_script": "res://src/ui/practice_overlay.gd", "no_record": true}
 	var cfg := {"arena": str(setup["arena"]), "rules": rules, "fighters": fighters, "spectate": mode == "spectate",
 		"ui": {"mode": mode, "setup": setup.duplicate(true)}}
+	var look := str(setup.get("look", ""))
+	if look != "" and _looks().any(func(lk): return str(lk["id"]) == look):
+		cfg["context"] = {"variant": look}
 	cfg.merge(extra, true)
 	return cfg
+
+
+## Unlocked hidden looks of the chosen arena for the chosen rules' mode ([{id, label}]).
+func _looks() -> Array:
+	if mode == "practice":
+		return []
+	var a := Content.arena(str(setup.get("arena", "")))
+	var m := str(rules_dict().get("mode", "standard"))
+	return ArenaVariants.unlocked_extras(a, Profiles.current, m) if a != null else []
 
 
 func _try_start() -> void:

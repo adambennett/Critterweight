@@ -82,10 +82,16 @@ func _build_rows() -> void:
 		var why := "No roster fighters are installed yet."
 		if pending > 0:
 			why = "%d roster fighters are installed but their kits are not usable yet (%s)." % [pending, first_problem]
-		_rows.add_child(CampaignUI.label(why + " Enable development stand-ins to try the campaign (runs are marked custom).", 20, CampaignUI.DANGER))
-		_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS", func(): App.goto("campaign_menu", {"stand_ins": true})))
+		# development stand-ins are a developer tool (CampaignFlow.dev_tools): hidden in normal play
+		if CampaignFlow.dev_tools():
+			_rows.add_child(CampaignUI.label(why + " Enable development stand-ins to try the campaign (runs are marked custom).", 20, CampaignUI.DANGER))
+			_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS", func(): App.goto("campaign_menu", {"stand_ins": true})))
+		else:
+			_rows.add_child(CampaignUI.label(why + " The card opens once their fight kits are cleared.", 20, CampaignUI.DANGER))
 	else:
 		_row("FIGHTER", fs, fighter, _pick_fighter)
+		if not stand_ins and CampaignFlow.dev_tools() and catalog.available_fighters().size() < catalog.roster().size():
+			_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS (unfinished kits)", func(): App.goto("campaign_menu", {"stand_ins": true})))
 	var ds := []
 	for did in catalog.difficulty_ids():
 		ds.append([str(catalog.difficulties[did].get("name", did)), str(did)])

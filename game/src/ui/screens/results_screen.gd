@@ -139,18 +139,22 @@ func _table() -> Control:
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		grid.add_child(l)
 	var w := winner_team()
+	var owner_seen := false
 	for f in result.get("fighters", []):
 		var d: Dictionary = f
 		var team := int(d.get("team", 0))
 		grid.add_child(TeamChip.new(team, 40))
 		var nc := UiTheme.vbox(0)
+		# the profile owner's row (first local player) wears the equipped profile frame
+		var is_owner := not owner_seen and str(d.get("kind", "")) == "player"
+		owner_seen = owner_seen or is_owner
 		var nm := UiTheme.label(str(d.get("name", "?")).to_upper(), "Value")
 		nc.add_child(nm)
 		var cid := str(d.get("creature", ""))
 		var cname := str(Content.get_entry("creatures", cid).get("name", cid))
 		var state := "KO'd" if bool(d.get("out", false)) else "%d HP left" % ceili(float(d.get("health", 0.0)))
 		nc.add_child(UiTheme.label("%s  ·  %s" % [cname, state], "Caption"))
-		grid.add_child(nc)
+		grid.add_child(ProfileFrame.wrap(nc, ProfileFrame.style()) if is_owner else nc)
 		if team == w:
 			var wr := UiTheme.hbox(6)
 			wr.add_child(UiIcons.rect("trophy", 30, UiTheme.GOLD_HI))
