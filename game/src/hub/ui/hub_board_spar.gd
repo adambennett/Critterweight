@@ -47,7 +47,7 @@ static func build(b: HubBoard, p: Dictionary) -> void:
 # ---- your locker --------------------------------------------------------------------------------
 
 const SLOTS := [["piece", "Gag piece"], ["idle_prop", "Idle prop"], ["back", "Walkout back-piece"], ["frame", "Profile frame"],
-	["juice", "JUICE colour"], ["pet", "Hub pet"], ["neck", "Neckwear"], ["can", "Supplement can"]]
+	["juice", "JUICE colour"], ["pet", "Hub pet"], ["neck", "Neckwear"]]
 
 
 static func build_lockers(b: HubBoard, _p: Dictionary) -> void:
@@ -139,7 +139,7 @@ static func build_booth(b: HubBoard, _p: Dictionary) -> void:
 	b.section("Line packs")
 	if st.has_secret("sec_booth_tape"):
 		var vt := ToggleRow.new("Vintage Bellows ('73)").setup(st.pack_on("vintage_bellows"))
-		vt.set_help("Vintage Bellows", "Barnaby, 1973 edition: plays in the booth and on the tape. More hair, more reverb.")
+		vt.set_help("Vintage Bellows", "Barnaby, 1973 edition, calling your matches (and the tape). More hair, more reverb.")
 		vt.value_changed.connect(func(v) -> void: st.set_pack("vintage_bellows", bool(v)))
 		b.list.content.add_child(vt)
 	else:

@@ -680,7 +680,7 @@ func _crawlspace() -> void:
 	var k := v.kit("crawlspace")
 	k.box(Vector3(-15.2, 1.02, 4.9), Vector3(0.4, 0.04, 1.4), Color("#5e4a3a"), HubMeshKit.PLANK)
 	for i in 4:
-		k.box(Vector3(-13.0 - i * 0.7, 1.9, 4.9), Vector3(0.1, 0.1, 1.6), Color("#3a2c22"))
+		k.box(Vector3(-13.0 - i * 0.7, 2.0, 4.9), Vector3(0.1, 0.1, HubLayout.PANEL_RECT.size.y), Color("#3a2c22"))
 	v.omni(Vector3(-14.0, 1.8, 4.9), Color("#ffcf85"), 0.9, 4.0)
 
 

@@ -753,19 +753,52 @@ static func build_rooftop(parent: Node3D, a: ArenaDef, v: Dictionary, out: Dicti
 	var neon_g := ArenaPropVisuals.neon(Color("#8BD426"), 3.2, 0.0, 1.0)
 	var neon_p := ArenaPropVisuals.neon(Color("#E04FB0"), 3.5, 0.6, 2.0)
 	out["neon"].append(neon_p)
-	var letters := Label3D.new()
-	letters.text = "GLANDCO"
-	letters.font = load("res://assets/fonts/BarlowCondensed-900.woff2")
-	letters.font_size = 220
-	letters.pixel_size = 0.012
-	letters.modulate = Color(2.2, 0.6, 1.6)
-	letters.outline_size = 18
-	letters.outline_modulate = Color(0.7, 0.1, 0.4)
+	# one Label3D per letter: on a normal night the "A" is a dead tube ("GL NDCO" — it fell off and
+	# lies on the Cannery's roof); the "night_neon" variant (variant.sign_full, unlocked by fixing
+	# the sign in the Fight Camp hub) lights every letter and adds a neon border
+	var full := bool(v.get("sign_full", false))
+	var letters := Node3D.new()
+	letters.name = "Letters"
 	letters.position = Vector3(0.6, 4.3, 0.2)
 	letters.rotation = Vector3(0, PI, 0)
-	letters.shaded = false
 	sign.add_child(letters)
+	var lfont: Font = load("res://assets/fonts/BarlowCondensed-900.woff2")
+	var word := "GLANDCO"
+	var widths: Array[float] = []
+	var total := 0.0
+	for ch in word:
+		var w := lfont.get_string_size(ch, HORIZONTAL_ALIGNMENT_LEFT, -1, 220).x * 0.012
+		widths.append(w)
+		total += w
+	var x := -total * 0.5
+	var letter_nodes: Array = []
+	for i in word.length():
+		var l := Label3D.new()
+		l.name = "Letter%d_%s" % [i, word[i]]
+		l.text = word[i]
+		l.font = lfont
+		l.font_size = 220
+		l.pixel_size = 0.012
+		var dead := i == 2 and not full
+		l.modulate = Color(0.3, 0.1, 0.24) if dead else Color(2.2, 0.6, 1.6)
+		l.outline_size = 18
+		l.outline_modulate = Color(0.1, 0.03, 0.08) if dead else Color(0.7, 0.1, 0.4)
+		l.position = Vector3(x + widths[i] * 0.5, 0, 0)
+		l.shaded = false
+		l.set_meta("lit", not dead)
+		letters.add_child(l)
+		letter_nodes.append(l)
+		x += widths[i]
 	out["sign_label"] = letters
+	out["sign_letters"] = letter_nodes
+	if full:
+		var frame_pts := PackedVector3Array([Vector3(-total * 0.5 - 0.2, 5.25, 0.25), Vector3(total * 0.5 + 0.2, 5.25, 0.25),
+			Vector3(total * 0.5 + 0.2, 3.45, 0.25), Vector3(-total * 0.5 - 0.2, 3.45, 0.25)])
+		var border_mat := ArenaPropVisuals.neon(Color("#E04FB0"), 3.6, 0.0, 3.0)
+		out["neon"].append(border_mat)
+		var border := ArenaMeshKit.add(sign, ArenaMeshKit.tube(frame_pts, 0.06, 6, true), border_mat)
+		border.name = "FullNeonBorder"
+		border.position = Vector3(0.6, 0, 0)
 	var sub := Label3D.new()
 	sub.text = "JUICE  •  FEEL THE GLAND"
 	sub.font = load("res://assets/fonts/BarlowCondensed-700.woff2")
@@ -791,7 +824,7 @@ static func build_rooftop(parent: Node3D, a: ArenaDef, v: Dictionary, out: Dicti
 	ArenaMeshKit.add(sign, ArenaMeshKit.tube(drop, 0.07, 6, true), neon_g)
 	var sign_light := OmniLight3D.new()
 	sign_light.light_color = Color("#E04FB0")
-	sign_light.light_energy = 2.2
+	sign_light.light_energy = 3.2 if full else 2.2
 	sign_light.omni_range = 11.0
 	sign_light.position = Vector3(0, 4.0, -1.0)
 	sign.add_child(sign_light)

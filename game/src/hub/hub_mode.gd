@@ -785,10 +785,43 @@ func carried_by(f: Fighter) -> Dictionary:
 
 ## Throw strength from the fighter's body mass and throw stats (fighter throws use the same
 ## inputs): Stoke 1.0, Dredge 1.3, Dozer 1.22, Gusto 0.84, Jitters 0.78.
+## How hard a fighter heaves a crate (docs/HUB_SYSTEMS.md §5). The rule: the fighter's BEST throw in
+## their kit (the longest of throw_fwd / throw_side / throw_back, metres an opponent flies) relative
+## to the roster's average best throw, times a body factor ((mass / 85 kg)^0.4: an 18 kg crate is
+## easier for a 160 kg crab than for a 45 kg jelly), clamped to 0.6..1.5, times the fighter's
+## throw-distance modifiers. So the heavy grapplers out-throw the mid-weights and Jitters throws
+## least, whatever the exact kit numbers are.
 static func throw_strength(f: Fighter) -> float:
-	var td: Dictionary = f.creature.throws.get("throw_fwd", {})
-	var stat := float(td.get("distance", 2.5)) / 2.5 * float(f.mods.get("throw_distance", 1.0))
-	return clampf(pow(f.rig.total_mass / 85.0, 0.4), 0.72, 1.3) * stat
+	var stat := best_throw(f.creature) / roster_best_throw()
+	return clampf(stat * body_factor(f.rig.total_mass), 0.6, 1.5) * float(f.mods.get("throw_distance", 1.0))
+
+
+static func body_factor(mass: float) -> float:
+	return clampf(pow(mass / 85.0, 0.4), 0.75, 1.3)
+
+
+## The longest throw in a kit (kits without throws: the engine's default 2.5 m).
+static func best_throw(c: CreatureDef) -> float:
+	var best := 0.0
+	for k in ["throw_fwd", "throw_side", "throw_back"]:
+		var td = c.throws.get(k, null)
+		if typeof(td) == TYPE_DICTIONARY:
+			best = maxf(best, float((td as Dictionary).get("distance", 2.5)))
+	return best if best > 0.0 else 2.5
+
+
+## The average best throw of the roster fighters installed (the reference a strength of 1.0 means).
+static func roster_best_throw() -> float:
+	var sum := 0.0
+	var n := 0
+	for id in Content.playable_creatures():
+		if not str(id).begins_with("f_"):
+			continue
+		var c := Content.creature(str(id))
+		if c != null:
+			sum += best_throw(c)
+			n += 1
+	return sum / n if n > 0 else 2.5
 
 
 func throw_distance(f: Fighter, charge: float, item_mass: float) -> float:
@@ -886,7 +919,17 @@ func _update_flying() -> void:
 			continue
 		var half := 0.31 if str(fl["kind"]) == "crate" else 0.2
 		var over_water := p.z < HubLayout.WATER_EDGE_Z and HubLayout.space_at(p + Vector3.UP * 0.5) == ""
-		var landed := age > 0.12 and not over_water and body.linear_velocity.y <= 0.5 and p.y <= half + 0.12 + _floor_under(p)
+		# a crate scores where it FIRST comes down: the tick its fall is stopped or it is knocked off
+		# its line (the floor, a crate already lying in a ring), not where it finally tumbles to rest.
+		# (Other items keep flying until they settle: the letter may glance off the sign's frame.)
+		var v := body.linear_velocity
+		var vh := Vector2(v.x, v.z).length()
+		var vy_prev := float(fl.get("vy", v.y))
+		var vh_prev := float(fl.get("vh", vh))
+		fl["vy"] = v.y
+		fl["vh"] = vh
+		var impact := str(fl["kind"]) == "crate" and age > 0.12 and ((vy_prev < -1.0 and v.y > vy_prev + 1.0) or (vh_prev > 1.0 and vh < vh_prev * 0.65))
+		var landed := not over_water and (impact or (age > 0.12 and v.y <= 0.5 and p.y <= half + 0.12 + _floor_under(p)))
 		if landed or age > 4.0:
 			flying.erase(item_id)
 			emit_hub({"type": "hub_land", "item": item_id, "pos": p, "dist": dist})

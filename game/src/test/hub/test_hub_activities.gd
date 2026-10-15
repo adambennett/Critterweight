@@ -153,16 +153,22 @@ func test_crate_toss_scores_rings_and_pays_tiers() -> void:
 	check(mode.crates.running(), "the Crate Toss started")
 	var line := Vector3(HubLayout.CRATE_LANE_X, 0.0, HubLayout.CRATE_LINE_Z + 0.4)
 	var s0 := last_seq()
+	var picked := 0
 	for i in 10:
+		# walk up to the front of the pile (the lane side) and take the crate in front of you, the
+		# front row first, as a player does (never from inside the pile)
 		var crate: RigidBody3D = mode.world["crates"][i]
-		await teleport(Vector3(crate.global_position.x + 0.0, 0, crate.global_position.z + 0.85), 180.0)
+		await teleport(Vector3(crate.global_position.x, 0, crate.global_position.z - 0.85), 0.0)
 		var to := crate.global_position - player().pos()
 		player().facing_yaw = atan2(to.x, to.z)
 		press("grab")
 		await run_until(func(): return not mode.carried_by(player()).is_empty(), 1.0)
+		if str(mode.carried_by(player()).get("id", "")) == "crate:%d" % i:
+			picked += 1
 		await teleport(line, 180.0)
-		# aim at the 5 m ring: pick the charge that lands 5 m ahead
-		var want := 5.0 - 0.95 if i < 7 else 8.0 - 0.95
+		# aim at the 5 m ring (the last three at the 8 m one): pick the charge that lands on its centre
+		# (the crate leaves the hands 0.15 m past the line)
+		var want := (5.0 if i < 7 else 8.0) - 0.15
 		var lo := mode.throw_distance(player(), 0.0, HubWorld.CRATE_MASS)
 		var hi := mode.throw_distance(player(), 1.0, HubWorld.CRATE_MASS)
 		var ch := clampf((want - lo) / (hi - lo), 0.0, 1.0)
@@ -170,6 +176,7 @@ func test_crate_toss_scores_rings_and_pays_tiers() -> void:
 		mode.throw_carried(player(), ch)
 		await run_until(func(): return mode.flying.is_empty(), 3.0)
 	await run_until(func(): return not mode.crates.running(), 3.0)
+	check_eq(picked, 10, "Grab takes the crate in front of you off the pile, each one once")
 	var ends := events_of("hub_activity", s0).filter(func(e): return str(e["phase"]) == "end" and str(e["activity"]) == "crates")
 	check(not ends.is_empty(), "the toss ends after ten crates")
 	if not ends.is_empty():

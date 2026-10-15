@@ -36,6 +36,19 @@ var intro_seen := {}             ## act -> true once its intro card was shown th
 var _last_ms := 0                ## wall clock of the last time tick; 0 while a presented fight runs
 
 
+## Developer switches (the campaign's development stand-ins) stay hidden in normal play. They show
+## with --dev or --campaign-stand-ins on the command line or Settings > Diagnostics > Developer
+## tools. (Screens may still be opened with params.stand_ins by tests and tools.)
+static var force_dev_tools := false      ## tests
+
+
+static func dev_tools() -> bool:
+	if force_dev_tools:
+		return true
+	var a := OS.get_cmdline_user_args()
+	return a.has("--dev") or a.has("--campaign-stand-ins") or Settings.get_value("diag.dev_tools") == true
+
+
 static func make_catalog(stand_ins: bool) -> CampaignCatalog:
 	return CampaignCatalog.new(Content, "dev_biped" if stand_ins else "")
 

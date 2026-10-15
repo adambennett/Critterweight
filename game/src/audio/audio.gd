@@ -28,6 +28,12 @@ var bank := {}                        ## parsed bank.json
 var bank_loaded := false
 var crowd_heat := 0.0                 ## 0..1 crossfades murmur/excited/roar
 var announcer_mode := "full"          ## full | reduced | off (Settings gameplay.announcer)
+## Active announcer line pack ("" = the standard bank). Set per match from the profile option
+## `announcer_pack` (the Cannery's Barnaby desk turns on Vintage Bellows) or ctx.announcer_pack.
+## Pack lines (announcer entries with "pack") are preferred for every trigger they cover.
+var announcer_pack := ""
+var _pack_lines := {}                    ## id -> entry (lines that belong to a pack)
+var _pack_by_trigger := {}               ## pack -> {trigger -> [ids]}
 var subtitles_on := true
 
 var _sfx_entries := {}               ## id -> resolved entry (aliases merged)
@@ -731,9 +737,21 @@ func _tick_music(dt: float) -> void:
 func _load_lines() -> void:
 	_lines.clear()
 	_lines_by_trigger.clear()
+	_pack_lines.clear()
+	_pack_by_trigger.clear()
 	for id in Content.ids("announcer"):
 		var e := Content.get_entry("announcer", id)
 		if str(e.get("text", "")) == "":
+			continue
+		var pk := str(e.get("pack", ""))
+		if pk != "":
+			_pack_lines[id] = e
+			if not _pack_by_trigger.has(pk):
+				_pack_by_trigger[pk] = {}
+			var pt := str(e.get("trigger", ""))
+			if not (_pack_by_trigger[pk] as Dictionary).has(pt):
+				_pack_by_trigger[pk][pt] = []
+			_pack_by_trigger[pk][pt].append(id)
 			continue
 		_lines[id] = e
 		var trig := str(e.get("trigger", ""))
@@ -742,6 +760,7 @@ func _load_lines() -> void:
 		_lines_by_trigger[trig].append(id)
 
 
+## The standard bank's line ids (pack lines: pack_line_ids).
 func line_ids() -> Array:
 	var out: Array = _lines.keys()
 	out.sort()
@@ -749,7 +768,27 @@ func line_ids() -> Array:
 
 
 func line(id: String) -> Dictionary:
-	return _lines.get(id, {})
+	return _lines.get(id, _pack_lines.get(id, {}))
+
+
+## Line packs installed (ids), e.g. ["vintage_bellows"].
+func line_packs() -> Array:
+	var out: Array = _pack_by_trigger.keys()
+	out.sort()
+	return out
+
+
+func pack_line_ids(pack: String) -> Array:
+	var out: Array = []
+	for t in _pack_by_trigger.get(pack, {}):
+		out.append_array(_pack_by_trigger[pack][t])
+	out.sort()
+	return out
+
+
+## Selects the active line pack ("" or an unknown pack = the standard bank).
+func set_announcer_pack(pack: String) -> void:
+	announcer_pack = pack if _pack_by_trigger.has(pack) else ""
 
 
 func _substitute(text: String, vars: Dictionary) -> String:
@@ -764,7 +803,7 @@ func _substitute(text: String, vars: Dictionary) -> String:
 
 ## Speaks a line from the bank by id (announcer or coach). Returns false if dropped.
 func announce(line_id: String, vars := {}) -> bool:
-	var l: Dictionary = _lines.get(line_id, {})
+	var l: Dictionary = _lines.get(line_id, _pack_lines.get(line_id, {}))
 	if l.is_empty():
 		_warn_missing("line:" + line_id)
 		return false
@@ -869,13 +908,22 @@ func announce_trigger(trigger: String, ctx := {}, vars := {}) -> String:
 
 
 func pick_line(trigger: String, ctx := {}) -> String:
-	var ids: Array = _lines_by_trigger.get(trigger, [])
+	if announcer_pack != "":
+		var pack_ids: Array = (_pack_by_trigger.get(announcer_pack, {}) as Dictionary).get(trigger, [])
+		var pid := _pick_from(pack_ids, _pack_lines, trigger, ctx)
+		if pid != "":
+			return pid
+	return _pick_from(_lines_by_trigger.get(trigger, []), _lines, trigger, ctx)
+
+
+## The most specific line of `ids` (entries in `table`) matching ctx, rotating through equals.
+func _pick_from(ids: Array, table: Dictionary, trigger: String, ctx: Dictionary) -> String:
 	if ids.is_empty():
 		return ""
 	var best: Array = []
 	var best_spec := -1
 	for id in ids:
-		var l: Dictionary = _lines[id]
+		var l: Dictionary = table[id]
 		var when: Dictionary = l.get("when", {})
 		var ok := true
 		for k in when:
@@ -1055,6 +1103,9 @@ func begin_match(ctx: Dictionary) -> void:
 	_ann_rotation.clear()
 	_ann_seed = int(ctx.get("seed", 0))
 	_ann_vars = {}
+	# the profile's announcer line pack (Vintage Bellows from the Cannery) unless the caller names one
+	var pf: Dictionary = Profiles.current if typeof(Profiles.current) == TYPE_DICTIONARY else {}
+	set_announcer_pack(str(ctx.get("announcer_pack", pf.get("announcer_pack", ""))))
 	var names: Array = []
 	var pi := int(ctx.get("player_index", 0))
 	for f in ctx.get("fighters", []):
@@ -1122,7 +1173,12 @@ func match_context() -> Dictionary:
 
 func creature_audio(creature_id: String) -> Dictionary:
 	var c: Dictionary = bank.get("creatures", {}).get(creature_id, {})
-	var content_entry := Content.get_entry("creatures", creature_id)
+	# roster fighters, minions and bosses all carry their own audio block
+	var content_entry := {}
+	for kind in Content.CREATURE_KINDS:
+		content_entry = Content.get_entry(kind, creature_id)
+		if not content_entry.is_empty():
+			break
 	if content_entry.has("audio") and typeof(content_entry["audio"]) == TYPE_DICTIONARY:
 		var merged := c.duplicate()
 		for k in content_entry["audio"]:

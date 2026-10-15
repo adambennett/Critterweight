@@ -281,6 +281,7 @@ func _tick_element_cycle() -> void:
 	boss.creature.element = el
 	for slot in CreatureDef.MOVE_SLOTS + CreatureDef.ABILITY_SLOTS:
 		boss.mods["element_" + str(slot)] = el
+	boss.mods["effect_element"] = el          # elemental areas and projectiles follow the cycle too
 	sim.emit_event({"type": "boss_element", "fighter": boss.index, "element": el})
 
 

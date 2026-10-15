@@ -455,6 +455,24 @@
     "ambient": "#2A3150",
     "ambient_energy": 0.7,
     "crowd_energy": 0.3
+   },
+   "night_neon": {
+    "label": "Night (full neon)",
+    "hidden": true,
+    "unlock": "hub_rooftop_neon",
+    "replaces": "night",
+    "sign_full": true,
+    "key": "#C9D2FF",
+    "key_energy": 0.85,
+    "rim": "#FF5FC4",
+    "rim2": "#9BEA2E",
+    "spot": "#F2F4FF",
+    "bg": "#120F24",
+    "fog": "#1C1636",
+    "fog_density": 0.006,
+    "ambient": "#33305A",
+    "ambient_energy": 0.78,
+    "crowd_energy": 0.4
    }
   },
   "default_variant": "night",

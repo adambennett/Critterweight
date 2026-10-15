@@ -24,6 +24,7 @@ var _input_yaw := 0.0
 var frame_shift := Vector2.ZERO
 var _shift := Vector2.ZERO
 var _hold_input := false       ## the camera turns itself into a new space while you walk: keep your heading
+var pitch_lock := 0.0          ## QA captures (--hub-pitch <deg>): one fixed pitch in every space
 
 
 func _ready() -> void:
@@ -36,7 +37,7 @@ func _ready() -> void:
 func set_space(space_id: String) -> void:
 	var s := HubLayout.space(space_id)
 	var cam: Array = s.get("cam", [54.0, 10.5])
-	pitch_deg = float(cam[0])
+	pitch_deg = pitch_lock if pitch_lock > 0.0 else float(cam[0])
 	distance = float(cam[1])
 	var want := deg_to_rad(float(cam[2]) if cam.size() > 2 else 0.0)
 	if absf(wrapf(want - yaw, -PI, PI)) > 0.05:

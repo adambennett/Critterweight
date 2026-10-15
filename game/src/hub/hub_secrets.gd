@@ -105,7 +105,7 @@ func on_bag_hit(bag: String, info: Dictionary) -> void:
 	var body: RigidBody3D = mode.bag_body("body")
 	if body:
 		body.apply_central_impulse(Vector3(-1, 0, 0.15).normalized() * body.mass * 2.6)
-	mode.emit_hub({"type": "hub_reveal", "what": "panel", "pos": Vector3(-11.9, 1.0, 4.9)})
+	mode.emit_hub({"type": "hub_reveal", "what": "panel", "pos": Vector3(-11.9, 1.0, HubLayout.PANEL_RECT.get_center().y)})
 	mode.emit_hub({"type": "hub_say", "npc": "granny", "key": "line:bag_secret_hint"})
 
 
@@ -113,7 +113,7 @@ func on_bag_hit(bag: String, info: Dictionary) -> void:
 func pull_panel(f: Fighter) -> bool:
 	if not panel_revealed() or panel_open():
 		return false
-	if Vector2(f.pos().x - HubLayout.PANEL_RECT.position.x, f.pos().z - 4.9).length() > 1.5:
+	if Vector2(f.pos().x - HubLayout.PANEL_RECT.position.x, f.pos().z - HubLayout.PANEL_RECT.get_center().y).length() > 1.8:
 		return false
 	mode.remove_panel()
 	_found("sec_loose_panel")

@@ -16,18 +16,24 @@ Code lives in `game/src/hub/**`, data in `game/content/core/hub/*.json`, tests i
 | Main menu → **Fight Camp** | `App.goto("hub", {"from": "menu"})`. |
 | Run summary (Fight Camp) → **BACK TO THE CANNERY** | `App.goto("hub", {"from": "run"})`; the run's result changes the time of day and adds a Wall of Fame photo. |
 | End of a spar / lesson / tape, leaving the Bookie's Table or the AI Lab | Back into the hub where you were (`from` = `spar`, `tutorial`, `tape`, `bookie`, `lab`). |
-| Command line | `godot --path game -- --hub [--hub-spot <space>] [--hub-fighter <id>] [--hub-demo <presets>] [--hub-board <board>] [--hub-cam-yaw <deg>] [--hub-pos x,y,z[,yaw]]` |
+| Command line | `godot --path game -- --hub [--hub-spot <space>] [--hub-fighter <id>] [--hub-demo <presets>] [--hub-board <board>] [--hub-cam-yaw <deg>] [--hub-pos x,y,z[,yaw]] [--hub-zoom <f>] [--hub-pitch <deg>] [--hub-juice]` |
 | `Cannery.leave()` | Saves and returns to the main menu (pause board → Leave the Cannery). |
 
 `params`: `spot` (space id to arrive in; default: where you left off, the Main Floor on the first
 visit), `fighter` (creature to walk with; default: your locker choice, else the last Fight Camp
-fighter, else `Tutorial.DEFAULT_FIGHTER`), `from` (only changes the welcome), `spar` (a sparring
-result to pay out).
+fighter, else `Tutorial.DEFAULT_FIGHTER`, else the first roster fighter whose kit the campaign can
+use — always a roster fighter `f_*`; the dev biped only when no roster is installed or a developer
+names it with `--hub-fighter`), `from` (only changes the welcome), `spar` (a sparring result to pay
+out).
 
 QA flags (`--hub-demo` writes into the active profile — use `--user-root <scratch dir>`): `clout`,
-`upgraded`, `half` (12 upgrades), `evening`, `night`, `loss`, `secrets`, `toured`, comma-separated.
+`upgraded`, `half` (12 upgrades), `evening`, `night`, `loss`, `secrets`, `toured`, `dressed` (the
+locker's wearables unlocked and equipped, Vintage Bellows on), `catches` (every fished can, both
+arena looks), comma-separated.
 `--hub-board talk:granny | station:gym_floor | run | spar | lockers | records | booth | map | pause |
-lessons | shop | rest | activity:drill | activity:crates | activity:bag:heavy`.
+lessons | shop | rest | activity:drill | activity:crates | activity:bag:heavy`. Capture helpers:
+`--hub-zoom` (camera distance factor), `--hub-pitch` (one fixed camera pitch), `--hub-juice` (JUICE
+glow held on, to show the Sizzle colour).
 
 ## 2. Layout
 
@@ -49,7 +55,7 @@ whole hub.
 | Boiler Room (basement) | 40, −5, 14 × 10 | hatch up to the Main Floor | boiler, Teddy's card table (Bookie's Table), AI Lab terminal, ledger desk |
 | Roof (secret) | 40, −36, 16 × 12 | freight elevator | GL_NDCO sign, water tower, AC units, trunk, rooftop practice ring |
 | Pier (secret) | 20, −44, 8 × 4 | pier ladder | fishing rod, bait crate |
-| Crawlspace (secret) | −15.4, 4.1, 3.4 × 1.6 | behind the loose panel | Granny's tooth in a jar |
+| Crawlspace (secret) | −15.4, 3.7, 3.4 × 2.4 | behind the loose panel | Granny's tooth in a jar |
 
 Doors are cut out of the walls (collision split around each opening), the stairs are real ramps the
 rig hovers up, the dock edge, stair rail, landing rail, roof and pier edges are **fighter-only
@@ -58,6 +64,14 @@ water/at the sign. The Boiler Room, Roof and Pier are separate regions at ground
 through the hatch/elevator/ladders (a 0.3 s fade, then the fighter is placed at the other end) —
 see §13. `HubLayout.NAV` / `NAV_LINKS` is the navigation graph (clear straight segments) used by
 Ludlow's rounds, the Scrapling, Fast walk and the tests.
+
+**Room for every body plan.** The spaces are sized for the real kits, not the stub biped: the office
+stairs and landing are 2.9 m wide (`STAIRS_Z`/`STAIRS_W`; Dredge's claws wedged between rail and
+wall at 2 m), the crawlspace and its panel opening are 2.4 m deep (`PANEL_RECT`), the Body bag hangs
+far enough from the wall for a crab to get round it, the belt case (`BELT_CASE_POS`) stands clear of
+the walk to the booth ladder, and every arrival point (booth, office, locker room, boiler room, roof,
+pier) leaves room behind a serpent's tail or a quadruped's rump. `test_hub_wander` walks all of it
+with every roster fighter (§12).
 
 ## 3. Simulation (`HubMode`)
 
@@ -73,7 +87,12 @@ The hub is a real `MatchSim` with the player's real fighter (rig, motor, fight c
 - **Fight controls work**: Light/Heavy (charged Heavy too) hit the bags, the boiler and NPCs; Guard
   crouches (secret #5); Taunt plays (secret #4); Grab picks up crates, parts, the lid, the letter
   (`on_grab_pressed`), Grab/Light tosses, holding Heavy heaves with a charge. Throw distance follows
-  the fighter (`throw_strength`: mass and throw stats — Dredge and Dozer far, Jitters less).
+  the fighter (`throw_strength`): the longest throw in the fighter's own kit (`throw_fwd/side/back`
+  distance) relative to the installed roster's average, times a body factor `(mass / 85 kg)^0.4`
+  (0.75–1.3: an 18 kg crate is easier for a 160 kg crab than for a jelly), clamped to 0.6–1.5, times
+  the fighter's `throw_distance` modifiers. So the heavy grapplers (Dredge, Dozer) out-heave the
+  mid-weights, Stoke reaches the 8 m ring with a full heave and Jitters doesn't, whatever the exact
+  kit numbers are.
 - **No damage, no knockdowns**: `on_depleted` restores health; `_keep_standing` undoes knockdowns;
   NPCs and the boiler are `Combat` hittables that only emit events (NPCs answer with a "hit" line).
 - **Spaces**: the current space (`hub_space` events, first-visit discovery, the first tour of the 8
@@ -119,7 +138,7 @@ fighter per bag**).
 | Heavy Bag Score Challenge (`HubBagChallenge`) | the bag signs or Granny | 3 s countdown, 30 s. Every weapon hit on the bag is scored with the combat damage formula: move damage × (0.55 + 0.6 q) × (0.75 + 0.25 clean) × charge bonus, × 3 points, × 1.5 Heavy / × 2 Finisher, × combo (+0.1 per hit within 0.6 s, max × 2). Light bag: flat bonus, faster combo; Heavy bag: quality weighted; Body bag (Snappington-shaped): only head/shell zones count | 300 / 600 / 1000 → 10 / 25 / 50; Heavy 600 wakes the Scrapling (#3); Body 1000 → Granny's hint about #1 |
 | Chum Cannon Dodge Drill (`HubChumDrill`) | Ludlow's cannon sign | 45 s in the painted 4 × 4 m square; buckets are ballistic projectiles aimed at where you're heading, faster over time. Resolved with the real combat checks: dodge i-frames pass, a parry pops it (+5), a front guard blocks, else a hit costs 3 drill HP (never health) and the streak. Leaving the square or 0 drill HP ends it | streak 15 / 30 / 50 → 10 / 25 / 50; 50 unlocks the "Soaked" frame |
 | Crate Toss (`HubCrateToss`) | the crate pile | 10 crates, picked up with Grab and thrown from behind the line (Grab/Light toss, hold Heavy to heave). Where a crate first lands scores 5 / 10 / 20 (rings at 3 / 5 / 8 m); over the line is a foul | 30 / 60 / 100 → 10 / 25 / 50; 100 with Jitters → Ludlow's hint about #8 |
-| Ring Sparring (`HubSparring`) | Kid Lamprey or the cage gate | A real match in the shared `practice_cage` arena (`Tutorial.practice_cage()`): Kid Lamprey or any roster fighter, any bot tier, Spar (one round) or Practice (no KO, HUD telemetry), optional low gravity / hazards. Not recorded (`no_record`); back to the cage afterwards | first win vs Kid at Contender: 25 Clout; a per-fighter "beat a Headliner" badge |
+| Ring Sparring (`HubSparring`) | Kid Lamprey or the cage gate | A real match in the shared `practice_cage` arena (`Tutorial.practice_cage()`): Kid Lamprey or any roster fighter, any bot tier, Spar (one round) or Practice (no KO, HUD telemetry), optional low gravity / hazards. Not recorded (`no_record`); back to the cage afterwards. Kid Lamprey fights with his own kit (`npc_kid_lamprey`) as soon as it parses cleanly for the campaign resolver (`HubSparring.kid_ready()`); until then a roster fighter stands in under his name | first win vs Kid at Contender: 25 Clout; a per-fighter "beat a Headliner" badge |
 | The Bookie's Table | Teddy | the campaign's autobattler screen (`bookie`) | as the campaign defines (Clout at 50%) |
 
 Also on the Main Floor: **Granny's corner → Lessons in the cage** (`Tutorial.start(index, fighter,
@@ -201,13 +220,14 @@ object with the same calls.
 - **Run start** at Snappington's desk (the sign-up stand or her conversation): fighter, difficulty,
   Dose, seed text and co-op format → `FightCamp.run_config` (Cannery upgrades carried as meta) →
   `CampaignFlow.start(catalog, cfg).show_current()`; the campaign menu (suspended runs, co-op lobby) is
-  one button away. While the roster's fight kits are not usable by the campaign, the sheet offers the
-  campaign's **development stand-ins** (a custom run, no records) — the same switch the campaign menu
-  has. The Dosage row only offers Doses the chosen difficulty takes (Sparring: the base card). A
-  profile has ONE suspended Fight Camp run: while one is on file the sheet says so, and signing asks
-  first (`HubServices.start_run` answers `{needs_confirm, suspended}` and starts nothing) — *Abandon
-  it, sign new* (`replace_suspended`: the old run is credited as an abandoned defeat), *Resume it*
-  (`HubServices.resume_run()`) or *Keep it*.
+  one button away. The campaign's **development stand-ins** (a custom run, no records) are a developer
+  tool: the sheet (like the campaign menu and the Bookie's Table) offers them only behind the dev flag
+  (`CampaignFlow.dev_tools()`: `--dev`, `--campaign-stand-ins` or Settings → Diagnostics → Developer
+  tools) and only while some roster kit is still unusable. The Dosage row only offers Doses the
+  chosen difficulty takes (Sparring: the base card). A profile has ONE suspended Fight Camp run:
+  while one is on file the sheet says so, and signing asks first (`HubServices.start_run` answers
+  `{needs_confirm, suspended}` and starts nothing) — *Abandon it, sign new* (`replace_suspended`: the
+  old run is credited as an abandoned defeat), *Resume it* (`HubServices.resume_run()`) or *Keep it*.
 - **Bookie's Table**: `App.goto("bookie", {from_hub})`; leaving the table walks you back to Teddy.
 - **AI Lab terminal**: `App.goto("lab", {from_hub, boiler_room_key})`; Back returns to the terminal.
   Without the screen installed, Teddy says the terminal is dark.
@@ -239,21 +259,25 @@ Building the hub takes ~10 ms (sim) + 0.2–0.35 s (view) on that machine.
 
 ## 12. Tests and evidence
 
-`godot --headless --path game --fixed-fps 120 -- --test hub` — 43 tests:
+`godot --headless --path game --fixed-fps 120 -- --test test_hub_` — 54 tests:
 
 | File | Covers |
 |---|---|
 | `test_hub_geometry` | layout data consistency; **every space reachable on foot** (a real fighter walks the nav graph through all 11 spaces, taking stairs, hatch, ladders, elevator, pier ladder); walls/blockers hold; a thrown crate flies over the dock-edge blocker; stairs up/down |
-| `test_hub_interactions` | every interactable fires its event; **A interacts instead of dodging** (and still dodges in the open); carry/heave a crate; throw distance follows the fighter; hits on NPCs are shrugged off, nobody goes down; transitions and Fast walk |
+| `test_hub_interactions` | every interactable fires its event; **A interacts instead of dodging** (and still dodges in the open); carry/heave a crate; **the throw rule** for every roster fighter (kit's best throw / roster average × body factor) and its consequences (Dredge and Dozer out-heave Stoke, Stoke out-heaves Jitters, Stoke reaches the 8 m ring and Jitters only the 5 m one, a quick toss is short); hits on NPCs are shrugged off, nobody goes down; transitions and Fast walk |
 | `test_hub_activities` | bag points formula; bag challenge with real hits pays Clout tiers per fighter; chum drill counts dodges/guards/parries/hits; crate toss rings, tiers, foul, Jitters hint; sparring config |
 | `test_hub_secrets` | all ten secrets through their real triggers, Ludlow's one hint per visit, found secrets persisting into the world |
 | `test_hub_services` | every station lists its upgrades (24 at 6 stations, each with a world change); purchase flow spends Clout and respects gates; purchases change the world (12+ lights, 24 banner); run options/config; **run start hands over to the campaign's run screens**; **the Bookie's Table and the AI Lab open for real and return to the Boiler Room**; injected backend |
-| `test_hub_wander` | **two minutes of scripted wandering** (least-visited goals, hatch/ladder/elevator rides, fight buttons mashed): never below the floor, never off the map, never left down, no damage, no ring-out |
+| `test_hub_wander` | **two minutes of scripted wandering with every roster fighter** (biped, crab, quadruped, avian, serpent, hopper; least-visited goals, hatch/ladder/elevator rides, fight buttons mashed at a player's pace): never below the floor, never off the map, never left down, no damage, no ring-out, rarely stuck (≤ 2 legs timed out, ≤ 8 waypoints given up on). `HUB_WANDER_ONLY=f_dredge` runs one |
+| `test_hub_cosmetics` | the locker's wearables on all six roster bodies and the dev biped: fitted to the forged model (vertices collected per segment; on the skin, rings hugging the body, nothing over the mouth), on the right part, following the body, no collision, lid and belt put away mid-round; the gold tooth pops as the gag piece; in a headless `MatchScene` only the profile owner is dressed, Sizzle recolours Stoke only, the frame wraps the owner's HUD card; frames on results and profile; the locker only offers what shows; the can shelf |
+| `test_hub_unlocks` | Rooftop full neon replaces the night look once unlocked (dead A before), Pier Night is a hidden Chum Rush look in the versus setup's Look row; Vintage Bellows calls matches when selected; dev stand-ins hidden in normal play; Kid Lamprey's real kit is picked up automatically |
 | `test_hub_ui` | the real `HubScene` via `Cannery.enter()`: **every board** (all stations, every NPC's conversation, map, locker, records, booth, run, spar, lessons, shop, rest, pause) opens with focus inside, D-pad moves it, **B closes back to walking** without grabbing; boards and HUD fit and read ≥ 18 px at 1280×800; Enter / pad A talk instead of dodging; the **first secret unlocks ach_confidant** |
 
 Screenshots (`docs/evidence/hub/`, captured with `--hub --hub-demo ... --capture`): every space,
 the secret Roof (night, sign fixed) and Pier, time-of-day and upgrade states, your banner after all
-24 upgrades, the chum drill in progress, the main boards (and one at 1280×800).
+24 upgrades, the chum drill in progress, the main boards (and one at 1280×800); `22`–`29`: the
+wearables on every body and close-ups, the fight-view walkout with the framed name card, Stoke's
+Sizzle, the profile screen's frame, the can shelf, Rooftop night vs full neon, Pier Night.
 
 ## 13. Deviations from HUB.md
 
@@ -266,26 +290,30 @@ the secret Roof (night, sign fixed) and Pier, time-of-day and upgrade states, yo
 - **Bag-2 Flare-Up**: the bags are props, not fighters, so they have no status system; the Heavy bag
   keeps its own elemental build-up from element-tagged hits and fires the real `Elements.reaction`
   (Flare-Up → Granny's line) when two elements pass the threshold.
-- **Kid Lamprey** has no creature kit yet (`npc_kid_lamprey`), so sparring uses a roster fighter named
-  Kid Lamprey (Gusto, else Jitters, else Stoke); the Locker Room NPC uses its own hub model.
+- **Kid Lamprey**: until his creature kit (`npc_kid_lamprey`) parses cleanly, sparring uses a roster
+  fighter named Kid Lamprey (Gusto, else Jitters, else Stoke); the switch to the real kit is
+  automatic. The Locker Room NPC uses its own hub model.
 - **The 1973 tape** is a live 40 s AI-vs-AI fight between two headliner bots (Snappington — her
   stand-in body until the boss kit exists — vs a challenger drawn as a silhouette) under a sepia
   broadcast overlay with Vintage Bellows calls, rather than a recorded replay (there is no replay
   recording format).
-- **Run start needs development stand-ins** while the roster's kits are unusable for the campaign
-  (it marks the run custom; the sheet says why).
+- **Development stand-ins** for unfinished kits are a developer option only (dev flag, §9).
 - The Locker Room's "lockers (cosmetics/loadouts)" board covers the hub's walking fighter and hub
   cosmetics; run loadouts are chosen on the sign-up sheet.
+- **Fished supplement cans** are a collection on a locker-room shelf rather than an equippable "can"
+  slot (a held can had nowhere sensible to show on six different body plans).
+- **Pier Night** is a look you pick (the versus setup's Look row for Chum Rush on the Drydock); the
+  **Rooftop full neon** replaces the stock night look everywhere once the sign is fixed.
 
 ## 14. Known gaps
 
-- Hub cosmetics are recorded and equippable in your locker, but only the Blister pet is rendered; the
-  gag piece / idle prop / back piece / frames, the Sizzle JUICE colour, the Rooftop full-neon variant
-  and Pier Night need hooks in the fighter view, profile frames and arena variants owned by other
-  packages (the unlock ids are documented in `content/core/hub/cosmetics.json`).
-- The Vintage Bellows line pack is unlocked and toggled at Barnaby's desk and plays on the tape; the
-  in-match announcer does not read hub line packs yet (the announcer owner's system).
-- Real kits for the bosses and Kid Lamprey will replace the stand-ins without hub changes.
+- Cosmetics are local and view-only: on your screen your own fighter wears them; other players'
+  cosmetics are not sent in online matches (no field for them in the networked match config yet).
+- Frames wrap the name card where the active profile's card is shown: the fight HUD, the results
+  table and the profile screen. There is no separate lobby name card to frame.
+- Attachments are fitted automatically to each body (§16); a kit can pin any of them with
+  `art.attach.<kind>` if an automatic fit ever looks off on a new model.
+- Real kits for the bosses will replace the stand-ins without hub changes.
 - The frame-time numbers are from one machine (the reference PC); a Steam Deck run is not verified.
 
 ## 15. Files outside the hub folders
@@ -298,3 +326,56 @@ the secret Roof (night, sign fixed) and Pier, time-of-day and upgrade states, yo
 | `src/campaign/ui/run_summary_screen.gd` | BACK TO THE CANNERY button for Fight Camp runs | runs end back in the hub |
 | `src/campaign/ui/bookie_screen.gd` | `return_to_hub` (from `params.from_hub`) | leaving the Bookie's Table walks back to Teddy |
 | `src/lab/ui/lab_screen.gd` | `return_to_hub` (from `params.from_hub`) | Back from the AI Lab walks back to the terminal |
+| `src/view/cosmetic_attachments.gd` (new) | fitted anchors + meshes for tooth, lid, belt, scarf | §16: the wearables in the fight view |
+| `src/view/fighter_cosmetics.gd` (new) | profile → attachments, JUICE style, frame; `dress(view, profile)` | §16: one place that reads the locker for every view |
+| `src/view/creature_view.gd` | per-segment model vertices, `set_cosmetics`, `set_juice_style`, walkout hiding, the gold-tooth gag | §16 (view-only; no sim access) |
+| `src/view/shaders/creature.gdshader` | `glow_color` uniform | Sizzle recolours glowing surfaces |
+| `src/app/match_scene.gd` | `owner_index`; dresses the owner's view; walkout pieces off while the round is live; JUICE VFX use the view's colour | §16 |
+| `src/ui/widgets/profile_frame.gd` (new), `src/ui/fight_hud.gd`, `src/ui/screens/results_screen.gd`, `src/ui/screens/profile_screen.gd` | `ProfileFrame.wrap` round the owner's name card | profile/nameplate frames |
+| `src/view/arena_variants.gd` (new), `src/app/app.gd`, `src/ui/screens/versus_setup.gd`, `src/editor/arena_editor_screen.gd` | unlock-aware arena looks; `resolve_match_config` upgrades night → full neon; the Look row; the editor hides locked looks | the two arena variants |
+| `src/view/arena_set_dressing.gd`, `src/view/arena_view.gd`, `content/core/arenas/arena_rooftop.json`, `arena_drydock.json` | per-letter GLANDCO sign (dead A unless `sign_full`), the neon border; Drydock night sky; the `night_neon` and `pier_night` variants | the two arena variants |
+| `src/audio/audio.gd`, `content/core/announcer/barnaby_vintage.json` (new) | announcer line packs (`pack` lines, `set_announcer_pack`, profile `announcer_pack` read at `begin_match`) | Vintage Bellows in matches |
+| `src/campaign/campaign_flow.gd`, `src/campaign/ui/campaign_menu_screen.gd`, `src/campaign/ui/bookie_screen.gd`, `src/persist/settings.gd` | `CampaignFlow.dev_tools()`; stand-in switches behind it; `diag.dev_tools` setting | dev stand-ins hidden in normal play |
+
+## 16. What the locker unlocks, in the game
+
+Everything the locker offers shows outside the hub too; all of it is presentation — the simulation
+never sees it. `FighterCosmetics` reads the profile (`camp.hub.loadout.cosmetics`, filtered by
+`unlocks.cosmetics`) and `FighterCosmetics.dress(view, profile)` applies it to a `CreatureView`.
+Only the **profile owner's** fighter is dressed (the first local player in `MatchScene`, your walker
+in the hub); bots and other players are not.
+
+| Unlock (`content/core/hub/cosmetics.json`) | From | Shows |
+|---|---|---|
+| Gold Tooth (`piece`) | secret #2 | in the mouth; at the end-of-fight gag it pops out instead of the kit's gag piece (a debris-layer body that never touches the sim) |
+| Trash-Can Lid Shield (`idle_prop`) | secret #3 | strapped to the outer side of the left forearm/wing (armless bodies: slung on the back, or flat on top of a horizontal body); on walkouts, celebrations and in the hub, put away while the round is live |
+| Replica Belt (`back`) | secret #4 | a sash over the shoulder (a girth strap round a horizontal body, a waist belt low on a hopper); walkout piece like the lid |
+| Rooftop Scarf (`neck`) | the roof trunk | a scarf where the head meets the body, tails trailing; always on |
+| Sign Fixer / Soaked frames, Headliner badges (`frame`) | secret #7, the chum drill, sparring | `ProfileFrame` round the owner's name card in the fight HUD, the results table and the profile screen (border, glow, tag line) |
+| Sizzle (`juice`) | secret #9 | Stoke only: his JUICE glow and glowing surfaces go white-hot (creature shader `glow_color`), the JUICED! burst in that colour |
+| Rooftop: full neon (`arena_variant`) | secret #7 | the Rooftop's `night_neon` look replaces the stock night (every GLANDCO letter lit, neon border; stock night has a dead A) — `ArenaVariants.upgrade` in `App.resolve_match_config` |
+| Pier Night (`arena_variant`) | first catch on the pier | a hidden Drydock look for Chum Rush: the versus setup's **Look** row offers it once fished up (match context `variant`) |
+| Vintage Bellows line pack (`pack`) | secret #5 | Barnaby's desk sets the profile's `announcer_pack`; `Audio.begin_match` reads it and 1973 Barnaby calls the match (triggers the pack lacks fall back to the standard bank) |
+| Fished cans (`collection`) | fishing | a shelf in the Locker Room |
+| Frozen Blister (`pet`) | secret #10 | follows you round the hub |
+
+**How the wearables are fitted** (`CosmeticAttachments`): each piece rides one body segment and is
+placed from the forged model's own vertices (`CreatureView` collects them per bone/segment; fallback
+bodies use their body shapes), so it fits all six roster bodies, the dev biped and future kits without
+per-creature data:
+
+- *rings* (belt, scarf) are ellipses fitted to the body's outline where a plane cuts it — the furthest
+  vertex in 16 directions, snouts, beaks and jaws dropped — drawn as an elliptical tube that hugs oval
+  bodies;
+- *scarf*: on a neck, the narrowest well-filled cut between head and neck; a head sitting on the body
+  gets a ring round its base (Dredge: round the eye stalks); a ring that would cross the mouth is
+  tipped forward about its back so it dips under the chin (Stoke);
+- *tooth*: the front of the lower face, weighted toward the middle line (eyes either side lose); a head
+  with nothing on its middle line (eye stalks) wears it on the body just below;
+- *lid*: the outer side of the distal left arm or wing.
+
+A kit can pin any piece with `art.attach.<kind> = {segment, offset, rotation_deg, size}`.
+
+**Dev stand-ins and Kid Lamprey.** The campaign's development stand-ins (for kits that don't parse
+yet) appear only behind `CampaignFlow.dev_tools()` — never in normal play. Sparring switches to Kid
+Lamprey's own kit (`npc_kid_lamprey`) by itself as soon as the campaign resolver accepts it.
