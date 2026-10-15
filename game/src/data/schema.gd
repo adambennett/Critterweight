@@ -34,6 +34,22 @@ static func validate(data, schema: Dictionary, label := "$") -> PackedStringArra
 	return errs
 
 
+## True when `pattern` matches `s` with JSON-Schema (ECMA-262) semantics. Godot's RegEx is PCRE2,
+## whose `$` also matches just before a final line break, so "1.0.0\n" would pass "^...$": a match
+## of a pattern ending in `$` must end at the very end of the string. An invalid pattern never
+## matches.
+static func full_match(pattern: String, s: String) -> bool:
+	var re := RegEx.new()
+	if re.compile(pattern) != OK:
+		return false
+	var m := re.search(s)
+	if m == null:
+		return false
+	if pattern.ends_with("$") and not pattern.ends_with("\\$"):
+		return m.get_end() == s.length()
+	return true
+
+
 static func _type_ok(data, t: String) -> bool:
 	match t:
 		"object": return typeof(data) == TYPE_DICTIONARY
@@ -85,10 +101,8 @@ static func _validate(data, s: Dictionary, root: Dictionary, path: String, errs:
 			errs.append("%s: shorter than %d characters" % [path, int(s["minLength"])])
 		if s.has("maxLength") and str(data).length() > int(s["maxLength"]):
 			errs.append("%s: longer than %d characters" % [path, int(s["maxLength"])])
-		if s.has("pattern"):
-			var re := RegEx.new()
-			if re.compile(str(s["pattern"])) == OK and re.search(str(data)) == null:
-				errs.append("%s: '%s' does not match %s" % [path, str(data), str(s["pattern"])])
+		if s.has("pattern") and not full_match(str(s["pattern"]), str(data)):
+			errs.append("%s: '%s' does not match %s" % [path, str(data).c_escape(), str(s["pattern"])])
 	if typeof(data) == TYPE_ARRAY:
 		var arr: Array = data
 		if s.has("minItems") and arr.size() < int(s["minItems"]):
