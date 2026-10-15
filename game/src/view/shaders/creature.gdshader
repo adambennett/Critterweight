@@ -20,6 +20,9 @@ uniform float time_offset = 0.0;
 // (furnace door, barnacles, coil, headlamp...). vertex_glow scales it: 0 = off (fallback
 // meshes / non-glowing surfaces), 0.3..1.0 = driven by Hype (CreatureView.hype).
 uniform float vertex_glow = 0.0;
+// Cosmetic colour variant of the glowing surfaces (e.g. Stoke's white-hot "Sizzle"): rgb = target,
+// a = amount. 0 keeps the model's own colours.
+uniform vec4 glow_color : source_color = vec4(1.0, 1.0, 1.0, 0.0);
 
 varying vec3 world_pos;
 
@@ -29,6 +32,10 @@ void vertex() {
 
 void fragment() {
 	vec3 base = COLOR.rgb * tint.rgb;
+	vec3 glow_rgb = mix(COLOR.rgb, glow_color.rgb, glow_color.a);
+	if (vertex_glow > 0.0 && glow_color.a > 0.0) {
+		base = mix(base, glow_color.rgb, clamp(COLOR.a * glow_color.a * 1.4, 0.0, 1.0));
+	}
 	float bruise = 0.0;
 	for (int i = 0; i < 8; i++) {
 		vec4 b = bruises[i];
@@ -49,7 +56,7 @@ void fragment() {
 	float rim = pow(1.0 - ndv, 3.0);
 	vec3 emit = rim_color.rgb * rim * rim_strength;
 	emit += flash_color.rgb * flash * 1.6;
-	emit += COLOR.rgb * COLOR.a * vertex_glow * 2.2;
+	emit += glow_rgb * COLOR.a * vertex_glow * 2.2;
 	if (juice > 0.0) {
 		float jp = 0.6 + 0.4 * sin(TIME * 9.0 + time_offset);
 		emit += juice_color.rgb * juice * (0.25 + rim * 1.2) * jp;
