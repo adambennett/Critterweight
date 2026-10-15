@@ -59,8 +59,8 @@ damage ×2).
 | Squash leap + landing circle + Bonk | `leap distance 2.0 height 0.7 to_target` with `on_land area squash_landing r 1.0`; `on_hit {if hit_part head → damage_add 3}` (new `hit_part` condition). Test: slam + landing hit at 1.5 m, landing circle alone at 2.8 m. |
 | Super Squash guard-crush, knock-up 0.8 m, landing r 1.6, no armor | `guard_break 2.5` + `on_hit {if target_guarding → guard_crush ×2}`, `launch 4.0`, `on_land area super_squash_landing r 1.6`, no `armor`. Tests: guard drain ≥ 30, dummy rises > 0.25 m, landing hit, empty armor list. |
 | Static Cling +10 Hype on Jolted | passives `static_cling_window` + `static_cling_hype` (`status_applied`, element static + flag). Test: +10.0 Hype when a pre-charged dummy is Jolted by it. |
-| Pinball wall bounce toward the target, ×2 from a pad | `charge` with `bounce 1, bounce_distance 2.2, end_move false` (charge-bounce extension) + passive `pad_pinball`. Tests: one bounce, Jitters turns to face the target and travels > 1.1 m back; damage ratio 2.00 with `pad_launched`. |
-| Fastest pummel (0.25 s) | `pummel` move duration 0.25 (pummel cadence extension). Test: 3 zaps 0.24–0.34 s apart, 2.4 dmg each. |
+| Pinball wall bounce toward the target, ×2 from a pad | `charge` with `bounce 1, bounce_distance 2.2` (charge-bounce extension) and the shared `recovery 0.32` (the spin and hit window play out after the charge) + passive `pad_pinball`. Tests: one bounce, Jitters turns to face the target and travels > 1.1 m back; damage ratio 2.00 with `pad_launched`. |
+| Fastest pummel (0.25 s) | `pummel` move `interval: 0.25` (the shared pummel cadence field). Test: 3 zaps 0.24–0.34 s apart, 2.4 dmg each. |
 | Grabs on Jitters hold 30 % shorter | creature `mods.held_time_mult 0.7`. Test: an unescaped hold auto-throws after 1.40 s (2.00 s without the mod). |
 | Knockdown recovery +30 % | creature `mods.getup_speed 1.3`. Test: knockdown → up in < 85 % of the unmodded time. |
 | Arc Lash homing, expiry pulse, reflectable | projectile `homing_deg 90`, `on_expire area arc_lash_pulse`, `burst_on_hit false`. Tests: hits a strafing target, no pulse after a direct hit, pulse hits a target 10.2 m away, reflect flag bounces it, 6 s cooldown blocks a second cast. |
@@ -70,14 +70,13 @@ damage ×2).
 
 ## AI (bots)
 
-Personality **pest** (`ai` block): aggression +0.08, dodge +0.08, ability +0.20; melee reach
-0.85 m; preferred band **0.7–1.4 m** (keeps hopping in close). Rules:
-**Arc Lash** at 2.2–7 m (chance 0.5 × skill), **Spring Pad** at 1.8–4.2 m (chance 0.35 × skill) —
-placed toward the target, **Squash against long windups** (`heavy_vs_windup 0.55`: a target showing
-> 0.3 s of startup within 2.4 m), **Pinball in** (`dash_in`: dodge-in + Light from 2.0–3.4 m, chance
-0.5 × aggression). As a kit-driven bot it releases buttons after each press, charges Squashes on
-purpose by tier and steps out of enemy puddles; the engine's generic bot adds the Static Cling
-finisher off Slap strings and JUICE at 100 Hype.
+Personality **pest**, written as kit hints on the shared bot mechanism (`ai` block): aggression
++0.08, dodge +0.08, ability +0.20; `reach` 0.85 m; `range` **[0.7, 1.4]** (keeps hopping in
+close). Ability hints: **Arc Lash** at 2.2–7 m (chance 1.4 × 0.35 × skill), **Spring Pad** at
+1.8–4.2 m (chance 1.0 × 0.35 × skill), placed toward the target. **Squash against long windups**
+(`heavy_vs_windup 0.55`: a target showing > 0.3 s of startup within 2.4 m), **Pinball in**
+(`dash_in`: dodge-in + Light from 2.0–3.4 m, chance 0.5 × aggression), `charge_heavy` 0.5 and
+`avoid_zones`. The generic bot adds the Static Cling finisher off Slap strings and JUICE at 100 Hype.
 
 ## Verification
 
@@ -105,23 +104,24 @@ Squash, Overcharge start / burst / armor / pulses / chain arcs / end / crash, gu
 ## Balance
 
 Bot vs bot (`BotBrain` both sides, same tier), arena `the_gullet`, one round capped at 60 s (a
-time-out goes to the higher health fraction), sides alternate every bout, fixed seeds. Final kit,
-after merging main. "Strike dmg/hit" counts landed strikes, projectiles and circles; "all hits" also
-counts Slurry's 0.75-damage puddle ticks; Gunked damage-over-time is extra (per bout).
+time-out goes to the higher health fraction), sides alternate every bout, fixed seeds. Final kit
+and final bot hints, on top of the latest main. "Strike dmg/hit" counts landed strikes,
+projectiles and circles; "all hits" also counts Slurry's 0.75-damage puddle ticks; Gunked
+damage-over-time is extra (per bout).
 
 | Pairing | Tier | Bouts | Wins | Win % | Strike dmg/hit | All hits dmg/hit | Gunked DoT / bout |
 |---|---|---|---|---|---|---|---|
-| Slurry vs Jitters | regular | 24 | 15–9 | **62 / 38** | 6.61 vs 6.78 | 3.39 vs 6.78 | 11.3 |
-| Slurry vs Jitters | pro | 24 | 14–10 | **58 / 42** | 6.24 vs 6.97 | 3.63 vs 6.97 | 7.2 |
-| Slurry mirror | regular | 20 | 10–10 | 50 / 50 | 6.78 vs 6.63 | 3.19 vs 2.82 | 5.0 vs 6.5 |
-| Jitters mirror | regular | 20 | 11–9 | 55 / 45 | 6.93 vs 5.85 | 6.93 vs 5.85 | — |
+| Slurry vs Jitters | regular | 24 | 13–11 | **54 / 46** | 6.66 vs 7.07 | 3.19 vs 7.07 | 9.1 |
+| Slurry vs Jitters | pro | 24 | 14–10 | **58 / 42** | 6.21 vs 7.03 | 3.36 vs 7.03 | 8.5 |
+| Slurry mirror | regular | 20 | 9–11 | 45 / 55 | 6.59 vs 6.72 | 2.94 vs 2.91 | 5.7 vs 7.1 |
+| Jitters mirror | regular | 20 | 11–9 | 55 / 45 | 5.90 vs 6.05 | 5.90 vs 6.05 | — |
 
-Earlier samples of the cross matchup with the same kit (before the last Head Butt trim and the main
-merge) ran regular 13–11 and 11–13 and pro 16–8 (67 %, before the zoner band gate: 17–7), so the
-matchup sits around 54 % for Slurry at regular (39–33 over 72 bouts) with ±10 % noise per 24-bout
-sample. Damage sources (regular, final): Slurry — Sludge Lob 450, Head Butt 231, Venom Spit 279,
-Gunked 272, puddle ticks 178, Rear & Crash 88, Tail Sweep 108; Jitters — Arc Lash 409, Squash 286
-(+154 landing circles, +74 pad Squash), Static Cling 214, Pinball 175, Headbonk 109, Slaps 219.
+Over the four regular 24-bout samples taken while finishing the kit (13–11, 11–13, 15–9, 13–11)
+Slurry won 52 of 96 (54 %); a single 24-bout sample carries about ±10 % noise. No mirror bout timed
+out (the zoner closes in once its lobs are on cooldown). Damage sources (regular, final): Slurry —
+Sludge Lob 462, Venom Spit 237, Head Butt 218, Gunked 219, puddle ticks 198, Rear & Crash 98,
+Tail Flick 86, Tail Sweep 84; Jitters — Arc Lash 473, Static Cling 441, Pinball 247, Squash 231
+(+123 landing circles, +87 pad Squash), Slaps 223, Headbonk 106.
 
 ## Generic engine extensions this kit relies on
 
@@ -129,13 +129,14 @@ All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_
 - `creature_def.gd` / `fighter.gd`: creature `mods` (base Fighter.mods: `getup_speed`,
   `held_time_mult`) — slippery holds and quick get-ups.
 - `hooks.gd`: condition `hit_part` (the Bonk; main later added an equivalent one, merged).
-- `fighter.gd`: charge `bounce` / `bounce_distance` / `end_move` (Pinball), `is_airborne()`, pummel
-  cadence = the `pummel` move's duration (Zap every 0.25 s).
+- `fighter.gd`: charge `bounce` / `bounce_distance` (Pinball; the move then plays out through the
+  shared charge `recovery`), `is_airborne()`.
 - `effects.gd`: projectile `burst_on_hit` (Arc Lash pulses only on timeout), spring pads ignore
   airborne fighters (a Squash flying over a pad is not relaunched).
 - `rig.gd`: the horizontal ground drive only acts while the body is supported, so leaps and pad
   launches are not braked near the floor.
-- `bot_brain.gd`: `ai` block rules (ability bands, `heavy_vs_windup`, `dash_in`, preferred band).
+- `bot_brain.gd`: extra optional keys on the shared kit-hint mechanism — `reach`, `heavy_vs_windup`
+  / `heavy_reach`, `dash_in`, `avoid_zones` (plus the shared `abilities`, `range`, `charge_heavy`).
 
 ## Deviations from ROSTER (and why)
 

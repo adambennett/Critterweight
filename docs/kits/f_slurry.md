@@ -45,7 +45,7 @@ Throws (from Coil): **Whip Toss** (forward) 3.0 m, 10 dmg · **Slingshot** (side
 - Gunked enemies anywhere take an extra **Overflowing** 1.5 dps debuff (= 2× Gunked damage);
 - ending downside: the engine JUICE crash (2 s at 0.75× speed, half stamina regen).
 
-Passive **drain_refund**: on `emerge`, if Slurry stands in a Sludge zone, `cooldown ability2 −3 s`.
+Passive **drain_refund**: on `emerge`, if Slurry stands in a Sludge zone, `cooldown ability2 add −3 s`.
 
 ## How the ROSTER properties are implemented
 
@@ -59,10 +59,10 @@ Passive **drain_refund**: on `emerge`, if Slurry stands in a Sludge zone, `coold
 | Rear & Crash guard-crush | `guard_break 2.5` + `on_hit {if target_guarding → guard_crush ×2}`. Test: guard drain ≥ 30 stamina vs 5.5 for a guarded Tail Sweep. |
 | Venom Spit reflectable | engine projectile default (`reflectable`). Test: a reflect flag bounces it; guard blocks it; a parry-timed press only blocks. |
 | Slither Strike bonus in a puddle | `on_hit {if in_zone sludge → damage_add 2, buildup sludge 10}`. Test: +2.0 dmg and ≥ +9 build-up with a puddle under Slurry. |
-| Coil grab, Squeeze pummel 4 dmg / 0.4 s | `grab` move (head tilted down so it wraps short targets) + `pummel` move (duration = cadence, see extensions). |
+| Coil grab, Squeeze pummel 4 dmg / 0.4 s | `grab` move (head tilted down so it wraps short targets) + `pummel` move with `interval: 0.4` (the shared pummel cadence field). |
 | Gulp-and-Spit lands Gunked +30 | throw `buildup: 30` (engine applies the thrower's element). |
 | Sludge Lob, 2 charges, puddle on impact or expiry | `charges: 2`, projectile `lob`, `range 9`, `arrive_y 0.45`, `on_expire zone sludge_puddle owner_immune` (bursts on hits too). Test: 2 shots then empty, one charge back after 7 s, two puddles. |
-| Drain Dive invulnerable, emerge circle, refund 3 s | `blink dir stick 4.5 m delay 0.5` (the engine makes a submerged fighter untouchable), `on_emerge area drain_emerge`, passive `drain_refund` (new `emerge` hook event + `cooldown` action). Test: no hits taken while submerged; travel ≤ 4.5 m; cooldown 3.0 s shorter when emerging in an own puddle. |
+| Drain Dive invulnerable, emerge circle, refund 3 s | `blink dir stick 4.5 m delay 0.5` (the engine makes a submerged fighter untouchable), `on_emerge area drain_emerge`, passive `drain_refund` (new `emerge` hook event + the shared `cooldown {add: -3}` action). Test: no hits taken while submerged; travel ≤ 4.5 m; cooldown 3.0 s shorter when emerging in an own puddle. |
 | Overflow river 8 m × 3 m, 8 s | three circular own puddles (zones are circles) r 1.5 m spaced 3 m. |
 | Overflow: Light spits, 2× Gunked damage, heals 2 HP/s in sludge | `juice_state` hooks: `move_start move_class light → projectile`, `tick 0.5 → debuff require_status sludge (1.5 dps)`, `tick 0.5 in_zone sludge → heal 1`. Tests cover each. |
 | Own puddles never hurt Slurry | every Slurry zone is `owner_immune` (ELEMENTS §7 "kit says otherwise"). Test: Slurry in its own puddle takes 0 damage while the enemy ticks. |
@@ -70,14 +70,15 @@ Passive **drain_refund**: on `emerge`, if Slurry stands in a Sludge zone, `coold
 
 ## AI (bots)
 
-Personality **trapper** (`ai` block): aggression −0.12, block +0.08, dodge +0.04, ability +0.30,
-grab −0.04; melee reach 1.4 m; preferred band **2.8–5.5 m** held while a Sludge Lob charge is
-ready (with both lobs on cooldown the bot closes in and fights in melee).
-Ability rules: **Sludge Lob** at 2.5–9 m (chance 0.22 per decision × skill); **Drain Dive away**
-from a target within 2.6 m when poise < 40 % (chance 0.7, stick committed away for 0.35 s).
-Because the ai block uses kit keys the bot is *kit-driven*: it releases buttons after each press
-and charges Heavies on purpose (regular 25 %, pro 40 %), and steps out of enemy puddles; the
-engine's generic bot adds Venom Spit via the string finisher and JUICE at 100 Hype.
+Personality **trapper**, written as kit hints on the shared bot mechanism (`ai` block):
+aggression −0.12, block +0.08, dodge +0.04, ability +0.30, grab −0.04; `reach` 1.4 m;
+`range` **[2.8, 5.5]** (footwork aims between 5.5 m and 2.8 m by skill) with
+`range_needs_tools` — the range only holds while a Sludge Lob charge is ready, so with both lobs
+on cooldown the bot closes in and fights in melee. Ability hints: **Sludge Lob** at 2.5–9 m
+(chance 0.63 × 0.35 × skill per decision); **Drain Dive** within 2.6 m when its poise is below
+40 % (`when: self_poise_below 0.4`), diving **away** (`stick: away`). `charge_heavy` 0.5 (× combo
+skill: ~25 % of Heavies charged at regular, ~38 % at pro), `avoid_zones` (steps out of enemy
+puddles). The generic bot adds Venom Spit via the string finisher and JUICE at 100 Hype.
 
 ## Verification
 
@@ -104,35 +105,36 @@ extra Gunked damage / end / crash, taunt, and a bot smoke test. Engine extension
 ## Balance
 
 Bot vs bot (`BotBrain` both sides, same tier), arena `the_gullet`, one round capped at 60 s (a
-time-out goes to the higher health fraction), sides alternate every bout, fixed seeds. Final kit,
-after merging main. "Strike dmg/hit" counts landed strikes, projectiles and circles; "all hits" also
-counts Slurry's 0.75-damage puddle ticks; Gunked damage-over-time is extra (per bout).
+time-out goes to the higher health fraction), sides alternate every bout, fixed seeds. Final kit
+and final bot hints, on top of the latest main. "Strike dmg/hit" counts landed strikes,
+projectiles and circles; "all hits" also counts Slurry's 0.75-damage puddle ticks; Gunked
+damage-over-time is extra (per bout).
 
 | Pairing | Tier | Bouts | Wins | Win % | Strike dmg/hit | All hits dmg/hit | Gunked DoT / bout |
 |---|---|---|---|---|---|---|---|
-| Slurry vs Jitters | regular | 24 | 15–9 | **62 / 38** | 6.61 vs 6.78 | 3.39 vs 6.78 | 11.3 |
-| Slurry vs Jitters | pro | 24 | 14–10 | **58 / 42** | 6.24 vs 6.97 | 3.63 vs 6.97 | 7.2 |
-| Slurry mirror | regular | 20 | 10–10 | 50 / 50 | 6.78 vs 6.63 | 3.19 vs 2.82 | 5.0 vs 6.5 |
-| Jitters mirror | regular | 20 | 11–9 | 55 / 45 | 6.93 vs 5.85 | 6.93 vs 5.85 | — |
+| Slurry vs Jitters | regular | 24 | 13–11 | **54 / 46** | 6.66 vs 7.07 | 3.19 vs 7.07 | 9.1 |
+| Slurry vs Jitters | pro | 24 | 14–10 | **58 / 42** | 6.21 vs 7.03 | 3.36 vs 7.03 | 8.5 |
+| Slurry mirror | regular | 20 | 9–11 | 45 / 55 | 6.59 vs 6.72 | 2.94 vs 2.91 | 5.7 vs 7.1 |
+| Jitters mirror | regular | 20 | 11–9 | 55 / 45 | 5.90 vs 6.05 | 5.90 vs 6.05 | — |
 
-Earlier samples of the cross matchup with the same kit (before the last Head Butt trim and the main
-merge) ran regular 13–11 and 11–13 and pro 16–8 (67 %, before the zoner band gate: 17–7), so the
-matchup sits around 54 % for Slurry at regular (39–33 over 72 bouts) with ±10 % noise per 24-bout
-sample. Damage sources (regular, final): Slurry — Sludge Lob 450, Head Butt 231, Venom Spit 279,
-Gunked 272, puddle ticks 178, Rear & Crash 88, Tail Sweep 108; Jitters — Arc Lash 409, Squash 286
-(+154 landing circles, +74 pad Squash), Static Cling 214, Pinball 175, Headbonk 109, Slaps 219.
+Over the four regular 24-bout samples taken while finishing the kit (13–11, 11–13, 15–9, 13–11)
+Slurry won 52 of 96 (54 %); a single 24-bout sample carries about ±10 % noise. No mirror bout timed
+out (the zoner closes in once its lobs are on cooldown). Damage sources (regular, final): Slurry —
+Sludge Lob 462, Venom Spit 237, Head Butt 218, Gunked 219, puddle ticks 198, Rear & Crash 98,
+Tail Flick 86, Tail Sweep 84; Jitters — Arc Lash 473, Static Cling 441, Pinball 247, Squash 231
+(+123 landing circles, +87 pad Squash), Slaps 223, Headbonk 106.
 
 ## Generic engine extensions this kit relies on
 
 All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_sj.gd`.
-- `hooks.gd`: event `emerge` (a delayed blink resurfaced) and action `cooldown {slot, amount}` —
-  the Drain Dive refund.
+- `hooks.gd`: event `emerge` (a delayed blink resurfaced) — the Drain Dive refund, with the shared
+  `cooldown {slot, add}` action.
 - `effects.gd`: `debuff.require_status` (Overflow's extra Gunked damage), lob `arrive_y` (the glob
   arrives at body height instead of the floor).
-- `fighter.gd`: pummel cadence = the `pummel` move's duration (Squeeze every 0.4 s).
 - `fighter_motor.gd`: joints keyed by a move skip the serpent gait wave (the head stays on line).
-- `bot_brain.gd`: `ai` block rules (ability bands / chance / poise gate / dive away, preferred
-  distance band gated on ready ranged tools, enemy-zone avoidance, deliberate charged Heavies).
+- `bot_brain.gd`: extra optional keys on the shared kit-hint mechanism — `reach`,
+  `range_needs_tools`, ability `stick`, `avoid_zones` (plus the shared `abilities` / `when`,
+  `range` and `charge_heavy` keys).
 
 ## Deviations from ROSTER (and why)
 
