@@ -212,10 +212,30 @@ func _process(dt: float) -> void:
 		if hs.has("target") and not parts.is_empty():
 			line += "   (to %d)" % int(hs["target"])
 		_mode_label.text = mm.hud_status() + ("\n" + line if line != "" else "")
+		_apply_highlight(str(hs.get("highlight", "")))
 	if _center.text != "" and Time.get_ticks_msec() / 1000.0 > _center_until:
 		_center.text = ""
 	if _sub.text != "" and Time.get_ticks_msec() / 1000.0 > _sub_until:
 		_sub.text = ""
+
+
+## Pulses one meter on the local player's card (tutorial: "stamina", "cooldown", "hype").
+func _apply_highlight(which: String) -> void:
+	if not cards.has(player_index):
+		return
+	var c: Dictionary = cards[player_index]
+	var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() / 1000.0 * 7.0)
+	var on := Color(1.0 + 0.6 * pulse, 1.0 + 0.6 * pulse, 1.0 + 0.2 * pulse)
+	for key in ["st", "hype", "cd1", "hype_l"]:
+		(c[key] as CanvasItem).modulate = Color.WHITE
+	match which:
+		"stamina":
+			(c["st"] as CanvasItem).modulate = on
+		"hype":
+			(c["hype"] as CanvasItem).modulate = on
+			(c["hype_l"] as CanvasItem).modulate = on
+		"cooldown":
+			(c["cd1"] as CanvasItem).modulate = on
 
 
 func _cd_text(f: Fighter, slot: String, short: String) -> String:

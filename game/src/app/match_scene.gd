@@ -74,6 +74,29 @@ func start(cfg: Dictionary) -> void:
 	hud.setup(sim, player_index)
 	sim.finished.connect(_on_finished)
 	_apply_presentation_settings()
+	# audio bridge: impacts, voices, crowd, announcer and music follow the sim (docs/AUDIO.md §6)
+	Audio.attach_match(sim, player_index, {"context": str(cfg.get("audio_context", "versus"))})
+	Audio.music(str(cfg.get("music", _default_music())), 1.5, {"seed": int(cfg.get("seed", 1))})
+	if not Audio.subtitle.is_connected(hud.subtitle):
+		Audio.subtitle.connect(hud.subtitle)
+	if cfg.has("overlay_script"):
+		var ov = load(str(cfg["overlay_script"])).new()
+		hud_layer.add_child(ov)
+		if ov.has_method("bind"):
+			ov.call("bind", self)
+
+
+func _default_music() -> String:
+	var m := sim.mode.id() if sim.mode else "standard"
+	if m != "standard" or sim.fighters.size() > 2:
+		return "combat_b"
+	return "combat_a"
+
+
+func _exit_tree() -> void:
+	if hud and Audio.subtitle.is_connected(hud.subtitle):
+		Audio.subtitle.disconnect(hud.subtitle)
+	Audio.end_match()
 
 
 func _make_view(i: int) -> void:
@@ -267,12 +290,25 @@ func _on_event(ev: Dictionary) -> void:
 				views[di] = null
 		"goal":
 			hud.callout("GOAL!", 2.0, TeamColors.color(int(ev["team"])).lightened(0.3))
+			Audio.announce_trigger("mode", {"mode": "chumball_goal"})
 		"unit_crowned":
 			hud.callout("%s IS THE ABSOLUTE UNIT" % sim.fighters[int(ev["fighter"])].display_name.to_upper(), 2.2, Color("#8BD426"))
+			Audio.announce_trigger("mode", {"mode": "new_unit"}, {"p": sim.fighters[int(ev["fighter"])].display_name})
 		"wave_start":
 			hud.callout("WAVE %d" % int(ev["wave"]), 1.6, Color(1.0, 0.6, 0.3))
+			Audio.announce_trigger("mode", {"mode": "rush_wave"}, {"n": int(ev["wave"])})
 		"wave_cleared":
 			hud.callout("WAVE CLEARED", 1.4, Color(0.6, 1.0, 0.6))
+		"gate_spawn":
+			var gi := int(ev["fighter"])
+			if gi < sim.fighters.size() and bool(sim.fighters[gi].flags.get("headliner", false)):
+				hud.callout("HEADLINER: %s" % sim.fighters[gi].display_name.to_upper(), 2.0, Color(1.0, 0.4, 0.3))
+				Audio.announce_trigger("mode", {"mode": "rush_headliner"}, {"o": sim.fighters[gi].display_name})
+		"spotlight_swing":
+			Audio.announce_trigger("mode", {"mode": "spotlight"})
+		"sudden_death":
+			hud.callout("SUDDEN DEATH", 1.8, Color(1.0, 0.35, 0.3))
+			Audio.announce_trigger("time", {"kind": "sudden_death"})
 
 
 func _team_label(team: int) -> String:

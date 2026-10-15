@@ -37,6 +37,8 @@ func update_state(v: Dictionary, dt: float) -> void:
 			_update_unit(v)
 		"chum_rush":
 			_update_gates(v)
+		"tutorial":
+			_update_rings(v.get("rings", []))
 	_update_downed(v.get("downed", []))
 
 
@@ -346,6 +348,34 @@ func _update_gates(v: Dictionary) -> void:
 		(bulb.material_override as StandardMaterial3D).albedo_color = Color(1.0, 0.35, 0.25) if (is_open or blink) else Color(0.45, 0.12, 0.1)
 		var cmat := chevron.material_override as StandardMaterial3D
 		cmat.albedo_color.a = lerpf(cmat.albedo_color.a, 0.85 if is_open else 0.0, 0.2)
+
+
+## Tutorial footwork rings: white until stepped in, then green.
+func _update_rings(rings: Array) -> void:
+	var have := get_children().filter(func(c): return str(c.name).begins_with("TutRing"))
+	if have.size() != rings.size():
+		for c in have:
+			c.queue_free()
+		have.clear()
+		for i in rings.size():
+			var mi := MeshInstance3D.new()
+			mi.name = "TutRing%d" % i
+			var tm := TorusMesh.new()
+			tm.inner_radius = 0.86
+			tm.outer_radius = 1.0
+			tm.rings = 32
+			mi.mesh = tm
+			mi.material_override = Materials.unshaded(Color(1, 1, 1, 0.85), true)
+			add_child(mi)
+			have.append(mi)
+	for i in rings.size():
+		var r: Dictionary = rings[i]
+		var mi2: MeshInstance3D = have[i]
+		var p: Vector3 = r["pos"]
+		mi2.global_position = Vector3(p.x, 0.04, p.z)
+		var rad := float(r["radius"]) * (1.0 + (0.0 if bool(r["done"]) else 0.06 * sin(_t * 5.0 + i)))
+		mi2.scale = Vector3(rad, 0.2, rad)
+		(mi2.material_override as StandardMaterial3D).albedo_color = Color(0.4, 1.0, 0.5, 0.9) if bool(r["done"]) else Color(1, 1, 1, 0.85)
 
 
 func _update_downed(list: Array) -> void:

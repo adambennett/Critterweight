@@ -14,6 +14,9 @@ func _init() -> void:
 	var i := args.find("--user-root")
 	if i >= 0 and i + 1 < args.size():
 		root = args[i + 1].replace("\\", "/")
+	elif args.has("--test"):
+		# the automated suite never touches the player's real profiles, settings or mods
+		root = OS.get_user_data_dir().replace("\\", "/").path_join("_test_root")
 	else:
 		root = OS.get_user_data_dir().replace("\\", "/")
 	for d in SUBDIRS:

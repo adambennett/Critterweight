@@ -2,6 +2,7 @@ extends Node
 ## Process entry point. Dispatches on command-line user arguments (after `--`):
 ##   (none)                  normal game (title screen)
 ##   --test [filter]         run automated tests headless, exit code = failures
+##   --tutorial [n]          start Granny's tutorial at exercise n (0-based) [--creature id]
 ##   --probe <name>          run a physics/combat probe and print metrics
 ##   --server [--config p]   dedicated server (see docs/SERVER.md)
 ##   --lab-worker <job>      AI Lab training worker (spawned by the Lab UI)
@@ -20,6 +21,8 @@ func _ready() -> void:
 		mode = "probe"
 	elif args.has("--sandbox"):
 		mode = "sandbox"
+	elif args.has("--tutorial"):
+		mode = "tutorial"
 	elif args.has("--check"):
 		mode = "check"
 	elif args.has("--server"):
@@ -54,6 +57,8 @@ func _start(mode: String) -> void:
 			probe.run(arg_value("--probe", "stand"))
 		"sandbox":
 			_start_sandbox()
+		"tutorial":
+			Tutorial.start(int(arg_value("--tutorial", "0")), arg_value("--creature", ""))
 		"check":
 			_check_scripts()
 		"server":
