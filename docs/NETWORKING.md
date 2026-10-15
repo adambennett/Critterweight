@@ -290,7 +290,11 @@ name, creature, hash}]} (listen hosts; dedicated servers list only creatures), `
 * Players get stable session ids (1 = server/listen host, joiners from 2) and lobby slots; joiners
   beyond `max_players` become spectators when spectator slots are free, otherwise `server_full`.
 * Characters, teams (`-1` = automatic), ready and spectator are per player; the server validates
-  creature ids against the playable roster.
+  creature ids against the playable roster (`Content.playable_creatures()`): hidden `npc_only`
+  creatures such as the dev biped are never a player's pick - a join naming one gets the first
+  playable fighter, an explicit pick of one is refused and scored as a protocol violation - while
+  bots driven by an AI Lab policy may still fight as the policy's own (even hidden) creature. There
+  is deliberately no switch to allow hidden creatures: the network tests name roster fighters.
 * Match composition: humans who sat out longest first, capped at the entry's `max_players`; bots
   fill to `min_players` where allowed (listen host: plus the host's bot count). Bots are scripted
   (`BotBrain`) or **AI Lab policies** (`bot_policy`: host setting, playlist entry or

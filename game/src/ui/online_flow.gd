@@ -73,7 +73,7 @@ static func _on_returned_to_lobby() -> void:
 static func _on_disconnected(reason: Dictionary) -> void:
 	if not active:
 		return
-	active = false
+	end()   # also drops this machine's party run of the lost session
 	MatchFlow.set_paused(false)
 	var code := int(reason.get("code", 0))
 	App.goto("main_menu")

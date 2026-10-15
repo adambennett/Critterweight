@@ -97,8 +97,9 @@ func _aggressive(c: NetClient) -> Callable:
 func test_session_flow_inprocess() -> void:
 	var port := _port()
 	var server := _server(port)
-	var a := _client(port, {"name": "Ann"})
-	var b := _client(port, {"name": "Ben"}, true)
+	# roster fighters named explicitly: Ann's Stoke must knock out Ben's (lighter) Jitters in time
+	var a := _client(port, {"name": "Ann", "creature": "f_stoke"})
+	var b := _client(port, {"name": "Ben", "creature": "f_jitters"}, true)
 	check(await _until(func() -> bool: return a.state == NetClient.State.LOBBY and b.state == NetClient.State.LOBBY, 8.0), "both admitted")
 	check_eq(server.players.size(), 2, "two players")
 	check(not a.welcome.is_empty() and int(a.welcome["player_id"]) >= 2, "player ids start at 2 (1 = server)")

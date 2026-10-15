@@ -229,7 +229,12 @@ of this PC's).
 Capture: `godot --path game -- --user-root <dir> --ui-screen settings --capture out.png --capture-at 3`.
 
 Evidence: `docs/evidence/ui/` — 24 screens at 1920×1080 and 1280×800 (real GUI renders; results from a real bot round,
-pause over a real paused match) and a native 4K crop of controller prompts.
+pause over a real paused match) and a native 4K crop of controller prompts. Online: `online_host_*`, `online_join_*`
+(two demo recent servers), `online_lan_*` (two dedicated servers announcing on this PC, one with a password) and
+`lobby_host_*` (a real hosted session with three scripted guests wearing cosmetics) at 1600×900 (keyboard prompts) and
+1280×800 (controller prompts); editor binary, `--ui-demo-net` shows an example address instead of this PC's. Note for
+captures: `--capture-at` counts from boot, and the first frame (shader compilation) can take 10–20 s on a loaded
+machine, so capture late (40–50 s) or an early frame is saved.
 
 ## 10. Known gaps (UI)
 

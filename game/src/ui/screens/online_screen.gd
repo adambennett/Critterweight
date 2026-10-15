@@ -515,7 +515,10 @@ func _build_lan(focus_key := "") -> void:
 	for s in sessions:
 		var d: Dictionary = s
 		var players := "%d/%d" % [int(d.get("players", 0)), int(d.get("max_players", 0))]
-		var what := "%s @ %s" % [str(d.get("rules", "")), str(d.get("arena", ""))]
+		# names when this game knows the ids (beacons carry ids; unknown ones are shown as sent)
+		var rid := str(d.get("rules", ""))
+		var aid := str(d.get("arena", ""))
+		var what := "%s @ %s" % [str(Content.get_entry("rules", rid).get("name", rid)), str(Content.get_entry("arenas", aid).get("name", aid))]
 		var text := "%s  ·  %s  ·  %s players%s" % [str(d.get("name", "Session")), what, players, "  ·  in a match" if bool(d.get("in_match", false)) else ""]
 		var icon := "lock" if bool(d.get("password", false)) else ("error" if not bool(d.get("compatible", true)) else "online")
 		var b := UiButton.new(text, "", icon)

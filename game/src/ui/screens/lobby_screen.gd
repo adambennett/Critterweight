@@ -50,10 +50,9 @@ func on_enter(_p: Dictionary) -> void:
 	left.add_child(lv)
 	_scroll = FocusScroll.new(8)
 	lv.add_child(_scroll)
+	# (no overrun trimming: a trimmed Label reports a 1 px minimum height and collapses in the box)
 	_help = UiTheme.label("", "Caption", true)
 	_help.max_lines_visible = 2
-	_help.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	_help.custom_minimum_size = Vector2(0, 0)
 	lv.add_child(_help)
 	get_viewport().gui_focus_changed.connect(_on_focus_changed)
 	var right := UiTheme.vbox(UiTheme.GAP_M)

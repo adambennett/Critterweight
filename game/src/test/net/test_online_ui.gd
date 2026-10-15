@@ -209,7 +209,8 @@ func test_host_lobby_match_and_back_to_lobby() -> void:
 	expect_focus("lobby opened")
 	var lob := App.top_screen()
 	check(find_label(lob, "HOST") != null and find_label(lob, "YOU") != null, "the host's own row is shown")
-	check(find_label(lob, "Your fighter:") != null, "the help line under the list describes the focused row")
+	var hl := find_label(lob, "Your fighter:")
+	check(hl != null and hl.size.y >= 20.0, "the help line under the list describes the focused row (%s)" % (str(hl.size) if hl else "missing"))
 	var g := guest(port, {"name": "Guesty"})
 	check(await until(func() -> bool: return g.state == NetClient.State.LOBBY, 6.0), "a guest joins")
 	check(await until(func() -> bool: return find_label(App.top_screen(), "GUESTY") != null, 3.0), "the guest's name card appears")
@@ -257,7 +258,8 @@ func test_join_other_process_through_screens() -> void:
 	u = U.new(self, "online_ui_join")
 	var port: int = u.base_port
 	var host: int = u.spawn("host", ["--net-client", "--net-host", "--port", port, "--name", "Hosty", "--script", "aggressive",
-		"--host-start-after-players", "2", "--rules", "duel", "--rounds", "1", "--round-time", "8", "--results-time", "3",
+		"--creature", "f_stoke", "--host-start-after-players", "2", "--rules", "duel", "--rounds", "1", "--round-time", "8",
+		"--no-sudden-death", "--results-time", "3",
 		"--host-auto-start-limit", "1", "--host-start-when-ready", "--quit-after", "90", "--result", u.result_path("Hosty")])
 	var r0: Dictionary = await u.wait_json(u.result_path("Hosty"), func(d: Dictionary) -> bool: return bool(d.get("connected", false)), U.SERVER_READY_S)
 	check(bool(r0.get("connected", false)), "the host process is up")
@@ -418,12 +420,15 @@ func _audit(s: Screen, tag: String, vr: Rect2, px_per_du: float) -> void:
 	check(bars > 0, "%s: has a prompt bar" % tag)
 	var smallest := 999.0
 	var smallest_text := ""
+	var collapsed: Array = []
 	for n in s.find_children("*", "", true, false):
 		var size_du := 0
 		var text := ""
 		if n is Label and (n as Label).is_visible_in_tree():
 			text = (n as Label).text
 			size_du = (n as Label).get_theme_font_size("font_size")
+			if text.strip_edges() != "" and (n as Label).size.y < float(size_du) * 0.8:
+				collapsed.append(text.substr(0, 30))
 		elif n is Button and (n as Button).is_visible_in_tree():
 			text = (n as Button).text
 			size_du = (n as Button).get_theme_font_size("font_size")
@@ -434,3 +439,4 @@ func _audit(s: Screen, tag: String, vr: Rect2, px_per_du: float) -> void:
 			smallest = px
 			smallest_text = text
 	check(smallest >= 18.0 - 0.01, "%s: smallest text '%s' is %.1f px (< 18 px)" % [tag, smallest_text.substr(0, 30), smallest])
+	check(collapsed.is_empty(), "%s: labels squeezed below one line of text: %s" % [tag, str(collapsed)])
