@@ -15,6 +15,7 @@ var _ready_ms := 0
 func _ready() -> void:
 	_ready_ms = Time.get_ticks_msec()
 	args = OS.get_cmdline_user_args()
+	Log.i("app", "Critterweight %s (%s %s, Godot %s)" % [BuildInfo.label(), OS.get_name(), Engine.get_architecture_name(), Engine.get_version_info()["string"]])
 	# integration points other owners' menus call into
 	TutorialHook.launcher = Callable(Tutorial, "start_lesson")
 	if not args.has("--test") and not args.has("--server") and not args.has("--lab-worker") and not args.has("--check"):
