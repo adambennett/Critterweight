@@ -372,13 +372,14 @@ onto Jitters (0.97 m) or past Dredge's raised claws from any distance, so those 
 | Slurry | its string lands from a long step out (the Head Butt drives the head ~1.3 m; its reach estimate is 0.97 m); Finisher Venom Spit is a projectile (counted by its effect id) |
 | Jitters | 0.97 m body: the Kid's low body jabs reach it (the Gusto fallback stand-in cannot) |
 
-Slurry and Jitters were checked with their real kits on a trial merge of their kit branch (the stub kits
-on main at the time could not do the Heavy and the freestyle: a stub Tail Sweep that hits behind Slurry,
-a stub Jitters without damage to speak of).
+Slurry and Jitters were checked with their real kits on a trial merge of their kit branch: all seven
+fighters complete the course. The stub kits on main at the time could not: a stub Tail Sweep that hits
+behind Slurry fails the Heavy, and a stub Jitters without damage to speak of loses the freestyle.
 
 Verification: `test_tutorial` runs the whole course with the pairing the game launches;
-`tools/verify/tutorial_matrix.ps1` runs it for every fighter in parallel (by hand: `TUTORIAL_CREATURE=<id>`;
-`TUTORIAL_PARTNER=<id>` tries other Kid bodies, `TUTORIAL_TRACE=1` prints each exercise's events). The driver stands in for a competent player: hit-confirm string rhythm, parry and
-dodge timing learned from when his strikes actually land, spacing tried and varied like a person would,
-the kit's own bot personality for the freestyle. `test_kit_npc_kid_lamprey` runs the Kid's side of the
-drills for every roster fighter with its own drivers.
+`tools/verify/tutorial_matrix.ps1` runs it for every fighter in parallel (by hand:
+`TUTORIAL_CREATURE=<id>`; `TUTORIAL_PARTNER=<id>` tries other Kid bodies, `TUTORIAL_TRACE=1` prints
+each exercise's events). The driver stands in for a competent player: hit-confirm string rhythm, parry
+and dodge timing learned from when his strikes actually land, spacing tried and varied like a person
+would, the kit's own bot personality for the freestyle. `test_kit_npc_kid_lamprey` runs the Kid's side
+of the drills for every roster fighter with its own drivers.
