@@ -8,7 +8,8 @@ extends RefCounted
 ## poise_regen, dodge_cost, heavy_poise_taken, cooldown_rate, damage_taken, damage_dealt,
 ## pulse_interval, pulse_stun, hit_buildup {el: amount}, buildup_received {el: mult},
 ## flags: no_hover no_leap no_blink no_dodge no_guard grab_lock armor_lights armor_all,
-## hooks [Hooks dicts active while the status lasts], source (Fighter), icon.
+## hooks [Hooks dicts active while the status lasts], source (Fighter), icon,
+## guard_arc / guard_absorb (shield statuses: Fighter blocks hits from that frontal arc).
 
 var fighter                          ## Fighter
 var buildup := {}                    ## element -> amount

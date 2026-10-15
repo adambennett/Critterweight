@@ -127,7 +127,7 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 		"chain_arc":
 			_chain_arc(f, e, p)
 		"self_damage":
-			f.health = maxf(1.0, f.health - float(e.get("amount", 5.0)))
+			_self_damage(f, e)
 		"cleanse":
 			f.statuses.cleanse_elements()
 		"hype":
@@ -879,3 +879,22 @@ func trigger_reaction(r: Dictionary, victim: Fighter, source, el_a: String, el_b
 ## affected by their ticks, entry flinches or push-outs (ROSTER: Hang Time ignores ground zones).
 static func zone_ignores(o: Fighter) -> bool:
 	return o != null and o.has_flag("hovering")
+
+
+# =====================================================================================
+# NPC-kit extension (docs/kits/minions.md): `self_damage` never kills unless the effect says
+# "lethal": true — a Blister consumed by its own pop (it may be knocked down mid-throw, where
+# damage-over-time cannot finish it). The depletion goes through the mode like any KO.
+# =====================================================================================
+
+func _self_damage(f: Fighter, e: Dictionary) -> void:
+	var amount := float(e.get("amount", 5.0))
+	if not bool(e.get("lethal", false)):
+		f.health = maxf(1.0, f.health - amount)
+		return
+	if f.is_out():
+		return
+	f.health -= amount
+	f.stats_record["damage_taken"] += amount
+	if f.health <= 0.0:
+		sim.on_fighter_depleted(f, null, {"self": true})

@@ -51,6 +51,7 @@ snout 1.27 m, Bilge 2.4 m). Use `--gap 3.2` (fighters) / `--gap 6` (bosses) when
 | f_dozer | 1.000 | 0.76–0.77 | 0.992 | 13.7 |
 | f_slurry | 1.000 | 1.42 | 0.991 | 7.7 |
 | f_jitters | 1.000 | 0.82 (no head segment: root + 0.4) | 0.990 | 1.6 |
+| npc_kid_lamprey | 1.000 | 1.09 | 0.995 | 3.8 |
 | npc_scrapling | 1.000 | 0.68 | 0.928 | 23.0 |
 | npc_blister | 1.000 | 0.73 | 0.992 | 12.3 |
 | boss_bilge | 1.000 | 1.63–1.65 | 0.991 | 11.7 |
@@ -105,19 +106,27 @@ Root `body` (hover 0.42; the hopper gait bounces the hover height by `step_heigh
 (`part: fin`, soft springs). Weapons `slap_l/r`, `body_slam`, `hug` (grab), `cap`, `antenna_l/r`
 (Arc Lash origin). No head segment: `head_pos()` falls back to root + 0.4 m. Gore: the battery cap.
 
+### Kid Lamprey (`npc_kid_lamprey`) — biped, 13 segments, ~60 kg, 1.41 m
+Tutorial / Ring Sparring partner (kit: `docs/kits/npc_kid_lamprey.md`). Root `pelvis` (hover 0.55),
+`chest`, `head` (hood + sucker mouth), sleeves as chains `arm_l/arm_r` (`uarm_*` + `farm_*`), legs
+`leg_l/leg_r` (`thigh_*` + `shin_*`, sneaker boxes), eel tail `tail1 → tail2` behind. Weapons
+`fist_l/fist_r` (r 0.12), `mouth`, `hood`, `shoulder_l/r`, `body`, `tail_tip`. Stance = sleeves at the
+chin; guard = forearms over the hood. Skinned forge model (`tools/forge/defs/creatures/npc_kid_lamprey.js`,
+9 000 tris). Gore: a tooth.
+
 ### Scrapling (`npc_scrapling`) — biped, 8 segments, 40 kg, 1.0 m
 `torso` root (hover 0.42), `head`, single-segment `arm_l` (carries the **lid** box, guard) and `arm_r`
 (carries the **pipe** capsule), `leg_l/leg_r` chains. Weapons `pipe` (tip), `pipe_mid`, `lid`, `head`,
 `body`. Guard = crouch behind the lid. Gore: the lid.
 
 ### Blister (`npc_blister`) — hopper, 3 segments, 25 kg, 0.7 m
-`core` root (hover 0.33), `nub_l/nub_r` (`part: tail`, flop). Weapons `body`, `nub_l/r`. The heavy stub
-is the 1.2 s inflate (height +0.15) then a body pulse; the real Inflate & Pop is an ability for the kit.
+`core` root (hover 0.33), `nub_l/nub_r` (`part: tail`, flop). Weapons `body`, `nub_l/r`. Kit (Hop, Belly Bump, Inflate & Pop,
+Death Pop, live bomb): `docs/kits/minions.md`.
 
 ### Bilge (`boss_bilge`) — quadruped, 15 segments, 320 kg, 2.08 m shoulder, 4 m long
 Dozer's plan plus `neck1`, `neck2` and a cosmetic `chain` segment (`part: tail`, `collide: false`,
 hangs from the collar). Weapons `jaws`, `head`, `paw_fl/fr/bl/br`, `body_slam`, `belly` (Belly Flop),
-`shoulder_l/r`, `tail_tip`. Stub `heavy` is the Shake-Off spin (multi-hit windows).
+`shoulder_l/r`, `tail_tip`. Kit: `docs/kits/bosses.md`.
 
 ### Conduit (`boss_conduit`) — serpent, 9 segments, 260 kg, 3.3 m reared, ~7 m long
 Slurry's plan with longer links: `body4` root (hover 0.42), `body3…body1`, `head`; rear `body5…body7`,
@@ -140,6 +149,7 @@ Guard = Withdraw (neck folded 38°, −16 cm). Bosses are exempt from the 1.6 m 
 | f_dozer | 14 000 | 11 454 | 767 KB | 300 |
 | f_slurry | 13 000 | 10 307 | 693 KB | 300 |
 | f_jitters | 10 000 | 7 998 | 545 KB | 400 |
+| npc_kid_lamprey | 9 000 | 7 658 | 515 KB | — |
 | npc_scrapling | 1 900 | 1 819 | 131 KB | 300 |
 | npc_blister | 1 500 | 1 045 | 79 KB | 200 |
 | boss_bilge | 18 000 | 14 225 | 953 KB | 300 |
