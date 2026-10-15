@@ -32,6 +32,8 @@ var flying := {}                     ## item id -> {from, t, kind, thrower}
 var current_space := ""
 var transition := {}                 ## {id, t, to, yaw, fighter} while fading out
 var auto_transition := true          ## tests/headless: teleport without waiting for a presenter
+var dodge_interacts := true          ## a buffered Dodge (pad A) near an interactable interacts; HubScene
+                                     ## turns it off because HubPlayerInput maps the device buttons itself
 var start_spot := "main_floor"
 var ludlow := {"pos": Vector3.ZERO, "yaw": 0.0, "leg": 0, "wait": 2.0, "hold": 0.0, "moving": false}
 var hidden_items := {}               ## item id -> true while not yet revealed
@@ -192,7 +194,7 @@ func focus_point(f: Fighter):
 func intercept_actions(f: Fighter) -> bool:
 	var handled := false
 	# A near an interactable is an interaction, not a dodge
-	if f._peek(FighterInput.DODGE) and not (focus.get(f.index, {}) as Dictionary).is_empty() and transition.is_empty():
+	if dodge_interacts and f._peek(FighterInput.DODGE) and not (focus.get(f.index, {}) as Dictionary).is_empty() and transition.is_empty():
 		f._consume(FighterInput.DODGE)
 		_interact(f)
 		handled = true
@@ -456,12 +458,7 @@ func _interact(f: Fighter) -> void:
 	match str(e["kind"]):
 		"npc":
 			var npc := str(d["npc"])
-			if npc == "ludlow" and carry.has(f.index) and str(carry[f.index]["kind"]) == "part":
-				var part := str(carry[f.index]["id"])
-				_release_carry(f)
-				delivered[part] = true
-				_park_item(part)
-				secrets.give_part(f, part)
+			if npc == "ludlow" and give_carried_to_ludlow(f):
 				return
 			hold_npc(npc, 6.0)
 			emit_hub({"type": "hub_interact", "kind": "npc", "npc": npc, "id": eid, "fighter": f.index})
@@ -477,6 +474,18 @@ func _interact(f: Fighter) -> void:
 			emit_hub({"type": "hub_interact", "kind": "object", "id": eid, "fighter": f.index})
 		"secret":
 			secrets.interact(eid, f)
+
+
+## Hands Ludlow the elevator part the fighter is carrying (secret #6). false when not carrying one.
+func give_carried_to_ludlow(f: Fighter) -> bool:
+	if f == null or not carry.has(f.index) or str(carry[f.index]["kind"]) != "part":
+		return false
+	var part := str(carry[f.index]["id"])
+	_release_carry(f)
+	delivered[part] = true
+	_park_item(part)
+	secrets.give_part(f, part)
+	return true
 
 
 # =====================================================================================

@@ -19,6 +19,16 @@ static func enter(params := {}) -> void:
 	scene.start(params)
 
 
+## Leaves the hub for the main menu (progress is saved first).
+static func leave() -> void:
+	Profiles.save()
+	App.set_scene(null)
+	if App.has_screen("main_menu"):
+		App.goto("main_menu")
+	else:
+		App.quit()
+
+
 ## Accessibility game speed never applies in the hub (it is a social space, not a fight).
 static func _restore_speed() -> void:
 	Engine.time_scale = 1.0

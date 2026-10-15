@@ -37,6 +37,8 @@ func _ready() -> void:
 		mode = "autotest"
 	elif args.has("--bench"):
 		mode = "bench"
+	elif args.has("--hub"):
+		mode = "hub"
 	if args.has("--capture"):
 		_setup_capture()
 	if args.has("--boot-report"):
@@ -100,6 +102,10 @@ func _start(mode: String) -> void:
 			var bench = load("res://src/test/bench.gd").new()
 			add_child(bench)
 			bench.call("run", arg_value("--bench", "busy"), args)
+		"hub":
+			# The Cannery directly (docs/HUB_SYSTEMS.md): --hub-spot <space> --hub-fighter <id> --hub-demo <presets>
+			Hub.enter({"spot": arg_value("--hub-spot", ""), "fighter": arg_value("--hub-fighter", ""), "demo": arg_value("--hub-demo", ""),
+				"board": arg_value("--hub-board", ""), "cam_yaw": arg_value("--hub-cam-yaw", "")})
 		_:
 			_boot_game()
 

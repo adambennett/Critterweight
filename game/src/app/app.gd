@@ -31,6 +31,8 @@ const SCREENS := {
 	"dialog": "res://src/ui/screens/dialog.gd",
 	"spectate": "res://src/ui/screens/spectate_setup.gd",
 	"bookie": "res://src/campaign/ui/bookie_screen.gd",
+	"hub": "res://src/hub/ui/hub_entry_screen.gd",
+	"hub_board": "res://src/hub/ui/hub_board.gd",
 	"tutorial_menu": "res://src/ui/screens/tutorial_menu.gd",
 	"controls": "res://src/ui/screens/controls_screen.gd",
 	"text_entry": "res://src/ui/screens/text_entry.gd",
