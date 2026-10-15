@@ -137,7 +137,7 @@
   },
   "art": {"model": "res://assets/models/creatures/boss_snappington.glb", "palette": {"primary": "#4F6B3A", "secondary": "#C9A227", "accent": "#8A8C5A", "skin": "#8A8C5A"}, "roughness": 0.5, "outline": 0.014, "hype_feature": "shell seams", "gore_piece": {"segment": "head", "offset": [0.0, 0.26, 0.3], "size": 0.06, "shape": "glasses", "color": "#C9A227"}},
   "audio": {"voice": "snappington", "material": "chitin", "plan": "quadruped", "juice": "juice_generic"},
-  "ai": {"style": "by the book", "aggression": 0.0, "grab": 0.05, "ability": 0.12, "counter_slot": "ability2", "counter_chance": 0.3, "block": -1.0, "dodge": -1.0, "charge": -1.0, "reach": {"l1": 2.5}, "rest": [1.4, 2.4], "bulky": true},
+  "ai": {"style": "by the book", "aggression": 0.0, "grab": 0.05, "ability": 0.12, "block": -1.0, "dodge": -1.0, "reach": {"l1": 2.5}, "rest": [1.4, 2.4], "bulky": true, "abilities": {"ability2": {"chance": 0.25, "when": [{"target_winding": true}]}}},
   "string": ["l1", "l2"],
   "throws": {
     "throw_fwd": {"distance": 4.0, "damage": 10, "knockdown": true, "buildup": 20},

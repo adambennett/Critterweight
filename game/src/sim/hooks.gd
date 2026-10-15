@@ -20,7 +20,8 @@ extends RefCounted
 ##   damage_add {amount, min}, damage_mult, knockback_mult, launch, knockdown, stun_add, poise_mult,
 ##   guard_crush, buildup {element, amount, target}, refresh_status {element}, set_flag {flag, seconds},
 ##   stamina {amount, target}, hype {amount}, self_damage {amount}, cleanse,
-##   status {status: {...StatusSet fields}, target} (adds/refreshes a status on self or the other).
+##   status {status: {...StatusSet fields}, target} (adds/refreshes a status on self or the other),
+##   cooldown {slot, set | add} (ability cooldowns; see the block at the end).
 ## Resource limits: at most 32 hooks per fighter and 16 actions per firing; recursion depth 2.
 
 const MAX_HOOKS := 32
@@ -53,7 +54,7 @@ static func validate(h: Dictionary) -> PackedStringArray:
 			errs.append("hook: action is not an object")
 			continue
 		var t := str(a.get("type", ""))
-		if not HIT_MODIFIERS.has(t) and not EffectsSystem.TYPES.has(t) and not t in ["set_flag", "stamina", "cleanse", "self_damage", "hype", "status"]:
+		if not HIT_MODIFIERS.has(t) and not EffectsSystem.TYPES.has(t) and not t in ["set_flag", "stamina", "cleanse", "self_damage", "hype", "status", "cooldown"]:
 			errs.append("hook: unknown action '%s'" % t)
 	return errs
 
@@ -291,6 +292,8 @@ func _act(a: Dictionary, ctx: Dictionary) -> void:
 				if not st.is_empty():
 					st["source"] = f
 					who.statuses.add(st)
+		"cooldown":
+			_act_cooldown(a)
 		_:
 			if f.sim and EffectsSystem.TYPES.has(t):
 				var e: Dictionary = a.duplicate()
@@ -299,6 +302,26 @@ func _act(a: Dictionary, ctx: Dictionary) -> void:
 				if hit != null and not e.has("at"):
 					e["at_point"] = hit.get("point", f.pos())
 				f.sim.effects.fire(f, e, null)
+
+
+# =====================================================================================
+# Kit extension (added with the Dredge/Dozer kits): ability cooldown control.
+#   {"type": "cooldown", "slot": "ability1", "set": 0.0}  or  {"type": "cooldown", "slot": "ability2", "add": -3.0}
+# Acts on the hook owner. Reaching 0 refills the slot's charges (e.g. a JUICE state that makes an
+# ability free to repeat: on ability_used -> set 0).
+# =====================================================================================
+
+func _act_cooldown(a: Dictionary) -> void:
+	var f = fighter
+	var slot := str(a.get("slot", ""))
+	if not f.creature.abilities.has(slot):
+		return
+	var left := float(f.cooldown_left.get(slot, 0.0))
+	left = float(a["set"]) if a.has("set") else left + float(a.get("add", 0.0))
+	left = maxf(0.0, left)
+	f.cooldown_left[slot] = left
+	if left <= 0.0:
+		f.charges_left[slot] = int(f.creature.ability_charges.get(slot, 1))
 
 
 # =====================================================================================

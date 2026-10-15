@@ -119,3 +119,20 @@ docs/PLATFORM.md; nothing claims it.
 Collision walls are built on the same polygon as the rendered fence (side normals at `TAU*i/sides`) and rise
 5 m above it; a containment net in `MatchSim` pulls any rig that still escapes back inside and logs it. Found
 from mode captures where fighters stood outside the cage.
+
+## D-023 A ring-out is a short absence, not a defeat
+A ring-out parks the fighter (inactive) until it returns at the edge. Round-over checks in every mode ask
+`MatchMode.is_beaten(f)` (out and *not* waiting to come back) instead of `is_out()`. Found when a campaign run
+on The Rooftop was lost with the player's only fighter mid-return: an enemy KO at that moment read the party
+as wiped out. Boss "defeated", Chum Rush survivors, tag-team auto-tags and campaign results use it too.
+
+## D-024 Bots respect open edges
+On arenas with ring-out edges (and ring-outs on), `BotBrain` cancels the outward part of its movement within
+1.7 m of an open edge and adds an inward pull scaled by the tier's spacing skill; dodges use the corrected
+direction. A bot that is carrying someone still walks them out to throw. Without it, headliner bots walked
+off The Rooftop three times in one fight (8% max HP each).
+
+## D-025 Whole numbers are saved as integer text
+`Saves.stabilize` normalizes whole-number floats (up to 2^53) to ints before its JSON round trip. Godot reads
+"N" exactly but misreads a large "N.0" by one, which silently changed 53-bit campaign seeds on save and made a
+resumed run diverge (35 of 300 random seeds before the fix).

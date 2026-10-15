@@ -108,7 +108,7 @@
   },
   "art": {"model": "res://assets/models/creatures/boss_conduit.glb", "palette": {"primary": "#1E1E24", "secondary": "#F7E04A", "accent": "#CFF4FF", "copper": "#B87333"}, "roughness": 0.5, "outline": 0.014, "hype_feature": "seam glow", "gore_piece": {"segment": "head", "offset": [0.06, -0.1, 0.6], "size": 0.07, "shape": "tooth", "color": "#CFF4FF"}},
   "audio": {"voice": "conduit", "material": "chitin", "plan": "serpent", "juice": "juice_generic", "drip": "serpent_tick"},
-  "ai": {"style": "ambusher", "aggression": 0.05, "grab": 0.06, "ability": 0.15, "counter_slot": "ability2", "counter_chance": 0.25, "block": -1.0, "dodge": -1.0, "charge": -1.0, "reach": {"l1": 2.4, "grab": 2.4}, "rest": [1.8, 3.0], "bulky": true},
+  "ai": {"style": "ambusher", "aggression": 0.05, "grab": 0.06, "ability": 0.15, "block": -1.0, "dodge": -1.0, "reach": {"l1": 2.4, "grab": 2.4}, "rest": [1.8, 3.0], "bulky": true, "abilities": {"ability2": {"chance": 0.2, "when": [{"target_winding": true}]}}},
   "string": ["l1", "l2"],
   "throws": {
     "throw_fwd": {"distance": 2.5, "damage": 8, "knockdown": true, "buildup": 30},

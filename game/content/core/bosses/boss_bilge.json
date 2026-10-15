@@ -135,7 +135,7 @@
   },
   "art": {"model": "res://assets/models/creatures/boss_bilge.glb", "palette": {"primary": "#5A4E45", "secondary": "#8BD426", "accent": "#E03A2B", "chain": "#8C3B2B"}, "roughness": 0.55, "outline": 0.014, "hype_feature": "collar light", "gore_piece": {"segment": "head", "offset": [0.08, -0.14, 0.5], "size": 0.07, "shape": "tooth", "color": "#E8DFC8"}},
   "audio": {"voice": "bilge", "material": "flesh", "plan": "quadruped", "juice": "juice_generic"},
-  "ai": {"style": "playful brute", "aggression": 0.0, "grab": 0.08, "ability": -0.1, "block": -1.0, "dodge": -1.0, "charge": -1.0, "reach": {"l1": 3.0}, "rest": [1.8, 3.0], "bulky": true},
+  "ai": {"style": "playful brute", "aggression": 0.0, "grab": 0.08, "ability": -0.1, "block": -1.0, "dodge": -1.0, "reach": {"l1": 3.0}, "rest": [1.8, 3.0], "bulky": true},
   "string": ["l1", "l2"],
   "throws": {
     "throw_fwd": {"distance": 4.0, "damage": 10, "knockdown": true, "buildup": 20},

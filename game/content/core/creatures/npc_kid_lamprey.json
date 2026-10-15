@@ -153,5 +153,5 @@
   ],
   "art": {"model": "res://assets/models/creatures/npc_kid_lamprey.glb", "palette": {"primary": "#3F4A5C", "secondary": "#6E8B8E", "accent": "#C23A2B", "skin": "#6E8B8E", "teeth": "#F2EFE4"}, "roughness": 0.8, "outline": 0.012, "hype_feature": "mouth glow", "gore_piece": {"segment": "head", "offset": [0.03, -0.03, 0.17], "size": 0.03, "shape": "tooth", "color": "#F2EFE4"}},
   "audio": {"voice": "lamprey", "material": "flesh", "plan": "biped", "juice": "juice_generic"},
-  "ai": {"style": "showoff rookie", "aggression": -0.05, "block": -0.05, "grab": -0.06, "charge": -0.1, "counter_slot": "ability2", "counter_chance": 0.35}
+  "ai": {"style": "showoff rookie", "aggression": -0.05, "block": -0.05, "grab": -0.06, "charge_heavy": 0.15, "abilities": {"ability2": {"chance": 0.8, "when": [{"target_winding": true}]}}}
 }

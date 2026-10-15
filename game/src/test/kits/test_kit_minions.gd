@@ -204,6 +204,8 @@ func test_scrapling_dies_in_a_few_clean_hits() -> void:
 				cursor = int(ev["seq"])
 				if str(ev["type"]) == "hit" and int(ev["fighter"]) == 0 and not bool(ev["blocked"]) and float(ev["damage"]) > 0.5:
 					hits += 1
+					if OS.get_cmdline_user_args().has("--kit-ttk"):
+						print("   hit %s %.1f at %.2f hp %.1f" % [str(ev.get("slot", "")), float(ev["damage"]), sim.time, sim.fighters[1].health])
 			dead = sim.fighters[1].is_out()
 		print("SCRAPLING TTK: %s %s -> %d clean hits (dead %s, %.1f s)" % [spec[0], spec[1], hits, dead, sim.time])
 		if bool(spec[4]):
@@ -283,9 +285,23 @@ func test_blister_inflate_and_pop() -> void:
 		for e in sim.effects.entities:
 			if str(e["kind"]) == "zone" and str(e.get("zone_kind", "")) == "sludge_puddle":
 				out["puddle"] = true
+		var k := sim.fighters[1]
+		if OS.get_cmdline_user_args().has("--kit-events") and k.move != null:
+			var line := "t=%.2f kid %s st=%.2f root(%.2f,%.2f,%.2f) blister(%.2f,%.2f,%.2f) state %s" % [sim.time, k.move_slot, k.state_time,
+				k.pos().x, k.pos().y, k.pos().z, sim.fighters[0].pos().x, sim.fighters[0].pos().y, sim.fighters[0].pos().z, Fighter.State.keys()[sim.fighters[0].state]]
+			for wn in ["fist_l", "fist_r"]:
+				var wd: BodyDef.Weapon = k.creature.body.weapons[wn]
+				var wp := k.rig.bodies[wd.seg].global_transform * wd.local
+				line += " %s(%.2f,%.2f,%.2f)" % [wn, wp.x, wp.y, wp.z]
+			for c in sim.combat.debug_contacts:
+				line += " CONTACT vn=%.2f" % c["vn"]
+			print(line)
 	var r := await shoot(BLISTER, PUNCHER, 1.3, press("ability1"), 2.2, at([{"t0": 0.4, "t1": 1.0, "move": "to_target"}, {"t0": 0.6, "t1": 0.65, "press": ["light"]}]), Callable(), 6.0, each)
 	var pops := []
 	var jabbed := false
+	if OS.get_cmdline_user_args().has("--kit-events"):
+		for ev in r["events"]:
+			print("   ", JSON.stringify(ev).substr(0, 200))
 	for ev in r["events"]:
 		if str(ev["type"]) == "hit" and int(ev["fighter"]) == 0 and str(ev.get("move_class", "")) == "pop":
 			pops.append(float(ev["damage"]))

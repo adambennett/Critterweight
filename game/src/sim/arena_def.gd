@@ -378,6 +378,21 @@ func edge_distance(p: Vector3, open_only := false) -> float:
 	return best
 
 
+## Inward unit normal (XZ as Vector3) of the closest open (ring-out) edge, or ZERO when none.
+func open_edge_inward(p: Vector3) -> Vector3:
+	var p2 := Vector2(p.x, p.z)
+	var best := INF
+	var n := Vector2.ZERO
+	for e in _edges:
+		if bool(e["wall"]):
+			continue
+		var dd := _seg_dist(p2, e["a"], e["b"])
+		if dd < best:
+			best = dd
+			n = -(e["n"] as Vector2)
+	return Vector3(n.x, 0.0, n.y)
+
+
 ## Inward unit normal (XZ as Vector3) of the closest wall, or ZERO when there is none.
 func wall_normal_near(p: Vector3) -> Vector3:
 	var p2 := Vector2(p.x, p.z)

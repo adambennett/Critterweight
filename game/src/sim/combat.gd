@@ -176,7 +176,7 @@ func _resolve_melee(a: Fighter, b: Fighter, widx: int, wp: Vector3, wv: Vector3,
 	dir = dir.normalized() if dir.length_squared() > 1e-6 else a.forward()
 	match m.kb_dir:
 		"side":
-			var side := a.forward().cross(Vector3.UP) * (1.0 if m.kb_side >= 0.0 else -1.0)
+			var side := Vector3.UP.cross(a.forward()) * (1.0 if m.kb_side >= 0.0 else -1.0)   # +1 = attacker's left (+X), as MoveDef documents
 			dir = (side * 0.8 + a.forward() * 0.2).normalized()
 		"up":
 			dir = Vector3.ZERO

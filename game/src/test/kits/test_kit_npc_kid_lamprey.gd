@@ -67,8 +67,8 @@ func test_kit_is_complete_and_valid() -> void:
 	for k in ["health", "walk_speed", "stamina", "poise", "dodge_distance", "dodge_time"]:
 		check((raw["stats"] as Dictionary).has(k), "stat %s set" % k)
 	check(not (raw["stats"] as Dictionary).has("dodge_speed"), "no unknown dodge_speed stat")
-	var ai: Dictionary = c.ai
-	check(str(ai.get("counter_slot", "")) == "ability2", "bot answers wind-ups with Hood Up")
+	var hint: Dictionary = (c.ai.get("abilities", {}) as Dictionary).get("ability2", {})
+	check(JSON.stringify(hint.get("when", [])).contains("target_winding"), "bot answers wind-ups with Hood Up (kit hint)")
 
 
 ## Every move lands its own slot at its intended range against a standing Stoke, misses beyond
@@ -350,7 +350,8 @@ func test_zz_debug_tutorial() -> void:
 			cursor = int(ev["seq"])
 			var t := str(ev["type"])
 			if t == "move_start" and int(ev["fighter"]) == 1:
-				print("%.2f kid %s dist %.2f player %s guard_blend %.2f" % [sim.time, ev["slot"], kid.pos().distance_to(p.pos()), p.state_name(), p.motor.guard_blend])
+				print("%.2f kid %s dist %.2f player %s guard_blend %.2f (heights kid %.2f player %.2f strike scale %.2f)" % [sim.time, ev["slot"], kid.pos().distance_to(p.pos()), p.state_name(), p.motor.guard_blend,
+					kid.creature.body.height, p.creature.body.height, kid.motor.strike_height_scale])
 			elif t == "hit" or t == "glance":
 				print("%.2f %s f%d->f%d blocked=%s slot=%s" % [sim.time, t, ev.get("fighter", -1), ev.get("target", -1), ev.get("blocked", false), ev.get("slot", "")])
 		if kid.move != null and kid.move.window_index(kid.state_time) >= 0:

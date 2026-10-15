@@ -101,7 +101,7 @@ func test_zz_debug_bout() -> void:
 			next_line += 0.25
 			print("%5.2f d=%.2f A %-9s %-9s hp %.0f st %.0f | B %-9s %-9s hp %.0f st %.0f reach %.2f+%.2f mv(%.1f,%.1f) guard %s" % [sim.time, a.pos().distance_to(b.pos()),
 				Fighter.State.keys()[a.state], a.move_slot, a.health, a.stamina, Fighter.State.keys()[b.state], b.move_slot, b.health, b.stamina,
-				bb.reach_of(b.creature, "l1"), bb._npc_target_bulk(b, a), b.input.move.x, b.input.move.z, str(b.input.is_held(FighterInput.GUARD))])
+				bb.reach_of(b.creature, "l1"), bb._kit_target_bulk(b, a), b.input.move.x, b.input.move.z, str(b.input.is_held(FighterInput.GUARD))])
 	print("winner %s" % str(sim.result.get("winner_team", -1)))
 	sim.get_parent().queue_free()
 
