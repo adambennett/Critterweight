@@ -89,7 +89,14 @@ static func start_lesson(lesson_id: String, creature_id := "") -> void:
 	start(idx, creature_id)
 
 
+## Where exit_tutorial goes instead of the menus (the hub passes its way back, a lambda). main.gd
+## clears it at exit through forget_exit(): a lambda left in a static var crashes Godot 4.5.1 at
+## exit (AGENTS.md).
 static var _exit_override: Callable = Callable()
+
+
+static func forget_exit() -> void:
+	_exit_override = Callable()
 
 
 static func exit_tutorial() -> void:
