@@ -304,7 +304,7 @@ func _spawn_projectile(f: Fighter, e: Dictionary, yaw_off: float) -> void:
 		var w: BodyDef.Weapon = f.creature.body.weapons[from_w]
 		origin = f.rig.bodies[w.seg].global_transform * w.local
 	var spd := float(e.get("speed", 12.0))
-	var dir := MathX.yaw_basis(f.facing_yaw + yaw_off) * Vector3.FORWARD
+	var dir := MathX.forward_of_yaw(f.facing_yaw + yaw_off)   # fighter space: +Z is forward
 	var vel := dir * spd
 	var grav := float(e.get("gravity", 0.0))
 	if bool(e.get("lob", false)):
