@@ -20,6 +20,7 @@ uniform float outline_w = 0.07;
 uniform float glow = 0.0;
 uniform float active = 0.0;
 uniform vec2 hole = vec2(0.0);    // rect shapes: hollow centre (pit rims)
+uniform float icon_rot = 0.0;     // rotates the icon field (wind direction arrows)
 
 float sd_seg(vec2 p, vec2 a, vec2 b) {
 	vec2 pa = p - a, ba = b - a;
@@ -144,11 +145,12 @@ void fragment() {
 	float hatch = step(0.62, fract(rp.x / hatch_period));
 	float ic = 0.0;
 	if (icon > 0) {
-		vec2 cellp = lp / icon_spacing;
+		vec2 ilp = vec2(cos(icon_rot) * lp.x - sin(icon_rot) * lp.y, sin(icon_rot) * lp.x + cos(icon_rot) * lp.y);
+		vec2 cellp = ilp / icon_spacing;
 		vec2 fc = fract(cellp + 0.5) - 0.5;
 		float small = min(size.x, size.y);
 		if (small < icon_spacing * 1.2) {
-			fc = lp / max(small * 0.62, 0.3);
+			fc = ilp / max(small * 0.62, 0.3);
 			ic = icon_mask(icon, fc / max(icon_size, 0.05) * 0.55);
 		} else {
 			ic = icon_mask(icon, fc * icon_spacing / max(icon_size, 0.05));

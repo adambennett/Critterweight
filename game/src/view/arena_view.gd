@@ -370,11 +370,36 @@ func _build_base_hazards() -> void:
 				node.visible = false
 				_hz_decals[id] = {"mats": [m4], "node": node}
 			"wind_gust":
+				# floor-shaped (never overhangs notches or edges); arrows rotate with the gust
 				var ext := arena.extent()
 				var m5 := ArenaPropVisuals.decal(Color("#CFF4F2"), 0, ext.size, ArenaPropVisuals.ICONS["arrow"], {"icon_spacing": 2.6, "base_alpha": 0.0, "outline_w": 0.0, "hatch_period": 100.0})
-				var node2 := ArenaPropVisuals.decal_quad(_hazard_root, m5, ext.size, Vector3(ext.get_center().x, 0.0, ext.get_center().y))
+				var node2 := MeshInstance3D.new()
+				node2.mesh = _floor_uv_mesh(arena.boundary_polygon(), ext, 0.014)
+				node2.material_override = m5
+				node2.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 				node2.visible = false
+				_hazard_root.add_child(node2)
 				_hz_decals[id] = {"mats": [m5], "node": node2}
+
+
+## Flat mesh of a polygon at height y whose UVs span `ext` (0..1), for floor-shaped decals.
+static func _floor_uv_mesh(poly: PackedVector2Array, ext: Rect2, y: float) -> ArrayMesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var tri := Geometry2D.triangulate_polygon(poly)
+	for k in range(0, tri.size(), 3):
+		var pts := [poly[tri[k]], poly[tri[k + 1]], poly[tri[k + 2]]]
+		var a: Vector2 = pts[0]
+		var b: Vector2 = pts[1]
+		var c: Vector2 = pts[2]
+		if (Vector3(b.x, 0, b.y) - Vector3(a.x, 0, a.y)).cross(Vector3(c.x, 0, c.y) - Vector3(a.x, 0, a.y)).y > 0.0:
+			pts = [a, c, b]
+		for p in pts:
+			var v: Vector2 = p
+			st.set_normal(Vector3.UP)
+			st.set_uv((v - ext.position) / ext.size)
+			st.add_vertex(Vector3(v.x, y, v.y))
+	return st.commit()
 
 
 func _build_legacy_hazard(h: Dictionary) -> Node3D:
@@ -739,11 +764,9 @@ func _wind_anim(hz: Dictionary, deco: Dictionary, phase: String, dt: float) -> v
 	var mats: Array = deco.get("mats", [])
 	if node:
 		node.visible = phase != "idle"
-		node.rotation.y = atan2(dir.x, dir.y)
-		var ext := arena.extent()
-		var sz := ext.size if absf(dir.x) < 0.5 else Vector2(ext.size.y, ext.size.x)
 		for m in mats:
-			(m as ShaderMaterial).set_shader_parameter("size", sz)
+			# decal local +Y is world +Z; the arrow icon points along local +Y
+			(m as ShaderMaterial).set_shader_parameter("icon_rot", atan2(dir.x, dir.y))
 			(m as ShaderMaterial).set_shader_parameter("base_alpha", 0.0)
 			(m as ShaderMaterial).set_shader_parameter("glow", 0.6 if phase == "telegraph" else 0.0)
 			(m as ShaderMaterial).set_shader_parameter("active", 0.35 if phase == "active" else 0.0)

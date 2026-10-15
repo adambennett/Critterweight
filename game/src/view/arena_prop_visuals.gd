@@ -317,8 +317,11 @@ static func _barrel(root: Node3D, s: Vector2, h: float, by: float, el: String, s
 			flame.name = "Flame"
 			flame.position = Vector3(0, by + h, 0)
 			root.add_child(flame)
-			ArenaMeshKit.add(flame, ArenaMeshKit.cylinder(0.01, r * 0.75, 0.55, 10, 0.0), glow(Color("#FF6B2B"), 3.2), Vector3(0, 0.27, 0), Vector3.ZERO, Vector3.ONE, false)
-			ArenaMeshKit.add(flame, ArenaMeshKit.cylinder(0.01, r * 0.45, 0.4, 8, 0.0), glow(Color("#FFD27A"), 4.0), Vector3(0.05, 0.2, -0.03), Vector3.ZERO, Vector3.ONE, false)
+			# three flame tongues (tall, pointed: the Scorch shape), hot core
+			ArenaMeshKit.add(flame, ArenaMeshKit.cylinder(0.005, r * 0.72, 0.6, 10, 0.0), glow(Color("#FF7A1A"), 2.2), Vector3(0, 0.3, 0), Vector3.ZERO, Vector3.ONE, false)
+			ArenaMeshKit.add(flame, ArenaMeshKit.cylinder(0.005, r * 0.42, 0.42, 8, 0.0), glow(Color("#FF9A2E"), 2.4), Vector3(r * 0.4, 0.2, r * 0.2), Vector3(0, 0, -0.25), Vector3.ONE, false)
+			ArenaMeshKit.add(flame, ArenaMeshKit.cylinder(0.005, r * 0.38, 0.36, 8, 0.0), glow(Color("#FF9A2E"), 2.4), Vector3(-r * 0.35, 0.18, -r * 0.2), Vector3(0.2, 0, 0.25), Vector3.ONE, false)
+			ArenaMeshKit.add(flame, ArenaMeshKit.cylinder(0.005, r * 0.36, 0.32, 8, 0.0), glow(Color("#FFE08A"), 3.0), Vector3(0, 0.17, 0), Vector3.ZERO, Vector3.ONE, false)
 			var l := OmniLight3D.new()
 			l.light_color = Color("#FF8A3D")
 			l.light_energy = 1.6
