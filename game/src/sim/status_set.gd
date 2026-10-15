@@ -97,6 +97,8 @@ func _received_mult(element: String) -> float:
 
 
 func _trigger_element(element: String, source) -> void:
+	if source != null and not is_instance_valid(source):
+		source = null
 	var edef: Dictionary = Elements.defs.get(element, {})
 	var st: Dictionary = edef.get("status", {}).duplicate(true)
 	if st.is_empty():

@@ -177,6 +177,8 @@ func _process(dt: float) -> void:
 	if sim == null:
 		return
 	for f in sim.fighters:
+		if not cards.has(f.index) or f.despawned:
+			continue
 		var c: Dictionary = cards[f.index]
 		var frac := f.health_frac()
 		(c["hp"] as ProgressBar).value = frac
@@ -191,15 +193,25 @@ func _process(dt: float) -> void:
 		(c["cd2"] as Label).text = _cd_text(f, "ability2", "A2")
 		var st_txt := []
 		for s in f.statuses.summary():
-			var nm := str(s["element"]) if str(s["element"]) != "" else str(s["id"])
-			st_txt.append("%s %.0fs" % [nm.to_upper(), float(s["left"])])
+			var nm := str(s["element"]) if str(s["element"]) != "" else str(s["name"])
+			nm = nm.replace("_", " ").to_upper()
+			var left := float(s["left"])
+			# mode-long statuses (e.g. the Absolute Unit) show no countdown
+			st_txt.append(nm if left > 999.0 else "%s %.0fs" % [nm, ceilf(left)])
 		(c["status"] as Label).text = "  ".join(st_txt)
 		(c["lives"] as Label).text = ("  x%d" % f.lives) if f.lives > 1 or (f.lives >= 0 and sim.rules.get("lives", 1) > 1) else ""
 	var mm := sim.mode
 	if mm:
 		var rt := float(sim.rules.get("round_time", 99.0))
 		_timer.text = "%d" % ceili(mm.round_timer) if rt > 0.0 else "--"
-		_mode_label.text = mm.hud_status()
+		var hs: Dictionary = mm.hud_state()
+		var parts := []
+		for row in hs.get("rows", []):
+			parts.append("%s %d" % [str(row["label"]), int(row["value"])])
+		var line := "   ".join(parts)
+		if hs.has("target") and not parts.is_empty():
+			line += "   (to %d)" % int(hs["target"])
+		_mode_label.text = mm.hud_status() + ("\n" + line if line != "" else "")
 	if _center.text != "" and Time.get_ticks_msec() / 1000.0 > _center_until:
 		_center.text = ""
 	if _sub.text != "" and Time.get_ticks_msec() / 1000.0 > _sub_until:

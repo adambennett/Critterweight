@@ -283,11 +283,24 @@ func _apply_bus(key: String) -> void:
 func _apply_window() -> void:
 	if _headless:
 		return
-	# explicit command-line window options (captures, tests, Steam launch options) win over settings
+	# explicit command-line window options (captures, tests, Steam launch options) win over
+	# settings. The engine consumes its own --resolution/--windowed flags, so the game also
+	# accepts them after "--":  -- --windowed [--size 1600x900]
 	var cli := OS.get_cmdline_args()
+	var user := OS.get_cmdline_user_args()
+	var w := get_window()
+	if user.has("--windowed"):
+		var sz := Vector2i(1600, 900)
+		var at := user.find("--size")
+		if at >= 0 and at + 1 < user.size() and "x" in user[at + 1]:
+			var parts := user[at + 1].split("x")
+			sz = Vector2i(int(parts[0]), int(parts[1]))
+		w.mode = Window.MODE_WINDOWED
+		w.size = sz
+		w.move_to_center()
+		return
 	if cli.has("--resolution") or cli.has("--windowed") or cli.has("-w") or cli.has("--fullscreen") or cli.has("-f"):
 		return
-	var w := get_window()
 	var screen := clampi(int(values["display.screen"]), 0, DisplayServer.get_screen_count() - 1)
 	var mode := str(values["display.window_mode"])
 	var res := str(values["display.resolution"])

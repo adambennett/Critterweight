@@ -45,6 +45,8 @@ func detect_hits() -> void:
 			continue
 		var weps: PackedStringArray = a.move.windows[widx]["weapons"]
 		for wname in weps:
+			if a.move == null:
+				break
 			var w: BodyDef.Weapon = a.creature.body.weapons.get(wname)
 			if w == null:
 				continue
@@ -53,7 +55,11 @@ func detect_hits() -> void:
 			var wr := w.radius * float(a.mods.get("reach_radius", 1.0))
 			if a.move.damage > 0.0:
 				sim.effects.hit_props(wp, wr, a.move.damage * 0.5)
+			if not sim.hittables.is_empty():
+				_hit_objects(a, w, wp, wr, widx)
 			for b: Fighter in sim.fighters:
+				if a.move == null:
+					break
 				if b == a or not sim.can_hit(a, b):
 					continue
 				if a.move_hits.has(b.index):
@@ -74,6 +80,34 @@ func detect_hits() -> void:
 				_resolve_melee(a, b, widx, wp, wv, c)
 				if a.state != Fighter.State.ATTACK and a.state != Fighter.State.ABILITY:
 					break
+
+
+## Weapons striking registered mode objects (Chumball's ball, bags...). Needs real closing speed.
+func _hit_objects(a: Fighter, w: BodyDef.Weapon, wp: Vector3, wr: float, widx: int) -> void:
+	for h in sim.hittables:
+		var body: RigidBody3D = h.get("body")
+		if body == null or not is_instance_valid(body):
+			continue
+		var key := "obj:" + str(h["id"])
+		if a.move_hits.has(key):
+			continue
+		# objects can declare a vertical reach column (balls on the floor are hit by punches too)
+		var c := MathX.closest_on_segment(wp, body.global_position, body.global_position + Vector3.UP * float(h.get("reach_up", 0.0)))
+		if wp.distance_to(c) - float(h["radius"]) > wr:
+			continue
+		var n := (wp - c).normalized() if wp.distance_squared_to(c) > 1e-8 else -a.forward()
+		var wv := a.rig.point_velocity(w.seg, wp)
+		var vn := (wv - body.linear_velocity).dot(-n)
+		if vn < a.move.vmin * 0.6:
+			continue
+		a.move_hits[key] = {"w": widx, "t": a.state_time}
+		a.move_hit_any = true
+		var dir := (-n * 0.5 + a.forward() * 0.5)
+		dir.y = maxf(dir.y, 0.0)
+		dir = dir.normalized()
+		var on_hit: Callable = h["on_hit"]
+		on_hit.call(a, dir, a.move.knockback, a.move.launch, a.element_for(a.move), wp)
+		sim.emit_event({"type": "object_hit", "fighter": a.index, "object": str(h["id"]), "point": wp, "element": a.element_for(a.move)})
 
 
 ## Closest hurt-shape contact of a weapon sphere against fighter b, or {} if none.
@@ -299,6 +333,8 @@ func apply_simple_damage(source: Fighter, b: Fighter, amount: float, kind: Strin
 
 ## Damage-over-time tick from a status. `no_kill` keeps the target at ≥ 1 HP.
 func apply_dot(source, b: Fighter, amount: float, status_id: String, element: String, no_kill: bool) -> void:
+	if source != null and not is_instance_valid(source):
+		source = null   # the applier's slot was reused
 	if b.is_out() or amount <= 0.0:
 		return
 	if no_kill and b.health - amount < 1.0:

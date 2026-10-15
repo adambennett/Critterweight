@@ -11,11 +11,12 @@ extends Node
 signal reloaded()
 
 const KINDS := ["creatures", "arenas", "rules", "modes", "supplements", "techniques", "meta_upgrades",
-	"events", "encounters", "bosses", "minions", "playlists", "announcer", "hub", "props", "ladder", "tutorial", "policies"]
+	"events", "encounters", "bosses", "boss_fights", "minions", "playlists", "announcer", "hub", "props", "ladder", "tutorial", "policies"]
 ## Kinds that change simulation outcomes and therefore the multiplayer content hash.
 const GAMEPLAY_KINDS := ["creatures", "rules", "modes", "supplements", "techniques", "events", "encounters",
-	"bosses", "minions", "props", "ladder", "arenas"]
-const SCHEMA_FOR := {"creatures": "creature", "arenas": "arena", "rules": "rules", "playlists": "playlist"}
+	"bosses", "boss_fights", "minions", "props", "ladder", "arenas"]
+const SCHEMA_FOR := {"creatures": "creature", "minions": "creature", "bosses": "creature", "arenas": "arena", "rules": "rules", "playlists": "playlist"}
+const CREATURE_KINDS := ["creatures", "minions", "bosses"]
 
 var packages: Array = []          ## [{id, version, path, source:"core"|"mod", manifest}]
 var tables := {}                  ## kind -> {id -> Dictionary}
@@ -164,10 +165,19 @@ func ids(kind: String) -> Array:
 	return out
 
 
+## Raw creature dictionary from any creature-bearing kind (fighters, minions, bosses).
+func creature_entry(id: String) -> Dictionary:
+	for k in CREATURE_KINDS:
+		var d := get_entry(k, id)
+		if not d.is_empty():
+			return d
+	return {}
+
+
 func creature(id: String) -> CreatureDef:
 	if creatures.has(id):
 		return creatures[id]
-	var d := get_entry("creatures", id)
+	var d := creature_entry(id)
 	if d.is_empty():
 		return null
 	var c := CreatureDef.from_dict(d, Callable(), str(d.get("_package", "")))
@@ -175,6 +185,27 @@ func creature(id: String) -> CreatureDef:
 		for e in c.errors:
 			errors.append("%s: %s" % [d.get("_file", id), e])
 	creatures[id] = c
+	return c
+
+
+## A resized variant of a creature (e.g. the Absolute Unit): every body dimension and authored
+## move target is scaled by `scale`, masses by `weight_mult`. Cached per (id, scale, weight).
+func scaled_creature(id: String, scale: float, weight_mult := 1.0) -> CreatureDef:
+	var key := "%s@x%.2f_w%.2f" % [id, scale, weight_mult]
+	if creatures.has(key):
+		return creatures[key]
+	var d := creature_entry(id)
+	if d.is_empty():
+		return null
+	var c2: Dictionary = d.duplicate(true)
+	var body = c2.get("body")
+	if typeof(body) == TYPE_DICTIONARY:
+		body["scale"] = float(body.get("scale", 1.0)) * scale
+	var st: Dictionary = c2.get("stats", {})
+	st["weight"] = float(st.get("weight", 1.0)) * weight_mult
+	c2["stats"] = st
+	var c := CreatureDef.from_dict(c2, Callable(), str(d.get("_package", "")))
+	creatures[key] = c
 	return c
 
 

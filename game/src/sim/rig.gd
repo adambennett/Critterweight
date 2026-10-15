@@ -187,6 +187,17 @@ func place(pos: Vector3, yaw: float) -> void:
 	yaw_target = yaw
 
 
+## Moves every segment by `delta` keeping the current pose; removes velocity along `delta`'s
+## opposite (used to pull a body back through a boundary it should never have crossed).
+func shift(delta: Vector3) -> void:
+	var back := -delta.normalized() if delta.length_squared() > 1e-8 else Vector3.ZERO
+	for rb in bodies:
+		rb.global_position += delta
+		var out := rb.linear_velocity.dot(back)
+		if out > 0.0:
+			rb.linear_velocity -= back * out
+
+
 func root() -> RigidBody3D:
 	return bodies[0]
 

@@ -108,6 +108,7 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 			f.set_flag("reflect", float(e.get("duration", 0.6)))
 		"pull", "push":
 			var s := float(e.get("strength", 5.0)) * (-1.0 if t == "pull" else 1.0)
+			push_objects(f, p, float(e.get("radius", 3.0)), s, str(e.get("element", "")))
 			for o: Fighter in enemies_in(f, p, float(e.get("radius", 3.0))):
 				var d := o.pos() - p
 				d.y = 0.0
@@ -193,6 +194,7 @@ func enemies_in(f: Fighter, p: Vector3, r: float, include_allies := false) -> Ar
 func area(f: Fighter, e: Dictionary, p: Vector3) -> void:
 	var shape := str(e.get("shape", "circle"))
 	var r := float(e.get("radius", 2.0))
+	push_objects(f, p, r + 0.3, float(e.get("knockback", 0.0)) + float(e.get("strength", 0.0)), str(e.get("element", "")))
 	if shape == "line":
 		r = float(e.get("length", 3.0)) + 1.0
 	var origin := p
@@ -481,6 +483,25 @@ func _chain_arc(f: Fighter, e: Dictionary, p: Vector3) -> void:
 		sim.emit_event({"type": "arc", "from": origin, "to": best.pos(), "fighter": f.index, "element": str(e.get("element", ""))})
 
 
+## Radial push on hittable mode objects (positive = away from p, negative = toward p).
+func push_objects(f: Fighter, p: Vector3, r: float, strength: float, element: String) -> void:
+	if strength == 0.0:
+		return
+	for h in sim.hittables:
+		var hb: RigidBody3D = h.get("body")
+		if hb == null or not is_instance_valid(hb):
+			continue
+		var d := hb.global_position - p
+		d.y = 0.0
+		if d.length() > r:
+			continue
+		var dir := d.normalized() if d.length_squared() > 1e-6 else (f.forward() if f else Vector3.FORWARD)
+		if strength < 0.0:
+			dir = -dir
+		var on_hit: Callable = h["on_hit"]
+		on_hit.call(f, dir, absf(strength), 0.0, element, hb.global_position)
+
+
 func spawn_hazard_zone(p: Vector3, e: Dictionary) -> void:
 	var ent := {"id": _next_id, "kind": "zone", "zone_kind": str(e.get("hazard", "")), "owner": -1, "team": -1,
 		"pos": Vector3(p.x, 0.0, p.z), "radius": float(e.get("radius", 1.0)), "life": 1e9, "tick": float(e.get("tick", 0.5)),
@@ -577,6 +598,14 @@ func _update_projectile(ent: Dictionary, dt: float) -> void:
 	ent["pos"] = p
 	if float(ent["life"]) <= 0.0:
 		return
+	for h in sim.hittables:
+		var hb: RigidBody3D = h.get("body")
+		if hb and is_instance_valid(hb) and hb.global_position.distance_to(p) < float(h["radius"]) + float(ent["radius"]):
+			var on_hit: Callable = h["on_hit"]
+			on_hit.call(f, vel.normalized(), float(ent["e"].get("knockback", 2.0)), float(ent["e"].get("launch", 0.0)), str(ent["element"]), p)
+			if not bool(ent["pierce"]):
+				ent["life"] = 0.0
+				return
 	for o: Fighter in sim.fighters:
 		if f and (o == f or not sim.can_hit(f, o)):
 			continue
@@ -748,7 +777,7 @@ func _expire(ent: Dictionary) -> void:
 
 func trigger_reaction(r: Dictionary, victim: Fighter, source, el_a: String, el_b: String) -> void:
 	var p := victim.ground_pos()
-	var src: Fighter = source if source is Fighter else null
+	var src: Fighter = source if (source != null and is_instance_valid(source) and source is Fighter) else null
 	var id := str(r.get("id", ""))
 	var ally_hit := src != null and not sim.are_enemies(src, victim) and src != victim
 	var dmg_mult := float(Elements.rules.get("ally_reaction_damage_mult", 0.25)) if ally_hit else 1.0

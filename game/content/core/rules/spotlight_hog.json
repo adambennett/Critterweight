@@ -1,0 +1,24 @@
+{
+  "id": "spotlight_hog",
+  "name": "Spotlight Hog",
+  "mode": "spotlight_hog",
+  "format": "ffa",
+  "teams": 0,
+  "players": [
+    2,
+    8
+  ],
+  "rounds": 1,
+  "round_time": 300,
+  "win": "score",
+  "score_target": 60,
+  "respawn": true,
+  "respawn_delay": 5.0,
+  "ko_points": 3,
+  "light_radius": 2.0,
+  "dwell": 25.0,
+  "contest": "strict",
+  "hot_light": false,
+  "description": "A roaming spotlight. Stand in it with no enemies to score a point per second; KOs are worth 3. First to 60.",
+  "version": 1
+}

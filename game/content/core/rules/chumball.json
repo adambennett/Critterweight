@@ -1,0 +1,25 @@
+{
+  "id": "chumball",
+  "name": "Chumball",
+  "mode": "chumball",
+  "format": "teams",
+  "teams": 2,
+  "players": [
+    2,
+    8
+  ],
+  "rounds": 1,
+  "round_time": 240,
+  "win": "score",
+  "score_target": 5,
+  "respawn": true,
+  "respawn_delay": 6.0,
+  "ball_mass": 25.0,
+  "goal_width": 3.0,
+  "carry": true,
+  "own_goals": true,
+  "hot_ball": false,
+  "chaos": false,
+  "description": "Hit, throw or charge the 25 kg chum ball into the other team's goal. First to 5; ties go to a golden goal.",
+  "version": 1
+}

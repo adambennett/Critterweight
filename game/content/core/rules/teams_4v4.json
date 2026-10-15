@@ -1,0 +1,19 @@
+{
+  "id": "teams_4v4",
+  "name": "Teams 4v4",
+  "mode": "standard",
+  "format": "teams",
+  "teams": 2,
+  "players": [
+    8,
+    8
+  ],
+  "rounds": 1,
+  "round_time": 180,
+  "win": "ko",
+  "lives": 1,
+  "revive": true,
+  "downed_time": 12.0,
+  "description": "The full house: four against four.",
+  "version": 1
+}
