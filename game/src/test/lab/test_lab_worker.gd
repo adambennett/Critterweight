@@ -60,6 +60,29 @@ func test_helper_heartbeat_rule() -> void:
 	check(not LabBatch.heartbeat_ok(h, 0, 5001 + LabBatch.HEARTBEAT_TIMEOUT_S, 3000), "silent for longer than the timeout: gone")
 
 
+## A worker that stops reporting while its process still exists (starved of CPU at low priority
+## on a busy PC) is alive: it must not be shown as interrupted or be resumed a second time.
+func test_silent_worker_with_a_live_process_is_not_resumed() -> void:
+	var run := temp_dir("lab_worker_silent_%d" % Time.get_ticks_usec())
+	_job(run, {})
+	var win := OS.get_name() == "Windows"
+	var pid := OS.create_process("ping" if win else "sleep", ["-n", "60", "127.0.0.1"] if win else ["60"])
+	check(pid > 0, "stand-in worker process started")
+	if pid <= 0:
+		return
+	var old := Time.get_unix_time_from_system() - 120.0
+	LabIO.write_json(run.path_join("status.json"), {"state": "running", "pid": pid, "updated": old})
+	LabIO.write_json(run.path_join("progress.json"), {"updated": old})
+	check(LabManager.silent_for(run) >= 100.0, "silent for two minutes (%.0f s)" % LabManager.silent_for(run))
+	check(LabManager.is_alive(run), "but its process exists: still alive")
+	check_eq(LabManager.effective_state(run), "running", "shown as running")
+	check(not LabManager.can_resume(run), "so it cannot be started a second time")
+	OS.kill(pid)
+	check(await _wait(func() -> bool: return not OS.is_process_running(pid), 10.0), "stand-in stopped")
+	check_eq(LabManager.effective_state(run), "interrupted", "silent and without a process: interrupted")
+	check(LabManager.can_resume(run), "and resumable")
+
+
 func test_pause_resume_cancel() -> void:
 	var run := temp_dir("lab_worker_ctl_%d" % Time.get_ticks_usec())
 	_job(run, {})

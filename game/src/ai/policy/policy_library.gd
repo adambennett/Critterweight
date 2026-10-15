@@ -20,7 +20,8 @@ static var _errors := {}         ## id -> last load error
 
 static func user_dir() -> String:
 	if user_dir_override != "":
-		DirAccess.make_dir_recursive_absolute(user_dir_override)
+		if not DirAccess.dir_exists_absolute(user_dir_override):
+			DirAccess.make_dir_recursive_absolute(user_dir_override)
 		return user_dir_override
 	var paths := _autoload("Paths")
 	if paths != null:

@@ -304,10 +304,11 @@ func _check_limits() -> void:
 		task.request_stop("memory limit (%d MB)" % int(lim["max_memory_mb"]))
 
 
-## True if a process with this pid exists. OS.is_process_running only knows a process's own
-## children (on Windows and Unix), so the parent is checked through the OS (best effort; an
-## unknown answer counts as alive so a worker never stops by mistake).
-static func process_alive(pid: int) -> bool:
+## True if a process with this pid exists (and, on Windows, when `image` is given, runs that
+## executable: a reused pid then does not count). OS.is_process_running only knows a process's
+## own children, so other processes are checked through the OS (best effort; an unknown answer
+## counts as alive so a worker never stops by mistake).
+static func process_alive(pid: int, image := "") -> bool:
 	if pid <= 0:
 		return false
 	if OS.is_process_running(pid):
@@ -317,7 +318,10 @@ static func process_alive(pid: int) -> bool:
 		var code := OS.execute("tasklist", ["/FI", "PID eq %d" % pid, "/NH", "/FO", "CSV"], out, true)
 		if code != 0 or out.is_empty():
 			return true
-		return str(out[0]).contains("\"%d\"" % pid)
+		var line := str(out[0])
+		if not line.contains("\"%d\"" % pid):
+			return false
+		return image == "" or line.to_lower().begins_with("\"%s\"" % image.to_lower())
 	var c2 := OS.execute("kill", ["-0", str(pid)], out, true)
 	return c2 == 0
 

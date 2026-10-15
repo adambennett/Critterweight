@@ -25,13 +25,15 @@ static var root_override := ""
 
 static func root() -> String:
 	if root_override != "":
-		DirAccess.make_dir_recursive_absolute(root_override)
+		if not DirAccess.dir_exists_absolute(root_override):
+			DirAccess.make_dir_recursive_absolute(root_override)
 		return root_override
 	var tree := Engine.get_main_loop() as SceneTree
 	var paths: Node = tree.root.get_node_or_null("Paths") if tree != null else null
 	var base: String = str(paths.call("dir", "lab")) if paths != null else OS.get_user_data_dir().path_join("lab")
 	var d := base.path_join("datasets")
-	DirAccess.make_dir_recursive_absolute(d)
+	if not DirAccess.dir_exists_absolute(d):
+		DirAccess.make_dir_recursive_absolute(d)
 	return d
 
 

@@ -8,17 +8,24 @@ extends RefCounted
 ## and stop as "interrupted"; `start(run_dir)` later resumes from that checkpoint.
 
 const LIVE_STATES: PackedStringArray = ["starting", "running", "paused"]
-## A live worker rewrites progress.json every 0.5 s (also while paused); silence for longer than
-## this means it is gone. File heartbeats work across game restarts, unlike process handles.
+## A live worker rewrites progress.json every 0.5 s (also while paused). After this much silence
+## the worker's process is checked: a low-priority worker on a saturated PC can be starved of CPU
+## for a while without being gone (and must never be resumed twice). File heartbeats and pid
+## checks both work across game restarts.
 const STALE_PROGRESS_S := 20.0
 const STARTUP_GRACE_S := 60.0
+const PROCESS_RECHECK_MS := 5000
 
 static var _seen_updated := {}   ## run dir -> newest progress/status "updated" time read
+static var _spawned := {}        ## pids of workers this game session launched (children)
+static var _proc_cache := {}     ## pid -> {alive, ms}: OS process checks of other sessions' workers
+static var _job_info := {}       ## run dir -> {kind, name, creature} (a run's job never changes)
+static var _final_progress := {} ## run dir -> {key, progress} for runs that are not live
 
 
 static func runs_dir() -> String:
 	var d := Paths.dir("lab").path_join("runs")
-	DirAccess.make_dir_recursive_absolute(d)
+	LabIO.ensure_dir(d)
 	return d
 
 
@@ -53,6 +60,7 @@ static func start(run_dir: String) -> int:
 	var a := LabWorker.spawn_args(run_dir.path_join("job.json"), run_dir, ["--lab-rank", 0, "--lab-parent-pid", OS.get_process_id(), "--user-root", home])
 	var pid := OS.create_process(OS.get_executable_path(), a)
 	if pid > 0:
+		_spawned[pid] = true
 		LabIO.write_json(run_dir.path_join("status.json"), {"state": "starting", "pid": pid, "message": "launching worker", "updated": Time.get_unix_time_from_system()})
 	return pid
 
@@ -84,28 +92,65 @@ static func job_of(run_dir: String) -> Dictionary:
 	return j if not j.is_empty() else LabIO.read_json(run_dir.path_join("job.json"))
 
 
-## True when the run's coordinator recently reported (heartbeat through progress.json).
-static func is_alive(run_dir: String) -> bool:
-	var st := status(run_dir)
-	var state := str(st.get("state", ""))
-	if not LIVE_STATES.has(state):
-		return false
-	var now := Time.get_unix_time_from_system()
-	var pr := progress(run_dir)
+## How the UI should see a run, from its status (and, for live runs, progress) dictionaries:
+## {state, alive, silent_s}. `state` is the stored state, except that a live run whose worker
+## is gone reads "interrupted". A live run's coordinator is alive while it reports (heartbeat
+## through progress.json) or, when silent for longer than the heartbeat gap, while its process
+## still exists (`silent_s` > 0: waiting for CPU rather than gone). Pass dictionaries already
+## read to avoid reading the files again; empty ones are read here when needed.
+static func run_state(run_dir: String, st := {}, pr := {}) -> Dictionary:
+	if st.is_empty():
+		st = status(run_dir)
+	var raw := str(st.get("state", "new"))
+	if not LIVE_STATES.has(raw):
+		return {"state": raw, "alive": false, "silent_s": 0.0}
+	if pr.is_empty():
+		pr = progress(run_dir)
 	var updated := maxf(float(pr.get("updated", 0.0)), float(st.get("updated", 0.0)))
 	# a read that races the worker's atomic rewrite returns {}: remember the newest time seen
 	updated = maxf(updated, float(_seen_updated.get(run_dir, 0.0)))
 	_seen_updated[run_dir] = updated
-	var limit := STARTUP_GRACE_S if state == "starting" else STALE_PROGRESS_S
-	return now - updated < limit
+	var age := Time.get_unix_time_from_system() - updated
+	var limit := STARTUP_GRACE_S if raw == "starting" else STALE_PROGRESS_S
+	var silent := age if age >= limit else 0.0
+	var alive := silent <= 0.0 or worker_process_running(int(st.get("pid", -1)))
+	return {"state": raw if alive else "interrupted", "alive": alive, "silent_s": silent}
+
+
+## True while the run's coordinator is working (see run_state).
+static func is_alive(run_dir: String) -> bool:
+	return bool(run_state(run_dir)["alive"])
+
+
+## Seconds a live run's coordinator has been silent beyond the allowed heartbeat gap (0 = it
+## reports normally). With a running process this means "waiting for CPU", not "gone".
+static func silent_for(run_dir: String) -> float:
+	return float(run_state(run_dir)["silent_s"])
+
+
+## Whether a worker process with this pid still exists. Workers this session launched are
+## children (cheap, exact check); others (launched before the game restarted) are looked up
+## through the OS by pid and executable name, at most every PROCESS_RECHECK_MS, and a process
+## once seen gone stays gone.
+static func worker_process_running(pid: int) -> bool:
+	if pid <= 0:
+		return false
+	if OS.is_process_running(pid):
+		return true
+	if _spawned.has(pid):
+		return false
+	var c: Dictionary = _proc_cache.get(pid, {})
+	var now := Time.get_ticks_msec()
+	if not c.is_empty() and (not bool(c["alive"]) or now - int(c["ms"]) < PROCESS_RECHECK_MS):
+		return bool(c["alive"])
+	var alive := LabWorker.process_alive(pid, OS.get_executable_path().get_file())
+	_proc_cache[pid] = {"alive": alive, "ms": now}
+	return alive
 
 
 ## Status as the UI should show it: a "running" run whose process vanished is "interrupted".
 static func effective_state(run_dir: String) -> String:
-	var st := str(status(run_dir).get("state", "new"))
-	if LIVE_STATES.has(st) and not is_alive(run_dir):
-		return "interrupted"
-	return st
+	return str(run_state(run_dir)["state"])
 
 
 static func has_checkpoint(run_dir: String) -> bool:
@@ -118,25 +163,46 @@ static func has_checkpoint(run_dir: String) -> bool:
 
 
 static func can_resume(run_dir: String) -> bool:
-	var st := effective_state(run_dir)
-	return st in ["interrupted", "cancelled", "failed", "new"] and not is_alive(run_dir)
+	return resumable(run_state(run_dir))
 
 
-## Summaries of all runs, newest first.
+## Whether a run in this run_state can be (re)started.
+static func resumable(rs: Dictionary) -> bool:
+	return str(rs["state"]) in ["interrupted", "cancelled", "failed", "new"] and not bool(rs["alive"])
+
+
+## Summaries of all runs, newest first. Cheap enough to poll: a run's job is read once, and a
+## finished run's progress only again when its status changes (one small read per run).
 static func list_runs() -> Array:
 	var out := []
-	var dirs := Array(DirAccess.get_directories_at(runs_dir()))
+	var root := runs_dir()
+	var dirs := Array(DirAccess.get_directories_at(root))
 	dirs.sort()
 	dirs.reverse()
 	for d in dirs:
-		var dir := runs_dir().path_join(str(d))
-		var job := job_of(dir)
-		if job.is_empty():
-			continue
-		var pr := progress(dir)
-		out.append({"run_id": str(d), "dir": dir, "kind": str(job.get("kind", "")), "name": str(job.get("name", "")),
-			"creature": str(job.get("creature", "")), "state": effective_state(dir), "episodes": int(pr.get("episodes", 0)),
-			"elapsed_s": float(pr.get("elapsed_s", 0.0)), "message": str(status(dir).get("message", ""))})
+		var dir := root.path_join(str(d))
+		var info: Dictionary = _job_info.get(dir, {})
+		if info.is_empty():
+			var job := job_of(dir)
+			if job.is_empty():
+				continue
+			info = {"kind": str(job.get("kind", "")), "name": str(job.get("name", "")), "creature": str(job.get("creature", ""))}
+			_job_info[dir] = info
+		var st := status(dir)
+		var raw := str(st.get("state", "new"))
+		var key := "%s|%s" % [raw, str(st.get("updated", ""))]
+		var cached: Dictionary = _final_progress.get(dir, {})
+		var pr: Dictionary
+		if not LIVE_STATES.has(raw) and str(cached.get("key", "")) == key:
+			pr = cached["progress"]
+		else:
+			pr = progress(dir)
+			if not LIVE_STATES.has(raw):
+				_final_progress[dir] = {"key": key, "progress": pr}
+		var rs := run_state(dir, st, pr)
+		out.append({"run_id": str(d), "dir": dir, "kind": info["kind"], "name": info["name"], "creature": info["creature"],
+			"state": rs["state"], "episodes": int(pr.get("episodes", 0)), "elapsed_s": float(pr.get("elapsed_s", 0.0)),
+			"message": str(st.get("message", ""))})
 	return out
 
 
@@ -169,6 +235,9 @@ static func delete_run(run_dir: String) -> Error:
 	if not run_dir.begins_with(runs_dir()):
 		return ERR_INVALID_PARAMETER
 	LabIO.remove_tree(run_dir)
+	_job_info.erase(run_dir)
+	_final_progress.erase(run_dir)
+	_seen_updated.erase(run_dir)
 	return OK
 
 

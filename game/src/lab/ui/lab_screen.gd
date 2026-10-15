@@ -20,6 +20,11 @@ var _panels: Array[Control] = []
 var _status: Label
 var _timer: Timer
 var _tick := 0
+var _chart_sig := ""                      ## run dir + metrics size of the curve on screen
+var _job_dir := ""                        ## run whose job is cached in _job (a job never changes)
+var _job := {}
+var _ckpt_files := ""                     ## run dir + checkpoint file names behind _ckpt_rows
+var _ckpt_rows := PackedStringArray()     ## checkpoint rows on screen
 
 # ---- train ----
 var _creatures: Array = []
@@ -617,13 +622,20 @@ func _refresh_run_detail(full: bool) -> void:
 	if _run_dir == "":
 		_run_info.text = "No runs yet. Configure one on the Train tab."
 		_chart.set_series([])
+		_chart_sig = ""
 		_report.text = ""
 		_ckpts.clear()
+		_ckpt_rows = PackedStringArray()
+		_ckpt_files = ""
 		return
-	var job := LabManager.job_of(_run_dir)
+	if _job_dir != _run_dir:
+		_job_dir = _run_dir
+		_job = LabManager.job_of(_run_dir)
+	var job := _job
 	var pr := LabManager.progress(_run_dir)
 	var st := LabManager.status(_run_dir)
-	var state := LabManager.effective_state(_run_dir)
+	var rs := LabManager.run_state(_run_dir, st, pr)
+	var state := str(rs["state"])
 	var kind := str(job.get("kind", ""))
 	var t := "[b]%s[/b]  [color=%s]%s[/color]\n" % [str(job.get("name", "")) if str(job.get("name", "")) != "" else str(job.get("id", "")), LabUi.state_color(state), state.to_upper()]
 	t += "%s · %s · seed %d\n" % [str(LabJob.KIND_NAMES.get(kind, kind)), str(job.get("creature", "")), int(job.get("seed", 0))]
@@ -643,27 +655,49 @@ func _refresh_run_detail(full: bool) -> void:
 		for k in ["fitness_mean", "fitness_max", "eval_reward", "best_eval_reward", "train_loss", "val_loss", "val_acc_joint", "best_val_loss"]:
 			if pr.has(k):
 				t += "%s: %.3f\n" % [str(k).replace("_", " "), float(pr[k])]
+	var silent := float(rs["silent_s"])
+	if silent > 0.0 and state in ["running", "paused", "starting"]:
+		t += "\n[i]No report for %d s: the worker process is alive but waiting for CPU (a low-priority worker yields to other programs on a busy PC).[/i]\n" % int(silent)
 	if str(st.get("message", "")) != "":
 		t += "\n[i]%s[/i]\n" % str(st["message"])
-	_run_info.text = t
+	if _run_info.text != t:   # re-laying out rich text is the expensive part: only on change
+		_run_info.text = t
 	_btn_pause.disabled = state != "running"
 	_btn_resume.disabled = state != "paused"
 	_btn_cancel.disabled = not (state in ["running", "paused", "starting"])
-	_btn_continue.disabled = not LabManager.can_resume(_run_dir)
+	_btn_continue.disabled = not LabManager.resumable(rs)
 	_btn_snapshot.disabled = not (state in ["running", "paused"]) or not (kind in ["es", "bc"])
 	if not full and _tick % 4 != 0:
 		return
 	_update_chart(kind)
-	_ckpts.clear()
-	var bias := int(Time.get_time_zone_from_system().get("bias", 0)) * 60
-	for ck: Dictionary in LabManager.checkpoints(_run_dir):
-		_ckpts.add_item("#%d  %s  (%d KB)" % [int(ck["n"]), Time.get_datetime_string_from_unix_time(int(ck["time"]) + bias, true), int(ck["size_kb"])])
+	var ck_dir := _run_dir.path_join("checkpoints")
+	var files := _run_dir + "|" + (",".join(DirAccess.get_files_at(ck_dir)) if DirAccess.dir_exists_absolute(ck_dir) else "")
+	if files != _ckpt_files:   # checkpoints are new files: re-list only when the names change
+		_ckpt_files = files
+		var bias := int(Time.get_time_zone_from_system().get("bias", 0)) * 60
+		var rows := PackedStringArray()
+		for ck: Dictionary in LabManager.checkpoints(_run_dir):
+			rows.append("#%d  %s  (%d KB)" % [int(ck["n"]), Time.get_datetime_string_from_unix_time(int(ck["time"]) + bias, true), int(ck["size_kb"])])
+		if rows != _ckpt_rows:
+			_ckpt_rows = rows
+			_ckpts.clear()
+			for row in rows:
+				_ckpts.add_item(row)
 	var rep := LabManager.report(_run_dir)
-	_report.text = _report_text(rep)
+	var rep_text := _report_text(rep)
+	if _report.text != rep_text:
+		_report.text = rep_text
 	_check_achievement(rep)
 
 
 func _update_chart(kind: String) -> void:
+	# the learning curve only changes when metrics.jsonl grows: parse it only then
+	var fa := FileAccess.open(_run_dir.path_join("metrics.jsonl"), FileAccess.READ)
+	var sig := "%s|%d" % [_run_dir, fa.get_length() if fa != null else -1]
+	fa = null
+	if sig == _chart_sig:
+		return
+	_chart_sig = sig
 	var lines := LabManager.metrics(_run_dir)
 	if kind == "bc":
 		var tl := []
@@ -871,7 +905,7 @@ func _refresh_policies() -> void:
 	_import_pick.clear()
 	_import_files.clear()
 	var imp_dir := PolicyLibrary.user_dir().path_join("import")
-	DirAccess.make_dir_recursive_absolute(imp_dir)
+	LabIO.ensure_dir(imp_dir)
 	for fn in DirAccess.get_files_at(imp_dir):
 		if str(fn).ends_with(".json"):
 			_import_pick.add_item(str(fn))
@@ -909,7 +943,12 @@ func _show_policy() -> void:
 	t += "id: %s\nfighter: %s · approach: %s · decisions: %s at %d Hz\n" % [p.id, p.creature, str(tr.get("approach", "?")), p.act_mode, p.decision_hz]
 	t += "network: MLP %s %s, %d parameters · obs %s / act %s\n" % [str(Array(p.net.hidden)), p.net.activation, p.param_count(), PolicyObs.VERSION, PolicyActions.VERSION]
 	t += "created %s · updated %s\n" % [p.created, p.updated]
-	if tr.has("episodes"):
+	if p.description != "":
+		t += "[i]%s[/i]\n" % p.description
+	if str(tr.get("approach", "")) == "bc" and tr.has("samples"):
+		t += "trained on %d recorded decisions (%s), %d epochs · %d test matches · %s wall time\n" % [int(tr["samples"]),
+			", ".join(PackedStringArray(tr.get("datasets", []))), int(tr.get("epochs", 0)), int(tr.get("episodes", 0)), LabUi.fmt_time(float(tr.get("wall_time_s", 0.0)))]
+	elif tr.has("episodes"):
 		t += "trained on %d episodes, %.0f s simulated, %s wall time\n" % [int(tr["episodes"]), float(tr.get("sim_seconds", 0.0)), LabUi.fmt_time(float(tr.get("wall_time_s", 0.0)))]
 	if typeof(tr.get("objective")) == TYPE_DICTIONARY:
 		t += "objective: %s\n" % str((tr["objective"] as Dictionary).get("preset", ""))

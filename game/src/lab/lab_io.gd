@@ -16,8 +16,15 @@ extends RefCounted
 ##   eval_*.json, report.json, best.policy.json, final.policy.json, worker_r<k>.log, home_r<k>/
 
 
+## Creates a folder (and parents) unless it exists. make_dir_recursive_absolute alone probes
+## every path component, which costs milliseconds on Windows; status files are written often.
+static func ensure_dir(d: String) -> void:
+	if not DirAccess.dir_exists_absolute(d):
+		DirAccess.make_dir_recursive_absolute(d)
+
+
 static func write_json(path: String, data) -> Error:
-	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+	ensure_dir(path.get_base_dir())
 	var tmp := "%s.%d.tmp" % [path, OS.get_process_id()]
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:
