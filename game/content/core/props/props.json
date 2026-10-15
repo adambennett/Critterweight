@@ -1,0 +1,850 @@
+{
+ "items": [
+  {
+   "id": "prop_crate",
+   "name": "Crate",
+   "class": "obstacle",
+   "cost": 2,
+   "tab": "obstacles",
+   "description": "Pushable (needs a 2 m/s shove), 40 HP, can be stood on.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     1.0,
+     1.0
+    ]
+   },
+   "height": 1.0,
+   "body": "dynamic",
+   "solid": true,
+   "hp": 40,
+   "splat": true,
+   "behaviour": "crate",
+   "push": {
+    "min_speed": 2.0,
+    "mass": 45,
+    "friction": 0.7
+   }
+  },
+  {
+   "id": "prop_heavy_crate",
+   "name": "Heavy crate",
+   "class": "obstacle",
+   "cost": 3,
+   "tab": "obstacles",
+   "description": "Immovable cover, 80 HP.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     1.5,
+     1.5
+    ]
+   },
+   "height": 1.2,
+   "body": "static",
+   "solid": true,
+   "hp": 80,
+   "splat": true
+  },
+  {
+   "id": "prop_sponsor_board",
+   "name": "Sponsor board wall",
+   "class": "wall",
+   "cost": 3,
+   "tab": "walls",
+   "description": "Indestructible low wall; wall splats apply.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     2.0,
+     0.3
+    ]
+   },
+   "height": 1.2,
+   "body": "static",
+   "solid": true,
+   "hp": 0,
+   "splat": true
+  },
+  {
+   "id": "prop_fence_segment",
+   "name": "Chain-link fence",
+   "class": "wall",
+   "cost": 4,
+   "tab": "walls",
+   "description": "Indestructible 3 m cage panel; builds interior cages.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     3.0,
+     0.12
+    ]
+   },
+   "height": 2.4,
+   "body": "static",
+   "solid": true,
+   "hp": 0,
+   "splat": true
+  },
+  {
+   "id": "prop_tire_stack",
+   "name": "Tire stack",
+   "class": "obstacle",
+   "cost": 2,
+   "tab": "obstacles",
+   "description": "Bouncy: fighters slammed into it rebound 1.5 m, no splat damage.",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     1.0
+    ]
+   },
+   "height": 1.0,
+   "body": "static_nosplat",
+   "solid": true,
+   "hp": 0,
+   "splat": false,
+   "bounce": {
+    "rebound": 1.5,
+    "min_speed": 2.5
+   }
+  },
+  {
+   "id": "prop_bollard",
+   "name": "Bollard",
+   "class": "obstacle",
+   "cost": 1,
+   "tab": "obstacles",
+   "description": "Indestructible cast-iron post.",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     0.8
+    ]
+   },
+   "height": 1.0,
+   "body": "static",
+   "solid": true,
+   "hp": 0,
+   "splat": true
+  },
+  {
+   "id": "prop_fire_barrel",
+   "name": "Fire barrel",
+   "class": "hazard",
+   "cost": 3,
+   "tab": "hazards",
+   "element": "scorch",
+   "description": "30 HP. Burns anyone touching it (10 Scorch build-up/s); bursts into a Scorch patch (r 1.5 m, 4 s) + 6 dmg.",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     0.6
+    ]
+   },
+   "height": 0.9,
+   "body": "static",
+   "solid": true,
+   "hazard": true,
+   "hp": 30,
+   "splat": true,
+   "touch": {
+    "element": "scorch",
+    "buildup_per_s": 10,
+    "reach": 0.35
+   },
+   "on_destroy": {
+    "zone": "scorch_patch",
+    "radius": 1.5,
+    "duration": 4.0,
+    "burst": {
+     "radius": 1.5,
+     "damage": 6,
+     "element": "scorch",
+     "knockback": 2.0
+    }
+   }
+  },
+  {
+   "id": "prop_sludge_drum",
+   "name": "Sludge drum",
+   "class": "hazard",
+   "cost": 3,
+   "tab": "hazards",
+   "element": "sludge",
+   "description": "30 HP. Ruptures into a Sludge puddle (r 1.8 m, 6 s).",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     0.6
+    ]
+   },
+   "height": 0.9,
+   "body": "static",
+   "solid": true,
+   "hazard": true,
+   "hp": 30,
+   "splat": true,
+   "on_destroy": {
+    "zone": "sludge_puddle",
+    "radius": 1.8,
+    "duration": 6.0
+   }
+  },
+  {
+   "id": "prop_brine_barrel",
+   "name": "Brine barrel",
+   "class": "hazard",
+   "cost": 2,
+   "tab": "hazards",
+   "element": "brine",
+   "description": "30 HP. Splits into a Brine puddle (r 1.8 m, 6 s).",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     0.6
+    ]
+   },
+   "height": 0.9,
+   "body": "static",
+   "solid": true,
+   "hazard": true,
+   "hp": 30,
+   "splat": true,
+   "on_destroy": {
+    "zone": "brine_puddle",
+    "radius": 1.8,
+    "duration": 6.0
+   }
+  },
+  {
+   "id": "prop_battery",
+   "name": "Car battery",
+   "class": "hazard",
+   "cost": 3,
+   "tab": "hazards",
+   "element": "static",
+   "description": "Pushable, 30 HP. Shorts into a Static field (r 1.5 m, 2 s) + 0.4 s stun.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     0.8,
+     0.5
+    ]
+   },
+   "height": 0.4,
+   "body": "dynamic",
+   "solid": true,
+   "hazard": true,
+   "hp": 30,
+   "splat": false,
+   "behaviour": "crate",
+   "push": {
+    "min_speed": 2.0,
+    "mass": 25,
+    "friction": 0.6
+   },
+   "on_destroy": {
+    "zone": "static_field",
+    "radius": 1.5,
+    "duration": 2.0,
+    "burst": {
+     "radius": 1.5,
+     "damage": 0,
+     "stun": 0.4,
+     "element": "static",
+     "buildup": 20
+    }
+   }
+  },
+  {
+   "id": "prop_gravel_sack",
+   "name": "Gravel sack",
+   "class": "hazard",
+   "cost": 2,
+   "tab": "hazards",
+   "element": "grit",
+   "description": "20 HP. Bursts into Grit rubble (r 1.5 m, 4 s).",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     0.8,
+     0.6
+    ]
+   },
+   "height": 0.6,
+   "body": "static",
+   "solid": true,
+   "hazard": true,
+   "hp": 20,
+   "splat": false,
+   "on_destroy": {
+    "zone": "grit_rubble",
+    "radius": 1.5,
+    "duration": 4.0
+   }
+  },
+  {
+   "id": "prop_fan_unit",
+   "name": "Industrial fan",
+   "class": "hazard",
+   "cost": 4,
+   "tab": "hazards",
+   "element": "gale",
+   "description": "Always on: 5 x 1.5 m push line at 1.5 m/s away from the fan. 50 HP.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     1.0,
+     1.0
+    ]
+   },
+   "height": 1.5,
+   "body": "static",
+   "solid": true,
+   "hazard": true,
+   "hp": 50,
+   "splat": true,
+   "behaviour": "fan",
+   "params": {
+    "length": 5.0,
+    "width": 1.5,
+    "speed": 1.5
+   }
+  },
+  {
+   "id": "prop_steam_vent",
+   "name": "Steam vent",
+   "class": "hazard",
+   "cost": 3,
+   "tab": "hazards",
+   "element": "scorch",
+   "description": "Every 8 s: 1 s telegraph, then a 2 m Scorch cone: 6 dmg, 30 Scorch, push 1.5 m.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     1.0,
+     1.0
+    ]
+   },
+   "height": 0.05,
+   "body": "none",
+   "solid": false,
+   "hazard": true,
+   "behaviour": "steam_vent",
+   "timed": {
+    "period": 8.0,
+    "telegraph": 1.0,
+    "active": 0.6
+   },
+   "params": {
+    "length": 2.0,
+    "cone_deg": 70,
+    "damage": 6,
+    "buildup": 30,
+    "push": 1.5,
+    "element": "scorch"
+   }
+  },
+  {
+   "id": "prop_electric_plate",
+   "name": "Electrified plate",
+   "class": "hazard",
+   "cost": 4,
+   "tab": "hazards",
+   "element": "static",
+   "description": "Every 10 s: 1 s telegraph, then a 2 s Static field (20 build-up/s, flinch on entry).",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     2.0,
+     2.0
+    ]
+   },
+   "height": 0.04,
+   "body": "none",
+   "solid": false,
+   "hazard": true,
+   "behaviour": "electric_plate",
+   "timed": {
+    "period": 10.0,
+    "telegraph": 1.0,
+    "active": 2.0
+   },
+   "params": {
+    "damage": 0,
+    "buildup": 10,
+    "tick": 0.5,
+    "flinch": 0.15,
+    "element": "static"
+   }
+  },
+  {
+   "id": "prop_spring_pad",
+   "name": "Spring pad",
+   "class": "hazard",
+   "cost": 3,
+   "tab": "hazards",
+   "description": "Launches anyone 2.5 m up and 3 m forward.",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     1.2
+    ]
+   },
+   "height": 0.15,
+   "body": "none",
+   "solid": false,
+   "hazard": true,
+   "behaviour": "spring_pad",
+   "params": {
+    "up": 2.5,
+    "forward": 3.0
+   }
+  },
+  {
+   "id": "prop_bumper",
+   "name": "Pinball bumper",
+   "class": "hazard",
+   "cost": 3,
+   "tab": "hazards",
+   "description": "Pushes 3 m on contact, 2 dmg, ding.",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     1.0
+    ]
+   },
+   "height": 1.0,
+   "body": "static_nosplat",
+   "solid": true,
+   "hazard": true,
+   "hp": 0,
+   "splat": false,
+   "behaviour": "bumper",
+   "params": {
+    "push": 3.0,
+    "damage": 2.0,
+    "cooldown": 0.6
+   }
+  },
+  {
+   "id": "prop_pit",
+   "name": "Pit",
+   "class": "hazard",
+   "cost": 4,
+   "tab": "hazards",
+   "description": "Ring-out hole. Rooftop, or any base whose layout allows pits; needs a respawn marker within 4 m.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     2.0,
+     2.0
+    ]
+   },
+   "height": 0.0,
+   "body": "none",
+   "solid": true,
+   "hazard": true,
+   "behaviour": "pit",
+   "rotation_step": 90,
+   "params": {
+    "respawn_within": 4.0
+   }
+  },
+  {
+   "id": "prop_drain_pair",
+   "name": "Drain pair",
+   "class": "hazard",
+   "cost": 5,
+   "tab": "hazards",
+   "description": "Two linked drains: step on one to pop out of the other (0.5 s, 3 s cooldown).",
+   "footprint": {
+    "shape": "pair",
+    "size": [
+     1.0
+    ]
+   },
+   "height": 0.05,
+   "body": "none",
+   "solid": false,
+   "hazard": true,
+   "behaviour": "drain_pair",
+   "params": {
+    "delay": 0.5,
+    "cooldown": 3.0,
+    "radius": 0.5,
+    "separation": 4.0
+   }
+  },
+  {
+   "id": "prop_heavy_bag",
+   "name": "Heavy bag",
+   "class": "obstacle",
+   "cost": 2,
+   "tab": "obstacles",
+   "description": "Hanging bag: swings when hit, blocks projectiles, deals no damage.",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     0.5
+    ]
+   },
+   "height": 1.4,
+   "body": "bag",
+   "solid": true,
+   "hp": 0,
+   "splat": false,
+   "behaviour": "heavy_bag",
+   "params": {
+    "mass": 35.0,
+    "hang": 2.3
+   }
+  },
+  {
+   "id": "prop_chum_bucket",
+   "name": "Chum bucket",
+   "class": "pickup",
+   "cost": 3,
+   "tab": "pickups",
+   "description": "Heals 15 HP on touch; respawns after 30 s. Max 2 per layout.",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     0.6
+    ]
+   },
+   "height": 0.5,
+   "body": "none",
+   "behaviour": "pickup",
+   "max_per_layout": 2,
+   "pickup": {
+    "kind": "health",
+    "amount": 15,
+    "respawn": 30,
+    "radius": 0.7
+   }
+  },
+  {
+   "id": "prop_hype_can",
+   "name": "JUICE can",
+   "class": "pickup",
+   "cost": 3,
+   "tab": "pickups",
+   "description": "+25 Hype on touch; respawns after 45 s. Max 2 per layout.",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     0.3
+    ]
+   },
+   "height": 0.35,
+   "body": "none",
+   "behaviour": "pickup",
+   "max_per_layout": 2,
+   "pickup": {
+    "kind": "hype",
+    "amount": 25,
+    "respawn": 45,
+    "radius": 0.6
+   }
+  },
+  {
+   "id": "prop_ramp",
+   "name": "Ramp",
+   "class": "obstacle",
+   "cost": 2,
+   "tab": "obstacles",
+   "description": "15 degree ramp up to crate height; charges and dashes get +0.5 m air off the lip.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     1.0,
+     2.0
+    ]
+   },
+   "height": 0.54,
+   "body": "ramp",
+   "solid": true,
+   "hp": 0,
+   "splat": false,
+   "behaviour": "ramp",
+   "params": {
+    "lip_air": 0.5,
+    "min_speed": 3.5
+   }
+  },
+  {
+   "id": "marker_spawn",
+   "name": "Spawn point",
+   "class": "marker",
+   "cost": 0,
+   "tab": "markers",
+   "description": "Up to 8 individual spawns (a ring) + team clusters A/B (up to 4 each). 1.5 m clearance.",
+   "marker": {
+    "name": "spawn",
+    "max": 8,
+    "teams": true,
+    "team_max": 4
+   }
+  },
+  {
+   "id": "marker_boss",
+   "name": "Boss spawn",
+   "class": "marker",
+   "cost": 0,
+   "tab": "markers",
+   "description": "Required for boss layouts.",
+   "marker": {
+    "name": "boss",
+    "max": 1
+   }
+  },
+  {
+   "id": "marker_spotlight_anchor",
+   "name": "Spotlight anchor",
+   "class": "marker",
+   "cost": 0,
+   "tab": "markers",
+   "description": "Spotlight Hog: the light moves between anchors (3 or more).",
+   "marker": {
+    "name": "spotlight_anchor",
+    "max": 8
+   }
+  },
+  {
+   "id": "marker_goal",
+   "name": "Chumball goal",
+   "class": "marker",
+   "cost": 0,
+   "tab": "markers",
+   "description": "Two required, team-tagged (A and B). 3 x 2 m frame.",
+   "marker": {
+    "name": "goal",
+    "max": 2,
+    "teams": true,
+    "team_max": 1,
+    "size": [
+     3.0,
+     2.0,
+     0.2
+    ]
+   }
+  },
+  {
+   "id": "marker_ball_spawn",
+   "name": "Chumball spawn",
+   "class": "marker",
+   "cost": 0,
+   "tab": "markers",
+   "description": "Where the ball drops. One required.",
+   "marker": {
+    "name": "ball_spawn",
+    "max": 3
+   }
+  },
+  {
+   "id": "marker_wave_gate",
+   "name": "Wave gate",
+   "class": "marker",
+   "cost": 0,
+   "tab": "markers",
+   "description": "Chum Rush minion entry (2 or more). A cosmetic door.",
+   "marker": {
+    "name": "wave_gate",
+    "max": 8,
+    "size": [
+     2.0,
+     2.4,
+     0.2
+    ]
+   }
+  },
+  {
+   "id": "marker_unit_spawn",
+   "name": "Unit spawn",
+   "class": "marker",
+   "cost": 0,
+   "tab": "markers",
+   "description": "Absolute Unit: where the Unit spawns.",
+   "marker": {
+    "name": "unit_spawn",
+    "max": 1
+   }
+  },
+  {
+   "id": "marker_respawn",
+   "name": "Respawn point",
+   "class": "marker",
+   "cost": 0,
+   "tab": "markers",
+   "description": "Ring-out/pit return point (edges and pits need one within 4 m).",
+   "marker": {
+    "name": "respawn",
+    "max": 12
+   }
+  },
+  {
+   "id": "prop_scrap_pile",
+   "name": "Scrap pile",
+   "class": "obstacle",
+   "cost": 0,
+   "palette": false,
+   "description": "Crushed-car wall, 60 HP; sheds Grit rubble (r 1 m, 3 s).",
+   "element": "grit",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     2.0,
+     1.0
+    ]
+   },
+   "height": 1.5,
+   "body": "static",
+   "solid": true,
+   "hp": 60,
+   "splat": true,
+   "on_destroy": {
+    "zone": "grit_rubble",
+    "radius": 1.0,
+    "duration": 3.0
+   }
+  },
+  {
+   "id": "prop_scrap_bundle",
+   "name": "Scrap bundle",
+   "class": "obstacle",
+   "cost": 0,
+   "palette": false,
+   "description": "Dropped by the crane magnet: 1.5 m wall, 60 HP.",
+   "element": "grit",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     1.5,
+     1.5
+    ]
+   },
+   "height": 1.5,
+   "body": "static",
+   "solid": true,
+   "hp": 60,
+   "splat": true,
+   "on_destroy": {
+    "zone": "grit_rubble",
+    "radius": 1.0,
+    "duration": 3.0
+   }
+  },
+  {
+   "id": "prop_rubber_mat",
+   "name": "Rubber mat",
+   "class": "floor",
+   "cost": 0,
+   "palette": false,
+   "description": "Insulated: never electrified, immune to the magnet.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     1.5,
+     1.5
+    ]
+   },
+   "height": 0.03,
+   "body": "none",
+   "solid": false,
+   "behaviour": "mat",
+   "params": {
+    "insulated": true,
+    "magnet_immune": true
+   }
+  },
+  {
+   "id": "prop_mooring_block",
+   "name": "Mooring block",
+   "class": "obstacle",
+   "cost": 0,
+   "palette": false,
+   "description": "Raised 0.4 m concrete block: dry footing above the flood.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     1.2,
+     1.2
+    ]
+   },
+   "height": 0.4,
+   "body": "static_nosplat",
+   "solid": true,
+   "hp": 0,
+   "splat": false,
+   "behaviour": "block",
+   "params": {
+    "dry": true
+   }
+  },
+  {
+   "id": "prop_hvac_unit",
+   "name": "HVAC unit",
+   "class": "obstacle",
+   "cost": 0,
+   "palette": false,
+   "description": "Indestructible cover and a ledge.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     1.2,
+     1.2
+    ]
+   },
+   "height": 1.0,
+   "body": "static",
+   "solid": true,
+   "hp": 0,
+   "splat": true
+  },
+  {
+   "id": "prop_water_tower_leg",
+   "name": "Water tower leg",
+   "class": "obstacle",
+   "cost": 0,
+   "palette": false,
+   "description": "Steel tower leg; the tank looms overhead.",
+   "footprint": {
+    "shape": "circle",
+    "size": [
+     0.6
+    ]
+   },
+   "height": 4.0,
+   "body": "static",
+   "solid": true,
+   "hp": 0,
+   "splat": true
+  },
+  {
+   "id": "prop_edge_railing",
+   "name": "Edge railing",
+   "class": "wall",
+   "cost": 0,
+   "palette": false,
+   "description": "0.9 m pipe railing, 40 HP; breaks when someone is splatted into it, opening the edge.",
+   "footprint": {
+    "shape": "box",
+    "size": [
+     10.0,
+     0.12
+    ]
+   },
+   "height": 0.9,
+   "body": "static",
+   "solid": false,
+   "hp": 40,
+   "splat": true,
+   "behaviour": "railing",
+   "params": {
+    "break_on_splat": true
+   }
+  }
+ ]
+}

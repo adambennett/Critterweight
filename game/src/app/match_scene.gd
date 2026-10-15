@@ -42,12 +42,15 @@ func start(cfg: Dictionary) -> void:
 			"player":
 				var lp := LocalPlayerInput.new()
 				lp.camera = camera
-				entry["source"] = lp
+				entry["source"] = LabRecording.wrap_player(lp, e, self)   # AI Lab imitation recording (off by default)
 				player_index = idx
 				# accessibility aim assist is part of the fighter's (replicated) modifiers
 				var m: Dictionary = (entry.get("mods", {}) as Dictionary).duplicate()
 				m["assist"] = float({"low": 0.5, "normal": 1.0, "high": 1.8}.get(str(Settings.get_value("access.target_assist")), 1.0))
 				entry["mods"] = m
+			"policy":
+				# AI Lab policy: e.policy_id (falls back to a scripted bot if missing/incompatible)
+				entry["source"] = PolicyInputSource.for_match(e, int(cfg.get("seed", 1)) * 31 + idx, idx)
 			"bot":
 				var bb := BotBrain.new(str(e.get("difficulty", "regular")), int(cfg.get("seed", 1)) * 31 + idx)
 				bb.set_personality((e["creature"] as CreatureDef).ai)

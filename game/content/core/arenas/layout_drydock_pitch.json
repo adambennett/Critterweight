@@ -1,0 +1,287 @@
+{
+ "id": "layout_drydock_pitch",
+ "name": "Drydock Pitch",
+ "base": "drydock",
+ "variant": "overcast",
+ "format": 2,
+ "version": 1,
+ "author": "Critterweight",
+ "description": "The long axis is a pitch: the gutter floods mid-field every 20 s and the drums at the goals punish campers.",
+ "example": true,
+ "size": [
+  16.0,
+  10.0
+ ],
+ "modes": [
+  "chumball",
+  "teams"
+ ],
+ "flags": {},
+ "removed_builtins": [
+  "bollard_nw",
+  "bollard_se"
+ ],
+ "props": [
+  {
+   "type": "prop_crate",
+   "pos": [
+    -1.6,
+    0.0,
+    2.6
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_crate",
+   "pos": [
+    1.6,
+    0.0,
+    -2.6
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_crate",
+   "pos": [
+    -1.6,
+    0.0,
+    -2.6
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_crate",
+   "pos": [
+    1.6,
+    0.0,
+    2.6
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_tire_stack",
+   "pos": [
+    -2.2,
+    0.0,
+    4.3
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_tire_stack",
+   "pos": [
+    2.2,
+    0.0,
+    -4.3
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_sludge_drum",
+   "pos": [
+    -7.4,
+    0.0,
+    1.6
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_sludge_drum",
+   "pos": [
+    7.4,
+    0.0,
+    -1.6
+   ],
+   "yaw": 0.0
+  }
+ ],
+ "markers": {
+  "spawn": [
+   {
+    "pos": [
+     -3.8,
+     0.0,
+     -3.6
+    ],
+    "yaw": 46.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     -6.8,
+     0.0,
+     -3.6
+    ],
+    "yaw": 62.1,
+    "team": -1
+   },
+   {
+    "pos": [
+     -7.0,
+     0.0,
+     3.4
+    ],
+    "yaw": 115.9,
+    "team": -1
+   },
+   {
+    "pos": [
+     -4.2,
+     0.0,
+     4.0
+    ],
+    "yaw": 133.6,
+    "team": -1
+   },
+   {
+    "pos": [
+     3.8,
+     0.0,
+     3.6
+    ],
+    "yaw": -133.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     6.8,
+     0.0,
+     3.6
+    ],
+    "yaw": -117.9,
+    "team": -1
+   },
+   {
+    "pos": [
+     7.0,
+     0.0,
+     -3.4
+    ],
+    "yaw": -64.1,
+    "team": -1
+   },
+   {
+    "pos": [
+     4.2,
+     0.0,
+     -4.0
+    ],
+    "yaw": -46.4,
+    "team": -1
+   },
+   {
+    "pos": [
+     -5.8,
+     0.0,
+     -2.6
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -5.8,
+     0.0,
+     2.6
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -4.4,
+     0.0,
+     -2.4
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -4.4,
+     0.0,
+     2.4
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     5.8,
+     0.0,
+     -2.6
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     5.8,
+     0.0,
+     2.6
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     4.4,
+     0.0,
+     -2.4
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     4.4,
+     0.0,
+     2.4
+    ],
+    "yaw": -90.0,
+    "team": 1
+   }
+  ],
+  "goal": [
+   {
+    "pos": [
+     -7.85,
+     0.0,
+     0
+    ],
+    "yaw": 90.0,
+    "team": 0,
+    "size": [
+     3.0,
+     2.0,
+     0.2
+    ]
+   },
+   {
+    "pos": [
+     7.85,
+     0.0,
+     0
+    ],
+    "yaw": -90.0,
+    "team": 1,
+    "size": [
+     3.0,
+     2.0,
+     0.2
+    ]
+   }
+  ],
+  "ball_spawn": [
+   {
+    "pos": [
+     0,
+     0.0,
+     0
+    ],
+    "yaw": 0.0,
+    "team": -1
+   }
+  ]
+ }
+}

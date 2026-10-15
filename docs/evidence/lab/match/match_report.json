@@ -1,0 +1,41 @@
+{
+  "fight": {
+    "damage": [
+      0.0,
+      43.0622671829853
+    ],
+    "health": [
+      56.9377328170147,
+      100.0
+    ],
+    "hits": [
+      0,
+      7
+    ],
+    "sources": [
+      "Player",
+      "AI: Regular Clone (BC)"
+    ],
+    "time": 6.20833333333343
+  },
+  "policy": "dev_biped_bc_regular",
+  "spectate": {
+    "damage": [
+      56.4317037677322,
+      68.6028879054003
+    ],
+    "health": [
+      31.3971120945997,
+      43.5682962322678
+    ],
+    "hits": [
+      9,
+      8
+    ],
+    "sources": [
+      "AI: Regular Clone (BC)",
+      "Bot (Rookie)"
+    ],
+    "time": 12.025
+  }
+}

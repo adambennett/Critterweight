@@ -1,0 +1,27 @@
+{
+  "kind": "record",
+  "name": "Record scripted jabber vs Rookie",
+  "creature": "dev_biped",
+  "seed": 8,
+  "objective": {
+    "preset": "aggressive"
+  },
+  "scenario": {
+    "preset": "spar_jabber",
+    "opponents": [
+      "bot_rookie"
+    ],
+    "round_time": 20
+  },
+  "record": {
+    "teacher": "jabber",
+    "episodes": 60,
+    "dataset_id": "ev_teacher_jabber_vs_rookie",
+    "dataset_name": "Teacher: scripted jabber vs Rookie"
+  },
+  "limits": {
+    "workers": 3,
+    "worlds": 2,
+    "low_priority": false
+  }
+}
