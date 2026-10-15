@@ -20,6 +20,11 @@ static func run(host: Node, config: Dictionary, max_seconds := 420.0, is_paused:
 	var sim := MatchSim.new()
 	sim.running = false
 	sv.add_child(sim)
+	# Start on a physics frame: called from idle processing, the first sim step would otherwise
+	# run before a different number of physics steps than when called from a physics frame, and
+	# the same fight (same seed) would play out differently depending on the caller.
+	if not Engine.is_in_physics_frame():
+		await host.get_tree().physics_frame
 	sim.setup(config)
 	var dt := SimSpeed.step_dt()
 	var tree := host.get_tree()
