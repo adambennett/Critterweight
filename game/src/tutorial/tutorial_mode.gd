@@ -107,7 +107,7 @@ func _say(kind: String, text: String) -> void:
 	var line := Tutorial.fill(text, player().creature)
 	coach = {"kind": kind, "text": line}
 	sim.emit_event({"type": "tutorial_line", "kind": kind, "text": line, "index": index})
-	Audio.say("Granny Haymaker", line, 80 if kind != "hint" else 60)
+	Audio.say("granny", line, 80 if kind != "hint" else 60)
 
 
 func objective() -> String:
@@ -405,8 +405,7 @@ func on_timeout() -> void:
 
 
 func hud_status() -> String:
-	var ex := current()
-	return "%d/%d  %s" % [index + 1, list.size(), str(ex.get("title", "")).to_upper()]
+	return ""      # the tutorial overlay shows the exercise title, goal and progress
 
 
 func progress_text() -> String:

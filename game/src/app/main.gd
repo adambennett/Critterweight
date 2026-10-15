@@ -14,6 +14,8 @@ var args: PackedStringArray
 
 func _ready() -> void:
 	args = OS.get_cmdline_user_args()
+	# integration points other owners' menus call into
+	TutorialHook.launcher = Callable(Tutorial, "start_lesson")
 	var mode := "game"
 	if args.has("--test"):
 		mode = "test"
@@ -36,6 +38,11 @@ func _ready() -> void:
 	if args.has("--capture"):
 		_setup_capture()
 	call_deferred("_start", mode)
+
+
+func _exit_tree() -> void:
+	# static Callables outliving their scripts crash the engine at exit
+	TutorialHook.launcher = Callable()
 
 
 func arg_value(flag: String, fallback := "") -> String:

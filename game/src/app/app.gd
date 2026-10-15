@@ -194,6 +194,7 @@ func start_match(cfg: Dictionary, on_finished: Callable = Callable()) -> MatchSc
 	set_scene(scene)
 	scene.start(resolved)
 	scene.match_finished.connect(func(result: Dictionary):
+		_record_match(cfg, scene, result)
 		match_ended.emit(result)
 		if on_finished.is_valid():
 			on_finished.call(result)
@@ -201,6 +202,25 @@ func start_match(cfg: Dictionary, on_finished: Callable = Callable()) -> MatchSc
 			push("results", {"result": result, "config": cfg}))
 	match_started.emit(scene)
 	return scene
+
+
+## Records a finished match in the active profile exactly once (local player matches only;
+## spectated, tutorial and online-client matches are not recorded here). Custom rules / mods
+## mark the result custom so records stay separate (CMP-07, UI-11).
+func _record_match(cfg: Dictionary, scene: MatchScene, result: Dictionary) -> void:
+	if bool(cfg.get("no_record", false)) or str(result.get("mode", "")) in ["tutorial", "practice"]:
+		return
+	var me := -1
+	for i in (cfg.get("fighters", []) as Array).size():
+		if str((cfg["fighters"][i] as Dictionary).get("kind", "")) == "player":
+			me = i
+			break
+	if me < 0 or me >= scene.sim.fighters.size():
+		return
+	var f := scene.sim.fighters[me]
+	var wt := int(result.get("winner_team", -2))
+	var custom := bool(cfg.get("custom", false)) or not Mods.load_order.is_empty()
+	Profiles.record_match(wt == f.team, wt == -1, f.creature.id, f.stats_record, float(result.get("time", 0.0)), custom)
 
 
 func quit() -> void:

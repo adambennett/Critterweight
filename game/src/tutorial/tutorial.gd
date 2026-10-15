@@ -46,8 +46,19 @@ static func start(index := 0, creature_id := "", on_exit: Callable = Callable())
 		"audio_context": "tutorial", "music": "fight_night_poster",
 		"rules": {"id": "tutorial", "name": "Tutorial", "mode": "tutorial", "round_time": 0.0, "rounds": 1, "intro_time": 0.0},
 		"fighters": [
-			{"creature": cid, "team": 0, "kind": "player", "name": "You"},
+			{"creature": cid, "team": 0, "kind": "player", "name": Profiles.player_name()},
 			{"creature": partner_id, "team": 1, "kind": "scripted", "name": "Kid Lamprey"}]})
+
+
+## TutorialHook launcher (the tutorial menu): lesson 1 runs the whole course in order, any other
+## lesson is a single replay.
+static func start_lesson(lesson_id: String, creature_id := "") -> void:
+	var list := exercises()
+	var idx := 0
+	for i in list.size():
+		if str(list[i].get("id", "")) == lesson_id:
+			idx = i
+	start(idx, creature_id)
 
 
 static func _default_exit() -> void:
