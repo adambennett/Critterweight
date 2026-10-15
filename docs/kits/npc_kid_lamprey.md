@@ -118,7 +118,7 @@ the Kid's string meets a guarding Dozer at 1.3 m instead (known gap below).
 | `test_tutorial_partner_behaviours` | the tutorial exercises above |
 | `test_balance_vs_roster` | smoke (both land hits); with `--balance` the 20-bout tables below |
 
-Result (merged with main 2a5beaa): 11 / 11 kit tests pass (plus opt-in aids).
+Result (merged with main 144efdc): 11 / 11 kit tests pass (plus opt-in aids).
 
 ## Balance
 

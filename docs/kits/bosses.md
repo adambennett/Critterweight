@@ -126,7 +126,7 @@ boss; the Stoke/Slurry/Jitters stubs await their kits (re-run the table when the
 | `test_snappington_signature_moves` | Withdraw blocks/counters, Shell Spin spins upright through jabs, Title Slam knocks down, juiced A1 is Juice Spray |
 | `test_balance_vs_roster` | smoke (both sides land hits); `--balance` runs the table above with its assertions |
 
-Result (merged with main 2a5beaa): 8 / 8 boss tests pass; `--balance --balance-bouts 10` passes for all three.
+Result (merged with main 144efdc): 8 / 8 boss tests pass; `--balance --balance-bouts 10` passes for all three.
 
 ## Evidence
 
