@@ -105,7 +105,7 @@
                     {"t": 0.26, "chains": {"leg_r": {"target": [-0.06, 1.58, 0.72], "pole": [0, -0.8, -0.6]}}, "lean": [-10, 0, 0], "height": 0.04},
                     {"t": 0.56}]},
     "heavy": {"name": "Crosswind Slash", "duration": 0.76, "damage": 7, "knockback": 3.6, "stun": 0.5, "poise": 10, "stamina": 11,
-              "vmin": 1.4, "vref": 6.0, "speed": 1.7, "charge_time": 1.0, "charge_damage": 0.0, "multi_hit": true, "lunge": [[0.12, 0.32, 6.0]], "move_mult": 0.25,
+              "vmin": 1.4, "vref": 6.0, "speed": 1.7, "charge_time": 1.0, "charge_damage": 0.0, "multi_hit": true, "lunge": [[0.12, 0.15, 6.0], [0.17, 0.32, 6.0]], "move_mult": 0.25,
               "element": "gale", "buildup": 15,
               "hit": [{"t0": 0.24, "t1": 0.30, "weapons": ["wing_edge_l", "wing_mid_l"]}, {"t0": 0.30, "t1": 0.37, "weapons": ["wing_edge_r", "wing_mid_r"]}],
               "effects": [{"t": 0.37, "type": "push", "at": "forward:0.7", "radius": 1.4, "strength": 6.0, "element": "gale", "vfx": "crosswind"}],
@@ -240,8 +240,7 @@
          "abilities": {"ability1": [{"if": ["target_closing", "target_near:5.0"], "chance": 0.5, "min_dist": 1.6},
                                     {"if": ["target_winding_heavy"], "chance": 0.6, "max_dist": 3.0},
                                     {"if": ["target_far:2.5"], "chance": 0.12}],
-                       "ability2": [{"if": ["in_enemy_zone"], "chance": 0.9},
-                                    {"if": ["target_winding_heavy", "target_near:2.2"], "chance": 0.3}]},
+                       "ability2": [{"if": ["in_enemy_zone"], "chance": 0.9}]},
          "charge_heavy": {"from": "pro", "chance": 0.2},
          "parry_heavy": {"from": "champion", "chance": 0.35}}
 }

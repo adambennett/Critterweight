@@ -493,6 +493,45 @@ func balance(c0: String, c1: String, n: int, difficulty := "regular", round_time
 	return agg
 
 
+## Evidence captures (gated; needs a window, i.e. the GUI binary):
+##   godot --path game --fixed-fps 120 --resolution 1600x900 -- --test test_kit_f_stoke.gd::test_zz_showcase --kit-showcase <dir>
+## Each shot runs a real MatchScene (views, VFX, camera, HUD) with a scripted attacker and saves
+## the rendered frame at the given times after the scripted start.
+## shot: {name, gap, def (creature id), starts/presses/holds/dirs (Driver fields), at: [s...], def_src}
+func showcase(att_id: String, shots: Array) -> void:
+	var args := OS.get_cmdline_user_args()
+	var i := args.find("--kit-showcase")
+	if i < 0 or i + 1 >= args.size() or DisplayServer.get_name() == "headless":
+		return
+	var out_dir := args[i + 1]
+	DirAccess.make_dir_recursive_absolute(out_dir)
+	for shot in shots:
+		var d := Driver.new()
+		for k in ["starts", "presses", "holds", "dirs"]:
+			if shot.has(k):
+				d.set(k, shot[k])
+		var gap := float(shot.get("gap", 1.3))
+		var arena: Dictionary = Content.get_entry("arenas", "the_gullet").duplicate(true)
+		arena["id"] = "kit_showcase"
+		arena["spawns"] = [[0, -gap * 0.5, 0], [0, gap * 0.5, 180]]
+		var scene := App.start_match({"arena": ArenaDef.from_dict(arena), "seed": 7, "no_record": true,
+			"rules": {"id": "kit_showcase", "name": "Kit showcase", "mode": "standard", "rounds": 1, "round_time": 0, "intro_time": 0.4},
+			"fighters": [{"creature": att_id, "team": 0, "kind": "scripted", "source": d, "name": att_id.trim_prefix("f_").to_upper()},
+				{"creature": str(shot.get("def", att_id)), "team": 1, "kind": "scripted", "source": shot.get("def_src", null), "name": "DUMMY"}]})
+		if shot.has("setup"):
+			await get_tree().physics_frame
+			(shot["setup"] as Callable).call(scene.sim)
+		var times: Array = shot.get("at", [0.3])
+		for k in times.size():
+			while d.time < float(times[k]):
+				await get_tree().physics_frame
+			await RenderingServer.frame_post_draw
+			var img := get_viewport().get_texture().get_image()
+			var path := out_dir.path_join("%s_%s%s.png" % [att_id, str(shot["name"]), "" if times.size() == 1 else "_%d" % k])
+			img.save_png(path)
+			print("SHOWCASE ", path)
+
+
 ## Lab entry: `--kit-lab slot[@gap],...` prints describe() lines for the given creature.
 func lab(att_id: String) -> void:
 	var args := OS.get_cmdline_user_args()

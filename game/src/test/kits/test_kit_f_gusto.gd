@@ -160,14 +160,27 @@ func test_downdraft_leap_direct_hit_and_landing_area() -> void:
 	var a2 := (near["hits"] as Array).filter(func(h): return str(h["slot"]) == "effect" and float(h["dmg"]) > 0.0)
 	check(not a2.is_empty() or not hits_with_damage(near).is_empty(), "landing area reaches 1.5 m around the landing point")
 	dispose(near["sim"])
-	# a charged Heavy hold turns into the Downdraft
+	# a charged Heavy hold turns into the Downdraft; Gusto winds up in place while holding (the
+	# Crosswind lunge pauses around the charge hold point, 0.7 x startup) and the Downdraft lands
 	var d := Driver.new()
 	d.holds = [{"t0": 0.2, "t1": 0.95, "button": FighterInput.HEAVY}]
 	d.presses = [{"t": 0.2, "button": FighterInput.HEAVY}]
 	var sim := duel(CID, FOE, 2.0, d)
-	await step_sim(sim, INTRO + 1.6)
+	await step_sim(sim, INTRO)
+	var g := sim.fighters[0]
+	var p_hold := Vector3.INF
+	var hold_drift := 0.0
+	for i in int(1.6 / DT):
+		sim.step(DT)
+		await get_tree().physics_frame
+		if g.move_slot == "heavy":
+			if p_hold == Vector3.INF:
+				p_hold = g.pos()
+			hold_drift = maxf(hold_drift, Vector2(g.pos().x - p_hold.x, g.pos().z - p_hold.z).length())
 	var slots := events_of(sim, "move_start").filter(func(e): return int(e["fighter"]) == 0).map(func(e): return str(e["slot"]))
 	check(slots.has("heavy_charged"), "hold Heavy -> Downdraft (%s)" % str(slots))
+	check(hold_drift < 0.4, "Gusto winds up in place while charging (drift %.2f m)" % hold_drift)
+	check(not hits_by(sim, 0).filter(func(e): return str(e["slot"]) in ["heavy_charged", "effect"]).is_empty(), "the held Downdraft connects")
 	dispose(sim)
 
 
@@ -343,3 +356,19 @@ func test_taunt_guard_and_parry() -> void:
 
 func test_zz_lab() -> void:
 	await lab(CID)
+
+
+## Evidence frames (gated, needs a window): see kit_harness_stoke_gusto.gd showcase().
+func test_zz_showcase() -> void:
+	var hyped := func(s: MatchSim): s.fighters[0].hype = 100.0
+	await showcase(CID, [
+		{"name": "wing_snap", "def": FOE, "gap": 1.3, "starts": [{"t": 1.2, "slot": "l1"}], "at": [1.2 + 0.05, 1.2 + 0.14]},
+		{"name": "beak_peck", "def": FOE, "gap": 1.2, "starts": [{"t": 1.2, "slot": "l2"}], "at": [1.2 + 0.14]},
+		{"name": "crosswind", "def": FOE, "gap": 1.5, "starts": [{"t": 1.2, "slot": "heavy"}], "at": [1.2 + 0.21, 1.2 + 0.32]},
+		{"name": "downdraft", "def": FOE, "gap": 2.0, "starts": [{"t": 1.2, "slot": "heavy_charged"}], "at": [1.2 + 0.36, 1.2 + 0.62]},
+		{"name": "tailspin", "def": FOE, "gap": 1.4, "starts": [{"t": 1.2, "slot": "finisher"}], "at": [1.2 + 0.30]},
+		{"name": "hang_time", "def": FOE, "gap": 2.4, "presses": [{"t": 1.2, "button": FighterInput.AB2}, {"t": 2.15, "button": FighterInput.LIGHT}],
+			"at": [1.2 + 0.8, 2.15 + 0.45]},
+		{"name": "gust_bomb", "def": FOE, "gap": 3.5, "starts": [{"t": 1.2, "slot": "ability1", "ability": true}], "at": [1.2 + 0.32]},
+		{"name": "hurricane_strut", "def": FOE, "gap": 2.0, "setup": hyped, "presses": [{"t": 1.2, "button": FighterInput.JUICE}], "at": [1.2 + 0.47]},
+	])

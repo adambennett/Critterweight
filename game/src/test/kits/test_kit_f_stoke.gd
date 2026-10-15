@@ -136,9 +136,15 @@ func test_charged_heavy_hold_armor_and_overhand_armor() -> void:
 	var a := sim.fighters[0]
 	var saw_charge_armor := false
 	var saw_charged := false
+	var p_hold := Vector3.INF
+	var hold_drift := 0.0
 	for i in 200:
 		sim.step(DT)
 		await get_tree().physics_frame
+		if a.move_slot == "heavy":
+			if p_hold == Vector3.INF:
+				p_hold = a.pos()
+			hold_drift = maxf(hold_drift, Vector2(a.pos().x - p_hold.x, a.pos().z - p_hold.z).length())
 		if a.move_slot == "heavy" and a._charging and a._armor_covers("light") and not a._armor_covers("heavy"):
 			saw_charge_armor = true
 		if a.move_slot == "heavy_charged":
@@ -147,6 +153,8 @@ func test_charged_heavy_hold_armor_and_overhand_armor() -> void:
 				check(a._armor_covers("light"), "Haymaker startup is armored against Lights")
 	check(saw_charge_armor, "holding the charge carries Light armor")
 	check(saw_charged, "hold >= 0.35 s releases the Furnace Haymaker")
+	# the Overhand lunge starts after the charge hold point (0.7 x startup), so Stoke winds up in place
+	check(hold_drift < 0.3, "Stoke holds his ground while charging (drift %.2f m)" % hold_drift)
 	check(not hits_by(sim, 0).filter(func(e): return str(e["slot"]) == "heavy_charged").is_empty(), "Haymaker connects")
 	dispose(sim)
 	# the Overhand is armored (vs Lights) during its active window only: a jab that lands in the
@@ -383,6 +391,22 @@ func test_taunt_guard_and_parry() -> void:
 
 func test_zz_lab() -> void:
 	await lab(CID)
+
+
+## Evidence frames (gated, needs a window): see kit_harness_stoke_gusto.gd showcase().
+func test_zz_showcase() -> void:
+	var hyped := func(s: MatchSim): s.fighters[0].hype = 100.0
+	await showcase(CID, [
+		{"name": "jab", "def": FOE, "gap": 1.25, "starts": [{"t": 1.2, "slot": "l1"}], "at": [1.2 + 0.17]},
+		{"name": "lead_hook", "def": CID, "gap": 1.15, "starts": [{"t": 1.2, "slot": "l3"}], "at": [1.2 + 0.10, 1.2 + 0.22]},
+		{"name": "overhand", "def": FOE, "gap": 1.3, "starts": [{"t": 1.2, "slot": "heavy"}], "at": [1.2 + 0.23, 1.2 + 0.34]},
+		{"name": "haymaker", "def": FOE, "gap": 1.3, "starts": [{"t": 1.2, "slot": "heavy_charged"}], "at": [1.2 + 0.36, 1.2 + 0.55]},
+		{"name": "gut_furnace", "def": FOE, "gap": 1.5, "starts": [{"t": 1.2, "slot": "finisher"}], "at": [1.2 + 0.21]},
+		{"name": "stoke_step", "def": FOE, "gap": 2.6, "dirs": [{"t0": 1.18, "t1": 1.45, "dir": Vector3(0, 0, 1)}],
+			"presses": [{"t": 1.2, "button": FighterInput.DODGE}, {"t": 1.32, "button": FighterInput.LIGHT}], "at": [1.32 + 0.2]},
+		{"name": "steam_vent", "def": FOE, "gap": 1.7, "starts": [{"t": 1.2, "slot": "ability1", "ability": true}], "at": [1.2 + 0.26]},
+		{"name": "meltdown", "def": FOE, "gap": 2.0, "setup": hyped, "presses": [{"t": 1.2, "button": FighterInput.JUICE}], "at": [1.2 + 0.47, 1.2 + 1.6]},
+	])
 
 
 ## Balance spars (gated, slow): `-- --test test_kit_f_stoke.gd::test_zz_balance --kit-balance [n] [difficulty]`
