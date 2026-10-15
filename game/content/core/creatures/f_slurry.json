@@ -326,7 +326,7 @@
   "throw_back": {"name": "Gulp-and-Spit", "distance": 2.0, "damage": 9, "buildup": 30}
  },
  "abilities": {
-  "ability1": {"name": "Sludge Lob", "cooldown": 6.0, "charges": 2, "duration": 0.6, "stamina": 10, "move_mult": 0.0, "turn_rate": 8.0,
+  "ability1": {"name": "Sludge Lob", "cooldown": 7.0, "charges": 2, "duration": 0.6, "stamina": 10, "move_mult": 0.0, "turn_rate": 8.0,
    "keys": [
     {"t": 0.0},
     {"t": 0.15, "lean": [-8, 0, 0], "joints": {"body2": [-14, 0, 0], "body1": [-10, 0, 0], "head": [-24, 0, 0]}},
@@ -376,7 +376,7 @@
  "audio": {},
  "ai": {"personality": "trapper", "aggression": -0.12, "block": 0.08, "dodge": 0.04, "ability": 0.3, "grab": -0.04,
   "reach": 1.4, "range": [2.8, 5.5],
-  "abilities": {"ability1": {"min": 2.5, "max": 9.0, "chance": 0.3},
+  "abilities": {"ability1": {"min": 2.5, "max": 9.0, "chance": 0.22},
                 "ability2": {"min": 0.0, "max": 2.6, "chance": 0.7, "poise_below": 0.4, "away": true}}},
  "art": {
   "model": "res://assets/models/creatures/f_slurry.glb",
