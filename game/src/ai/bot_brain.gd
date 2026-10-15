@@ -19,13 +19,6 @@ const PROFILES := {
 		"combo": 0.95, "ability": 0.85, "grab": 0.38, "mistake": 0.02, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0},
 }
 
-## Chance that a chosen Heavy is held into a Charged Heavy (lower tiers never charge). Kit-driven
-## bots only (see KIT_KEYS): other bots keep the original behaviour, where a pressed button stays held.
-const CHARGE_CHANCE := {"rookie": 0.0, "regular": 0.25, "pro": 0.4, "champion": 0.5, "hall_of_famer": 0.55}
-## Creature "ai" keys that make a bot kit-driven (kit rules, button release, deliberate charges,
-## enemy-zone avoidance). A personality without any of them plays exactly as before.
-const KIT_KEYS := ["abilities", "range", "reach", "heavy_vs_windup", "dash_in"]
-
 var difficulty := "regular"
 var p := {}
 var rng := RandomNumberGenerator.new()
@@ -45,9 +38,8 @@ var _last_target: Fighter = null
 var objective_override := {}      ## set by modes / autobattler
 var label_text := ""
 var _hold_until := 0.0
-var _kit_hold_until := 0.0        ## kit rule committed the stick (e.g. dive away): skip thinking
-var _charge_until := 0.0          ## holding Heavy to charge it until this time
-var _kit_driven := false          ## the creature ai block uses kit keys (KIT_KEYS)
+var _heavy_hold_until := 0.0      ## kit hint "charge_heavy": Heavy held into the charged version
+var _kit_hold_until := 0.0        ## kit hints "stick" / "dash_in": the stick is committed, skip thinking
 
 
 func _init(diff := "regular", seed_value := 0) -> void:
@@ -62,10 +54,6 @@ func label() -> String:
 
 func set_personality(ai: Dictionary) -> void:
 	personality = ai
-	_kit_driven = false
-	for k in KIT_KEYS:
-		if ai.has(k):
-			_kit_driven = true
 	for k in ["aggression", "block", "dodge", "ability", "grab"]:
 		if ai.has(k):
 			p[k] = clampf(float(p[k]) + float(ai[k]), 0.0, 1.0)
@@ -87,21 +75,41 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 		if _t >= float(q["at"]):
 			f.input.press(int(q["b"]))
 			_press_queue.erase(q)
-	# presses set their button's held bit; kit-driven bots release them after the press tick so a
-	# Heavy is only charged when the bot means to (it holds Heavy while _charge_until is running)
-	if _kit_driven:
-		f.input.held &= ~((1 << FighterInput.LIGHT) | (1 << FighterInput.HEAVY) | (1 << FighterInput.DODGE))
 	if _t >= _next_think:
 		_next_think = _t + float(p["think"]) * rng.randf_range(0.7, 1.3)
 		_think(f, sim)
-	if _kit_driven:
-		f.input.set_held(FighterInput.HEAVY, _t < _charge_until)
-	f.input.move = _move
+	f.input.move = _edge_safe(f, sim, _move)
 	f.input.set_held(FighterInput.GUARD, _guard and _t < _guard_until)
 	f.input.set_held(FighterInput.GRAB, _t < _hold_until)
+	f.input.set_held(FighterInput.HEAVY, _t < _heavy_hold_until)
 	if f.state == Fighter.State.HELD:
 		if rng.randf() < float(p["mash_escape"]) * 0.5:
 			f.input.press(FighterInput.LIGHT if rng.randf() < 0.5 else FighterInput.HEAVY)
+
+
+## Ring-out arenas: a ring-out costs health and time, so bots keep off open edges. Within
+## EDGE_CAUTION of one, the outward part of the intended move is cancelled and an inward pull
+## added (stronger closer to the edge and for better spacing). Dodges use the corrected move, so
+## they never point off the roof. A bot carrying someone still walks them out to throw.
+const EDGE_CAUTION := 1.7
+
+
+func _edge_safe(f: Fighter, sim: MatchSim, mv: Vector3) -> Vector3:
+	if sim == null or sim.arena == null or f.state == Fighter.State.GRABBING:
+		return mv
+	if not bool(sim.rules.get("ringouts", true)) or not sim.arena.has_open_edges():
+		return mv
+	var d := sim.arena.edge_distance(f.pos(), true)
+	if d >= EDGE_CAUTION:
+		return mv
+	var inward := sim.arena.open_edge_inward(f.pos())
+	if inward == Vector3.ZERO:
+		return mv
+	var out := mv.dot(-inward)
+	if out > 0.0:
+		mv += inward * out
+	mv += inward * (1.0 - d / EDGE_CAUTION) * lerpf(0.5, 1.0, float(p["spacing"]))
+	return mv.limit_length(1.0)
 
 
 func _perceived() -> Dictionary:
@@ -200,7 +208,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	var dist := to.length()
 	var dir := to / maxf(dist, 0.01)
 	if _t < _kit_hold_until:
-		return
+		return   # kit hint: an ability / dash committed the stick (e.g. a dive away)
 	var my_reach := float(personality.get("reach", reach_of(c, "l1")))
 	var their_reach := reach_of(tgt.creature, "heavy") if tgt else 1.0
 	var mistake := rng.randf() < float(p["mistake"])
@@ -209,6 +217,8 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	var attacking := per_state == Fighter.State.ATTACK or per_state == Fighter.State.ABILITY
 	var winding := attacking and float(per.get("st", 0.0)) < float(per.get("first", 0.0))
 	if attacking and dist < their_reach + 0.6 and not mistake and f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD]:
+		if _kit_ability(f, tgt, dist, dir, per, true):   # kit hint: reactive abilities (counters, armor)
+			return
 		var roll := rng.randf()
 		if winding and roll < float(p["parry"]):
 			# time the tap for the expected active frame
@@ -239,26 +249,24 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		f.input.press(FighterInput.JUICE)
 		return
 	# ---- abilities ----
-	if _kit_actions(f, tgt, dist, dir, per):
+	if _kit_ability(f, tgt, dist, dir, per, false):   # kit hints from the creature "ai" block
 		return
-	var rules: Dictionary = personality.get("abilities", {})
+	if _kit_heavy_vs_windup(f, dist, per) or _kit_dash_in(f, dist, dir):
+		return
 	for slot in ["ability1", "ability2"]:
-		if rules.has(slot):
-			continue   # the kit's own rule (above) decides this slot
-		if c.abilities.has(slot) and float(f.cooldown_left.get(slot, 0.0)) <= 0.0 and rng.randf() < float(p["ability"]) * 0.35:
+		if _kit_hint(slot).is_empty() and c.abilities.has(slot) and float(f.cooldown_left.get(slot, 0.0)) <= 0.0 and rng.randf() < float(p["ability"]) * 0.35:
 			var ar := reach_of(c, slot, true)
 			if dist <= ar and dist >= minf(1.2, ar * 0.3):
 				f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
 				return
-	# ---- don't idle in the opponent's puddles / patches ----
-	if _kit_driven and dist > my_reach + 0.4 and _avoid_enemy_zone(f, sim, dir):
-		return
+	if dist > my_reach + 0.4 and _kit_avoid_zone(f, sim, dir):
+		return   # kit hint "avoid_zones": step out of an enemy puddle / patch before closing in
 	# ---- offence ----
 	var stamina_ok := f.stamina > 18.0 or rng.randf() < 0.2
 	var aggression := float(p["aggression"]) * (1.25 if f.health_frac() > tgt.health_frac() else 0.9)
 	if dist <= my_reach + 0.1 and stamina_ok and rng.randf() < aggression + 0.2:
 		var t_guarding := per_state == Fighter.State.GUARD
-		if t_guarding and rng.randf() < float(p["grab"]) * 2.0:
+		if (t_guarding or _kit_grab_target(tgt)) and rng.randf() < float(p["grab"]) * 2.0:
 			f.input.press(FighterInput.GRAB)
 		elif f.state == Fighter.State.ATTACK and f.move_slot in ["l1", "l2"] and rng.randf() < float(p["combo"]):
 			if f.move_slot == "l2" and rng.randf() < 0.4:
@@ -267,8 +275,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 				f.input.press(FighterInput.LIGHT)
 		elif rng.randf() < 0.28:
 			f.input.press(FighterInput.HEAVY)
-			if _kit_driven and rng.randf() < float(CHARGE_CHANCE.get(difficulty, 0.25)):
-				_charge_until = _t + rng.randf_range(0.5, 1.0)
+			_kit_maybe_charge()
 		elif rng.randf() < float(p["grab"]) * 0.4:
 			f.input.press(FighterInput.GRAB)
 		else:
@@ -279,20 +286,14 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		f.input.press(FighterInput.LIGHT)
 	# ---- footwork ----
 	var want := my_reach * lerpf(0.7, 0.95, float(p["spacing"]))
+	if personality.get("range") is Array and (personality["range"] as Array).size() >= 2 and _kit_range_ready(f):
+		want = lerpf(float(personality["range"][1]), float(personality["range"][0]), float(p["spacing"]))
 	if f.stamina < 15.0 and rng.randf() < float(p["spacing"]):
 		want = their_reach + 0.8
 	if _t >= _strafe_until:
 		_strafe = -1.0 if rng.randf() < 0.5 else 1.0
 		_strafe_until = _t + rng.randf_range(0.5, 1.6)
 	var side2 := dir.cross(Vector3.UP) * _strafe
-	var band = personality.get("range")
-	if typeof(band) == TYPE_ARRAY and (band as Array).size() == 2 and f.stamina >= 15.0 and _band_tools_ready(f):
-		# kit preferred distance band (zoners keep away while their tools are up, rushdown stays close)
-		var lo := float(band[0])
-		var hi := float(band[1])
-		want = clampf(want, lo, hi) if dist <= my_reach + 0.1 else (lo + hi) * 0.5
-		if dist >= lo and dist <= hi:
-			want = dist
 	if dist > want + 0.25:
 		_move = (dir + side2 * 0.25).normalized()
 		if dist > 4.0 and rng.randf() < float(p["aggression"]) * 0.1:
@@ -354,18 +355,198 @@ func p_think() -> float:
 	return float(p["think"])
 
 
+func _toward(from: Vector3, to: Vector3) -> Vector3:
+	var d := to - from
+	d.y = 0.0
+	return d.normalized() if d.length() > 0.2 else Vector3.ZERO
+
+
 # =====================================================================================
-# Kit-driven extras (data from the creature "ai" block; generic, never by fighter id)
-#   reach: m                  melee reach of the light string (joint-driven bodies)
-#   range: [lo, hi]           preferred distance band for footwork (while a ruled ability is ready)
-#   abilities: {slot: {min, max, chance, poise_below, target_down, away}}
-#   heavy_vs_windup: p        Heavy when the target shows a long startup (> 0.3 s left)
-#   dash_in: {min, max, chance}  dodge toward the target then Light (dash attack)
+# Kit hints (optional keys of the creature "ai" block; added with the Dredge/Dozer kits).
+# Absent keys keep the generic behaviour above.
+#   "range": [near, far]        preferred engagement distance (root to root) for footwork
+#   "charge_heavy": p           chance a Heavy press is held into the charged version (scaled by skill)
+#   "grab_status": [ids]        targets carrying one of these statuses are grabbed like guarding ones
+#   "abilities": {slot: {"min": m, "max": m, "chance": c, "when": [cond, ...]}}
+#       an ability with a hint is used only by its hint (replaces the generic reach test). `when` is a
+#       list of alternatives (any may hold; absent = always); each is a dict whose keys must all hold:
+#       min / max (distance), self_poise_below, self_health_below (fractions), target_status (id or
+#       element), target_heavy (perceived Heavy / Charged Heavy windup), target_winding (any windup),
+#       target_ranged (the target has a projectile ability), wall_behind_target (an arena wall
+#       within this many metres beyond the target, on the line from this fighter).
+#       Reactive conditions (target_heavy / target_winding) are also checked while defending.
+#       Optional "stick": "away" | "toward" commits the stick for 0.35 s when the ability fires
+#       (blinks / dives that travel along the stick).
+# Added with the Slurry/Jitters kits (same mechanism, more optional keys):
+#   "reach": m                  melee reach of the light string (joint-driven bodies the generic
+#                               reach estimate cannot read)
+#   "range_needs_tools": true   "range" holds only while a ranged ability hint (min >= 1.5 m) has a
+#                               charge: a zoner with its tools on cooldown closes in and fights
+#   "heavy_vs_windup": p, "heavy_reach": m   Heavy into a perceived windup with > 0.3 s left
+#   "dash_in": {"min": m, "max": m, "chance": c}   dodge toward the target, then Light (dash attack)
+#   "avoid_zones": true         step out of enemy zones that hurt or build up before closing in
 # =====================================================================================
+
+func _kit_hint(slot: String) -> Dictionary:
+	var ab = personality.get("abilities", {})
+	if typeof(ab) != TYPE_DICTIONARY:
+		return {}
+	var h = (ab as Dictionary).get(slot, {})
+	return h if typeof(h) == TYPE_DICTIONARY else {}
+
+
+func _kit_ability(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary, reactive: bool) -> bool:
+	for slot in ["ability1", "ability2"]:
+		var h := _kit_hint(slot)
+		if h.is_empty() or not f.creature.abilities.has(slot) or int(f.charges_left.get(slot, 1)) <= 0:
+			continue
+		var ab: MoveDef = f.creature.abilities[slot]
+		if f.stamina < ab.stamina * 0.5:
+			continue
+		var gate := float(p["ability"]) * (0.8 if reactive else 0.35) * float(h.get("chance", 1.0))
+		if rng.randf() >= gate:
+			continue
+		if dist < float(h.get("min", 0.0)) or dist > float(h.get("max", 99.0)):
+			continue
+		var whens = h.get("when", [])
+		var ok: bool = typeof(whens) != TYPE_ARRAY or (whens as Array).is_empty()
+		if reactive:
+			ok = false
+		if typeof(whens) == TYPE_ARRAY:
+			for w in whens:
+				if typeof(w) == TYPE_DICTIONARY and _kit_when(f, tgt, dist, dir, per, w as Dictionary, reactive):
+					ok = true
+					break
+		if ok:
+			_kit_stick(h, dir)
+			f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
+			return true
+	return false
+
+
+func _kit_stick(h: Dictionary, dir: Vector3) -> void:
+	match str(h.get("stick", "")):
+		"away":
+			_move = -dir
+			_kit_hold_until = _t + 0.35
+		"toward":
+			_move = dir
+			_kit_hold_until = _t + 0.35
+
+
+func _kit_when(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary, w: Dictionary, reactive: bool) -> bool:
+	if reactive and not (w.has("target_heavy") or w.has("target_winding")):
+		return false
+	var p_state := int(per.get("state", Fighter.State.NEUTRAL))
+	var p_attacking := p_state == Fighter.State.ATTACK or p_state == Fighter.State.ABILITY
+	var p_winding := p_attacking and float(per.get("st", 0.0)) < float(per.get("first", 0.0))
+	for k in w:
+		var v = w[k]
+		match str(k):
+			"min":
+				if dist < float(v):
+					return false
+			"max":
+				if dist > float(v):
+					return false
+			"self_poise_below":
+				if f.poise / maxf(1.0, f.effective_max_poise()) >= float(v):
+					return false
+			"self_health_below":
+				if f.health_frac() >= float(v):
+					return false
+			"target_status":
+				if tgt == null or not (tgt.statuses.has(str(v)) or tgt.statuses.has_element(str(v))):
+					return false
+			"target_heavy":
+				if (p_winding and str(per.get("slot", "")).begins_with("heavy")) != bool(v):
+					return false
+			"target_winding":
+				if p_winding != bool(v):
+					return false
+			"target_ranged":
+				if _kit_is_ranged(tgt) != bool(v):
+					return false
+			"wall_behind_target":
+				if f.sim == null or f.sim.arena == null:
+					return false
+				if f.sim.arena.inside(f.pos() + dir * (dist + float(v)), 0.3):
+					return false
+	return true
+
+
+func _kit_is_ranged(tgt: Fighter) -> bool:
+	if tgt == null:
+		return false
+	for slot in tgt.creature.abilities:
+		var m: MoveDef = tgt.creature.abilities[slot]
+		for e in m.effects:
+			if typeof(e) == TYPE_DICTIONARY and str(e.get("type", "")) == "projectile":
+				return true
+	return false
+
+
+func _kit_grab_target(tgt: Fighter) -> bool:
+	var gs = personality.get("grab_status", [])
+	if tgt == null or typeof(gs) != TYPE_ARRAY:
+		return false
+	for s in gs:
+		if tgt.statuses.has(str(s)) or tgt.statuses.has_element(str(s)):
+			return true
+	return false
+
+
+## After a Heavy press: maybe keep holding it so the charged version comes out (skill-scaled).
+func _kit_maybe_charge() -> void:
+	var ch := float(personality.get("charge_heavy", 0.0)) * float(p["combo"])
+	if ch > 0.0 and rng.randf() < ch:
+		_heavy_hold_until = _t + rng.randf_range(0.6, 1.1)
+
+
+func _kit_range_ready(f: Fighter) -> bool:
+	if not bool(personality.get("range_needs_tools", false)):
+		return true
+	for slot in ["ability1", "ability2"]:
+		var h := _kit_hint(slot)
+		if h.is_empty() or float(h.get("min", 0.0)) < 1.5 or not f.creature.abilities.has(slot):
+			continue
+		if int(f.charges_left.get(slot, 1)) > 0:
+			return true
+	return false
+
+
+func _kit_heavy_vs_windup(f: Fighter, dist: float, per: Dictionary) -> bool:
+	var hw := float(personality.get("heavy_vs_windup", 0.0))
+	if hw <= 0.0 or f.state != Fighter.State.NEUTRAL or dist > float(personality.get("heavy_reach", 2.2)):
+		return false
+	var st := int(per.get("state", Fighter.State.NEUTRAL))
+	var left := float(per.get("first", 0.0)) - float(per.get("st", 0.0))
+	if (st == Fighter.State.ATTACK or st == Fighter.State.ABILITY) and left > 0.3 and rng.randf() < hw:
+		f.input.press(FighterInput.HEAVY)
+		return true
+	return false
+
+
+func _kit_dash_in(f: Fighter, dist: float, dir: Vector3) -> bool:
+	var di = personality.get("dash_in", {})
+	if typeof(di) != TYPE_DICTIONARY or (di as Dictionary).is_empty() or f.state != Fighter.State.NEUTRAL:
+		return false
+	if dist < float(di.get("min", 2.0)) or dist > float(di.get("max", 3.0)) or f.stamina <= 25.0:
+		return false
+	if rng.randf() >= float(di.get("chance", 0.2)) * float(p["aggression"]):
+		return false
+	_move = dir
+	_kit_hold_until = _t + 0.3
+	f.input.press(FighterInput.DODGE)
+	_queue(FighterInput.LIGHT, 0.14)
+	return true
+
 
 ## Steps out of an enemy zone that hurts or builds up (puddles, patches) instead of idling in it,
 ## sideways relative to the target so the bot keeps facing the fight. Skill-scaled (spacing).
-func _avoid_enemy_zone(f: Fighter, sim: MatchSim, dir: Vector3) -> bool:
+func _kit_avoid_zone(f: Fighter, sim: MatchSim, dir: Vector3) -> bool:
+	if not bool(personality.get("avoid_zones", false)) or sim == null:
+		return false
 	if rng.randf() >= float(p["spacing"]):
 		return false
 	var fp := f.pos()
@@ -383,65 +564,3 @@ func _avoid_enemy_zone(f: Fighter, sim: MatchSim, dir: Vector3) -> bool:
 		_move = (out + side * (1.0 if side.dot(out) >= 0.0 else -1.0) * 0.5).normalized()
 		return true
 	return false
-
-
-## The preferred distance band holds while at least one ranged kit tool (an ability rule used from
-## 1.5 m or farther) has a charge: a zoner with its tools on cooldown closes in and fights.
-## Kits without ranged ability rules always keep their band.
-func _band_tools_ready(f: Fighter) -> bool:
-	var rules: Dictionary = personality.get("abilities", {})
-	var ranged := 0
-	for slot in rules:
-		var r: Dictionary = rules[slot]
-		if float(r.get("min", 0.0)) < 1.5 or not f.creature.abilities.has(slot):
-			continue
-		ranged += 1
-		if int(f.charges_left.get(slot, 1)) > 0:
-			return true
-	return ranged == 0
-
-
-func _kit_actions(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary) -> bool:
-	var c := f.creature
-	var rules: Dictionary = personality.get("abilities", {})
-	for slot in ["ability1", "ability2"]:
-		if not rules.has(slot) or not c.abilities.has(slot):
-			continue
-		var r: Dictionary = rules[slot]
-		if int(f.charges_left.get(slot, 1)) <= 0:
-			continue
-		if dist < float(r.get("min", 0.0)) or dist > float(r.get("max", 99.0)):
-			continue
-		if r.has("poise_below") and f.poise / maxf(1.0, f.effective_max_poise()) >= float(r["poise_below"]):
-			continue
-		if bool(r.get("target_down", false)) and not tgt.is_down():
-			continue
-		if rng.randf() >= float(r.get("chance", 0.5)) * float(p["ability"]):
-			continue
-		if bool(r.get("away", false)):
-			_move = -dir
-			_kit_hold_until = _t + 0.35
-		f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
-		return true
-	var hw := float(personality.get("heavy_vs_windup", 0.0))
-	if hw > 0.0 and f.state == Fighter.State.NEUTRAL and dist <= float(personality.get("heavy_reach", 2.2)):
-		var st := int(per.get("state", Fighter.State.NEUTRAL))
-		var left := float(per.get("first", 0.0)) - float(per.get("st", 0.0))
-		if (st == Fighter.State.ATTACK or st == Fighter.State.ABILITY) and left > 0.3 and rng.randf() < hw:
-			f.input.press(FighterInput.HEAVY)
-			return true
-	var di: Dictionary = personality.get("dash_in", {})
-	if not di.is_empty() and f.state == Fighter.State.NEUTRAL and dist >= float(di.get("min", 2.0)) and dist <= float(di.get("max", 3.0)):
-		if f.stamina > 25.0 and rng.randf() < float(di.get("chance", 0.2)) * float(p["aggression"]):
-			_move = dir
-			_kit_hold_until = _t + 0.3
-			f.input.press(FighterInput.DODGE)
-			_queue(FighterInput.LIGHT, 0.14)
-			return true
-	return false
-
-
-func _toward(from: Vector3, to: Vector3) -> Vector3:
-	var d := to - from
-	d.y = 0.0
-	return d.normalized() if d.length() > 0.2 else Vector3.ZERO

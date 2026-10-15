@@ -311,7 +311,7 @@
     {"t": 0.42, "lean": [32, 0, 0], "height": -0.22, "joints": {"body2": [48, 0, 0], "body1": [26, 0, 0], "head": [28, 0, 0], "body4": [-16, 0, 0]}},
     {"t": 0.75}
    ]},
-  "pummel": {"name": "Squeeze", "duration": 0.4, "damage": 4, "element": "sludge", "buildup": 10},
+  "pummel": {"name": "Squeeze", "duration": 0.4, "interval": 0.4, "damage": 4, "element": "sludge", "buildup": 10},
   "taunt": {"name": "Hypnotic Sway", "kind": "taunt", "duration": 1.5, "stamina": 0, "move_mult": 0.0,
    "keys": [
     {"t": 0.0},
@@ -373,13 +373,13 @@
  },
  "juice": {"duration": 6.0},
  "passives": [
-  {"id": "drain_refund", "on": "emerge", "if": {"in_zone": "sludge"}, "do": [{"type": "cooldown", "slot": "ability2", "amount": -3.0}]}
+  {"id": "drain_refund", "on": "emerge", "if": {"in_zone": "sludge"}, "do": [{"type": "cooldown", "slot": "ability2", "add": -3.0}]}
  ],
  "audio": {},
  "ai": {"personality": "trapper", "aggression": -0.12, "block": 0.08, "dodge": 0.04, "ability": 0.3, "grab": -0.04,
-  "reach": 1.4, "range": [2.8, 5.5],
-  "abilities": {"ability1": {"min": 2.5, "max": 9.0, "chance": 0.22},
-                "ability2": {"min": 0.0, "max": 2.6, "chance": 0.7, "poise_below": 0.4, "away": true}}},
+  "reach": 1.4, "range": [2.8, 5.5], "range_needs_tools": true, "charge_heavy": 0.5, "avoid_zones": true,
+  "abilities": {"ability1": {"min": 2.5, "max": 9.0, "chance": 0.63},
+                "ability2": {"max": 2.6, "chance": 1.0, "when": [{"self_poise_below": 0.4}], "stick": "away"}}},
  "art": {
   "model": "res://assets/models/creatures/f_slurry.glb",
   "palette": {

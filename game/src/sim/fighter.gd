@@ -82,7 +82,6 @@ var _grab_joint: Joint3D = null
 var _hold_left := 0.0
 var _escape_presses := 0
 var _pummels := 0
-var _pummel_ready := 0.0
 var thrown_speed := 0.0
 var _seg_stagger: PackedFloat32Array = PackedFloat32Array()
 var timed_flags := {}            ## name -> expiry time (hovering, juiced, shield, reflect, ...)
@@ -714,7 +713,7 @@ func _st_move(dt: float) -> void:
 			armor_level = "lights"
 		elif not input.is_held(FighterInput.HEAVY) or move_charge >= 1.0:
 			_charging = false
-			if move_charge >= 0.35 and creature.moves.has("heavy_charged") and move_slot == "heavy":
+			if move_charge >= 0.35 and creature.moves.has("heavy_charged") and move_slot.split("@")[0] == "heavy":
 				# a long hold switches to the dedicated charged heavy
 				var cv: Array = _move_variant("heavy_charged")
 				var keep := move_charge
@@ -725,6 +724,8 @@ func _st_move(dt: float) -> void:
 	m.apply_overlay(t, motor)
 	if not _charge.is_empty():
 		_update_charge(dt)
+		if move != m:
+			return   # the charge ended the move (or a wall bonk stunned us): don't re-run its effects
 	else:
 		var mv := input.move
 		var spd := eff("walk_speed") * m.move_mult * speed_mult()
@@ -784,6 +785,7 @@ func _start_dodge() -> void:
 	if dir.length() < 0.2:
 		dir = -forward()
 	dodge_dir = dir.normalized()
+	_flag_side_dodge()   # kit extension: directional dodges (see the block at the end)
 	spend_stamina(Tuning.v("dodge_stamina") * statuses.mult("dodge_cost") * float(mods.get("dodge_cost", 1.0)))
 	_dodge_cd = Tuning.v("dodge_cooldown") + eff("dodge_time")
 	_set_state(State.DODGE)
@@ -800,7 +802,7 @@ func _st_dodge(dt: float) -> void:
 	motor.overlay_lean = Vector3(-8.0 if dodge_dir.dot(forward()) < 0.0 else 8.0, 0.0, 0.0)
 	motor.overlay_height = -0.08 * creature.body.scale
 	if t < dur:
-		var dist := eff("dodge_distance") * float(mods.get("dodge_distance", 1.0)) * statuses.mult("dash")
+		var dist := dodge_distance_now() * float(mods.get("dodge_distance", 1.0)) * statuses.mult("dash")
 		rig.desired_vel = dodge_dir * (dist / maxf(dur, 0.05)) * speed_mult()
 		rig.max_accel = 90.0
 		if _peek(FighterInput.LIGHT) and creature.moves.has("dash_attack") and t > dur * 0.35:
@@ -1132,10 +1134,7 @@ func _update_charge(dt: float) -> void:
 	if hit_wall and _charge_bounce():
 		return
 	if hit_wall or float(_charge["dist"]) >= float(_charge["max"]):
-		var keep_move := not bool(_charge.get("end_move", true))
-		_finish_charge(hit_wall)
-		if not keep_move:
-			_end_move()
+		_end_charge_move(hit_wall)
 
 
 func _finish_charge(hit_wall := false) -> void:
@@ -1144,12 +1143,13 @@ func _finish_charge(hit_wall := false) -> void:
 	if c.is_empty():
 		return
 	if hit_wall:
-		if _carried and not _carried.is_out():
+		var v := _carried   # a splat KO can end the round, and celebrate() drops the carry mid-call
+		if v and not v.is_out():
 			var sp: Dictionary = c.get("splat", {"damage": 5.0, "stun": 0.4, "knockdown": true})
 			var by := self
-			sim.combat.apply_simple_damage(by, _carried, float(sp.get("damage", 5.0)) + float(mods.get("splat_damage_add", 0.0)), "wall_splat", {"stun": float(sp.get("stun", 0.4)), "knockdown": bool(sp.get("knockdown", true)), "poise": float(mods.get("splat_poise_add", 0.0))})
-			hooks.fire("wall_splat", {"other": _carried})
-			_emit({"type": "splat", "pos": _carried.pos(), "by": index})
+			sim.combat.apply_simple_damage(by, v, float(sp.get("damage", 5.0)) + float(mods.get("splat_damage_add", 0.0)), "wall_splat", {"stun": float(sp.get("stun", 0.4)), "knockdown": bool(sp.get("knockdown", true)), "poise": float(mods.get("splat_poise_add", 0.0))})
+			hooks.fire("wall_splat", {"other": v})
+			_emit({"type": "splat", "pos": v.pos(), "by": index})
 		elif float(c.get("wall_stagger", 0.6)) > 0.0:
 			_end_carry()
 			stun(float(c.get("wall_stagger", 0.6)), true)
@@ -1248,11 +1248,10 @@ func _st_grabbing(dt: float) -> void:
 	var throw_dir := Vector3.ZERO
 	if _consume(FighterInput.HEAVY) or _consume(FighterInput.GRAB):
 		throw_dir = input.move if input.move.length() > 0.3 else forward()
-	elif _peek(FighterInput.LIGHT) and _pummels < int(Tuning.v("pummel_max")) and time >= _pummel_ready:
-		_consume(FighterInput.LIGHT)
+	elif _pummel_ready() and _consume(FighterInput.LIGHT) and _pummels < int(Tuning.v("pummel_max")):
 		_pummels += 1
 		var pm: MoveDef = creature.moves.get("pummel")
-		_pummel_ready = time + (pm.duration if pm else 0.0)   # per-fighter cadence (pummel move duration)
+		_pummel_next = time + (pm.interval if pm else 0.0)
 		var pdmg := pm.damage if pm else Tuning.v("pummel_damage")
 		if sim:
 			var hp := {"attacker": self, "damage": pdmg, "point": holding.pos(), "normal": Vector3.UP, "seg": 0, "part": "core",
@@ -1280,7 +1279,7 @@ func _do_throw(throw_dir: Vector3) -> void:
 	elif absf(rel.dot(fwd.cross(Vector3.UP))) > 0.6:
 		kind = "throw_side"
 	var td: Dictionary = creature.throws.get(kind, creature.throws.get("throw_fwd", {}))
-	var dist := float(td.get("distance", 2.5)) * float(mods.get("throw_distance", 1.0))
+	var dist := float(td.get("distance", 2.5)) * float(mods.get("throw_distance", 1.0)) * statuses.mult("throw_distance")
 	var mass_ratio := clampf(sqrt(Tuning.v("ref_mass") / maxf(20.0, v.rig.total_mass)), 0.5, 1.6)
 	var air := 0.55
 	var horiz := rel * (dist * mass_ratio / air)
@@ -1534,7 +1533,55 @@ func cooldown_frac(slot: String) -> float:
 
 
 # =====================================================================================
-# Kit data extensions (generic; driven by creature JSON, never by fighter id)
+# Kit extensions (data-driven, generic; added with the Dredge/Dozer kits)
+#  * directional dodges: stat `dodge_side_distance` (> 0) is the dash length for a purely
+#    sideways dodge (lerped by sideness); sideways dodges set the timed flag "dodge_side" that
+#    hooks can test with {"flag": "dodge_side"} (e.g. a dash attack out of a side dash).
+#  * charge effects take "recovery" (s): when the charge ends the move jumps to its last
+#    `recovery` seconds (its recovery keys) instead of ending instantly; a wall bonk stagger
+#    (wall_stagger) is kept instead of being overwritten by the move ending.
+#  * the pummel move's "interval" (s) is the minimum time between pummels (0 = unlimited).
+# =====================================================================================
+
+var _pummel_next := -1.0
+
+
+func _pummel_ready() -> bool:
+	return time >= _pummel_next
+
+
+func _flag_side_dodge() -> void:
+	if absf(dodge_dir.dot(forward().cross(Vector3.UP))) > 0.7:
+		set_flag("dodge_side", eff("dodge_time") + 0.5)
+
+
+## Dash length of the current dodge (forward/back use dodge_distance, sideways may differ).
+func dodge_distance_now() -> float:
+	var side := eff("dodge_side_distance")
+	if side <= 0.0:
+		return eff("dodge_distance")
+	var sideness := absf(dodge_dir.dot(forward().cross(Vector3.UP)))
+	return lerpf(eff("dodge_distance"), side, sideness)
+
+
+func _end_charge_move(hit_wall: bool) -> void:
+	var rec := float(_charge.get("recovery", 0.0))
+	_finish_charge(hit_wall)
+	if state != State.ATTACK and state != State.ABILITY:
+		return   # stunned by the wall bonk: keep the stagger
+	if rec > 0.0 and move != null:
+		state_time = maxf(state_time, move.duration - rec)
+		rig.desired_vel = Vector3.ZERO
+	else:
+		_end_move()
+
+
+# =====================================================================================
+# Kit extensions (data-driven, generic; added with the Slurry/Jitters kits)
+#  * is_airborne(): true during a ballistic leap / launch (spring pads ignore airborne fighters).
+#  * creature "mods": base Fighter.mods (e.g. getup_speed, held_time_mult) applied at setup.
+#  * charge effects take "bounce" (n) / "bounce_distance" (m): a wall contact turns the charge
+#    toward the target (or reflects it off the fence) for another leg instead of ending it.
 # =====================================================================================
 
 ## True during a ballistic leap / launch (begin_airborne until landing).

@@ -240,6 +240,33 @@ func test_knockouts_before_the_bell_end_the_fight() -> void:
 	check(sim.time < 4.0, "right at the bell (%.1f s)" % sim.time)
 
 
+## A ring-out parks the fighter until it returns at the edge: while the party's only fighter is
+## out of the ring, an enemy KO must not end the fight as a defeat (it did on The Rooftop).
+func test_ringout_return_is_not_a_defeat() -> void:
+	var sim := _plain_sim()
+	var mode: CampaignMatchMode = sim.mode
+	mode.phase = MatchMode.Phase.FIGHT
+	var me: Fighter = sim.fighters[0]
+	var hp := me.health
+	mode.on_ringout(me, null)
+	check(me.is_out(), "rung out: parked until the return")
+	check(not mode.is_beaten(me), "but not beaten")
+	check_near(me.health, hp - me.max_health * 0.08, 0.01, "a ring-out costs 8% max HP")
+	var foes: Array = sim.fighters.filter(func(f): return f.team != me.team)
+	var first: Fighter = foes[0]
+	first.health = 0.0
+	mode.on_depleted(first, null, {})
+	check_eq(mode.outcome, "win" if foes.size() == 1 else "", "an enemy KO during the return decides nothing against the party")
+	var res := mode.build_result()
+	check(not bool(res["campaign"]["players"]["p0"]["out"]), "the result does not count the party fighter as KO'd")
+	if foes.size() > 1:
+		var dt := 1.0 / 120.0
+		for i in 120 * 4:
+			sim.step(dt)
+			await get_tree().physics_frame
+		check(not me.is_out(), "back in the ring after the return delay")
+
+
 ## Time up: everyone drops to 1 HP ("first hit wins"); a decision after the grace period judges
 ## the health everyone had when time ran out, and the 1-HP drop does not carry into the run.
 func test_sudden_death_judges_time_up_health_and_keeps_hp() -> void:

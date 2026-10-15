@@ -51,6 +51,7 @@ var keys: Array = []          ## [{t, chains:{name:Vector3|BASE}, poles:{}, join
 var animated_chains: PackedStringArray = PackedStringArray()
 var animated_joints: PackedInt32Array = PackedInt32Array()
 var props: PackedStringArray = PackedStringArray()
+var interval := 0.0           ## kit extension (pummel slot): minimum seconds between pummels, 0 = no limit
 
 
 static func parse(d: Dictionary, body: BodyDef, errors: PackedStringArray) -> MoveDef:
@@ -103,6 +104,7 @@ static func parse(d: Dictionary, body: BodyDef, errors: PackedStringArray) -> Mo
 	m.charge_damage = float(d.get("charge_damage", 0.5))
 	m.effects = d.get("effects", [])
 	m.props = PackedStringArray(d.get("props", []))
+	m.interval = float(d.get("interval", 0.0))
 	for w in d.get("hit", []):
 		if typeof(w) != TYPE_DICTIONARY:
 			continue

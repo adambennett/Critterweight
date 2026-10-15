@@ -32,6 +32,21 @@ func _rows() -> Array:
 	]
 
 
+## The campaign uses a roster creature as soon as it parses with zero errors.
+func test_creature_parses_cleanly() -> void:
+	var c := Content.creature(ID)
+	if check(c != null, "creature missing"):
+		check(c.errors.is_empty(), "parse errors: %s" % str(c.errors))
+		for slot in c.light_string:
+			check(c.moves.has(str(slot)), "light string slot %s is not defined" % str(slot))
+		for slot in ["l1", "l2", "l3", "heavy", "heavy_charged", "finisher", "dash_attack", "grab", "pummel", "taunt"]:
+			check(c.moves.has(slot), "move %s missing" % slot)
+		for slot in ["ability1", "ability2", "juice"]:
+			check(c.abilities.has(slot), "ability %s missing" % slot)
+		for kind in ["throw_fwd", "throw_side", "throw_back"]:
+			check(c.throws.has(kind), "throw %s missing" % kind)
+
+
 func test_moves_connect_in_range_and_whiff_outside() -> void:
 	for row in _rows():
 		var st := await check_move_row(ID, row)

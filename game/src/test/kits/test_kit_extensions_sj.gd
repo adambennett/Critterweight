@@ -1,10 +1,11 @@
 extends "res://src/test/kits/kit_sj_helpers.gd"
 ## Unit tests for the small generic engine extensions added for the Slurry / Jitters kits (all
-## data-driven, none keyed to a fighter id): hooks "emerge" event, "hit_part" condition and
-## "cooldown" action; creature "mods"; pummel cadence; Fighter.is_airborne(); charge bounce /
-## end_move; debuff.require_status; projectile burst_on_hit and lob arrive_y; spring pads ignore
-## airborne fighters; keyed joints skip the gait wave; airborne bodies are not ground-braked; the
-## bot's kit rules (ability rules, heavy_vs_windup, dash_in, zone avoidance, held-button release).
+## data-driven, none keyed to a fighter id): hooks "emerge" event (with main's cooldown action, the
+## Drain Dive refund) and the "hit_part" condition the Bonk relies on; creature "mods";
+## Fighter.is_airborne(); charge bounce; debuff.require_status; projectile burst_on_hit and lob
+## arrive_y; spring pads ignore airborne fighters; keyed joints skip the gait wave; airborne bodies
+## are not ground-braked; the extra bot kit hints (reach, range_needs_tools, ability "stick",
+## heavy_vs_windup, dash_in, avoid_zones) on top of the shared kit-hint mechanism.
 
 
 func _pair(a = "dev_biped", b = "dev_biped", gap := 2.0) -> MatchSim:
@@ -17,27 +18,21 @@ func _creature_with(base_id: String, extra: Dictionary) -> CreatureDef:
 	return CreatureDef.from_dict(d)
 
 
-func test_hook_emerge_event_and_cooldown_action() -> void:
+func test_hook_emerge_event() -> void:
 	var sim := _pair()
 	await run(sim, 0.3)
 	var f := sim.fighters[0]
-	f.hooks.add({"on": "emerge", "do": [{"type": "cooldown", "slot": "ability2", "amount": -3.0}]}, "test")
+	f.hooks.add({"on": "emerge", "do": [{"type": "cooldown", "slot": "ability2", "add": -3.0}]}, "test")
 	f.cooldown_left["ability2"] = 5.0
 	f.charges_left["ability2"] = 0
+	var cursor := sim.event_seq
 	f.begin_submerge(f.pos() + Vector3(0, 0, 1.0), 0.2, [])
-	await run(sim, 0.3)
+	await run(sim, 0.1)
+	check_near(float(f.cooldown_left["ability2"]), 5.0 - 0.1, 0.02, "emerge fired before the fighter resurfaced")
+	await run(sim, 0.2)
 	check_near(float(f.cooldown_left["ability2"]), 5.0 - 0.3 - 3.0, 0.02, "emerge refund")
-	# a refund larger than what is left never zeroes the timer directly: the next tick restores the charge
-	f.cooldown_left["ability2"] = 1.0
-	f.hooks.run_inline({"do": [{"type": "cooldown", "slot": "ability2", "amount": -3.0}]}, {})
-	check(float(f.cooldown_left["ability2"]) > 0.0, "cooldown action zeroed the timer itself")
-	await run(sim, 0.05)
-	check_eq(int(f.charges_left["ability2"]), 1, "charge restored after the refund")
-	# idle cooldowns are left alone
-	f.cooldown_left["ability1"] = 0.0
-	f.hooks.run_inline({"do": [{"type": "cooldown", "slot": "ability1", "amount": 2.0}]}, {})
-	check_eq(float(f.cooldown_left["ability1"]), 0.0, "idle cooldown changed")
-	check(Hooks.validate({"on": "emerge", "do": [{"type": "cooldown", "slot": "ability1", "amount": -1}]}).is_empty(), "emerge/cooldown hook rejected")
+	check(not sim.events_since(cursor).filter(func(e): return str(e["type"]) == "submerge").is_empty(), "no submerge event")
+	check(Hooks.validate({"on": "emerge", "do": [{"type": "cooldown", "slot": "ability1", "add": -1}]}).is_empty(), "emerge hook rejected")
 	sim.queue_free()
 
 
@@ -70,19 +65,6 @@ func test_creature_mods() -> void:
 	sim.queue_free()
 
 
-func test_pummel_cadence_follows_pummel_duration() -> void:
-	var d: Dictionary = Content.creature_entry("dev_biped").duplicate(true)
-	d["moves"]["pummel"] = {"name": "Slow pummel", "duration": 0.3, "damage": 2}
-	var c := CreatureDef.from_dict(d)
-	check(c.is_valid(), "pummel test creature invalid: %s" % str(c.errors))
-	var sim := duel(c, "dev_biped", 0.9, [press(T, "grab"), {"t0": T + 0.3, "t1": T + 1.3, "press": ["light"], "every": 0.05}])
-	var st := await run(sim, 1.8)
-	var pm := hits(st, 0, "pummel", 1)
-	if check(not events(st, "grab").is_empty() and pm.size() >= 2, "setup: %d grabs, %d pummels" % [events(st, "grab").size(), pm.size()]):
-		for i in range(1, pm.size()):
-			var gap_s := (int(pm[i]["tick"]) - int(pm[i - 1]["tick"])) / float(Engine.physics_ticks_per_second)
-			check(gap_s >= 0.29, "pummels %.2f s apart (cadence 0.3 s)" % gap_s)
-	sim.queue_free()
 
 
 func test_airborne_flag_and_spring_pad_skip() -> void:
@@ -243,7 +225,7 @@ func test_airborne_bodies_not_ground_braked() -> void:
 	check(float(speeds[true]) > float(speeds[false]) + 0.5, "grounded drive did not brake (%.2f vs %.2f)" % [float(speeds[false]), float(speeds[true])])
 
 
-func _bot_on(sim: MatchSim, personality: Dictionary) -> BotBrain:
+func _bot_on(_sim: MatchSim, personality: Dictionary) -> BotBrain:
 	var bot := BotBrain.new("champion", 99)
 	bot.set_personality(personality)
 	bot.p["ability"] = 1.0
@@ -253,7 +235,7 @@ func _bot_on(sim: MatchSim, personality: Dictionary) -> BotBrain:
 	return bot
 
 
-func test_bot_kit_rules() -> void:
+func test_bot_kit_hints() -> void:
 	var sim := _pair("dev_biped", "dev_biped", 3.0)
 	await run(sim, 0.3)
 	var f := sim.fighters[0]
@@ -262,71 +244,64 @@ func test_bot_kit_rules() -> void:
 	dir.y = 0.0
 	var dist := dir.length()
 	dir = dir / dist
-	# ability rule inside its band (and only there)
-	var bot := _bot_on(sim, {"abilities": {"ability1": {"min": 1.0, "max": 6.0, "chance": 1.0}}})
+	# "reach" overrides the generic reach estimate
+	var bot0 := _bot_on(sim, {"reach": 1.4})
+	check_eq(float(bot0.personality.get("reach", 0.0)), 1.4, "reach hint")
+	# ability hint inside its band (and only there)
+	var bot := _bot_on(sim, {"abilities": {"ability1": {"min": 1.0, "max": 6.0, "chance": 1000.0}}})
 	var n0 := int(f.input.press_count[FighterInput.AB1])
-	check(bot._kit_actions(f, tgt, dist, dir, {}), "ability rule did not fire in band")
+	check(bot._kit_ability(f, tgt, dist, dir, {}, false), "ability hint did not fire in its band")
 	check_eq(int(f.input.press_count[FighterInput.AB1]), n0 + 1, "AB1 press")
-	check(not bot._kit_actions(f, tgt, 9.0, dir, {}), "ability rule fired out of band")
-	# poise gate + "away": dive away when poise is low
-	var bot2 := _bot_on(sim, {"abilities": {"ability2": {"max": 6.0, "chance": 1.0, "poise_below": 0.4, "away": true}}})
-	check(not bot2._kit_actions(f, tgt, dist, dir, {}), "poise_below ignored at full poise")
+	check(not bot._kit_ability(f, tgt, 9.0, dir, {}, false), "ability hint fired out of its band")
+	# poise gate + "stick": "away" (a dive away when poise is low)
+	var bot2 := _bot_on(sim, {"abilities": {"ability2": {"max": 6.0, "chance": 1000.0, "when": [{"self_poise_below": 0.4}], "stick": "away"}}})
+	check(not bot2._kit_ability(f, tgt, dist, dir, {}, false), "poise gate ignored at full poise")
 	f.poise = f.effective_max_poise() * 0.2
-	check(bot2._kit_actions(f, tgt, dist, dir, {}), "poise_below rule did not fire at low poise")
-	check(bot2._move.dot(dir) < -0.99 and bot2._kit_hold_until > bot2._t, "away rule did not commit the stick away")
+	check(bot2._kit_ability(f, tgt, dist, dir, {}, false), "poise-gated hint did not fire at low poise")
+	check(bot2._move.dot(dir) < -0.99 and bot2._kit_hold_until > bot2._t, "stick away was not committed")
 	f.poise = f.effective_max_poise()
 	# heavy against a long windup
 	var bot3 := _bot_on(sim, {"heavy_vs_windup": 1.0, "heavy_reach": 4.0})
 	var nh := int(f.input.press_count[FighterInput.HEAVY])
-	check(bot3._kit_actions(f, tgt, dist, dir, {"state": Fighter.State.ATTACK, "first": 0.7, "st": 0.1}), "heavy_vs_windup ignored a long windup")
+	check(bot3._kit_heavy_vs_windup(f, dist, {"state": Fighter.State.ATTACK, "first": 0.7, "st": 0.1}), "heavy_vs_windup ignored a long windup")
 	check_eq(int(f.input.press_count[FighterInput.HEAVY]), nh + 1, "Heavy press")
-	check(not bot3._kit_actions(f, tgt, dist, dir, {"state": Fighter.State.ATTACK, "first": 0.3, "st": 0.1}), "heavy_vs_windup fired on a short windup")
+	check(not bot3._kit_heavy_vs_windup(f, dist, {"state": Fighter.State.ATTACK, "first": 0.3, "st": 0.1}), "heavy_vs_windup fired on a short windup")
+	check(not bot0._kit_heavy_vs_windup(f, dist, {"state": Fighter.State.ATTACK, "first": 0.7, "st": 0.1}), "heavy_vs_windup without the hint")
 	# dash in
 	var bot4 := _bot_on(sim, {"dash_in": {"min": 1.0, "max": 5.0, "chance": 1.0}})
 	var nd := int(f.input.press_count[FighterInput.DODGE])
-	check(bot4._kit_actions(f, tgt, dist, dir, {}), "dash_in did not fire")
+	check(bot4._kit_dash_in(f, dist, dir), "dash_in did not fire")
 	check_eq(int(f.input.press_count[FighterInput.DODGE]), nd + 1, "Dodge press")
 	check(bot4._press_queue.any(func(q): return int(q["b"]) == FighterInput.LIGHT), "dash_in queued no Light")
+	check(not bot0._kit_dash_in(f, dist, dir), "dash_in without the hint")
 	sim.queue_free()
 
 
-func test_bot_avoids_enemy_zones_and_releases_buttons() -> void:
+func test_bot_avoid_zones_hint() -> void:
 	var sim := _pair("dev_biped", "dev_biped", 3.0)
 	await run(sim, 0.3)
 	var f := sim.fighters[0]
 	var foe := sim.fighters[1]
-	var bot := _bot_on(sim, {})
 	var dir := (foe.pos() - f.pos()).normalized()
-	check(not bot._avoid_enemy_zone(f, sim, dir), "no zone, yet avoidance fired")
+	var bot := _bot_on(sim, {"avoid_zones": true})
+	var plain := _bot_on(sim, {})
+	check(not bot._kit_avoid_zone(f, sim, dir), "no zone, yet avoidance fired")
 	sim.effects.spawn_zone(foe, {"kind": "sludge_puddle", "radius": 1.0, "duration": 5.0}, f.pos() + Vector3(0.3, 0, 0))
-	check(bot._avoid_enemy_zone(f, sim, dir), "standing in an enemy puddle, no avoidance")
+	check(bot._kit_avoid_zone(f, sim, dir), "standing in an enemy puddle, no avoidance")
 	check(bot._move.x < 0.0, "avoidance did not step out of the puddle (%s)" % str(bot._move))
-	# held-button release (kit-driven bots only): a pressed Heavy is not kept held unless charging
-	check(BotBrain.CHARGE_CHANCE.has("rookie") and BotBrain.CHARGE_CHANCE.has("hall_of_famer"), "charge chances missing")
-	check(not bot._kit_driven, "an empty ai block made the bot kit-driven")
-	f.input.set_held(FighterInput.HEAVY, true)
-	bot.poll(f, sim, 1.0 / 120.0)
-	check(f.input.is_held(FighterInput.HEAVY), "a plain bot changed its original held-button behaviour")
-	var kit_bot := _bot_on(sim, {"reach": 1.0})
-	check(kit_bot._kit_driven, "a kit key did not make the bot kit-driven")
-	f.input.set_held(FighterInput.HEAVY, true)
-	f.input.set_held(FighterInput.LIGHT, true)
-	kit_bot.poll(f, sim, 1.0 / 120.0)
-	check(not f.input.is_held(FighterInput.HEAVY) and not f.input.is_held(FighterInput.LIGHT), "pressed buttons stayed held")
-	kit_bot._charge_until = kit_bot._t + 1.0
-	kit_bot.poll(f, sim, 1.0 / 120.0)
-	check(f.input.is_held(FighterInput.HEAVY), "charging bot did not hold Heavy")
+	check(not plain._kit_avoid_zone(f, sim, dir), "avoidance without the hint")
 	sim.queue_free()
 
 
-func test_bot_band_waits_for_ranged_tools() -> void:
+func test_bot_range_needs_tools_hint() -> void:
 	var sim := _pair()
 	await run(sim, 0.3)
 	var f := sim.fighters[0]
-	var bot := _bot_on(sim, {"range": [3.0, 5.0], "abilities": {"ability1": {"min": 2.5, "max": 9.0}, "ability2": {"min": 0.0, "max": 2.0}}})
-	check(bot._band_tools_ready(f), "band dropped while a ranged tool is ready")
+	var bot := _bot_on(sim, {"range": [3.0, 5.0], "range_needs_tools": true,
+		"abilities": {"ability1": {"min": 2.5, "max": 9.0}, "ability2": {"min": 0.0, "max": 2.0}}})
+	check(bot._kit_range_ready(f), "range dropped while a ranged tool is ready")
 	f.charges_left["ability1"] = 0
-	check(not bot._band_tools_ready(f), "band held with every ranged tool on cooldown (a melee-range rule must not count)")
+	check(not bot._kit_range_ready(f), "range held with every ranged tool on cooldown (a melee-range hint must not count)")
 	var bot2 := _bot_on(sim, {"range": [0.7, 1.4]})
-	check(bot2._band_tools_ready(f), "a kit without ranged rules lost its band")
+	check(bot2._kit_range_ready(f), "a range without range_needs_tools must always hold")
 	sim.queue_free()
