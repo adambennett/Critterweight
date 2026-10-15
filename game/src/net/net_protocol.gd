@@ -103,7 +103,8 @@ const MAX_APP_PAYLOAD := 65536
 ## App type a client uses to have the authority relay a party message to other members
 ## (payload {to: "" | "<member id>", type, payload}); see Net.send_app with a String target.
 const APP_RELAY := "net.relay"
-const MAX_PACKAGES := 64      ## content packages listed in the handshake (core + mods)
+const MAX_PACKAGES := 64      ## gameplay packages listed in the handshake (core + mods)
+const MAX_RELAY_PAYLOAD := 16384   ## party messages a client asks the authority to relay
 ## Aim-assist multipliers of the accessibility setting "access.target_assist" (same table as
 ## MatchScene). Remote players send theirs; the server clamps to MAX_ASSIST.
 const ASSIST_LEVELS := {"low": 0.5, "normal": 1.0, "high": 1.8}
@@ -218,13 +219,26 @@ static func assist_from_byte(b: int) -> float:
 	return clampf(float(b) / 100.0, 0.0, MAX_ASSIST)
 
 
-## Package list on the wire: [u8 n] n x ([str id][str version][str hash][u8 1 = client_only]),
-## at most MAX_PACKAGES entries (Content.package_list() / Mods.fingerprint() format).
+## The packages that matter for joining: gameplay packages only (client_only ones never block, so
+## they never travel). Content.package_list() / Mods.fingerprint() format.
+static func gameplay_packages(pkgs: Array) -> Array:
+	return pkgs.filter(func(p) -> bool: return typeof(p) == TYPE_DICTIONARY and not bool(p.get("client_only", false)))
+
+
+## More gameplay packages than the handshake can list: online play refuses instead of comparing a
+## truncated list.
+static func too_many_packages(pkgs: Array) -> bool:
+	return gameplay_packages(pkgs).size() > MAX_PACKAGES
+
+
+## Package list on the wire: [u8 n] n x ([str id][str version][str hash][u8 1 = client_only]):
+## the gameplay packages, at most MAX_PACKAGES (callers refuse earlier when there are more).
 static func write_packages(w: NetWriter, pkgs: Array) -> void:
-	var n := mini(pkgs.size(), MAX_PACKAGES)
+	var list := gameplay_packages(pkgs)
+	var n := mini(list.size(), MAX_PACKAGES)
 	w.u8(n)
 	for i in n:
-		var p: Dictionary = pkgs[i] if typeof(pkgs[i]) == TYPE_DICTIONARY else {}
+		var p: Dictionary = list[i]
 		w.text(str(p.get("id", "")), 64)
 		w.text(str(p.get("version", "")), 32)
 		w.text(str(p.get("hash", "")), 80)

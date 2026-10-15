@@ -407,7 +407,9 @@ func _update_pick_panel() -> void:
 	if not (sim.mode is ChumRushMode):
 		return
 	var cr := sim.mode as ChumRushMode
-	var mine: Array = cr.pending_pick.get(player_index, [])
+	# only this machine's own fighter: a listen host who sits a match out keeps player_index 0 and
+	# must not see (or answer) the offer of a remote player's fighter
+	var mine: Array = cr.pending_pick.get(player_index, []) if _is_local_player() else []
 	if mine.is_empty():
 		if _pick_panel:
 			_pick_panel.queue_free()

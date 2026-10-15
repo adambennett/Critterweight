@@ -18,13 +18,13 @@ func after_each() -> void:
 	_nodes.clear()
 
 
-static var _port_seq := 0
-
-
-## A fresh port per test (a closing listen server keeps its port for up to 2 s).
+## A fresh port per test (a closing listen server keeps its port for up to 2 s). The sequence lives
+## in Engine metadata: the runner makes a new instance per test, and a script `static var` made
+## Godot 4.5.1 crash at exit after `--check` loaded this file.
 func _port() -> int:
-	_port_seq += 1
-	return 34000 + (OS.get_process_id() % 500) * 20 + (_port_seq % 10) * 2
+	var seq := int(Engine.get_meta("net_loopback_port_seq", 0)) + 1
+	Engine.set_meta("net_loopback_port_seq", seq)
+	return 34000 + (OS.get_process_id() % 500) * 20 + (seq % 10) * 2
 
 
 func _server(port: int, extra: Dictionary = {}, entries: Array = []) -> NetServer:
@@ -458,16 +458,18 @@ func test_party_relay_inprocess() -> void:
 	check(await _until(func() -> bool: return got_a.size() == 1 and got_b.size() == 3, 3.0), "host broadcast reached both clients")
 	if got_a.size() == 1:
 		check_eq(got_a[0], ["1", "cmp/ticket", {"node": 3}], "from member 1")
-	# reserved types are never relayed
+	# reserved types and oversized party messages are never relayed
 	a.send_app(NetProtocol.APP_RELAY, {"to": "", "type": "mode.pick", "payload": {}})
+	a.send_app(NetProtocol.APP_RELAY, {"to": "", "type": "cmp/huge", "payload": {"blob": "x".repeat(NetProtocol.MAX_RELAY_PAYLOAD + 100)}})
 	await wait_physics(20)
-	check_eq(got_b.size(), 3, "reserved types are not relayed")
+	check_eq(got_b.size(), 3, "reserved types and oversized messages are not relayed")
 	b.drop()
 	check(await _until(func() -> bool: return not left.is_empty(), 4.0), "member_left when a member drops")
 	if not left.is_empty():
 		check_eq(str(left[0][0]), idb)
-	party.close()
 	Net.leave()
+	check(left.size() >= 2 and str(left[-1][0]) == ida and str(left[-1][1]) == "session ended", "member_left for everyone when the session ends: %s" % str(left))
+	party.close()
 
 
 ## MOD-05 authority: the server repeats the content check on hello, so a client that lies about

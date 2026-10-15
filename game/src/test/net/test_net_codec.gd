@@ -325,7 +325,13 @@ func test_package_list_codec() -> void:
 	var r := NetReader.new(w.data(), 1)
 	var back := NetProtocol.read_packages(r)
 	check(r.ok and r.expect_end(), "package list decodes exactly")
-	check_eq(back, pk, "package list round trip (id, version, hash, client_only)")
+	check_eq(back, pk.slice(0, 2), "gameplay packages round trip (id, version, hash); client_only ones never travel")
+	var big: Array = []
+	for i in NetProtocol.MAX_PACKAGES + 1:
+		big.append({"id": "mod_%d" % i, "version": "1.0.0", "hash": "", "client_only": false})
+	check(NetProtocol.too_many_packages(big), "more gameplay packages than the handshake lists is refused up front")
+	big[0]["client_only"] = true
+	check(not NetProtocol.too_many_packages(big), "client_only packages do not count")
 	var many: Array = []
 	for i in 80:
 		many.append({"id": "mod_%d" % i, "version": "1.0.0", "hash": "", "client_only": false})

@@ -16,7 +16,7 @@ Code: `game/src/net/`. Tests: `game/src/test/net/`. Dedicated server operation: 
 | Simulation | Jolt physics + fighter logic at **120 Hz** fixed step (`server.tick_rate`, tuned at 120). |
 | Client input | `FighterInput` (world-space move, held bits, per-button press counters) sampled every client physics tick, sent at **60 Hz**, each packet carrying the 4 newest samples (redundancy). |
 | Server output | Full-state **snapshots at 30 Hz** (unreliable) + simulation **events** (reliable, tick-stamped) + roster changes (reliable). |
-| Client view | No local simulation, no prediction/rollback: active ragdolls cannot be reconciled, so clients render an **interpolated** past (adaptive buffer, ~40 ms on LAN) and fire event feedback when the render clock reaches the event's tick. |
+| Client view | No local simulation, no prediction/rollback: active ragdolls cannot be reconciled, so clients render an **interpolated** past (adaptive buffer: 40-90 ms measured over loopback, depending on machine load) and fire event feedback when the render clock reaches the event's tick. |
 | Listen host | The host's fighter is driven by `LocalPlayerInput` inside the authoritative sim: **zero added latency** for the host. |
 | Randomness | Owned by the server: the match seed (server RNG) drives bots and modes; it is stripped from replicated events. Clients never roll dice that affect outcomes; cosmetic randomness (particles, gore piece spin) is local. |
 | Determinism | Not relied upon across machines. Same build + seed + inputs reproduce locally (sim tests), but the network model never assumes cross-machine float determinism. |
@@ -103,8 +103,9 @@ is a **protocol violation**. Layouts are documented in `src/net/net_protocol.gd`
 | 78 | ROSTER | S->C (ch 1) | | tick, changed slots (§6) |
 
 **Handshake.** ENet connect -> server sends CHALLENGE (a fresh nonce, plus its gameplay content
-hash and package list) -> the client checks the protocol version, then compares content on its own
-side with `Mods.compare(server packages)` (MOD-05, below). If that fails it stops right there with
+hash and gameplay package list) -> the client checks the protocol version and the game version
+(a different build is "update the game", never reported as a content problem), then compares
+content on its own side with `Mods.compare(server packages)` (MOD-05, below). If that fails it stops right there with
 `content_mismatch` and the Mods wording ("Missing mod: moon_rules 1.0.0 (install it, then enable
 it)", "You have X enabled but the host does not (disable it to join)", "Different version of X: you
 have A, the host has B") and closes with that reason code, which the server logs. Otherwise it
@@ -119,7 +120,8 @@ version, so a mismatched protocol is always recognised and never misread as a co
 
 **Content verdict** (`NetProtocol.content_verdict(Mods.compare(theirs), theirs, same_gameplay_hash)`,
 symmetric, unit-tested): a gameplay package that is missing, extra or of another version blocks;
-`client_only` (presentation-only) packages never count; a package with the same version but a
+`client_only` (presentation-only) packages never count and never travel (lists carry at most 64
+gameplay packages, core included; more is refused up front with a clear message); a package with the same version but a
 different package hash (a folder install vs. the same package as an archive, edited textures)
 passes only when both gameplay content hashes are equal - the simulation cannot diverge - and is
 logged; identical package lists with different gameplay hashes are refused as "same packages and
@@ -151,6 +153,11 @@ for a button that opens the Mods screen).
 
 **Limits and abuse handling (server).** Per player token buckets: input 150/s (burst 60), control
 30/s, chat 1/s (burst 5), app 40/s, bytes 128 KB/s (burst 640 KB -> immediate kick, "flood").
+A relayed party message costs the sender one app token and its size in bytes per recipient (the
+server sends one copy each), and may be at most 16 KB, so the relay cannot multiply a client's
+upload. Buckets refill with the larger of wall-clock and simulated time: the
+same thing in real-time runs, and under `--fixed-fps` test runs (faster than real time) a client's
+60 inputs per simulated second are not mistaken for a flood.
 Violations add points (unknown id 6, malformed 3-5, rate excess 0.25-0.5, host-only request 2)
 that decay at 2/s; 20 points = kick (`protocol_violation`) and a temporary ban. Oversized packets
 kick immediately. Input samples are clamped (move length <= 1, undefined held bits masked).
@@ -279,9 +286,11 @@ min_players, max_players}], tally}, `playlist` {id, name, valid, invalid, errors
 | Same player connects twice | The new session replaces the old one (`replaced`) |
 | Malformed / oversized / flooding input | Dropped, scored, kicked (`protocol_violation`/`flood`), temporarily banned; the server keeps serving others |
 | Forged damage / server messages / app "damage" requests | No code path accepts them; victim health unchanged (multi-process test) |
-| Incompatible build / content | Rejected with versions or the package diff |
+| Incompatible build / content | Rejected with both versions, or refused on the client with the `Mods.compare` lines (the server repeats the verdict) |
 | Server shutdown | CLOSING with message and restart hint, delivered before the disconnect (server waits for acknowledgements, max 3 s) |
-| Host leaves a listen session | Clients get `host_left`; the host's game continues offline |
+| Host leaves a listen session | Clients get `host_left`; the host's game continues offline. Quit to menu from the pause menu leaves the session (`MatchFlow.quit_to_menu`) |
+| The listen host's match scene is removed by another path | The match ends for everyone with an aborted result; the session returns to the lobby |
+| A player never answers a mode pick | Taken for them after 20 s - remote players and the listen host's own player alike (a dropped player's bot takes it at once) |
 | Everyone leaves (dedicated, `idle`) | Running match aborted, server idles |
 
 ## 10. Connectivity
@@ -414,7 +423,7 @@ authority:
 * `broadcast_app(type, payload)`: authority -> everyone.
 * `app_request(from_id, type, payload)` fires only where the authority runs; `app_message(from_id,
   type, payload)` on receivers. Types match `[a-z0-9_.:/-]{1,64}`; payloads <= 64 KB, plain data.
-* Clients cannot message each other directly; the authority validates and relays (route voting,
+* Clients never talk to each other directly: everything goes through the authority (route voting,
   reward picks, checkpoint sync and party resume are built this way: clients request, the server
   decides and broadcasts). `mode.*` request types are reserved for modes (`mode.pick`).
 * **Party messages** (the co-op campaign's transport contract, `NetPartyTransport`):
@@ -423,8 +432,12 @@ authority:
   (`net.relay`), which passes it on with the sender's id; receivers get
   `app_message(sender id, type, payload)`, never an echo. Member ids are the session player ids
   as strings (`local_member_id()`, `member_ids()` = the other connected players, spectators
-  excluded); `member_joined(id)` / `member_left(id, "disconnected" | "left")` follow the lobby.
-  Delivery is reliable and ordered per sender; `net.*` and `mode.*` types are never relayed.
+  excluded); `member_joined(id)` / `member_left(id, "disconnected" | "left" | "session ended")`
+  follow the lobby and the end of the session. Delivery is reliable and ordered per sender;
+  `net.*` and `mode.*` types are never relayed; relayed messages are limited to 16 KB and charged
+  per recipient; dedicated servers can switch relaying off (`server.party_relay`). The relay passes
+  messages on unchanged with the true sender id, so receivers must validate them: members should
+  accept host-only messages (run state, tickets, run end) only from the host's member id.
 
 ## 15. Measured bandwidth and server cost
 
@@ -458,8 +471,8 @@ and 889 B with 8 (13-segment test creature, every vital and status filled).
 loopback duel 39-89 ms interpolation delay depending on machine load; packaged release builds
 (`tools/verify/net_session_check.ps1`) 30 snapshots/s and 49-90 ms; with the conditioner at
 80 +- 20 ms one-way and 2 % loss: RTT max 180-250 ms, interpolation 80-116 ms, jitter p95 34-76 ms,
-1-2 % of packets dropped, about 1 % of rendered frames starved - the match still completes with the
-correct result.
+about 2 % of packets dropped (as configured), 1-2 % of rendered frames starved - the match still
+completes with the correct result.
 
 **Soak** (`test_net_soak.gd --soak-minutes 10`): see the numbers below, refreshed with every
 requirement-level run.
@@ -501,7 +514,7 @@ Also LOOPBACK on one PC.
 
 * Internet play is untested off-machine (no second host was available); no relay/NAT traversal.
 * No client-side prediction: input-to-visual latency is the network RTT plus the interpolation
-  delay (~40 ms on LAN). This is the designed trade-off for active ragdolls (D-014).
+  delay (40-90 ms measured over loopback). This is the designed trade-off for active ragdolls (D-014).
 * IPv4 only. No encryption (ENet has no TLS here); the password is protected by a challenge proof,
   but traffic is readable on the path.
 * The ENet per-peer receive buffer limit (32 MB) is not configurable from GDScript.

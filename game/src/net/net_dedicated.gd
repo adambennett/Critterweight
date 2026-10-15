@@ -127,6 +127,13 @@ func _apply_mods() -> String:
 		if not DirAccess.dir_exists_absolute(dir):
 			return "server.mods_dir '%s' does not exist" % dir
 		Mods.use_root(dir)
+	# listing a mod in the server config is the operator's consent to its capabilities (e.g.
+	# replaces_core), which a headless server cannot ask for
+	for id in want:
+		var need: Array = Mods.consent_needed(id)
+		if not need.is_empty():
+			Mods.grant_consent(id, need)
+			Log.i("server", "mods: %s uses %s; listed in server.mods, so it is allowed" % [id, ", ".join(PackedStringArray(need))])
 	var have: Array = Mods.load_order.duplicate()
 	var sorted_want: Array = []
 	sorted_want.append_array(want)

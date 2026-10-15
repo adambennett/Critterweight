@@ -375,12 +375,21 @@ func _on_challenge(r: NetReader) -> void:
 		_fail_now(NetProtocol.describe(NetProtocol.R_PROTOCOL, ["Server: game %s, network protocol %d" % [gv, proto],
 			"You: game %s, network protocol %d" % [NetProtocol.game_version(), my_proto]]))
 		return
+	# a different build is "update the game", not a content problem: say so before comparing content
+	var my_gv := str(opts.get("test_game_version", NetProtocol.game_version()))
+	if gv != my_gv:
+		_fail_now(NetProtocol.describe(NetProtocol.R_GAME_VERSION, ["Server game version: %s" % gv, "Your game version: %s" % my_gv]))
+		return
 	r.u8()  # players (shown by LAN beacons; the lobby state follows)
 	r.u8()  # max players
 	var server_hash := r.text(80)
 	server_packages = NetProtocol.read_packages(r)
 	if not r.ok:
 		_fail_now(NetProtocol.describe(NetProtocol.R_VIOLATION, ["The server sent an invalid challenge (%s)." % r.error]))
+		return
+	if NetProtocol.too_many_packages(Content.package_list()):
+		_fail_now(NetProtocol.describe(NetProtocol.R_CONTENT, ["You have %d gameplay mods enabled; online sessions support up to %d. Disable some in the Mods screen." % [
+			NetProtocol.gameplay_packages(Content.package_list()).size() - 1, NetProtocol.MAX_PACKAGES - 1]]))
 		return
 	# content check on our side first (Mods.compare wording for the join error), MOD-05
 	content_check = NetProtocol.content_verdict(Mods.compare(server_packages), server_packages, server_hash == Content.content_hash())
@@ -392,7 +401,7 @@ func _on_challenge(r: NetReader) -> void:
 		return
 	var w := NetWriter.new(NetProtocol.C_HELLO)
 	w.u16(my_proto)
-	w.text(str(opts.get("test_game_version", NetProtocol.game_version())), 32)
+	w.text(my_gv, 32)
 	w.text(Content.content_hash(), 80)
 	NetProtocol.write_packages(w, opts.get("test_packages", Content.package_list()))
 	w.text(NetProtocol.clean_name(str(opts.get("name", Settings.get_value("network.player_name")))), 80)

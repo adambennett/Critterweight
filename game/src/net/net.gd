@@ -288,8 +288,12 @@ func _fail(reason: Dictionary) -> void:
 
 
 func _set_state(s: String) -> void:
-	if s == "offline":
+	if s == "offline" and not _members.is_empty():
+		# the session is gone: every other member is gone with it (co-op transports must know)
+		var gone: Array = _members.keys()
 		_members.clear()
+		for id in gone:
+			member_left.emit(str(id), "session ended")
 	if _state != s:
 		_state = s
 		session_state_changed.emit(s)

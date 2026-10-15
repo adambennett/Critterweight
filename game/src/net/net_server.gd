@@ -113,6 +113,11 @@ func start(config: Dictionary, is_dedicated: bool, args := PackedStringArray()) 
 	else:
 		_rng.randomize()
 	transport.timeout_ms = int(cfg["timeout"]) * 1000
+	if NetProtocol.too_many_packages(Content.package_list()):
+		transport.last_error = "%d gameplay packages are loaded; online sessions support up to %d (core included)" % [
+			NetProtocol.gameplay_packages(Content.package_list()).size(), NetProtocol.MAX_PACKAGES]
+		Log.e("net", "server start failed: %s" % transport.last_error)
+		return ERR_INVALID_DATA
 	var max_peers := int(cfg["max_players"]) + int(cfg["max_spectators"]) + 8
 	conditioner = NetConditioner.from_args(args)
 	var err: Error
@@ -814,8 +819,18 @@ func _handle_app(p: NetPlayer, data: PackedByteArray) -> void:
 		if typeof(ip) != TYPE_DICTIONARY or not NetProtocol.valid_app_type(it) or it.begins_with("net.") or it.begins_with("mode.") or to.length() > 12:
 			_violation(p, 1.0, "bad relay request")
 			return
-		if not p.spectator:
-			relay_app(p.id, to, it, ip)
+		if p.spectator or not bool(cfg.get("party_relay", true)):
+			return
+		if blob.size() > NetProtocol.MAX_RELAY_PAYLOAD:
+			_violation(p, 1.0, "relay payload of %d bytes" % blob.size())
+			return
+		# the server sends one copy per recipient: the extra copies count against the sender's
+		# app and byte budgets, so a client cannot multiply its upload through the relay
+		var copies := relay_targets(p.id, to).size()
+		if copies > 1 and (not p.rl_app.take(float(copies - 1)) or not p.rl_bytes.take(float(blob.size() * (copies - 1)))):
+			_violation(p, 0.5, "relay rate")
+			return
+		relay_app(p.id, to, it, ip)
 		return
 	if t.begins_with("mode."):
 		handle_mode_request(p.id, t, dec["value"])
@@ -838,9 +853,9 @@ func handle_mode_request(pid: int, t: String, payload: Dictionary) -> void:
 				_violation(p, 1.0, "unknown mode request '%s'" % t)
 
 
-## Mode picks offered to remote players (Chum Rush supplements between waves) must not let one
-## player stall the match: an unanswered pick is taken for them (first offer) after
-## pick_timeout_ms. Local and bot fighters choose on their own.
+## Mode picks offered to human players (Chum Rush supplements between waves) must not let one
+## player stall the session: an unanswered pick is taken for them (first offer) after
+## pick_timeout_ms - remote players and the listen host's own player alike. Bots choose at once.
 func _check_mode_picks(now: int) -> void:
 	if sim == null or not is_instance_valid(sim) or sim.mode == null or phase != PHASE_MATCH:
 		_pick_since.clear()
@@ -854,7 +869,7 @@ func _check_mode_picks(now: int) -> void:
 			_pick_since.erase(k)
 	for k in pd.keys():
 		var i := int(k)
-		if i < 0 or i >= sim.fighters.size() or sim.fighters[i].controller_kind != "net":
+		if i < 0 or i >= sim.fighters.size() or not (sim.fighters[i].controller_kind in ["net", "player"]):
 			continue
 		if not _pick_since.has(i):
 			_pick_since[i] = now
@@ -1037,18 +1052,26 @@ func relay_app(from_id: int, to: String, type: String, payload: Dictionary) -> i
 	w.text(type, NetProtocol.MAX_APP_TYPE)
 	w.blob(bytes, true)
 	var data := w.data()
-	var n := 0
+	var targets := relay_targets(from_id, to)
+	for np in targets:
+		if np.peer == -1:
+			app_relayed.emit.call_deferred(from_id, type, payload.duplicate(true))
+		else:
+			transport.send(np.peer, NetProtocol.CH_CONTROL, data, true)
+	return targets.size()
+
+
+## Members a party message from `from_id` to `to` ("" = all others) reaches: connected players,
+## not spectators, not the sender; the listen host's own member included.
+func relay_targets(from_id: int, to: String) -> Array[NetPlayer]:
+	var out: Array[NetPlayer] = []
 	for p in players.values():
 		var np: NetPlayer = p
 		if np.id == from_id or np.spectator or not np.connected or (to != "" and str(np.id) != to):
 			continue
-		if np.peer == -1:
-			app_relayed.emit.call_deferred(from_id, type, payload.duplicate(true))
-			n += 1
-		elif np.peer > 0:
-			transport.send(np.peer, NetProtocol.CH_CONTROL, data, true)
-			n += 1
-	return n
+		if np.peer == -1 or np.peer > 0:
+			out.append(np)
+	return out
 
 
 # =====================================================================================

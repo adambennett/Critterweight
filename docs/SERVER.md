@@ -130,13 +130,16 @@ mistyped values stop the server with `file:line` errors.
 | `stats_interval` | int | 60 | 5-3600 s | Period of the `stats:` log line |
 | `mods` | text | (empty) | mod ids, comma separated | Exactly the mods this server loads (core is always loaded); see below |
 | `mods_dir` | text | (empty) | folder | Mods folder to use instead of `<user data>/mods` |
+| `party_relay` | bool | true | | Relay co-op party messages between players (off = players can only talk to the server) |
 
 **Mods.** A server loads exactly the mods named by `mods` (or `--mods id1,id2`) - never a player's
 mod set - from `mods_dir` when given, else from the `mods` folder of its user-data directory
 (install packages there as `.critmod` files or folders; the bundled examples such as `moon_rules`
 are always available). Mods are data only (docs/MODDING.md: no scripts, archives checked before
-extraction). A listed mod that is missing or fails to load stops the server with exit code 2 and
-the reason. The log names the loaded packages and the gameplay hash (`content: core 1.0.0,
+extraction). Listing a mod counts as the operator's consent to its capabilities (for example
+`replaces_core`), which a headless server cannot ask for. A listed mod that is missing or fails to
+load stops the server with exit code 2 and the reason. At most 64 gameplay packages (core
+included) can be listed in the handshake; more stops the server with a clear error. The log names the loaded packages and the gameplay hash (`content: core 1.0.0,
 moon_rules 1.0.0; gameplay hash ...`), and `status` lists them. Players need the same gameplay
 mods in the same versions: a client without them is refused before it joins, with lines like
 "Missing mod: moon_rules 1.0.0 (install it, then enable it)" (NETWORKING.md §5); presentation-only
