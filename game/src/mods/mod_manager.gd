@@ -803,14 +803,28 @@ func _load_sets() -> void:
 			else:
 				Saves.quarantine(_sets_path)
 		return
+	if typeof(r["data"]) != TYPE_DICTIONARY:
+		return
 	var d: Dictionary = r["data"]
 	var s = d.get("sets", {})
-	if typeof(s) == TYPE_DICTIONARY and not s.is_empty():
-		sets = s
+	if typeof(s) == TYPE_DICTIONARY:
+		# set name -> [mod ids]; malformed sets are dropped instead of breaking every lookup
+		var clean := {}
+		for k in s:
+			if typeof(s[k]) == TYPE_ARRAY:
+				clean[str(k)] = (s[k] as Array).map(func(x): return str(x))
+		if not clean.is_empty():
+			sets = clean
 	active_set = str(d.get("active", "Default"))
 	if not sets.has(active_set):
 		active_set = sets.keys()[0]
-	consent = d.get("consent", {}) if typeof(d.get("consent")) == TYPE_DICTIONARY else {}
+	# consent entries must be "id@version" -> [capability names]; anything else is dropped
+	consent = {}
+	var c = d.get("consent", {})
+	if typeof(c) == TYPE_DICTIONARY:
+		for k in c:
+			if typeof(c[k]) == TYPE_ARRAY:
+				consent[str(k)] = (c[k] as Array).filter(func(x): return typeof(x) == TYPE_STRING)
 
 
 func _save_sets() -> void:
@@ -917,8 +931,9 @@ func apply() -> void:
 				load_report[id] = ["could not unpack the archive (it changed since it was checked, or does not match its checked listing); rescan and try again"]
 				continue
 		# Content reads only these validated files, and only overrides core with this consent
+		var granted = consent.get("%s@%s" % [id, info["version"]], [])
 		pkgs.append({"id": id, "version": info["version"], "path": path, "manifest": info["manifest"], "hash": info["hash"],
-			"files": validated_files(info), "consent": (consent.get("%s@%s" % [id, info["version"]], []) as Array).duplicate()})
+			"files": validated_files(info), "consent": (granted as Array).duplicate() if typeof(granted) == TYPE_ARRAY else []})
 		load_order.append(id)
 	Content.reload(pkgs)
 	for e in Content.errors:

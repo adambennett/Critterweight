@@ -193,6 +193,8 @@ func test_core_override_without_declared_capability_is_refused() -> void:
 		"tuning.json": {"parry_window": 0.5}})
 	check(Mods.import_package(p)["ok"], "installed (the problem is found when loading)")
 	check(Mods.consent_needed("sneaky_override").is_empty(), "nothing declared, so nothing is asked")
+	# even a consent left over for this id@version (e.g. from a copy that did declare it) is not enough
+	Mods.grant_consent("sneaky_override", ["replaces_core"])
 	check(Mods.set_enabled("sneaky_override", true)["ok"], "enabled")
 	Mods.apply()
 	check_eq(int(Content.get_entry("rules", "duel").get("round_time", 0)), core_round, "core duel untouched")
