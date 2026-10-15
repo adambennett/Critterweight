@@ -183,6 +183,30 @@ standard/swapped episodes per policy (n = 30), each compared on the same episode
   clone's evidence is imitation (section 2), not a higher reward against Rookie.
 - The BC → ES sample is not measurably different from the clone it started from.
 
+## 4b. Roster sample policies (one per fighter)
+
+The same ES drill job run once for each of the six roster fighters (jobs in `jobs/roster/`, run
+evidence in `roster/<run>/`: report, learning curve, effective job, coordinator log). Each run:
+12 mirrored pairs x 1 episode per generation, 25 generations, 3 worker processes x 2 worlds, on the
+integration machine while other build/test jobs were running (2026-10-15). Test: 20 held-out
+episodes (standard + swapped spawns, per-seed jitter) played by the starting network and the selected
+one; paired difference (selected - starting), Student-t 95 % interval, df 19.
+
+| Fighter | Seed | Selected | Paired gain (95 % CI) | t | Wall |
+|---|---|---|---|---|---|
+| Stoke | 411 | gen 20, elite | +36.7 (30.1..43.3) | 11.7 | 650 s |
+| Dredge | 412 | gen 20, elite | +32.6 (30.0..35.3) | 26.0 | 658 s |
+| Gusto | 413 | gen 5, theta | +30.2 (21.4..39.0) | 7.2 | 383 s |
+| Dozer | 414 | gen 5, elite | +30.9 (21.4..40.4) | 6.8 | 467 s |
+| Slurry | 415 | gen 15, elite | +23.8 (15.7..31.9) | 6.2 | 261 s |
+| Jitters | 416 | gen 5, elite | +24.9 (20.8..29.1) | 12.5 | 263 s |
+
+All six learned to close in on and hit the drill dummy, significantly better than their starting
+networks on episodes training never saw. They ship as `f_<fighter>_es_drill` in
+`game/content/core/policies/` (published with `--lab-publish` from each run's `best.policy.json`).
+They are drill specialists: they do not defend, so they are sparring targets and Lab starting points,
+not substitutes for the scripted bot tiers.
+
 ## 5. Measurements
 
 **Inference cost** (LAB-09; `bench/inference_*.json`). 8 policy-controlled fighters in a live
@@ -286,6 +310,8 @@ $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 & $g --headless --path game --fixed-fps 120 -- --lab-worker ../docs/evidence/lab/jobs/eval_es_drill.json --lab-out ../runs/eval_es_drill --user-root ../runs/home
 & $g --headless --path game --fixed-fps 120 -- --lab-worker ../docs/evidence/lab/jobs/eval_bc_regular.json --lab-out ../runs/eval_bc_regular --user-root ../runs/home
 & $g --headless --path game --fixed-fps 120 -- --lab-worker ../docs/evidence/lab/jobs/eval_bces_aggressive.json --lab-out ../runs/eval_bces_aggressive --user-root ../runs/home
+# roster sample policies (one ES drill run per fighter; same --user-root rules as above)
+foreach ($f in "f_stoke","f_dredge","f_gusto","f_dozer","f_slurry","f_jitters") { & $g --headless --path game --fixed-fps 120 -- --lab-worker ../docs/evidence/lab/jobs/roster/es_drill_$f.json --lab-out ../runs/roster/es_drill_$f --user-root ../runs/roster_home }
 # benches and the summary
 & $g --headless --path game --fixed-fps 120 -- --lab-worker --lab-bench inference --lab-out ../runs/bench32.json
 & $g --headless --path game --fixed-fps 120 -- --lab-worker --lab-bench inference --hidden 64,64 --lab-out ../runs/bench64.json
