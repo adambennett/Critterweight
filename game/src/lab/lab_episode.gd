@@ -34,6 +34,15 @@ func start(parent: Node, it: Dictionary, policy: PolicyData) -> String:
 	var content: Node = tree.root.get_node_or_null("Content")
 	var c_learner: CreatureDef = content.call("creature", str(ep.get("learner", ""))) as CreatureDef if content != null else null
 	var c_opp: CreatureDef = content.call("creature", str(ep.get("opponent_creature", ""))) as CreatureDef if content != null else null
+	var opp_mods := {}
+	var opp_kind := str(ep.get("opponent", "idle"))
+	if opp_kind.begins_with(LabOpponents.BUILD_PREFIX):
+		# one of your saved builds: its fighter with the techniques and supplements it finished with
+		var comp := compose_build(LabOpponents.build_of(opp_kind))
+		if comp.get("creature") == null:
+			return _fail("saved build unusable: %s" % "; ".join(comp.get("errors", PackedStringArray())))
+		c_opp = comp["creature"]
+		opp_mods = comp.get("mods", {})
 	if c_learner == null or c_opp == null:
 		return _fail("unknown creature '%s' / '%s'" % [str(ep.get("learner", "")), str(ep.get("opponent_creature", ""))])
 	var seed_value := int(ep.get("seed", 1))
@@ -72,9 +81,18 @@ func start(parent: Node, it: Dictionary, policy: PolicyData) -> String:
 		"sudden_death": false}
 	sim.setup({"arena": LabScenarios.arena_for(ep), "rules": rules, "seed": seed_value,
 		"fighters": [{"creature": c_learner, "team": 0, "source": src, "name": "Learner", "kind": "policy"},
-			{"creature": c_opp, "team": 1, "source": opp, "name": LabOpponents.display_name(str(ep.get("opponent", ""))), "kind": "bot"}]})
+			{"creature": c_opp, "team": 1, "source": opp, "name": LabOpponents.display_name(str(ep.get("opponent", ""))), "kind": "bot", "mods": opp_mods}]})
 	max_ticks = int(round_time * Engine.physics_ticks_per_second) + Engine.physics_ticks_per_second
 	return ""
+
+
+## A saved campaign build as a fighter: the campaign's own BuildApplier (techniques, supplements
+## and their hooks/patches; no Cannery upgrades, no Dose). {creature, mods, errors}.
+static func compose_build(build: Dictionary) -> Dictionary:
+	if str(build.get("fighter", "")) == "":
+		return {"creature": null, "errors": PackedStringArray(["no fighter"])}
+	var player := {"fighter": str(build["fighter"]), "techniques": build.get("techniques", []), "supplements": build.get("supplements", [])}
+	return BuildApplier.compose(CampaignCatalog.shared(), {"variant": "off_the_street", "dose": 0}, player, {"party": "solo"})
 
 
 func _fail(msg: String) -> String:

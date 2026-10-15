@@ -234,6 +234,8 @@ func start_match(cfg: Dictionary, on_finished: Callable = Callable()) -> MatchSc
 	var scene := MatchScene.new()
 	set_scene(scene)
 	scene.start(resolved)
+	if on_finished.is_valid():
+		scene.set_meta("on_finished", on_finished)     # MatchFlow.restart() ends a restart the same way
 	scene.match_finished.connect(func(result: Dictionary):
 		_record_match(cfg, scene, result)
 		match_ended.emit(result)

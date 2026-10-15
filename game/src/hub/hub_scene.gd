@@ -151,7 +151,14 @@ func player() -> Fighter:
 	return sim.fighters[0]
 
 
-## The Locker: walk around as another fighter (the body is rebuilt where you stand).
+## The hub is a local world, never an online match (MatchFlow.is_online: the settings screen opened
+## from the pause board must not say "online match — still running").
+func is_online() -> bool:
+	return false
+
+
+## The Locker: walk around as another fighter (the body is rebuilt where you stand). A challenge in
+## progress belongs to the fighter who started it, so it is called off.
 func switch_fighter(id: String) -> void:
 	var c := Content.creature(id)
 	var f := player()
@@ -159,6 +166,7 @@ func switch_fighter(id: String) -> void:
 		return
 	var at := f.ground_pos()
 	var yaw := f.facing_yaw
+	mode.cancel_activity()
 	mode.drop_carried(f)
 	f.rebuild(c, at, yaw)
 	f.reset_vitals()
@@ -199,7 +207,9 @@ func _exit_tree() -> void:
 		Audio.subtitle.disconnect(_on_subtitle)
 	if Settings.changed.is_connected(_on_setting_changed):
 		Settings.changed.disconnect(_on_setting_changed)
-	Audio.end_match()
+	# a spar, a lesson, the tape or a campaign fight started from here attached its own match
+	# audio before this scene left: only end the hub's own
+	Audio.end_match(sim)
 	if state and state.dirty:
 		Profiles.save()
 		state.dirty = false
@@ -212,6 +222,8 @@ func _exit_tree() -> void:
 func _physics_process(dt: float) -> void:
 	if sim == null:
 		return
+	# any board or menu over the hub (PAUSED included) stops the world's clocks (HubMode.frozen)
+	mode.frozen = App.top_screen() != null
 	sim.step(dt)
 	_process_events()
 	creature_view.push_transforms(player().rig.segment_transforms())

@@ -522,3 +522,37 @@ func test_verify_rebuilds_runs_and_rejects_tampering() -> void:
 	var o := RunController.verify_from(cat(), first["ctrl"], RunStore.json_stable(other.state))
 	check(bool(o["ok"]) and str((o["ctrl"] as RunController).state["run_id"]) == str(other.state["run_id"]),
 		"another run is never taken for a continuation: it is rebuilt on its own (full replay)")
+
+
+## Hub review #4: the Cannery's Title Contender (500 Clout) is what lets a Fight Camp card's Dose
+## clears count toward the Dosage cosmetics it shares with Off the Street (CAMPAIGN.md §10.1);
+## without it they stay on the Camp board. Off the Street is unaffected.
+func test_title_contender_counts_fight_camp_doses() -> void:
+	var ctrl := new_run({"seed": 105, "dose": 2, "variant": "fight_camp"})
+	play_synthetic(ctrl)
+	check_eq(ctrl.phase(), "victory", "precondition: the Fight Camp Dose 2 card was cleared")
+	var plain := Profiles.default_profile("camp_plain", "Plain")
+	CampaignProgression.ensure_fields(plain)
+	plain["ladder"]["fight_camp"] = {"unlocked": 3, "cleared": 2, "open": true}
+	var rep := CampaignProgression.finish_run(cat(), ctrl.state, "p0", plain)
+	check(not bool(rep["dose_ineligible"]), "Dose 2 is on this profile's Camp ladder")
+	var cos: Array = plain["unlocks"]["cosmetics"]
+	check(not cos.has("badge_dose_2"), "without Title Contender the Dose badge stays on the Camp board")
+	check_eq(str(rep.get("dose_cosmetics_need", "")), "meta_title_contender", "the report says what would count it")
+	check(cos.has("title_f_stoke"), "the clear still earns the fighter's title")
+	var contender := Profiles.default_profile("camp_tc", "Contender")
+	CampaignProgression.ensure_fields(contender)
+	contender["ladder"]["fight_camp"] = {"unlocked": 3, "cleared": 2, "open": true}
+	contender["camp"]["upgrades"]["meta_title_contender"] = 1
+	check(CampaignProgression.title_contender(contender), "the upgrade is read from the Cannery's ledger")
+	CampaignProgression.finish_run(cat(), ctrl.state, "p0", contender)
+	check((contender["unlocks"]["cosmetics"] as Array).has("badge_dose_2"), "with Title Contender the Fight Camp Dose clear earns the shared badge")
+	# Off the Street never needed it
+	var street := new_run({"seed": 106, "dose": 1})
+	play_synthetic(street)
+	var sp := Profiles.default_profile("street", "Street")
+	CampaignProgression.ensure_fields(sp)
+	sp["ladder"]["off_the_street"] = {"unlocked": 2, "cleared": 1, "open": true}
+	CampaignProgression.finish_run(cat(), street.state, "p0", sp)
+	if street.phase() == "victory":
+		check((sp["unlocks"]["cosmetics"] as Array).has("badge_dose_1"), "an Off the Street Dose clear earns its badge as before")

@@ -27,16 +27,18 @@ static func completed_ids() -> Array:
 	return t.get("exercises", [])
 
 
-## Starts the tutorial at exercise `index` (0-based). `on_exit` is called when the player
-## leaves (default: back to the tutorial menu or the main menu).
-static func start(index := 0, creature_id := "", on_exit: Callable = Callable()) -> MatchScene:
+## Starts the tutorial at exercise `index` (0-based). `exit_to` = {screen: App screen name, params}
+## is where the player goes when they leave (the Cannery: {"screen": "hub", "params": {spot}});
+## default: back to the tutorial menu or the main menu. A plain route, never a Callable: a static
+## holding a lambda crashes the engine at exit if the game is closed during the lesson.
+static func start(index := 0, creature_id := "", exit_to: Dictionary = {}) -> MatchScene:
 	var cid := creature_id if creature_id != "" and Content.creature(creature_id) != null else DEFAULT_FIGHTER
 	if Content.creature(cid) == null:
 		cid = str(Content.playable_creatures()[0])
 	var partner_id := PARTNER if Content.creature(PARTNER) != null else ("f_gusto" if cid != "f_gusto" else "f_stoke")
 	if Content.creature(partner_id) == null:
 		partner_id = cid
-	_exit_override = on_exit
+	_exit_route = exit_to.duplicate(true)
 	var t: Dictionary = Profiles.current.get("tutorial", {})
 	t["times_offered"] = int(t.get("times_offered", 0)) + 1
 	Profiles.current["tutorial"] = t
@@ -61,16 +63,23 @@ static func start_lesson(lesson_id: String, creature_id := "") -> void:
 	start(idx, creature_id)
 
 
-static var _exit_override: Callable = Callable()
+## Where the running lesson leaves to ({screen, params}; {} = the default exit). Plain data only.
+static var _exit_route: Dictionary = {}
 
 
 static func exit_tutorial() -> void:
-	var cb := _exit_override
-	_exit_override = Callable()
-	if cb.is_valid():
-		cb.call()
+	var route := _exit_route
+	_exit_route = {}
+	var screen := str(route.get("screen", ""))
+	if screen != "" and App.has_screen(screen):
+		App.goto(screen, route.get("params", {}))
 	else:
 		_default_exit()
+
+
+## Forgets where the current lesson would return to (leaving to the main menu, quitting the game).
+static func clear_exit_route() -> void:
+	_exit_route = {}
 
 
 static func _default_exit() -> void:

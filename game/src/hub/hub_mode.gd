@@ -37,6 +37,10 @@ var dodge_interacts := true          ## a buffered Dodge (pad A) near an interac
 var start_spot := "main_floor"
 var ludlow := {"pos": Vector3.ZERO, "yaw": 0.0, "leg": 0, "wait": 2.0, "hold": 0.0, "moving": false}
 var hidden_items := {}               ## item id -> true while not yet revealed
+## A board is open (the pause board, a conversation, a station...): the world's clocks stop — the
+## activities (bag challenge, chum drill, crate toss), the secrets' timers and Ludlow's round wait
+## and nothing is scored against the fighter standing at the board. HubScene sets it every tick.
+var frozen := false
 var delivered := {}                  ## item id -> true (given to Ludlow: removed from the world)
 var _pending_interact := {}          ## fighter index -> sim time of the request
 var _interact_cd := {}
@@ -75,6 +79,8 @@ func setup(match_sim) -> void:
 		if bool((HubLayout.ITEMS[item_id] as Dictionary).get("hidden", false)):
 			hidden_items[item_id] = true
 	_apply_persistent_world()
+	for item_id2 in HubLayout.ITEMS:
+		_sync_item_body(str(item_id2))
 	_register_hittables()
 	var lp: Vector3 = HubLayout.NAV[HubLayout.LUDLOW_ROUND[0]]
 	ludlow["pos"] = lp
@@ -244,6 +250,12 @@ func tick_fight(dt: float) -> void:
 	if f == null:
 		return
 	_keep_standing(f, dt)
+	if frozen:
+		# a board is open: whatever you hold stays in your hands and anything already flying lands,
+		# but no clock runs (a drill bucket can't hit you, a bag challenge can't run out)
+		_update_carry(0.0)
+		_update_flying()
+		return
 	_update_space(f, dt)
 	_update_ludlow(dt)
 	_update_carry(dt)
@@ -940,6 +952,27 @@ func _update_flying() -> void:
 		var c: RigidBody3D = world["crates"][i]
 		if c.global_position.y < -2.0:
 			_return_from_water("crate:%d" % i)
+	_return_lost_items()
+
+
+## The letter A and the elevator parts are needed for secrets: one thrown off the roof or the pier
+## (or left somewhere nobody can reach) goes back where it was found, so a missed throw never costs
+## a secret for the rest of the visit.
+func _return_lost_items() -> void:
+	for item_id in world["items"]:
+		if delivered.has(item_id) or hidden_items.has(item_id):
+			continue
+		var b: RigidBody3D = world["items"][item_id]
+		if b.freeze or _is_carried(b):
+			continue
+		var p := b.global_position
+		var fell := p.y < -2.0
+		var resting := b.linear_velocity.length() < 0.05 and not flying.has(item_id)
+		var unreachable := HubLayout.space_at(p + Vector3.UP * 0.5) == "" or p.y - _floor_under(p) > 1.9
+		if fell or (resting and unreachable):
+			flying.erase(item_id)
+			_return_from_water(str(item_id))
+			emit_hub({"type": "hub_item_returned", "item": item_id, "pos": (HubLayout.ITEMS[item_id] as Dictionary)["pos"]})
 
 
 func _floor_under(p: Vector3) -> float:
@@ -1000,6 +1033,22 @@ func fix_elevator() -> void:
 
 func show_item(item_id: String) -> void:
 	hidden_items.erase(item_id)
+	_sync_item_body(item_id)
+
+
+## A hidden item (the red button before the Scouting Report, the lid before the Scrapling drops it)
+## is not drawn and must not be solid either: it would block the walk past the filing cabinet.
+## Visible, undelivered items lying in the world collide as props.
+func _sync_item_body(item_id: String) -> void:
+	var b: RigidBody3D = world["items"].get(item_id)
+	if b == null or delivered.has(item_id) or _is_carried(b):
+		return
+	if hidden_items.has(item_id):
+		b.collision_layer = 0
+		b.collision_mask = 0
+	else:
+		b.collision_layer = Rig.LAYER_PROPS
+		b.collision_mask = HubWorld.PROP_MASK
 
 
 func _park_item(item_id: String) -> void:

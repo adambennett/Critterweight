@@ -14,6 +14,7 @@ var mode:
 	get:
 		return _mode_ref.get_ref() if _mode_ref != null else null
 var bag := ""
+var fighter_id := ""           ## who started it: the tier is theirs (HubScene calls it off on a fighter switch)
 var phase := "idle"            ## idle | countdown | running | done
 var t := 0.0
 var score := 0.0
@@ -36,6 +37,8 @@ func running() -> bool:
 
 func start(bag_id: String) -> void:
 	bag = bag_id
+	var f: Fighter = mode.player()
+	fighter_id = f.creature.id if f else "?"
 	phase = "countdown"
 	t = 0.0
 	score = 0.0
@@ -129,8 +132,7 @@ func finish() -> void:
 	phase = "done"
 	var tiers: Array = cfg.get("tiers", [300, 600, 1000])
 	var clouts: Array = cfg.get("clout", [10, 25, 50])
-	var f: Fighter = mode.player()
-	var fid := f.creature.id if f else "?"
+	var fid := fighter_id if fighter_id != "" else "?"
 	var rew: Dictionary = mode.state.reward_tiers("bag_%s_%s" % [bag, fid], score, tiers, clouts, "%s challenge" % str((cfg.get("bags", {}) as Dictionary).get(bag, {}).get("name", bag)))
 	mode.state.reward_tiers("bag_%s" % bag, score, [], [])
 	result = {"bag": bag, "score": int(score), "hits": hits, "best_combo": best_combo, "tier": int(rew["tier"]), "new_tier": int(rew["tier"]) > int(rew["previous"]),
