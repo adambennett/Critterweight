@@ -190,7 +190,7 @@
       "highlight": "hype",
       "intro": "Two lights, then {heavy} in the middle of the string. That's your finisher. Now the fun part: see the meter? That's Hype. Hits fill it. Getting hit fills it. Taunting fills it — {taunt} — if you've got the nerve. Full meter, {juice}. That's the JUICE. Yours is called {juice_name}. Don't ask what's in it.",
       "success": "That's the whole kit. Hands, heavy, guard, dodge, grab, two tricks, and the JUICE. Everything after this is timing.",
-      "hint": "{light}, {light}, then {heavy} quickly. For the JUICE: fill the meter — taunt with {taunt} when he's far away — then press {juice}.",
+      "hint": "{light}, {light}, then {heavy} as the second one lands. For the JUICE: fill the meter — taunt with {taunt} when he's far away — then press {juice}.",
       "adapt": {
         "no_finisher": {
           "intro": "No finisher in your kit: two lights and {heavy} just gets you a Heavy. So, the fun part: see the meter? That's Hype. Hits fill it. Getting hit fills it. Taunting fills it — {taunt} — if you've got the nerve. Full meter, {juice}. That's the JUICE. Yours is called {juice_name}. Don't ask what's in it.",
@@ -200,7 +200,7 @@
         "no_juice": {
           "intro": "Two lights, then {heavy} in the middle of the string. That's your finisher. Your kit's got no JUICE, so that's the whole lesson.",
           "goal": "Land a Finisher ({light} {light} then {heavy}). (No JUICE in your kit.)",
-          "hint": "{light}, {light}, then {heavy} quickly.",
+          "hint": "{light}, {light}, then {heavy} as the second one lands.",
           "success": "That's the whole kit. Hands, heavy, guard, dodge, grab, your tricks. No JUICE for you. Everything after this is timing."
         },
         "skip": {

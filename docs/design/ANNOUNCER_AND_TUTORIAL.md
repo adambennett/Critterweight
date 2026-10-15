@@ -315,52 +315,70 @@ Ids are stable; `{p}` = player fighter name, `{o}` = opponent name, `{n}` = a nu
 The course must be completable, with the inputs each exercise teaches, by every fighter against the Kid
 the game actually launches (`src/tutorial/`, data in `content/core/tutorial/exercises.json`).
 
-**Sparring partner.** Kid Lamprey's own kit (`npc_kid_lamprey`) when it exists. Until then a roster
-stand-in (`Tutorial.partner_for`): Gusto, unless he stands more than 1.6× the player's height, then
-Stoke (a Gusto player always spars Stoke). Gusto's wing and kick strikes are authored at a 1.84 m bird's
-neck height; size matching cannot bring them onto Jitters (0.97 m) or past Dredge's raised claws from
-any distance, so those drills would be impossible (or, for the dodge drill, pass without any threat).
+**Sparring partner.** Kid Lamprey's own kit, `npc_kid_lamprey` (`docs/kits/npc_kid_lamprey.md`), for
+every fighter. Without it (a content set that drops him) `Tutorial.partner_for` picks a roster stand-in:
+Gusto, unless he stands more than 1.6× the player's height, then Stoke (a Gusto player spars Stoke).
+Gusto's wing and kick strikes are authored at a 1.84 m bird's neck height; size matching cannot bring them
+onto Jitters (0.97 m) or past Dredge's raised claws from any distance, so those drills would be impossible
+(or, for the dodge drill, pass without any threat).
 
-**How the Kid drills** (`TutorialMode.KidScript`), the same for every partner body:
+**How the Kid drills** (`TutorialMode.KidScript`), the same for any partner body:
 - *One strike at a time.* His strings press the next Light only once the last strike connected or
-  finished its swing; a buffered Light is consumed at the move's cancel time, which for Stoke and Gusto is
-  the tick the active window opens, so a mashed string never lands.
-- *Feet planted at his spacing.* Before each drill attack he walks in (easing off as he arrives) or
-  steps back to his spacing and settles, so every strike starts from rest; walking momentum carried him
-  into raised guards (Dredge's claws stand 0.9 m out front), where strikes are smothered.
-- *Adaptive spacing.* Each attack kind keeps a record per spacing (fractions of the move's estimated
-  reach); one that lands less than half the time (two strikes of a string, else the strike; blocked and
-  parried count, dodged ones don't) gives way to the next.
+  finished its swing. A buffered Light is consumed at the move's cancel time, which for some kits (Stoke,
+  Gusto) is the tick the active window opens, so a mashed string never lands.
+- *Feet planted at his spacing.* Before each drill attack he walks in (easing off as he arrives) or steps
+  back to his spacing and settles, so every strike starts from rest; walking momentum carried him into
+  raised guards (Dredge's claws stand 0.9 m out front), where strikes are smothered.
+- *Adaptive spacing.* He starts at 0.8 of the move's estimated reach (the estimate overshoots: his jab
+  estimates 1.16 m and lands at 0.9–1.0 m, early in its window, where a parry is timed). Each attack kind
+  keeps a record per spacing; one that lands less than half the time (two strikes of a string, else the
+  strike; blocked and parried count, dodged ones don't) gives way to the next.
 - *Holds his ground in Hands.* Once a string starts landing he can't be knocked further than he stood at
-  the first hit (+0.15 m): Stoke's jab and cross knock the 55 kg Gusto out of the hook's reach, Dozer's
-  stomp does the same before the Scoop. Inside that distance he reacts to every hit normally.
-- *Freestyle:* Punching Bag bot with the Sparring difficulty's opponent handicaps (0.8× HP, 0.7×
-  damage, `content/core/ladder/difficulty.json`): a rookie Stoke's armored overhand otherwise beat
-  even strong Dredge play on health.
+  the first hit (+0.15 m). Strings that knock a light body out of the next hit's reach (Stoke's jab and
+  cross, Dozer's stomp before the Scoop) would otherwise make Hands luck; inside that distance he reacts
+  to every hit normally.
+- *Freestyle:* Punching Bag bot with the Sparring difficulty's opponent handicaps (0.8× HP, 0.7× damage,
+  `content/core/ladder/difficulty.json`). Even his deliberately weak kit splits 60 s rounds with a slow
+  fighter (measured: a strong Dredge needed two rounds without them; one with them).
 
 **Checks read the fighter's real kit.**
-- *Hands*: the kit's first three string slots, named from the kit (`{l_names}`). Area effects fired
-  by a string move count as that move's hit (Dozer's L2 Hoof Stomp is an area at the hoof). The chain
-  resets when it goes cold. Lights mashed so fast that one cancels the last before it lands
-  (`TutorialMode.rushable`: Stoke, Gusto) get Granny's `rush` line: "tap, let it land, tap again".
-- *Heavy*: any Heavy first, then a charged one: the dedicated `heavy_charged` (Quarry Ram, Downdraft,
-  Hull Breaker, Furnace Haymaker) or a Heavy held to ≥ 0.35 of its charge time (where Fighter switches
-  to `heavy_charged`). Variant slots (`heavy@juiced`) count as their slot.
+- *Hands*: the kit's first three string slots, named from the kit (`{l_names}`). The chain resets when
+  it goes cold. Lights mashed so fast that one cancels the last before it lands
+  (`TutorialMode.rushable`: Stoke, Gusto) get Granny's `rush` line: "tap, let it land, tap again". Her
+  hint opens with "step in and plant your feet": a string started on arrival from a walk carries the
+  momentum into the Kid (Gusto's Scissor Kick then starts with the foot against his body and can't
+  land); from a set stance every roster string lands on him.
+- *Effect hits count for the move that fired them*: an effect with an `id` by that id (Slurry's
+  Finisher spits the projectile `venom_spit`, which lands after the move has ended), an unnamed one by
+  its same-tick `effect` event (Dozer's L2 Hoof Stomp is an area at the hoof).
+- *Heavy*: any Heavy first, then a charged one: the dedicated `heavy_charged` (named in the goal,
+  `{charged_name}`: Furnace Haymaker, Downdraft, Hull Breaker, Quarry Ram) or a Heavy held to ≥ 0.35 of its
+  charge time (where Fighter switches to `heavy_charged`). Variant slots (`heavy@juiced`) count as their slot.
+- *Dodge / Dash Attack, Finisher*: the Kid's Heavy by its base slot; dash attack and finisher hits by
+  slot, effects included. The Finisher is Heavy inside a string Light's cancel window, which some kits
+  open late (Slurry's Tail Flick at 0.42 s), so the hint says "then {heavy} as the second one lands",
+  not "quickly": a Heavy pressed early expires in the input buffer.
 - *Missing slots* are honest, not silent: each exercise's `adapt` block (`no_charge`, `no_dash`,
-  `no_finisher`, `no_juice`, or `skip` when nothing is possible) replaces its intro/goal/hint/success
-  lines and the progress text drops the missing part. No current roster kit lacks a slot; mod kits may.
+  `no_finisher`, `no_juice`, or `skip` when nothing is possible) replaces its intro/goal/hint/success lines
+  and the progress text drops the missing part. No current roster kit lacks a slot; mod kits may.
 
-| Fighter | Kid stand-in | Kit specifics the course handles |
-|---|---|---|
-| Test Dummy (`dev_biped`) | Gusto | — |
-| Stoke | Gusto | jab + cross knock Gusto out of the hook's reach (Kid holds); mashed lights cancel before they land (rush line) |
-| Gusto | Stoke | his string needs knockback space (kick 1.0–1.5 m): the hold never closes it; mashed lights cancel (rush line) |
-| Dredge | Stoke | guards with claws far out front: the Kid strikes from his settled spacing |
-| Dozer | Gusto | L2 Hoof Stomp is an area effect; the Quarry Ram needs room to travel (released against a body it only shoves) |
-| Slurry | Gusto | stub kit on this branch (its Tail Sweep stub hits behind it): pending the real kit |
-| Jitters | Stoke | 0.97 m body: Gusto can't reach it; the stub kit's strikes are pending the real kit |
+| Fighter | Kit specifics the course handles |
+|---|---|
+| Test Dummy (`dev_biped`) | — |
+| Stoke | jab and cross knock a light body out of the hook's reach (the Kid holds); mashed lights cancel before they land (rush line) |
+| Gusto | his Scissor Kick needs room (lands from 0.85–1.45 m): from a set stance it gets it, out of a run his lunges jam him into the Kid; mashed lights cancel (rush line) |
+| Dredge | guards with claws far out front (the Kid strikes from his settled spacing); a slow kit in the freestyle (Sparring handicaps) |
+| Dozer | L2 Hoof Stomp is an area effect; the Quarry Ram needs room to travel (released against a body it only shoves: "give it room") |
+| Slurry | its string lands from a long step out (the Head Butt drives the head ~1.3 m; its reach estimate is 0.97 m); Finisher Venom Spit is a projectile (counted by its effect id) |
+| Jitters | 0.97 m body: the Kid's low body jabs reach it (the Gusto fallback stand-in cannot) |
+
+Slurry and Jitters were checked with their real kits on a trial merge of their kit branch (the stub kits
+on main at the time could not do the Heavy and the freestyle: a stub Tail Sweep that hits behind Slurry,
+a stub Jitters without damage to speak of).
 
 Verification: `test_tutorial` runs the whole course with the pairing the game launches; run it per fighter
-with `TUTORIAL_CREATURE=<id>` (and `TUTORIAL_PARTNER=<id>` to try other Kid bodies; `TUTORIAL_TRACE=1`
-prints each exercise's events). The driver stands in for a competent player: hit-confirm string rhythm,
-learned parry timing, spacing tried and varied like a person would, kit personality for the freestyle bot.
+with `TUTORIAL_CREATURE=<id>` (`TUTORIAL_PARTNER=<id>` tries other Kid bodies, `TUTORIAL_TRACE=1` prints
+each exercise's events). The driver stands in for a competent player: hit-confirm string rhythm, parry and
+dodge timing learned from when his strikes actually land, spacing tried and varied like a person would,
+the kit's own bot personality for the freestyle. `test_kit_npc_kid_lamprey` runs the Kid's side of the
+drills for every roster fighter with its own drivers.
