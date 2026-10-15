@@ -11,6 +11,9 @@ extends RefCounted
 ## waves / sequential entries -> parked fighters swapped in by the mode; timed sudden death ->
 ## round_time + 1-HP sudden death; ffa -> enemies on separate teams; hype_x2 / enemy start Hype ->
 ## Fighter.mods; puddles_x2 -> zone lifetime multiplier; blister_fast -> loadout time_scale patch.
+## Spars (event "spar" fights) are a copy of your fighter at the template's HP multiplier and are
+## never scaled by difficulty, Dose or party size. Bosses use their own phase2_at (a run modifier
+## such as Dose 8 only makes phase 2 come sooner).
 
 const PLAYER_TEAM := 0
 const ENEMY_TEAM := 1
@@ -117,10 +120,12 @@ static func plan(catalog: CampaignCatalog, state: Dictionary, encounter_id: Stri
 					var tb := _random_build(catalog, f, ntech, rng)
 					e["build"] = str(tb[0])
 					e["techniques"] = tb[1]
-				if int(rr.get("enemy_extra_techniques", 0.0)) > 0:
+				# Dose 6 juices enemy fighters — never a spar's copy of you (sparring is unscaled)
+				if int(rr.get("enemy_extra_techniques", 0.0)) > 0 and not spar:
 					var extra := _random_build(catalog, f, (e["techniques"] as Array).size() + int(rr["enemy_extra_techniques"]), rng, e["techniques"])
 					e["techniques"] = extra[1]
-				e["start_hype"] = maxf(float(e["start_hype"]), float(rr.get("enemy_start_hype", 0.0)))
+				if not spar:
+					e["start_hype"] = maxf(float(e["start_hype"]), float(rr.get("enemy_start_hype", 0.0)))
 			e["start_hype"] = maxf(float(e["start_hype"]), float(sp.get("enemy_start_hype", 0.0)))
 			enemies.append(e)
 	# Dose 5: every normal fight adds a Scrapling matching the arena
@@ -204,16 +209,17 @@ static func plan(catalog: CampaignCatalog, state: Dictionary, encounter_id: Stri
 		hp_mult *= float(nf["enemy_hp_mult"])
 		p_out["rule_tags"].append("Weight class: enemies HP x%.2f" % float(nf["enemy_hp_mult"]))
 	for e4 in enemies:
-		# bosses use their own party multiplier instead of the generic enemy one (CAMPAIGN.md §11)
-		e4["hp_mult"] = float(e4["hp_mult"]) * hp_mult * (boss_hp_mult if e4["kind"] == "boss" else party_hp_mult)
-		e4["dmg_mult"] = dmg_mult
+		if spar:
+			# a spar is a copy of your fighter at the template's own HP multiplier (x0.6): no
+			# difficulty, Dose or party scaling of its HP or damage
+			e4["dmg_mult"] = 1.0
+		else:
+			# bosses use their own party multiplier instead of the generic enemy one (CAMPAIGN.md §11)
+			e4["hp_mult"] = float(e4["hp_mult"]) * hp_mult * (boss_hp_mult if e4["kind"] == "boss" else party_hp_mult)
+			e4["dmg_mult"] = dmg_mult
 		e4["name"] = _enemy_name(catalog, e4)
 		if nf.has("enemy_start_hype"):
 			e4["start_hype"] = maxf(float(e4["start_hype"]), float(nf["enemy_start_hype"]))
-	# spar: a copy of the player's fighter at HP x0.6, no scaling
-	if spar:
-		for e5 in enemies:
-			e5["hp_mult"] = float(e5.get("hp_mult", 1.0))
 	if enemies.size() > MAX_TOTAL_FIGHTERS - players.size():
 		enemies = enemies.slice(0, MAX_TOTAL_FIGHTERS - players.size())
 	p_out["enemies"] = enemies
@@ -465,8 +471,7 @@ static func build_match(catalog: CampaignCatalog, state: Dictionary, plan_d: Dic
 		var bmods: Dictionary = state.get("flags", {}).get("boss_mods", {}).get(str(boss_fight.get("creature", "")), {})
 		mode_cfg["boss"] = boss_fight
 		mode_cfg["boss_mods"] = bmods
-		var rr := RunRules.compute(catalog, state)
-		mode_cfg["phase2_at"] = float(rr.get("boss_phase2_at", float(boss_fight.get("phase2_at", 0.5))))
+		mode_cfg["phase2_at"] = boss_phase2_at(catalog, state, boss_fight)
 		var lead := 0.0
 		for p2 in players:
 			lead = maxf(lead, float(RunRules.compute(catalog, state, p2).get("boss_tell_lead", 0.0)))
@@ -482,6 +487,17 @@ static func build_match(catalog: CampaignCatalog, state: Dictionary, plan_d: Dic
 		"context": {"campaign": true, "variant": plan_d.get("variant", ""), "encounter": plan_d.get("encounter", ""),
 			"rule_tags": plan_d.get("rule_tags", []), "dark": _any_dark(players)}}
 	return {"config": config, "errors": errors, "warnings": warnings, "roles": roles}
+
+
+## A boss's phase-2 threshold in this run: its own content value (boss_fights/*.json phase2_at);
+## a run modifier (Dose 8 "No Mercy": 65%) only ever brings phase 2 sooner, never later.
+static func boss_phase2_at(catalog: CampaignCatalog, state: Dictionary, boss_fight: Dictionary) -> float:
+	var run_default := float(CampaignCatalog.RUN_DEFAULTS["boss_phase2_at"])
+	var own := float(boss_fight.get("phase2_at", run_default))
+	var run := float(RunRules.compute(catalog, state).get("boss_phase2_at", run_default))
+	if is_equal_approx(run, run_default):
+		return own
+	return maxf(own, run)
 
 
 static func _merged_next_rules(p: Dictionary) -> Dictionary:

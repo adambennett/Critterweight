@@ -270,3 +270,230 @@ func test_tag_team_format() -> void:
 		if mode.is_party(f) and not mode.is_parked(f):
 			active += 1
 	check_eq(active, 1, "one active party fighter; the partner waits on the apron")
+
+
+# --- review regressions ----------------------------------------------------------------------------
+
+## A state the host could claim at the end: Dose 10, victory and 50,000 Clout each.
+func _forged_victory(st: Dictionary) -> Dictionary:
+	var forged: Dictionary = st.duplicate(true)
+	forged["phase"] = "victory"
+	forged["dose"] = 10
+	forged["node"] = {}
+	forged["result"] = {"victory": true, "abandoned": false, "act": 3, "node": "", "elapsed": 1.0, "dose": 10, "difficulty": "amateur",
+		"variant": "off_the_street", "mode": "campaign", "custom": false, "seed_text": str(st.get("seed_text", "")), "players": {}, "stats": {}}
+	for p in forged["players"]:
+		p["clout"] = 50000
+	return forged
+
+
+## Plays the host's run to its end with synthetic fight results (members follow over loopback).
+func _finish_party_run(s: Array, pids: Array) -> void:
+	var host: CoopSession = s[0]
+	var guard := 0
+	while not host.ctrl.is_over() and guard < 400:
+		guard += 1
+		if host.ctrl.phase() == "map":
+			tick_all(s, 11.0)
+		elif host.ctrl.phase() == "fight":
+			host.complete_fight(fake_result(host.ctrl))
+		else:
+			CampaignAutoPilot.settle(host.ctrl, pids)
+			host._after_change("test")
+		tick_all(s, 0.1)
+	tick_all(s, 0.1, 3)
+
+
+## Turns the next reachable node into a group event, and votes the party into it.
+func _enter_group_event(s: Array, event_id: String) -> void:
+	var host: CoopSession = s[0]
+	var nid := str(host.ctrl.available_nodes()[0])
+	var n := RunState.node(host.ctrl.state, nid)
+	n["type"] = "event"
+	n["event"] = event_id
+	n["encounter"] = ""
+	n.erase("hidden")
+	for m in s:
+		(m as CoopSession).act("vote", {"node": nid})
+	tick_all(s, 0.1, 2)
+
+
+## Review #3: host-only messages are accepted only from the host (the transport's peer id): a
+## member forging run_end / ticket / run_state / host_changed changes nothing for the others.
+func test_members_ignore_host_messages_from_other_members() -> void:
+	var s := make_party(3)
+	var host: CoopSession = s[0]
+	var victim: CoopSession = s[1]
+	var attacker: CoopSession = s[2]
+	var forged := _forged_victory(host.ctrl.state)
+	var before := Saves.checksum(victim.profile)
+	var position := str(host.ctrl.state.get("position", ""))
+	attacker.transport.send("p1", "run_end", {"state": forged})
+	attacker.transport.send("p1", "ticket", RunStore.make_ticket(forged, "p2"))
+	attacker.transport.send("p1", "run_state", {"state": forged, "host": "p2", "reason": "forged"})
+	attacker.transport.send("p1", "host_changed", {"host": "p2"})
+	tick_all(s, 0.1, 3)
+	check(not victim._credited, "a forged run_end from a member is not credited")
+	check_eq(Saves.checksum(victim.profile), before, "the victim's profile is untouched (no Clout, ladder, cosmetics)")
+	check_eq(victim.host_id, "p0", "a member cannot make itself host")
+	check(str(victim.ticket.get("state", {}).get("phase", "map")) != "victory", "a forged ticket is not kept")
+	check_eq(str(victim.state().get("phase", "")), host.ctrl.phase(), "the mirror still shows the host's run")
+	check_eq(str(victim.state().get("position", "")), position, "unchanged")
+
+
+## Review #3: even from the host, a checkpoint or final result must be this party's run and must
+## follow from its own decision log before a member keeps or credits it.
+func test_host_results_must_follow_their_log() -> void:
+	var s := make_party(2)
+	var host: CoopSession = s[0]
+	var mem: CoopSession = s[1]
+	var forged := _forged_victory(host.ctrl.state)
+	var notes := []
+	mem.notice.connect(func(t: String) -> void: notes.append(t))
+	host.transport.send("p1", "ticket", RunStore.make_ticket(forged, "p0"))
+	host.transport.send("p1", "run_end", {"state": forged})
+	tick_all(s, 0.1, 2)
+	check(not mem._credited, "a tampered final result is not credited")
+	check(not str(mem.ticket.get("state", {}).get("phase", "map")) in ["victory", "defeat"], "a tampered checkpoint is not kept")
+	check(notes.any(func(t): return str(t).contains("not credited")), "the member is told why (%s)" % str(notes))
+	# a state of another run (other id/seed) is not mirrored either
+	var other := RunController.start_run(cat(), party_cfg(2, {"seed": 999, "created_at": 8})).state
+	host.transport.send("p1", "run_state", {"state": other, "host": "p0", "reason": "x"})
+	tick_all(s, 0.1)
+	check_eq(str(mem.state().get("run_id", "")), str(host.ctrl.state["run_id"]), "another run's state is ignored")
+	# the honest end of the run is still credited, from the rebuilt run
+	_finish_party_run(s, ["p0", "p1"])
+	check_eq(host.ctrl.phase(), "victory", "party run finished")
+	check(mem._credited, "the honest result is credited")
+	check_eq(int(mem.profile["records"]["runs"]["off_the_street"]["clears"]), 1, "one clear for the member")
+
+
+## Review #3: host_changed counts only from the successor the election rule picks (next
+## connected member in Captain order) — and only once the host is really gone.
+func test_host_change_only_from_the_elected_successor() -> void:
+	var s := make_party(3)
+	var host: CoopSession = s[0]
+	var p1: CoopSession = s[1]
+	var p2: CoopSession = s[2]
+	tick_all(s, 11.0)
+	check_eq(host.ctrl.phase(), "fight", "a node boundary passed: members hold a checkpoint")
+	# p2 is not next after p0 (p1 is): ignored
+	p2.transport.send("p1", "host_changed", {"host": "p2"})
+	tick_all(s, 0.1)
+	check_eq(p1.host_id, "p0", "a claim from the wrong member is ignored")
+	# p1 claims while p0 is still connected: held, not followed
+	p1.transport.send("p2", "host_changed", {"host": "p1"})
+	tick_all(s, 0.1)
+	check_eq(p2.host_id, "p0", "no host change while the host is still here")
+	# p0 really leaves: the held claim of the rightful successor is followed at once
+	hub.leave("p0")
+	tick_all([p1, p2], 0.1, 2)
+	check_eq(p2.host_id, "p1", "the successor's claim is followed once the host is gone")
+	check(not p2.waiting_host, "no 60 s wait needed")
+
+
+## Review #5: a group event's vote offers only what every member can pay; a pick that still
+## fails is dropped and the error broadcast; idle parties resolve too — never a loop.
+func test_group_event_vote_never_loops() -> void:
+	var s := make_party(2)
+	var host: CoopSession = s[0]
+	host.ctrl.player("p0")["scrip"] = 200
+	host.ctrl.player("p1")["scrip"] = 20
+	_enter_group_event(s, "evt_the_belt")
+	check_eq(host.ctrl.phase(), "event", "in the group event")
+	tick_all(s, 0.1)
+	check(host.event_vote != null, "the party votes")
+	if host.event_vote == null:
+		return
+	check_eq(host.event_vote.options, ["window"], "Buy (50 Scrip each) is not on the ballot: Member 1 has 20")
+	# nobody votes: the timer resolves it (the deterministic pick can only be what the party can pay)
+	tick_all(s, 11.0, 2)
+	check(host.ctrl.phase() != "event", "the idle party moved on")
+	# a pick that fails at resolution (Scrip spent since the vote opened) is dropped and reported
+	var s2 := make_party(2)
+	var h2: CoopSession = s2[0]
+	h2.ctrl.player("p0")["scrip"] = 200
+	h2.ctrl.player("p1")["scrip"] = 200
+	_enter_group_event(s2, "evt_the_belt")
+	tick_all(s2, 0.1)
+	check(h2.event_vote != null and (h2.event_vote.options as Array).has("buy"), "Buy is on the ballot while everyone can pay")
+	var notes := []
+	(s2[1] as CoopSession).notice.connect(func(t: String) -> void: notes.append(t))
+	h2.act("event_choice", {"choice": "buy"})
+	h2.ctrl.player("p1")["scrip"] = 10
+	(s2[1] as CoopSession).act("event_choice", {"choice": "buy"})
+	tick_all(s2, 0.1, 2)
+	check_eq(h2.ctrl.phase(), "event", "the failed pick changed nothing")
+	check(notes.any(func(t): return str(t).contains("could not be done")), "every member hears why (%s)" % str(notes))
+	tick_all(s2, 0.1)
+	check(h2.event_vote != null and not (h2.event_vote.options as Array).has("buy"), "the failed pick is not offered again")
+	var rounds := 0
+	while h2.ctrl.phase() == "event" and rounds < 4:
+		rounds += 1
+		tick_all(s2, 11.0)
+	check(h2.ctrl.phase() != "event", "the next vote resolves")
+	var chosen := ""
+	for e in h2.ctrl.state["log"]:
+		if str(e["k"]) == "event":
+			chosen = str(e["d"]["choice"])
+	check_eq(chosen, "window", "with what the party could pay")
+
+
+## Review #9: one member's choice on a GROUP event is a vote, never the decision.
+func test_member_choice_on_group_event_is_a_vote() -> void:
+	var s := make_party(3)
+	var host: CoopSession = s[0]
+	var nid := str(host.ctrl.available_nodes()[0])
+	var n := RunState.node(host.ctrl.state, nid)
+	n["type"] = "event"
+	n["event"] = "evt_lost_dog"
+	n["encounter"] = ""
+	n.erase("hidden")
+	for i in 3:
+		(s[i] as CoopSession).act("vote", {"node": nid})
+	host.tick(0.1)                    # the route vote resolves: the party is in the event
+	(s[2] as CoopSession).tick(0.0)
+	check_eq(str((s[2] as CoopSession).state().get("phase", "")), "event", "the member sees the group event")
+	(s[2] as CoopSession).act("event_choice", {"choice": "feed"})
+	host.tick(0.1)                    # arrives before the host opened the event vote itself
+	check_eq(host.ctrl.phase(), "event", "one member did not decide for the party")
+	check(host.event_vote != null and str(host.event_vote.votes.get("p2", "")) == "feed", "it counted as p2's vote")
+	host.act("event_choice", {"choice": "pet"})
+	(s[1] as CoopSession).act("event_choice", {"choice": "pet"})
+	tick_all(s, 0.1, 2)
+	var chosen := ""
+	for e in host.ctrl.state["log"]:
+		if str(e["k"]) == "event":
+			chosen = str(e["d"]["choice"])
+	check_eq(chosen, "pet", "the majority decided")
+
+
+## Review #11: party slots are cleared when the run ends (they are no suspended runs then), on
+## the host and on every member.
+func test_party_slots_cleared_at_run_end() -> void:
+	var host_store := RunStore.new(temp_dir("coop_host_%d" % Time.get_ticks_usec()))
+	var mem_store := RunStore.new(temp_dir("coop_mem_%d" % Time.get_ticks_usec()))
+	hub = LoopbackTransport.Hub.new()
+	var t0 := hub.join("p0")
+	var t1 := hub.join("p1")
+	var host := CoopSession.host_new(t0, cat(), party_cfg(2), host_store, Profiles.default_profile("m0", "M0"))
+	var mem := CoopSession.member_join(t1, cat(), "p0", mem_store, Profiles.default_profile("m1", "M1"))
+	var s := [host, mem]
+	tick_all(s, 0.1, 2)
+	var slot := RunStore.slot_for(host.ctrl.state)
+	tick_all(s, 11.0)
+	check(bool(host_store.load_slot("m0", slot, cat())["exists"]), "the host saves the party run while it goes on")
+	check(bool(mem_store.load_slot("m1", slot, cat())["ok"]), "the member keeps a verified replica checkpoint")
+	_finish_party_run(s, ["p0", "p1"])
+	check(host.ctrl.is_over(), "the run ended")
+	check(mem._credited, "the member was credited")
+	check(not bool(host_store.load_slot("m0", slot, cat())["exists"]), "the host's party slot is cleared at the end")
+	check(not bool(mem_store.load_slot("m1", slot, cat())["exists"]), "the member's party slot is cleared at the end")
+	check(host_store.list("m0", cat()).is_empty() and mem_store.list("m1", cat()).is_empty(), "nothing left to resume")
+
+
+## Review #4: a co-op host can only deal a Dose its own profile has unlocked.
+func test_host_dose_clamped_to_own_ladder() -> void:
+	hub = LoopbackTransport.Hub.new()
+	var host := CoopSession.host_new(hub.join("p0"), cat(), party_cfg(2, {"dose": 7}), null, Profiles.default_profile("m0", "M0"))
+	check_eq(int(host.ctrl.state["dose"]), 0, "a closed Dosage deals the base card")

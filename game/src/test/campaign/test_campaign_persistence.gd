@@ -180,6 +180,39 @@ func test_inconsistent_state_rejected() -> void:
 	check(str(r["error"]).contains("cannot be resumed"), "clear message: %s" % r["error"])
 
 
+## Review #10: a crash can leave a slot with only its verified .tmp and/or its .bak — load_slot
+## recovers from those, so the suspended-runs list must show the slot too (and abandoning a
+## broken one moves every copy aside, so no leftover brings it back).
+func test_slots_with_only_tmp_or_bak_are_listed() -> void:
+	var ctrl := new_run({"seed": 617})
+	store.save(ctrl.state, "tester")
+	var path := store.slot_path("tester", "off_the_street")
+	_advance(ctrl, 1)
+	Saves.simulate_crash_after_tmp = true
+	store.save(ctrl.state, "tester")          # verified .tmp written, then "crash"
+	Saves.simulate_crash_after_tmp = false
+	DirAccess.rename_absolute(path, path + ".bak")   # ...and the main file had just been rotated
+	check(not FileAccess.file_exists(path), "precondition: no main file, only .tmp and .bak")
+	var r := store.load_slot("tester", "off_the_street", cat())
+	check(bool(r["ok"]), "load_slot recovers it: %s" % r["error"])
+	var listed := store.list("tester", cat())
+	check_eq(listed.size(), 1, "the recoverable run is listed")
+	if listed.size() == 1:
+		check_eq(str(listed[0]["slot"]), "off_the_street", "under its slot name")
+		check(bool(listed[0]["ok"]), "and resumable from the list")
+	DirAccess.remove_absolute(path + ".tmp")
+	check_eq(store.list("tester", cat()).size(), 1, "a slot with only its .bak is listed too")
+	# a broken run that is abandoned: every copy moved aside, nothing left to list
+	var f := FileAccess.open(path + ".bak", FileAccess.WRITE)
+	f.store_string("garbage")
+	f.close()
+	var listed2 := store.list("tester", cat())
+	check(listed2.size() == 1 and not bool(listed2[0]["ok"]), "a damaged leftover is listed with its error")
+	store.quarantine("tester", "off_the_street")
+	check(store.list("tester", cat()).is_empty(), "quarantine moves every copy aside")
+	check_eq(RunStore.slot_of_file("off_the_street.json.bak.damaged-5"), "", "quarantined copies are no slots")
+
+
 func test_party_ticket_integrity() -> void:
 	var ctrl := new_run({"seed": 615})
 	var t := RunStore.make_ticket(ctrl.state, "p0")

@@ -12,7 +12,8 @@ extends RefCounted
 ##             a build direction; skip only if every option scores negative; Treasure takes the
 ##             Scrip alternative when the best supplement is weak.
 ##   Events  - expected value of each available choice's weighted outcomes (HP weighted more
-##             when low, Scrip, picks, side effects, fights only when healthy).
+##             when low, Scrip, picks, side effects, fights only when healthy). Availability is
+##             EventRunner's (group costs must fit every member); nothing available = PASS.
 ##   Shop    - buy the best affordable item above a value threshold keeping a 30 Scrip reserve;
 ##             Rub-down with 2+ side effects; then leave.
 ##   Rest    - Patch up below 60% HP, Rub-down with 2+ side effects, else Train if a technique
@@ -205,7 +206,8 @@ static func choose_event(ctrl: RunController, pid: String) -> String:
 		if v > best_v + 1e-6:
 			best_v = v
 			best = str(c["id"])
-	return best
+	# nothing anyone can take (e.g. a group cost nobody can split): move on instead of stalling
+	return best if best != "" else EventRunner.PASS
 
 
 static func rest_choice(ctrl: RunController, pid: String) -> String:

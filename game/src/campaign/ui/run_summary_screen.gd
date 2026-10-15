@@ -128,6 +128,8 @@ func _reward_lines() -> Array:
 	if bool(ctrl.state.get("custom", false)):
 		var reasons: Array = ctrl.state.get("custom_reasons", ctrl.state.get("start_cfg", {}).get("custom_reasons", []))
 		out.append(["Custom run%s: statistics and history only — no records, ladder or unlocks." % ((" (%s)" % ", ".join(reasons)) if not reasons.is_empty() else ""), CampaignUI.MUTED])
+	if bool(rep.get("dose_ineligible", false)):
+		out.append(["Dose %d is not on your own Dosage ladder (or not allowed on this difficulty): no Dose records, badges or ladder progress." % int(ctrl.state.get("dose", 0)), CampaignUI.MUTED])
 	if bool(rep.get("ladder_open", false)):
 		out.append(["THE DOSAGE IS OPEN: Dose 1 unlocked!", CampaignUI.DANGER])
 	elif int(rep.get("new_dose", 0)) > 0:
