@@ -1,0 +1,155 @@
+{
+  "_doc": "The Cannery's eight NPCs (docs/design/HUB.md §2, docs/HUB_SYSTEMS.md §4). Lines may use {player} {fighter} {boss} {act} {kos} {dose} {clout} {secrets}. 'run' lines react to the most recent Fight Camp run: none | loss (act 1) | loss_act2 | loss_act3 | win (beat at least one boss) | title. 'barks' play when you walk past (one per NPC every 25 s), 'talk' when you open a conversation, 'hit' when you punch them (no damage in the hub), 'lines' are keyed reactions the hub triggers.",
+  "items": [
+    {"id": "npc_granny", "type": "npc", "key": "granny", "name": "Granny Haymaker", "role": "Head coach", "speaker": "granny", "color": "#B06BFF",
+     "model": "res://assets/models/hub/granny_haymaker.glb", "height": 1.25,
+     "barks": ["Hands up. Chin down. Everything else is details.", "Hit the bag like it owes you Scrip.", "I've seen faster feet on a filing cabinet.", "Breathe out when you throw. Breathe in when you're winning.", "That bag's been here longer than you. Show it some respect. Then show it your elbow."],
+     "talk": ["You again. Good. The bag missed you.", "Gloves on, mouth shut, eyes open. What do you need?", "I was knocking out longshoremen in this cannery before your parents were spawned. Talk."],
+     "hit": ["Cute.", "Was that a punch or a rumor?", "Hit the BAG, sweetheart."],
+     "run": {
+       "none": ["First day? Then here's the first lesson: everybody gets hit. Champions get up."],
+       "loss": ["You lost to a *dog*? Fine. Dogs are fast. Show me your guard.", "{boss} sent you home in Act {act}. I've seen worse. I've *coached* worse. Bag. Now."],
+       "loss_act2": ["Act 2 and {boss} got you. That eel doesn't care how you feel. Neither do I. Again.", "You made the main card. Now make it to the end of it."],
+       "loss_act3": ["One fight from the belt and you blinked. I saw it. Everybody saw it. Don't blink.", "The Commissioner doesn't fight fair. Neither should your footwork."],
+       "win": ["You beat a boss with {fighter}. Don't let it go to your head. Let it go to your hands.", "Good night's work. Ice your knuckles, then hit the bag."],
+       "title": ["Champion. Hmph. Now the hard part: staying one.", "You took the belt off that turtle. My knees haven't been this happy since 1973."]
+     },
+     "lines": {
+       "bag_start": "Thirty seconds. Make the bag regret being a bag.",
+       "bag_low": "That's a warm-up score. Go again.",
+       "bag_mid": "Now we're talking. Hands back to the face after every shot.",
+       "bag_high": "THAT'S a score. The bag's filing a complaint.",
+       "bag_secret_hint": "Bag three's got a secret. Always has. Hit it with something charged and see what swings loose.",
+       "flare_up": "Did you just set my bag on fire? ...Do it again.",
+       "upgrade": "Now THAT'S equipment. Don't break it. Break yourself on it.",
+       "tutorial": "Lessons are in the cage. Bring your guard; leave your excuses.",
+       "scrapling": "Something's been sleeping under those stairs. Hit the heavy bag hard enough and it'll wake up.",
+       "lights": "Somebody finally fixed the lights. I could see you losing before. Now I can see it in color."
+     },
+     "options": ["bag_challenge", "tutorial", "station:gym_floor", "last_run"]},
+
+    {"id": "npc_snappington", "type": "npc", "key": "snappington", "name": "Commissioner Snappington", "role": "Runs the league", "speaker": "snappington", "color": "#C9A227",
+     "model": "res://assets/models/hub/snappington_desk.glb", "height": 1.3, "static": true,
+     "barks": ["Sign here. And here. The waiver is mostly decorative.", "The Commission has reviewed your conduct and found it entertaining.", "Title shots are earned. Or purchased. Mostly earned.", "Do not touch the gavel."],
+     "talk": ["State your business. The Commission bills by the minute.", "Ah. The applicant. Sit. Do not sit there.", "The rulebook is four hundred pages. I wrote it. I remember all of it."],
+     "hit": ["The Commission notes the assault. The Commission is unbothered.", "That will be on your record. In ink.", "Shell. Is. Armored."],
+     "run": {
+       "none": ["A new contender. The Commission will now pretend to be surprised when you win."],
+       "loss": ["Your card ended in Act {act}. The paperwork, however, is eternal.", "The Commission has filed your loss under 'learning experiences'. It is a thick folder."],
+       "loss_act2": ["Act 2. Respectable. Unremarkable. Respectably unremarkable.", "{boss} sends regards. And an invoice."],
+       "loss_act3": ["You reached my desk and fell at the last signature. The Commission is... almost impressed.", "So close to the belt. The Commission enjoys 'so close'."],
+       "win": ["A boss defeated. The Commission will update your file. Slowly.", "Your win has been reviewed, stamped and filed. Do it again."],
+       "title": ["The belt is yours. Temporarily. Everything is temporary. Except the rulebook.", "Champion {player}. The Commission congratulates you and reminds you that rematches are mandatory."]
+     },
+     "lines": {
+       "run_absent": "The fight cards haven't come back from the printer. The Commission apologizes for nothing.",
+       "run_start": "Signed. Witnessed. Notarized. Go and be entertaining.",
+       "upgrade": "Purchase recorded. The ledger thanks you. I do not.",
+       "cabinet": "That second cabinet is Commission property. As is everything you can see."
+     },
+     "options": ["start_run", "station:office", "last_run"]},
+
+    {"id": "npc_needles", "type": "npc", "key": "needles", "name": "Needles", "role": "Juice Bar vendor", "speaker": "needles", "color": "#8BD426",
+     "model": "res://assets/models/hub/needles.glb", "height": 1.3,
+     "barks": ["Everything here is natural. *Everything*. Some of it was natural very recently.", "Side effects? Define 'side'.", "This one makes your heavy hit harder. Also your hair might fall out. Mostly the first thing.", "Try the green one! Everyone tries the green one. Once."],
+     "talk": ["Welcome welcome welcome! Lab coat's clean, I promise. Mostly clean. What can I get you?", "You look like a customer! I love customers. I'm sweating because I love you.", "Fresh batch! Labels are optional! Questions are discouraged!"],
+     "hit": ["Ow! That's assault on a licensed professional! The license is pending!", "Careful! I'm full of quills and liability!"],
+     "run": {
+       "none": ["First run? You'll be back. Everybody comes back. Usually thirsty."],
+       "loss": ["Lost in Act {act}? Have you tried more supplements? It's always more supplements.", "{boss}? Oof. You know what beats {boss}? Electrolytes. Probably."],
+       "loss_act2": ["Act 2 is where the side effects kick in. Coincidence! Totally."],
+       "loss_act3": ["So close! Next time take the purple one. Or don't. I'm legally required to say don't."],
+       "win": ["A winner! Winners love my products! Correlation is causation!"],
+       "title": ["Champion! Can I put your face on a label? I can't pay you. I can pay you in labels."]
+     },
+     "lines": {"upgrade": "Pleasure doing business! The fine print is very fine.", "shop_preview": "Tonight's menu! Prices are for runs only, the Commission is very strict about that.", "radio": "Don't touch the dial, it took me a week to find a station that doesn't play news."},
+     "options": ["shop_preview", "station:juice_bar", "last_run"]},
+
+    {"id": "npc_doc", "type": "npc", "key": "doc", "name": "Doc Sutura", "role": "Cut-woman", "speaker": "doc", "color": "#35C1C9",
+     "model": "res://assets/models/hub/doc_sutura.glb", "height": 1.35,
+     "barks": ["Hold still. Hold stiller.", "That's not blood, that's JUICE. That's worse.", "You'll live. That's a medical opinion and a threat.", "Eight hands and none of them are for holding yours."],
+     "talk": ["Sit. Where does it hurt? Don't answer, I can see it.", "Make it quick, I've got a lamprey with a tooth stuck in a turnbuckle.", "Next."],
+     "hit": ["I will stitch your mouth shut. I have the thread.", "Do that again and I'll prescribe you a nap. A long one."],
+     "run": {
+       "none": ["Clean chart. Let's keep it that way. We won't."],
+       "loss": ["Act {act}. {boss}. Bruising consistent with getting hit a lot. Diagnosis: get hit less.", "You took {kos} knockouts with you and lost anyway. Interesting. Stop being interesting."],
+       "loss_act2": ["Act 2 hurts. That's not advice, that's anatomy."],
+       "loss_act3": ["Final card? You held together better than your guard did."],
+       "win": ["You won and you're still in one piece. Mostly one piece."],
+       "title": ["The champion's chart. Remarkably intact. I'm almost disappointed."]
+     },
+     "lines": {"upgrade": "Noted on the chart. It's a very long chart.", "rest_preview": "Patch-ups happen on the card, between fights. Here's what I can do for you out there.", "frost": "Stay in there long enough and you'll find something at the bottom. Probably your dignity.", "dumpster_prize": "Huh. So THAT'S where it went."},
+     "options": ["rest_preview", "station:med_bay", "last_run"]},
+
+    {"id": "npc_kid", "type": "npc", "key": "kid", "name": "Kid Lamprey", "role": "Sparring partner", "speaker": "kid", "color": "#6FA8DC",
+     "model": "res://assets/models/hub/kid_lamprey.glb", "height": 1.3,
+     "barks": ["I'd fight you but my coach says I'd get sued.", "Rematch. Rematch. Rematch. I'm just saying the word now.", "I'm not a fan. I just know all your stats. Coincidentally.", "Nice shoes. I mean, whatever. They're fine."],
+     "talk": ["Oh. It's you. Hey. Not that I was waiting.", "You wanna spar? I'll go easy. Easier. Medium.", "I've watched your fights. For scouting. Only for scouting."],
+     "hit": ["HEY. Cage. Cage is for that.", "Okay that was a cheap shot and I respect it."],
+     "run": {
+       "none": ["You're new. I'm not. Spar me. Wait, that came out wrong."],
+       "loss": ["{boss} got you? Pfft. I'd have lost to {boss} way worse. Way, way worse.", "Act {act}. I've got a poster of you anyway. For darts. Not for... it's for darts."],
+       "loss_act2": ["Act 2! That's further than me. I mean. I wasn't counting."],
+       "loss_act3": ["So close! I was cheering. Quietly. In a way that didn't count."],
+       "win": ["You beat a boss with {fighter}! I knew it. I mean. Called it. I mean, lucky."],
+       "title": ["Can you sign my— I mean. Congrats. Sign it anyway."]
+     },
+     "lines": {"after_loss_kid": "I let you have that one. The next thirty too, probably.", "after_win_kid": "HA! Rematch. No, wait, I won. Rematch anyway.", "belt_case": "...it's not even locked.", "challenge": "Cage. Now. Bring a mouthguard, my teeth are a whole thing.", "lid": "Was that a Scrapling? Did it just drop a lid? Grab it! Or don't! I'm not your coach!"},
+     "options": ["sparring", "last_run"]},
+
+    {"id": "npc_ludlow", "type": "npc", "key": "ludlow", "name": "Ludlow", "role": "Janitor, keeper of secrets", "speaker": "ludlow", "color": "#C7A160",
+     "model": "res://assets/models/hub/ludlow.glb", "height": 1.75,
+     "barks": ["Used to be a freight elevator there. Still is, I suppose. Just doesn't...", "There's a loose panel behind bag three. Don't tell the Commissioner. Tell me what you find.", "Bellows wasn't always a pelican. Well. He was. But he was a *quieter* one.", "Mop's older than the cage. Cleaner, too..."],
+     "talk": ["Oh. Hello there. Didn't hear you come in. Didn't hear much of anything since '71...", "Mm. Shift's almost over. Shift's always almost over...", "Sit a spell. Or stand. Floor's clean enough to sit on. I'd know..."],
+     "hit": ["Ah. Back in my day we hit the bags. Well. Some of us...", "Careful, the mop's taken worse..."],
+     "run": {
+       "none": ["New face. Nice face. Keep it that way, if you can..."],
+       "loss": ["Act {act}, was it? {boss}... I mopped up after that one's first fight. Took a week...", "You'll get there. Everybody gets somewhere, eventually..."],
+       "loss_act2": ["The main card... the lights are brighter there. So is the floor, when you're looking at it..."],
+       "loss_act3": ["One more fight... I remember being one more fight away. Still am, I suppose..."],
+       "win": ["Beat a boss, did you? I'll polish a spot on the Wall for you..."],
+       "title": ["A champion in my cannery... I'll mop around you. Respectfully..."]
+     },
+     "lines": {
+       "panel_pal": "You found the panel! Panel pal. That's what we are now. Panel pals...",
+       "parts_intro": "That old elevator needs three things... a fuse, a cable spool, a button. Bring 'em and I'll do the rest...",
+       "part_thanks": "That's {parts} of three. Getting there...",
+       "elevator_fixed": "There. She runs. Roof's up top. Mind the sign, it's missing something...",
+       "no_more_hints": "You've found everything I know about. And a few things I didn't...",
+       "upgrade": "Fine choice. I'll have it set up by morning. It is morning? Somewhere..."
+     },
+     "options": ["hint", "give_part", "station:loading_dock", "last_run"]},
+
+    {"id": "npc_teddy", "type": "npc", "key": "teddy", "name": "Teddy Two-Tooth", "role": "Bookie", "speaker": "teddy", "color": "#FFC43D",
+     "model": "res://assets/models/hub/teddy_two_tooth.glb", "height": 1.0,
+     "barks": ["No real money. Just Scrip. Fake Scrip. Fake-er Scrip.", "Odds on the bird are long. The bird keeps winning. I don't understand the bird.", "Sit. Watch. Pick. Don't touch the dice.", "Four, five, six... seven... I'm counting. I'm always counting."],
+     "talk": ["Pull up a crate! The table's warm, the odds are warmer.", "You want in? Everybody wants in. Some people want out. Those people owe me.", "Teddy Two-Tooth, licensed bookmaker. The license is a napkin. It's a very official napkin."],
+     "hit": ["Hey hey HEY, the ledger! Not the ledger!", "You hit the bookie, the odds go DOWN, pal."],
+     "run": {
+       "none": ["Fresh meat! I mean. Fresh contender! I've got you at forty to one."],
+       "loss": ["Act {act}, {boss}... I had you at three to one. You owe the house a frown.", "Lost to {boss}? I made a killing. Nothing personal."],
+       "loss_act2": ["Act 2! The over-under was Act 2! Somebody's buying me dinner."],
+       "loss_act3": ["The final! I had money on the final! I had a LITTLE money on the final."],
+       "win": ["Upset special! I love an upset. I hate paying them."],
+       "title": ["The champ! Your odds just went from 'lol' to 'hmm'."]
+     },
+     "lines": {"upgrade": "Pleasure! Your credit's good here. Your credit's fake, but it's good.", "boiler_face": "Don't do that again. The boiler remembers.", "bookie_absent": "Table's closed tonight. The cards haven't come in yet.", "lab_absent": "Terminal's dark. Somebody's still wiring the brain in that thing."},
+     "options": ["bookie", "ai_lab", "station:boiler_room", "last_run"]},
+
+    {"id": "npc_barnaby", "type": "npc", "key": "barnaby", "name": "Barnaby Bellows", "role": "Announcer", "speaker": "barnaby", "color": "#C9A227",
+     "model": "res://assets/models/hub/barnaby_bellows.glb", "height": 1.6,
+     "barks": ["WELCOME, welcome, WELCOME to the booth, where the magic, the *magic*, is me.", "I've called four thousand fights and I remember every single one of yours, kid. Both of them.", "Say the word and I'll re-call your last fight. Louder.", "Testing! Testing! One, two, KNOCKOUT!"],
+     "talk": ["The BOOTH! The nerve center! The place where the volume lives!", "You want the mic? Nobody gets the mic. You can LOOK at the mic.", "Every fight needs a voice and every voice needs a pelican. It's science."],
+     "hit": ["Not the gullet! The gullet is my instrument!", "OUCH, and the crowd goes... the crowd is not here. Shame."],
+     "run": {
+       "none": ["A fresh name for the card! I'll practice pronouncing it with ENTHUSIASM."],
+       "loss": ["Down in Act {act}! A heartbreaker! A tragedy! A STATISTIC!", "{boss} wins it! Ooh, I called that one with feeling."],
+       "loss_act2": ["The main card! The lights! The heartbreak! I cried. I cry at everything."],
+       "loss_act3": ["ONE fight from glory! I need a minute. I need several minutes."],
+       "win": ["A BOSS goes DOWN! I said that on air! I'll say it again! A BOSS goes DOWN!"],
+       "title": ["AND NEEEEW! I'm crying. It's a title fight. I always cry at title fights."]
+     },
+     "lines": {"recall_intro": "From the top! Your last fight, called LOUDER!", "tape": "Is that... the '73 tape? The Commissioner's title fight? I called that! I had HAIR then!", "vintage": "Ladies, gentlemen, and assorted critters... in the year of our Lord nineteen-seventy-three...", "no_run": "No fights on file! Go make some history, I'll bring the volume."},
+     "options": ["booth", "recall", "tape", "last_run"]}
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "_doc": "Hub activity tuning (docs/design/HUB.md §3, docs/HUB_SYSTEMS.md §5). Bag points use the combat damage formula (closing speed quality q and contact cleanliness): base = move damage x (0.55 + 0.6 q) x (0.75 + 0.25 clean) x (1 + charge x charge_damage); points = base x points_per_damage x class multiplier (Heavy x1.5, Finisher x2) x combo multiplier (+combo_step per hit landed within combo_window s, capped). Tiers pay Clout once per tier (bags: once per tier per fighter).",
+  "items": [
+    {"id": "act_bags", "type": "activity", "name": "Heavy Bag Score Challenge", "duration": 30.0, "countdown": 3.0,
+     "points_per_damage": 6.0, "heavy_mult": 1.5, "finisher_mult": 2.0, "combo_window": 0.6, "combo_step": 0.1, "combo_max": 2.0,
+     "tiers": [300, 600, 1000], "clout": [10, 25, 50],
+     "bags": {
+       "light": {"name": "Light bag", "desc": "Speed: every hit counts, quick strings build the combo faster.", "base_bonus": 6.0, "combo_step_mult": 1.6, "quality_weight": 0.5},
+       "heavy": {"name": "Heavy bag", "desc": "Power: closing speed and charge are everything.", "base_bonus": 0.0, "combo_step_mult": 1.0, "quality_weight": 1.6},
+       "body": {"name": "Body bag", "desc": "Shaped like the Commissioner. Only head and shell hits count.", "base_bonus": 2.0, "combo_step_mult": 1.0, "quality_weight": 1.0, "zones": {"head": [1.25, 2.0, 1.5], "shell": [0.6, 1.25, 1.0]}}
+     },
+     "scrapling_wake": 600, "body_hint": 1000},
+    {"id": "act_drill", "type": "activity", "name": "Chum Cannon Dodge Drill", "duration": 45.0, "countdown": 3.0, "drill_hp": 30, "bucket_damage": 3,
+     "interval_start": 1.7, "interval_end": 0.55, "flight_start": 1.25, "flight_end": 0.7, "spread": 0.7, "parry_bonus": 5,
+     "tiers": [15, 30, 50], "clout": [10, 25, 50], "frame_streak": 50, "frame": "hub_frame_soaked"},
+    {"id": "act_crates", "type": "activity", "name": "Crate Toss", "crates": 10, "time_limit": 150.0,
+     "tap_distance": 3.2, "full_distance": 8.9, "charge_time": 0.9,
+     "tiers": [30, 60, 100], "clout": [10, 25, 50], "jitters_hint": 100}
+  ]
+}

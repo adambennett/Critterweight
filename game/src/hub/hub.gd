@@ -1,0 +1,50 @@
+class_name Hub
+extends RefCounted
+## Entry points for THE CANNERY, the Fight Camp hub (docs/HUB_SYSTEMS.md §1).
+##   Hub.enter({spot, fighter, from})   leave whatever is running and walk into the hub
+##                                      (App screen "hub" does the same: App.goto("hub", params))
+##   Hub.build_sim(parent, state, ...)  the hub's MatchSim (used by HubScene and the headless tests)
+## params: spot = HubLayout space id to arrive in (default: where you left off), fighter = creature
+## id to walk with (default: the Locker's choice, else the first roster fighter), from = "run" |
+## "spar" | "tutorial" | "menu" (only changes the welcome line), result = a sparring result.
+
+const RULES := {"id": "hub", "name": "The Cannery", "mode": "hub", "round_time": 0.0, "rounds": 1, "intro_time": 0.0}
+
+
+static func enter(params := {}) -> void:
+	_restore_speed()
+	App.clear_screens()
+	var scene := HubScene.new()
+	App.set_scene(scene)
+	scene.start(params)
+
+
+## Accessibility game speed never applies in the hub (it is a social space, not a fight).
+static func _restore_speed() -> void:
+	Engine.time_scale = 1.0
+
+
+## The fighter the player walks with: explicit > Locker loadout > last Fight Camp run > roster.
+static func pick_fighter(state: HubState, wanted := "") -> String:
+	for cand in [wanted, state.loadout_fighter(), str(state.last_run().get("fighter", ""))]:
+		var cid := str(cand)
+		if cid != "" and Content.creature(cid) != null and Content.get_entry("creatures", cid).size() > 0:
+			return cid
+	var roster := Content.playable_creatures().filter(func(c): return str(c).begins_with("f_"))
+	if not roster.is_empty():
+		return str(roster[0])
+	var any := Content.playable_creatures()
+	return str(any[0]) if not any.is_empty() else "dev_biped"
+
+
+static func build_sim(parent: Node, state: HubState, fighter_id: String, spot := "main_floor", source: InputSource = null, seed_value := 7) -> MatchSim:
+	var sim := MatchSim.new()
+	sim.running = false
+	parent.add_child(sim)
+	var c := Content.creature(fighter_id)
+	if c == null:
+		c = Content.creature(pick_fighter(state))
+	var mode := HubMode.new(state, spot)
+	sim.setup({"arena": HubArenaDef.make(), "rules": RULES.duplicate(true), "seed": seed_value, "mode": mode,
+		"fighters": [{"creature": c, "team": 0, "source": source, "name": str(state.profile.get("name", "Rookie")), "kind": "player"}]})
+	return sim
