@@ -137,6 +137,30 @@ func _make_proxies(rec: Dictionary) -> void:
 		rec["proxies"].append(ent)
 
 
+## Solid props that are not wall-splat surfaces (tire stacks, bumpers, ramps, mooring blocks,
+## low sacks, pushables) still stop projectiles; splat props and heavy bags already do through
+## their proxies. Returns the index into `props` of the prop in the way, or -1.
+func blocking_prop(p: Vector3, radius: float) -> int:
+	for k in props.size():
+		var rec: Dictionary = props[k]
+		var def: Dictionary = rec["def"]
+		if def.is_empty() or not bool(def["solid"]) or str(def["body"]) == "none" or bool(rec["destroyed"]) or not (rec["proxies"] as Array).is_empty():
+			continue
+		var item: Dictionary = rec["item"]
+		if p.y > float(def["height"]) * float(item.get("scale", 1.0)) + radius:
+			continue
+		var body = rec["body"]
+		if body is RigidBody3D and not (body as RigidBody3D).freeze:
+			# a pushed prop: its footprint moved with the body
+			var bp := (body as Node3D).global_position
+			var s := ArenaCatalog.footprint_size(item, def)
+			if Vector2(p.x - bp.x, p.z - bp.z).length() < maxf(s.x, s.y) * 0.5 + radius:
+				return k
+		elif ArenaCatalog.footprint_distance(item, def, Vector2(p.x, p.z)) < radius:
+			return k
+	return -1
+
+
 func _make_pad(rec: Dictionary) -> void:
 	var def: Dictionary = rec["def"]
 	var params: Dictionary = def["params"]

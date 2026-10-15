@@ -433,3 +433,22 @@ func test_fan_and_wind_push_but_hover_ignores_wind() -> void:
 	var moved := Vector2(a.pos().x - pa.x, a.pos().z - pa.z)
 	check_near(moved.dot(dir), 1.5, 0.15, "gust pushes 1.5 m")
 	check(Vector2(b.pos().x - pb.x, b.pos().z - pb.z).length() < 0.05, "hovering ignores the wind")
+
+
+func test_solid_props_without_splat_stop_projectiles() -> void:
+	var sim := _sim(_layout([{"type": "prop_tire_stack", "pos": [0, 0, 0]}, {"type": "prop_pit", "pos": [3, 0, 0]}]))
+	_fight(sim)
+	var f := sim.fighters[0]
+	var shots := []
+	for x in [0.0, 3.0]:
+		var e := {"type": "projectile", "speed": 8.0, "range": 8.0, "radius": 0.15, "damage": 5.0}
+		var before := sim.effects.entities.size()
+		sim.effects.fire(f, e, null)
+		var ent: Dictionary = sim.effects.entities[before]
+		ent["pos"] = Vector3(x, 0.6, -2.0)
+		ent["vel"] = Vector3(0, 0, 8.0)
+		ent["gravity"] = 0.0
+		shots.append(ent)
+	_steps(sim, 60)
+	check(float(shots[0]["life"]) <= 0.0 and float(shots[0]["pos"].z) < 0.6, "the tire stack stopped the shot (z %.2f)" % float(shots[0]["pos"].z))
+	check(float(shots[1]["pos"].z) > 1.0, "a pit is not in the way (z %.2f)" % float(shots[1]["pos"].z))
