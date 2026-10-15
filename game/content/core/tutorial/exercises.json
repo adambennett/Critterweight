@@ -46,7 +46,7 @@
       "highlight": "",
       "intro": "{light}. Three taps, three hits. {l_names} — or whatever your body calls them. Don't think. Tap.",
       "success": "That's a string. It'll work on a lot of people. Not on the good ones. We'll fix that.",
-      "hint": "Tap {light}, let it land, tap again. Three times. Mash it and they trip over each other. The third hit's the one with the shove.",
+      "hint": "Step in and plant your feet. Then tap {light}, let it land, tap again. Three times. Mash it and they trip over each other.",
       "rush": "Easy. One at a time: tap, let it land, tap again. Rush it and the next one cancels the last before it lands.",
       "barnaby": "ann_tut_string"
     },

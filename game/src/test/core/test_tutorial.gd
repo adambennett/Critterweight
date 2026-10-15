@@ -185,14 +185,17 @@ func test_footwork() -> void:
 	await _run(0, plan)
 
 
-## The Hands driver's attempts: (fraction of the Jab's reach to start from, how hard the stick
-## pushes toward the Kid during the string). A player whose string doesn't finish tries again
-## from another spacing, pushing in more or less.
-const HANDS_TRIES := [[0.85, 0.3], [0.7, 0.5], [0.95, 0.2], [0.55, 0.5], [0.45, 0.3], [1.0, 0.5]]
+## The Hands driver's attempts: (fraction of the first Light's estimated reach to start from, how
+## hard the stick pushes toward the Kid during the string). A player whose string doesn't finish
+## tries again from another spacing, closer or further out, pushing in more or less. The estimate
+## can be well off either way: Slurry's Head Butt drives the head ~1.3 m forward (estimate 0.97 m)
+## and its whole string lands from 1.5-1.7 m.
+const HANDS_TRIES := [[0.85, 0.3], [0.7, 0.3], [1.0, 0.0], [0.95, 0.3], [1.6, 0.3], [0.55, 0.3], [1.3, 0.0], [1.7, 0.0], [0.45, 0.3], [1.15, 0.3]]
 
 
 func test_light_string() -> void:
-	# step in, tap the three Lights in rhythm with the hits while pushing toward the Kid
+	# step in, set the feet, then tap the three Lights in rhythm with the hits (pushing toward the
+	# Kid or not, depending on the attempt)
 	var plan := func(f: Fighter, sim, t: float, mem: Dictionary) -> void:
 		var kid: Fighter = sim.fighters[1]
 		var attempt: Array = HANDS_TRIES[int(mem.get("tries", 0)) % HANDS_TRIES.size()]
@@ -206,11 +209,19 @@ func test_light_string() -> void:
 			if d < want - 0.15 and t - float(mem.get("set_t", 0.0)) < 1.5:
 				f.input.move = -_toward(f, kid.pos())
 				mem["_pd"] = -1.0
+				mem.erase("arrived")
 				return
-			if d > want and not _stalled(d, mem):
+			if d > want + 0.1 and not _stalled(d, mem):
 				f.input.move = _toward(f, kid.pos())
+				mem.erase("arrived")
 				return
 			mem["_pd"] = -1.0
+			# arrived: a beat to stand still, so the string starts from the spacing, not from a run
+			if not mem.has("arrived"):
+				mem["arrived"] = t
+			var v := f.rig.com_velocity()
+			if Vector2(v.x, v.z).length() > 0.4 and t - float(mem["arrived"]) < 0.6:
+				return
 		if presses < 3:
 			# taps in rhythm with the hits (Granny: "let it land, tap again")
 			if TutorialMode.swing_over(f) and t - float(mem.get("last", -9.0)) > 0.08:
@@ -222,6 +233,7 @@ func test_light_string() -> void:
 			mem["presses"] = 0
 			mem["tries"] = int(mem.get("tries", 0)) + 1
 			mem["set_t"] = t
+			mem.erase("arrived")
 		else:
 			f.input.move = _toward(f, kid.pos()) * push
 	await _run(1, plan)
@@ -452,12 +464,17 @@ func test_finisher_then_juice() -> void:
 			return
 		if f.state == Fighter.State.NEUTRAL and not _in_reach(f, kid, "l1", mem):
 			f.input.move = _toward(f, kid.pos())
+			mem["step"] = 0
 			return
+		# Light, Light, then Heavy while the second Light can still chain (each press once the
+		# last strike landed or finished its swing, as in Hands)
 		var step := int(mem.get("step", 0))
-		if t - float(mem.get("last", -9.0)) > 0.24:
+		if step < 3 and TutorialMode.swing_over(f) and t - float(mem.get("last", -9.0)) > 0.08:
 			mem["last"] = t
 			f.input.press(FighterInput.HEAVY if step == 2 else FighterInput.LIGHT)
-			mem["step"] = (step + 1) % 4
+			mem["step"] = step + 1
+		elif step >= 3 and f.state == Fighter.State.NEUTRAL:
+			mem["step"] = 0
 	await _run(8, plan, 60.0)
 
 

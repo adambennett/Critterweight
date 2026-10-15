@@ -525,15 +525,24 @@ static func string_slots(c: CreatureDef) -> Array:
 
 
 ## The move slot (variant suffix dropped) behind hit event `evs[i]` of fighter `f`. Effect hits
-## (slot "effect") belong to the move whose own timeline fired them, e.g. Dozer's Hoof Stomp (an
-## area at the hoof): EffectsSystem emits an effect's hits first (Combat.deliver emits each hit
-## after its hooks ran) and then that effect's "effect" event with the move's id, in the same
-## tick. Hook-fired and delayed effects carry no move id and give "".
+## (slot "effect") belong to the move whose own timeline fired them:
+##  * an effect with an "id" reports it as the hit's "move" (Slurry's finisher spits the
+##    projectile "venom_spit", which lands after the move has ended), so it maps to the move
+##    that declares it;
+##  * an unnamed one is paired with its "effect" event: EffectsSystem emits an effect's hits
+##    first (Combat.deliver emits each hit after its hooks ran) and then that effect's event
+##    with the move's id, in the same tick (Dozer's Hoof Stomp, an area at the hoof).
+## Hook-fired and delayed effects carry no move id and give "".
 static func _hit_slot(evs: Array, i: int, f: Fighter) -> String:
 	var ev: Dictionary = evs[i]
 	var slot := str(ev.get("slot", ""))
 	if slot != "effect":
 		return slot.split("@")[0]
+	var eid := str(ev.get("move", ""))
+	for s in f.creature.moves:
+		for e in (f.creature.moves[s] as MoveDef).effects:
+			if typeof(e) == TYPE_DICTIONARY and str((e as Dictionary).get("id", "")) == eid and eid != "":
+				return str(s).split("@")[0]
 	for j in range(i + 1, evs.size()):
 		var e2: Dictionary = evs[j]
 		if int(e2.get("tick", -1)) != int(ev.get("tick", -2)):
