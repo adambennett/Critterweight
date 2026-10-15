@@ -1,0 +1,275 @@
+{
+ "id": "layout_glandco_showcase",
+ "name": "Glandco Showcase",
+ "base": "gullet",
+ "variant": "title_night",
+ "format": 2,
+ "version": 1,
+ "author": "Critterweight",
+ "description": "A loud sponsor night: vents push fights into the aisle, the pad launches people over the boards.",
+ "example": true,
+ "size": [
+  12.0,
+  12.0
+ ],
+ "modes": [
+  "ffa",
+  "teams",
+  "absolute_unit"
+ ],
+ "flags": {},
+ "removed_builtins": [],
+ "props": [
+  {
+   "type": "prop_steam_vent",
+   "pos": [
+    0,
+    0.0,
+    5.3
+   ],
+   "yaw": 180.0
+  },
+  {
+   "type": "prop_steam_vent",
+   "pos": [
+    5.3,
+    0.0,
+    0
+   ],
+   "yaw": -90.0
+  },
+  {
+   "type": "prop_steam_vent",
+   "pos": [
+    0,
+    0.0,
+    -5.3
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_steam_vent",
+   "pos": [
+    -5.3,
+    0.0,
+    0
+   ],
+   "yaw": 90.0
+  },
+  {
+   "type": "prop_sponsor_board",
+   "pos": [
+    -1.6,
+    0.0,
+    0
+   ],
+   "yaw": 90.0
+  },
+  {
+   "type": "prop_sponsor_board",
+   "pos": [
+    1.6,
+    0.0,
+    0
+   ],
+   "yaw": 90.0
+  },
+  {
+   "type": "prop_spring_pad",
+   "pos": [
+    0,
+    0.0,
+    0
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_hype_can",
+   "pos": [
+    -3.6,
+    0.0,
+    3.6
+   ],
+   "yaw": 0.0
+  },
+  {
+   "type": "prop_hype_can",
+   "pos": [
+    3.6,
+    0.0,
+    -3.6
+   ],
+   "yaw": 0.0
+  }
+ ],
+ "markers": {
+  "spawn": [
+   {
+    "pos": [
+     3.33,
+     0.0,
+     1.38
+    ],
+    "yaw": -112.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     1.38,
+     0.0,
+     3.33
+    ],
+    "yaw": -157.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     -1.38,
+     0.0,
+     3.33
+    ],
+    "yaw": 157.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     -3.33,
+     0.0,
+     1.38
+    ],
+    "yaw": 112.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     -3.33,
+     0.0,
+     -1.38
+    ],
+    "yaw": 67.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     -1.38,
+     0.0,
+     -3.33
+    ],
+    "yaw": 22.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     1.38,
+     0.0,
+     -3.33
+    ],
+    "yaw": -22.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     3.33,
+     0.0,
+     -1.38
+    ],
+    "yaw": -67.5,
+    "team": -1
+   },
+   {
+    "pos": [
+     -3.4,
+     0.0,
+     -1.6
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -3.4,
+     0.0,
+     1.6
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -4.0,
+     0.0,
+     -3.0
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -4.0,
+     0.0,
+     3.0
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     3.4,
+     0.0,
+     -1.6
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     3.4,
+     0.0,
+     1.6
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     4.0,
+     0.0,
+     -3.0
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     4.0,
+     0.0,
+     3.0
+    ],
+    "yaw": -90.0,
+    "team": 1
+   }
+  ],
+  "unit_spawn": [
+   {
+    "pos": [
+     0,
+     0.0,
+     2.6
+    ],
+    "yaw": 180.0,
+    "team": -1
+   }
+  ],
+  "boss": [
+   {
+    "pos": [
+     0,
+     0.0,
+     -2.6
+    ],
+    "yaw": 0.0,
+    "team": -1
+   }
+  ]
+ }
+}

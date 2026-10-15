@@ -1,0 +1,399 @@
+{
+ "id": "arena_crusher",
+ "name": "The Crusher",
+ "base": "crusher",
+ "variant": "night",
+ "format": 2,
+ "version": 1,
+ "author": "Critterweight",
+ "description": "The pit of a scrapyard car-compactor. One steel plate electrifies every 10 s (seeded, never two neighbours in a row); the crane magnet pulls everyone in and drops a scrap bundle every 25 s. Rubber mats are safe.",
+ "size": [
+  12.0,
+  12.0
+ ],
+ "modes": [
+  "duel",
+  "ffa",
+  "teams",
+  "coop",
+  "spotlight_hog",
+  "boss"
+ ],
+ "flags": {},
+ "removed_builtins": [],
+ "props": [],
+ "markers": {
+  "spawn": [
+   {
+    "pos": [
+     0.0,
+     0.0,
+     -3.4
+    ],
+    "yaw": -0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.4,
+     0.0,
+     -2.4
+    ],
+    "yaw": -45.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     3.4,
+     0.0,
+     0.0
+    ],
+    "yaw": -90.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.4,
+     0.0,
+     2.4
+    ],
+    "yaw": -135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     0.0,
+     0.0,
+     3.4
+    ],
+    "yaw": -180.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -2.4,
+     0.0,
+     2.4
+    ],
+    "yaw": 135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -3.4,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -2.4,
+     0.0,
+     -2.4
+    ],
+    "yaw": 45.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -4.6,
+     0.0,
+     -1.0
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -4.6,
+     0.0,
+     1.0
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -3.2,
+     0.0,
+     -2.0
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -3.2,
+     0.0,
+     2.0
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     4.6,
+     0.0,
+     -1.0
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     4.6,
+     0.0,
+     1.0
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     3.2,
+     0.0,
+     -2.0
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     3.2,
+     0.0,
+     2.0
+    ],
+    "yaw": -90.0,
+    "team": 1
+   }
+  ],
+  "boss": [
+   {
+    "pos": [
+     0,
+     0.0,
+     2.6
+    ],
+    "yaw": 180.0,
+    "team": -1
+   }
+  ],
+  "spotlight_anchor": [
+   {
+    "pos": [
+     0,
+     0.0,
+     0
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -4,
+     0.0,
+     -4
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     4,
+     0.0,
+     -4
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     4,
+     0.0,
+     4
+    ],
+    "yaw": 0.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -4,
+     0.0,
+     4
+    ],
+    "yaw": 0.0,
+    "team": -1
+   }
+  ]
+ },
+ "base_def": {
+  "id": "crusher",
+  "name": "The Crusher",
+  "shape": "rect",
+  "style": "crusher",
+  "description": "The pit of a scrapyard car-compactor. One steel plate electrifies every 10 s (seeded, never two neighbours in a row); the crane magnet pulls everyone in and drops a scrap bundle every 25 s. Rubber mats are safe.",
+  "size": [
+   12.0,
+   12.0
+  ],
+  "size_min": [
+   9.0,
+   9.0
+  ],
+  "size_max": [
+   12.0,
+   12.0
+  ],
+  "size_step": 0.5,
+  "uniform": true,
+  "wall_height": 3.0,
+  "open_edges": false,
+  "allow_pits": false,
+  "quirks": {
+   "wall_bounce": 0.15
+  },
+  "hazards": [
+   {
+    "id": "plates",
+    "type": "plate_grid",
+    "grid": [
+     3,
+     3
+    ],
+    "period": 10.0,
+    "first": 10.0,
+    "telegraph": 1.0,
+    "active": 2.0,
+    "damage": 8.0,
+    "buildup": 40.0,
+    "tick": 1.0,
+    "flinch": 0.15,
+    "element": "static",
+    "flag": "electrified_plates",
+    "label": "Electrified plates"
+   },
+   {
+    "id": "magnet",
+    "type": "crane_magnet",
+    "period": 25.0,
+    "first": 25.0,
+    "telegraph": 1.5,
+    "active": 1.5,
+    "radius": 3.0,
+    "speed": 2.5,
+    "drop": "prop_scrap_bundle",
+    "max_drops": 3,
+    "crush_damage": 6.0,
+    "caked_resist": 0.5,
+    "flag": "crane_magnet",
+    "label": "Crane magnet"
+   }
+  ],
+  "areas": [
+   {
+    "id": "steel",
+    "type": "slick_floor",
+    "side": "",
+    "dash_mult": 1.1
+   }
+  ],
+  "builtins": [
+   {
+    "id": "scrap_ne",
+    "type": "prop_scrap_pile",
+    "pos": [
+     4.4,
+     0.0,
+     4.4
+    ],
+    "yaw": 45.0
+   },
+   {
+    "id": "scrap_nw",
+    "type": "prop_scrap_pile",
+    "pos": [
+     -4.4,
+     0.0,
+     4.4
+    ],
+    "yaw": -45.0
+   },
+   {
+    "id": "scrap_sw",
+    "type": "prop_scrap_pile",
+    "pos": [
+     -4.4,
+     0.0,
+     -4.4
+    ],
+    "yaw": 45.0
+   },
+   {
+    "id": "scrap_se",
+    "type": "prop_scrap_pile",
+    "pos": [
+     4.4,
+     0.0,
+     -4.4
+    ],
+    "yaw": -45.0
+   },
+   {
+    "id": "mat_c",
+    "type": "prop_rubber_mat",
+    "pos": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 0.0
+   },
+   {
+    "id": "mat_w",
+    "type": "prop_rubber_mat",
+    "pos": [
+     -4.0,
+     0.0,
+     2.0
+    ],
+    "yaw": 0.0
+   },
+   {
+    "id": "mat_e",
+    "type": "prop_rubber_mat",
+    "pos": [
+     4.0,
+     0.0,
+     -2.0
+    ],
+    "yaw": 0.0
+   }
+  ],
+  "variants": {
+   "night": {
+    "label": "Night",
+    "key": "#FFB347",
+    "key_energy": 1.05,
+    "rim": "#E04FB0",
+    "spot": "#FFC777",
+    "bg": "#0B0A0F",
+    "fog": "#21161F",
+    "fog_density": 0.018,
+    "ambient": "#2E2630",
+    "ambient_energy": 0.55,
+    "crowd_energy": 0.3
+   }
+  },
+  "default_variant": "night",
+  "palette": {
+   "floor": "#5B6168",
+   "stripe_a": "#F7E04A",
+   "stripe_b": "#1E1E24",
+   "rust": "#8C3B2B",
+   "sodium": "#FFB347",
+   "rim": "#E04FB0"
+  }
+ }
+}

@@ -1,0 +1,422 @@
+{
+ "id": "arena_drydock",
+ "name": "Drydock",
+ "base": "drydock",
+ "variant": "overcast",
+ "format": 2,
+ "version": 1,
+ "author": "Critterweight",
+ "description": "An outdoor concrete dry dock at low tide. The tidal gutter floods every 20 s (Brine), the crane hook snatches whoever stands in its circle every 30 s, and the wet planks make dodges slide.",
+ "size": [
+  16.0,
+  10.0
+ ],
+ "modes": [
+  "duel",
+  "ffa",
+  "teams",
+  "coop",
+  "chumball",
+  "chum_rush",
+  "boss"
+ ],
+ "flags": {},
+ "removed_builtins": [],
+ "props": [],
+ "markers": {
+  "spawn": [
+   {
+    "pos": [
+     -2.6,
+     0.0,
+     -2.6
+    ],
+    "yaw": 45.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.6,
+     0.0,
+     -2.6
+    ],
+    "yaw": -45.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     6.2,
+     0.0,
+     -2.6
+    ],
+    "yaw": -67.2,
+    "team": -1
+   },
+   {
+    "pos": [
+     6.2,
+     0.0,
+     2.6
+    ],
+    "yaw": -112.8,
+    "team": -1
+   },
+   {
+    "pos": [
+     2.6,
+     0.0,
+     2.6
+    ],
+    "yaw": -135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -2.6,
+     0.0,
+     2.6
+    ],
+    "yaw": 135.0,
+    "team": -1
+   },
+   {
+    "pos": [
+     -6.2,
+     0.0,
+     2.6
+    ],
+    "yaw": 112.8,
+    "team": -1
+   },
+   {
+    "pos": [
+     -6.2,
+     0.0,
+     -2.6
+    ],
+    "yaw": 67.2,
+    "team": -1
+   },
+   {
+    "pos": [
+     -6.6,
+     0.0,
+     -2.5
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -6.6,
+     0.0,
+     2.5
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -5.0,
+     0.0,
+     -2.3
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     -5.0,
+     0.0,
+     2.3
+    ],
+    "yaw": 90.0,
+    "team": 0
+   },
+   {
+    "pos": [
+     6.6,
+     0.0,
+     -2.5
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     6.6,
+     0.0,
+     2.5
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     5.0,
+     0.0,
+     -2.3
+    ],
+    "yaw": -90.0,
+    "team": 1
+   },
+   {
+    "pos": [
+     5.0,
+     0.0,
+     2.3
+    ],
+    "yaw": -90.0,
+    "team": 1
+   }
+  ],
+  "boss": [
+   {
+    "pos": [
+     3.0,
+     0.0,
+     0.0
+    ],
+    "yaw": -90.0,
+    "team": -1
+   }
+  ],
+  "goal": [
+   {
+    "pos": [
+     -7.85,
+     0.0,
+     0
+    ],
+    "yaw": 90.0,
+    "team": 0,
+    "size": [
+     3.0,
+     2.0,
+     0.2
+    ]
+   },
+   {
+    "pos": [
+     7.85,
+     0.0,
+     0
+    ],
+    "yaw": -90.0,
+    "team": 1,
+    "size": [
+     3.0,
+     2.0,
+     0.2
+    ]
+   }
+  ],
+  "ball_spawn": [
+   {
+    "pos": [
+     0,
+     0.0,
+     0
+    ],
+    "yaw": 0.0,
+    "team": -1
+   }
+  ],
+  "wave_gate": [
+   {
+    "pos": [
+     -5.6,
+     0.0,
+     4.85
+    ],
+    "yaw": 180.0,
+    "team": -1,
+    "size": [
+     2.0,
+     2.4,
+     0.2
+    ]
+   },
+   {
+    "pos": [
+     5.6,
+     0.0,
+     -4.85
+    ],
+    "yaw": 0.0,
+    "team": -1,
+    "size": [
+     2.0,
+     2.4,
+     0.2
+    ]
+   }
+  ]
+ },
+ "base_def": {
+  "id": "drydock",
+  "name": "Drydock",
+  "shape": "rect",
+  "style": "drydock",
+  "description": "An outdoor concrete dry dock at low tide. The tidal gutter floods every 20 s (Brine), the crane hook snatches whoever stands in its circle every 30 s, and the wet planks make dodges slide.",
+  "size": [
+   16.0,
+   10.0
+  ],
+  "size_min": [
+   12.0,
+   8.0
+  ],
+  "size_max": [
+   16.0,
+   10.0
+  ],
+  "size_step": 0.5,
+  "wall_height": 2.0,
+  "open_edges": false,
+  "allow_pits": false,
+  "quirks": {
+   "wall_bounce": 0.2
+  },
+  "hazards": [
+   {
+    "id": "gutter",
+    "type": "tidal_gutter",
+    "axis": "x",
+    "width": 1.5,
+    "period": 20.0,
+    "first": 20.0,
+    "active": 8.0,
+    "telegraph": 1.5,
+    "buildup_per_s": 15.0,
+    "element": "brine",
+    "flag": "tidal_gutter",
+    "label": "Tidal gutter"
+   },
+   {
+    "id": "crane",
+    "type": "crane_hook",
+    "spots": [
+     [
+      0.0,
+      2.3
+     ]
+    ],
+    "radius": 0.75,
+    "period": 30.0,
+    "first": 30.0,
+    "telegraph": 1.5,
+    "active": 2.0,
+    "height": 2.0,
+    "damage": 8.0,
+    "flag": "crane_hook",
+    "label": "Crane hook"
+   }
+  ],
+  "areas": [
+   {
+    "id": "planks_n",
+    "type": "wet_planks",
+    "side": "n",
+    "width": 1.5,
+    "dash_mult": 1.3,
+    "slide": 0.5
+   },
+   {
+    "id": "planks_s",
+    "type": "wet_planks",
+    "side": "s",
+    "width": 1.5,
+    "dash_mult": 1.3,
+    "slide": 0.5
+   }
+  ],
+  "builtins": [
+   {
+    "id": "bollard_nw",
+    "type": "prop_bollard",
+    "pos": [
+     -4.4,
+     0.0,
+     4.2
+    ],
+    "yaw": 0.0
+   },
+   {
+    "id": "bollard_se",
+    "type": "prop_bollard",
+    "pos": [
+     4.4,
+     0.0,
+     -4.2
+    ],
+    "yaw": 0.0
+   },
+   {
+    "id": "bollard_s",
+    "type": "prop_bollard",
+    "pos": [
+     0.0,
+     0.0,
+     -4.3
+    ],
+    "yaw": 0.0
+   },
+   {
+    "id": "block_w",
+    "type": "prop_mooring_block",
+    "pos": [
+     -2.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 0.0
+   },
+   {
+    "id": "block_e",
+    "type": "prop_mooring_block",
+    "pos": [
+     2.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 0.0
+   },
+   {
+    "id": "block_n",
+    "type": "prop_mooring_block",
+    "pos": [
+     0.0,
+     0.0,
+     4.2
+    ],
+    "yaw": 0.0
+   }
+  ],
+  "variants": {
+   "overcast": {
+    "label": "Overcast",
+    "key": "#EEF2F4",
+    "key_energy": 1.25,
+    "rim": "#C9D3D8",
+    "spot": "#FFFFFF",
+    "bg": "#C9D3D8",
+    "fog": "#BCC7CD",
+    "fog_density": 0.012,
+    "ambient": "#AEB9C0",
+    "ambient_energy": 0.9,
+    "sky_top": "#8FA2AE",
+    "sky_horizon": "#DCE3E6",
+    "crowd_energy": 0.3
+   }
+  },
+  "default_variant": "overcast",
+  "palette": {
+   "floor": "#9A9A92",
+   "planks": "#6B4F3A",
+   "water": "#2E9BE0",
+   "rust": "#8C3B2B",
+   "sky": "#C9D3D8"
+  }
+ }
+}
