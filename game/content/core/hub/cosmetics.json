@@ -1,0 +1,22 @@
+{
+  "_doc": "Cosmetics the Cannery hands out (ids in profile unlocks.cosmetics). 'slot' groups what the Locker equips together (one per slot). None of these change gameplay.",
+  "items": [
+    {"id": "hub_gold_tooth", "type": "cosmetic", "slot": "piece", "name": "Gold Tooth", "desc": "Your fighter's detachable gag piece becomes Granny's old gold tooth."},
+    {"id": "hub_trash_lid", "type": "cosmetic", "slot": "idle_prop", "name": "Trash-Can Lid Shield", "desc": "Carried like a shield while you idle in the hub."},
+    {"id": "hub_replica_belt", "type": "cosmetic", "slot": "back", "name": "Replica Belt", "desc": "Worn over the shoulder on the walkout. The real one is at the cleaners."},
+    {"id": "hub_pack_vintage_bellows", "type": "cosmetic", "slot": "pack", "name": "Vintage Bellows line pack", "desc": "Barnaby, 1973 edition: more hair, more reverb."},
+    {"id": "hub_frame_sign_fixer", "type": "cosmetic", "slot": "frame", "name": "Sign Fixer frame", "desc": "Profile frame in full GLANDCO neon."},
+    {"id": "hub_frame_soaked", "type": "cosmetic", "slot": "frame", "name": "Soaked frame", "desc": "Profile frame for a 50-bucket drill streak. Smells like it."},
+    {"id": "hub_juice_sizzle", "type": "cosmetic", "slot": "juice", "name": "Sizzle", "desc": "Alternate JUICE colour for Stoke: white-hot."},
+    {"id": "hub_pet_blister", "type": "cosmetic", "slot": "pet", "name": "Frozen Blister", "desc": "A Blister on ice. Follows you around the Cannery. Mostly sliding."},
+    {"id": "hub_rooftop_scarf", "type": "cosmetic", "slot": "neck", "name": "Rooftop Scarf", "desc": "Found in an old trunk on the roof. Smells like pigeons and victory."},
+    {"id": "hub_fish_electrolyte", "type": "cosmetic", "slot": "can", "name": "Barnacled Electrolyte Gum", "desc": "OTC supplement variant: pulled from the harbor, still sealed. Probably."},
+    {"id": "hub_fish_tonic", "type": "cosmetic", "slot": "can", "name": "Brackish Tonic", "desc": "OTC supplement variant with a seaweed label."},
+    {"id": "hub_fish_jerky", "type": "cosmetic", "slot": "can", "name": "Kelp Jerky", "desc": "OTC supplement variant. Chewy. Wet. Iconic."},
+    {"id": "hub_fish_liniment", "type": "cosmetic", "slot": "can", "name": "Rusty Liniment", "desc": "OTC supplement variant in a tin that has seen things."},
+    {"id": "hub_fish_lozenge", "type": "cosmetic", "slot": "can", "name": "Salt-Crust Lozenges", "desc": "OTC supplement variant. The crust is the flavour."},
+    {"id": "hub_fish_shake", "type": "cosmetic", "slot": "can", "name": "Low-Tide Protein Shake", "desc": "OTC supplement variant. Shaken by the harbor itself."},
+    {"id": "hub_pier_night", "type": "cosmetic", "slot": "arena_variant", "name": "Pier Night (Chum Rush arena variant)", "desc": "Chum Rush's hidden arena variant: the pier under the dock, after dark."},
+    {"id": "hub_rooftop_neon", "type": "cosmetic", "slot": "arena_variant", "name": "Rooftop: full neon", "desc": "The Rooftop arena's night variant with every GLANDCO letter lit."}
+  ]
+}

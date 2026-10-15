@@ -53,6 +53,11 @@ func _build() -> void:
 		var up := CampaignUI.button("RAISE THE DOSE (Dose %d)" % (dose + 1), _restart.bind(false, 1), 24, CampaignUI.DANGER)
 		row.add_child(up)
 		_buttons.append(up)
+	# Fight Camp runs end back in the Cannery (docs/HUB_SYSTEMS.md)
+	if str(s.get("variant", "")) == "fight_camp" and str(s.get("mode", "")) != "bookie" and App.has_screen("hub"):
+		var hub := CampaignUI.button("BACK TO THE CANNERY", _cannery, 24, CampaignUI.GOOD)
+		row.add_child(hub)
+		_buttons.append(hub)
 	var menu := CampaignUI.button("CAMPAIGN MENU", _menu, 24, CampaignUI.MUTED)
 	row.add_child(menu)
 	_buttons.append(menu)
@@ -158,6 +163,10 @@ func _restart(same_seed: bool, dose_delta: int) -> void:
 
 func _menu() -> void:
 	App.goto("campaign_menu")
+
+
+func _cannery() -> void:
+	App.goto("hub", {"from": "run"})
 
 
 func on_back() -> bool:

@@ -3,6 +3,8 @@ extends Screen
 ## button" accepts any key, controller button or mouse click and opens the main menu.
 ## Also the boot hook for development flags (UiDevFlags: --ui-screen, --ui-seed-window, ...).
 
+const MAIN_MENU := preload("res://src/ui/screens/main_menu.gd")
+
 var _wordmark: Wordmark
 var _press: Control
 var _accepting := false
@@ -17,7 +19,7 @@ func on_enter(_p: Dictionary) -> void:
 	_wordmark.play_intro()
 	var timer := get_tree().create_timer(0.45, true, false, true)
 	timer.timeout.connect(func() -> void: _accepting = true)
-	Audio.music("menu_theme", 1.5)
+	Audio.music(MAIN_MENU.menu_track(), 1.5)
 
 
 func _build() -> void:

@@ -64,8 +64,8 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 |---|---|---|---|
 | CMP-01 | Off the Street (fresh-run): no permanent power; only stats/cosmetics/records/ladder persist; unlocks keep parity | I T | Off the Street variant: no carried power, cosmetic-only Clout wallet, stats/records/history/ladder persist (CampaignProgression); test_campaign_run, test_campaign_full_runs |
 | CMP-02 | Clearing the highest unlocked Dose unlocks the next, max Dose 10 | I T | CampaignProgression.apply_ladder_clear (Dose 0 clear opens The Dosage; highest Dose clear unlocks next, max 10); test_campaign_run::test_ladder_unlock_rule |
-| CMP-03 | Fight Camp (persistent): permanent upgrades; between runs the player explores the 3D hub | ~ T | Fight Camp: 24 Cannery upgrades (meta_upgrades/cannery.json, meta_bonus) bought with Clout via FightCamp API + Cannery Ledger screen; applied only in Fight Camp runs (test_campaign_run, test_campaign_full_runs). The 3D hub itself is CMP-04 |
-| CMP-04 | Hub: ≥5 connected spaces, characters, activities, secrets, upgrade stations, real movement | — | |
+| CMP-03 | Fight Camp (persistent): permanent upgrades; between runs the player explores the 3D hub | I T | Fight Camp: 24 Cannery upgrades (meta_upgrades/cannery.json, meta_bonus) bought with Clout at 6 hub stations (hub_services.gd) or the Cannery Ledger; applied only in Fight Camp runs (test_campaign_run, test_campaign_full_runs, test_hub_services); main menu Fight Camp opens The Cannery and run summaries return there; upgrades show in the world (docs/HUB_SYSTEMS.md, docs/evidence/hub) |
+| CMP-04 | Hub: ≥5 connected spaces, characters, activities, secrets, upgrade stations, real movement | I T | The Cannery (src/hub): 11 connected spaces walked by a real fighter (stairs, hatch, ladders, freight elevator, pier), 8 NPCs with idle/look-at/barks/talk and reactions to the last run, 3 scored activities (bag challenge, chum cannon drill, crate toss) + sparring + Bookie's Table, 10 in-world secrets (first unlocks ach_confidant), corkboard map with fast walk, time of day from the last result; tests test_hub_{geometry,interactions,activities,secrets,services,ui,wander}; perf --hub-bench 2.68 ms avg at 1080p High (docs/evidence/hub); docs/HUB_SYSTEMS.md |
 | CMP-05 | Both: branching routes, risk/reward, synergies, random events, bosses, rewards, victory/defeat/replay | I T | branching 3-act maps, elites/treasure, synergy tags, events, 3 bosses, rewards, victory/defeat summary with Run it back/New card/Raise the Dose; test_campaign_full_runs (real fights, both variants, victory and defeat), test_campaign_ui |
 | CMP-06 | Pacing/run length defined; seeded reproducible generation; no impossible routes/invalid rewards/softlocks (tested) | I T | pacing rules + estimates (25-40 min), 53-bit seeds, deterministic generation, claim ledger, safe-layout fallback; test_campaign_generation (500 seeds, every route paced and valid), test_campaign_run (duplicate rewards), test_campaign_ui (forfeit when a fight cannot be built) |
 | CMP-07 | How custom runs affect progression/records defined and shown | I T | custom runs (stand-ins, reduced game speed, custom rules) keep stats/history, no records/ladder/unlocks/achievements, Clout 50%, shown on the summary card; test_campaign_run::test_custom_runs_keep_stats_but_no_records |
@@ -126,7 +126,7 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 ## Art, animation, graphics, audio, tone [12]
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
-| ART-01 | Art direction guide | ~ | docs/design/ART_DIRECTION.md (in progress) |
+| ART-01 | Art direction guide | I | docs/design/ART_DIRECTION.md: style statement, silhouettes/proportions, global/element/fighter palettes, stylized PBR materials, active-ragdoll animation principles, per-element VFX shape language (readable without colour), impact/hit-flash rules, UI style and typography, wordmark, readability in 4-8 fighter scenes, asset standards for the forge pipeline |
 | ART-02 | Cohesive cartoony 3D style, original creatures; representative fighter & arena early | I | Forged original creatures (docs/evidence/art), The Gullet arena; tools/forge |
 | ART-03 | glTF import path validated; PBR, soft shadows, SSAO, HDR tonemapping; scalable quality | I | glTF pipeline (forge -> .glb -> Godot import; runtime GLTFDocument for mods), PBR hints, AgX, SSAO, soft shadows, quality presets |
 | ART-04 | Readable locomotion, attacks, abilities, hit reactions, blocking, knockdowns/recovery, win/loss per anatomy | — | |
@@ -176,10 +176,9 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
 | PRV-01 | Original names, designs, writing, UI identity, audio | ~ | docs/design |
-| PRV-02 | Third-party inventory incl. Cage Rules reuse and engine/deps | ~ | docs/THIRD_PARTY.md (Godot, Jolt, fonts incl. Bungee); Cage Rules reuse to be completed |
-| PRV-03 | Generated assets: tool/source recorded, editable sources kept | — | |
-| PRV-04 | Credits/notices; unresolved legal/platform items recorded; no certification claims | — | |
-
+| PRV-02 | Third-party inventory incl. Cage Rules reuse and engine/deps | I | docs/THIRD_PARTY.md: engine/middleware, fonts (Barlow via Cage Rules, Bungee) with sources, licences, notices; Cage Rules reuse audited repo-wide (fonts only; its bundled three.js/rapier/peerjs unused); original-asset inventory (models, visuals, audio, policies, writing) |
+| PRV-03 | Generated assets: tool/source recorded, editable sources kept | I | Models: tools/forge from tools/forge/defs (docs/ART_PIPELINE.md, generator recorded in each .glb); audio: tools/audio sources with byte-identical re-render check (docs/AUDIO.md); icons: game/assets/ui/source/make_icons.py; policies: Lab jobs/logs in docs/evidence/lab |
+| PRV-04 | Credits/notices; unresolved legal/platform items recorded; no certification claims | I | In-game Credits + Notices (engine licence/component texts from the running binary, OFL texts); docs/CREDITS.md and THIRD_PARTY.md + OFL files ship in every package (tools/build/package.ps1); open legal/platform items listed in THIRD_PARTY.md (no certification claims) |
 ## Verification gates [17, 19]
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
