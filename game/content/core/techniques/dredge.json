@@ -1,0 +1,37 @@
+{
+  "_doc": "DREDGE techniques and build directions (docs/design/ROSTER.md §2).",
+  "items": [
+    {"id": "tech_dredge_mooring_chain", "type": "technique", "fighter": "f_dredge", "name": "Mooring Chain", "build": "build_dredge_hurler",
+     "tags": ["grab", "pull"], "effect": "Grab reach 1.3 -> 1.6 m (the chain lunges the clamp forward)",
+     "apply": {"patches": [{"op": "append", "path": "moves.grab.lunge", "value": [0.0, 0.25, 1.2]}]}},
+    {"id": "tech_dredge_barnacle_plating", "type": "technique", "fighter": "f_dredge", "name": "Barnacle Plating", "build": "build_dredge_the_wall",
+     "tags": ["tank", "guard"], "effect": "Guard absorbs 85% instead of 75%; each blocked hit refunds +2 stamina",
+     "apply": {"mods": [{"key": "guard_absorb_mult", "mul": 0.6}],
+               "hooks": [{"on": "pre_hit_taken", "if": {"hit_blocked": true}, "do": [{"type": "stamina", "amount": 2, "target": "self"}]}]}},
+    {"id": "tech_dredge_undertow", "type": "technique", "fighter": "f_dredge", "name": "Undertow", "build": "build_dredge_riptide",
+     "tags": ["zone", "pull"], "effect": "Brine puddles Dredge creates pull other fighters toward their centre",
+     "apply": {"patches": [{"op": "merge", "path": "abilities.ability1.effects[type=projectile].on_expire", "value": {"push_out": -0.6, "owner_immune": true}},
+                           {"op": "merge", "path": "moves.heavy_charged.effects[type=zone]", "value": {"push_out": -0.6, "owner_immune": true}}]}},
+    {"id": "tech_dredge_wall_and_chain", "type": "technique", "fighter": "f_dredge", "name": "Wall-and-Chain", "build": "build_dredge_hurler",
+     "tags": ["grab", "arena"], "effect": "Wall splats from any Dredge throw or shove deal +6 damage and +15 poise",
+     "apply": {"mods": [{"key": "splat_damage_add", "add": 6}, {"key": "splat_poise_add", "add": 15}]}},
+    {"id": "tech_dredge_molting_season", "type": "technique", "fighter": "f_dredge", "name": "Molting Season", "build": "build_dredge_the_wall",
+     "tags": ["counter", "cleanse"], "effect": "Anchor Drop ends with a shell-shed pulse (r 2 m, 8 dmg, push) and cleanses Dredge; Anchor Drop cooldown +3 s",
+     "apply": {"patches": [{"op": "append", "path": "abilities.ability2.effects", "value": {"t": 0.15, "type": "delayed", "delay": 2.5, "radius": 2.0, "damage": 8, "knockback": 3.0, "poise": 15, "stun": 0.3}},
+                           {"op": "add", "path": "abilities.ability2.cooldown", "value": 3}],
+               "hooks": [{"on": "ability_used", "if": {"slot": "ability2"}, "do": [{"type": "status", "target": "self",
+                  "status": {"id": "molting", "name": "Molting", "duration": 2.9,
+                             "hooks": [{"on": "tick", "every": 2.6, "max_uses": 1, "do": [{"type": "cleanse", "target": "self"}]}]}}]}]}},
+    {"id": "tech_dredge_sidewinder", "type": "technique", "fighter": "f_dredge", "name": "Sidewinder", "build": "build_dredge_riptide",
+     "tags": ["mobility"], "effect": "Sideways walk 3.2 -> 3.8 m/s, dash +0.6 m; Scuttle Check deals x1.25",
+     "apply": {"patches": [{"op": "add", "path": "stats.side_speed", "value": 0.6, "default": 3.2}, {"op": "add", "path": "stats.dodge_distance", "value": 0.6, "default": 2.2}],
+               "hooks": [{"on": "pre_hit_dealt", "if": {"slot": "dash_attack"}, "do": [{"type": "damage_mult", "mult": 1.25}]}]}},
+
+    {"id": "build_dredge_hurler", "type": "build", "fighter": "f_dredge", "name": "Hurler", "techniques": ["tech_dredge_mooring_chain", "tech_dredge_wall_and_chain"],
+     "tags": ["grab", "arena", "heavy"], "blurb": "Pull, hurl, splat. Loves small arenas and props."},
+    {"id": "build_dredge_the_wall", "type": "build", "fighter": "f_dredge", "name": "The Wall", "techniques": ["tech_dredge_barnacle_plating", "tech_dredge_molting_season"],
+     "tags": ["tank", "guard", "counter"], "blurb": "Stand still, get hit, hit back harder, shed everything."},
+    {"id": "build_dredge_riptide", "type": "build", "fighter": "f_dredge", "name": "Riptide", "techniques": ["tech_dredge_undertow", "tech_dredge_sidewinder"],
+     "tags": ["zone", "mobility", "status"], "blurb": "Lay puddles, circle sideways, let the water drag them in."}
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "items": [
+    {"id": "dose_1", "type": "dose", "level": 1, "name": "Thin Wallet", "desc": "Scrip rewards -20%.",
+     "badge": "badge_dose_1", "color": "#9CD66B", "run": [{"key": "scrip_mult", "mul": 0.8}]},
+    {"id": "dose_2", "type": "dose", "level": 2, "name": "Extra Cardio", "desc": "Enemies +15% HP.",
+     "badge": "badge_dose_2", "color": "#6BD6A6", "run": [{"key": "enemy_hp_mult", "mul": 1.15}]},
+    {"id": "dose_3", "type": "dose", "level": 3, "name": "Cut Weight", "desc": "Your max HP -10%.",
+     "badge": "badge_dose_3", "color": "#6BC2D6", "run": [{"key": "player_max_hp_mult", "mul": 0.9}]},
+    {"id": "dose_4", "type": "dose", "level": 4, "name": "Mean Streak", "desc": "Enemies +15% damage.",
+     "badge": "badge_dose_4", "color": "#6B8CD6", "run": [{"key": "enemy_damage_mult", "mul": 1.15}]},
+    {"id": "dose_5", "type": "dose", "level": 5, "name": "Undercard Swarm", "desc": "Every normal Fight adds +1 Scrapling (loadout matches the arena).",
+     "badge": "badge_dose_5", "color": "#8C6BD6", "run": [{"key": "normal_fight_extra_minions", "add": 1}]},
+    {"id": "dose_6", "type": "dose", "level": 6, "name": "Juiced Opponents", "desc": "Enemy fighters start every fight with 50 Hype and one extra technique.",
+     "badge": "badge_dose_6", "color": "#C26BD6", "run": [{"key": "enemy_start_hype", "set": 50}, {"key": "enemy_extra_techniques", "add": 1}]},
+    {"id": "dose_7", "type": "dose", "level": 7, "name": "Side Effects", "desc": "Every supplement you take also applies a random side effect.",
+     "badge": "badge_dose_7", "color": "#D66BA8", "run": [{"key": "supplement_side_effects", "set": 1}]},
+    {"id": "dose_8", "type": "dose", "level": 8, "name": "No Mercy", "desc": "Bosses enter phase 2 at 65% HP instead of 50%.",
+     "badge": "badge_dose_8", "color": "#D6736B", "run": [{"key": "boss_phase2_at", "set": 0.65}]},
+    {"id": "dose_9", "type": "dose", "level": 9, "name": "Hostile Venue", "desc": "All arena hazards always on at their shortest timers; shop prices +30%.",
+     "badge": "badge_dose_9", "color": "#D6A26B", "run": [{"key": "hazards_always_on", "set": 1}, {"key": "shop_price_mult", "mul": 1.3}]},
+    {"id": "dose_10", "type": "dose", "level": 10, "name": "Lethal Dose", "desc": "Enemy bots are Hall-of-Famers; Rest heals half; the Title Card's elite is always The Commissioner's Cut.",
+     "badge": "badge_dose_10", "color": "#E8D24A",
+     "run": [{"key": "bot_tier", "set": "hall_of_famer"}, {"key": "rest_heal_mult", "mul": 0.5}, {"key": "act3_elite", "set": "elite_a3_commissioners_cut"}]}
+  ]
+}

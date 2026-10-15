@@ -159,6 +159,8 @@ func _start_sandbox() -> void:
 			"difficulty": arg_value("--difficulty", "regular") if i > 0 else arg_value("--p1diff", "pro"),
 			"name": "Player" if kind == "player" else "Bot %d" % i})
 	var cfg := {"arena": arg_value("--arena", "the_gullet"), "rules": rules_id, "seed": int(arg_value("--seed", "11")), "fighters": fighters}
+	if str(preset.get("mode", "")) == "practice":
+		cfg["overlay_script"] = "res://src/ui/practice_overlay.gd"
 	if args.has("--spectate"):
 		# AI-vs-AI with the auto-director camera and spectator controls (same path as the menu)
 		cfg["spectate"] = true

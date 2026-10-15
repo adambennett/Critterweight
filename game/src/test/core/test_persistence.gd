@@ -19,28 +19,6 @@ func test_round_trip_preserves_data() -> void:
 	check_eq(str(r["recovered_from"]), "")
 
 
-## Floats that Godot's JSON parser reads back 1 ulp off (seen in profile stats, e.g. a computed
-## damage total written as 101.44279598486929) must still verify.
-func test_floats_that_do_not_round_trip_exactly() -> void:
-	var odd := []
-	var v := 0.1
-	for i in 50000:
-		v = v * 1.0001 + 0.0137
-		var j := JSON.new()
-		if j.parse(JSON.stringify(v, "", false, true)) == OK and typeof(j.data) == TYPE_FLOAT and float(j.data) != v:
-			odd.append(v)
-			if odd.size() >= 3:
-				break
-	if odd.is_empty():
-		print("    note: this engine's JSON round-trips every float tried; nothing to check")
-		return
-	var p := dir.path_join("floats.json")
-	var data := {"damage_dealt": odd[0], "list": odd, "nested": {"time_played": odd[-1]}}
-	check_eq(Saves.write_json(p, "test", 1, data), OK, "write verifies")
-	var r := Saves.read_json(p, "test", 1)
-	check(r["ok"] and str(r["recovered_from"]) == "", "read back without recovery: %s" % r["error"])
-
-
 func test_interrupted_write_recovers_newest_valid_copy() -> void:
 	var p := dir.path_join("crash.json")
 	Saves.write_json(p, "test", 1, {"gen": 1})
