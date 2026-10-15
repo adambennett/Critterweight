@@ -1,0 +1,12 @@
+{
+  "_doc": "Mini-encounters launched by event outcomes (tier 'event': never placed on the map directly).",
+  "items": [
+    {"id": "evt_fight_scrap_crane", "type": "encounter", "tier": "event", "act": 0, "name": "Scrap Crane", "arena": "drydock",
+     "blurb": "Three Scraplings think the crate is theirs.", "enemies": [{"minion": "scrapling_basic", "count": 3}],
+     "special": {"hazards": [{"kind": "crane_hook", "every": 10}]}},
+    {"id": "evt_fight_blister_nest", "type": "encounter", "tier": "event", "act": 0, "name": "Blister Nest", "arena": "drydock",
+     "blurb": "Six Blisters and something glinting.", "enemies": [{"minion": "blister_sludge", "count": 6}]},
+    {"id": "evt_fight_spar", "type": "encounter", "tier": "event", "act": 0, "name": "Sparring with Kid Lamprey", "arena": "gullet_day",
+     "blurb": "A copy of you at 60% HP. It's only sparring.", "enemies": [{"fighter": "mirror", "techniques": 0, "hp_mult": 0.6}]}
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "practice_cage",
+  "name": "Granny's Practice Cage",
+  "base": "octagon",
+  "radius": 3.6,
+  "wall_height": 2.4,
+  "theme": "can",
+  "author": "Critterweight",
+  "version": 1,
+  "spawns": [[0, -1.6, 0], [0, 1.6, 180]],
+  "props": [],
+  "hazards": [],
+  "markers": {},
+  "practice": true
+}

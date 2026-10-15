@@ -70,6 +70,16 @@ func _send_to_apron(f: Fighter, slot: int) -> void:
 
 func on_round_reset() -> void:
 	super.on_round_reset()
+	_assisting.clear()
+	_assist_cd.clear()
+	_tag_cd.clear()
+	for f: Fighter in sim.fighters:
+		if f.despawned:
+			continue
+		f.flags.erase("resting")
+		f.flags.erase("_rest_counts")
+		f.flags.erase("_tag_seen")
+		f.set_inactive(false)
 	_place_teams()
 
 
@@ -103,7 +113,17 @@ func tick_fight(dt: float) -> void:
 				_start_assist(f)
 		elif _assisting.has(f.index) and sim.time >= float(_assisting[f.index]["until"]):
 			_assisting.erase(f.index)
-			_send_to_apron(f, 1)
+			if f.is_out():
+				continue                      # knocked out during the assist: stays out
+			var a: Fighter = active.get(f.team)
+			if a == null or a.is_out():
+				# the partner went down while we were in: we stay in as the active fighter
+				active[f.team] = f
+				sim.emit_event({"type": "auto_tag", "team": f.team})
+			else:
+				var hp := f.health
+				_send_to_apron(f, 1)
+				f.health = hp
 	for t in active.keys():
 		var a: Fighter = active[t]
 		if a.is_out():
@@ -147,10 +167,11 @@ func _next_partner(team: int, current: Fighter) -> Fighter:
 func _swap(team: int, out_f: Fighter, in_f: Fighter) -> void:
 	var p := out_f.pos()
 	var yaw := out_f.facing_yaw
+	var in_hp := in_f.health
 	in_f.flags.erase("resting")
 	in_f.set_inactive(false)
 	in_f.respawn(sim.clamp_to_arena(p, 0.6), yaw)
-	in_f.health = minf(in_f.health, in_f.max_health)
+	in_f.health = minf(in_hp, in_f.max_health)      # respawn() refills; tagging in must not
 	in_f.invuln_until = in_f.time + 0.5
 	active[team] = in_f
 	if out_f.health > 0.0 and not out_f.is_out():
@@ -190,6 +211,31 @@ func on_depleted(f: Fighter, attacker: Fighter, hit: Dictionary) -> void:
 			_swap(t, f, partner)
 			sim.emit_event({"type": "auto_tag", "team": t})
 	check_round_over()
+
+
+## Timeout decision counts every member's remaining health, including partners on the apron.
+func on_timeout() -> void:
+	var totals := {}
+	for f: Fighter in sim.fighters:
+		if f.despawned:
+			continue
+		var alive := f.health > 0.0 and f.state != Fighter.State.KO
+		totals[f.team] = float(totals.get(f.team, 0.0)) + (f.health_frac() if alive else 0.0)
+	var best := -1
+	var best_v := -INF
+	var tie := false
+	for t in totals:
+		if float(totals[t]) > best_v + 0.001:
+			best_v = float(totals[t])
+			best = int(t)
+			tie = false
+		elif absf(float(totals[t]) - best_v) <= 0.001:
+			tie = true
+	sim.emit_event({"type": "timeout"})
+	if tie and bool(rules.get("sudden_death", true)):
+		start_sudden_death()
+		return
+	end_round(-1 if tie else best)
 
 
 func alive_teams() -> Array:

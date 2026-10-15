@@ -80,6 +80,13 @@ func _valid(i: int) -> bool:
 	return i >= 0 and i < sim.fighters.size() and not sim.fighters[i].despawned and not sim.fighters[i].is_out()
 
 
+## During a held cut (KO, knockdown) the camera may stay on a fighter who is down or out.
+func _framable(i: int) -> bool:
+	if i < 0 or i >= sim.fighters.size() or sim.fighters[i].despawned:
+		return false
+	return _valid(i) or sim.time < _hold_until
+
+
 func _next_shot() -> void:
 	_cuts += 1
 	_shot_t = 0.0
@@ -107,7 +114,7 @@ func _next_shot() -> void:
 
 ## Focus pair for the camera: [focus position, opponent position or null]; [] = frame everyone.
 func focus() -> Array:
-	if shot == "wide" or not _valid(focus_index):
+	if shot == "wide" or not _framable(focus_index):
 		return []
 	var f := sim.fighters[focus_index]
 	var other = f.target.pos() if f.target and not f.target.is_out() else null
@@ -116,7 +123,7 @@ func focus() -> Array:
 
 ## Points the camera should keep in frame for the current shot.
 func points() -> Array:
-	if shot == "wide" or not _valid(focus_index):
+	if shot == "wide" or not _framable(focus_index):
 		return []
 	var f := sim.fighters[focus_index]
 	var pts := [f.pos()]

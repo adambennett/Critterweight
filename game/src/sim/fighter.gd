@@ -36,7 +36,9 @@ var hype := 0.0
 var shield_hp := 0.0
 var _stamina_delay := 0.0
 var _poise_delay := 0.0
-var lives := -1                  ## -1 = not using lives; modes set this
+var lives := -1                  ## remaining lives; -1 = unlimited (modes set this per round)
+var last_attacker_index := -1    ## who last damaged this fighter (credit for KOs by hazards, DoTs, ring-outs)
+var last_attacked_at := -1.0
 
 # ---- state ----
 var state := State.NEUTRAL
@@ -322,6 +324,8 @@ func sim_tick(dt: float) -> void:
 	time += dt
 	state_time += dt * _time_scale()
 	var presses := _tracker.consume(input)
+	if sim and (not sim.input_enabled or sim.is_finished):
+		presses = 0          # presses during the intro / after the end never carry into the fight
 	for b in FighterInput.BUTTON_COUNT:
 		if (presses >> b) & 1:
 			_buffer.append({"b": b, "t": time})
@@ -537,6 +541,7 @@ func _clear_overlay() -> void:
 	motor.overlay_joints.clear()
 	motor.overlay_lean = Vector3.ZERO
 	motor.overlay_height = 0.0
+	motor.strike_height_scale = 1.0
 	for i in rig.seg_speed.size():
 		rig.seg_speed[i] = 1.0
 
@@ -673,6 +678,13 @@ func _start_move(m: MoveDef, slot: String, st: int) -> void:
 			facing_yaw = atan2(input.move.x, input.move.z)
 	elif input.move.length() > 0.3:
 		facing_yaw = atan2(input.move.x, input.move.z)
+	# size matching: limb strikes authored against a same-size opponent re-aim vertically to the
+	# current target's height (a giant Unit hits normal heads, a jab doesn't sail over Jitters)
+	motor.strike_height_scale = 1.0
+	if target and _target_in_lock_range() and m.kind != "taunt":
+		var own_h := maxf(0.3, creature.body.height)
+		var ratio := clampf(target.creature.body.height / own_h, 0.5, 1.3)
+		motor.strike_height_scale = lerpf(1.0, ratio, Tuning.v("strike_height_follow"))
 	for i in rig.seg_speed.size():
 		rig.seg_speed[i] = 1.0
 	if m.speed != 1.0:
@@ -777,7 +789,7 @@ func _start_dodge() -> void:
 	_dodge_cd = Tuning.v("dodge_cooldown") + eff("dodge_time")
 	_set_state(State.DODGE)
 	move_slot = "dodge"
-	evade_until = time + Tuning.v("dodge_evade_end")
+	evade_until = time + Tuning.v("dodge_evade_end") + float(mods.get("dodge_iframes_add", 0.0))
 	hooks.fire("dodge", {})
 	_emit({"type": "dodge"})
 
@@ -817,6 +829,9 @@ func _st_hitstun(dt: float) -> void:
 func knock_down(reason := "hit", by: Fighter = null) -> void:
 	if state == State.KO or is_out():
 		return
+	# modes may replace a knockdown (boss Dazed state, "prevent one knockdown" upgrades)
+	if sim and sim.mode and sim.mode.intercept_knockdown(self, reason, by):
+		return
 	_release_grab()
 	_end_carry()
 	if held_by:
@@ -852,7 +867,7 @@ func _st_down(_dt: float) -> void:
 		_set_state(State.GETUP)
 		rig.hover_enabled = true
 		rig.upright_strength = 0.0
-		invuln_until = time + Tuning.v("getup_time") + Tuning.v("wakeup_invuln")
+		invuln_until = time + Tuning.v("getup_time") + Tuning.v("wakeup_invuln") + float(mods.get("wakeup_invuln_add", 0.0))
 		_emit({"type": "getup"})
 
 
@@ -888,7 +903,8 @@ func _st_out(_dt: float) -> void:
 		motor.overlay_height = absf(sin(time * 3.0)) * 0.04
 
 
-func knock_out(by: Fighter = null) -> void:
+## `silent`: re-applies the KO state without a second "ko" event (e.g. after a body rebuild).
+func knock_out(by: Fighter = null, silent := false) -> void:
 	_release_grab()
 	_end_carry()
 	if held_by:
@@ -899,6 +915,8 @@ func knock_out(by: Fighter = null) -> void:
 	rig.muscle = Tuning.v("ko_muscle")
 	rig.hover_enabled = false
 	health = 0.0
+	if silent:
+		return
 	if by:
 		by.hooks.fire("ko_dealt", {"other": self})
 	_emit({"type": "ko", "by": by.index if by else -1})
@@ -1179,7 +1197,7 @@ func begin_grab(victim: Fighter, my_seg: int, victim_seg: int) -> void:
 		return
 	holding = victim
 	victim.held_by = self
-	_hold_left = Tuning.v("grab_hold_max") * float(victim.mods.get("held_time_mult", 1.0))
+	_hold_left = Tuning.v("grab_hold_max") * float(victim.mods.get("held_time_mult", 1.0)) + float(mods.get("grab_hold_add", 0.0))
 	victim._escape_presses = 0
 	_pummels = 0
 	_interrupt_move()
@@ -1293,7 +1311,7 @@ func _st_held(_dt: float, presses: int) -> void:
 			n += 1
 	if n > 0:
 		_escape_presses += n
-		if _escape_presses >= int(Tuning.v("grab_escape_presses")):
+		if _escape_presses >= int(Tuning.v("grab_escape_presses")) + int(held_by.mods.get("grab_escape_add", 0.0)):
 			var g := held_by
 			g._release_grab()
 			var away := (pos() - g.pos())

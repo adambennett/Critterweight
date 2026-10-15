@@ -1,0 +1,37 @@
+{
+  "_doc": "JITTERS techniques and build directions (docs/design/ROSTER.md §6).",
+  "items": [
+    {"id": "tech_jitters_capacitor", "type": "technique", "fighter": "f_jitters", "name": "Capacitor", "build": "build_jitters_battery",
+     "tags": ["hype", "juice"], "effect": "Hype gain +20%; Overcharge 8 -> 10 s",
+     "apply": {"mods": [{"key": "hype_gain", "mul": 1.2}],
+               "patches": [{"op": "mul", "path": "juice.duration", "value": 1.25}, {"op": "mul", "path": "abilities.juice.effects[type=juice_state].duration", "value": 1.25}]}},
+    {"id": "tech_jitters_bouncy_castle", "type": "technique", "fighter": "f_jitters", "name": "Bouncy Castle", "build": "build_jitters_trampoline",
+     "tags": ["prop", "coop"], "effect": "Spring Pad max 2 -> 3, cooldown 7 -> 5 s",
+     "apply": {"patches": [{"op": "add", "path": "abilities.ability2.effects[type=prop].max_active", "value": 1, "default": 2},
+                           {"op": "mul", "path": "abilities.ability2.cooldown", "value": 0.714}]}},
+    {"id": "tech_jitters_chain_reaction", "type": "technique", "fighter": "f_jitters", "name": "Chain Reaction", "build": "build_jitters_battery",
+     "tags": ["status", "crowd"], "effect": "Hitting a Jolted enemy leaks 10 Static build-up to every enemy within 1.5 m",
+     "apply": {"hooks": [{"on": "hit_dealt", "if": {"target_status": "static"}, "cooldown": 0.25,
+                          "do": [{"type": "area", "radius": 1.5, "damage": 0, "knockback": 0, "poise": 0, "stun": 0, "element": "static", "buildup": 10}]}]}},
+    {"id": "tech_jitters_rubber_core", "type": "technique", "fighter": "f_jitters", "name": "Rubber Core", "build": "build_jitters_spark_plug",
+     "tags": ["tank"], "effect": "Knockdown recovery 50% faster; poise 45 -> 60",
+     "apply": {"mods": [{"key": "getup_speed", "mul": 1.5}], "patches": [{"op": "add", "path": "stats.poise", "value": 15, "default": 45}]}},
+    {"id": "tech_jitters_head_hunter", "type": "technique", "fighter": "f_jitters", "name": "Head Hunter", "build": "build_jitters_trampoline",
+     "tags": ["heavy"], "effect": "Squash 'Bonk' bonus +3 -> +7 on head hits; Squash leap +0.5 m higher and 25% farther",
+     "apply": {"hooks": [{"on": "pre_hit_dealt", "if": {"slots": ["heavy", "heavy_charged"], "hit_part": "head"}, "do": [{"type": "damage_add", "amount": 4}]}],
+               "patches": [{"op": "add", "path": "moves.heavy.effects[type=leap].height", "value": 0.5, "default": 1.8},
+                           {"op": "mul", "path": "moves.heavy.effects[type=leap].distance", "value": 1.25}]}},
+    {"id": "tech_jitters_short_fuse", "type": "technique", "fighter": "f_jitters", "name": "Short Fuse", "build": "build_jitters_spark_plug",
+     "tags": ["projectile", "glass"], "effect": "Arc Lash homing 90 -> 180 deg/s and 2 charges; stamina regen -20%",
+     "apply": {"patches": [{"op": "mul", "path": "abilities.ability1.effects[type=projectile].homing_deg", "value": 2.0},
+                           {"op": "set", "path": "abilities.ability1.charges", "value": 2}],
+               "mods": [{"key": "stamina_regen", "mul": 0.8}]}},
+
+    {"id": "build_jitters_trampoline", "type": "build", "fighter": "f_jitters", "name": "Trampoline", "techniques": ["tech_jitters_bouncy_castle", "tech_jitters_head_hunter"],
+     "tags": ["prop", "heavy", "coop"], "blurb": "Three pads, free Squashes, bonk everything."},
+    {"id": "build_jitters_battery", "type": "build", "fighter": "f_jitters", "name": "Battery", "techniques": ["tech_jitters_capacitor", "tech_jitters_chain_reaction"],
+     "tags": ["hype", "status", "crowd"], "blurb": "JUICE early, JUICE often; crowds Jolt themselves."},
+    {"id": "build_jitters_spark_plug", "type": "build", "fighter": "f_jitters", "name": "Spark Plug", "techniques": ["tech_jitters_rubber_core", "tech_jitters_short_fuse"],
+     "tags": ["tank", "projectile", "glass"], "blurb": "Two homing orbs, bounce back up from every knockdown."}
+  ]
+}

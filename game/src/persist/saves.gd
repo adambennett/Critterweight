@@ -44,9 +44,24 @@ static func checksum(data) -> String:
 	return JSON.stringify(canonical(data), "", true, true).sha256_text()
 
 
+## Data exactly as it will read back: Godot's JSON text round trip is not exact for every double
+## (small numbers lose trailing digits), so saves store and hash the round-trip fixed point. A
+## checksum computed on the in-memory values would otherwise flag good files as damaged.
+static func stabilize(data):
+	var d = data
+	for i in 4:
+		var t1 := JSON.stringify(d, "", true, true)
+		var d2 = JSON.parse_string(t1)
+		if JSON.stringify(d2, "", true, true) == t1:
+			return d2
+		d = d2
+	return d
+
+
 func envelope(kind: String, version: int, data) -> Dictionary:
+	var stable = stabilize(data)
 	return {"format": FORMAT, "kind": kind, "version": version, "game_version": game_version(),
-		"saved_at": Time.get_unix_time_from_system(), "checksum": checksum(data), "data": data}
+		"saved_at": Time.get_unix_time_from_system(), "checksum": checksum(stable), "data": stable}
 
 
 func write_json(path: String, kind: String, version: int, data) -> Error:
