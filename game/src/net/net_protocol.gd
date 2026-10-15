@@ -12,8 +12,11 @@ class_name NetProtocol
 ## entries carry hash + client_only, hello ends with the player's aim-assist level (LQ_ASSIST
 ## updates it). The challenge prefix (protocol, game version, name, nonce, flags) never changes,
 ## so a mismatched protocol is always recognised.
+## 4 = party seats (net.party_claim / net.party_leave requests, party ids stamped on relayed
+## messages while a party run is open), equipped cosmetics (LQ_COSMETICS, lobby players and
+## MATCH_START carry them), MATCH_START arena packages and policy hashes; C_LOBBY up to 1 KB.
 
-const VERSION := 3
+const VERSION := 4
 
 ## ---- channels (ENet) ----
 const CH_CONTROL := 0      ## reliable ordered: handshake, lobby, chat, app messages, match lifecycle
@@ -50,7 +53,7 @@ const S_PONG := 77
 const S_ROSTER := 78          ## fighter slot changes (events channel, before the events of that tick)
 
 ## Maximum accepted payload size (bytes, including the id byte) per client -> server message.
-const MAX_SIZE := {C_HELLO: 16384, C_LEAVE: 16, C_LOBBY: 512, C_CHAT: 600, C_VOTE: 16,
+const MAX_SIZE := {C_HELLO: 16384, C_LEAVE: 16, C_LOBBY: 1024, C_CHAT: 600, C_VOTE: 16,
 	C_INPUT: 256, C_APP: 65536 + 256, C_PING: 32}
 ## Server -> client messages are bounded too (clients reject anything bigger).
 const MAX_SERVER_PACKET := 1 << 20
@@ -61,6 +64,9 @@ const LQ_CREATURE := 2
 const LQ_TEAM := 3
 const LQ_SPECTATE := 4
 const LQ_ASSIST := 5          ## aim-assist level for the next matches (accessibility setting)
+const LQ_COSMETICS := 6       ## equipped cosmetics {slot: id} (presentation only, see clean_cosmetics)
+const MAX_COSMETIC_SLOTS := 8
+const MAX_COSMETICS_BYTES := 768
 const LQ_HOST_RULES := 10     ## host only (listen server): rules preset id
 const LQ_HOST_ARENA := 11     ## host only: arena id
 const LQ_HOST_BOTS := 12      ## host only: bot count + difficulty
@@ -395,6 +401,62 @@ static func valid_app_type(t: String) -> bool:
 		if not ok:
 			return false
 	return true
+
+
+## A player's equipped cosmetics as the other players may see them: {slot: id} where every id
+## is a known cosmetic (content kind "hub", type "cosmetic") worn in its own slot, or - in the
+## "frame" slot - the headliner badge of an installed fighter. Anything else is dropped.
+## Presentation only: wearables, name-card frame, JUICE colour; the simulation never reads it.
+static func clean_cosmetics(v) -> Dictionary:
+	var out := {}
+	if typeof(v) != TYPE_DICTIONARY:
+		return out
+	for k in v:
+		if out.size() >= MAX_COSMETIC_SLOTS:
+			break
+		var slot := str(k)
+		var id := str(v[k])
+		if slot.length() > 24 or id.length() > 64 or not valid_app_type(slot) or not valid_app_type(id):
+			continue
+		if id.begins_with("hub_badge_headliner_"):
+			if slot == "frame" and Content.creature(id.trim_prefix("hub_badge_headliner_")) != null:
+				out[slot] = id
+			continue
+		var it: Dictionary = Content.get_entry("hub", id)
+		if str(it.get("type", "")) == "cosmetic" and str(it.get("slot", "")) == slot:
+			out[slot] = id
+	return out
+
+
+## This machine's equipped cosmetics from the active profile (HubState's locker: owned items
+## only), cleaned like everyone else's.
+static func local_cosmetics() -> Dictionary:
+	var tree := Engine.get_main_loop() as SceneTree
+	var profs: Node = tree.root.get_node_or_null("Profiles") if tree else null
+	if profs == null:
+		return {}
+	var prof = profs.get("current")
+	if typeof(prof) != TYPE_DICTIONARY:
+		return {}
+	var camp = (prof as Dictionary).get("camp", {})
+	var hub = camp.get("hub", {}) if typeof(camp) == TYPE_DICTIONARY else {}
+	var lo = hub.get("loadout", {}) if typeof(hub) == TYPE_DICTIONARY else {}
+	var cos = lo.get("cosmetics", {}) if typeof(lo) == TYPE_DICTIONARY else {}
+	var unlocks = (prof as Dictionary).get("unlocks", {})
+	var owned = unlocks.get("cosmetics", []) if typeof(unlocks) == TYPE_DICTIONARY else []
+	var eq := {}
+	if typeof(cos) == TYPE_DICTIONARY and typeof(owned) == TYPE_ARRAY:
+		for slot in cos:
+			if (owned as Array).has(str(cos[slot])):
+				eq[str(slot)] = str(cos[slot])
+	return clean_cosmetics(eq)
+
+
+## A stand-in profile that wears `eq` (for FighterCosmetics.dress / frame on another player's
+## fighter or name card): the locker layout HubState writes, every item owned.
+static func cosmetics_profile(eq: Dictionary) -> Dictionary:
+	var clean := clean_cosmetics(eq)
+	return {"camp": {"hub": {"loadout": {"cosmetics": clean}}}, "unlocks": {"cosmetics": clean.values()}}
 
 
 ## A campaign run id as party seats carry it: 1-64 of [A-Za-z0-9_-].

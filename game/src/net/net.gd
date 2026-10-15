@@ -58,6 +58,8 @@ var _lan_wanted := false          ## the UI asked to browse (kept while the sett
 var _lan_port := DISCOVERY_PORT
 var _members := {}                ## other connected members (party peers): id string -> true
 var _party_seen := {}             ## last party offer reported through party_changed
+var _cosmetics := {}              ## cosmetics set with set_cosmetics() (else the active profile's)
+var _cosmetics_set := false
 
 
 func _ready() -> void:
@@ -141,6 +143,7 @@ func host(cfg: Dictionary = {}) -> Error:
 		if cfg.has(k):
 			server.host_set(k, cfg[k])
 	server.add_local_player(pname, str(cfg.get("creature", "")))
+	server.set_cosmetics(SERVER_ID, cfg.get("cosmetics", session_cosmetics()))
 	_connect_server_signals()
 	role = "host"
 	_set_state("lobby")
@@ -358,6 +361,9 @@ func _connect_client_signals() -> void:
 	client.admitted.connect(func(w: Dictionary) -> void:
 		_rejoin = {"address": client.address, "port": client.port, "token": client.token, "password": str(client.opts.get("password", "")),
 			"until_ms": Time.get_ticks_msec() + 3600 * 1000}
+		var cos := session_cosmetics()
+		if not cos.is_empty():
+			client.send_lobby(NetProtocol.LQ_COSMETICS, cos)
 		if client.state != NetClient.State.MATCH:
 			_set_state("lobby")
 		status_changed.emit("Connected to '%s'" % client.server_name)
@@ -758,6 +764,37 @@ func party_claim(seat: String) -> String:
 func party_leave() -> void:
 	if role == "client" and client:
 		client.send_app(NetProtocol.APP_PARTY_LEAVE, {})
+
+
+# =====================================================================================
+# Cosmetics (presentation only)
+# =====================================================================================
+
+## The cosmetics this participant shows other players: what set_cosmetics() chose, else the
+## active profile's equipped (owned) items. {slot: id}, cleaned (NetProtocol.clean_cosmetics).
+func session_cosmetics() -> Dictionary:
+	return _cosmetics.duplicate() if _cosmetics_set else NetProtocol.local_cosmetics()
+
+
+## Shows these equipped cosmetics ({slot: id}: wearables, name-card "frame", JUICE colour) to the
+## other players from now on (lobby rows; fighters from the next match). Unknown ids are dropped;
+## nothing here affects gameplay.
+func set_cosmetics(equipped: Dictionary) -> void:
+	_cosmetics = NetProtocol.clean_cosmetics(equipped)
+	_cosmetics_set = true
+	match role:
+		"host":
+			server.set_cosmetics(SERVER_ID, _cosmetics)
+		"client":
+			if client:
+				client.send_lobby(NetProtocol.LQ_COSMETICS, _cosmetics)
+
+
+## A player's cosmetics as a stand-in profile for the view helpers (FighterCosmetics.dress /
+## frame): `player` is a lobby player row (Net.lobby().players) or a {slot: id} dictionary.
+static func cosmetics_profile(player: Dictionary) -> Dictionary:
+	var eq = player.get("cosmetics", player) if player.has("cosmetics") or player.has("id") else player
+	return NetProtocol.cosmetics_profile(eq if typeof(eq) == TYPE_DICTIONARY else {})
 
 
 ## Client -> authority request (on the listen host it is delivered locally as app_request).

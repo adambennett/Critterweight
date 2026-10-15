@@ -11,6 +11,7 @@ var slot := -1                   ## lobby slot (0..max_players-1), -1 for specta
 var team := -1                   ## requested team (-1 = automatic)
 var creature := ""
 var assist := 1.0                ## aim-assist multiplier from the player's settings (fighter mods)
+var cosmetics := {}              ## equipped cosmetics {slot: id} (NetProtocol.clean_cosmetics; presentation only)
 var ready := false
 var spectator := false
 var is_host := false
@@ -49,4 +50,4 @@ func is_human_player() -> bool:
 func to_public() -> Dictionary:
 	return {"id": id, "name": name, "slot": slot, "team": team, "creature": creature, "ready": ready,
 		"spectator": spectator, "host": is_host, "connected": connected, "fighter": fighter,
-		"ping": roundi(rtt_ms), "vote": vote}
+		"ping": roundi(rtt_ms), "vote": vote, "cosmetics": cosmetics.duplicate()}

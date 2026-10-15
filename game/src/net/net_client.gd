@@ -611,6 +611,11 @@ func send_lobby(kind: int, value) -> void:
 			w.i8(int(value))
 		NetProtocol.LQ_ASSIST:
 			w.u8(NetProtocol.assist_to_byte(float(value)))
+		NetProtocol.LQ_COSMETICS:
+			var b := NetProtocol.encode_payload(NetProtocol.clean_cosmetics(value))
+			if b.size() > NetProtocol.MAX_COSMETICS_BYTES:
+				return
+			w.blob(b)
 	transport.send(1, NetProtocol.CH_CONTROL, w.data(), true)
 
 

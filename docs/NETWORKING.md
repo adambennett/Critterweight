@@ -69,7 +69,7 @@ fighter in a slot before any event refers to them; snapshots carry the match id 
 when they belong to another match. Disconnects carry a reason code (ENet disconnect data) as a
 fallback when the reason message itself could not be delivered.
 
-## 5. Protocol (version 3)
+## 5. Protocol (version 4)
 
 Every packet: `[u8 message id][payload]`. Ids 1-63 client->server, 64-127 server->client; the wrong
 direction, an unknown id, the wrong channel, an oversized payload or a failed bounds-checked decode
@@ -80,7 +80,7 @@ is a **protocol violation**. Layouts are documented in `src/net/net_protocol.gd`
 |---|---|---|---|---|
 | 1 | HELLO | C->S | 16 KB | protocol, game version, gameplay content hash, packages (<= 64) [{id, version, hash, client_only}], name, password proof, rejoin token, flags, creature, aim assist (x100) |
 | 2 | LEAVE | C->S | 16 B | - (graceful leave: no rejoin reservation) |
-| 3 | LOBBY | C->S | 512 B | kind (ready, creature, team, spectate, assist) + value |
+| 3 | LOBBY | C->S | 1 KB | kind (ready, creature, team, spectate, assist, cosmetics) + value |
 | 4 | CHAT | C->S | 600 B | text (<= 200 chars after cleaning) |
 | 5 | VOTE | C->S | 16 B | candidate index (-1 = none) |
 | 6 | INPUT | C->S | 256 B | seq, last snapshot tick, n (1-8), n x sample (4 + BUTTON_COUNT bytes) |
@@ -252,6 +252,20 @@ request to one of the setting's three levels (what any player can pick), and wit
 `match.player_assist = false` (or `Net.host({"player_assist": false})`) it gives every remote
 player the normal level instead. Nothing else gameplay-related comes from clients.
 
+**Cosmetics** (presentation only): each player's equipped cosmetics - wearables, the name-card
+frame, the JUICE colour (Sizzle) - travel as `{slot: id}` with the player info: the active
+profile's owned, equipped items (the Cannery locker, `camp.hub.loadout.cosmetics`) go out after
+the join (`LQ_COSMETICS`; `Net.set_cosmetics()` changes them, `Net.session_cosmetics()` reads
+them; a listen host's own come with `Net.host()`). The authority keeps only known items worn in
+their own slot (`NetProtocol.clean_cosmetics`: content kind `hub`, `type: cosmetic`, matching
+`slot`; in `frame`, also the headliner badge of an installed fighter), shows them in every lobby
+player row (`players[].cosmetics`) and puts each human fighter's set into MATCH_START
+(`cosmetics` {fighter index: {slot: id}}) and into the listen host's fighter entries. The
+simulation never reads them; views dress fighters and name cards from them
+(`Net.cosmetics_profile(row)` builds the stand-in profile the view helpers take). Ownership
+cannot be proven without accounts, so a player could show any known item - harmless, it is looks
+only.
+
 Diagnostics overlay: `Settings diag.show_net` shows RTT, loss, snapshot rate, interpolation delay
 and jitter, buffer depth and KB/s in the match; the same values come from `Net.stats()`.
 
@@ -361,9 +375,10 @@ cost, traffic, memory, objects/nodes/orphans).
 
 ## 13. Version compatibility
 
-* `NetProtocol.VERSION` (now **3**: content package lists with hashes in the challenge and hello,
-  aim assist; 2 = 11-button input samples, roster generations, mode view/HUD state) must match
-  exactly; it is bumped whenever any layout changes.
+* `NetProtocol.VERSION` (now **4**: party seats, cosmetics, arena packages and policy hashes in
+  MATCH_START; 3 = content package lists with hashes in the challenge and hello, aim assist; 2 =
+  11-button input samples, roster generations, mode view/HUD state) must match exactly; it is
+  bumped whenever any layout changes.
 * The game version (`application/config/version`) must match exactly.
 * Content: the content verdict above over `Mods.compare()` (gameplay packages, ids, versions,
   package hashes) and `Content.content_hash()` (all gameplay kinds of every loaded package).
@@ -631,7 +646,7 @@ Also LOOPBACK on one PC.
   them); rules presets travel in full and player-made arenas as checked layout packages (§13).
 * Server CPU with 8 fighters is 56-68 % of one core (target < 35 %); the cost is the simulation,
   not networking (§15).
-* Event types added after protocol 3 was fixed (arena hazards and props, bosses, ring-out return,
+* Event types added after the event codec's id table was fixed (arena hazards and props, bosses, ring-out return,
   campaign events; `test_net_parity` lists them) travel with their type name instead of a 1-byte
   id: they work, the event packets are just a little larger. Giving them ids is a protocol bump.
 * Co-op: resuming a suspended party run through the lobby is wired (party seats + `NetPartyRuns`,

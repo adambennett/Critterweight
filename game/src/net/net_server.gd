@@ -848,6 +848,14 @@ func _handle_lobby(p: NetPlayer, data: PackedByteArray) -> void:
 			var a := r.u8()
 			if r.expect_end():
 				p.assist = NetProtocol.assist_from_byte(a)
+		NetProtocol.LQ_COSMETICS:
+			var cb := r.blob(NetProtocol.MAX_COSMETICS_BYTES)
+			if r.expect_end():
+				var dec := NetProtocol.decode_payload(cb)
+				if bool(dec["ok"]):
+					set_cosmetics(p.id, dec["value"])
+				else:
+					_violation(p, 2.0, "bad cosmetics payload: %s" % str(dec["error"]))
 		_:
 			# host-only requests never come over the network (the listen host is local)
 			_violation(p, 2.0, "lobby request %d not allowed" % kind)
@@ -996,6 +1004,19 @@ func set_creature(pid: int, cid: String) -> void:
 		return
 	p.creature = cid
 	_lobby_dirty = true
+
+
+## A player's equipped cosmetics (wearables, name-card frame, JUICE colour): validated against the
+## known cosmetic ids (NetProtocol.clean_cosmetics) and shown to everyone - lobby rows and the
+## fighter's look in matches. Presentation only: the simulation never reads them.
+func set_cosmetics(pid: int, v) -> void:
+	var p: NetPlayer = players.get(pid)
+	if p == null:
+		return
+	var clean := NetProtocol.clean_cosmetics(v)
+	if clean != p.cosmetics:
+		p.cosmetics = clean
+		_lobby_dirty = true
 
 
 func set_team(pid: int, t: int) -> void:
@@ -1639,6 +1660,9 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 			# the remote player's accessibility aim assist (MatchScene does this for local players):
 			# one of the setting's levels, or the normal level when the server decides for everyone
 			e["mods"] = {"assist": p2.assist if bool(cfg.get("player_assist", true)) else 1.0}
+		# presentation only: views dress the fighter (MatchScene / NetMatchScene); MatchSim ignores it
+		if not p2.cosmetics.is_empty():
+			e["cosmetics"] = p2.cosmetics.duplicate()
 		p2.fighter = i
 		fighters.append(e)
 	var policy_list: Array = []      ## [{fighter, id, name, hash}] for MATCH_START and the log
@@ -1709,6 +1733,14 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 		"snapshot_rate": int(cfg["snapshot_rate"]), "fighters": fl, "entry": current_entry, "seed": seed_v}
 	if not arena_pkg.is_empty():
 		match_info["arena_package"] = arena_pkg
+	# each human fighter's equipped cosmetics (fighter index -> {slot: id}), for the players' views
+	var dressed := {}
+	for i2 in chosen.size():
+		var pc: NetPlayer = chosen[i2]
+		if not pc.cosmetics.is_empty():
+			dressed[str(i2)] = pc.cosmetics.duplicate()
+	if not dressed.is_empty():
+		match_info["cosmetics"] = dressed
 	if not policy_list.is_empty():
 		match_info["policies"] = policy_list
 		for pe in policy_list:

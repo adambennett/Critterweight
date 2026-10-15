@@ -563,6 +563,50 @@ func test_party_seats_inprocess() -> void:
 	party.close()
 
 
+## Equipped cosmetics travel with the player info (presentation only): validated against the
+## known cosmetic ids (each in its own slot; headliner badges of installed fighters as frames),
+## shown in the lobby rows and in MATCH_START per fighter, never in the simulation.
+func test_cosmetics_travel_with_players_inprocess() -> void:
+	var clean := NetProtocol.clean_cosmetics({"piece": "hub_gold_tooth", "frame": "hub_badge_headliner_f_stoke",
+		"juice": "hub_frame_soaked", "back": "made_up_item", "neck": 42, "Bad Slot!": "hub_gold_tooth"})
+	check_eq(clean, {"piece": "hub_gold_tooth", "frame": "hub_badge_headliner_f_stoke"}, "only known items, each in its own slot")
+	check(NetProtocol.clean_cosmetics({"frame": "hub_badge_headliner_no_such_fighter"}).is_empty(), "badges need an installed fighter")
+	var port := _port()
+	var server := _server(port, {}, [{"rules": "duel", "arena": "the_gullet", "weight": 1, "rules_override": {"rounds": 1, "round_time": 20}}])
+	var a := _client(port, {"name": "Ann"})
+	var b := _client(port, {"name": "Ben"})
+	check(await _until(func() -> bool: return a.state == NetClient.State.LOBBY and b.state == NetClient.State.LOBBY, 6.0), "both admitted")
+	a.send_lobby(NetProtocol.LQ_COSMETICS, {"piece": "hub_gold_tooth", "juice": "hub_juice_sizzle", "frame": "hub_frame_soaked", "back": "made_up_item"})
+	b.send_lobby(NetProtocol.LQ_COSMETICS, {"frame": "hub_badge_headliner_f_stoke"})
+	var row_of := func(c: NetClient, pid: int) -> Dictionary:
+		for p in c.lobby.get("players", []):
+			if int(p.get("id", 0)) == pid:
+				return p
+		return {}
+	check(await _until(func() -> bool: return (row_of.call(b, a.player_id) as Dictionary).get("cosmetics", {}).size() == 3, 4.0),
+		"Ben's lobby shows Ann's cosmetics: %s" % str((row_of.call(b, a.player_id) as Dictionary).get("cosmetics", {})))
+	check_eq((row_of.call(a, b.player_id) as Dictionary).get("cosmetics", {}), {"frame": "hub_badge_headliner_f_stoke"}, "and Ann sees Ben's badge")
+	a.send_lobby(NetProtocol.LQ_READY, true)
+	b.send_lobby(NetProtocol.LQ_READY, true)
+	check(await _until(func() -> bool: return a.state == NetClient.State.MATCH and b.state == NetClient.State.MATCH, 15.0), "match started")
+	var dressed: Dictionary = a.match_info.get("cosmetics", {})
+	check_eq(dressed.get(str(a.my_fighter), {}), {"piece": "hub_gold_tooth", "juice": "hub_juice_sizzle", "frame": "hub_frame_soaked"}, "MATCH_START dresses Ann's fighter")
+	check_eq(dressed.get(str(b.my_fighter), {}), {"frame": "hub_badge_headliner_f_stoke"}, "and Ben's")
+	if server.sim != null:
+		for f in server.sim.fighters:
+			for k in f.mods:
+				check(not str(k) in ["piece", "juice", "frame", "cosmetics"], "no cosmetic reaches the simulation (%s)" % str(k))
+	# a listen host shows its own equipped items too
+	var port2 := _port()
+	check_eq(Net.host({"port": port2, "player_name": "Hosty", "lan_discovery": false, "cosmetics": {"back": "hub_replica_belt", "piece": "nope"}}), OK, "listen host up")
+	var hrow: Dictionary = (Net.lobby().get("players", []) as Array)[0]
+	check_eq(hrow.get("cosmetics", {}), {"back": "hub_replica_belt"}, "the host's row carries its cosmetics")
+	Net.set_cosmetics({"frame": "hub_frame_sign_fixer"})
+	check_eq((Net.lobby().get("players", []) as Array)[0].get("cosmetics", {}), {"frame": "hub_frame_sign_fixer"}, "set_cosmetics changes them")
+	check_eq(Net.cosmetics_profile(hrow)["unlocks"]["cosmetics"], ["hub_replica_belt"], "a stand-in profile for the view helpers")
+	Net.leave()
+
+
 ## A member re-verifies the run a host resumes against its own party save before playing on:
 ## the same run (id + seed), a state that follows from its decision log, a log that continues the
 ## member's (the host may be ahead, never behind or different).
