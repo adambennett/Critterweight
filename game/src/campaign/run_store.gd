@@ -71,7 +71,8 @@ func load_slot(profile_id: String, slot: String, catalog: CampaignCatalog) -> Di
 	var path := slot_path(profile_id, slot)
 	var r := Saves.read_json(path, KIND, RunState.VERSION, migrate)
 	var out := {"ok": false, "state": {}, "error": "", "problems": [], "recovered_from": str(r.get("recovered_from", "")),
-		"migrated": bool(r.get("migrated", false)), "exists": bool(r.get("exists", false)), "path": path}
+		"migrated": bool(r.get("migrated", false)), "exists": bool(r.get("exists", false)), "path": path,
+		"newer": bool(r.get("newer", false))}
 	if not bool(r["ok"]):
 		if not bool(r.get("exists", false)):
 			out["error"] = "No suspended run in this slot."
@@ -133,14 +134,22 @@ static func summarize(st: Dictionary) -> Dictionary:
 		"seed_text": str(st.get("seed_text", "")), "elapsed": float(st.get("elapsed", 0.0)), "custom": bool(st.get("custom", false))}
 
 
-## Removes a finished run's suspend slot (its summary lives on in the profile history).
+## Removes a finished run's suspend slot (its summary lives on in the profile history). A slot
+## written by a newer game version is never touched.
 func clear(profile_id: String, slot: String) -> void:
-	Saves.delete_save(slot_path(profile_id, slot))
+	var path := slot_path(profile_id, slot)
+	if Saves.is_newer(path, KIND, RunState.VERSION):
+		return
+	Saves.delete_save(path)
 
 
-## Moves an unusable save aside instead of deleting it (abandoning a broken run).
+## Moves an unusable save aside instead of deleting it (abandoning a broken run). Returns the new
+## path, or "" when nothing was moved: a run saved by a newer game version stays where it is.
 func quarantine(profile_id: String, slot: String) -> String:
-	return Saves.quarantine(slot_path(profile_id, slot))
+	var path := slot_path(profile_id, slot)
+	if Saves.is_newer(path, KIND, RunState.VERSION):
+		return ""
+	return Saves.quarantine(path)
 
 
 ## Save-format migrations. v0 (pre-release prototype) lacked claims/flags/log; future versions

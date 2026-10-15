@@ -148,6 +148,23 @@ func test_profiles_from_a_newer_version_are_never_overwritten() -> void:
 	p2.free()
 
 
+func test_newer_campaign_runs_are_never_moved_or_deleted() -> void:
+	var store := RunStore.new(dir.path_join("runs"))
+	var path := store.slot_path("tester", "off_the_street")
+	Saves.write_json(path, RunStore.KIND, RunState.VERSION + 1, {"future": true})
+	var before := _text(path)
+	var res := store.load_slot("tester", "off_the_street", null)
+	check(not bool(res["ok"]) and bool(res["newer"]), "reported as newer")
+	check_eq(store.quarantine("tester", "off_the_street"), "", "abandoning does not move it aside")
+	store.clear("tester", "off_the_street")
+	check_eq(_text(path), before, "still in place, unchanged")
+	check(store.save({"run_id": "x", "variant": "off_the_street"}, "tester") != OK and _text(path) == before, "a new run cannot overwrite it")
+	# an ordinary damaged run is still moved aside (never deleted)
+	var other := store.slot_path("tester", "fight_camp")
+	_store(other, "{ broken")
+	check(store.quarantine("tester", "fight_camp") != "" and not FileAccess.file_exists(other), "damaged runs are quarantined as before")
+
+
 # ---------------------------------------------------------------------------------------------
 # H. recovery follows the write order, not the clock
 
