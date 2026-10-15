@@ -14,6 +14,10 @@ const APPROACH_NAMES: PackedStringArray = ["Evolution strategies (reward)", "Beh
 const NET_SIZES := [[16], [32, 32], [64, 64], [96, 96]]
 const NET_NAMES: PackedStringArray = ["Tiny 16 (fastest)", "Small 32×32 (default for ES)", "Medium 64×64 (default for imitation)", "Large 96×96 (slow)"]
 
+## Opened from the AI Lab terminal in the Cannery's Boiler Room (params.from_hub): leaving walks
+## back there instead of the main menu (kept across the Lab's own fight/spectate round trips).
+static var return_to_hub := false
+
 var _tab := 0
 var _tab_buttons: Array[Button] = []
 var _panels: Array[Control] = []
@@ -103,6 +107,7 @@ var _delete_ds_armed := ""
 
 
 func on_enter(p: Dictionary) -> void:
+	return_to_hub = bool(p.get("from_hub", false))
 	# the shared UiTheme is applied by Screen; this screen only adds an opaque backdrop
 	var bg := ColorRect.new()
 	bg.color = UiTheme.BG_DEEP
@@ -151,6 +156,10 @@ func on_back() -> bool:
 
 
 func _go_back() -> void:
+	if return_to_hub and App.has_screen("hub"):
+		return_to_hub = false
+		App.goto("hub", {"spot": "boiler_room", "from": "lab"})
+		return
 	for s in ["main_menu", "title"]:
 		if App.has_screen(s):
 			App.goto(s)
@@ -1039,7 +1048,7 @@ func _fight() -> void:
 ## Match end -> free the match scene and return to the Policies tab.
 static func _back_to_lab(_result: Dictionary) -> void:
 	App.set_scene(null)
-	App.goto("lab", {"tab": 2})
+	App.goto("lab", {"tab": 2, "from_hub": return_to_hub})
 
 
 func _spectate() -> void:

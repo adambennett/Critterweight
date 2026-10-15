@@ -21,7 +21,7 @@ const ENTRIES := [
 		"children": [
 			{"id": "off_the_street", "label": "Off the Street", "icon": "campaign", "screen": "campaign_menu", "params": {"variant": "off_the_street"},
 				"desc": "A fresh run with nothing carried over. Climb The Dosage on skill alone."},
-			{"id": "fight_camp", "label": "Fight Camp", "icon": "trophy", "screen": "campaign_menu", "params": {"variant": "fight_camp"},
+			{"id": "fight_camp", "label": "Fight Camp", "icon": "trophy", "screen": "hub", "params": {"from": "menu"},
 				"desc": "Train between runs at The Cannery and keep your permanent upgrades."},
 			{"id": "bookie", "label": "Bookie's Table", "icon": "random", "screen": "bookie", "params": {},
 				"desc": "Teddy Two-Tooth's autobattler: build the fighter, pick the route, let the bots throw the punches."},
