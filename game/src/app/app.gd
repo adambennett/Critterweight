@@ -32,6 +32,9 @@ const SCREENS := {
 	"spectate": "res://src/ui/screens/spectate_setup.gd",
 	"bookie": "res://src/campaign/ui/bookie_screen.gd",
 	"tutorial_menu": "res://src/ui/screens/tutorial_menu.gd",
+	"controls": "res://src/ui/screens/controls_screen.gd",
+	"text_entry": "res://src/ui/screens/text_entry.gd",
+	"ui_gallery": "res://src/ui/screens/ui_gallery.gd",
 }
 
 var ui_layer: CanvasLayer
@@ -191,6 +194,7 @@ func start_match(cfg: Dictionary, on_finished: Callable = Callable()) -> MatchSc
 	set_scene(scene)
 	scene.start(resolved)
 	scene.match_finished.connect(func(result: Dictionary):
+		_record_match(cfg, scene, result)
 		match_ended.emit(result)
 		if on_finished.is_valid():
 			on_finished.call(result)
@@ -198,6 +202,37 @@ func start_match(cfg: Dictionary, on_finished: Callable = Callable()) -> MatchSc
 			push("results", {"result": result, "config": cfg}))
 	match_started.emit(scene)
 	return scene
+
+
+## Records a finished match in the active profile exactly once (local player matches only;
+## spectated, tutorial and online-client matches are not recorded here). Custom rules / mods
+## mark the result custom so records stay separate (CMP-07, UI-11).
+func _record_match(cfg: Dictionary, scene: MatchScene, result: Dictionary) -> void:
+	if bool(cfg.get("spectate", false)) and float(result.get("time", 0.0)) > 20.0:
+		Platform.unlock_achievement("ach_ringside")
+	if bool(cfg.get("no_record", false)) or str(result.get("mode", "")) in ["tutorial", "practice"]:
+		return
+	var me := -1
+	for i in (cfg.get("fighters", []) as Array).size():
+		if str((cfg["fighters"][i] as Dictionary).get("kind", "")) == "player":
+			me = i
+			break
+	if me < 0 or me >= scene.sim.fighters.size():
+		return
+	var f := scene.sim.fighters[me]
+	var wt := int(result.get("winner_team", -2))
+	var custom := bool(cfg.get("custom", false)) or not Mods.load_order.is_empty() or float(Settings.get_value("access.game_speed")) < 0.999
+	var won := wt == f.team
+	Profiles.record_match(won, wt == -1, f.creature.id, f.stats_record, float(result.get("time", 0.0)), custom)
+	if won:
+		Platform.unlock_achievement("ach_first_win")
+		var rid := str((cfg.get("rules") as Dictionary).get("id", "")) if typeof(cfg.get("rules")) == TYPE_DICTIONARY else str(cfg.get("rules", ""))
+		if bool(cfg.get("custom", false)) or RulePresets.is_user(rid):
+			Platform.unlock_achievement("ach_house_rules")
+		var pf: Dictionary = (Profiles.current["stats"] as Dictionary).get("per_fighter", {})
+		var roster := Content.playable_creatures().filter(func(c): return str(c).begins_with("f_"))
+		if not roster.is_empty() and roster.all(func(c): return int((pf.get(c, {}) as Dictionary).get("wins", 0)) > 0):
+			Platform.unlock_achievement("ach_full_card")
 
 
 func quit() -> void:

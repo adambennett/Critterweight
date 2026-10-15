@@ -8,14 +8,19 @@ signal match_finished(result: Dictionary)
 
 var sim: MatchSim
 var arena_view: ArenaView
-var views: Array[CreatureView] = []
+var views: Array = []           ## index -> CreatureView (null for despawned slots)
 var vfx: Vfx
+var mode_view: ModeView
+var _pick_panel: Control = null
+var _dt := 0.016
 var camera: FightCamera
 var hud: FightHud
 var hud_layer: CanvasLayer
 var player_index := 0
 var _event_cursor := 0
 var config := {}
+var director: SpectatorDirector = null   ## auto-director when spectating (cfg.spectate)
+var _goals_by_me := 0
 
 
 ## config: {arena: ArenaDef, rules: {}, seed: int, mode: MatchMode, fighters: [{creature, team, kind:"player"|"bot", difficulty, name}]}
@@ -38,6 +43,10 @@ func start(cfg: Dictionary) -> void:
 				lp.camera = camera
 				entry["source"] = LabRecording.wrap_player(lp, e, self)   # AI Lab imitation recording (off by default)
 				player_index = idx
+				# accessibility aim assist is part of the fighter's (replicated) modifiers
+				var m: Dictionary = (entry.get("mods", {}) as Dictionary).duplicate()
+				m["assist"] = float({"low": 0.5, "normal": 1.0, "high": 1.8}.get(str(Settings.get_value("access.target_assist")), 1.0))
+				entry["mods"] = m
 			"policy":
 				# AI Lab policy: e.policy_id (falls back to a scripted bot if missing/incompatible)
 				entry["source"] = PolicyInputSource.for_match(e, int(cfg.get("seed", 1)) * 31 + idx, idx)
@@ -49,21 +58,25 @@ func start(cfg: Dictionary) -> void:
 				entry["source"] = e.get("source")
 		entries.append(entry)
 		idx += 1
+	Log.i("match", "start %s on %s: %s" % [str((cfg.get("rules", {}) as Dictionary).get("id", "?")), (cfg["arena"] as ArenaDef).id,
+		", ".join(entries.map(func(en): return "%s/t%d/%s" % [(en["creature"] as CreatureDef).id, int(en.get("team", -1)), str(en.get("kind", "bot"))]))])
 	sim = MatchSim.new()
 	sim.running = false
 	add_child(sim)
 	sim.setup({"arena": cfg["arena"], "rules": cfg.get("rules", {}), "seed": cfg.get("seed", 1),
 		"mode": cfg.get("mode"), "fighters": entries})
 	for f in sim.fighters:
-		var v := CreatureView.new()
-		add_child(v)
-		v.setup(f.creature, TeamColors.color(f.team))
-		v.snap_transforms(f.rig.segment_transforms())
-		views.append(v)
+		views.append(null)
+		_make_view(f.index)
 	vfx = Vfx.new()
 	add_child(vfx)
+	mode_view = ModeView.new()
+	add_child(mode_view)
+	mode_view.head_of = _head_of
 	camera.points_provider = _camera_points
 	camera.focus_provider = _camera_focus
+	if bool(cfg.get("spectate", false)):
+		director = SpectatorDirector.new(sim)
 	camera.snap()
 	hud_layer = CanvasLayer.new()
 	add_child(hud_layer)
@@ -71,17 +84,88 @@ func start(cfg: Dictionary) -> void:
 	hud_layer.add_child(hud)
 	hud.setup(sim, player_index)
 	sim.finished.connect(_on_finished)
+	_apply_presentation_settings()
+	# audio bridge: impacts, voices, crowd, announcer and music follow the sim (docs/AUDIO.md §6)
+	Audio.attach_match(sim, player_index, {"context": str(cfg.get("audio_context", "versus"))})
+	Audio.music(str(cfg.get("music", _default_music())), 1.5, {"seed": int(cfg.get("seed", 1))})
+	if not Audio.subtitle.is_connected(hud.subtitle):
+		Audio.subtitle.connect(hud.subtitle)
+	# accessibility game speed: offline matches with a local player only (recorded as custom)
+	var speed := float(Settings.get_value("access.game_speed"))
+	if speed < 0.999 and not bool(cfg.get("online", false)) and not bool(cfg.get("spectate", false)) and _is_local_player():
+		Engine.time_scale = speed
+	if cfg.has("overlay_script"):
+		var ov = load(str(cfg["overlay_script"])).new()
+		hud_layer.add_child(ov)
+		if ov.has_method("bind"):
+			ov.call("bind", self)
+
+
+func _default_music() -> String:
+	var m := sim.mode.id() if sim.mode else "standard"
+	if m != "standard" or sim.fighters.size() > 2:
+		return "combat_b"
+	return "combat_a"
+
+
+func _exit_tree() -> void:
+	Engine.time_scale = 1.0          # spectator speed control never leaks out of the match
+	if hud and Audio.subtitle.is_connected(hud.subtitle):
+		Audio.subtitle.disconnect(hud.subtitle)
+	Audio.end_match()
+
+
+func _make_view(i: int) -> void:
+	if i < views.size() and views[i] != null:
+		(views[i] as CreatureView).queue_free()
+	while views.size() <= i:
+		views.append(null)
+	var f := sim.fighters[i]
+	if f.despawned:
+		views[i] = null
+		return
+	var v := CreatureView.new()
+	add_child(v)
+	v.setup(f.creature, TeamColors.color(f.team))
+	v.gore_level = int({"full": 2, "reduced": 1, "off": 0}.get(str(Settings.get_value("access.gore")), 2))
+	v.snap_transforms(f.rig.segment_transforms())
+	views[i] = v
+
+
+func _head_of(i: int) -> Vector3:
+	if i < 0 or i >= views.size() or views[i] == null:
+		return Vector3.ZERO
+	var f := sim.fighters[i]
+	var hs: int = f.creature.body.seg_index.get("head", 0)
+	return (views[i] as CreatureView).segment_world(hs).origin
+
+
+func _apply_presentation_settings() -> void:
+	camera.shake_scale = float(Settings.get_value("access.camera_shake"))
+	vfx.reduce_flashes = bool(Settings.get_value("access.reduce_flashing"))
+	vfx.quality = int(Settings.get_value("graphics.effects"))
+	arena_view.apply_quality(Settings.quality())
 
 
 func _camera_points() -> Array:
+	if director and camera.mode == FightCamera.Mode.SPECTATE:
+		var dp := director.points()
+		if not dp.is_empty():
+			return dp
 	var pts := []
 	for f in sim.fighters:
-		if f.state != Fighter.State.INACTIVE and f.pos().y > -3.0:
+		if f.despawned or f.state == Fighter.State.INACTIVE:
+			continue
+		if f.pos().y > -3.0:
 			pts.append(f.pos())
 	return pts
 
 
 func _camera_focus() -> Array:
+	if director and camera.mode == FightCamera.Mode.SPECTATE:
+		var df := director.focus()
+		if not df.is_empty():
+			return df
 	var me := sim.fighters[player_index]
 	return [me.pos(), me.target.pos() if me.target else null]
 
@@ -90,22 +174,33 @@ func _physics_process(dt: float) -> void:
 	if sim == null or sim.paused:
 		return
 	sim.step(dt)
-	for i in sim.fighters.size():
-		views[i].push_transforms(sim.fighters[i].rig.segment_transforms())
-	for i in sim.arena_nodes.get("dynamic_props", []).size():
-		pass
 	_process_events()
+	for i in sim.fighters.size():
+		var f := sim.fighters[i]
+		if f.despawned:
+			continue
+		if i >= views.size() or views[i] == null:
+			_make_view(i)
+		(views[i] as CreatureView).push_transforms(f.rig.segment_transforms())
 
 
-func _process(_dt: float) -> void:
+func _process(delta: float) -> void:
+	_dt = delta
 	if sim == null:
 		return
 	var alpha := Engine.get_physics_interpolation_fraction()
 	for i in views.size():
+		if views[i] == null or i >= sim.fighters.size():
+			continue
 		var f := sim.fighters[i]
-		views[i].juice_amount = 1.0 if f.time < f.juiced_until else 0.0
-		views[i].status_color = _status_color(f)
-		views[i].render(alpha)
+		var cv: CreatureView = views[i]
+		cv.juice_amount = 1.0 if f.time < f.juiced_until else 0.0
+		cv.status_color = _status_color(f)
+		cv.visible = not f.has_flag("submerged")
+		cv.render(alpha)
+	if sim.mode:
+		mode_view.update_state(sim.mode.view_state(), _dt)
+		_update_pick_panel()
 	var props: Array = sim.arena_nodes.get("props", [])
 	for i in props.size():
 		arena_view.set_prop_transform(i, (props[i] as Node3D).global_transform)
@@ -126,6 +221,10 @@ func _process_events() -> void:
 	for ev in sim.events_since(_event_cursor):
 		_event_cursor = int(ev["seq"])
 		_on_event(ev)
+		if director:
+			director.on_event(ev)
+	if director:
+		director.update(1.0 / Engine.physics_ticks_per_second)
 
 
 func _on_event(ev: Dictionary) -> void:
@@ -135,7 +234,9 @@ func _on_event(ev: Dictionary) -> void:
 			var dmg := float(ev["damage"])
 			var p: Vector3 = ev["point"]
 			var n: Vector3 = ev["normal"]
-			var v := views[ti]
+			if ti >= views.size() or views[ti] == null:
+				return
+			var v: CreatureView = views[ti]
 			var el := str(ev.get("element", ""))
 			var col := Elements.color(el) if el != "" else Color(1.0, 0.9, 0.55)
 			if bool(ev["blocked"]):
@@ -152,18 +253,22 @@ func _on_event(ev: Dictionary) -> void:
 			var involved := ti == player_index or int(ev["fighter"]) == player_index
 			if involved:
 				Controls.rumble(clampf(dmg / 20.0, 0.1, 0.6), clampf(dmg / 30.0, 0.0, 0.8), 0.12)
+			if bool(Settings.get_value("gameplay.damage_numbers")) and dmg >= 0.5:
+				vfx.word(p + Vector3.UP * 0.25, "%d" % roundi(dmg), Color(0.75, 0.85, 1.0) if bool(ev["blocked"]) else Color(1.0, 0.95, 0.8), 40)
 		"parry":
 			var pp: Vector3 = ev.get("pos", sim.fighters[int(ev["fighter"])].pos())
 			vfx.word(pp + Vector3.UP * 1.2, "PARRY!", Color(0.5, 0.9, 1.0))
 			vfx.ring(pp + Vector3.UP * 1.0, 1.2, Color(0.6, 0.9, 1.0, 0.9), 0.3, false)
 		"knockdown":
 			var f := sim.fighters[int(ev["fighter"])]
-			vfx.emit("dust", f.ground_pos(), Vector3.UP, Color(0.8, 0.75, 0.65, 0.7))
+			vfx.emit("dust", f.ground_pos(), Vector3.UP, Color(0.8, 0.75, 0.65, 0.5))
 			camera.add_trauma(0.3)
 		"ko":
 			var fk := sim.fighters[int(ev["fighter"])]
 			var away := fk.pos() - camera.global_position
-			views[int(ev["fighter"])].detach_piece(Vector3(away.x, 0, away.z))
+			var ki := int(ev["fighter"])
+			if ki < views.size() and views[ki] != null:
+				(views[ki] as CreatureView).detach_piece(Vector3(away.x, 0, away.z))
 			hud.callout("K.O.!", 2.0, Color(1.0, 0.35, 0.3))
 			camera.add_trauma(0.5)
 		"guard_break":
@@ -180,11 +285,15 @@ func _on_event(ev: Dictionary) -> void:
 			var el2 := str(ev.get("element", ""))
 			if str(ev["effect"]) == "area":
 				vfx.ring(pe + Vector3.UP * 0.05, 2.2, (Elements.color(el2) if el2 != "" else Color(1, 0.9, 0.6)) * Color(1, 1, 1, 0.8), 0.35)
-				vfx.emit("dust", pe, Vector3.UP, Color(0.85, 0.8, 0.7, 0.6))
+				vfx.emit("dust", pe, Vector3.UP, Color(0.85, 0.8, 0.7, 0.45))
 		"reaction":
 			var pr: Vector3 = ev["pos"]
 			vfx.word(pr + Vector3.UP * 1.6, str(ev.get("name", "REACTION")).to_upper() + "!", Color(1, 1, 1), 72)
 			vfx.emit("burst", pr + Vector3.UP * 0.8, Vector3.UP, Elements.color(str(ev["a"])), 1.4)
+		"elimination":
+			var by := int(ev.get("by", -1))
+			if by == player_index and _is_local_player() and by < sim.fighters.size() and sim.fighters[by].time < sim.fighters[by].juiced_until:
+				Platform.unlock_achievement("ach_juice_ko")
 		"slam":
 			camera.add_trauma(0.4)
 			vfx.word(ev["pos"] + Vector3.UP * 1.0, "CAGE SLAM!", Color(1.0, 0.8, 0.3))
@@ -204,7 +313,46 @@ func _on_event(ev: Dictionary) -> void:
 			hud.callout("DRAW!" if w2 < 0 else "%s WINS!" % _team_label(w2), 3.0, Color(1.0, 0.85, 0.3))
 		"round_reset":
 			for i in sim.fighters.size():
-				views[i].snap_transforms(sim.fighters[i].rig.segment_transforms())
+				if i < views.size() and views[i] != null and not sim.fighters[i].despawned:
+					(views[i] as CreatureView).snap_transforms(sim.fighters[i].rig.segment_transforms())
+		"fighter_spawned", "fighter_rebuilt":
+			_make_view(int(ev["fighter"]))
+		"fighter_despawned":
+			var di := int(ev["fighter"])
+			if di < views.size() and views[di] != null:
+				(views[di] as CreatureView).queue_free()
+				views[di] = null
+		"goal":
+			hud.callout("GOAL!", 2.0, TeamColors.color(int(ev["team"])).lightened(0.3))
+			if int(ev.get("scorer", -1)) == player_index and _is_local_player() and not bool(ev.get("own_goal", false)):
+				_goals_by_me += 1
+				if _goals_by_me >= 3:
+					Platform.unlock_achievement("ach_hat_trick")
+			Audio.announce_trigger("mode", {"mode": "chumball_goal"})
+		"unit_crowned":
+			hud.callout("%s IS THE ABSOLUTE UNIT" % sim.fighters[int(ev["fighter"])].display_name.to_upper(), 2.2, Color("#8BD426"))
+			Audio.announce_trigger("mode", {"mode": "new_unit"}, {"p": sim.fighters[int(ev["fighter"])].display_name})
+		"wave_start":
+			hud.callout("WAVE %d" % int(ev["wave"]), 1.6, Color(1.0, 0.6, 0.3))
+			if int(ev["wave"]) >= 20 and _is_local_player():
+				Platform.unlock_achievement("ach_last_call")
+			Audio.announce_trigger("mode", {"mode": "rush_wave"}, {"n": int(ev["wave"])})
+		"wave_cleared":
+			hud.callout("WAVE CLEARED", 1.4, Color(0.6, 1.0, 0.6))
+		"gate_spawn":
+			var gi := int(ev["fighter"])
+			if gi < sim.fighters.size() and bool(sim.fighters[gi].flags.get("headliner", false)):
+				hud.callout("HEADLINER: %s" % sim.fighters[gi].display_name.to_upper(), 2.0, Color(1.0, 0.4, 0.3))
+				Audio.announce_trigger("mode", {"mode": "rush_headliner"}, {"o": sim.fighters[gi].display_name})
+		"spotlight_swing":
+			Audio.announce_trigger("mode", {"mode": "spotlight"})
+		"sudden_death":
+			hud.callout("SUDDEN DEATH", 1.8, Color(1.0, 0.35, 0.3))
+			Audio.announce_trigger("time", {"kind": "sudden_death"})
+
+
+func _is_local_player() -> bool:
+	return player_index < sim.fighters.size() and sim.fighters[player_index].controller_kind == "player"
 
 
 func _team_label(team: int) -> String:
@@ -229,3 +377,46 @@ func _seg_near(fi: int, p: Vector3) -> int:
 
 func _on_finished(result: Dictionary) -> void:
 	match_finished.emit(result)
+
+
+## Chum Rush supplement pick for the local player (every 5th break).
+func _update_pick_panel() -> void:
+	if not (sim.mode is ChumRushMode):
+		return
+	var cr := sim.mode as ChumRushMode
+	var mine: Array = cr.pending_pick.get(player_index, [])
+	if mine.is_empty():
+		if _pick_panel:
+			_pick_panel.queue_free()
+			_pick_panel = null
+		return
+	if _pick_panel:
+		return
+	_pick_panel = PanelContainer.new()
+	_pick_panel.set_anchors_preset(Control.PRESET_CENTER)
+	_pick_panel.custom_minimum_size = Vector2(760, 240)
+	_pick_panel.offset_left = -380
+	_pick_panel.offset_top = -120
+	hud_layer.add_child(_pick_panel)
+	var box := VBoxContainer.new()
+	_pick_panel.add_child(box)
+	var title := Label.new()
+	title.text = "Pick a supplement"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_child(row)
+	var first: Button = null
+	for i in mine.size():
+		var u := Content.get_entry("supplements", str(mine[i]))
+		var b := Button.new()
+		b.text = "%s\n%s" % [str(u.get("name", mine[i])), str(u.get("description", u.get("effect", "")))]
+		b.custom_minimum_size = Vector2(230, 150)
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.pressed.connect(cr.choose_pick.bind(player_index, i))
+		row.add_child(b)
+		if first == null:
+			first = b
+	if first:
+		first.grab_focus.call_deferred()

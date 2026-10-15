@@ -594,6 +594,29 @@ func _delete_run() -> void:
 	_refresh_runs()
 
 
+## "Mad Scientist": a trained policy beat its baseline in a held-out evaluation (ES/BC→ES: the
+## trained network vs its starting network on test seeds; evaluation runs: vs a random network;
+## BC: held-out accuracy clearly above the majority-class baseline).
+static func beats_baseline(rep: Dictionary) -> bool:
+	if rep.has("initial") and rep.has("trained"):
+		return float((rep["trained"] as Dictionary)["reward"]["mean"]) > float((rep["initial"] as Dictionary)["reward"]["mean"]) \
+			and float(rep.get("welch_t", 0.0)) >= 2.0
+	if rep.has("target") and rep.has("compare"):
+		var t: Array = (rep["target"] as Dictionary)["reward"]["ci95"]
+		var c: Array = (rep["compare"] as Dictionary)["reward"]["ci95"]
+		return t.size() == 2 and c.size() == 2 and float(t[0]) > float(c[1])
+	if rep.has("final_val") and rep.has("majority_baseline"):
+		return float((rep["final_val"] as Dictionary).get("acc_joint", 0.0)) > float((rep["majority_baseline"] as Dictionary).get("acc_joint", 1.0)) + 0.05
+	return false
+
+
+func _check_achievement(rep: Dictionary) -> void:
+	if rep.is_empty() or Platform.is_unlocked("ach_mad_scientist"):
+		return
+	if beats_baseline(rep):
+		Platform.unlock_achievement("ach_mad_scientist")
+
+
 func _refresh_runs() -> void:
 	if _runs_list == null:
 		return
@@ -602,6 +625,8 @@ func _refresh_runs() -> void:
 	var sel := -1
 	for i in _runs.size():
 		var r: Dictionary = _runs[i]
+		if str(r["state"]) == "completed":
+			_check_achievement(LabManager.report(str(r["dir"])))
 		var nm := str(r["name"]) if str(r["name"]) != "" else str(r["run_id"])
 		_runs_list.add_item("[%s] %s · %s · %s · %d ep" % [str(r["state"]).to_upper(), nm, str(r["kind"]).to_upper(), str(r["creature"]), int(r["episodes"])])
 		if str(r["dir"]) == _run_dir:
@@ -661,7 +686,9 @@ func _refresh_run_detail(full: bool) -> void:
 	var bias := int(Time.get_time_zone_from_system().get("bias", 0)) * 60
 	for ck: Dictionary in LabManager.checkpoints(_run_dir):
 		_ckpts.add_item("#%d  %s  (%d KB)" % [int(ck["n"]), Time.get_datetime_string_from_unix_time(int(ck["time"]) + bias, true), int(ck["size_kb"])])
-	_report.text = _report_text(LabManager.report(_run_dir))
+	var rep := LabManager.report(_run_dir)
+	_report.text = _report_text(rep)
+	_check_achievement(rep)
 
 
 func _update_chart(kind: String) -> void:

@@ -1,0 +1,16 @@
+{
+  "id": "practice",
+  "name": "Practice",
+  "mode": "practice",
+  "format": "practice",
+  "teams": 2,
+  "players": [
+    1,
+    2
+  ],
+  "rounds": 1,
+  "round_time": 0,
+  "win": "none",
+  "description": "No timer and no KO: a dummy you can set to stand, guard, parry, counter or replay a recording, with the hit telemetry overlay.",
+  "version": 1
+}

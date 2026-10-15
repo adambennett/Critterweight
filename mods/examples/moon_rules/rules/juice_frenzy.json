@@ -1,0 +1,16 @@
+{
+  "id": "moon_rules:juice_frenzy",
+  "name": "Juice Frenzy",
+  "mode": "standard",
+  "format": "duel",
+  "teams": 2,
+  "players": [2, 2],
+  "rounds": 3,
+  "round_time": 60,
+  "win": "rounds",
+  "start_hype": 100,
+  "hype_mult": 3.0,
+  "cooldown_rate": 1.5,
+  "description": "Everyone starts with full Hype and earns it three times as fast; abilities recharge 50% faster. Short rounds, best of three.",
+  "version": 1
+}

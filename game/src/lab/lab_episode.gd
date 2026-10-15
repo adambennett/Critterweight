@@ -66,7 +66,11 @@ func start(parent: Node, it: Dictionary, policy: PolicyData) -> String:
 	sim.running = false
 	world.add_child(sim)
 	var round_time := float(ep.get("round_time", 10.0))
-	sim.setup({"arena": LabScenarios.arena_for(ep), "rules": {"rounds": 1, "round_time": round_time, "lives": 1}, "seed": seed_value,
+	# standard rules for one round; the cosmetic intro shrinks to a short settle and a timeout
+	# tie is a draw (no sudden death), so every episode has a bounded length
+	var rules := {"rounds": 1, "round_time": round_time, "lives": 1, "intro_time": float(SETTLE_TICKS) / float(Engine.physics_ticks_per_second),
+		"sudden_death": false}
+	sim.setup({"arena": LabScenarios.arena_for(ep), "rules": rules, "seed": seed_value,
 		"fighters": [{"creature": c_learner, "team": 0, "source": src, "name": "Learner", "kind": "policy"},
 			{"creature": c_opp, "team": 1, "source": opp, "name": LabOpponents.display_name(str(ep.get("opponent", ""))), "kind": "bot"}]})
 	max_ticks = int(round_time * Engine.physics_ticks_per_second) + Engine.physics_ticks_per_second
@@ -87,16 +91,12 @@ func tick(dt: float) -> void:
 	sim.step(dt)
 	ticks += 1
 	if not started_fight:
-		if ticks >= SETTLE_TICKS:
-			# skip the remaining cosmetic intro: fight starts with the standard round timer
-			var mode := sim.mode
-			mode.phase = MatchMode.Phase.FIGHT
-			mode.phase_time = 0.0
-			mode.round_timer = float(sim.rules.get("round_time", 10.0))
-			sim.input_enabled = true
-			sim.emit_event({"type": "round_start", "round": 1})
+		# the mode itself ends the (shortened) intro and starts the fight with the round timer
+		if sim.mode.phase == MatchMode.Phase.FIGHT:
 			tracker.start(sim, 0)
 			started_fight = true
+		elif ticks > SETTLE_TICKS + Engine.physics_ticks_per_second * 5:
+			_fail("the round never started")
 		return
 	fight_ticks += 1
 	tracker.update(sim, dt)

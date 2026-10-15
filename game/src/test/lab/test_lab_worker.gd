@@ -22,12 +22,20 @@ func _job(run: String, extra: Dictionary) -> Dictionary:
 	return job
 
 
+## Wall-clock waits: the suite may run with --fixed-fps, where game-time timers run fast.
+func _sleep(seconds: float) -> void:
+	var t0 := Time.get_ticks_msec()
+	while float(Time.get_ticks_msec() - t0) / 1000.0 < seconds:
+		await get_tree().process_frame
+		OS.delay_msec(5)
+
+
 func _wait(cond: Callable, seconds: float) -> bool:
 	var t0 := Time.get_ticks_msec()
 	while float(Time.get_ticks_msec() - t0) / 1000.0 < seconds:
 		if cond.call():
 			return true
-		await get_tree().create_timer(0.25).timeout
+		await _sleep(0.25)
 	return cond.call()
 
 
@@ -48,7 +56,7 @@ func test_pause_resume_cancel() -> void:
 	LabManager.control(run, "pause")
 	check(await _wait(func() -> bool: return str(LabManager.status(run).get("state", "")) == "paused", 30.0), "worker reports paused")
 	var e1 := _episodes(run)
-	await get_tree().create_timer(3.0).timeout
+	await _sleep(3.0)
 	check_eq(_episodes(run), e1, "no episodes are run while paused")
 	check(OS.is_process_running(pid) and LabManager.is_alive(run), "paused worker stays alive and keeps reporting")
 	LabManager.control(run, "run")

@@ -1,1 +1,19 @@
-{"id": "teams_2v2", "name": "Tag Along (2v2 Teams)", "mode": "standard", "version": 1, "format": "teams", "teams": 2, "rounds": 3, "round_time": 120, "win": "ko", "lives": 1, "revive": true, "description": "Two teams of two fight at once. Knocked-out partners can be revived by teammates standing over them."}
+{
+  "id": "teams_2v2",
+  "name": "Teams 2v2",
+  "mode": "standard",
+  "format": "teams",
+  "teams": 2,
+  "players": [
+    4,
+    4
+  ],
+  "rounds": 3,
+  "round_time": 120,
+  "win": "ko",
+  "lives": 1,
+  "revive": true,
+  "downed_time": 12.0,
+  "description": "Two teams of two fight at once. KO'd partners go down and can be revived by a teammate holding Grab next to them.",
+  "version": 1
+}

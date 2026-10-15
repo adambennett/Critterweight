@@ -10,13 +10,13 @@ signal bindings_changed()
 signal joy_connection(device: int, connected: bool)
 
 const GAME_ACTIONS := ["move_left", "move_right", "move_up", "move_down", "light", "heavy", "guard",
-	"dodge", "grab", "ability1", "ability2", "juice", "taunt", "target", "cam_left", "cam_right",
+	"dodge", "grab", "ability1", "ability2", "juice", "taunt", "target", "tag", "cam_left", "cam_right",
 	"pause", "scoreboard", "interact"]
 const ACTION_LABELS := {
 	"move_left": "Move left", "move_right": "Move right", "move_up": "Move forward", "move_down": "Move back",
 	"light": "Light attack", "heavy": "Heavy attack (hold to charge)", "guard": "Guard (tap to parry)",
 	"dodge": "Dodge", "grab": "Grab / throw", "ability1": "Ability 1", "ability2": "Ability 2",
-	"juice": "JUICE (ultimate)", "taunt": "Taunt", "target": "Switch target", "cam_left": "Camera left",
+	"juice": "JUICE (ultimate)", "taunt": "Taunt / cheer", "target": "Switch target", "tag": "Tag partner", "cam_left": "Camera left",
 	"cam_right": "Camera right", "pause": "Pause menu", "scoreboard": "Scoreboard", "interact": "Interact",
 }
 ## Actions that are held (vs pressed) for the hold/toggle accessibility option.
@@ -56,6 +56,7 @@ func _default_bindings() -> Dictionary:
 		"juice": [_key(KEY_R), _axis(JOY_AXIS_TRIGGER_RIGHT, 1.0)],
 		"taunt": [_key(KEY_T), _joy(JOY_BUTTON_DPAD_UP)],
 		"target": [_key(KEY_TAB), _joy(JOY_BUTTON_RIGHT_STICK)],
+		"tag": [_key(KEY_G), _joy(JOY_BUTTON_DPAD_DOWN)],
 		"cam_left": [_key(KEY_Z), _axis(JOY_AXIS_RIGHT_X, -1.0)],
 		"cam_right": [_key(KEY_C), _axis(JOY_AXIS_RIGHT_X, 1.0)],
 		"pause": [_key(KEY_ESCAPE), _joy(JOY_BUTTON_START)],
@@ -248,7 +249,7 @@ func fill(fi: FighterInput, cam_basis: Basis) -> void:
 	var map := {"light": FighterInput.LIGHT, "heavy": FighterInput.HEAVY, "guard": FighterInput.GUARD,
 		"dodge": FighterInput.DODGE, "grab": FighterInput.GRAB, "ability1": FighterInput.AB1,
 		"ability2": FighterInput.AB2, "juice": FighterInput.JUICE, "taunt": FighterInput.TAUNT,
-		"target": FighterInput.TARGET}
+		"target": FighterInput.TARGET, "tag": FighterInput.TAG}
 	for a in map:
 		var b: int = map[a]
 		if Input.is_action_just_pressed(a):
