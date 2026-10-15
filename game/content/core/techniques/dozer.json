@@ -1,0 +1,36 @@
+{
+  "_doc": "DOZER techniques and build directions (docs/design/ROSTER.md §4).",
+  "items": [
+    {"id": "tech_dozer_quarry_legs", "type": "technique", "fighter": "f_dozer", "name": "Quarry Legs", "build": "build_dozer_freight_train",
+     "tags": ["charge", "mobility"], "effect": "Bulldoze 7 -> 8.5 m/s, steering 20 -> 30 deg/s; Quarry Ram dash 3 -> 4 m",
+     "apply": {"mods": [{"key": "charge_speed", "mul": 1.214}, {"key": "charge_steer", "mul": 1.5}],
+               "patches": [{"op": "mul", "path": "moves.heavy_charged.effects[type=charge].distance", "value": 1.333},
+                           {"op": "mul", "path": "moves.heavy_charged.lunge[*][2]", "value": 1.333}]}},
+    {"id": "tech_dozer_pack_mule", "type": "technique", "fighter": "f_dozer", "name": "Pack Mule", "build": "build_dozer_boulder",
+     "tags": ["tank"], "effect": "Max HP +15; knockback taken -20%",
+     "apply": {"mods": [{"key": "max_health_add", "add": 15}, {"key": "knockback_taken", "mul": 0.8}]}},
+    {"id": "tech_dozer_rockslide", "type": "technique", "fighter": "f_dozer", "name": "Rockslide", "build": "build_dozer_rockbreaker",
+     "tags": ["status", "heavy"], "effect": "A Heavy on a Caked target below 50% poise knocks it down outright",
+     "apply": {"hooks": [{"on": "pre_hit_dealt", "if": {"slots": ["heavy", "heavy_charged"], "target_status": "grit", "target_poise_below": 0.5},
+                          "do": [{"type": "knockdown"}]}]}},
+    {"id": "tech_dozer_demolition_permit", "type": "technique", "fighter": "f_dozer", "name": "Demolition Permit", "build": "build_dozer_freight_train",
+     "tags": ["zone", "arena"], "effect": "Wall splats from Bulldoze or throws leave a Grit rubble zone (r 1.5 m, 3 s)",
+     "apply": {"hooks": [{"on": "wall_splat", "do": [{"type": "zone", "kind": "grit_rubble", "radius": 1.5, "duration": 3.0, "at": "target"}]}]}},
+    {"id": "tech_dozer_hard_hat", "type": "technique", "fighter": "f_dozer", "name": "Hard Hat", "build": "build_dozer_boulder",
+     "tags": ["counter", "zone"], "effect": "Dust Bowl also reflects projectiles; Dozer's Lights have armor inside it",
+     "apply": {"patches": [{"op": "append", "path": "abilities.ability2.effects", "value": {"t": 0.3, "type": "reflect", "duration": 4.0}}],
+               "hooks": [{"on": "move_start", "if": {"slots": ["l1", "l2", "l3"], "in_zone": "grit"},
+                          "do": [{"type": "buff", "status": {"id": "hard_hat", "name": "Hard Hat", "duration": 0.45, "armor_lights": true}}]}]}},
+    {"id": "tech_dozer_tusk_dust_habit", "type": "technique", "fighter": "f_dozer", "name": "Tusk Dust Habit", "build": "build_dozer_rockbreaker",
+     "tags": ["heavy", "glass"], "effect": "Horn attacks (Horn Lunge, Quarry Ram, Snout Hook throws) +25% damage; poise regen halved",
+     "apply": {"patches": [{"op": "mul", "path": "moves.heavy.damage", "value": 1.25}, {"op": "mul", "path": "moves.heavy_charged.damage", "value": 1.25},
+                           {"op": "mul", "path": "throws.*.damage", "value": 1.25}, {"op": "mul", "path": "stats.poise_regen", "value": 0.5, "default": 15}]}},
+
+    {"id": "build_dozer_freight_train", "type": "build", "fighter": "f_dozer", "name": "Freight Train", "techniques": ["tech_dozer_quarry_legs", "tech_dozer_demolition_permit"],
+     "tags": ["charge", "arena", "zone"], "blurb": "Charge across the cage, splat, leave rubble, charge again."},
+    {"id": "build_dozer_boulder", "type": "build", "fighter": "f_dozer", "name": "Boulder", "techniques": ["tech_dozer_pack_mule", "tech_dozer_hard_hat"],
+     "tags": ["tank", "counter", "zone"], "blurb": "Stand in your dust, shrug off projectiles and lights, lunge when they come in."},
+    {"id": "build_dozer_rockbreaker", "type": "build", "fighter": "f_dozer", "name": "Rockbreaker", "techniques": ["tech_dozer_rockslide", "tech_dozer_tusk_dust_habit"],
+     "tags": ["status", "heavy", "glass"], "blurb": "Cake them, then every Heavy is a knockdown."}
+  ]
+}

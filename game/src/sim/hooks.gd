@@ -12,11 +12,15 @@ extends RefCounted
 ## Conditions (`if`, all must hold): slot / slots, move_class (light|heavy|ability|juice|grab),
 ##   charged, target_status / self_status (status id or element id), target_element,
 ##   self_health_below / above, target_health_below, target_guarding, target_down,
-##   self_juiced, distance_below / above, in_zone (zone kind under self), flag (self flag set).
+##   self_juiced, distance_below / above, in_zone (zone kind under self), flag (self flag set),
+##   self_hype_above / below, other_flag (flag on the other fighter's `flags`, e.g. "minion"),
+##   self_attacking (bool), hit_blocked (bool, pre_*/hit contexts), target_poise_below (fraction),
+##   hit_part (body part of the pending hit: head|core|arm|leg|...).
 ## Actions (`do`): any EffectsSystem effect type, plus hit modifiers (only meaningful in pre_*):
-##   damage_add, damage_mult, knockback_mult, launch, knockdown, stun_add, poise_mult, guard_crush,
-##   buildup {element, amount, target}, refresh_status {element}, set_flag {flag, seconds},
+##   damage_add {amount, min}, damage_mult, knockback_mult, launch, knockdown, stun_add, poise_mult,
+##   guard_crush, buildup {element, amount, target}, refresh_status {element}, set_flag {flag, seconds},
 ##   stamina {amount, target}, hype {amount}, self_damage {amount}, cleanse,
+##   status {status: {...StatusSet fields}, target} (adds/refreshes a status on self or the other),
 ##   cooldown {slot, set | add} (ability cooldowns; see the block at the end).
 ## Resource limits: at most 32 hooks per fighter and 16 actions per firing; recursion depth 2.
 
@@ -50,7 +54,7 @@ static func validate(h: Dictionary) -> PackedStringArray:
 			errs.append("hook: action is not an object")
 			continue
 		var t := str(a.get("type", ""))
-		if not HIT_MODIFIERS.has(t) and not EffectsSystem.TYPES.has(t) and not t in ["set_flag", "stamina", "cleanse", "self_damage", "hype", "cooldown"]:
+		if not HIT_MODIFIERS.has(t) and not EffectsSystem.TYPES.has(t) and not t in ["set_flag", "stamina", "cleanse", "self_damage", "hype", "status", "cooldown"]:
 			errs.append("hook: unknown action '%s'" % t)
 	return errs
 
@@ -186,6 +190,29 @@ func _conditions(c: Dictionary, ctx: Dictionary) -> bool:
 			"element":
 				if str(ctx.get("element", "")) != str(v):
 					return false
+			"self_hype_above":
+				if f.hype <= float(v):
+					return false
+			"self_hype_below":
+				if f.hype >= float(v):
+					return false
+			"other_flag":
+				if other == null or not bool(other.flags.get(str(v), false)):
+					return false
+			"self_attacking":
+				if (f.state == Fighter.State.ATTACK or f.state == Fighter.State.ABILITY) != bool(v):
+					return false
+			"hit_blocked":
+				var hb = ctx.get("hit")
+				if hb == null or bool(hb.get("blocked", false)) != bool(v):
+					return false
+			"target_poise_below":
+				if other == null or other.poise >= other.effective_max_poise() * float(v):
+					return false
+			"hit_part":
+				var hp = ctx.get("hit")
+				if hp == null or str(hp.get("part", "")) != str(v):
+					return false
 	return true
 
 
@@ -209,7 +236,11 @@ func _act(a: Dictionary, ctx: Dictionary) -> void:
 	match t:
 		"damage_add":
 			if hit != null:
-				hit["damage"] = float(hit["damage"]) + float(a.get("amount", 0.0))
+				var before := float(hit["damage"])
+				var after := before + float(a.get("amount", 0.0))
+				if a.has("min"):
+					after = maxf(after, minf(before, float(a["min"])))
+				hit["damage"] = after
 		"damage_mult":
 			if hit != null:
 				hit["damage"] = float(hit["damage"]) * float(a.get("mult", 1.0))
@@ -249,6 +280,12 @@ func _act(a: Dictionary, ctx: Dictionary) -> void:
 			f.health = maxf(1.0, f.health - float(a.get("amount", 1.0)))
 		"cleanse":
 			who.statuses.cleanse_elements()
+		"status":
+			if who and not who.is_out():
+				var st: Dictionary = a.get("status", {}).duplicate(true)
+				if not st.is_empty():
+					st["source"] = f
+					who.statuses.add(st)
 		"cooldown":
 			_act_cooldown(a)
 		_:

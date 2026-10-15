@@ -1,0 +1,8 @@
+{
+  "_doc": "The three acts of a fight card (docs/design/GAME_PITCH.md, CAMPAIGN.md §2).",
+  "items": [
+    {"id": "act_1", "type": "act", "act": 1, "name": "The Undercard", "boss": "boss_a1", "blurb": "Daytime harbor shows, dock crowds, cheap seats."},
+    {"id": "act_2", "type": "act", "act": 2, "name": "The Main Card", "boss": "boss_a2", "blurb": "Scrapyards and rooftops, night crowds, real money."},
+    {"id": "act_3", "type": "act", "act": 3, "name": "The Title Card", "boss": "boss_a3", "blurb": "Prime time inside The Gullet. The Commissioner is watching."}
+  ]
+}

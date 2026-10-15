@@ -1,0 +1,38 @@
+{
+  "_doc": "SLURRY techniques and build directions (docs/design/ROSTER.md §5). Hardened Arteries removes kit hooks by id: the kit should tag them slurry_dive_refund / slurry_overflow_heal.",
+  "items": [
+    {"id": "tech_slurry_septic_bloom", "type": "technique", "fighter": "f_slurry", "name": "Septic Bloom", "build": "build_slurry_swamp",
+     "tags": ["zone"], "effect": "Slurry's puddles are 50% larger and last +2 s",
+     "apply": {"mods": [{"key": "zone_size", "mul": 2.25}, {"key": "zone_duration_add", "add": 2}]}},
+    {"id": "tech_slurry_lockjaw", "type": "technique", "fighter": "f_slurry", "name": "Lockjaw", "build": "build_slurry_constrictor",
+     "tags": ["grab", "pull"], "effect": "Fang Snap pull 0.5 -> 1.2 m; Coil reach 1.4 -> 1.6 m",
+     "apply": {"patches": [{"op": "mul", "path": "moves.l3.pull", "value": 2.4}, {"op": "append", "path": "moves.grab.lunge", "value": [0.0, 0.25, 0.8]}]}},
+    {"id": "tech_slurry_blood_thinner", "type": "technique", "fighter": "f_slurry", "name": "Blood Thinner", "build": "build_slurry_toxin",
+     "tags": ["status"], "effect": "Gunked damage 1.5 -> 2.25 HP/s; Gunked targets' guard lets 35% through instead of 25%",
+     "apply": {"hooks": [{"on": "status_applied", "if": {"element": "sludge"}, "do": [{"type": "status", "target": "target",
+                            "status": {"id": "blood_thinner", "name": "Blood Thinner", "duration": 6.0, "dps": 0.75, "tick": 0.5}}]},
+                         {"on": "pre_hit_dealt", "if": {"target_status": "sludge", "hit_blocked": true}, "do": [{"type": "damage_mult", "mult": 1.4}]}]}},
+    {"id": "tech_slurry_grease_trap", "type": "technique", "fighter": "f_slurry", "name": "Grease Trap", "build": "build_slurry_swamp",
+     "tags": ["zone", "mobility"], "effect": "Enemies in Slurry's puddles dodge 40% shorter; Slurry moves +15% faster in any Sludge zone",
+     "apply": {"patches": [{"op": "merge", "path": "abilities.ability1.effects[type=projectile].on_expire", "value": {"status": {"id": "grease_trap", "name": "Greased", "duration": 0.6, "dash": 0.6}, "owner_immune": true}},
+                           {"op": "merge", "path": "moves.heavy_charged.effects[type=zone]", "value": {"status": {"id": "grease_trap", "name": "Greased", "duration": 0.6, "dash": 0.6}, "owner_immune": true}}],
+               "hooks": [{"on": "tick", "every": 0.25, "if": {"in_zone": "sludge"}, "do": [{"type": "buff", "status": {"id": "grease_glide", "name": "Greased Lightning", "duration": 0.3, "speed": 1.15}}]}]}},
+    {"id": "tech_slurry_double_dip", "type": "technique", "fighter": "f_slurry", "name": "Double Dip", "build": "build_slurry_toxin",
+     "tags": ["projectile", "blink"], "effect": "Sludge Lob charges 2 -> 3; Drain Dive emerge damage 5 -> 9 and radius 1.2 -> 1.6 m",
+     "apply": {"patches": [{"op": "add", "path": "abilities.ability1.charges", "value": 1, "default": 2},
+                           {"op": "add", "path": "abilities.ability2.effects[type=blink].on_emerge[type=area].damage", "value": 4},
+                           {"op": "mul", "path": "abilities.ability2.effects[type=blink].on_emerge[type=area].radius", "value": 1.333}]}},
+    {"id": "tech_slurry_hardened_arteries", "type": "technique", "fighter": "f_slurry", "name": "Hardened Arteries", "build": "build_slurry_constrictor",
+     "tags": ["tank", "glass"], "effect": "Poise 55 -> 80; loses Drain Dive's cooldown refund and Overflow's self-heal",
+     "apply": {"patches": [{"op": "add", "path": "stats.poise", "value": 25, "default": 55},
+                           {"op": "remove", "path": "passives[id=slurry_dive_refund]"},
+                           {"op": "remove", "path": "abilities.juice.effects[type=juice_state].hooks[id=slurry_overflow_heal]"}]}},
+
+    {"id": "build_slurry_swamp", "type": "build", "fighter": "f_slurry", "name": "Swamp", "techniques": ["tech_slurry_septic_bloom", "tech_slurry_grease_trap"],
+     "tags": ["zone", "mobility", "status"], "blurb": "Cover the floor; nobody can dodge; you glide."},
+    {"id": "build_slurry_constrictor", "type": "build", "fighter": "f_slurry", "name": "Constrictor", "techniques": ["tech_slurry_lockjaw", "tech_slurry_hardened_arteries"],
+     "tags": ["grab", "pull", "tank"], "blurb": "Drag them in from 1.6 m, coil, Gulp-and-Spit, stand your ground."},
+    {"id": "build_slurry_toxin", "type": "build", "fighter": "f_slurry", "name": "Toxin", "techniques": ["tech_slurry_blood_thinner", "tech_slurry_double_dip"],
+     "tags": ["status", "projectile", "blink"], "blurb": "Three lobs, Gunked melts guards and HP, dive in and out."}
+  ]
+}
