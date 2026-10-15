@@ -88,6 +88,7 @@ var pick_timeout_ms := PICK_TIMEOUT_MS
 var _pick_since := {}             ## fighter index -> ms its pending pick was first seen
 var _policy_cache: Array = []
 var _policy_cache_ms := 0
+var _arena_pkg_cache := {}        ## arena content hash -> ArenaPackage bytes
 var _roster: Array = []           ## per fighter slot: {gen, obj, rig, creature, scale, despawned, team, name, kind, player}
 var _gens := PackedByteArray()
 
@@ -195,6 +196,32 @@ func set_snapshot_rate(rate: int) -> void:
 ## Co-op party relay on/off (listen host: Settings > Network), applied immediately.
 func set_party_relay(on: bool) -> void:
 	cfg["party_relay"] = on
+
+
+## ArenaPackage bytes of a layout (ArenaPackage.export_package: schema-checked, hashed), cached
+## by the layout's content hash. Empty when it cannot be packaged or is over the size cap.
+func _arena_package_bytes(arena: ArenaDef) -> PackedByteArray:
+	var h := arena.content_hash()
+	if _arena_pkg_cache.has(h):
+		return _arena_pkg_cache[h]
+	var tmp := Paths.dir("downloads").path_join("net_arena_out_%d.zip" % Time.get_ticks_usec())
+	var res := ArenaPackage.export_package([arena.to_dict()], tmp, {"name": arena.display_name})
+	var bytes := PackedByteArray()
+	if bool(res.get("ok", false)):
+		bytes = FileAccess.get_file_as_bytes(tmp)
+	else:
+		Log.w("net", "arena '%s' could not be packaged: %s" % [arena.id, str(res.get("error", ""))])
+	if FileAccess.file_exists(tmp):
+		DirAccess.remove_absolute(tmp)
+	if bytes.size() > NetProtocol.MAX_ARENA_PACKAGE:
+		Log.w("net", "arena '%s' package is %d KB, over the %d KB limit" % [arena.id, int(bytes.size() / 1024.0), int(NetProtocol.MAX_ARENA_PACKAGE / 1024.0)])
+		bytes = PackedByteArray()
+	elif not bytes.is_empty():
+		Log.i("net", "arena '%s' packaged for the players: %d bytes" % [arena.id, bytes.size()])
+	if _arena_pkg_cache.size() > 8:
+		_arena_pkg_cache.clear()
+	_arena_pkg_cache[h] = bytes
+	return bytes
 
 
 ## AI Lab policies the host can put into bot slots: [{id, name, creature}] (valid ones, at most
@@ -1378,6 +1405,12 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 	var arena := Content.arena(arena_id)
 	if arena == null:
 		return "missing content: arena '%s' is not installed" % arena_id
+	# a player-made layout ("user:...") exists only here: players get it as an arena package
+	var arena_pkg := PackedByteArray()
+	if arena_id.begins_with(ArenaLibrary.PREFIX) or Content.origin_of("arenas", arena_id) == "user":
+		arena_pkg = _arena_package_bytes(arena)
+		if arena_pkg.is_empty():
+			return "missing content: arena '%s' could not be packaged for the players" % arena_id
 	if rules.is_empty():
 		return "missing content: rules preset '%s' is not installed" % rules_id
 	# the full rules dictionary goes to every client, so it must pass the rules editor's validation
@@ -1484,9 +1517,11 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 	for k in rules:
 		if not str(k).begins_with("_"):
 			public_rules[k] = rules[k]
-	match_info = {"match_id": match_id, "arena": arena.to_dict(), "arena_id": arena_id, "rules": public_rules,
-		"rules_id": rules_id, "mode": mode_id, "tick_rate": int(cfg["tick_rate"]), "snapshot_rate": int(cfg["snapshot_rate"]),
-		"fighters": fl, "entry": current_entry, "seed": seed_v}
+	match_info = {"match_id": match_id, "arena": arena.to_dict(), "arena_id": arena_id, "arena_hash": arena.content_hash(),
+		"rules": public_rules, "rules_id": rules_id, "mode": mode_id, "tick_rate": int(cfg["tick_rate"]),
+		"snapshot_rate": int(cfg["snapshot_rate"]), "fighters": fl, "entry": current_entry, "seed": seed_v}
+	if not arena_pkg.is_empty():
+		match_info["arena_package"] = arena_pkg
 	phase = PHASE_MATCH
 	phase_until = 0
 	for p5 in players.values():

@@ -65,8 +65,8 @@ func build(info: Dictionary, replica: NetReplica) -> void:
 	sim.running = false
 	sim.rules = (info.get("rules", {}) as Dictionary).duplicate(true)
 	sim.seed_value = int(info.get("match_id", 1))
-	var a := ArenaDef.from_dict(info.get("arena", {}), "net")
-	sim.arena = a
+	var checked = info.get("_arena_def", null)
+	sim.arena = checked if checked is ArenaDef else ArenaDef.from_dict(info.get("arena", {}), "net")
 	mode = MirrorMode.new()
 	mode.net_mode_id = str(info.get("mode", "standard"))
 	mode.sim = sim

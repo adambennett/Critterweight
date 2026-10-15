@@ -472,6 +472,42 @@ func test_party_relay_inprocess() -> void:
 	party.close()
 
 
+## Before a match is built the client checks the arena: local content or an imported layout
+## package must match the host's content hash; damaged or oversized packages are refused.
+func test_arena_checks_before_the_match() -> void:
+	var c := NetClient.new()
+	_nodes.append(c)
+	var good := Content.arena("the_gullet")
+	var info := {"arena_id": "the_gullet", "arena_hash": good.content_hash(), "arena": good.to_dict()}
+	check_eq(c._prepare_arena(info), "", "local core arena with the host's hash")
+	check(info.get("_arena_def") == good, "the local ArenaDef is used")
+	var other := {"arena_id": "the_gullet", "arena_hash": "0".repeat(64), "arena": good.to_dict()}
+	check(c._prepare_arena(other).contains("differs from the host's"), "a different content hash blocks the match")
+	var junk := PackedByteArray()
+	junk.resize(4096)
+	var forged := {"arena_id": "user:forged", "arena_hash": "x", "arena_package": junk}
+	check(c._prepare_arena(forged).contains("was refused"), "a damaged arena package is refused")
+	var huge := PackedByteArray()
+	huge.resize(NetProtocol.MAX_ARENA_PACKAGE + 1)
+	check(c._prepare_arena({"arena_id": "user:big", "arena_package": huge}).contains("too large"), "an oversized package is refused unopened")
+	# a real package round trip: export a layout, import it into the sandbox, same hash
+	var layout: Dictionary = Content.get_entry("arenas", "layout_gullet_classic").duplicate(true)
+	for k in layout.keys():
+		if str(k).begins_with("_"):
+			layout.erase(k)
+	layout.erase("example")
+	layout["id"] = "user:loopback_cage"
+	var a := ArenaDef.from_dict(layout, "user")
+	var server := NetServer.new()
+	_nodes.append(server)
+	var bytes: PackedByteArray = server._arena_package_bytes(a)
+	check(bytes.size() > 0 and bytes.size() <= NetProtocol.MAX_ARENA_PACKAGE, "layout packaged (%d bytes)" % bytes.size())
+	var pinfo := {"arena_id": "user:loopback_cage", "arena_hash": a.content_hash(), "arena_package": bytes}
+	check_eq(c._prepare_arena(pinfo), "", "imported into the sandbox and verified")
+	check_eq(c.arena_imported, "user:loopback_cage")
+	check(Content.arena("user:loopback_cage") == null, "sandboxed: not added to the player's own arenas")
+
+
 ## AI Lab policies fill bot slots in a server match (the server runs them; clients only see the
 ## fighter), and rules that fail the rules editor's validation never start.
 func test_policy_bots_and_rules_validation_inprocess() -> void:

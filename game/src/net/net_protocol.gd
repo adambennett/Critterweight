@@ -105,6 +105,7 @@ const MAX_APP_PAYLOAD := 65536
 const APP_RELAY := "net.relay"
 const MAX_PACKAGES := 64      ## gameplay packages listed in the handshake (core + mods)
 const MAX_RELAY_PAYLOAD := 16384   ## party messages a client asks the authority to relay
+const MAX_ARENA_PACKAGE := 512 * 1024   ## a user arena layout package sent with MATCH_START
 ## Aim-assist multipliers of the accessibility setting "access.target_assist" (same table as
 ## MatchScene). Remote players send theirs; the server clamps to MAX_ASSIST.
 const ASSIST_LEVELS := {"low": 0.5, "normal": 1.0, "high": 1.8}

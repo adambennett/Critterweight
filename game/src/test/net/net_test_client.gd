@@ -234,6 +234,7 @@ func _on_match_starting(info: Dictionary) -> void:
 		"arena_id": info.get("arena_id"), "mode": info.get("mode"), "entry": info.get("entry", {}), "fighters": (info.get("fighters", []) as Array).size(),
 		"rules_name": str(rules.get("name", "")), "damage_mult": float(rules.get("damage_mult", 1.0)),
 		"rules_known_here": not Content.get_entry("rules", str(info.get("rules_id", ""))).is_empty(),
+		"arena_imported": _client.arena_imported if _client else "", "arena_name": (info.get("_arena_def").display_name if info.get("_arena_def") is ArenaDef else ""),
 		"t_ms": Time.get_ticks_msec() - started_ms})
 	_phase_fight_since = -1
 
@@ -378,6 +379,18 @@ func _start_host() -> void:
 			cfg[k] = arg("--" + k)
 	if args.has("--discovery-port"):
 		cfg["discovery_port"] = int(arg("--discovery-port"))
+	if args.has("--user-arena"):
+		# a player-made layout (arena editor) saved on this machine only: players get it as a package
+		var src: Dictionary = Content.get_entry("arenas", "layout_gullet_classic").duplicate(true)
+		for k in src.keys():
+			if str(k).begins_with("_"):
+				src.erase(k)
+		src.erase("example")
+		src["id"] = "net_test_cage"
+		src["name"] = arg("--user-arena")
+		var saved_arena := ArenaLibrary.save_layout(src)
+		result["user_arena"] = saved_arena
+		cfg["arena"] = ArenaLibrary.content_id("net_test_cage")
 	if args.has("--user-rules"):
 		# a player-made preset (MCH-06) exists only on this machine: hosting sends it in full
 		var base: Dictionary = Content.get_entry("rules", str(cfg.get("rules", "duel"))).duplicate(true)

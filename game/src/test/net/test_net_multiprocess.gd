@@ -282,7 +282,7 @@ func test_listen_host_with_remote_client() -> void:
 	var port: int = u.base_port
 	# the host plays a rules preset it made itself ("user:..."): only it has that preset
 	var host: int = u.spawn("host", ["--net-client", "--net-host", "--port", port, "--name", "Hosty", "--script", "aggressive",
-		"--host-start-after-players", "2", "--rules", "duel", "--user-rules", "Spicy Duel", "--arena", "the_gullet", "--rounds", "1",
+		"--host-start-after-players", "2", "--rules", "duel", "--user-rules", "Spicy Duel", "--user-arena", "Net Test Cage", "--rounds", "1",
 		"--round-time", "75", "--party", "--stop-after-matches", "1", "--quit-after", "110", "--result", u.result_path("Hosty")])
 	var r0: Dictionary = await u.wait_json(u.result_path("Hosty"), func(d: Dictionary) -> bool: return bool(d.get("connected", false)), 15.0)
 	check(bool(r0.get("connected", false)), "listen server up")
@@ -310,6 +310,11 @@ func test_listen_host_with_remote_client() -> void:
 		check_eq(str(gm[0].get("rules_name", "")), "Spicy Duel", "full rules dictionary arrived")
 		check_eq(float(gm[0].get("damage_mult", 0.0)), 1.25, "custom values arrived")
 		check(not bool(gm[0].get("rules_known_here", true)), "the guest does not have that preset installed")
+		# user arena: the host's own layout reaches the guest as an arena package, imported into a
+		# sandbox and checked against the host's content hash before the match is built
+		check_eq(str(gm[0].get("arena_id", "")), "user:net_test_cage", "match ran in the host's own layout")
+		check_eq(str(gm[0].get("arena_imported", "")), "user:net_test_cage", "the guest imported the arena package")
+		check_eq(str(gm[0].get("arena_name", "")), "Net Test Cage", "and built the same arena")
 	# aim assist of the remote player is part of its authoritative fighter
 	var guest_assist := -1.0
 	var host_assist := -1.0

@@ -48,7 +48,10 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	client = client_
 	name = "NetMatchScene"
 	my_index = int(info.get("you", -1))
-	arena_def = ArenaDef.from_dict(info.get("arena", {}), "net")
+	# the arena NetClient checked against the host's content hash (local content or the imported
+	# layout package); the dictionary in MATCH_START is the fallback for direct callers
+	var checked = info.get("_arena_def", null)
+	arena_def = checked if checked is ArenaDef else ArenaDef.from_dict(info.get("arena", {}), "net")
 	if not arena_def.errors.is_empty():
 		return "invalid arena from server: %s" % "; ".join(arena_def.errors)
 	for e in replica.roster.values():

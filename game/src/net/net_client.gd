@@ -39,6 +39,7 @@ var server_tick_rate := 120
 var motd := ""
 var joined_as_spectator := false
 var server_packages: Array = []     ## the server's package list from the challenge
+var arena_imported := ""            ## id of the last arena received as a package from the host
 var content_check := {}             ## NetProtocol.content_verdict() result of the last challenge
 var lobby := {}
 var match_info := {}
@@ -462,6 +463,11 @@ func _on_match_start(info: Dictionary) -> void:
 		Log.e("net", "the server's rules failed validation: %s" % bad_rules)
 		leave(NetProtocol.describe(NetProtocol.R_CONTENT, ["The server's rules failed validation here: %s" % bad_rules]))
 		return
+	var bad_arena := _prepare_arena(info)
+	if bad_arena != "":
+		Log.e("net", "arena problem: %s" % bad_arena)
+		leave(NetProtocol.describe(NetProtocol.R_CONTENT, [bad_arena]))
+		return
 	_end_match_presentation()
 	match_info = info
 	my_fighter = int(info.get("you", -1))
@@ -486,6 +492,41 @@ func _on_match_start(info: Dictionary) -> void:
 			return
 		scene = s
 		match_ready.emit(s)
+
+
+## The match's arena, checked before anything is built: a player-made layout arrives as an
+## ArenaPackage (size-capped, imported into a sandbox folder - not the player's own library - with
+## every package check), core and mod arenas come from local content; either way the layout's
+## content hash must equal the host's. Puts the ArenaDef into info["_arena_def"]. Returns "" or why.
+func _prepare_arena(info: Dictionary) -> String:
+	var aid := str(info.get("arena_id", ""))
+	var want := str(info.get("arena_hash", ""))
+	var def: ArenaDef = null
+	var pkg = info.get("arena_package", null)
+	if typeof(pkg) == TYPE_PACKED_BYTE_ARRAY and (pkg as PackedByteArray).size() > 0:
+		var bytes: PackedByteArray = pkg
+		if bytes.size() > NetProtocol.MAX_ARENA_PACKAGE:
+			return "The host's arena package is too large (%d KB)." % int(bytes.size() / 1024.0)
+		var sandbox := Paths.dir("downloads").path_join("net_arenas")
+		var res := ArenaPackage.import_bytes(bytes, sandbox)
+		if not bool(res.get("ok", false)):
+			return "The host's arena '%s' was refused: %s" % [aid, "; ".join(PackedStringArray(res.get("errors", [])))]
+		var lr := ArenaLibrary.load_layout(ArenaLibrary.path_for(aid, sandbox))
+		if not bool(lr.get("ok", false)):
+			return "The host's arena '%s' could not be loaded after import." % aid
+		def = ArenaDef.from_dict(lr["data"], "user")
+		arena_imported = aid
+	else:
+		def = Content.arena(aid)
+	if def == null:
+		# not installed here (an older host sent no package): use the layout from MATCH_START
+		def = ArenaDef.from_dict(info.get("arena", {}), "net")
+	if not def.errors.is_empty():
+		return "The host's arena '%s' is invalid: %s" % [aid, "; ".join(def.errors)]
+	if want != "" and def.content_hash() != want:
+		return "Your copy of arena '%s' differs from the host's (content hash). Update or reinstall it." % aid
+	info["_arena_def"] = def
+	return ""
 
 
 func _end_match_presentation() -> void:
