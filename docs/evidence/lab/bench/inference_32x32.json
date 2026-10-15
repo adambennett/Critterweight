@@ -1,0 +1,17 @@
+{
+  "bench": "inference",
+  "decision_hz": 15,
+  "decisions": 487,
+  "fighters": 8,
+  "hidden": [
+    32,
+    32
+  ],
+  "max_decision_us": 256,
+  "mean_decision_us": 136.486652977413,
+  "mean_encode_us": 80.7700205338809,
+  "mean_forward_us": 42.8993839835729,
+  "params": 5557,
+  "per_tick_us_8_fighters": 138.477083333333,
+  "ticks": 480
+}

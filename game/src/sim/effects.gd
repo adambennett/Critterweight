@@ -364,7 +364,7 @@ func spawn_zone(f: Fighter, e: Dictionary, p: Vector3) -> Dictionary:
 
 
 func _enforce_zone_cap() -> void:
-	var cap := int(Elements.rules.get("max_zones", 24))
+	var cap := int(sim.rules.get("max_zones", Elements.rules.get("max_zones", 24)))
 	var zones := entities.filter(func(x): return x["kind"] == "zone" and not x["e"].has("hazard"))
 	while zones.size() > cap:
 		var oldest: Dictionary = zones.pop_front()
@@ -595,6 +595,12 @@ func _update_projectile(ent: Dictionary, dt: float) -> void:
 			if Vector2(p.x - pr["pos"].x, p.z - pr["pos"].z).length() < float(pr["radius"]) + float(ent["radius"]) and p.y < 1.0:
 				ent["life"] = 0.0
 				_damage_prop(pr, float(ent["e"].get("damage", 4.0)))
+	if sim.hazards is ArenaHazards and float(ent["life"]) > 0.0:
+		var hz := sim.hazards as ArenaHazards
+		var bi := hz.blocking_prop(p, float(ent["radius"]))
+		if bi >= 0:
+			ent["life"] = 0.0
+			hz.damage_prop(bi, float(ent["e"].get("damage", 4.0)))
 	ent["vel"] = vel
 	ent["pos"] = p
 	if float(ent["life"]) <= 0.0:
@@ -651,7 +657,7 @@ func _update_zone(ent: Dictionary, dt: float) -> void:
 				o.flinch(float(e["flinch_on_entry"]))
 			if e.has("launch"):
 				o.rig.apply_body_impulse(Vector3.UP * float(e["launch"]) * o.rig.total_mass)
-		if inside and float(e.get("push_out", 0.0)) > 0.0 and _zone_affects(ent, f, o):
+		if inside and float(e.get("push_out", 0.0)) != 0.0 and _zone_affects(ent, f, o):  # < 0 pulls inward
 			var away := o.pos() - Vector3(ent["pos"])
 			away.y = 0.0
 			o.rig.apply_body_impulse(away.normalized() * float(e["push_out"]) * dt * o.rig.total_mass * 3.0)
@@ -667,7 +673,7 @@ func _update_zone(ent: Dictionary, dt: float) -> void:
 		if not _zone_affects(ent, f, o):
 			continue
 		var ally := f != null and o != f and not sim.are_enemies(f, o)
-		var dmg_mult: float = float(Elements.rules.get("ally_reaction_damage_mult", 0.25)) if ally else 1.0
+		var dmg_mult: float = float(sim.rules.get("ally_reaction_damage_mult", Elements.rules.get("ally_reaction_damage_mult", 0.25))) if ally else 1.0
 		if float(e.get("tick_damage", 0.0)) > 0.0:
 			sim.combat.apply_simple_damage(f, o, float(e["tick_damage"]) * float(dmg_mult), "zone", {"element": e.get("element", "")})
 		var el := str(e.get("element", ""))
@@ -781,7 +787,7 @@ func trigger_reaction(r: Dictionary, victim: Fighter, source, el_a: String, el_b
 	var src: Fighter = source if (source != null and is_instance_valid(source) and source is Fighter) else null
 	var id := str(r.get("id", ""))
 	var ally_hit := src != null and not sim.are_enemies(src, victim) and src != victim
-	var dmg_mult := float(Elements.rules.get("ally_reaction_damage_mult", 0.25)) if ally_hit else 1.0
+	var dmg_mult := float(sim.rules.get("ally_reaction_damage_mult", Elements.rules.get("ally_reaction_damage_mult", 0.25))) if ally_hit else 1.0
 	match id:
 		"steam_burst":
 			victim.statuses.remove_element("scorch")

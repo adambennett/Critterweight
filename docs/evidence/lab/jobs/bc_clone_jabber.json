@@ -1,0 +1,48 @@
+{
+  "kind": "bc",
+  "name": "BC clone of the scripted jabber",
+  "creature": "dev_biped",
+  "seed": 8,
+  "objective": {
+    "preset": "aggressive"
+  },
+  "scenario": {
+    "preset": "spar_jabber",
+    "opponents": [
+      "bot_rookie"
+    ],
+    "round_time": 20
+  },
+  "eval": {
+    "opponents": [
+      "bot_rookie"
+    ]
+  },
+  "model": {
+    "hidden": [
+      64,
+      64
+    ]
+  },
+  "bc": {
+    "datasets": [
+      "ev_teacher_jabber_vs_rookie"
+    ],
+    "epochs": 80,
+    "batch": 128,
+    "lr": 0.003,
+    "val_frac": 0.2,
+    "patience": 8,
+    "rollouts": 12
+  },
+  "limits": {
+    "max_epochs": 80,
+    "workers": 3,
+    "worlds": 2,
+    "low_priority": false,
+    "max_wall_s": 5400
+  },
+  "output": {
+    "policy_name": "Jabber clone (BC)"
+  }
+}

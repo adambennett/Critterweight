@@ -38,6 +38,8 @@ func setup(match_sim) -> void:
 	match_sim.rules["rounds"] = 1
 	match_sim.rules["intro_time"] = 0.0
 	super.setup(match_sim)
+	if rules.has("tutorial_start"):
+		start_index = int(rules["tutorial_start"])
 	list = Tutorial.exercises()
 	completed = Tutorial.completed_ids().duplicate()
 	kid = KidScript.new(self)
@@ -83,6 +85,7 @@ func start_exercise(i: int, only_this := false) -> void:
 	if str(ex.get("check", "")) == "win_round":
 		round_timer = float((ex.get("params", {}) as Dictionary).get("time", 60.0))
 	kid.set_behavior(str(ex.get("dummy", "idle")))
+	data["adapt"] = _adaptation(str(ex.get("check", "")), p.creature)
 	var intro := str(ex.get("intro", ""))
 	if index == 0 and not only_this:
 		var jab := Tutorial.jab_for(p.creature.id)
@@ -101,6 +104,25 @@ func skip() -> void:
 		start_exercise(index + 1)
 	else:
 		_finish_all()
+
+
+## Which parts of an exercise this fighter's kit cannot do (a mod fighter may lack a slot); those
+## parts are explained and skipped instead of blocking the course.
+func _adaptation(check: String, c: CreatureDef) -> Dictionary:
+	var a := {}
+	match check:
+		"heavy_then_charged":
+			a["no_charge"] = not c.moves.has("heavy_charged") and (not c.moves.has("heavy") or (c.moves["heavy"] as MoveDef).charge_time <= 0.0)
+		"dodge_then_dash":
+			a["no_dash"] = not c.moves.has("dash_attack")
+		"ability_connect":
+			a["no_ability"] = not c.abilities.has("ability1")
+		"finisher_juice":
+			a["no_finisher"] = not c.moves.has("finisher")
+			a["no_juice"] = not c.abilities.has("juice")
+		"grab_throw":
+			a["no_grab"] = not c.moves.has("grab")
+	return a
 
 
 func _say(kind: String, text: String) -> void:
@@ -127,11 +149,13 @@ func tick_fight(dt: float) -> void:
 				_hint()
 		"success":
 			if state_t >= SUCCESS_PAUSE:
-				if index + 1 >= list.size():
-					_finish_all()
-				elif single:
+				if single:
 					state = "done_single"
 					state_t = 0.0
+					if _all_completed():
+						_save_progress(true)
+				elif index + 1 >= list.size():
+					_finish_all()
 				else:
 					start_exercise(index + 1)
 		"failed":
@@ -177,16 +201,23 @@ func _barnaby_kind(check: String) -> String:
 func _finish_all() -> void:
 	state = "complete"
 	state_t = 0.0
-	_save_progress(true)
-	sim.emit_event({"type": "tutorial_complete"})
-	Platform.unlock_achievement("ach_tutorial")
+	_save_progress(_all_completed())
+	sim.emit_event({"type": "tutorial_complete", "all": _all_completed()})
+
+
+func _all_completed() -> bool:
+	for ex in list:
+		if not str(ex.get("id", "")) in completed:
+			return false
+	return true
 
 
 func _save_progress(all_done: bool) -> void:
 	var t: Dictionary = Profiles.current.get("tutorial", {})
 	t["exercises"] = completed.duplicate()
-	if all_done or completed.size() >= list.size():
+	if all_done and _all_completed():
 		t["completed"] = true
+		Platform.unlock_achievement("ach_tutorial")
 	Profiles.current["tutorial"] = t
 	Profiles.save()
 
@@ -195,6 +226,8 @@ func leave() -> void:
 	sim.paused = true
 	if on_exit.is_valid():
 		on_exit.call()
+	else:
+		Tutorial.exit_tutorial()
 
 
 # ---------------------------------------------------------------------------------------------
@@ -231,7 +264,9 @@ func _check(dt: float, evs: Array) -> void:
 				if rad_to_deg(float(data.get("circle", 0.0))) >= float(prm.get("circle_degrees", 330.0)):
 					_succeed()
 		"light_string":
-			var string: Array = p.creature.light_string.slice(0, 3)
+			var string: Array = []
+			for slot in p.creature.light_string.slice(0, 3):
+				string.append(slot if p.creature.moves.has(slot) else "l1")
 			for ev in evs:
 				if ev["type"] != "hit" or int(ev["fighter"]) != 0 or int(ev["target"]) != 1 or bool(ev["blocked"]):
 					continue
@@ -260,6 +295,9 @@ func _check(dt: float, evs: Array) -> void:
 				if stage == 0 and slot2 == "heavy" and not charged:
 					stage = 1
 					_progress()
+					if bool((data.get("adapt", {}) as Dictionary).get("no_charge", false)):
+						_succeed()
+						return
 					_say("hint", "Good. Now hold {heavy} and let it go near him.")
 				elif stage == 1 and charged:
 					_succeed()
@@ -286,10 +324,17 @@ func _check(dt: float, evs: Array) -> void:
 				if bool(data.get("dodged", false)) and not bool(data.get("hit", false)):
 					stage = 1
 					_progress()
+					if bool((data.get("adapt", {}) as Dictionary).get("no_dash", false)):
+						_succeed()
+						return
 					_say("hint", "Nothing hits what isn't there. Now press {light} while you're dodging — dash attack.")
 				elif bool(data.get("hit", false)):
 					_hint()
 		"ability_connect":
+			if bool((data.get("adapt", {}) as Dictionary).get("no_ability", false)):
+				_say("hint", "Your fighter has no trick in that slot. Moving on.")
+				_succeed()
+				return
 			var slot3 := str(prm.get("slot", "ability1"))
 			for ev in evs:
 				if ev["type"] == "ability" and int(ev["fighter"]) == 0 and str(ev.get("slot", "")) == slot3:
@@ -320,6 +365,12 @@ func _check(dt: float, evs: Array) -> void:
 						_succeed()
 						return
 		"finisher_juice":
+			var ad: Dictionary = data.get("adapt", {})
+			if stage == 0 and bool(ad.get("no_finisher", false)):
+				stage = 1
+			if stage == 1 and bool(ad.get("no_juice", false)):
+				_succeed()
+				return
 			for ev in evs:
 				if stage == 0 and ev["type"] == "hit" and int(ev["fighter"]) == 0 and str(ev.get("slot", "")) == "finisher":
 					stage = 1
@@ -517,7 +568,9 @@ class KidScript:
 					_phase_t = 0.0
 			"approach":
 				var want := 1.05 if behavior == "string" or (behavior == "parry_drill" and not _alt) else 1.25
-				if dist > want:
+				# bodies of very different sizes can't get that close: close enough after a moment
+				var close_enough := dist <= want or (_phase_t > 1.2 and dist <= want + 0.6)
+				if not close_enough:
 					f.input.move = to.normalized()
 				elif f.state == Fighter.State.NEUTRAL:
 					_phase = "attack"
