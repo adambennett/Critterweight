@@ -345,12 +345,19 @@ func test_balance_vs_roster() -> void:
 			print(bout_line("%s vs %s (smoke)" % [boss, DUMMY], r))
 			check(int(r["a_hits"]) > 0 and int(r["b_hits"]) > 0, "%s and Stoke both land hits" % boss)
 		return
-	for boss in BOSSES:
+	var args := OS.get_cmdline_user_args()
+	var n := 20
+	if args.find("--balance-bouts") >= 0:
+		n = int(args[args.find("--balance-bouts") + 1])
+	var bosses: Array = BOSSES
+	if args.find("--kit-boss") >= 0:
+		bosses = [args[args.find("--kit-boss") + 1]]
+	for boss in bosses:
 		for tier in ["regular", "pro"]:
 			var boss_wins := 0
 			var total := 0
 			for target in ROSTER:
-				var r := await bouts(boss, target, "regular", tier, 20, 90.0, 4.0, 4, 500, 6.0, BOT_SLOT_HP)
+				var r := await bouts(boss, target, "regular", tier, n, 90.0, 4.0, 4, 500, 6.0, BOT_SLOT_HP)
 				print(bout_line("%s(regular) vs %s %s" % [boss, target, tier], r))
 				boss_wins += int(r["a_wins"])
 				total += int(r["bouts"])

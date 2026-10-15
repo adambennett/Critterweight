@@ -1588,10 +1588,11 @@ func _end_charge_move(hit_wall: bool) -> void:
 func _shield_status() -> Dictionary:
 	if not state in [State.NEUTRAL, State.ATTACK, State.ABILITY, State.GUARD, State.TAUNT]:
 		return {}
+	var best := {}
 	for s in statuses.active:
-		if float(s.get("guard_arc", 0.0)) > 0.0:
-			return s
-	return {}
+		if float(s.get("guard_arc", 0.0)) > float(best.get("guard_arc", 0.0)):
+			best = s   # the widest shield wins (a Withdraw shell over a raised lid)
+	return best
 
 
 func _shield_guards(from_pos: Vector3) -> bool:

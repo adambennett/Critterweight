@@ -584,6 +584,10 @@ func _kit_think(f: Fighter, sim: MatchSim, tgt: Fighter, dist: float, dir: Vecto
 			_move = Vector3.ZERO
 			_guard = false
 			return true
+	var rest = personality.get("rest", [])
+	if rest is Array and (rest as Array).size() >= 2 and (f.state == Fighter.State.ATTACK or f.state == Fighter.State.ABILITY) \
+			and f.move != null and f.state_time > _kit_last_threat(f.move) + 0.05:
+		return true   # nothing new is queued in a recovery: the rest follows the move
 	if _t < _rest_until and f.state == Fighter.State.NEUTRAL:
 		if _t >= _strafe_until:
 			_strafe = -1.0 if rng.randf() < 0.5 else 1.0
@@ -621,6 +625,11 @@ func _kit_opening(per: Dictionary, tgt: Fighter) -> bool:
 	var m: MoveDef = tgt.creature.moves.get(slot, tgt.creature.abilities.get(slot))
 	if m == null:
 		return false
+	return float(per.get("st", 0.0)) > _kit_last_threat(m) + 0.1
+
+
+## Time of a move's last threat: its last hit window, lunge or timed effect (landing included).
+static func _kit_last_threat(m: MoveDef) -> float:
 	var last := 0.0
 	for w in m.windows:
 		last = maxf(last, float(w["t1"]))
@@ -628,7 +637,7 @@ func _kit_opening(per: Dictionary, tgt: Fighter) -> bool:
 		last = maxf(last, float(l[1]))
 	for e in m.effects:
 		last = maxf(last, float(e.get("t", 0.0)) + float(e.get("time", 0.0)) + float(e.get("delay", 0.0)))
-	return float(per.get("st", 0.0)) > last + 0.1
+	return last
 
 
 func _kit_ability_ready(f: Fighter, slot: String) -> bool:
