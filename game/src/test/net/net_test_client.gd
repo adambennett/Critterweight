@@ -20,6 +20,10 @@ extends Node
 ##   --app-request <type>  send one app request once in the lobby (app channel test)
 ##   --party               run the campaign's NetPartyTransport: broadcast one "hello" once another
 ##                         member is present and record the party messages received
+##   --party-run <run id> --party-profile <id> [--party-seat s]
+##                         resume a suspended co-op party run through the lobby (NetPartyRuns):
+##                         a host offers it from its party save, a member claims its seat by run
+##                         id; both vote the first route and stop once the run moved on
 
 const RESULT_EVERY_MS := 500
 
@@ -52,6 +56,7 @@ var _client: NetClient = null
 var _server: NetServer = null
 var _party = null                   ## NetPartyTransport (--party)
 var _party_sent := false
+var _prun: NetPartyRuns = null      ## --party-run
 var _rng := RandomNumberGenerator.new()
 var _wander := Vector3.ZERO
 var _wander_t := 0.0
@@ -84,7 +89,7 @@ func run(a: PackedStringArray) -> void:
 		"notices": [], "chat": [], "lobby_phases": [], "hits_dealt": 0, "hits_taken": 0, "damage_dealt": 0.0,
 		"damage_taken": 0.0, "my_health_min": -1.0, "my_health_min_before_kick": -1.0, "health_seen": {}, "votes": [],
 		"candidates_seen": [], "forged_sent": 0, "kicked": {}, "stats": {}, "snapshots": 0, "max_snapshot_slots": 0,
-		"app_messages": [], "roster_updates": 0, "done": false, "exit_reason": "", "party_messages": [], "party_events": []}
+		"app_messages": [], "roster_updates": 0, "done": false, "exit_reason": "", "party_messages": [], "party_events": [], "party_run_messages": []}
 	var mod_dir := arg("--net-test-mod", "")
 	if mod_dir != "":
 		_load_test_mod(mod_dir)
@@ -145,7 +150,10 @@ func _start_client() -> void:
 	Net.chat_received.connect(func(id: int, n: String, t: String) -> void: _append_bounded("chat", {"from": id, "name": n, "text": t}))
 	Net.match_starting.connect(_on_match_starting)
 	Net.match_ended.connect(_on_match_ended)
-	Net.app_message.connect(func(id: int, t: String, p: Dictionary) -> void: _append_bounded("app_messages", {"from": id, "type": t, "payload": p}))
+	Net.app_message.connect(func(id: int, t: String, p: Dictionary) -> void:
+		# co-op campaign traffic (whole run states) is recorded by the party run itself
+		if not t.begins_with(NetPartyTransport.PREFIX):
+			_append_bounded("app_messages", {"from": id, "type": t, "payload": p}))
 	var err := Net.join(host, port, arg("--password", ""), opts)
 	_client = Net.client
 	if _client:
@@ -410,6 +418,8 @@ func _start_host() -> void:
 	_start_party()
 	result["connected"] = true
 	result["player_id"] = 1
+	if arg("--party-run", "") != "":
+		_party_run_host_open()
 	var ov := {}
 	if args.has("--rounds"):
 		ov["rounds"] = int(arg("--rounds"))
@@ -577,6 +587,90 @@ func _process(dt: float) -> void:
 	if _client and _client.present and _client.scene:
 		# presentation consumes events itself; count them from the replica's stats instead
 		result["events_total"] = _client.replica.events_received
+	if arg("--party-run", "") != "" and not _ended:
+		_party_run_step(dt)
+
+
+# =====================================================================================
+# Party run (--party-run <run id>): resume a suspended co-op party run through the lobby
+# =====================================================================================
+
+func _party_runs() -> NetPartyRuns:
+	if _prun == null:
+		var prof := Profiles.default_profile(arg("--party-profile", "default"), arg("--name", "Tester"))
+		_prun = NetPartyRuns.new(CampaignCatalog.new(Content, "dev_biped"), RunStore.new(), prof)
+	return _prun
+
+
+## Host: offers the run as soon as the session is up.
+func _party_run_host_open() -> void:
+	var pr := {"role": "host", "open_error": _party_runs().open_as_host(arg("--party-run"), arg("--party-seat", ""))}
+	pr["seat"] = _prun.seat
+	result["party_run"] = pr
+
+
+func _party_run_step(dt: float) -> void:
+	var pr: Dictionary = result.get("party_run", {"role": "host" if hosting else "member"})
+	var runs := _party_runs()
+	var rid := arg("--party-run")
+	if not hosting and runs.role == "" and not pr.has("claim_error") and str(Net.party().get("run_id", "")) == rid:
+		pr["claim_error"] = runs.claim(arg("--party-seat", ""))
+		pr["offer"] = Net.party()
+	if hosting and runs.role == "host" and runs.session == null:
+		# start once every member is back (or after 30 s without them)
+		if runs.missing_seats().is_empty() or Time.get_ticks_msec() - started_ms > 30000:
+			pr["started_with_missing"] = runs.missing_seats()
+			pr["start_error"] = runs.start_host()
+			if runs.session:
+				runs.session.transport.message_received.connect(_on_party_run_message)
+	var had := runs.session != null
+	runs.tick(dt)
+	var s := runs.session
+	if s != null and not had and not hosting:
+		s.transport.message_received.connect(_on_party_run_message)
+	pr["seat"] = runs.seat
+	pr["net_seat"] = Net.party_seat()
+	pr["members"] = Net.member_ids()
+	if s != null and s.ctrl != null:
+		var st: Dictionary = s.ctrl.state
+		var pos := str(st.get("position", ""))
+		if not pr.has("start_position"):
+			pr["start_position"] = pos
+			pr["start_log_size"] = (st.get("log", []) as Array).size()
+		# route vote: once per map position (members also when the host opens it)
+		var opts: Array = s.ctrl.available_nodes() if s.ctrl.phase() == "map" else []
+		if not opts.is_empty() and str(pr.get("voted_at", "-")) != "@" + pos and (not hosting or s.vote != null):
+			pr["voted_at"] = "@" + pos
+			pr["voted"] = str(opts[0])
+			s.act("vote", {"node": str(opts[0])})
+		pr["frames_with_run"] = int(pr.get("frames_with_run", 0)) + 1
+		pr["me"] = s.me
+		pr["host_id"] = s.host_id
+		pr["is_host"] = s.is_host()
+		pr["run_id"] = str(st.get("run_id", ""))
+		pr["position"] = pos
+		pr["phase"] = s.ctrl.phase()
+		pr["log_size"] = (st.get("log", []) as Array).size()
+		var ps: Array = []
+		for p in s.ctrl.players():
+			ps.append({"id": str(p.get("id", "")), "bot": bool(p.get("bot", false)), "connected": bool(p.get("connected", true))})
+		pr["players"] = ps
+		if pos != str(pr["start_position"]) and s.ctrl.phase() != "map" and not pr.has("done_ms"):
+			pr["done_ms"] = Time.get_ticks_msec() - started_ms
+	result["party_run"] = pr
+	if pr.has("done_ms") and Time.get_ticks_msec() - started_ms - int(pr["done_ms"]) > 2000:
+		_end("party run moved on")
+
+
+func _on_party_run_message(from: String, type: String, payload: Dictionary) -> void:
+	_append_bounded("party_run_messages", {"from": from, "type": type, "t_ms": Time.get_ticks_msec() - started_ms,
+		"counts": payload.get("counts", {}) if type == "vote_result" else {},
+		"position": str(payload.get("state", {}).get("position", "")) if type == "run_state" else ""})
+	# a member votes when the host opens the vote (and once on arrival, in _party_run_step)
+	if type == "vote_open" and _prun != null and _prun.session != null and not hosting:
+		var opts: Array = payload.get("options", [])
+		if not opts.is_empty():
+			_prun.session.act("vote", {"node": str(opts[0])})
 
 
 func _end(reason: String) -> void:

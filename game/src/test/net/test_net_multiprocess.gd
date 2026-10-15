@@ -286,7 +286,7 @@ func test_listen_host_with_remote_client() -> void:
 	var host: int = u.spawn("host", ["--net-client", "--net-host", "--port", port, "--name", "Hosty", "--script", "aggressive",
 		"--host-start-after-players", "2", "--rules", "duel", "--user-rules", "Spicy Duel", "--user-arena", "Net Test Cage", "--rounds", "1",
 		"--round-time", "75", "--party", "--stop-after-matches", "1", "--quit-after", "110", "--result", u.result_path("Hosty")])
-	var r0: Dictionary = await u.wait_json(u.result_path("Hosty"), func(d: Dictionary) -> bool: return bool(d.get("connected", false)), 15.0)
+	var r0: Dictionary = await u.wait_json(u.result_path("Hosty"), func(d: Dictionary) -> bool: return bool(d.get("connected", false)), U.SERVER_READY_S)
 	check(bool(r0.get("connected", false)), "listen server up")
 	var g: int = u.spawn("guest", u.client_args(port, "Guest", "passive", ["--ready", "--app-request", "coop.hello", "--assist", "1.8",
 		"--party", "--stop-after-matches", "1", "--quit-after", "110"]))
@@ -334,6 +334,66 @@ func test_listen_host_with_remote_client() -> void:
 	check(_party_from(rg, "1"), "guest's party transport got the host's broadcast: %s" % str(rg.get("party_messages", [])))
 	check(_party_from(rh, gid), "host's party transport got the guest's broadcast: %s" % str(rh.get("party_messages", [])))
 	_no_child_errors([host, g])
+
+
+## A suspended co-op party run resumed through the lobby (independent processes, LOOPBACK). Ann
+## (member id 1, who hosted it) and Ben (2) played the run online until everyone left; both
+## kept it in their party saves. Now Ben hosts a new session and offers the run, Ann joins and
+## claims her seat by run id. Their new session ids are the other way round (Ben 1, Ann 2): the
+## seats keep the run's ids, so CoopSession (host_resume / member_join over NetPartyTransport)
+## runs unchanged - Ann gets her fighter back, both vote and the run moves on identically.
+func test_party_run_resumed_through_the_lobby() -> void:
+	u = U.new(self, "party_run")
+	var port: int = u.base_port
+	var cat := CampaignCatalog.new(Content, "dev_biped")
+	var cfg := {"seed": 4242, "variant": "off_the_street", "difficulty": "amateur", "dose": 0, "created_at": 3,
+		"players": [{"id": "1", "name": "Ann", "profile_id": "ann", "fighter": "f_stoke"},
+			{"id": "2", "name": "Ben", "profile_id": "ben", "fighter": "f_dozer"}]}
+	var ctrl := RunController.start_run(cat, cfg)
+	var st: Dictionary = ctrl.state
+	var rid := str(st.get("run_id", ""))
+	check_eq(ctrl.phase(), "map", "a party run waiting at the map")
+	check_eq(RunStore.new(u.path("host").path_join("runs")).save(st, "ben", "party_" + rid), OK, "Ben's party save")
+	check_eq(RunStore.new(u.path("ann").path_join("runs")).save(st, "ann", "party_" + rid), OK, "Ann's party save")
+	var host: int = u.spawn("host", ["--net-client", "--net-host", "--port", port, "--name", "Ben", "--party-run", rid,
+		"--party-profile", "ben", "--quit-after", "70", "--result", u.result_path("Ben")])
+	var r0: Dictionary = await u.wait_json(u.result_path("Ben"), func(d: Dictionary) -> bool: return d.get("party_run", {}).has("open_error"), U.SERVER_READY_S)
+	check_eq(str(r0.get("party_run", {}).get("open_error", "?")), "", "Ben offers the run from his party save")
+	var ann: int = u.spawn("ann", u.client_args(port, "Ann", "idle", ["--party-run", rid, "--party-profile", "ann", "--quit-after", "70"]))
+	var ra: Dictionary = await u.wait_json(u.result_path("Ann"), _done, 75.0)
+	var rb: Dictionary = await u.wait_json(u.result_path("Ben"), _done, 20.0)
+	var pa: Dictionary = ra.get("party_run", {})
+	var pb: Dictionary = rb.get("party_run", {})
+	# identity: seats keep the run's member ids although the session ids are swapped
+	check_eq(int(ra.get("player_id", -1)), 2, "Ann is session player 2")
+	check_eq(str(pa.get("claim_error", "?")), "", "Ann claimed her seat by run id")
+	check_eq([str(pa.get("net_seat", "")), str(pa.get("me", ""))], ["1", "1"], "Ann plays as member 1 of the run")
+	check_eq([str(pb.get("seat", "")), str(pb.get("me", "")), bool(pb.get("is_host", false))], ["2", "2", true], "Ben hosts as member 2")
+	check_eq(str(pa.get("host_id", "")), "2", "Ann's CoopSession knows Ben (seat 2) as the host")
+	check_eq(str(pb.get("start_error", "?")), "", "Ben's CoopSession resumed the run")
+	check_eq(pb.get("started_with_missing", ["?"]), [], "after Ann was back")
+	var host_msgs: Array = ra.get("party_run_messages", [])
+	check(not host_msgs.is_empty() and host_msgs.all(func(m: Dictionary) -> bool: return str(m.get("from", "")) == "2"),
+		"every party message Ann got came from the host's seat: %s" % str(host_msgs.slice(0, 3)))
+	# the run itself: Ann's fighter back, both voted, both moved on the same way
+	var ann_player := {}
+	for p in pb.get("players", []):
+		if str(p.get("id", "")) == "1":
+			ann_player = p
+	check(not ann_player.is_empty() and not bool(ann_player.get("bot", true)) and bool(ann_player.get("connected", false)),
+		"Ann's fighter is hers again (not a bot): %s" % str(ann_player))
+	var votes := 0
+	for m in host_msgs:
+		if str(m.get("type", "")) == "vote_result":
+			for n in (m.get("counts", {}) as Dictionary).values():
+				votes += int(n)
+	check_eq(votes, 2, "both members voted the route")
+	check_eq(str(pa.get("run_id", "")), rid, "the same run")
+	check(str(pb.get("position", "")) != str(pb.get("start_position", "")) and str(pb.get("phase", "map")) != "map",
+		"the run moved on (%s -> %s, %s)" % [pb.get("start_position", ""), pb.get("position", ""), pb.get("phase", "")])
+	check_eq([str(pa.get("position", "")), str(pa.get("phase", "")), int(pa.get("log_size", -1))],
+		[str(pb.get("position", "")), str(pb.get("phase", "")), int(pb.get("log_size", -2))], "and identically on both machines")
+	_no_child_errors([host, ann])
 
 
 func _party_from(r: Dictionary, sender: String) -> bool:

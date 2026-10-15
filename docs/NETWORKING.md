@@ -264,7 +264,8 @@ ping, vote}], `settings` {rules, rules_name, arena, arena_name, mode, bots, bot_
 rules_override, bot_policy}, `vote` {open, candidates [{index, key, name, rules_name, arena_name,
 mode, weight, min_players, max_players}], tally}, `playlist` {id, name, valid, invalid, errors},
 `entry`, `match_id`, `options` {creatures, rules, arenas, bot_difficulties, bot_policies [{id,
-name, creature, hash}]} (listen hosts; dedicated servers list only creatures), `last_result`.
+name, creature, hash}]} (listen hosts; dedicated servers list only creatures), `last_result`,
+`party` (an open co-op party run, see "Party runs" in §14).
 
 * Players get stable session ids (1 = server/listen host, joiners from 2) and lobby slots; joiners
   beyond `max_players` become spectators when spectator slots are free, otherwise `server_full`.
@@ -487,6 +488,33 @@ authority:
   `test_net_loopback::test_party_relay_inprocess` (a member's message dressed up as the host's
   still arrives with the member's id). Receivers still decide *who may send what*: members accept
   host-only messages (run state, tickets, run end) only from the current host's member id.
+* **Party runs (resuming a co-op campaign run online).** A suspended party run keeps the member
+  ids it was played with (its player ids), but a new session gives everyone new session ids. The
+  listen host therefore offers the run in the lobby and every run player becomes a **seat**:
+  `Net.party_open(run_id, seats [{id, name, fighter}], host_seat, info)` (host only; seat ids are
+  the run's player ids, which runs started online have as 1-9 digit numbers; at most 4 seats;
+  `info` <= 2 KB of plain data) publishes `lobby.party` {run_id, info, host_seat, seats [{id,
+  name, fighter, session, connected}]}; `Net.party_claim(seat)` asks for a seat (the request
+  names the run id, so it never lands in another run); `Net.party_leave()` gives it up;
+  `Net.party_close()` withdraws the offer; `Net.party()` / `Net.party_seat()` read it; signals
+  `party_changed(party)` and `party_claim_failed(reason)`. The authority refuses wrong-run, taken
+  (also: held by a player whose rejoin reservation is still running), double and spectator
+  claims; a seat frees when its holder leaves the session. While the offer is open, party member
+  ids are seat ids everywhere: `local_member_id()`, `member_ids()` and `member_joined/left` report
+  seats, relayed party messages carry the sender's seat (stamped by the authority from the
+  connection) and are routed by seat, and players without a seat neither send nor receive party
+  messages. NetPartyTransport and CoopSession therefore run unchanged with the run's own ids.
+  `NetPartyRuns` (src/net/net_party_runs.gd) is the lobby glue the UI drives: the host calls
+  `open_as_host(run_id)` (loads its party save `party_<run id>`, opens the seats, finds its own by
+  profile id / name or takes the one the player picked) and `start_host()` once `missing_seats()`
+  is empty (CoopSession.host_resume over NetPartyTransport); a member calls `claim(seat)` when the
+  lobby offers a run it holds in its own party save ("rejoins by run id") and then `tick(dt)`
+  every frame, which starts CoopSession.member_join once seated, repeats its hello until the run
+  arrives and asks for its fighter back. Dedicated servers do not host party runs. Tested:
+  `test_net_loopback::test_party_seats_inprocess` (seat ids swapped against session ids, claim
+  rules, outsiders kept out) and `test_net_multiprocess::test_party_run_resumed_through_the_lobby`
+  (independent processes: Ben resumes the run Ann hosted, Ann claims seat 1 by run id, both vote,
+  the run moves on identically on both machines).
 
 ## 15. Measured bandwidth and server cost
 
@@ -567,8 +595,8 @@ $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 | `test_net_codec.gd` | Writer/reader, bounds, quantization error, event codec round trip, 3000-buffer fuzz + every truncation, input clamping, remote-input redundancy/jitter buffer, payload sanitizer, beacons, reasons, password proof, config parser (incl. `server.mods`), package-list codec, content verdict over `Mods.compare`, assist clamping, rate limiter |
 | `test_net_playlist.gd` | Weight distribution (10 000 draws), distinct candidates, repeat avoidance + relaxation, vote/tie/no-vote rules, min players + bot fill, invalid entries/missing content messages, persistence, shipped playlists |
 | `test_net_snapshot.gd` | FK reconstruction vs live sim, snapshot sizes, roster generations, interpolation/teleport/generation switch, event scheduling, mirror driving the real FightHud |
-| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, oversized/flood, host leaving, timeout, LAN discovery, host scene removed mid-match, mode picks for remote players (+ pick timeout), party relay (authenticated sender ids, limits, session end), arena checks before the match (local hash, mismatch, damaged and oversized packages, sandboxed import round trip), AI Lab policy bots (policy hash in the options and MATCH_START) + rules validation, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (`LQ_ASSIST`, snapped levels, `match.player_assist`), live network settings + invite text |
-| `test_net_multiprocess.gd` | Independent processes: dedicated match (hits, KO, results, presenting client), rejections (password, full, protocol, build, content refused on the client with Mods.compare wording), server mods (`server.mods` + client `--mods`, vanilla client refused, modded client plays the mod's preset, admin status lists packages), damage injection, disconnect + rejoin, stdin console shutdown, TCP admin auth/kick/ban/shutdown, 80 +- 20 ms / 2 % loss match, listen host (own `user:` rules preset sent in full and own `user:` arena sent as a package to a guest without either, guest aim assist applied, party messages) + remote client + app round trip, bonus modes (Chum Rush, Absolute Unit), LAN discovery, playlist rotation + votes + invalid entries + restart persistence |
+| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, oversized/flood, host leaving, timeout, LAN discovery, host scene removed mid-match, mode picks for remote players (+ pick timeout), party relay (authenticated sender ids, limits, session end), party seats (claims, seat-stamped and seat-routed messages, outsiders kept out), arena checks before the match (local hash, mismatch, damaged and oversized packages, sandboxed import round trip), AI Lab policy bots (policy hash in the options and MATCH_START) + rules validation, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (`LQ_ASSIST`, snapped levels, `match.player_assist`), live network settings + invite text |
+| `test_net_multiprocess.gd` | Independent processes: dedicated match (hits, KO, results, presenting client), rejections (password, full, protocol, build, content refused on the client with Mods.compare wording), server mods (`server.mods` + client `--mods`, vanilla client refused, modded client plays the mod's preset, admin status lists packages), damage injection, disconnect + rejoin, stdin console shutdown, TCP admin auth/kick/ban/shutdown, 80 +- 20 ms / 2 % loss match, listen host (own `user:` rules preset sent in full and own `user:` arena sent as a package to a guest without either, guest aim assist applied, party messages) + remote client + app round trip, bonus modes (Chum Rush, Absolute Unit), LAN discovery, playlist rotation + votes + invalid entries + restart persistence, a suspended co-op party run resumed through the lobby (seat claimed by run id, CoopSession on both machines, route vote) |
 | `test_net_parity.gd` | NetMatchScene handles every event MatchScene reacts to; reports event types without a codec id |
 | `test_net_server_examples.gd` | Example configs and the playlist template stay valid |
 | `test_net_measure.gd` | Bandwidth and server cost (duel, 8-fighter FFA) |
@@ -599,8 +627,10 @@ Also LOOPBACK on one PC.
 * Event types added after protocol 3 was fixed (arena hazards and props, bosses, ring-out return,
   campaign events; `test_net_parity` lists them) travel with their type name instead of a 1-byte
   id: they work, the event packets are just a little larger. Giving them ids is a protocol bump.
-* Co-op: the party message channel the campaign's `NetPartyTransport` needs is in place and
-  tested between processes, but starting a co-op campaign run from an online lobby is not wired
-  in the campaign UI yet (co-op runs are verified over the loopback transport).
+* Co-op: resuming a suspended party run through the lobby is wired (party seats + `NetPartyRuns`,
+  tested between processes up to the first route vote); fights of an online party run are not
+  yet played as network matches, and starting a *new* party run from the lobby is not wired in
+  the campaign UI (the same seat API covers it: the session ids become the run's player ids).
+  Co-op runs are otherwise verified over the loopback transport.
 * Host/join/lobby screens are built by the UI owner on this API; until then sessions start from
   the command line (`--host`, `--connect`, `--server`).
