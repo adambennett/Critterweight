@@ -55,14 +55,14 @@
       "order": 3,
       "title": "The big one",
       "name": "The big one",
-      "goal": "Land a Heavy ({heavy_name}), then hold {heavy} to land a charged one.",
+      "goal": "Land a Heavy ({heavy_name}), then hold {heavy} to land the charged one ({charged_name}).",
       "dummy": "loose",
       "check": "heavy_then_charged",
       "params": {},
       "highlight": "",
       "intro": "{heavy}. It's slower, it hurts more, and it shrugs off little hits while it's coming. Now hold it. Feel that? That's a charge. Let it go.",
       "success": "That's the one that ends arguments. It's also the one you'll miss most. Don't fall in love with it.",
-      "hint": "Hold {heavy} until your fighter's whole body winds up. Then let go near him.",
+      "hint": "Hold {heavy} until your fighter's whole body winds up. Then let go with him in range. If yours travels, give it room.",
       "adapt": {
         "no_charge": {
           "intro": "{heavy}. It's slower, it hurts more, and it shrugs off little hits while it's coming. Yours doesn't charge, so holding it buys you nothing. Land one clean.",

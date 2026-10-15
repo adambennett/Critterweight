@@ -130,6 +130,8 @@ static func fill(text: String, c: CreatureDef) -> String:
 				names.append((c.moves[slot] as MoveDef).display_name)
 		out = out.replace("{l_names}", " – ".join(names) if not names.is_empty() else "jab, cross, hook")
 		out = out.replace("{heavy_name}", (c.moves["heavy"] as MoveDef).display_name if c.moves.has("heavy") else "Heavy")
+		var charged: MoveDef = c.moves.get("heavy_charged", c.moves.get("heavy"))
+		out = out.replace("{charged_name}", charged.display_name if charged else "the charged one")
 		out = out.replace("{ability1_name}", (c.abilities["ability1"] as MoveDef).display_name if c.abilities.has("ability1") else "your first trick")
 		out = out.replace("{juice_name}", (c.abilities["juice"] as MoveDef).display_name if c.abilities.has("juice") else "the JUICE")
 	return out

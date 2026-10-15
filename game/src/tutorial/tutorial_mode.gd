@@ -352,7 +352,7 @@ func _check(dt: float, evs: Array) -> void:
 					if adapted("no_charge"):
 						_succeed()
 						return
-					_say("hint", "Good. Now hold {heavy} and let it go near him.")
+					_say("hint", "Good. Now hold {heavy} for {charged_name}, and let it go with him in range.")
 				elif charged:
 					_succeed()
 					return
