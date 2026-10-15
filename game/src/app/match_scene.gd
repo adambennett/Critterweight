@@ -21,6 +21,7 @@ var _event_cursor := 0
 var config := {}
 var director: SpectatorDirector = null   ## auto-director when spectating (cfg.spectate)
 var _goals_by_me := 0
+var _debug: CombatDebugDraw = null
 
 
 ## config: {arena: ArenaDef, rules: {}, seed: int, mode: MatchMode, fighters: [{creature, team, kind:"player"|"bot", difficulty, name}]}
@@ -91,11 +92,29 @@ func start(cfg: Dictionary) -> void:
 	var speed := float(Settings.get_value("access.game_speed"))
 	if speed < 0.999 and not bool(cfg.get("online", false)) and not bool(cfg.get("spectate", false)) and _is_local_player():
 		Engine.time_scale = speed
+	if OS.get_cmdline_user_args().has("--debug-draw"):
+		toggle_debug_draw()
 	if cfg.has("overlay_script"):
 		var ov = load(str(cfg["overlay_script"])).new()
 		hud_layer.add_child(ov)
 		if ov.has_method("bind"):
 			ov.call("bind", self)
+
+
+## Combat debug visualization (F3): hit capsules, weapon spheres by phase, reach, targets, hits.
+func toggle_debug_draw() -> void:
+	if _debug and is_instance_valid(_debug):
+		_debug.visible = not _debug.visible
+		return
+	_debug = CombatDebugDraw.new()
+	add_child(_debug)
+	_debug.setup(sim)
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and (event as InputEventKey).pressed and not (event as InputEventKey).echo and (event as InputEventKey).keycode == KEY_F3:
+		toggle_debug_draw()
+		get_viewport().set_input_as_handled()
 
 
 func _default_music() -> String:
