@@ -11,8 +11,6 @@ const KID := "npc_kid_lamprey"
 const DUMMY := "f_stoke"
 const ROSTER := ["f_stoke", "f_dredge", "f_gusto", "f_dozer", "f_slurry", "f_jitters"]
 const REACH_CAP := 1.6
-## Players whose body keeps the Kid farther than KidScript's fixed 1.05 m approach (tutorial gap).
-const KIDSCRIPT_UNREACHABLE := ["f_dozer"]
 
 
 ## [slot, inputs, seconds] for each scripted move; the counted slot is the first entry.
@@ -238,13 +236,6 @@ func test_tutorial_partner_behaviours() -> void:
 		if t < float(mem.get("hold_until", -1.0)):
 			f.input.set_held(FighterInput.GUARD, true)
 	for player in ROSTER:
-		if player in KIDSCRIPT_UNREACHABLE:
-			# KidScript walks to a fixed 1.05 m root-to-root before swinging; Dozer's snout keeps
-			# any partner at >= 1.2 m, so the lesson cannot start (reported to the tutorial owner).
-			# The Kid's kit itself still reaches a guarding Dozer from where the bodies meet:
-			var blk := await shoot(KID, player, 1.3, string_presses(3), 2.2, [{"t0": 0.0, "t1": 3.0, "hold": ["guard"]}])
-			check(int(blk["blocked"]) + int(blk["hits"]) >= 2, "the Kid's string meets a guarding %s at 1.3 m (blocked %d, hits %d)" % [player, blk["blocked"], blk["hits"]])
-			continue
 		var gr := await tutorial_run(3, player, KID, guard_plan, 45.0)
 		check(bool(gr["ok"]), "Hands up with %s: the Kid's string is blocked (%s, %s)" % [player, gr["state"], gr["progress"]])
 		var pr := await tutorial_run(7, player, KID, parry_plan, 60.0)

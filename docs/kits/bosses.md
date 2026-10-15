@@ -100,19 +100,18 @@ Outside the campaign a boss in a bot slot has **2× the highest fighter HP and n
 (ENEMIES_BOSSES.md "Custom rules"); the bouts use that rule (`BOT_SLOT_HP`, 90 s rounds, 10 bouts per
 matchup, seeds 500+). A = boss wins.
 
-| Boss | vs regular roster bots (boss wins) | vs pro roster bots (boss wins) | pro winners |
+| Boss | vs regular roster bots (boss wins) | vs pro roster bots (boss wins) | pro-tier roster wins |
 |---|---|---|---|
-| Bilge | 44 / 60 (73 %) | 43 / 60 (72 %) | Gusto 10/10, Jitters 4/10, Stoke 2/10, Dredge 1/10 |
-| Conduit | 48 / 60 (80 %) | 43 / 60 (72 %) | Gusto 10/10, Dozer 7/10 |
-| Snappington | 42 / 60 (70 %) | 39 / 60 (65 %) | Stoke 10/10, Gusto 10/10, Dredge 1/10 |
+| Bilge | 43 / 60 (72 %) | 46 / 60 (77 %) | Gusto 6/10, Jitters 4/10, Stoke 3/10, Dredge 1/10 |
+| Conduit | 54 / 60 (90 %) | 45 / 60 (75 %) | Dozer 7/10, Gusto 5/10, Stoke 3/10 |
+| Snappington | 44 / 60 (73 %) | 47 / 60 (78 %) | Stoke 10/10, Gusto 2/10, Dredge 1/10 |
 
-Per matchup (boss regular vs roster at regular / pro, boss wins of 10): Bilge — Stoke 7 / 8, Dredge 9 / 9,
-Gusto 0 / 0, Dozer 10 / 10, Slurry 10 / 10, Jitters 8 / 6. Conduit — Stoke 9 / 10, Dredge 10 / 10,
-Gusto 0 / 0, Dozer 9 / 3, Slurry 10 / 10, Jitters 10 / 10. Snappington — Stoke 2 / 0, Dredge 10 / 9,
-Gusto 0 / 0, Dozer 10 / 10, Slurry 10 / 10, Jitters 10 / 10. The asserted targets: the boss beats
-regular-tier roster bots most of the time, and pro-tier roster bots win some. Gusto's stub beats every
-boss; the Stoke/Slurry/Jitters stubs await their kits (re-run the table when they land).
-
+Per matchup (boss wins of 10, roster at regular / pro): Bilge — Stoke 5 / 7, Dredge 9 / 9, Gusto 1 / 4,
+Dozer 10 / 10, Slurry 10 / 10, Jitters 8 / 6. Conduit — Stoke 10 / 7, Dredge 10 / 10, Gusto 5 / 5,
+Dozer 9 / 3, Slurry 10 / 10, Jitters 10 / 10. Snappington — Stoke 1 / 0, Dredge 10 / 9, Gusto 3 / 8,
+Dozer 10 / 10, Slurry 10 / 10, Jitters 10 / 10. Measured with the merged Stoke/Gusto and Dredge/Dozer kits
+(main 144efdc); Slurry and Jitters are still stubs — re-run when their kits land. The asserted targets:
+the boss beats regular-tier roster bots most of the time, and pro-tier roster bots win some.
 ## Tests (`test_kit_bosses.gd`)
 
 | Test | Checks |

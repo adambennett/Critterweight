@@ -94,13 +94,13 @@ kit hint; the generic logic never fires Hood Up on its own).
 
 ## Tutorial partner
 
-The tutorial drives the Kid with its own scripted `KidScript` (it approaches to ~1.05 m root-to-root and
-throws his string / Heavy / Charged Heavy on cue). `test_tutorial_partner_behaviours` runs the real
+The tutorial drives the Kid with its own scripted `KidScript` (it walks in to his move's reach and throws his
+string / Heavy / Charged Heavy on cue). `test_tutorial_partner_behaviours` runs the real
 exercises against him for every roster fighter: "Hands up" (≥ 2 blocked hits of one string, ≤ 10 %
-health lost) and "The read" (his Light and Heavy parried) with Stoke, Dredge, Gusto, Slurry, Jitters;
-"Not there" (dodge his telegraphed Heavy, then Dash Attack) with dev_biped (the stub roster has no Dash
-Attack); Dozer's snout keeps KidScript out of its fixed approach distance, so for Dozer the test checks
-the Kid's string meets a guarding Dozer at 1.3 m instead (known gap below).
+health lost) and "The read" (his Light and Heavy parried) with every roster fighter (Stoke, Dredge, Gusto, Dozer, Slurry, Jitters);
+"Not there" (dodge his telegraphed Heavy, then Dash Attack) with dev_biped (the reference biped's
+complete kit plays the student). Since main's KidScript approaches by the move's own reach and stops when pressed
+against a big body (9bafd5c), the lessons also run for Dozer.
 
 ## Tests (`test_kit_npc_kid_lamprey.gd`)
 
@@ -122,7 +122,23 @@ Result (merged with main 144efdc): 11 / 11 kit tests pass (plus opt-in aids).
 
 ## Balance
 
-BALANCE_TABLE_PLACEHOLDER
+`test_balance_vs_roster --balance`: 20 seeded bot bouts per matchup, both bots at the same tier, 60 s
+rounds (decision on health), 3 m start gap. A = the Kid. Measured on main 144efdc + this branch (Stoke,
+Gusto, Dredge, Dozer have their real kits; Slurry and Jitters are stubs).
+
+| vs | Punching Bag (rookie): Kid wins | hits/bout Kid / opp | Journeyman (regular): Kid wins | hits/bout Kid / opp |
+|---|---|---|---|---|
+| Stoke | 1 / 20 | 12.1 / 9.9 | 0 / 20 | 12.8 / 8.8 |
+| Dredge | 10 / 20 | 29.3 / 13.4 | 8 / 20 | 21.6 / 12.7 |
+| Gusto | 2 / 20 | 14.7 / 15.8 | 0 / 20 | 11.9 / 16.2 |
+| Dozer | 3 / 20 | 16.6 / 14.3 | 1 / 20 | 12.4 / 13.9 |
+| Slurry (stub) | 8 / 20 | 20.8 / 15.6 | 7 / 20 | 18.4 / 14.8 |
+| Jitters (stub) | 17 / 20 | 19.8 / 10.4 | 18 / 20 | 16.6 / 9.3 |
+| **All** | **41 / 120 (34 %)** | | **34 / 120 (28 %)** | |
+
+Overall 31 % over 240 bouts: he loses most bouts at both tiers and lands 12–29 hits per bout against
+everyone. Mirror (regular): 14 / 6 for the first seat. Dredge's slow kit only splits with him inside 60 s
+rounds (few knockouts: decisions), and the Jitters stub loses to everyone.
 
 ## Evidence
 
@@ -139,9 +155,7 @@ NPC-kit engine extensions are listed in `docs/kits/minions.md`.
 
 - **Power 0.72 / health 80**: after the re-aim retune his body shots landed so reliably that he won most
   same-tier bouts; lowered so a rookie partner loses most of them.
-- **Dozer in the tutorial**: KidScript's fixed ~1.05 m approach cannot get past Dozer's snout, so the
-  guard/parry lessons do not start for a Dozer player (tutorial owner; the Kid's kit itself reaches a
-  guarding Dozer from where the bodies meet).
+
 - **Single matchups**: against the current roster stubs he still wins most bouts vs Jitters and takes
   decisions vs Dredge inside the 60 s test rounds (slow, few KOs); the aggregate per tier is what the
   balance test asserts.
