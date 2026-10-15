@@ -9,12 +9,13 @@ var x_label := ""
 var y_label := ""
 var empty_text := "No data yet"
 var font: Font
-var font_size := 18
+var font_size := 28
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(420, 240)
-	font = get_theme_default_font()
+	custom_minimum_size = Vector2(520, 320)
+	font = UiTheme.font("body")
+	font_size = UiTheme.size("caption") + 4
 	resized.connect(queue_redraw)
 
 
@@ -27,10 +28,10 @@ func _draw() -> void:
 	var r := Rect2(Vector2.ZERO, size)
 	draw_rect(r, Color(0.06, 0.05, 0.08, 0.92))
 	draw_rect(r, Color(0.35, 0.32, 0.4), false, 1.0)
-	var pad_l := 64.0
-	var pad_r := 16.0
-	var pad_t := 34.0
-	var pad_b := 36.0
+	var pad_l := 100.0
+	var pad_r := 20.0
+	var pad_t := 52.0
+	var pad_b := 52.0
 	var plot := Rect2(pad_l, pad_t, maxf(10.0, size.x - pad_l - pad_r), maxf(10.0, size.y - pad_t - pad_b))
 	var xmin := INF
 	var xmax := -INF
@@ -47,7 +48,7 @@ func _draw() -> void:
 			ymin = minf(ymin, y)
 			ymax = maxf(ymax, y)
 	if xmin == INF:
-		draw_string(font, Vector2(16, size.y * 0.5), empty_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(0.8, 0.78, 0.85))
+		draw_string(font, Vector2(20, size.y * 0.5), empty_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(0.8, 0.78, 0.85))
 		return
 	if xmax - xmin < 1e-6:
 		xmax = xmin + 1.0
@@ -63,15 +64,15 @@ func _draw() -> void:
 		var gy := plot.position.y + plot.size.y * float(k) / 4.0
 		draw_line(Vector2(plot.position.x, gy), Vector2(plot.end.x, gy), grid_col, 1.0)
 		var val := ymax - (ymax - ymin) * float(k) / 4.0
-		draw_string(font, Vector2(4, gy + 6), _fmt(val), HORIZONTAL_ALIGNMENT_LEFT, pad_l - 8, font_size - 4, Color(0.75, 0.73, 0.8))
+		draw_string(font, Vector2(6, gy + 10), _fmt(val), HORIZONTAL_ALIGNMENT_LEFT, pad_l - 8, font_size - 4, Color(0.75, 0.73, 0.8))
 	for k in 5:
 		var gx := plot.position.x + plot.size.x * float(k) / 4.0
 		draw_line(Vector2(gx, plot.position.y), Vector2(gx, plot.end.y), grid_col, 1.0)
 		var xv := xmin + (xmax - xmin) * float(k) / 4.0
-		draw_string(font, Vector2(gx - 20, plot.end.y + 22), _fmt(xv), HORIZONTAL_ALIGNMENT_LEFT, 60, font_size - 4, Color(0.75, 0.73, 0.8))
+		draw_string(font, Vector2(gx - 30, plot.end.y + 34), _fmt(xv), HORIZONTAL_ALIGNMENT_LEFT, 90, font_size - 4, Color(0.75, 0.73, 0.8))
 	draw_rect(plot, Color(0.5, 0.48, 0.55), false, 1.0)
 	if x_label != "":
-		draw_string(font, Vector2(plot.end.x - 160, size.y - 4), x_label, HORIZONTAL_ALIGNMENT_RIGHT, 160, font_size - 4, Color(0.7, 0.68, 0.75))
+		draw_string(font, Vector2(plot.end.x - 220, size.y - 2), x_label, HORIZONTAL_ALIGNMENT_RIGHT, 220, font_size - 4, Color(0.7, 0.68, 0.75))
 	# series
 	var lx := pad_l
 	for s: Dictionary in series:
@@ -91,12 +92,12 @@ func _draw() -> void:
 			prev = q
 		# legend
 		var label := str(s.get("name", ""))
-		_mark(Vector2(lx + 6, 16), str(s.get("shape", "circle")), col)
-		draw_line(Vector2(lx - 4, 16), Vector2(lx + 16, 16), col, 2.0)
-		draw_string(font, Vector2(lx + 22, 22), label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 2, Color(0.9, 0.88, 0.94))
+		_mark(Vector2(lx + 6, 22), str(s.get("shape", "circle")), col)
+		draw_line(Vector2(lx - 4, 22), Vector2(lx + 16, 22), col, 2.0)
+		draw_string(font, Vector2(lx + 24, 32), label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 2, Color(0.9, 0.88, 0.94))
 		lx += 40.0 + font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 2).x
 	if y_label != "":
-		draw_string(font, Vector2(lx + 12, 22), "(" + y_label + ")", HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 4, Color(0.7, 0.68, 0.75))
+		draw_string(font, Vector2(lx + 12, 32), "(" + y_label + ")", HORIZONTAL_ALIGNMENT_LEFT, -1, font_size - 4, Color(0.7, 0.68, 0.75))
 
 
 func _mark(q: Vector2, shape: String, col: Color) -> void:

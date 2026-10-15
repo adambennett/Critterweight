@@ -1,36 +1,33 @@
 class_name LabUi
 extends RefCounted
-## Small self-contained widget helpers for the AI Lab screen (plain Godot controls, minimal
-## styling, so the shared UI theme can be adopted later by replacing these few functions).
-## Every widget is focusable and works with mouse, keyboard and a controller (sliders and
-## option buttons respond to the D-pad/stick; buttons to A / Enter / click).
+## Small widget helpers for the AI Lab screen on top of the shared UiTheme (text styles are theme
+## type variations — Body, Caption, H3, Eyebrow — so the text-size setting rescales them live and
+## nothing drops below the 28 du legibility floor). Every widget is focusable and works with mouse,
+## keyboard and a controller (sliders and option buttons respond to the D-pad/stick; buttons to
+## A / Enter / click).
 
-const PAD := 10
+const PAD := 12
 
 
-## Paragraph text (wraps). Use `caption` for inline labels next to controls.
-static func label(text: String, size := 0, color := Color(0, 0, 0, 0)) -> Label:
-	var l := Label.new()
-	l.text = text
-	if size > 0:
-		l.add_theme_font_size_override("font_size", size)
+## Paragraph text (wraps). `style`: Body | BodyStrong | BodyMuted | Caption | CaptionStrong | H3 | Eyebrow ...
+static func label(text: String, style := "Body", color := Color(0, 0, 0, 0)) -> Label:
+	var l := UiTheme.label(text, style, true)
 	if color.a > 0.0:
 		l.add_theme_color_override("font_color", color)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return l
 
 
 ## Single-line label that never wraps (safe inside HBoxContainers).
-static func caption(text: String, size := 0, color := Color(0, 0, 0, 0)) -> Label:
-	var l := label(text, size, color)
-	l.autowrap_mode = TextServer.AUTOWRAP_OFF
-	return l
+static func caption(text: String, style := "Body") -> Label:
+	return UiTheme.label(text, style, false)
 
 
-static func button(text: String, cb: Callable, min_w := 0.0) -> Button:
+static func button(text: String, cb: Callable, min_w := 0.0, variation := "") -> Button:
 	var b := Button.new()
 	b.text = text
 	b.focus_mode = Control.FOCUS_ALL
+	if variation != "":
+		b.theme_type_variation = variation
 	if min_w > 0.0:
 		b.custom_minimum_size = Vector2(min_w, 0)
 	b.pressed.connect(cb)
@@ -53,6 +50,7 @@ static func option(items: Array, selected := 0) -> OptionButton:
 static func slider(min_v: float, max_v: float, step: float, value: float, fmt: String, on_change: Callable = Callable()) -> HBoxContainer:
 	var box := HBoxContainer.new()
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_theme_constant_override("separation", PAD)
 	var s := HSlider.new()
 	s.min_value = min_v
 	s.max_value = max_v
@@ -60,11 +58,11 @@ static func slider(min_v: float, max_v: float, step: float, value: float, fmt: S
 	s.value = value
 	s.focus_mode = Control.FOCUS_ALL
 	s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	s.custom_minimum_size = Vector2(180, 24)
+	s.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	s.custom_minimum_size = Vector2(220, 36)
 	s.name = "Slider"
-	var v := Label.new()
-	v.custom_minimum_size = Vector2(90, 0)
-	v.text = fmt % value
+	var v := UiTheme.label(fmt % value, "Value")
+	v.custom_minimum_size = Vector2(150, 0)
 	v.name = "Value"
 	s.value_changed.connect(func(x: float) -> void:
 		v.text = fmt % x
@@ -79,12 +77,11 @@ static func slider_of(box: Control) -> HSlider:
 	return box.get_node("Slider") as HSlider
 
 
-static func row(parent: Container, caption: String, control: Control, help := "") -> HBoxContainer:
+static func row(parent: Container, caption_text: String, control: Control, help := "") -> HBoxContainer:
 	var r := HBoxContainer.new()
 	r.add_theme_constant_override("separation", PAD)
-	var l := label(caption)
-	l.custom_minimum_size = Vector2(230, 0)
-	l.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var l := UiTheme.label(caption_text, "Body")
+	l.custom_minimum_size = Vector2(330, 0)
 	r.add_child(l)
 	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	r.add_child(control)
@@ -96,24 +93,11 @@ static func row(parent: Container, caption: String, control: Control, help := ""
 
 
 static func header(text: String) -> Label:
-	var l := label(text, 26, Color(1.0, 0.82, 0.45))
-	l.autowrap_mode = TextServer.AUTOWRAP_OFF
-	return l
+	return UiTheme.label(text.to_upper(), "Eyebrow")
 
 
 static func panel_box() -> PanelContainer:
-	var p := PanelContainer.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.1, 0.085, 0.13, 0.94)
-	sb.border_color = Color(0.32, 0.27, 0.38)
-	sb.set_border_width_all(1)
-	sb.set_corner_radius_all(6)
-	sb.content_margin_left = 14
-	sb.content_margin_right = 14
-	sb.content_margin_top = 10
-	sb.content_margin_bottom = 10
-	p.add_theme_stylebox_override("panel", sb)
-	return p
+	return UiTheme.panel("PanelSolid")
 
 
 static func rich() -> RichTextLabel:
@@ -140,13 +124,13 @@ static func fmt_time(seconds: float) -> String:
 static func state_color(state: String) -> String:
 	match state:
 		"running":
-			return "#7fe08a"
+			return "#" + UiTheme.SUCCESS.to_html(false)
 		"paused":
-			return "#f0d070"
+			return "#" + UiTheme.WARNING.to_html(false)
 		"completed":
-			return "#8fc8ff"
+			return "#" + UiTheme.RIM.to_html(false)
 		"failed", "interrupted":
-			return "#ff8a7a"
+			return "#" + UiTheme.DANGER.to_html(false)
 		"cancelled":
-			return "#c0b8c8"
-	return "#e0e0e0"
+			return "#" + UiTheme.MUTED.to_html(false)
+	return "#" + UiTheme.TEXT.to_html(false)

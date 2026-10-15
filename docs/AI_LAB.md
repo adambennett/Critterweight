@@ -14,8 +14,10 @@ held-out episodes), but strength grows with training time. Short runs learn habi
 
 ## 1. Workflow in the game
 
-Open the **AI Lab** screen (App screen `lab`). Everything works with a controller (D-pad/stick,
-A/B, **LB/RB** switch tabs) and with mouse/keyboard (**PageUp/PageDown** switch tabs).
+Open the **AI Lab** screen (main menu → AI Lab; App screen `lab`). Everything works with a
+controller (D-pad/stick, A/B, **LB/RB** switch tabs) and with mouse/keyboard (**Q/E** or
+**PageUp/PageDown** switch tabs; the footer prompts are clickable). The screen uses the shared
+UiTheme text styles, so the text-size and UI-scale settings apply to it.
 
 1. **Train** — choose the fighter, approach, objective/style (each reward weight is editable),
    training opponents and scenario, seed, network size, imitation dataset or starting policy,
@@ -36,9 +38,11 @@ A/B, **LB/RB** switch tabs) and with mouse/keyboard (**PageUp/PageDown** switch 
    match you play stores what you saw and did into the dataset "My <fighter> matches". You can
    also record a teacher bot headlessly, and rename/delete datasets.
 
-The game never trains in its own process, so menus stay responsive (measured: median frame
-16.7 ms, p99 19.7 ms while a worker trains — `docs/evidence/lab/README.md`). Closing the game
-stops workers at their last checkpoint ("interrupted"); *Resume after stop/crash* continues.
+The game never trains in its own process, so menus stay responsive (measured while a worker
+trains: see `docs/evidence/lab/README.md`). Closing the game stops workers at their last
+checkpoint ("interrupted"); *Resume after stop/crash* continues. When a completed run shows a
+trained policy beating its baseline on held-out evaluation, the Lab unlocks the *Mad Scientist*
+achievement (`Platform.unlock_achievement("ach_mad_scientist")`).
 
 ## 2. Training approaches
 
@@ -107,8 +111,10 @@ Champion*; every field can be overridden (opponents, round length, random vs sta
 spawn distance, arena).
 
 Every episode is a fresh physics world (SubViewport with its own World3D) running a real
-`MatchSim` with the standard `MatchMode` (one round; KO or decision at the time limit). Only
-the cosmetic intro is shortened to a 0.2 s settle.
+`MatchSim` with the standard `MatchMode` (one round; KO or decision at the time limit). Two
+rules differ from a broadcast match and are set through the normal rules dictionary: the
+cosmetic intro is a 0.2 s settle (`intro_time`; round-start hooks still fire) and a tie at the
+time limit is a draw (`sudden_death: false`) so every episode has a bounded length.
 
 Seeds come from disjoint named streams: `train:<job seed>:<generation>:<k>`,
 `val:<job seed>:<i>` (model selection only) and `test:<job seed>:<i>` (final reports only).
@@ -291,6 +297,7 @@ seed reproduces the same run (fixed-step worker processes).
 | test_policy_mlp.gd | parameter layout, deterministic init, fast path = reference, backprop = finite differences (tanh, relu), ES noise reproducibility, centred ranks, ES on a synthetic objective, no step without signal |
 | test_policy_io.gd | exact save/load round trip, rejection of truncated/garbage/edited/tampered/newer/incompatible/malformed/oversized/NaN files, inert unknown fields, .bak recovery, library save/rename/export/import (id collision)/delete, match fallback |
 | test_lab_bc.gd | dataset shards round trip + damaged shard handling, BC overfits a tiny dataset, BC generalises on held-out episodes and beats the majority baseline |
+| test_lab_recording.gd | a normal MatchScene match with the recording switch on, driven by simulated device input, writes human-labelled light/guard/move samples; with the switch off nothing changes |
 | test_policy_inference.gd | 8 policy fighters in a live match stay within the inference budget |
 | test_lab_worker.gd | the real worker process: pause/resume/cancel, kill + resume from the newest checkpoint with an unbroken curve, ES improves on the drill on held-out test seeds |
 
@@ -302,6 +309,9 @@ measures UI frame times while it trains and exercises pause/resume/cancel throug
 - Policies are per fighter; a policy only plays the creature it was trained for (by design: the
   observation is generic, the learned behaviour is not). The shipped samples are for the
   engine bring-up fighter `dev_biped`; the roster fighters need their own training runs.
+- obs_v1 describes fighters, walls, projectiles and zones — not bonus-mode objectives (balls,
+  spotlights, waves). Policies play standard fights; in objective modes they fight but ignore
+  the objective (an obs_v2 with mode features would be needed).
 - Training speed is bound by the physics simulation (~14 simulated seconds per wall second per
   worker process). Hours of training are needed for strong play against the harder bot tiers.
 - ES with small populations learns coarse behaviours; fine timing (parries) is rare without

@@ -98,44 +98,21 @@ var _delete_ds_armed := ""
 
 
 func on_enter(p: Dictionary) -> void:
-	var th := Theme.new()
-	th.default_font_size = 20
-	theme = th
+	# the shared UiTheme is applied by Screen; this screen only adds an opaque backdrop
 	var bg := ColorRect.new()
-	bg.color = Color(0.055, 0.045, 0.075)
+	bg.color = UiTheme.BG_DEEP
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
-	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 28)
-	add_child(margin)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 10)
-	margin.add_child(col)
-	# header
-	var head := HBoxContainer.new()
-	head.add_theme_constant_override("separation", 16)
-	col.add_child(head)
-	var title := LabUi.label("AI LAB", 40, Color(1.0, 0.78, 0.35))
-	title.autowrap_mode = TextServer.AUTOWRAP_OFF
-	head.add_child(title)
-	var sub := LabUi.label("Train real fighting policies on this PC — training runs in separate background processes.", 18, Color(0.75, 0.72, 0.82))
-	sub.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(sub)
-	head.add_child(LabUi.button("Back", _go_back, 120))
-	# tabs
-	var tabs := HBoxContainer.new()
-	tabs.add_theme_constant_override("separation", 6)
+	var frame := build_frame("Train real fighters", "AI Lab", std_prompts([{"actions": ["ui_tab_prev", "ui_tab_next"], "text": "Switch tab"}]))
+	(frame["header"] as VBoxContainer).add_child(LabUi.label("Policies learn on this PC in background worker processes — the game stays responsive while they train.", "BodyMuted"))
+	var col: VBoxContainer = frame["body"]
+	var tabs := UiTheme.hbox(UiTheme.GAP_S)
 	col.add_child(tabs)
 	for i in TAB_NAMES.size():
-		var b := LabUi.button(TAB_NAMES[i], _select_tab.bind(i), 170)
-		b.toggle_mode = true
+		var b := LabUi.button(TAB_NAMES[i], _select_tab.bind(i), 230, "TabButton")
 		tabs.add_child(b)
 		_tab_buttons.append(b)
-	var hint := LabUi.label("   LB / RB or PageUp / PageDown: switch tab", 16, Color(0.6, 0.58, 0.66))
-	hint.autowrap_mode = TextServer.AUTOWRAP_OFF
-	tabs.add_child(hint)
 	var body := Control.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(body)
@@ -146,7 +123,7 @@ func on_enter(p: Dictionary) -> void:
 	for pnl in _panels:
 		pnl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		body.add_child(pnl)
-	_status = LabUi.label("", 18, Color(0.85, 0.85, 0.6))
+	_status = LabUi.label("", "CaptionStrong", UiTheme.WARNING)
 	col.add_child(_status)
 	_timer = Timer.new()
 	_timer.wait_time = 0.5
@@ -185,18 +162,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible or App.top_screen() != self:
 		return
 	var step := 0
-	if event is InputEventJoypadButton and event.pressed:
-		var jb := event as InputEventJoypadButton
-		if jb.button_index == JOY_BUTTON_LEFT_SHOULDER:
-			step = -1
-		elif jb.button_index == JOY_BUTTON_RIGHT_SHOULDER:
-			step = 1
-	elif event is InputEventKey and event.pressed and not event.echo:
-		var k := event as InputEventKey
-		if k.keycode == KEY_PAGEUP:
-			step = -1
-		elif k.keycode == KEY_PAGEDOWN:
-			step = 1
+	# UiNav's tab actions: LB/RB, Q/E, PageUp/PageDown
+	if event.is_action_pressed("ui_tab_prev"):
+		step = -1
+	elif event.is_action_pressed("ui_tab_next"):
+		step = 1
 	if step != 0:
 		get_viewport().set_input_as_handled()
 		_select_tab(posmod(_tab + step, TAB_NAMES.size()))
@@ -209,7 +179,7 @@ func _select_tab(i: int) -> void:
 	_tab = clampi(i, 0, _panels.size() - 1)
 	for k in _panels.size():
 		_panels[k].visible = k == _tab
-		_tab_buttons[k].button_pressed = k == _tab
+		_tab_buttons[k].theme_type_variation = "TabButtonActive" if k == _tab else "TabButton"
 	# keep controller focus on something visible (e.g. after Start switches to Runs)
 	var fo := get_viewport().gui_get_focus_owner() if is_inside_tree() else null
 	if fo == null or not fo.is_visible_in_tree():
@@ -350,8 +320,7 @@ func _build_train() -> Control:
 	_run_name.placeholder_text = "optional name for the trained policy"
 	_run_name.max_length = 64
 	LabUi.row(form, "Name", _run_name)
-	_start_btn = LabUi.button("START TRAINING", _start_training, 260)
-	_start_btn.add_theme_font_size_override("font_size", 26)
+	_start_btn = LabUi.button("START TRAINING", _start_training, 360, "PrimaryButton")
 	form.add_child(_start_btn)
 	# help column
 	var help_panel := LabUi.panel_box()
@@ -549,7 +518,7 @@ func _build_runs() -> Control:
 	var ck_box := VBoxContainer.new()
 	ck_box.custom_minimum_size = Vector2(320, 0)
 	bottom.add_child(ck_box)
-	ck_box.add_child(LabUi.label("Checkpoints", 18, Color(1.0, 0.82, 0.45)))
+	ck_box.add_child(LabUi.header("Checkpoints"))
 	_ckpts = ItemList.new()
 	_ckpts.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_ckpts.focus_mode = Control.FOCUS_ALL
@@ -1071,7 +1040,7 @@ func _build_recording() -> Control:
 		LabRecording.set_enabled(on)
 		_set_status("Recording %s." % ("ON: your next matches are saved as imitation data" if on else "off")))
 	left.add_child(_rec_toggle)
-	left.add_child(LabUi.label("While this is on, every match you play stores what you saw (the same observations a policy sees) and what you did, in the dataset \"My <fighter> matches\". Matches play exactly as usual. Then pick Behaviour cloning on the Train tab.", 18, Color(0.78, 0.75, 0.85)))
+	left.add_child(LabUi.label("While this is on, every match you play stores what you saw (the same observations a policy sees) and what you did, in the dataset \"My <fighter> matches\". Matches play exactly as usual. Then pick Behaviour cloning on the Train tab.", "BodyMuted"))
 	left.add_child(LabUi.header("Record a teacher bot"))
 	_rec_fighter = LabUi.caption("")
 	LabUi.row(left, "Fighter", _rec_fighter, "The fighter selected on the Train tab.")
