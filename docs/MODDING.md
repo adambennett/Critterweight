@@ -129,6 +129,16 @@ modes and mods (`game/src/sim/hooks.gd`):
   damage_mult knockback_mult launch knockdown stun_add poise_mult guard_crush buildup
   refresh_status`), and `set_flag stamina hype self_damage cleanse`.
 - Limits: 32 hooks per fighter, 16 actions per firing, recursion depth 2.
+- NPC-kit additions (`docs/kits/minions.md`): events `knocked_out` (on the fighter just KO'd,
+  `other` = who did it) and `thrown` (on the thrown fighter, `other` = the thrower, with its landing
+  point); condition `"not": {...}`; any effect action may say `"source": "other"` to be fired by the
+  event's other fighter (credit, teams and targeting are theirs), centred on the event point;
+  `{"type": "self_damage", "lethal": true}` may knock the fighter out (plain `self_damage` leaves 1 HP).
+- Shield statuses: a status with `"guard_arc"` (degrees in front, 360 = all round) blocks hits from that
+  arc while its fighter is on its feet, without guarding; `"guard_absorb"` (0–1) is its damage absorption.
+- Bot behaviour: the creature `ai` block takes kit hints (`range`, `charge_heavy`, `grab_status`,
+  `abilities` with `min/max/chance/apart/when`, `pack`, `ally_ko_flinch`, `rest`, `reach`,
+  `keep_distance`, `bulky`) — documented in the kit-hint block of `game/src/ai/bot_brain.gd`.
 
 ## 5. Assets
 

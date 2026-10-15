@@ -191,7 +191,9 @@ func test_scrapling_pack_takes_turns() -> void:
 ## handful of landed hits (30 HP). Measured with the Kid's kit (stable); the roster stubs' numbers
 ## are printed for the record only, since their kits are being authored elsewhere.
 func test_scrapling_dies_in_a_few_clean_hits() -> void:
-	for spec in [[PUNCHER, "light", 0.95, 0.24, true], [PUNCHER, "heavy", 1.0, 1.0, false], ["f_jitters", "light", 0.9, 0.3, false], ["f_dozer", "light", 1.5, 0.5, false]]:
+	# the reference biped (complete kit, power 1) is asserted; the rest is printed for the docs
+	for spec in [["dev_biped", "light", 0.95, 0.24, true], ["dev_biped", "heavy", 1.0, 1.0, true], [PUNCHER, "light", 0.95, 0.24, false],
+			[PUNCHER, "heavy", 1.0, 1.0, false], ["f_dredge", "light", 1.3, 0.35, false], ["f_dozer", "light", 1.5, 0.5, false]]:
 		var sim := duel(str(spec[0]), SCRAP, float(spec[2]), InputSource.Scripted.new([{"t0": 0.3, "t1": 30.0, "press": [spec[1]], "every": spec[3], "move": "to_target"}]), null)
 		var dt := 1.0 / Engine.physics_ticks_per_second
 		var hits := 0
