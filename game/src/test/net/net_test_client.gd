@@ -175,6 +175,14 @@ func _on_joined(w: Dictionary) -> void:
 	var cr := arg("--creature", "")
 	if cr != "":
 		Net.set_creature(cr)
+	if args.has("--cosmetics"):
+		# "slot=id,slot=id": shown to the other players (presentation only)
+		var eq := {}
+		for pair in arg("--cosmetics").split(",", false):
+			var kv := pair.split("=")
+			if kv.size() == 2:
+				eq[kv[0]] = kv[1]
+		Net.set_cosmetics(eq)
 
 
 func _on_failed(r: Dictionary) -> void:
@@ -532,6 +540,18 @@ func _track_match() -> void:
 	var rep := _client.replica
 	result["snapshots"] = rep.snapshots_received
 	result["roster_updates"] = rep.roster_updates
+	if _client.scene != null and not result.has("dressed"):
+		# how the presenting client dressed each fighter (cosmetics from MATCH_START)
+		var dressed := {}
+		for i in (_client.scene.views as Array).size():
+			var v = _client.scene.views[i]
+			if v is CreatureView:
+				var ids: Array = []
+				for a in (v as CreatureView).cosmetics():
+					ids.append(str(a.get("id", "")))
+				dressed[str(i)] = {"attachments": ids, "juice": (v as CreatureView).juice_color.to_html(false)}
+		if not dressed.is_empty():
+			result["dressed"] = dressed
 	var snap := rep.latest()
 	if snap.is_empty():
 		return

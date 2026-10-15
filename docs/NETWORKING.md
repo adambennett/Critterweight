@@ -261,10 +261,16 @@ their own slot (`NetProtocol.clean_cosmetics`: content kind `hub`, `type: cosmet
 `slot`; in `frame`, also the headliner badge of an installed fighter), shows them in every lobby
 player row (`players[].cosmetics`) and puts each human fighter's set into MATCH_START
 (`cosmetics` {fighter index: {slot: id}}) and into the listen host's fighter entries. The
-simulation never reads them; views dress fighters and name cards from them
-(`Net.cosmetics_profile(row)` builds the stand-in profile the view helpers take). Ownership
-cannot be proven without accounts, so a player could show any known item - harmless, it is looks
-only.
+simulation never reads them. Views dress from them: NetMatchScene dresses every human fighter
+(`FighterCosmetics.dress` with the stand-in profile `NetProtocol.cosmetics_profile`), the listen
+host's MatchScene dresses its guests from their fighter entries, and a lobby row's framed name card
+is `ProfileFrame.wrap(content, ProfileFrame.style(Net.cosmetics_profile(row)))` (a row without a
+frame shows none - never this machine's). Ownership cannot be proven without accounts, so a player
+could show any known item - harmless, it is looks only. Tested:
+`test_net_loopback::test_cosmetics_travel_with_players_inprocess` (validation, lobby rows,
+MATCH_START, nothing in the simulation, host's own, name-card frame) and
+`test_net_multiprocess::test_dedicated_match_two_clients` (Bob's lobby and rendered match show
+Alice's gold tooth and Sizzle glow; a made-up id is dropped).
 
 Diagnostics overlay: `Settings diag.show_net` shows RTT, loss, snapshot rate, interpolation delay
 and jitter, buffer depth and KB/s in the match; the same values come from `Net.stats()`.

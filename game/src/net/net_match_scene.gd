@@ -161,10 +161,20 @@ func sync_roster() -> void:
 		add_child(v)
 		v.setup(e["def"], TeamColors.color(int(e["team"])))
 		v.gore_level = int({"full": 2, "reduced": 1, "off": 0}.get(str(Settings.get_value("access.gore")), 2))
+		_dress(v, i)
 		views[i] = v
 		_view_gen[i] = int(e["gen"])
 	if mirror:
 		mirror.sync_roster(replica)
+
+
+## A human fighter wears its player's equipped cosmetics (MATCH_START `cosmetics` by fighter slot,
+## validated by the server and again here). View only, like MatchScene's own fighter.
+func _dress(v: CreatureView, slot: int) -> void:
+	var all = info.get("cosmetics", {})
+	var eq = (all as Dictionary).get(str(slot), {}) if typeof(all) == TYPE_DICTIONARY else {}
+	if typeof(eq) == TYPE_DICTIONARY and not (eq as Dictionary).is_empty():
+		FighterCosmetics.dress(v, NetProtocol.cosmetics_profile(eq))
 
 
 ## Camera-relative movement basis for input sampling (LocalPlayerInput equivalent).
@@ -180,6 +190,8 @@ func _process(dt: float) -> void:
 	if _sample.is_empty():
 		return
 	var fl: Array = _sample["fighters"]
+	# walkout pieces are put away while the round is live (as in MatchScene)
+	var live: bool = mirror != null and mirror.mode != null and mirror.mode.phase == MatchMode.Phase.FIGHT
 	for i in mini(fl.size(), views.size()):
 		var cv: CreatureView = views[i]
 		if cv == null:
@@ -188,6 +200,7 @@ func _process(dt: float) -> void:
 		if int(fd["gen"]) == 0 or int(fd["gen"]) != int(_view_gen.get(i, -1)):
 			cv.visible = false
 			continue
+		cv.cosmetic_combat = live and int(fd.get("state", 0)) != Fighter.State.CELEBRATE
 		var xf: Array[Transform3D] = fd["xforms"]
 		if xf.is_empty():
 			cv.visible = false

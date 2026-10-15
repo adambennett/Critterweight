@@ -41,11 +41,29 @@ func test_dedicated_match_two_clients() -> void:
 	var port: int = u.base_port
 	var pl: String = u.playlist("duel.json", [DUEL])
 	var srv := await _start_server("srv", u.server_sections(port, {"match": {"playlist": pl}}))
-	var a: int = u.spawn("alice", u.client_args(port, "Alice", "aggressive", ["--ready", "--stop-after-matches", "1", "--quit-after", "110"]))
+	# Alice wears Cannery cosmetics (one made-up id the server must drop): presentation only
+	var a: int = u.spawn("alice", u.client_args(port, "Alice", "aggressive", ["--ready", "--creature", "f_stoke", "--cosmetics",
+		"piece=hub_gold_tooth,juice=hub_juice_sizzle,frame=hub_frame_soaked,back=made_up_item", "--stop-after-matches", "1", "--quit-after", "110"]))
 	var b: int = u.spawn("bob", u.client_args(port, "Bob", "passive", ["--ready", "--present", "--stop-after-matches", "1", "--quit-after", "110"]))
 	var ra: Dictionary = await u.wait_json(u.result_path("Alice"), _done, 120.0)
 	var rb: Dictionary = await u.wait_json(u.result_path("Bob"), _done, 20.0)
 	check(bool(ra.get("connected", false)) and bool(rb.get("connected", false)), "both clients joined")
+	# cosmetics: Bob's lobby row for Alice and Bob's rendered match show her equipped items
+	var alice_row := {}
+	for p in rb.get("lobby_last", {}).get("players", []):
+		if str(p.get("name", "")) == "Alice":
+			alice_row = p
+	check_eq(alice_row.get("cosmetics", {}), {"piece": "hub_gold_tooth", "juice": "hub_juice_sizzle", "frame": "hub_frame_soaked"},
+		"Bob's lobby shows Alice's cosmetics (unknown id dropped)")
+	if not (ra.get("matches", []) as Array).is_empty():
+		var ya := str(int(ra["matches"][0]["you"]))
+		var dressed: Dictionary = rb.get("dressed", {})
+		check((dressed.get(ya, {}).get("attachments", []) as Array).has("hub_gold_tooth"), "Bob's view of Alice's fighter wears the gold tooth: %s" % str(dressed))
+		var sizzle := str(Content.get_entry("hub", "hub_juice_sizzle").get("juice", {}).get("juice_color", "")).trim_prefix("#").to_lower()
+		check_eq(str(dressed.get(ya, {}).get("juice", "")).to_lower(), sizzle, "and glows in Sizzle")
+		for k in dressed:
+			if k != ya:
+				check((dressed[k].get("attachments", []) as Array).is_empty(), "Bob's own fighter wears nothing he did not equip")
 	var results: Array = ra.get("results", [])
 	check_eq(results.size(), 1, "Alice received the authoritative result")
 	check_eq((rb.get("results", []) as Array).size(), 1, "Bob received the authoritative result")

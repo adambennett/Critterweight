@@ -604,6 +604,10 @@ func test_cosmetics_travel_with_players_inprocess() -> void:
 	Net.set_cosmetics({"frame": "hub_frame_sign_fixer"})
 	check_eq((Net.lobby().get("players", []) as Array)[0].get("cosmetics", {}), {"frame": "hub_frame_sign_fixer"}, "set_cosmetics changes them")
 	check_eq(Net.cosmetics_profile(hrow)["unlocks"]["cosmetics"], ["hub_replica_belt"], "a stand-in profile for the view helpers")
+	# a lobby row's framed name card (ProfileFrame) comes from the row, never from this machine's profile
+	var fr := ProfileFrame.style(Net.cosmetics_profile({"id": 2, "cosmetics": {"frame": "hub_frame_soaked"}}))
+	check_eq(str(fr.get("id", "")), "hub_frame_soaked", "a row's name-card frame")
+	check(ProfileFrame.style(Net.cosmetics_profile({"id": 3, "cosmetics": {}})).is_empty(), "a row without a frame shows none")
 	Net.leave()
 
 
