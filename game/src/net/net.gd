@@ -32,9 +32,15 @@ signal app_message(from_id: int, type: String, payload: Dictionary)
 signal app_request(from_id: int, type: String, payload: Dictionary)
 signal lan_sessions_changed(sessions: Array)
 ## Party membership (connected players other than this one; ids are session player ids as
-## strings): co-op transports use these, the lobby UI uses peer_joined / lobby_changed.
+## strings, or seat ids while a party run is open): co-op transports use these, the lobby UI
+## uses peer_joined / lobby_changed.
 signal member_joined(peer: String)
 signal member_left(peer: String, reason: String)
+## The lobby's party run offer changed ({} = none): {run_id, info, host_seat, seats: [{id, name,
+## fighter, session, connected}]} (see party_open / party_claim).
+signal party_changed(party: Dictionary)
+## The authority refused this participant's seat claim (reason is UI-ready text).
+signal party_claim_failed(reason: String)
 
 const SERVER_ID := 1
 const ALL := 0
@@ -51,6 +57,7 @@ var _rejoin := {}                 ## {address, port, token, name, until_ms}
 var _lan_wanted := false          ## the UI asked to browse (kept while the setting is off)
 var _lan_port := DISCOVERY_PORT
 var _members := {}                ## other connected members (party peers): id string -> true
+var _party_seen := {}             ## last party offer reported through party_changed
 
 
 func _ready() -> void:
@@ -303,6 +310,9 @@ func _set_state(s: String) -> void:
 		_members.clear()
 		for id in gone:
 			member_left.emit(str(id), "session ended")
+	if s == "offline" and not _party_seen.is_empty():
+		_party_seen = {}
+		party_changed.emit({})
 	if _state != s:
 		_state = s
 		session_state_changed.emit(s)
@@ -381,7 +391,16 @@ func _connect_client_signals() -> void:
 	client.returned_to_lobby.connect(func() -> void:
 		_set_state("lobby")
 		returned_to_lobby.emit())
-	client.app_message.connect(func(id: int, t: String, p: Dictionary) -> void: app_message.emit(id, t, p))
+	client.app_message.connect(_on_client_app)
+
+
+func _on_client_app(id: int, t: String, p: Dictionary) -> void:
+	# the authority's answers to net.* requests are Net's own business, not app traffic
+	if t == NetProtocol.APP_PARTY_CLAIM_RESULT:
+		if id == SERVER_ID and not bool(p.get("ok", false)):
+			party_claim_failed.emit(str(p.get("error", "the host refused the seat")))
+		return
+	app_message.emit(id, t, p)
 
 
 # =====================================================================================
@@ -624,39 +643,121 @@ func _send_party(to: String, type: String, payload: Dictionary) -> bool:
 	return false
 
 
-## This participant's party member id ("" offline, connecting, or on a dedicated server).
+## This participant's party member id: its session player id, or its seat while a party run is
+## open ("" offline, connecting, on a dedicated server, or without a seat in an open party run).
 func local_member_id() -> String:
 	var id := local_peer_id()
-	return str(id) if id > 0 and role != "dedicated" else ""
+	if id <= 0 or role == "dedicated":
+		return ""
+	var pt := party()
+	return str(id) if pt.is_empty() else _seat_in(pt, id)
 
 
-## The other connected members (players, not spectators) as member ids, sorted.
+## The other connected members (players, not spectators; seated players while a party run is
+## open) as member ids, sorted.
 func member_ids() -> Array:
 	var out: Array = _members.keys()
 	out.sort()
 	return out
 
 
+static func _seat_in(pt: Dictionary, session_id: int) -> String:
+	for s in pt.get("seats", []):
+		if typeof(s) == TYPE_DICTIONARY and int((s as Dictionary).get("session", 0)) == session_id:
+			return str((s as Dictionary).get("id", ""))
+	return ""
+
+
 func _update_members(l: Dictionary) -> void:
-	var me := local_member_id()
 	var now := {}
 	var known := {}
+	var pv = l.get("party", {})
+	var pt: Dictionary = pv if typeof(pv) == TYPE_DICTIONARY else {}
+	var live := {}                    ## session id -> connected player (not spectator)
 	for p in l.get("players", []):
 		if typeof(p) != TYPE_DICTIONARY:
 			continue
 		var pd: Dictionary = p
-		var id := str(pd.get("id", ""))
-		known[id] = true
-		if bool(pd.get("connected", false)) and not bool(pd.get("spectator", false)) and id != me:
-			now[id] = true
-	for id in now:
-		if not _members.has(id):
-			_members[id] = true
-			member_joined.emit(str(id))
+		live[int(pd.get("id", 0))] = bool(pd.get("connected", false)) and not bool(pd.get("spectator", false))
+		if pt.is_empty():
+			var id := str(pd.get("id", ""))
+			known[id] = true
+			if bool(live[int(pd.get("id", 0))]) and id != str(local_peer_id()):
+				now[id] = true
+	if not pt.is_empty():
+		# party run: members are the seats, held by connected players; only a seated player has any
+		var mine := _seat_in(pt, local_peer_id())
+		for s in pt.get("seats", []):
+			if typeof(s) != TYPE_DICTIONARY:
+				continue
+			var seat := str((s as Dictionary).get("id", ""))
+			var sess := int((s as Dictionary).get("session", 0))
+			known[seat] = true
+			if mine != "" and seat != mine and sess > 0 and bool(live.get(sess, false)):
+				now[seat] = true
 	for id in _members.keys():
 		if not now.has(id):
 			_members.erase(id)
 			member_left.emit(str(id), "disconnected" if known.has(id) else "left")
+	for id in now:
+		if not _members.has(id):
+			_members[id] = true
+			member_joined.emit(str(id))
+	if pt != _party_seen:
+		_party_seen = pt.duplicate(true)
+		party_changed.emit(pt.duplicate(true))
+
+
+# =====================================================================================
+# Party runs (co-op campaign runs in the lobby: seats, NetServer.party_open)
+# =====================================================================================
+
+## The party run offered in this session's lobby ({} = none): {run_id, info, host_seat,
+## seats: [{id, name, fighter, session, connected}]}.
+func party() -> Dictionary:
+	var pv = lobby().get("party", {})
+	return (pv as Dictionary).duplicate(true) if typeof(pv) == TYPE_DICTIONARY else {}
+
+
+## This participant's seat in the open party run ("" = none).
+func party_seat() -> String:
+	var pt := party()
+	return "" if pt.is_empty() else _seat_in(pt, local_peer_id())
+
+
+## Listen host: offers a co-op party run in the lobby. `seats` are the run's players [{id,
+## name, fighter}] (ids as the run was started online), `host_seat` the host's own one, `info`
+## a small summary for the lobby. While it is open, party member ids are seat ids. Returns "" or
+## why not.
+func party_open(run_id: String, seats: Array, host_seat: String, info: Dictionary = {}) -> String:
+	if role != "host" or server == null:
+		return "only a listen host can open a party run"
+	return server.party_open(run_id, seats, host_seat, info)
+
+
+func party_close() -> void:
+	if role == "host" and server:
+		server.party_close()
+
+
+## Member: asks for seat `seat` of the open party run (the claim names the run id, so it never
+## lands in another run). Granted seats show in the lobby (party_changed); party_claim_failed
+## says why not. Returns "" once the request is on its way.
+func party_claim(seat: String) -> String:
+	if role != "client" or client == null:
+		return "only a player who joined a session claims a seat (the host holds its own)"
+	var pt := party()
+	if pt.is_empty():
+		return "the host has not opened a party run"
+	if not client.send_app(NetProtocol.APP_PARTY_CLAIM, {"run_id": str(pt.get("run_id", "")), "seat": seat}):
+		return "not connected"
+	return ""
+
+
+## Member: gives up this participant's seat.
+func party_leave() -> void:
+	if role == "client" and client:
+		client.send_app(NetProtocol.APP_PARTY_LEAVE, {})
 
 
 ## Client -> authority request (on the listen host it is delivered locally as app_request).

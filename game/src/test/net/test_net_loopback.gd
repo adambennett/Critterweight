@@ -485,6 +485,84 @@ func test_party_relay_inprocess() -> void:
 	party.close()
 
 
+## Party seats: a resumed party run keeps its own member ids (seats) although everyone has new
+## session ids. Here the run's seat 2 is the listen host (session 1) and seat 1 goes to the
+## player who joined second (session 2) - the ids are swapped on purpose. The authority stamps
+## seat ids from the connection, routes by seat, refuses wrong-run / taken / double claims and
+## keeps unseated players out of the party channel.
+func test_party_seats_inprocess() -> void:
+	var port := _port()
+	check_eq(Net.host({"port": port, "player_name": "Hosty", "lan_discovery": false, "max_players": 4}), OK, "listen server up")
+	var party := NetPartyTransport.new()
+	var got_host: Array = []
+	party.message_received.connect(func(f: String, t: String, p: Dictionary) -> void: got_host.append([f, t, p]))
+	var changes: Array = []
+	Net.party_changed.connect(func(pt: Dictionary) -> void: changes.append(pt))
+	var a := _client(port, {"name": "Ann"})
+	var c := _client(port, {"name": "Cid"})
+	check(await _until(func() -> bool: return a.state == NetClient.State.LOBBY and c.state == NetClient.State.LOBBY, 6.0), "both admitted")
+	var run_id := "run_TESTSEATS_7"
+	var seats := [{"id": "1", "name": "Ann", "fighter": "f_stoke"}, {"id": "2", "name": "Hosty", "fighter": "f_dozer"}]
+	check(Net.party_open("run bad id!", seats, "2") != "", "a malformed run id is refused")
+	check(Net.party_open(run_id, [{"id": "p0", "name": "X"}], "p0") != "", "seat ids must be online member ids")
+	check(Net.party_open(run_id, seats, "3") != "", "the host's seat must be one of the run's")
+	check_eq(Net.party_open(run_id, seats, "2"), "", "party run opened")
+	check_eq(Net.local_member_id(), "2", "the host is its seat, not session 1")
+	check_eq(party.local_id(), "2", "and so is its party transport")
+	check(Net.member_ids().is_empty(), "nobody else is seated yet (session players are not members)")
+	check(not changes.is_empty() and str(changes[-1].get("run_id", "")) == run_id, "party_changed announced the offer")
+	check(await _until(func() -> bool: return str(a.lobby.get("party", {}).get("run_id", "")) == run_id, 3.0), "the offer reached the players")
+	# claims: wrong run, taken seat, then the right one
+	var answers_a: Array = []
+	a.app_message.connect(func(f: int, t: String, p: Dictionary) -> void: answers_a.append([f, t, p]))
+	var answers_c: Array = []
+	c.app_message.connect(func(f: int, t: String, p: Dictionary) -> void: answers_c.append([f, t, p]))
+	a.send_app(NetProtocol.APP_PARTY_CLAIM, {"run_id": "run_OTHER_1", "seat": "1"})
+	a.send_app(NetProtocol.APP_PARTY_CLAIM, {"run_id": run_id, "seat": "2"})
+	check(await _until(func() -> bool: return answers_a.size() == 2, 3.0), "refused claims are answered")
+	if answers_a.size() == 2:
+		check(str(answers_a[0][2].get("error", "")).contains("different run"), "a claim for another run is refused: %s" % str(answers_a[0]))
+		check(str(answers_a[1][2].get("error", "")).contains("taken"), "the host's seat cannot be taken: %s" % str(answers_a[1]))
+	a.send_app(NetProtocol.APP_PARTY_CLAIM, {"run_id": run_id, "seat": "1"})
+	check(await _until(func() -> bool: return Net.member_ids() == ["1"], 3.0), "Ann holds seat 1 (session %d): %s" % [a.player_id, str(Net.member_ids())])
+	c.send_app(NetProtocol.APP_PARTY_CLAIM, {"run_id": run_id, "seat": "1"})
+	check(await _until(func() -> bool: return answers_c.size() == 1, 3.0), "Cid's claim is answered")
+	if answers_c.size() == 1:
+		check(str(answers_c[0][2].get("error", "")).contains("taken"), "a held seat cannot be claimed: %s" % str(answers_c[0]))
+	a.send_app(NetProtocol.APP_PARTY_CLAIM, {"run_id": run_id, "seat": "1"})
+	await wait_physics(10)
+	# party traffic: seat ids stamped by the authority, routed by seat, outsiders kept out
+	answers_a.clear()
+	answers_c.clear()
+	a.send_app(NetProtocol.APP_RELAY, {"to": "2", "type": "cmp/hello", "payload": {"player": "1"}})
+	check(await _until(func() -> bool: return got_host.size() == 1, 3.0), "the host got the seated member's message")
+	if got_host.size() == 1:
+		check_eq(got_host[0][0], "1", "from seat 1 (Ann's session id is %d)" % a.player_id)
+	party.send("1", "run_state", {"n": 1})
+	check(await _until(func() -> bool: return answers_a.size() >= 1, 3.0), "the host's message reached seat 1")
+	if not answers_a.is_empty():
+		check_eq([answers_a[-1][0], answers_a[-1][1]], [2, "cmp/run_state"], "from the host's seat 2, not session 1")
+	c.send_app(NetProtocol.APP_RELAY, {"to": "", "type": "cmp/run_end", "payload": {"victory": true}})
+	c.send_app(NetProtocol.APP_RELAY, {"to": "2", "type": "cmp/run_end", "payload": {"victory": true}})
+	party.send("", "notice", {"text": "members only"})
+	await wait_physics(20)
+	check_eq(got_host.size(), 1, "an unseated player cannot send into the party")
+	check(answers_c.is_empty(), "nor receives party messages: %s" % str(answers_c))
+	# a seat is freed when its holder leaves the session, then another player can take it
+	a.leave()
+	check(await _until(func() -> bool: return Net.member_ids().is_empty(), 4.0), "member_left when Ann goes")
+	check(await _until(func() -> bool: return int(Net.party()["seats"][0]["session"]) == 0, 4.0), "her seat is free again")
+	c.send_app(NetProtocol.APP_PARTY_CLAIM, {"run_id": run_id, "seat": "1"})
+	check(await _until(func() -> bool: return Net.member_ids() == ["1"], 3.0), "a new member takes the open seat")
+	# closing the offer turns member ids back into session ids
+	Net.party_close()
+	check(await _until(func() -> bool: return Net.local_member_id() == "1" and Net.member_ids() == [str(c.player_id)], 3.0),
+		"session ids again after party_close: %s" % str(Net.member_ids()))
+	check(not changes.is_empty() and changes[-1].is_empty(), "party_changed({}) on close")
+	Net.leave()
+	party.close()
+
+
 ## Before a match is built the client checks the arena: local content or an imported layout
 ## package must match the host's content hash; damaged or oversized packages are refused.
 func test_arena_checks_before_the_match() -> void:

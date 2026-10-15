@@ -90,6 +90,9 @@ var _policy_cache: Array = []
 var _policy_cache_ms := 0
 var _arena_pkg_cache := {}        ## arena content hash -> ArenaPackage bytes
 var _policy_hashes := {}          ## PolicyData instance id -> checksum
+## Open co-op party run (party seats, see party_open): {run_id, info, host_seat,
+## seats: [{id, name, fighter, session}]}; empty = no party run, party ids are session ids.
+var party := {}
 var _roster: Array = []           ## per fighter slot: {gen, obj, rig, creature, scale, despawned, team, name, kind, player}
 var _gens := PackedByteArray()
 
@@ -347,6 +350,7 @@ func _finalize_close() -> void:
 	players.clear()
 	_peer_player.clear()
 	_pending.clear()
+	party = {}
 	closed.emit(code, message)
 
 
@@ -902,6 +906,16 @@ func _handle_app(p: NetPlayer, data: PackedByteArray) -> void:
 			return
 		relay_app(p.id, to, it, ip)
 		return
+	if t.begins_with("net."):
+		match t:
+			NetProtocol.APP_PARTY_CLAIM:
+				_party_claim(p, dec["value"])
+			NetProtocol.APP_PARTY_LEAVE:
+				if _party_unseat(p.id):
+					_flush_lobby_now()
+			_:
+				_violation(p, 1.0, "unknown request '%s'" % t)
+		return
 	if t.begins_with("mode."):
 		handle_mode_request(p.id, t, dec["value"])
 		return
@@ -1128,33 +1142,52 @@ func send_app(target: int, type: String, payload: Dictionary) -> bool:
 
 
 ## Party relay (co-op transport): a member's message to one other member ("<id>") or to every
-## other member (""), passed on with the original sender id. Recipients are connected players
-## (spectators are not party members); the listen host's own member gets it via `app_relayed`.
-## Reserved types (net.*, mode.*) are never relayed. Returns how many members it reached.
+## other member (""), passed on with the sender's member id - always taken from the connection
+## (`from_id` is the session player id the message arrived from), never from the message. Party
+## member ids are session player ids, or the run's seat ids while a party run is open (then only
+## seated players send or receive). Recipients are connected players (spectators are not party
+## members); the listen host's own member gets it via `app_relayed`. Reserved types (net.*,
+## mode.*) are never relayed. Returns how many members it reached.
 func relay_app(from_id: int, to: String, type: String, payload: Dictionary) -> int:
 	if not NetProtocol.valid_app_type(type) or type.begins_with("net.") or type.begins_with("mode."):
+		return 0
+	var from_member := party_member_of(from_id)
+	if from_member <= 0:
 		return 0
 	var bytes := NetProtocol.encode_payload(payload)
 	if bytes.size() > NetProtocol.MAX_APP_PAYLOAD:
 		return 0
 	var w := NetWriter.new(NetProtocol.S_APP)
-	w.u32(from_id)
+	w.u32(from_member)
 	w.text(type, NetProtocol.MAX_APP_TYPE)
 	w.blob(bytes, true)
 	var data := w.data()
 	var targets := relay_targets(from_id, to)
 	for np in targets:
 		if np.peer == -1:
-			app_relayed.emit.call_deferred(from_id, type, payload.duplicate(true))
+			app_relayed.emit.call_deferred(from_member, type, payload.duplicate(true))
 		else:
 			transport.send(np.peer, NetProtocol.CH_CONTROL, data, true)
 	return targets.size()
 
 
-## Members a party message from `from_id` to `to` ("" = all others) reaches: connected players,
-## not spectators, not the sender; the listen host's own member included.
+## Members a party message from session player `from_id` to member `to` ("" = all others)
+## reaches: connected players, not spectators, not the sender; the listen host's own member
+## included. While a party run is open, `to` is a seat id and only seated players take part.
 func relay_targets(from_id: int, to: String) -> Array[NetPlayer]:
 	var out: Array[NetPlayer] = []
+	if not party.is_empty():
+		if _seat_of_session(from_id) == "":
+			return out
+		for s in party["seats"]:
+			var sd: Dictionary = s
+			var sid := int(sd["session"])
+			if sid <= 0 or sid == from_id or (to != "" and str(sd["id"]) != to):
+				continue
+			var tp: NetPlayer = players.get(sid)
+			if tp != null and tp.connected and not tp.spectator and (tp.peer == -1 or tp.peer > 0):
+				out.append(tp)
+		return out
 	for p in players.values():
 		var np: NetPlayer = p
 		if np.id == from_id or np.spectator or not np.connected or (to != "" and str(np.id) != to):
@@ -1162,6 +1195,137 @@ func relay_targets(from_id: int, to: String) -> Array[NetPlayer]:
 		if np.peer == -1 or np.peer > 0:
 			out.append(np)
 	return out
+
+
+# =====================================================================================
+# Party seats (co-op party runs in the lobby)
+# =====================================================================================
+
+## The party member id of session player `session_id`: the session id itself, or - while a
+## party run is open - the seat it holds (0 = not seated, not a party member).
+func party_member_of(session_id: int) -> int:
+	if party.is_empty():
+		return session_id
+	var seat := _seat_of_session(session_id)
+	return int(seat) if seat != "" else 0
+
+
+func _seat_of_session(session_id: int) -> String:
+	if party.is_empty():
+		return ""
+	for s in party["seats"]:
+		if int(s["session"]) == session_id:
+			return str(s["id"])
+	return ""
+
+
+## Listen host: opens a co-op party run in the lobby. A run keeps the member ids it was played
+## with (its player ids), but a new session gives everyone new session ids, so each run player
+## becomes a seat that one session player holds; party messages then carry seat ids, stamped by
+## this server from the connection, and only seated players take part. `seats`: [{id, name,
+## fighter}] (ids = the run's player ids: 1-9 digit numbers, as runs started online have);
+## `host_seat`: the host's own seat; `info`: a small plain summary for the lobby. Members claim
+## their seat (net.party_claim, by run id). Returns "" or why not.
+func party_open(run_id: String, seats: Array, host_seat: String, info: Dictionary = {}) -> String:
+	if dedicated or local_player_id <= 0:
+		return "party runs are hosted by a player (listen host)"
+	if not NetProtocol.valid_party_run_id(run_id):
+		return "invalid run id"
+	if seats.is_empty() or seats.size() > NetProtocol.MAX_PARTY_SEATS:
+		return "a party run has 1-%d players" % NetProtocol.MAX_PARTY_SEATS
+	var out: Array = []
+	var seen := {}
+	for s in seats:
+		if typeof(s) != TYPE_DICTIONARY:
+			return "invalid seat"
+		var sid := str((s as Dictionary).get("id", ""))
+		if not NetProtocol.valid_seat_id(sid):
+			return "seat '%s' is not an online member id (runs started online only)" % sid.left(16)
+		if seen.has(sid):
+			return "seat '%s' is listed twice" % sid
+		seen[sid] = true
+		out.append({"id": sid, "name": NetProtocol.clean_name(str(s.get("name", "Player"))),
+			"fighter": str(s.get("fighter", "")).left(64), "session": 0})
+	if not seen.has(host_seat):
+		return "the host's seat '%s' is not in this run" % host_seat.left(16)
+	var enc := NetProtocol.encode_payload(info)
+	if enc.size() > NetProtocol.MAX_PARTY_INFO or not bool(NetProtocol.decode_payload(enc)["ok"]):
+		return "party info must be small plain data"
+	for s2 in out:
+		if str(s2["id"]) == host_seat:
+			s2["session"] = local_player_id
+	party = {"run_id": run_id, "info": info.duplicate(true), "host_seat": host_seat, "seats": out}
+	Log.i("net", "party run %s open: %d seats, host seat %s" % [run_id, out.size(), host_seat])
+	_flush_lobby_now()
+	return ""
+
+
+func party_close() -> void:
+	if party.is_empty():
+		return
+	Log.i("net", "party run %s closed" % str(party["run_id"]))
+	party = {}
+	_flush_lobby_now()
+
+
+## A member claims a seat of the open party run: the run id must match, the seat must exist and
+## be free (a seat whose holder disconnected stays theirs until their reservation ends), the
+## claimant must be a player without a seat. The answer is the lobby (or an error message).
+func _party_claim(p: NetPlayer, v: Dictionary) -> void:
+	var why := ""
+	var seat := str(v.get("seat", ""))
+	if party.is_empty():
+		why = "no party run is open"
+	elif str(v.get("run_id", "")) != str(party["run_id"]):
+		why = "the host offers a different run"
+	elif p.spectator:
+		why = "spectators cannot take a seat"
+	elif _seat_of_session(p.id) != "":
+		why = "you already hold seat %s" % _seat_of_session(p.id)
+	else:
+		why = "no such seat"
+		for s in party["seats"]:
+			if str(s["id"]) == seat:
+				why = "" if int(s["session"]) <= 0 else "that seat is taken"
+				if why == "":
+					s["session"] = p.id
+	if why != "":
+		send_app(p.id, NetProtocol.APP_PARTY_CLAIM_RESULT, {"ok": false, "seat": seat, "error": why})
+		return
+	Log.i("net", "player %d '%s' took seat %s of party run %s" % [p.id, p.name, seat, str(party["run_id"])])
+	_flush_lobby_now()
+
+
+## Frees the seat a session player holds (left the session, or gave it up). True if it held one.
+func _party_unseat(session_id: int) -> bool:
+	if party.is_empty() or session_id == local_player_id:
+		return false
+	for s in party["seats"]:
+		if int(s["session"]) == session_id:
+			s["session"] = 0
+			return true
+	return false
+
+
+func _party_public() -> Dictionary:
+	if party.is_empty():
+		return {}
+	var seats: Array = []
+	for s in party["seats"]:
+		var sid := int(s["session"])
+		var np: NetPlayer = players.get(sid)
+		seats.append({"id": s["id"], "name": s["name"], "fighter": s["fighter"], "session": sid,
+			"connected": np != null and np.connected})
+	return {"run_id": party["run_id"], "info": party["info"], "host_seat": party["host_seat"], "seats": seats}
+
+
+## Seat changes go out at once (members switch their party ids on it), not on the lobby timer.
+func _flush_lobby_now() -> void:
+	_lobby_dirty = false
+	_lobby_sent_ms = Time.get_ticks_msec()
+	if transport.is_open():
+		_broadcast_control(_lobby_packet())
+	lobby_changed.emit()
 
 
 # =====================================================================================
@@ -1204,6 +1368,7 @@ func _remove_player(p: NetPlayer, reason: String) -> void:
 	players.erase(p.id)
 	if p.peer > 0:
 		_peer_player.erase(p.peer)
+	_party_unseat(p.id)
 	Log.i("net", "player %d '%s' removed (%s)" % [p.id, p.name, reason])
 	notice("%s left (%s)." % [p.name, reason])
 	player_left.emit(p.to_public(), reason)
@@ -1990,6 +2155,8 @@ func lobby_state() -> Dictionary:
 		st["options"] = {"creatures": Content.playable_creatures()}
 	if not last_result.is_empty() and phase == PHASE_RESULTS:
 		st["last_result"] = {"winner_team": last_result.get("winner_team", -2), "aborted": last_result.get("aborted", false)}
+	if not party.is_empty():
+		st["party"] = _party_public()
 	return st
 
 

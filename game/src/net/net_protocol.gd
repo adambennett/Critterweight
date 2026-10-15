@@ -103,6 +103,14 @@ const MAX_APP_PAYLOAD := 65536
 ## App type a client uses to have the authority relay a party message to other members
 ## (payload {to: "" | "<member id>", type, payload}); see Net.send_app with a String target.
 const APP_RELAY := "net.relay"
+## Party seats (co-op party runs, NetServer.party_open): a member claims a seat of the open run
+## ({run_id, seat}) or gives it up ({}); a refused claim is answered with CLAIM_RESULT
+## ({ok: false, seat, error}) - a granted one shows in the lobby's `party`.
+const APP_PARTY_CLAIM := "net.party_claim"
+const APP_PARTY_LEAVE := "net.party_leave"
+const APP_PARTY_CLAIM_RESULT := "net.party_claim_result"
+const MAX_PARTY_SEATS := 4
+const MAX_PARTY_INFO := 2048  ## encoded bytes of the run summary shown in the lobby
 const MAX_PACKAGES := 64      ## gameplay packages listed in the handshake (core + mods)
 const MAX_RELAY_PAYLOAD := 16384   ## party messages a client asks the authority to relay
 const MAX_ARENA_PACKAGE := 512 * 1024   ## a user arena layout package sent with MATCH_START
@@ -385,6 +393,29 @@ static func valid_app_type(t: String) -> bool:
 		var c := ch.unicode_at(0)
 		var ok := (c >= 97 and c <= 122) or (c >= 48 and c <= 57) or ch in ["_", ".", ":", "-", "/"]
 		if not ok:
+			return false
+	return true
+
+
+## A campaign run id as party seats carry it: 1-64 of [A-Za-z0-9_-].
+static func valid_party_run_id(s: String) -> bool:
+	if s.length() < 1 or s.length() > 64:
+		return false
+	for ch in s:
+		var c := ch.unicode_at(0)
+		if not ((c >= 97 and c <= 122) or (c >= 65 and c <= 90) or (c >= 48 and c <= 57) or ch == "_" or ch == "-"):
+			return false
+	return true
+
+
+## A party seat id: the member id a run was started with online (a session player id), so 1-9
+## digits without a leading zero - it travels as the sender id of relayed party messages.
+static func valid_seat_id(s: String) -> bool:
+	if s.length() < 1 or s.length() > 9 or s.begins_with("0"):
+		return false
+	for ch in s:
+		var c := ch.unicode_at(0)
+		if c < 48 or c > 57:
 			return false
 	return true
 
