@@ -96,6 +96,10 @@ func test_bot_ability_rules_fire_on_conditions() -> void:
 	var used := sim.events.filter(func(e): return e["type"] == "ability" and int(e["fighter"]) == 0 and str(e["slot"]) == "ability1")
 	check(used.is_empty(), "rule-only ability is not used while its condition is false")
 	sim.fighters[1].knock_down("test", sim.fighters[0])
-	await step_sim(sim, 0.6)
+	# the bot may be in the middle of a 0.66 s Heavy when the target falls: allow it to finish
+	var t_down := 0.0
+	while t_down < 1.4 and sim.fighters[1].is_down():
+		await step_sim(sim, 0.1)
+		t_down += 0.1
 	used = sim.events.filter(func(e): return e["type"] == "ability" and int(e["fighter"]) == 0 and str(e["slot"]) == "ability1")
-	check(not used.is_empty(), "ability fires once the target is down")
+	check(not used.is_empty(), "ability fires once the target is down (down for %.1f s)" % t_down)

@@ -15,7 +15,7 @@ const STRIKES := {
 	"l1": {"hit": [1.1, 1.3], "hit_foe": [1.1, 1.3], "miss": 1.7},
 	"l2": {"hit": [1.1, 1.2], "hit_foe": [1.1, 1.3], "miss": 1.8},
 	"l3": {"hit": [1.05, 1.2], "hit_foe": [1.0, 1.1], "miss": 1.6},
-	"heavy": {"hit": [1.1, 1.2], "hit_foe": [1.2, 1.4], "miss": 1.95},
+	"heavy": {"hit": [1.1, 1.2], "hit_foe": [1.1, 1.3], "miss": 1.95},
 	"heavy_charged": {"hit": [1.1, 1.4], "hit_foe": [1.2, 1.4], "miss": 2.0},
 	"finisher": {"hit": [1.4, 1.8], "hit_foe": [1.3, 1.6], "miss": 2.35},
 	"dash_attack": {"hit": [1.5], "hit_foe": [1.5], "miss": 2.3},
@@ -50,7 +50,8 @@ func test_stats_slots_and_data() -> void:
 	_check_timing(c.moves["l1"], [0.12, 0.08, 0.18], 4.0, 4.0)
 	_check_timing(c.moves["l2"], [0.14, 0.08, 0.22], 5.0, 5.0)
 	_check_timing(c.moves["l3"], [0.18, 0.10, 0.30], 7.0, 7.0)
-	_check_timing(c.moves["heavy"], [0.28, 0.10, 0.40], 12.0, 13.0)
+	# Overhand 13 -> 12: balance deviation (docs/kits/f_stoke.md)
+	_check_timing(c.moves["heavy"], [0.28, 0.10, 0.40], 12.0, 12.0)
 	_check_timing(c.moves["heavy_charged"], [0.50, 0.12, 0.50], 16.0, 18.0)
 	_check_timing(c.moves["finisher"], [0.16, 0.10, 0.45], 10.0, 10.0)
 	_check_timing(c.moves["dash_attack"], [0.14, 0.10, 0.35], 8.0, 8.0)
@@ -114,15 +115,22 @@ func test_light_string_and_finisher() -> void:
 	var slots := events_of(sim, "move_start").filter(func(e): return int(e["fighter"]) == 0).map(func(e): return str(e["slot"]))
 	check(slots.size() >= 3 and slots.slice(0, 3) == ["l1", "l2", "l3"], "light string l1 -> l2 -> l3 (%s)" % str(slots))
 	dispose(sim)
-	var s2 := InputSource.Scripted.new([{"t0": INTRO + 0.2, "t1": INTRO + 0.25, "press": ["light"]}, {"t0": INTRO + 0.36, "t1": INTRO + 0.41, "press": ["light"]},
-		{"t0": INTRO + 0.55, "t1": INTRO + 0.6, "press": ["heavy"]}])
-	var sim2 := duel(CID, FOE, 1.2, s2)
-	await step_sim(sim2, INTRO + 1.8)
-	var slots2 := events_of(sim2, "move_start").filter(func(e): return int(e["fighter"]) == 0).map(func(e): return str(e["slot"]))
-	check(slots2.has("finisher"), "Heavy in the cancel window is the Finisher (%s)" % str(slots2))
-	var fin := hits_by(sim2, 0).filter(func(e): return str(e["slot"]) == "finisher" and float(e["damage"]) > 0.0)
-	check(not fin.is_empty(), "Gut Furnace lands after the string")
-	dispose(sim2)
+	# Light, Light, Heavy lands the Gut Furnace on the mirror; Gusto (55 kg) slides out of its reach
+	# after the cross, so against him the short string Light, Heavy is checked
+	for foe in [CID, FOE]:
+		var presses := [{"t0": INTRO + 0.2, "t1": INTRO + 0.25, "press": ["light"]}]
+		if foe == CID:
+			presses.append({"t0": INTRO + 0.36, "t1": INTRO + 0.41, "press": ["light"]})
+			presses.append({"t0": INTRO + 0.55, "t1": INTRO + 0.6, "press": ["heavy"]})
+		else:
+			presses.append({"t0": INTRO + 0.36, "t1": INTRO + 0.41, "press": ["heavy"]})
+		var sim2 := duel(CID, foe, 1.2, InputSource.Scripted.new(presses))
+		await step_sim(sim2, INTRO + 1.8)
+		var slots2 := events_of(sim2, "move_start").filter(func(e): return int(e["fighter"]) == 0).map(func(e): return str(e["slot"]))
+		check(slots2.has("finisher"), "Heavy in the cancel window is the Finisher vs %s (%s)" % [foe, str(slots2)])
+		var fin := hits_by(sim2, 0).filter(func(e): return str(e["slot"]) == "finisher" and float(e["damage"]) > 0.0)
+		check(not fin.is_empty(), "Gut Furnace lands after the string vs %s" % foe)
+		dispose(sim2)
 
 
 func test_charged_heavy_hold_armor_and_overhand_armor() -> void:
@@ -411,6 +419,7 @@ func test_zz_showcase() -> void:
 
 ## Balance spars (gated, slow): `-- --test test_kit_f_stoke.gd::test_zz_balance --kit-balance [n] [difficulty]`
 ## prints win rates and damage per landed hit for Stoke vs Gusto and both mirrors.
+## `--kit-pair f_stoke-f_gusto` runs one pairing; `--kit-seed s` starts the bout seeds at s (default 100).
 func test_zz_balance() -> void:
 	var args := OS.get_cmdline_user_args()
 	var i := args.find("--kit-balance")
@@ -419,7 +428,8 @@ func test_zz_balance() -> void:
 	var n := int(args[i + 1]) if i + 1 < args.size() and args[i + 1].is_valid_int() else 20
 	var diff := args[i + 2] if i + 2 < args.size() and not args[i + 2].begins_with("--") else "regular"
 	var only := args[args.find("--kit-pair") + 1] if args.has("--kit-pair") else ""
+	var seed0 := int(args[args.find("--kit-seed") + 1]) if args.has("--kit-seed") else 100
 	for pair in [[CID, FOE], [CID, CID], [FOE, FOE]]:
 		if only != "" and "%s-%s" % [pair[0], pair[1]] != only:
 			continue
-		await balance(pair[0], pair[1], n, diff)
+		await balance(pair[0], pair[1], n, diff, 60.0, seed0)

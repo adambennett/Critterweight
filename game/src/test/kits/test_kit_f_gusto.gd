@@ -14,7 +14,7 @@ const STRIKES := {
 	"l1": {"hit": [1.3, 1.4], "hit_foe": [1.1, 1.3], "miss": 1.95},
 	"l2": {"hit": [1.2, 1.25], "hit_foe": [1.1, 1.25], "miss": 1.65},
 	"l3": {"hit": [1.3, 1.4], "hit_foe": [1.2, 1.3], "miss": 1.85},
-	"heavy": {"hit": [1.2, 1.5], "hit_foe": [1.4, 1.6], "miss": 2.45},
+	"heavy": {"hit": [1.2, 1.4], "hit_foe": [1.4, 1.6], "miss": 2.45},
 	"heavy_charged": {"hit": [1.8, 2.2], "hit_foe": [1.8, 2.2], "miss": 4.4},
 	"finisher": {"hit": [1.4, 1.6], "hit_foe": [1.2, 1.4], "miss": 3.4},
 	"dash_attack": {"hit": [1.4, 1.6], "hit_foe": [1.4, 1.6], "miss": 2.4},
@@ -40,11 +40,12 @@ func test_stats_slots_and_data() -> void:
 	var raw := FileAccess.get_file_as_string("res://content/core/creatures/%s.json" % CID)
 	check(not raw.contains("_stub"), "no stub moves left")
 	check_near(c.moves["taunt"].duration, 1.5, 0.001, "taunt lasts 1.5 s")
-	# damage deviations from ROSTER (balance, docs/kits/f_gusto.md): Wing Snap 4 -> 5, Crosswind 6+6 -> 7+7
+	# damage deviations from ROSTER (balance, docs/kits/f_gusto.md): Wing Snap 4 -> 5, Crosswind 6+6 -> 8+8,
+	# Gust Bomb 5 -> 7
 	_check_timing(c.moves["l1"], [0.10, 0.08, 0.18], 4.0, 5.0)
 	_check_timing(c.moves["l2"], [0.12, 0.12, 0.20], 4.0, 2.0)
 	_check_timing(c.moves["l3"], [0.16, 0.10, 0.30], 7.0, 7.0)
-	_check_timing(c.moves["heavy"], [0.24, 0.12, 0.40], 11.0, 7.0)
+	_check_timing(c.moves["heavy"], [0.24, 0.12, 0.40], 11.0, 8.0)
 	_check_timing(c.moves["finisher"], [0.15, 0.40, 0.45], 10.0, 3.0)
 	_check_timing(c.moves["dash_attack"], [0.10, 0.12, 0.30], 7.0, 6.0)
 	for slot in ["l1", "l2", "l3", "heavy", "heavy_charged", "finisher", "dash_attack", "pummel", "l1@hovering"]:
