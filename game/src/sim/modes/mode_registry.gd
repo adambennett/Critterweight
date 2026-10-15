@@ -17,6 +17,7 @@ static func _ensure_builtins() -> void:
 	_factories["chum_rush"] = func() -> MatchMode: return ChumRushMode.new()
 	_factories["tag_team"] = func() -> MatchMode: return TagTeamMode.new()
 	_factories["practice"] = func() -> MatchMode: return PracticeMode.new()
+	_factories["tutorial"] = func() -> MatchMode: return TutorialMode.new()
 
 
 static func register(id: String, factory: Callable) -> void:

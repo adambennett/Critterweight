@@ -309,7 +309,8 @@ func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 	sim.emit_event({"type": "hit", "fighter": a.index if a else -1, "target": b.index, "damage": float(h["damage"]),
 		"point": h["point"], "normal": h["normal"], "blocked": h["blocked"], "parried": h["parried"], "counter": h.get("counter", false),
 		"part": h.get("part", "core"), "element": el, "quality": h.get("quality", 1.0), "move": str(h.get("move", "")),
-		"slot": str(h.get("slot", "")), "knockdown": h.get("knockdown", false), "otg": b.is_down()})
+		"slot": str(h.get("slot", "")), "charged": bool(h.get("charged", false)), "move_class": str(h.get("move_class", "")),
+		"knockdown": h.get("knockdown", false), "otg": b.is_down()})
 
 
 ## Non-weapon damage (pummels, throws, slams, hazards). Never guarded or parried.

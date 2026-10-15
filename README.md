@@ -1,0 +1,91 @@
+# CRITTERWEIGHT
+
+An original physical creature cage-fighting game. Six cartoon fighters with real active-ragdoll bodies hit,
+block, grab and throw each other inside a chain-link cage, with elements, bonus modes, two campaigns,
+co-op, online play, local mods, an arena editor, spectating and a local AI Lab.
+
+Engine: Godot 4.5.1 (typed GDScript, Jolt physics @ 120 Hz, Forward+/Vulkan). Platforms: Windows x64 and
+Linux x86-64 (Steam Deck path). No account, store or network service is needed to play.
+
+> Status: release-candidate integration in progress. The per-requirement ledger with evidence is
+> [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md); current state and next actions are in
+> [`docs/PROGRESS.md`](docs/PROGRESS.md); test and runtime evidence in [`docs/VERIFICATION.md`](docs/VERIFICATION.md).
+
+## Play
+
+Packaged builds live in `dist/` after a build (see below):
+
+| Package | Run |
+|---|---|
+| `dist/Critterweight-windows-x64/Critterweight.exe` | double-click (Windows 10/11, Vulkan GPU) |
+| `dist/Critterweight-linux-x86_64/Critterweight.x86_64` | `./Critterweight.x86_64` (Ubuntu 24.04 / SteamOS) |
+| `dist/Critterweight-server-*/CritterweightServer*` | headless dedicated server — see [`docs/SERVER.md`](docs/SERVER.md) |
+
+Controller first (Xbox-style pad), mouse and keyboard fully supported. Start with **Tutorial** (Granny
+Haymaker's ten exercises), then **Fight**. The in-game Controls screen and [`docs/PLAYER_GUIDE.md`](docs/PLAYER_GUIDE.md)
+list every action. User data (profiles, settings, presets, mods, logs) lives in
+`%APPDATA%\Critterweight` (Windows) or `~/.local/share/Critterweight` (Linux) — never next to the game.
+
+Useful launch options (after `--`): `--safe-mode` (start without mods), `--mods id1,id2`, `--windowed
+--size 1600x900`, `--user-root <dir>` (portable/isolated user data).
+
+## Build
+
+Requirements: Godot 4.5.1 (console binary) with the official 4.5.1 export templates; PowerShell; Python 3
+(archives, mod packer); Node.js ≥ 20 only to regenerate art/audio sources.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/build/package.ps1 -RunTests -Archive
+```
+
+This imports assets, checks every script, runs the test suite, exports the Windows/Linux game and
+dedicated-server packages into `dist/`, copies docs and licences, writes `dist/BUILD_MANIFEST.json` (git
+revision, sizes, SHA-256) and creates `.zip`/`.tar.gz` archives. `-Targets "Windows Desktop"` builds one target.
+
+Regenerating sources (deterministic, byte-identical outputs):
+
+| What | Command | Docs |
+|---|---|---|
+| Creature/NPC models | `node tools/forge/forge.js` | [`docs/ART_PIPELINE.md`](docs/ART_PIPELINE.md) |
+| Music, SFX, voices | `node tools/audio/build.js` | [`docs/AUDIO.md`](docs/AUDIO.md) |
+| Example mods | `python tools/mods/pack_mod.py --examples` | [`docs/MODDING.md`](docs/MODDING.md) |
+| UI icons / credits | `python game/assets/ui/source/make_icons.py`, `make_credits.py` | [`docs/UI.md`](docs/UI.md) |
+
+## Test
+
+```powershell
+$g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
+& $g --headless --path game -- --check                         # every script compiles
+& $g --headless --path game --fixed-fps 120 -- --test           # full suite (exit code = failures)
+& $g --headless --path game --fixed-fps 120 -- --test tutorial  # one area (substring filter)
+& $g --path game -- --windowed --bench busy --n 8 --duration 30  # performance capture -> JSON report
+```
+
+Tests run in an isolated user-data folder and never touch real profiles. The same commands work on the
+packaged executable (`Critterweight.exe --headless -- --test`). Development helpers: `--sandbox --autoplay
+[--rules id --n 4 --creature f_stoke --spectate]`, `--tutorial [n]`, `--screen <name>`, `--probe <name>`,
+`--capture <png> --capture-at <s>`.
+
+## Repository
+
+| Path | Contents |
+|---|---|
+| `game/` | Godot project: `src/` (sim, view, ui, net, ai, lab, campaign, hub, editor, mods, tutorial, persist, platform, audio), `content/` (the `core` data package + JSON schemas), `assets/`, `mods_examples/` |
+| `tools/` | build/packaging, creature forge, audio synthesis, mod packer |
+| `mods/examples/` | editable sources of the bundled example mods |
+| `docs/` | records (requirements ledger, design, architecture, decisions, progress, verification), system docs, `design/` creative specs, `evidence/` captures |
+| `Initial_Prompt_v2.md` | the authoritative brief |
+
+## Documentation
+
+Architecture [`ARCHITECTURE`](docs/ARCHITECTURE.md) · Design and budgets [`DESIGN`](docs/DESIGN.md) · Decisions
+[`DECISIONS`](docs/DECISIONS.md) · UI [`UI`](docs/UI.md) · Modding [`MODDING`](docs/MODDING.md) · Platform/Steam
+deferral [`PLATFORM`](docs/PLATFORM.md) · Audio [`AUDIO`](docs/AUDIO.md) · Art [`ART_PIPELINE`](docs/ART_PIPELINE.md),
+[`CREATURES`](docs/CREATURES.md) · Kits [`kits/`](docs/kits) · Third-party inventory [`THIRD_PARTY`](docs/THIRD_PARTY.md).
+
+## Licence and provenance
+
+All game code, art, audio and writing are original to this project (generated by the project's own tools
+from editable sources) except the third-party components listed in [`docs/THIRD_PARTY.md`](docs/THIRD_PARTY.md)
+(Godot Engine and its bundled libraries, Jolt Physics, Barlow/Barlow Condensed/Bungee fonts under the SIL OFL).
+Store integration (Steam) and commercial release preparation are deferred and not part of this build.

@@ -31,6 +31,7 @@ var tuck := false                      ## airborne / falling: legs pull in inste
 ## ---- internal ----
 var _rest := {}                        ## chain name -> [Basis B1^T, Basis B2^T]
 var _feet: Array = []                  ## Array[Dictionary]
+var _limb_flags := PackedByteArray()
 var _wave_phase := 0.0
 var _hop_phase := 0.0
 var _root_rest := Vector3.ZERO
@@ -59,6 +60,13 @@ func _init(body_def: BodyDef, r: Rig) -> void:
 	for c: BodyDef.Chain in def.leg_chains:
 		_feet.append({"chain": c, "planted": Vector3.ZERO, "stepping": false, "from": Vector3.ZERO,
 			"to": Vector3.ZERO, "t": 0.0, "dur": def.step_time, "group": c.gait_group, "idle": 0.0})
+	# which segments belong to IK limbs (checked for every segment every tick)
+	_limb_flags.resize(def.segments.size())
+	for cname2 in def.chains:
+		var c2: BodyDef.Chain = def.chains[cname2]
+		if c2.kind == "limb2":
+			for si in c2.segs:
+				_limb_flags[si] = 1
 
 
 ## Re-plants feet under the current root (after spawn / getting up).
@@ -151,11 +159,7 @@ func to_world(rp: Vector3, yb: Basis, p: Vector3) -> Vector3:
 
 
 func _in_limb(idx: int) -> bool:
-	for cname in def.chains:
-		var c: BodyDef.Chain = def.chains[cname]
-		if c.kind == "limb2" and c.segs.has(idx):
-			return true
-	return false
+	return _limb_flags[idx] == 1
 
 
 func _chain_target(cname: String, c: BodyDef.Chain, gb: float) -> Vector3:

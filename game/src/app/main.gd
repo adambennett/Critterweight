@@ -2,6 +2,7 @@ extends Node
 ## Process entry point. Dispatches on command-line user arguments (after `--`):
 ##   (none)                  normal game (title screen)
 ##   --test [filter]         run automated tests headless, exit code = failures
+##   --tutorial [n]          start Granny's tutorial at exercise n (0-based) [--creature id]
 ##   --probe <name>          run a physics/combat probe and print metrics
 ##   --server [--config p]   dedicated server (see docs/SERVER.md)
 ##   --lab-worker <job>      AI Lab training worker (spawned by the Lab UI)
@@ -13,6 +14,10 @@ var args: PackedStringArray
 
 func _ready() -> void:
 	args = OS.get_cmdline_user_args()
+	# integration points other owners' menus call into
+	TutorialHook.launcher = Callable(Tutorial, "start_lesson")
+	if not args.has("--test") and not args.has("--server") and not args.has("--lab-worker") and not args.has("--check"):
+		UiNav.ensure()   # UI-only actions (LB/RB, Y, X) and focus guard exist even when no menu ran first
 	var mode := "game"
 	if args.has("--test"):
 		mode = "test"
@@ -20,6 +25,8 @@ func _ready() -> void:
 		mode = "probe"
 	elif args.has("--sandbox"):
 		mode = "sandbox"
+	elif args.has("--tutorial"):
+		mode = "tutorial"
 	elif args.has("--check"):
 		mode = "check"
 	elif args.has("--server"):
@@ -32,7 +39,27 @@ func _ready() -> void:
 		mode = "bench"
 	if args.has("--capture"):
 		_setup_capture()
+	if args.has("--boot-report"):
+		# PERF-03: time from process start until the first menu screen is shown, then quit
+		App.screen_changed.connect(_on_boot_screen, CONNECT_ONE_SHOT)
 	call_deferred("_start", mode)
+
+
+func _exit_tree() -> void:
+	# static Callables outliving their scripts crash the engine at exit
+	TutorialHook.launcher = Callable()
+
+
+func _on_boot_screen(screen: String) -> void:
+	await RenderingServer.frame_post_draw
+	var rep := {"screen": screen, "ms_since_start": Time.get_ticks_msec(), "static_memory_mb": OS.get_static_memory_usage() / 1048576.0,
+		"video_memory_mb": Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0}
+	var f := FileAccess.open(arg_value("--boot-report", "user://boot_report.json"), FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(rep, "  "))
+		f.close()
+	print("BOOT ", JSON.stringify(rep))
+	get_tree().quit(0)
 
 
 func arg_value(flag: String, fallback := "") -> String:
@@ -54,6 +81,8 @@ func _start(mode: String) -> void:
 			probe.run(arg_value("--probe", "stand"))
 		"sandbox":
 			_start_sandbox()
+		"tutorial":
+			Tutorial.start(int(arg_value("--tutorial", "0")), arg_value("--creature", ""))
 		"check":
 			_check_scripts()
 		"server":
@@ -80,7 +109,11 @@ func _start(mode: String) -> void:
 func _boot_game() -> void:
 	var direct := arg_value("--screen", "")
 	if direct != "" and App.has_screen(direct):
-		App.goto(direct)
+		var params := {}
+		var kv := arg_value("--screen-arg", "")       # e.g. --screen rules_editor --screen-arg edit=duel
+		if "=" in kv:
+			params[kv.split("=")[0]] = kv.split("=")[1]
+		App.goto(direct, params)
 	elif App.has_screen("title"):
 		App.goto("title")
 	else:
@@ -90,6 +123,7 @@ func _boot_game() -> void:
 ## Dev sandbox: player (or bot with --autoplay) vs bots.
 ##   --rules <preset id> (default duel)   --arena <arena id> (default the_gullet)
 ##   --n <fighters> (default by preset)  --creature/--creature2 <json path or creature id>
+##   --spectate (with --autoplay): auto-director camera + spectator overlay
 func _start_sandbox() -> void:
 	var c1 = _sandbox_creature(arg_value("--creature", "dev_biped"))
 	var c2 = _sandbox_creature(arg_value("--creature2", arg_value("--creature", "dev_biped")))
@@ -112,7 +146,13 @@ func _start_sandbox() -> void:
 		fighters.append({"creature": c1 if i == 0 else c2, "team": team, "kind": kind,
 			"difficulty": arg_value("--difficulty", "regular") if i > 0 else arg_value("--p1diff", "pro"),
 			"name": "Player" if kind == "player" else "Bot %d" % i})
-	App.start_match({"arena": arg_value("--arena", "the_gullet"), "rules": rules_id, "seed": int(arg_value("--seed", "11")), "fighters": fighters})
+	var cfg := {"arena": arg_value("--arena", "the_gullet"), "rules": rules_id, "seed": int(arg_value("--seed", "11")), "fighters": fighters}
+	if args.has("--spectate"):
+		# AI-vs-AI with the auto-director camera and spectator controls (same path as the menu)
+		cfg["spectate"] = true
+		MatchFlow.launch(cfg)
+	else:
+		App.start_match(cfg)
 
 
 func _sandbox_creature(spec: String):
