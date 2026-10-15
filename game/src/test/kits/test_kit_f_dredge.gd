@@ -1,12 +1,14 @@
 extends "res://src/test/kits/dd_kit_base.gd"
 ## DREDGE (f_dredge) kit verification — docs/kits/f_dredge.md, ROSTER.md §2.
+## Requirements: CNT-01 (finished fighter kits), CMB-06 (grab/throw/pummel layer).
 ## Every move: connects at its intended range against a standing dummy and misses outside it;
 ## damage / knockback / stun / build-up / properties; guard and parry rules; cooldowns; JUICE;
 ## grab, pummel, throws; physical sanity (upright, no spin-out, no self-clip, cage, 1.6 m cap).
 ## Also the generic engine extensions added with this kit (directional dodge, heavy variants that
 ## can still charge, the throw_distance status).
 ## Run: godot --headless --path game --fixed-fps 120 -- --test test_kit_f_dredge
-## Balance bouts: set KIT_BOUTS=<n> (default 2) to run n bot bouts per pairing in test_zz_balance.
+## Balance bouts: set KIT_BOUTS=<n> (default 2) to run n bot bouts per pairing in test_zz_balance
+## (Dredge vs Dozer, then the Dredge mirror; KIT_PAIRS=cross runs only the cross-matchup).
 
 const ID := "f_dredge"
 
@@ -130,8 +132,8 @@ func test_charged_heavy_hull_breaker() -> void:
 
 
 func test_double_clamp_hold_on_soaked() -> void:
-	var wet := await measure_move(ID, "l3", 1.2, {"before": _soak, "keep": true, "dummy": Content.creature("f_dozer")})
-	var dry := await measure_move(ID, "l3", 1.2, {"keep": true, "dummy": Content.creature("f_dozer")})
+	var wet := await measure_move(ID, "l3", 1.5, {"before": _soak, "keep": true, "dummy": Content.creature("f_dozer")})
+	var dry := await measure_move(ID, "l3", 1.5, {"keep": true, "dummy": Content.creature("f_dozer")})
 	check(not wet["melee"].is_empty() and not dry["melee"].is_empty(), "Double Clamp lands on both")
 	var t_wet := float(wet.get("b_stun_time", 0.0))
 	var t_dry := float(dry.get("b_stun_time", 0.0))
@@ -383,8 +385,9 @@ func test_zz_balance() -> void:
 		return
 	var cross := await spar("f_dredge", "f_dozer", n)
 	print("BALANCE dredge vs dozer: ", spar_summary(cross))
-	var mirror := await spar("f_dredge", "f_dredge", n)
-	print("BALANCE dredge mirror: ", spar_summary(mirror))
+	if OS.get_environment("KIT_PAIRS") != "cross":   # KIT_PAIRS=cross skips the mirror
+		var mirror := await spar("f_dredge", "f_dredge", n)
+		print("BALANCE dredge mirror: ", spar_summary(mirror))
 	check(int(cross["wins"]["f_dredge"]) + int(cross["wins"]["f_dozer"]) + int(cross["draws"]) == n, "bouts completed")
 	check(float(cross["dmg"]["f_dredge"]) > 0.0 and float(cross["dmg"]["f_dozer"]) > 0.0, "both fighters land damage")
 	if n >= 20:

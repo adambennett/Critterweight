@@ -7,7 +7,7 @@
   "tags": ["fighter", "quadruped", "lunker"],
   "stats": {
     "health": 130, "walk_speed": 3, "accel": 24, "turn_rate": 4.5, "stamina": 95, "stamina_regen": 12, "poise": 85,
-    "poise_regen": 15, "dodge_distance": 3.2, "dodge_time": 0.3, "power": 1.2, "defense": 1, "weight": 1
+    "poise_regen": 15, "dodge_distance": 3.2, "dodge_time": 0.3, "power": 1.15, "defense": 1, "weight": 1
   },
   "body": {
     "id": "f_dozer_body",
