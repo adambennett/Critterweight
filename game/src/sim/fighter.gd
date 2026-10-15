@@ -125,6 +125,7 @@ func setup(c: CreatureDef, idx: int, team_id: int, match_sim, pos: Vector3, yaw:
 	hooks = Hooks.new(self)
 	for h in c.passives:
 		hooks.add(h, "kit")
+	_apply_kit_mods(c)
 	_seg_stagger.resize(c.body.segments.size())
 	_seg_stagger.fill(0.0)
 	reset_vitals()
@@ -1011,6 +1012,7 @@ func _update_specials(dt: float) -> void:
 		for ef in emerge:
 			if sim:
 				sim.effects.fire(self, ef, null)
+		hooks.fire("emerge", {})
 	if not _splat.is_empty():
 		if time > float(_splat["until"]):
 			_splat = {}
@@ -1108,9 +1110,13 @@ func _update_charge(dt: float) -> void:
 		var delta := front - _carried.pos()
 		_carried.rig.apply_body_impulse((delta * 6.0 + forward() * spd - _carried.rig.com_velocity()) * _carried.rig.total_mass * dt * 8.0)
 	var hit_wall := sim != null and not sim.arena.inside(pos() + forward() * 0.9, 0.3)
+	if hit_wall and _charge_bounce():
+		return
 	if hit_wall or float(_charge["dist"]) >= float(_charge["max"]):
+		var keep_move := not bool(_charge.get("end_move", true))
 		_finish_charge(hit_wall)
-		_end_move()
+		if not keep_move:
+			_end_move()
 
 
 func _finish_charge(hit_wall := false) -> void:
@@ -1504,3 +1510,44 @@ func cooldown_frac(slot: String) -> float:
 		return 0.0
 	var total := float(creature.cooldowns.get(slot, 1.0))
 	return clampf(float(cooldown_left.get(slot, 0.0)) / maxf(total, 0.01), 0.0, 1.0)
+
+
+# =====================================================================================
+# Kit data extensions (generic; driven by creature JSON, never by fighter id)
+# =====================================================================================
+
+## True during a ballistic leap / launch (begin_airborne until landing).
+func is_airborne() -> bool:
+	return _airborne
+
+
+## Creature-level base modifiers ("mods" in the creature JSON, Fighter.mods keys such as
+## getup_speed or held_time_mult): numbers multiply into the defaults, flags/strings replace.
+func _apply_kit_mods(c: CreatureDef) -> void:
+	for k in c.mods:
+		var v = c.mods[k]
+		if typeof(v) == TYPE_BOOL or typeof(v) == TYPE_STRING:
+			mods[k] = v
+		else:
+			mods[k] = float(mods.get(k, 1.0)) * float(v)
+
+
+## Charge option "bounce": n rebounds off walls. On contact the charge turns toward the target
+## (or reflects off the fence without one) and continues for "bounce_distance" metres.
+## Returns true when the wall contact was consumed by a bounce.
+func _charge_bounce() -> bool:
+	if int(_charge.get("bounce", 0)) <= 0:
+		return false
+	_charge["bounce"] = int(_charge["bounce"]) - 1
+	if target and not target.is_out():
+		facing_yaw = _yaw_to_target()
+	else:
+		var inward := -pos()
+		inward.y = 0.0
+		var refl := forward().bounce(inward.normalized()) if inward.length_squared() > 1e-6 else -forward()
+		facing_yaw = atan2(refl.x, refl.z)
+	_charge["dist"] = 0.0
+	_charge["max"] = float(_charge.get("bounce_distance", 1.5)) * float(mods.get("charge_distance", 1.0))
+	rig.desired_vel = forward() * float(_charge["speed"])
+	_emit({"type": "bounce", "pos": pos()})
+	return true

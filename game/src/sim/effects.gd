@@ -7,6 +7,10 @@ extends RefCounted
 ##   pull push blink prop delayed destroy_projectiles chain_arc self_damage cleanse hype juice_state
 ## Common fields: t (seconds into the move), at ("self" | "forward:<m>" | "target" | "weapon:<n>"
 ## | "stick:<m>"), element, buildup, damage, knockback, launch, stun, poise, knockdown, status {}.
+## Kit options: debuff.require_status (only targets carrying that status/element),
+## projectile.burst_on_hit (false: on_expire fires on timeout/wall/floor but not on a fighter hit),
+## projectile.arrive_y (lob: height above the floor at which the arc reaches the target point),
+## charge.bounce / bounce_distance / end_move (see Fighter._charge_bounce).
 
 const TYPES := ["projectile", "area", "zone", "buff", "debuff", "heal", "shield", "dash", "leap", "hover",
 	"charge", "counter_stance", "reflect", "pull", "push", "blink", "prop", "delayed", "destroy_projectiles",
@@ -81,7 +85,10 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 		"debuff":
 			var st2: Dictionary = e.get("status", {}).duplicate(true)
 			st2["source"] = f
+			var req := str(e.get("require_status", ""))   # only targets carrying this status/element
 			for o: Fighter in enemies_in(f, p, float(e.get("radius", 2.5))):
+				if req != "" and not (o.statuses.has(req) or o.statuses.has_element(req)):
+					continue
 				o.statuses.add(st2)
 		"heal":
 			f.heal(float(e.get("amount", 10.0)))
@@ -322,6 +329,8 @@ func _spawn_projectile(f: Fighter, e: Dictionary, yaw_off: float) -> void:
 		horiz = horiz.rotated(Vector3.UP, yaw_off)
 		var tflight := horiz.length() / spd
 		var dy := (tp.y - origin.y) * 0.0 - 0.3
+		if e.has("arrive_y"):   # kit option: height above the floor the arc passes the target point at
+			dy = f.rig.ground_y + float(e["arrive_y"]) - origin.y
 		vel = horiz / tflight + Vector3.UP * ((dy + 0.5 * grav * tflight * tflight) / tflight)
 	elif f.target and str(e.get("aim", "forward")) == "target":
 		var to2 := f.target.pos() + Vector3.UP * 0.3 - origin
@@ -629,6 +638,7 @@ func _update_projectile(ent: Dictionary, dt: float) -> void:
 		effect_hit(f, o, ent["e"], p - vel.normalized() * 0.5)
 		if not bool(ent["pierce"]):
 			ent["life"] = 0.0
+			ent["consumed"] = true
 			break
 
 
@@ -705,7 +715,7 @@ func _update_prop(ent: Dictionary, _dt: float) -> void:
 	if str(ent["prop"]) == "spring_pad":
 		var cool: Dictionary = ent["cool"]
 		for o: Fighter in sim.fighters:
-			if o.is_out() or o.is_down():
+			if o.is_out() or o.is_down() or o.is_airborne():   # stepped on, not flown over
 				continue
 			var d := Vector2(o.pos().x - ent["pos"].x, o.pos().z - ent["pos"].z).length()
 			if d > float(ent["radius"]):
@@ -762,7 +772,8 @@ func _expire(ent: Dictionary) -> void:
 				effect_hit(null, o, area_e, ent["pos"])
 		sim.emit_event({"type": "effect", "fighter": int(ent["owner"]), "effect": "strike", "pos": ent["pos"], "element": ent["element"], "vfx": "bolt", "radius": float(ent["radius"]), "shape": "circle", "yaw": 0.0, "move": ""})
 		return
-	if e.has("on_expire"):
+	# "burst_on_hit": false keeps on_expire for timeouts/walls/floor only (not a fighter hit)
+	if e.has("on_expire") and not (bool(ent.get("consumed", false)) and not bool(e.get("burst_on_hit", true))):
 		var ex: Dictionary = e["on_expire"]
 		var et := str(ex.get("type", "area"))
 		if et == "area" and f:

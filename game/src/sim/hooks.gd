@@ -8,15 +8,18 @@ extends RefCounted
 ## Events (`on`): pre_hit_dealt, pre_hit_taken (may modify the pending hit), hit_dealt, hit_taken,
 ##   blocked, parried, parry_success, knockdown_dealt, knocked_down, ko_dealt, dodge, taunt,
 ##   ability_used, juice_start, juice_end, move_start, land, grab_start, throw, wall_splat,
-##   status_applied, status_received, reaction, round_start, tick (with "every": seconds).
+##   status_applied, status_received, reaction, round_start, tick (with "every": seconds),
+##   emerge (a delayed blink resurfaced).
 ## Conditions (`if`, all must hold): slot / slots, move_class (light|heavy|ability|juice|grab),
 ##   charged, target_status / self_status (status id or element id), target_element,
 ##   self_health_below / above, target_health_below, target_guarding, target_down,
-##   self_juiced, distance_below / above, in_zone (zone kind under self), flag (self flag set).
+##   self_juiced, distance_below / above, in_zone (zone kind under self), flag (self flag set),
+##   hit_part (body part the pending hit struck: head|core|arm|leg|tail|...).
 ## Actions (`do`): any EffectsSystem effect type, plus hit modifiers (only meaningful in pre_*):
 ##   damage_add, damage_mult, knockback_mult, launch, knockdown, stun_add, poise_mult, guard_crush,
 ##   buildup {element, amount, target}, refresh_status {element}, set_flag {flag, seconds},
-##   stamina {amount, target}, hype {amount}, self_damage {amount}, cleanse.
+##   stamina {amount, target}, hype {amount}, self_damage {amount}, cleanse,
+##   cooldown {slot, amount} (adds seconds to a running ability cooldown; negative = refund).
 ## Resource limits: at most 32 hooks per fighter and 16 actions per firing; recursion depth 2.
 
 const MAX_HOOKS := 32
@@ -24,7 +27,7 @@ const MAX_ACTIONS := 16
 const EVENTS := ["pre_hit_dealt", "pre_hit_taken", "hit_dealt", "hit_taken", "blocked", "parried",
 	"parry_success", "knockdown_dealt", "knocked_down", "ko_dealt", "dodge", "taunt", "ability_used",
 	"juice_start", "juice_end", "move_start", "land", "grab_start", "throw", "wall_splat",
-	"status_applied", "status_received", "reaction", "round_start", "tick"]
+	"status_applied", "status_received", "reaction", "round_start", "tick", "emerge"]
 const HIT_MODIFIERS := ["damage_add", "damage_mult", "knockback_mult", "launch", "knockdown", "stun_add",
 	"poise_mult", "guard_crush", "buildup", "refresh_status"]
 
@@ -49,7 +52,7 @@ static func validate(h: Dictionary) -> PackedStringArray:
 			errs.append("hook: action is not an object")
 			continue
 		var t := str(a.get("type", ""))
-		if not HIT_MODIFIERS.has(t) and not EffectsSystem.TYPES.has(t) and not t in ["set_flag", "stamina", "cleanse", "self_damage", "hype"]:
+		if not HIT_MODIFIERS.has(t) and not EffectsSystem.TYPES.has(t) and not t in ["set_flag", "stamina", "cleanse", "self_damage", "hype", "cooldown"]:
 			errs.append("hook: unknown action '%s'" % t)
 	return errs
 
@@ -185,6 +188,10 @@ func _conditions(c: Dictionary, ctx: Dictionary) -> bool:
 			"element":
 				if str(ctx.get("element", "")) != str(v):
 					return false
+			"hit_part":
+				var ph = ctx.get("hit")
+				if ph == null or str((ph as Dictionary).get("part", "")) != str(v):
+					return false
 	return true
 
 
@@ -248,6 +255,13 @@ func _act(a: Dictionary, ctx: Dictionary) -> void:
 			f.health = maxf(1.0, f.health - float(a.get("amount", 1.0)))
 		"cleanse":
 			who.statuses.cleanse_elements()
+		"cooldown":
+			# only a running cooldown changes; it never drops to exactly 0 here so the next timer
+			# tick still restores the charge through Fighter._update_timers
+			var cd_slot := str(a.get("slot", ""))
+			var left := float(f.cooldown_left.get(cd_slot, 0.0))
+			if left > 0.0:
+				f.cooldown_left[cd_slot] = maxf(0.001, left + float(a.get("amount", 0.0)))
 		_:
 			if f.sim and EffectsSystem.TYPES.has(t):
 				var e: Dictionary = a.duplicate()
