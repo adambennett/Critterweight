@@ -1,0 +1,18 @@
+{
+  "id": "custom_rotation",
+  "name": "My Custom Rotation",
+  "version": 1,
+  "description": "Template for a server-local playlist file. Point the server at it with: playlist = playlists/custom_rotation.json (path relative to where you start the server, or absolute). Field reference: docs/SERVER.md#playlists.",
+  "voting": {"enabled": true, "candidates": 3},
+  "repeat_avoidance": 2,
+  "entries": [
+    {"id": "duel", "name": "Classic Duel", "rules": "duel", "arena": "the_gullet", "weight": 4},
+    {"id": "quick_duel", "name": "Sudden Duel (1 round)", "rules": "duel", "arena": "the_gullet", "weight": 2,
+      "rules_override": {"rounds": 1, "round_time": 45, "damage_mult": 1.25}},
+    {"id": "hog", "name": "Spotlight Hog", "rules": "spotlight_hog", "arena": "the_gullet", "weight": 2,
+      "min_players": 3, "bots": 2},
+    {"id": "teams_humans_only", "name": "Teams 2v2 (humans only)", "rules": "teams_2v2", "arena": "the_gullet", "weight": 1,
+      "bots": 0},
+    {"id": "rush", "name": "Chum Rush (co-op)", "rules": "chum_rush", "arena": "the_gullet", "weight": 1, "max_players": 4}
+  ]
+}

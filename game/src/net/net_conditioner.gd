@@ -29,7 +29,8 @@ var _rng := RandomNumberGenerator.new()
 var _thread: Thread = null
 var _mutex := Mutex.new()
 var _running := false
-var _stats := {"up": 0, "down": 0, "up_dropped": 0, "down_dropped": 0, "clients": 0}
+var _stats := {"up": 0, "down": 0, "up_dropped": 0, "down_dropped": 0, "clients": 0,
+	"up_bytes": 0, "down_bytes": 0, "started_us": 0}
 
 
 static func from_args(args: PackedStringArray) -> NetConditioner:
@@ -80,6 +81,7 @@ func start(target_ip: String, target_port: int, port := 0, bind_ip := "127.0.0.1
 	_target_ip = target_ip
 	_target_port = target_port
 	_rng.randomize()
+	_stats["started_us"] = Time.get_ticks_usec()
 	_running = true
 	_thread = Thread.new()
 	_thread.start(_loop)
@@ -181,6 +183,7 @@ func _deliver(q: Array, now: int, up: bool) -> void:
 		return
 	var keep: Array = []
 	var sent := 0
+	var bytes := 0
 	for item in q:
 		var it: Dictionary = item
 		if int(it["at"]) > now:
@@ -189,16 +192,19 @@ func _deliver(q: Array, now: int, up: bool) -> void:
 		var c: Dictionary = _clients.get(it["key"], {})
 		if c.is_empty():
 			continue
+		var pkt: PackedByteArray = it["data"]
 		if up:
-			(c["udp"] as PacketPeerUDP).put_packet(it["data"])
+			(c["udp"] as PacketPeerUDP).put_packet(pkt)
 		else:
 			_sock.set_dest_address(str(c["ip"]), int(c["port"]))
-			_sock.put_packet(it["data"])
+			_sock.put_packet(pkt)
 		sent += 1
+		bytes += pkt.size()
 	q.clear()
 	q.append_array(keep)
 	if sent > 0:
 		_mutex.lock()
 		var k := "up" if up else "down"
 		_stats[k] = int(_stats[k]) + sent
+		_stats[k + "_bytes"] = int(_stats[k + "_bytes"]) + bytes
 		_mutex.unlock()

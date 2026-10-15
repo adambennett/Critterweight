@@ -73,7 +73,9 @@ func test_soak_server_with_bots() -> void:
 	var pl: String = u.playlist("soak.json", [
 		{"id": "s_duel", "rules": "duel", "arena": "the_gullet", "weight": 2, "rules_override": {"rounds": 1, "round_time": 30}},
 		{"id": "s_ffa", "rules": "free_for_all", "arena": "the_gullet", "weight": 2, "min_players": 4, "rules_override": {"round_time": 30}},
-		{"id": "s_teams", "rules": "teams_2v2", "arena": "the_gullet", "weight": 1, "rules_override": {"rounds": 1, "round_time": 30}}],
+		{"id": "s_teams", "rules": "teams_2v2", "arena": "the_gullet", "weight": 1, "rules_override": {"rounds": 1, "round_time": 30}},
+		{"id": "s_hog", "rules": "spotlight_hog", "arena": "the_gullet", "weight": 1, "min_players": 4, "rules_override": {"round_time": 35}},
+		{"id": "s_rush", "rules": "chum_rush", "arena": "the_gullet", "weight": 1, "bots": 0, "rules_override": {"round_time": 35}}],
 		{"voting": {"enabled": true, "candidates": 3}, "repeat_avoidance": 1})
 	var cfg: String = u.write_cfg("srv.cfg", u.server_sections(port, {"server": {"stats_interval": 30},
 		"match": {"playlist": pl, "lobby_time": 5, "results_time": 3, "empty_behavior": "showcase"}}))
@@ -125,6 +127,16 @@ func test_soak_server_with_bots() -> void:
 	var cpu_pct := 0.0
 	if samples.size() >= 2 and float(last.get("t", 0)) > float(first.get("t", 0)):
 		cpu_pct = (float(last["cpu_s"]) - float(first["cpu_s"])) / (float(last["t"]) - float(first["t"])) * 100.0
+	# log files after the graceful exit (on-disk sizes lag while the server runs: INFO is buffered)
+	var final_log_bytes := 0
+	var final_log_files := 0
+	var fld := DirAccess.open(u.path("srv").path_join("logs"))
+	if fld:
+		for f in fld.get_files():
+			final_log_files += 1
+			final_log_bytes += FileAccess.get_file_as_bytes(u.path("srv").path_join("logs").path_join(f)).size()
+	last["log_bytes"] = final_log_bytes
+	last["log_files"] = final_log_files
 	var report := {"label": "LOOPBACK soak on one machine (i7-7700K, Windows 10)", "minutes": minutes, "samples": samples,
 		"server_static_mem_slope_mb_per_min": mem_slope, "server_ws_slope_mb_per_min": ws_slope,
 		"server_cpu_percent_of_one_core": cpu_pct, "matches_played": int(last.get("matches", 0)),

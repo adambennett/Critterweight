@@ -1245,7 +1245,8 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 	_aborting = ""
 	current_entry = entry_info.duplicate(true)
 	var mode := ModeRegistry.create(mode_id)
-	var cfg_m := {"arena": arena, "rules": rules.duplicate(true), "seed": seed_v, "mode": mode, "fighters": fighters}
+	var cfg_m := {"arena": arena, "rules": rules.duplicate(true), "seed": seed_v, "mode": mode, "fighters": fighters,
+		"online": true, "audio_context": "coop" if str(rules.get("format", "")) == "coop" else "versus"}
 	if dedicated:
 		sim = MatchSim.new()
 		sim.running = false

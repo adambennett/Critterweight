@@ -218,6 +218,63 @@ func test_kick_ban_and_violations_inprocess() -> void:
 	check(await _until(func() -> bool: return good.state == NetClient.State.LOBBY, 6.0), "server still admits others")
 
 
+func test_oversized_and_flood_inprocess() -> void:
+	var port := _port()
+	var server := _server(port)
+	var big := _client(port, {"name": "Bigmouth"})
+	check(await _until(func() -> bool: return big.state == NetClient.State.LOBBY, 6.0), "admitted")
+	var r1: Array = []
+	big.disconnected.connect(func(r: Dictionary) -> void: r1.append(r))
+	var huge := PackedByteArray([NetProtocol.C_CHAT])
+	huge.resize(5000)
+	big.send_raw(NetProtocol.CH_CONTROL, huge, true)
+	check(await _until(func() -> bool: return not r1.is_empty(), 4.0), "oversized message kicks at once")
+	if not r1.is_empty():
+		check_eq(int(r1[0]["code"]), NetProtocol.R_VIOLATION)
+	var flood := _client(port, {"name": "Flooder"})
+	check(await _until(func() -> bool: return flood.state == NetClient.State.LOBBY, 6.0), "admitted")
+	var r2: Array = []
+	flood.disconnected.connect(func(r: Dictionary) -> void: r2.append(r))
+	var w := NetWriter.new(NetProtocol.C_INPUT)
+	w.u16(1)
+	w.u32(0)
+	w.u8(1)
+	NetSnapshot.write_input(w, FighterInput.new())
+	var pkt := w.data()
+	for i in 3000:
+		flood.send_raw(NetProtocol.CH_INPUT, pkt, false)
+	check(await _until(func() -> bool: return not r2.is_empty(), 4.0), "input flood kicked")
+	if not r2.is_empty():
+		check(int(r2[0]["code"]) in [NetProtocol.R_VIOLATION, NetProtocol.R_FLOOD], "flood/violation reason (%s)" % NetProtocol.reason_name(int(r2[0]["code"])))
+	var ok := _client(port, {"name": "Polite"})
+	check(await _until(func() -> bool: return ok.state == NetClient.State.LOBBY, 6.0), "server unaffected")
+	check(server.is_running(), "server running")
+
+
+func test_host_leaving_ends_session() -> void:
+	var port := _port()
+	check_eq(Net.host({"port": port, "player_name": "Hosty", "lan_discovery": false, "max_players": 4}), OK, "listen server up")
+	check(Net.is_host() and Net.is_authority() and Net.is_session_active(), "roles")
+	check_eq(Net.local_peer_id(), NetServer.SERVER_ID, "host is player 1")
+	var c := _client(port, {"name": "Guest"})
+	check(await _until(func() -> bool: return c.state == NetClient.State.LOBBY, 6.0), "guest admitted")
+	check_eq(Net.peers().size(), 2, "host + guest listed")
+	var reqs: Array = []
+	var on_req := func(id: int, t: String, p: Dictionary) -> void: reqs.append([id, t, p])
+	Net.app_request.connect(on_req)
+	c.send_app("coop.ready_check", {"ok": true})
+	check(await _until(func() -> bool: return reqs.size() == 1, 3.0), "host received the guest request via Net.app_request")
+	Net.app_request.disconnect(on_req)
+	var reasons: Array = []
+	c.disconnected.connect(func(r: Dictionary) -> void: reasons.append(r))
+	Net.leave()
+	check(not Net.is_session_active(), "host is offline again at once")
+	check(await _until(func() -> bool: return not reasons.is_empty(), 4.0), "guest told")
+	if not reasons.is_empty():
+		check_eq(int(reasons[0]["code"]), NetProtocol.R_HOST_LEFT, "host_left reason")
+		check(str(reasons[0]["message"]).contains("host left"), "clear message: %s" % str(reasons[0]["message"]))
+
+
 func test_timeout_inprocess() -> void:
 	var port := _port()
 	var server := _server(port, {"timeout": 5})

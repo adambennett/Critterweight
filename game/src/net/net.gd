@@ -285,7 +285,8 @@ func _connect_client_signals() -> void:
 	client.admitted.connect(func(w: Dictionary) -> void:
 		_rejoin = {"address": client.address, "port": client.port, "token": client.token, "password": str(client.opts.get("password", "")),
 			"until_ms": Time.get_ticks_msec() + 3600 * 1000}
-		_set_state("lobby")
+		if client.state != NetClient.State.MATCH:
+			_set_state("lobby")
 		status_changed.emit("Connected to '%s'" % client.server_name)
 		joined.emit(w))
 	client.failed.connect(func(r: Dictionary) -> void:
@@ -323,6 +324,11 @@ func _connect_client_signals() -> void:
 # =====================================================================================
 
 func is_online() -> bool:
+	return role != "offline"
+
+
+## Used by the UI (MatchFlow): online sessions never pause.
+func is_session_active() -> bool:
 	return role != "offline"
 
 

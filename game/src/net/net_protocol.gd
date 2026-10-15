@@ -159,7 +159,8 @@ static func describe(code: int, details: Array = [], server_text := "") -> Dicti
 			R_SHUTDOWN:
 				msg = "The server shut down: %s" % server_text
 			_:
-				msg += "\n" + server_text
+				if not msg.contains(server_text):
+					msg += "\n" + server_text
 	return {"code": code, "title": title, "message": msg, "details": details.duplicate()}
 
 

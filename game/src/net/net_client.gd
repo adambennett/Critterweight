@@ -410,7 +410,9 @@ func _on_welcome(r: NetReader) -> void:
 	welcome = {"player_id": pid, "rejoined": flags & 1 != 0, "spectator": joined_as_spectator,
 		"spectator_because_full": flags & 4 != 0, "dedicated": flags & 8 != 0, "server_name": sname,
 		"tick_rate": tick_rate, "snapshot_rate": snap_rate, "motd": m}
-	_set_state(State.LOBBY)
+	# MATCH_START travels on another channel and may overtake this message under loss
+	if state != State.MATCH:
+		_set_state(State.LOBBY)
 	Log.i("net", "joined '%s' as player %d%s" % [sname, pid, " (rejoined)" if flags & 1 != 0 else ""])
 	admitted.emit(welcome)
 
@@ -419,7 +421,9 @@ func _on_lobby(d: Dictionary) -> void:
 	lobby = d
 	lobby_updated.emit(lobby)
 	var ph := str(d.get("phase", ""))
-	if state == State.MATCH and (ph == "lobby" or ph == "idle"):
+	# a lobby state from before this match (delayed on the control channel) must not end it
+	var fresh := int(d.get("match_id", 0)) >= int(match_info.get("match_id", 0))
+	if state == State.MATCH and (ph == "lobby" or ph == "idle") and fresh:
 		_end_match_presentation()
 		_set_state(State.LOBBY)
 		returned_to_lobby.emit()

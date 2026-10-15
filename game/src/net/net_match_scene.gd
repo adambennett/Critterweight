@@ -83,7 +83,8 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	_apply_presentation_settings()
 	# audio bridge on the mirror: impacts, voices, crowd, announcer and music like local play
 	var seed_v := int(info.get("match_id", 1))
-	Audio.attach_match(mirror.sim, my_index, {"context": "online", "seed": seed_v})
+	var ctx := "coop" if str((info.get("rules", {}) as Dictionary).get("format", "")) == "coop" else "versus"
+	Audio.attach_match(mirror.sim, my_index, {"context": ctx, "seed": seed_v})
 	Audio.music(_default_music(), 1.5, {"seed": seed_v})
 	if not Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.connect(hud.subtitle)
@@ -268,6 +269,11 @@ func _camera_focus() -> Array:
 func show_result(result: Dictionary) -> void:
 	_result = result
 	results_received.emit(result)
+
+
+## MatchFlow (UI) asks scenes that are not a local MatchScene whether a match is in progress.
+func is_match_running() -> bool:
+	return _result.is_empty() and mirror != null and mirror.sim != null and not mirror.sim.is_finished
 
 
 ## Mode choices offered to this player (hud_state "picks"): a panel like the local one; the
