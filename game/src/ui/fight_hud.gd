@@ -140,7 +140,7 @@ func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dic
 	var name_l := _label(f.display_name.to_upper(), 30 if big else 22, _font_heavy)
 	name_l.add_theme_color_override("font_color", team_col.lightened(0.3))
 	head.add_child(name_l)
-	var tag := _label(" (YOU)" if f.index == player_index else "", 20, _font)
+	var tag := _label(" (YOU)" if f.index == player_index and f.controller_kind == "player" else "", 20, _font)
 	head.add_child(tag)
 	var lives := _label("", 20, _font)
 	head.add_child(lives)
