@@ -745,7 +745,10 @@ func _st_move(dt: float) -> void:
 		sim.effects.tick_move(self, m, t, dt)
 	if move == null or move != m:
 		return
-	if t >= m.cancel_t0 and (not m.cancel_on_hit or move_hit_any) and state == State.ATTACK:
+	# a buffered string press cancels only once this strike has landed or its hit windows are over:
+	# mashing Light must not cut every strike off before it can connect (whiffs stay punishable)
+	var strike_done := move_hit_any or m.windows.is_empty() or t >= m.last_active()
+	if t >= m.cancel_t0 and (not m.cancel_on_hit or move_hit_any) and strike_done and state == State.ATTACK:
 		if _try_actions(true):
 			return
 	if t >= m.duration:

@@ -175,6 +175,14 @@ func first_active() -> float:
 	return windows[0]["t0"] if not windows.is_empty() else duration
 
 
+## When the last hit window closes (0 for moves without windows).
+func last_active() -> float:
+	var t := 0.0
+	for w in windows:
+		t = maxf(t, float(w["t1"]))
+	return t
+
+
 func in_ranges(ranges: Array, t: float) -> bool:
 	for r in ranges:
 		if r.size() >= 2 and t >= float(r[0]) and t <= float(r[1]):
