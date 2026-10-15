@@ -156,3 +156,17 @@ this at load from the manifest and the consent list `Mods.apply()` passes in, so
 content. Found in review: `override` alone skipped the consent prompt (a mod without `replaces_core` silently
 replaced core rules or took over another mod's entries). Building on another mod = `requires` + own entries or
 `extends`; cross-mod replacement would need its own explicit capability and consent design first.
+
+## D-028 Bot tiers: one answer per seen attack, reads as a skill, reaction-spaced ladder
+`BotBrain` answers each attack it sees begin once (block, timed parry tap, dodge, counter-poke, armored
+blow-through, or nothing) instead of re-rolling a defence every think; it punishes openings it has seen (blocked,
+dodged or whiffed moves that cannot be cancelled, a parried attacker) with the strongest own move that fits;
+`read` is a skill (spotting button-mashing and charge-ups, timing parry taps on an attacker's pattern, not trading
+with a read masher in neutral); reach is judged to the target's body, and during the fight the bot learns how its
+own moves connect and when an attack reaches it. Perception stays reaction-delayed, nothing is read from the
+opponent's input, and every action is a `FighterInput`. Tier reactions are spaced evenly across the jab-blocking
+threshold (0.50 / 0.36 / 0.26 / 0.16 / 0.10 s) because reaction time is the strongest skill lever between two
+bots (measured); campaign tiers name the same profiles (their stale overrides were dropped). Found: a
+button-masher beat the Headliner 5 of 6, the tier bench was flat (Headliner 4-8 vs Contender, Hall-of-Famer 7-5 vs
+Punching Bag), and the old timed-parry branch raised the guard before its press, so it never parried. Tables and
+behaviour: docs/BOTS.md.

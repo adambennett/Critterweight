@@ -8,9 +8,12 @@ extends TestCase
 ##   * it mostly loses to a Headliner (>= 70% of bouts) and to a Hall-of-Famer (>= 80%);
 ##   * against a Journeyman it is roughly even (reported; checked loosely with NAIVE_BOUTS).
 ## Bouts per fighter: NAIVE_BOUTS (default 2 for the Punching Bag, 1 for the top tiers; the
-## Journeyman runs only when NAIVE_BOUTS is set). The tables in docs/BOTS.md use NAIVE_BOUTS=4.
+## Journeyman runs only when NAIVE_BOUTS is set). The acceptance thresholds above apply from
+## NAIVE_BOUTS=4 (>= 24 bouts per tier, the tables in docs/BOTS.md); the default suite run is a
+## smaller regression check with looser top-tier thresholds (a 6-bout sample cannot resolve 70%).
 
 const ROUND := 45.0
+const FULL_SAMPLE := 4      ## bouts per fighter from which the acceptance thresholds apply
 
 
 class Masher:
@@ -99,15 +102,19 @@ func test_a_button_masher_beats_the_punching_bag() -> void:
 
 
 func test_the_masher_mostly_loses_to_a_headliner() -> void:
-	var r := await _series("headliner", _bouts_per_fighter(1), 1300)
+	var n := _bouts_per_fighter(1)
+	var r := await _series("headliner", n, 1300)
 	var bouts := int(r["bouts"])
-	check(float(r["bot_wins"]) / bouts >= 0.7, "a Headliner beats button-mashing in >= 70%% of bouts (%d / %d, %s)" % [r["bot_wins"], bouts, str(r["per"])])
+	var need := 0.7 if n >= FULL_SAMPLE else 0.5
+	check(float(r["bot_wins"]) / bouts >= need, "a Headliner beats button-mashing in >= %.0f%% of bouts (%d / %d, %s)" % [need * 100.0, r["bot_wins"], bouts, str(r["per"])])
 
 
 func test_the_masher_mostly_loses_to_a_hall_of_famer() -> void:
-	var r := await _series("hall_of_famer", _bouts_per_fighter(1), 1700)
+	var n := _bouts_per_fighter(1)
+	var r := await _series("hall_of_famer", n, 1700)
 	var bouts := int(r["bouts"])
-	check(float(r["bot_wins"]) / bouts >= 0.8, "a Hall-of-Famer beats button-mashing in >= 80%% of bouts (%d / %d, %s)" % [r["bot_wins"], bouts, str(r["per"])])
+	var need := 0.8 if n >= FULL_SAMPLE else 0.65
+	check(float(r["bot_wins"]) / bouts >= need, "a Hall-of-Famer beats button-mashing in >= %.0f%% of bouts (%d / %d, %s)" % [need * 100.0, r["bot_wins"], bouts, str(r["per"])])
 
 
 ## Reported (docs/BOTS.md); with NAIVE_BOUTS set it also checks the split is not lopsided.

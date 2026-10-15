@@ -27,19 +27,20 @@ const PROFILES := {
 	"pro": {"reaction": 0.26, "think": 0.1, "aggression": 0.62, "block": 0.55, "parry": 0.25, "dodge": 0.22,
 		"combo": 0.75, "ability": 0.65, "grab": 0.28, "mistake": 0.1, "spacing": 0.75, "juice": 0.9, "wake": 0.4, "mash_escape": 0.85,
 		"punish": 0.5, "read": 0.45, "heavy": 0.28},
-	"champion": {"reaction": 0.16, "think": 0.07, "aggression": 0.66, "block": 0.75, "parry": 0.4, "dodge": 0.3,
+	"champion": {"reaction": 0.16, "think": 0.07, "aggression": 0.66, "block": 0.75, "parry": 0.5, "dodge": 0.3,
 		"combo": 0.9, "ability": 0.8, "grab": 0.35, "mistake": 0.05, "spacing": 0.92, "juice": 1.0, "wake": 0.25, "mash_escape": 1.0,
-		"punish": 0.75, "read": 0.65, "heavy": 0.28},
+		"punish": 0.75, "read": 0.8, "heavy": 0.28},
 	# Hall-of-Famer (CAMPAIGN.md difficulty tiers): the quickest reads, near-flawless, reads charge-ups
 	"hall_of_famer": {"reaction": 0.1, "think": 0.04, "aggression": 0.75, "block": 1.0, "parry": 0.55, "dodge": 0.36,
 		"combo": 1.0, "ability": 0.85, "grab": 0.38, "mistake": 0.01, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0,
 		"punish": 1.0, "read": 1.0, "heavy": 0.28},
 }
 ## Profile keys: reaction (s, perception delay), think (s between decisions), aggression, block /
-## parry / dodge (chances to answer a seen attack that way), punish (chance to use a seen opening),
-## read (spotting habits: button-mashing, attack rhythm, armored blow-throughs), combo, heavy
-## (share of Heavies in neutral offence), ability, grab, mistake (per decision / per seen attack),
-## spacing, juice, wake (s of wake-up hesitation), mash_escape.
+## parry / dodge (shares of the answer to a seen attack), punish (chance to use a seen opening),
+## read (spotting habits: button-mashing and its pattern, charge-ups, armored blow-throughs, which
+## own moves connect from here), combo, heavy (share of Heavies in neutral offence), ability, grab,
+## mistake (per decision / per seen attack), spacing, juice, wake (s of wake-up hesitation),
+## mash_escape. docs/BOTS.md has the tier table and the measurements.
 
 var difficulty := "regular"
 var p := {}
@@ -72,6 +73,7 @@ var _per_slot := ""
 var _per_st := 0.0
 var _per_t := 0.0
 var _per_frozen := 0.0            ## how long the perceived move time has stood still (a held charge)
+var _seen_defend_t := -99.0       ## bot clock of the last record showing the target guarding or dodging
 var _answer := {}                 ## {id, kind, punished, charge} for the newest seen attack
 var _busy_until := -1.0           ## a queued answer (punish, armored attack) owns the next moments
 var _armor_next := 0.0
@@ -353,6 +355,10 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		_move = dir * 0.4
 		return
 	var stamina_ok := f.stamina > 18.0 or rng.randf() < 0.2
+	# a read button-masher is not traded with in neutral: his stream wins trades, so a reader waits
+	# for the openings it gives (parries, his Finisher's recovery, an armored blow-through)
+	if _mashing() and not f._armor_covers("light") and rng.randf() < _pv("read"):
+		stamina_ok = false
 	var aggression := float(p["aggression"]) * (1.25 if f.health_frac() > tgt.health_frac() else 0.9)
 	# attacks start at a rate per second, so a quicker thinker is not a more aggressive one
 	var p_attack := 1.0 - exp(-aggression * ATTACK_RATE * float(p["think"]) * (2.5 if f._armor_covers("light") else 1.0))
@@ -590,6 +596,8 @@ func _note_seen(tgt: Fighter) -> void:
 	var per := _perceived()
 	var ps := int(per.get("state", Fighter.State.NEUTRAL))
 	var atk := ps == Fighter.State.ATTACK or ps == Fighter.State.ABILITY
+	if ps == Fighter.State.GUARD or ps == Fighter.State.DODGE:
+		_seen_defend_t = float(per.get("t", _t))
 	var slot := str(per.get("slot", ""))
 	var pst := float(per.get("st", 0.0))
 	if atk and slot != "" and (not _per_atk or slot != _per_slot or pst < _per_st - 0.001):
@@ -814,9 +822,12 @@ func _jitter() -> float:
 	return rng.randfn(0.0, float(p["reaction"]) * 0.15)
 
 
-## True while the target throws attacks non-stop (>= 5 begun in the last 2 s of what it saw,
-## mostly Lights): a button-masher.
+## True while the target throws attacks non-stop and never defends (>= 5 begun in the last 2 s of
+## what it saw, mostly Lights, and no guard or dodge seen for 3 s): a button-masher. A quick
+## fighter's strings alone are not mashing - a player who also guards is reading the fight.
 func _mashing() -> bool:
+	if _t - _seen_defend_t < 3.0:
+		return false
 	var n := 0
 	var lights := 0
 	var since := _t - float(p["reaction"]) - 2.0

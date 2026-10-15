@@ -184,8 +184,8 @@ func on_back() -> bool: return false       # true = handled (close a sub-panel, 
   is true). The lead verifies every entry exists before release.
 * **Starting matches from UI:** `MatchFlow.launch(cfg)` (records `last_config` for Rematch/Restart, applies spectating).
   Put UI metadata in `cfg.ui = {mode, setup}` so Results can offer "Change fighters".
-* **Bot tiers:** `BotTiers.ids()/names()/brain_tier(id)`; Hall-of-Famer asks for a `hall_of_famer` BotBrain profile and
-  falls back to `champion` until the AI owner adds it.
+* **Bot tiers:** `BotTiers.ids()/names()/brain_tier(id)`; every tier, Hall-of-Famer included, has its own BotBrain
+  profile (docs/BOTS.md).
 * **Tutorial:** set `TutorialHook.launcher = func(lesson_id: String, fighter_id: String) -> void: ...` at startup.
   Entry point: `App.push("tutorial_menu")` (main menu → Tutorial, Settings › Gameplay → Open the tutorial).
 * **Creature presentation fields** (all optional): `name`, `title` (epithet), `element`, `stats`, `blurb` (playstyle),
