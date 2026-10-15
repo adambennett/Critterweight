@@ -48,3 +48,6 @@ Add `--capture <png> --capture-at <s>` to any windowed run to save a real render
   (implemented / built / auto-tested / Windows-runtime verified / externally unverified).
 - Never weaken an acceptance criterion or delete a meaningful test to pass. Loopback network tests are labeled loopback.
 - Before committing: `--check` and relevant `--test` filters pass. Commit messages end with the Co-Authored-By line.
+- Machine load: run FULL suites only via `tools/dev/run_suite.ps1` (one full suite at a time across all
+  checkouts, below-normal priority); otherwise run at most one Godot test process at a time, from a shell
+  lowered with `(Get-Process -Id $PID).PriorityClass = 'BelowNormal'`. Long benches/training at Idle.
