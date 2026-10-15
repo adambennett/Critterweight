@@ -174,3 +174,48 @@ func test_test_play_round_trip_restores_session() -> void:
 	check(back.stack.can_undo(), "undo history survived test play")
 	back.stack.undo()
 	check_eq(back.model.items.size(), count - 1, "and still works")
+
+
+## docs/UI.md layout rules for the editor (UI-10): at 1280x800 (Steam Deck) and 1920x1080 the
+## footer prompt bar stays on screen, the 3D canvas keeps a usable size, and every visible label,
+## button and the palette list render at >= 18 px. The headless root window is resized, so this
+## measures real layout.
+func test_layout_fits_and_text_is_readable() -> void:
+	var scr = await _open({"example": "layout_glandco_showcase"})
+	var root := get_tree().root
+	var old := root.size
+	for res in [Vector2i(1280, 800), Vector2i(1920, 1080)]:
+		root.size = res
+		await wait_frames(4)
+		var vr := get_viewport().get_visible_rect()
+		var px_per_du := get_viewport().get_final_transform().get_scale().y
+		var tag := "%dx%d" % [res.x, res.y]
+		var bars: Array = scr.find_children("*", "PromptBar", true, false)
+		check(bars.size() >= 1, "%s: the editor has a prompt bar" % tag)
+		for b in bars:
+			var r := (b as Control).get_global_rect()
+			check(r.end.y <= vr.end.y + 1.0 and r.end.x <= vr.end.x + 1.0, "%s: prompts on screen (%s in %s)" % [tag, str(r), str(vr.size)])
+		var vpr: Rect2 = (scr.vp as Control).get_global_rect()
+		check(vpr.size.x * px_per_du >= 500.0 and vpr.size.y * px_per_du >= 300.0, "%s: canvas stays usable (%s px)" % [tag, str(vpr.size * px_per_du)])
+		var smallest := 999.0
+		var which := ""
+		for n in scr.find_children("*", "", true, false):
+			var size_du := 0
+			var text := ""
+			if n is Label and (n as Label).is_visible_in_tree():
+				text = (n as Label).text
+				size_du = (n as Label).get_theme_font_size("font_size")
+			elif n is Button and (n as Button).is_visible_in_tree():
+				text = (n as Button).text
+				size_du = (n as Button).get_theme_font_size("font_size")
+			elif n is ItemList and (n as ItemList).is_visible_in_tree():
+				text = "palette"
+				size_du = (n as ItemList).get_theme_font_size("font_size")
+			if text.strip_edges() == "":
+				continue
+			if size_du * px_per_du < smallest:
+				smallest = size_du * px_per_du
+				which = text
+		check(smallest >= 18.0 - 0.01, "%s: smallest text '%s' is %.1f px (>= 18)" % [tag, which.substr(0, 30), smallest])
+	root.size = old
+	await wait_frames(2)

@@ -12,7 +12,9 @@ extends Screen
 ## Esc cancel, H help. Controller: left stick cursor, right stick orbit (Y = pitch), LT/RT zoom,
 ## A place/select (A on the selection carries it), B back/cancel, X delete, Y rotate, LB/RB palette
 ## tab, D-pad nudge (or palette item when nothing is selected), Start menu, View panels, L3 snap.
-## Self-contained: plain Godot controls with a local theme (the shared UI theme can replace it).
+## UI (docs/UI.md): the shared UiTheme with a denser variant for the tool panels (compact_theme,
+## text never below 28 du), PromptBar footer prompts with device glyphs, UiButton dialog entries
+## in PanelDialog overlays, TabButton palette tabs. The 3D canvas keeps its own pointer/stick input.
 
 const TABS := ["obstacles", "walls", "hazards", "pickups", "markers"]
 const COL_BG := Color("#1A1D24")
@@ -23,6 +25,7 @@ const COL_DANGER := Color("#FF5A5A")
 const COL_OK := Color("#8BD426")
 const COL_WARN := Color("#FFC43D")
 const STICK_DEAD := 0.22
+const MAX_ISSUES_SHOWN := 4
 
 static var _session := {}
 
@@ -64,6 +67,9 @@ var _layout_box: VBoxContainer
 var _issues_box: VBoxContainer
 var _status: Label
 var _hints: Label
+var _issues_expanded := false
+var _prompts: PromptBar
+var _hint_key := ""
 var _undo_btn: Button
 var _redo_btn: Button
 var _right_scroll: ScrollContainer
@@ -75,8 +81,10 @@ var _first_panel_control: Control
 # =====================================================================================
 
 func on_enter(p: Dictionary) -> void:
-	theme = _make_theme()
+	# the shared UiTheme is applied by Screen; the editor panels add a denser variant of it
 	_build_ui()
+	if not Controls.device_changed.is_connected(_on_device_changed):
+		Controls.device_changed.connect(_on_device_changed)
 	if bool(p.get("resume", false)) and not _session.is_empty():
 		_restore_session()
 	elif p.has("example"):
@@ -94,8 +102,14 @@ func on_enter(p: Dictionary) -> void:
 
 
 func on_exit() -> void:
+	if Controls.device_changed.is_connected(_on_device_changed):
+		Controls.device_changed.disconnect(_on_device_changed)
 	if not _leaving:
 		_save_session()
+
+
+func _on_device_changed(_kind: String) -> void:
+	_hint_key = ""
 
 
 func default_focus() -> Control:
@@ -159,108 +173,106 @@ func _on_model_changed(what: String) -> void:
 # UI construction
 # =====================================================================================
 
-func _make_theme() -> Theme:
+## Dense tool layout on top of the shared UiTheme (docs/UI.md): same palette, fonts and gold focus
+## ring, tighter padding, and text that never drops below the 28 du legibility floor. Applied to
+## the editor's panels only; overlays and dialogs use the game's own dialog styling.
+static func compact_theme() -> Theme:
+	var base := UiTheme.get_theme()
 	var t := Theme.new()
-	var body := load("res://assets/fonts/Barlow-400.woff2")
-	var bold := load("res://assets/fonts/Barlow-600.woff2")
-	t.default_font = body
-	t.default_font_size = 20
-	var panel := StyleBoxFlat.new()
-	panel.bg_color = Color(COL_BG, 0.94)
-	panel.set_corner_radius_all(6)
-	panel.set_content_margin_all(10)
+	for type in ["Button", "PrimaryButton", "DangerButton", "TabButton", "TabButtonActive"]:
+		if type != "Button":
+			t.set_type_variation(type, "Button")
+		for st in ["normal", "hover", "pressed", "hover_pressed", "disabled", "focus"]:
+			var sb := base.get_stylebox(st, type).duplicate() as StyleBox
+			sb.content_margin_left = 14.0
+			sb.content_margin_right = 14.0
+			sb.content_margin_top = 6.0
+			sb.content_margin_bottom = 6.0
+			t.set_stylebox(st, type, sb)
+		t.set_font_size("font_size", type, UiTheme.size("button_sm"))
+	for type2 in ["OptionButton", "CheckBox"]:
+		t.set_font_size("font_size", type2, UiTheme.size("button_sm"))
+	var panel := base.get_stylebox("panel", "PanelContainer").duplicate() as StyleBox
+	panel.content_margin_left = 16.0
+	panel.content_margin_right = 16.0
+	panel.content_margin_top = 14.0
+	panel.content_margin_bottom = 14.0
 	t.set_stylebox("panel", "PanelContainer", panel)
-	var btn := StyleBoxFlat.new()
-	btn.bg_color = Color("#2B2F3A")
-	btn.set_corner_radius_all(5)
-	btn.set_content_margin_all(7)
-	var btn_hover := btn.duplicate() as StyleBoxFlat
-	btn_hover.bg_color = Color("#3A3F4C")
-	var btn_press := btn.duplicate() as StyleBoxFlat
-	btn_press.bg_color = Color("#4A3F1C")
-	var focus := StyleBoxFlat.new()
-	focus.draw_center = false
-	focus.border_color = COL_GOLD
-	focus.set_border_width_all(3)
-	focus.set_corner_radius_all(6)
-	focus.set_expand_margin_all(2)
-	for cls in ["Button", "OptionButton", "CheckBox", "CheckButton"]:
-		t.set_stylebox("normal", cls, btn)
-		t.set_stylebox("hover", cls, btn_hover)
-		t.set_stylebox("pressed", cls, btn_press)
-		t.set_stylebox("focus", cls, focus)
-		t.set_color("font_color", cls, COL_TEXT)
-		t.set_color("font_hover_color", cls, Color.WHITE)
-		t.set_color("font_focus_color", cls, Color.WHITE)
-		t.set_font("font", cls, bold)
-	for cls2 in ["LineEdit", "SpinBox", "ItemList", "HSlider"]:
-		t.set_stylebox("focus", cls2, focus)
-	var field := StyleBoxFlat.new()
-	field.bg_color = Color("#12141A")
-	field.set_corner_radius_all(4)
-	field.set_content_margin_all(6)
-	t.set_stylebox("normal", "LineEdit", field)
+	var field := UiTheme.box(UiTheme.BG_DEEP, UiTheme.RADIUS, 10.0, 6.0)
+	field.border_color = UiTheme.LINE
+	field.set_border_width_all(2)
 	t.set_stylebox("panel", "ItemList", field)
-	t.set_color("font_color", "LineEdit", COL_TEXT)
-	t.set_color("font_color", "ItemList", COL_TEXT)
-	t.set_color("font_selected_color", "ItemList", Color.WHITE)
-	var sel := StyleBoxFlat.new()
-	sel.bg_color = Color("#4A3F1C")
-	sel.set_corner_radius_all(4)
+	t.set_stylebox("focus", "ItemList", UiTheme.focus_ring())
+	var sel := UiTheme.box(Color(UiTheme.GOLD, 0.22), 4, 6.0, 2.0)
 	t.set_stylebox("selected", "ItemList", sel)
 	t.set_stylebox("selected_focus", "ItemList", sel)
-	t.set_stylebox("cursor", "ItemList", focus)
+	t.set_stylebox("hovered", "ItemList", UiTheme.box(Color(UiTheme.SURFACE_HI, 0.7), 4, 6.0, 2.0))
+	t.set_stylebox("cursor", "ItemList", UiTheme.focus_ring(4, 0.0))
 	t.set_stylebox("cursor_unfocused", "ItemList", StyleBoxEmpty.new())
-	t.set_color("font_color", "Label", COL_TEXT)
-	t.set_color("font_color", "CheckBox", COL_TEXT)
+	t.set_color("font_color", "ItemList", UiTheme.TEXT)
+	t.set_color("font_selected_color", "ItemList", Color.WHITE)
+	t.set_color("font_hovered_color", "ItemList", Color.WHITE)
+	t.set_font("font", "ItemList", UiTheme.font("body"))
+	t.set_font_size("font_size", "ItemList", UiTheme.size("body"))
+	t.set_constant("v_separation", "ItemList", 6)
+	t.set_font_size("font_size", "LineEdit", UiTheme.size("body"))
+	t.set_stylebox("background", "ProgressBar", UiTheme.box(UiTheme.BG_DEEP, 4, 0.0, 0.0))
 	return t
 
 
+## Section header (gold eyebrow) or panel title (H3).
 func _header(text: String, size := 26) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.add_theme_font_override("font", load("res://assets/fonts/BarlowCondensed-900.woff2"))
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_color", COL_GOLD)
-	return l
+	return UiTheme.label(text, "H3" if size >= 30 else "Eyebrow")
 
 
-func _label(text: String, col := COL_TEXT, size := 19) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.add_theme_color_override("font_color", col)
-	l.add_theme_font_size_override("font_size", size)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	return l
+## Body text in one of the theme's text styles, picked by meaning (colour); `_size` is ignored
+## (sizes come from the theme so the text-size setting and the 28 du floor always apply).
+func _label(text: String, col := COL_TEXT, _size := 19) -> Label:
+	var v := "Body"
+	if col == COL_MUTED:
+		v = "BodyMuted"
+	elif col == COL_GOLD:
+		v = "Eyebrow"
+	elif col == COL_WARN:
+		v = "Warning"
+	elif col == COL_OK:
+		v = "Success"
+	elif col == COL_DANGER:
+		v = "Danger"
+	return UiTheme.label(text, v, true)
 
 
-func _button(text: String, cb: Callable, tip := "") -> Button:
+func _button(text: String, cb: Callable, tip := "", variation := "") -> Button:
 	var b := Button.new()
 	b.text = text
 	b.tooltip_text = tip
-	b.pressed.connect(cb)
+	b.theme_type_variation = variation
+	b.pressed.connect(func() -> void:
+		Audio.sfx("ui_accept")
+		cb.call())
 	b.focus_mode = Control.FOCUS_ALL
 	return b
 
 
 func _build_ui() -> void:
 	var bg := ColorRect.new()
-	bg.color = Color("#0B0D12")
+	bg.color = UiTheme.BG_DEEP
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 	_root_box = HBoxContainer.new()
+	_root_box.theme = compact_theme()
 	_root_box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_root_box.add_theme_constant_override("separation", 8)
-	_root_box.offset_left = 8
-	_root_box.offset_top = 8
-	_root_box.offset_right = -8
-	_root_box.offset_bottom = -8
+	_root_box.add_theme_constant_override("separation", UiTheme.GAP_S)
+	_root_box.offset_left = UiTheme.GAP_S
+	_root_box.offset_top = UiTheme.GAP_S
+	_root_box.offset_right = -UiTheme.GAP_S
+	_root_box.offset_bottom = -UiTheme.GAP_S
 	add_child(_root_box)
 	_build_palette_panel()
 	var center := VBoxContainer.new()
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	center.add_theme_constant_override("separation", 6)
+	center.add_theme_constant_override("separation", UiTheme.GAP_XS)
 	_root_box.add_child(center)
 	_build_top_bar(center)
 	var frame := PanelContainer.new()
@@ -268,7 +280,7 @@ func _build_ui() -> void:
 	var fs := StyleBoxFlat.new()
 	fs.bg_color = Color.BLACK
 	fs.set_border_width_all(2)
-	fs.border_color = Color("#2B2F3A")
+	fs.border_color = UiTheme.LINE
 	frame.add_theme_stylebox_override("panel", fs)
 	center.add_child(frame)
 	vp = ArenaEditorViewport.new()
@@ -277,14 +289,20 @@ func _build_ui() -> void:
 	vp.pointer_moved.connect(_on_pointer_moved)
 	vp.pointer_pressed.connect(_on_pointer_pressed)
 	vp.pointer_released.connect(_on_pointer_released)
-	vp.focus_entered.connect(func(): _refresh_hints())
+	vp.focus_entered.connect(func(): _hint_key = "")
 	var bottom := PanelContainer.new()
 	center.add_child(bottom)
 	var bb := VBoxContainer.new()
+	bb.add_theme_constant_override("separation", 2)
 	bottom.add_child(bb)
-	_status = _label("", COL_TEXT, 19)
+	_status = UiTheme.label("", "BodyStrong", true)
+	_status.custom_minimum_size = Vector2(0, 40)
 	bb.add_child(_status)
-	_hints = _label("", COL_MUTED, 17)
+	_prompts = PromptBar.new()
+	_prompts.alignment = BoxContainer.ALIGNMENT_BEGIN
+	_prompts.add_theme_constant_override("separation", 28)
+	bb.add_child(_prompts)
+	_hints = UiTheme.label("", "Caption", true)
 	bb.add_child(_hints)
 	_build_right_panel()
 
@@ -293,106 +311,122 @@ func _build_top_bar(parent: Control) -> void:
 	var bar := PanelContainer.new()
 	parent.add_child(bar)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
+	row.add_theme_constant_override("separation", UiTheme.GAP_XS)
 	bar.add_child(row)
-	_name_edit = LineEdit.new()
-	_name_edit.custom_minimum_size = Vector2(200, 0)
-	_name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_name_edit.placeholder_text = "Layout name"
-	_name_edit.max_length = 40
-	_name_edit.text_submitted.connect(func(_t): _commit_name())
-	_name_edit.focus_exited.connect(_commit_name)
-	row.add_child(_name_edit)
-	_base_opt = OptionButton.new()
-	_base_opt.tooltip_text = "Arena base (starts a new layout)"
-	row.add_child(_base_opt)
-	for b in ArenaCatalog.base_ids():
-		_base_opt.add_item(str(ArenaCatalog.base(b).get("name", b)))
-		_base_opt.set_item_metadata(_base_opt.item_count - 1, b)
-	_base_opt.item_selected.connect(_on_base_selected)
-	_variant_opt = OptionButton.new()
-	_variant_opt.tooltip_text = "Theme variant"
-	_variant_opt.item_selected.connect(_on_variant_selected)
-	row.add_child(_variant_opt)
 	_undo_btn = _button("Undo", _undo, "Ctrl+Z")
 	_redo_btn = _button("Redo", _redo, "Ctrl+Y")
 	row.add_child(_undo_btn)
 	row.add_child(_redo_btn)
 	row.add_child(_button("Save", _save, "Ctrl+S"))
 	row.add_child(_button("Load", _open_load_dialog))
-	row.add_child(_button("Test Play", _open_test_dialog, "F5"))
+	var sp := Control.new()
+	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(sp)
+	row.add_child(_button("Help", _open_help, "H / F1"))
 	row.add_child(_button("Menu", _open_menu, "Start / Esc"))
+	row.add_child(_button("Test Play", _open_test_dialog, "F5", "PrimaryButton"))
 
 
 func _build_palette_panel() -> void:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(320, 0)
+	panel.custom_minimum_size = Vector2(420, 0)
 	_root_box.add_child(panel)
 	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 6)
+	v.add_theme_constant_override("separation", UiTheme.GAP_XS)
 	panel.add_child(v)
-	v.add_child(_header("ARENA EDITOR", 34))
-	v.add_child(_header("PALETTE", 24))
+	v.add_child(_header("ARENA EDITOR", 38))
+	_name_edit = LineEdit.new()
+	_name_edit.placeholder_text = "Layout name"
+	_name_edit.max_length = 40
+	_name_edit.tooltip_text = "Layout name (also its file name)"
+	_name_edit.text_submitted.connect(func(_t): _commit_name())
+	_name_edit.focus_exited.connect(_commit_name)
+	v.add_child(_name_edit)
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", UiTheme.GAP_S)
+	v.add_child(grid)
+	grid.add_child(UiTheme.label("Base", "BodyMuted"))
+	_base_opt = OptionButton.new()
+	_base_opt.tooltip_text = "Arena base (starts a new layout; Undo restores this one)"
+	_base_opt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_child(_base_opt)
+	for b in ArenaCatalog.base_ids():
+		_base_opt.add_item(str(ArenaCatalog.base(b).get("name", b)))
+		_base_opt.set_item_metadata(_base_opt.item_count - 1, b)
+	_base_opt.item_selected.connect(_on_base_selected)
+	grid.add_child(UiTheme.label("Look", "BodyMuted"))
+	_variant_opt = OptionButton.new()
+	_variant_opt.tooltip_text = "Theme variant (lighting and dressing)"
+	_variant_opt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_variant_opt.item_selected.connect(_on_variant_selected)
+	grid.add_child(_variant_opt)
+	v.add_child(_header("PALETTE"))
 	var tabs := HFlowContainer.new()
+	tabs.add_theme_constant_override("h_separation", 4)
+	tabs.add_theme_constant_override("v_separation", 4)
 	v.add_child(tabs)
 	for i in TABS.size():
-		var tb := _button(str(ArenaCatalog.TAB_LABELS[TABS[i]]), _set_tab.bind(i), "LB / RB  ·  [ / ]")
-		tb.toggle_mode = true
+		var tb := _button(str(ArenaCatalog.TAB_LABELS[TABS[i]]), _set_tab.bind(i), "LB / RB  ·  Q / E  ·  [ / ]", "TabButton")
+		tb.focus_mode = Control.FOCUS_NONE     # tabs switch with LB/RB (Q/E); not focus stops
 		tabs.add_child(tb)
 		_tab_buttons.append(tb)
 	_palette = ItemList.new()
 	_palette.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_palette.custom_minimum_size = Vector2(0, 420)
+	_palette.custom_minimum_size = Vector2(0, 260)
 	_palette.item_selected.connect(_on_palette_selected)
 	_palette.item_activated.connect(func(i): _on_palette_selected(i); vp.grab_focus())
 	v.add_child(_palette)
-	_palette_desc = _label("", COL_MUTED, 17)
-	_palette_desc.custom_minimum_size = Vector2(0, 110)
+	_palette_desc = UiTheme.label("", "Caption", true)
+	_palette_desc.custom_minimum_size = Vector2(0, 120)
 	v.add_child(_palette_desc)
 	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", UiTheme.GAP_XS)
 	v.add_child(row)
 	row.add_child(_button("Grid snap", func(): _toggle_snap(), "G / L3"))
 	row.add_child(_button("Team", func(): _cycle_team(), "T: spawn/goal team"))
-	row.add_child(_button("Help", _open_help, "H"))
 
 
 func _build_right_panel() -> void:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(400, 0)
+	panel.custom_minimum_size = Vector2(500, 0)
 	_root_box.add_child(panel)
 	_right_scroll = ScrollContainer.new()
 	_right_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_right_scroll.follow_focus = true
 	panel.add_child(_right_scroll)
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	v.add_theme_constant_override("separation", 8)
+	v.add_theme_constant_override("separation", UiTheme.GAP_XS)
 	_right_scroll.add_child(v)
 	v.add_child(_header("BUDGET"))
 	for key in ["budget", "props", "hazards", "pickups", "clear_floor"]:
 		var row := HBoxContainer.new()
-		var name_l := _label({"budget": "Points", "props": "Props", "hazards": "Hazards", "pickups": "Pickups", "clear_floor": "Clear floor"}[key], COL_MUTED, 18)
-		name_l.custom_minimum_size = Vector2(110, 0)
+		var name_l := UiTheme.label({"budget": "Points", "props": "Props", "hazards": "Hazards", "pickups": "Pickups", "clear_floor": "Clear floor"}[key], "BodyMuted")
+		name_l.custom_minimum_size = Vector2(150, 0)
 		row.add_child(name_l)
 		var bar := ProgressBar.new()
 		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		bar.custom_minimum_size = Vector2(0, 22)
+		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		bar.custom_minimum_size = Vector2(0, 20)
 		bar.show_percentage = false
 		row.add_child(bar)
-		var val := _label("", COL_TEXT, 18)
-		val.custom_minimum_size = Vector2(90, 0)
+		var val := UiTheme.label("", "Value")
+		val.custom_minimum_size = Vector2(110, 0)
 		val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		row.add_child(val)
 		v.add_child(row)
 		_meters[key] = [bar, val]
+	# live validation sits right under the budget so problems are always on screen
+	v.add_child(_header("VALIDATION"))
+	_issues_box = VBoxContainer.new()
+	v.add_child(_issues_box)
 	v.add_child(_header("SELECTION"))
 	_inspector = VBoxContainer.new()
 	v.add_child(_inspector)
 	v.add_child(_header("LAYOUT"))
 	_layout_box = VBoxContainer.new()
 	v.add_child(_layout_box)
-	v.add_child(_header("VALIDATION"))
-	_issues_box = VBoxContainer.new()
-	v.add_child(_issues_box)
 
 
 # =====================================================================================
@@ -428,7 +462,7 @@ func _refresh_history() -> void:
 
 func _refresh_palette() -> void:
 	for i in _tab_buttons.size():
-		_tab_buttons[i].button_pressed = i == tab
+		_tab_buttons[i].theme_type_variation = "TabButtonActive" if i == tab else "TabButton"
 	_palette.clear()
 	var entries := ArenaCatalog.palette(TABS[tab])
 	for e in entries:
@@ -519,8 +553,9 @@ func _size_slider(axis: int, lo: float, hi: float, cur: float, step: float) -> H
 	s.value = cur
 	s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	s.focus_mode = Control.FOCUS_ALL
-	var val := _label("%.1f m" % cur, COL_TEXT, 18)
-	val.custom_minimum_size = Vector2(70, 0)
+	var val := UiTheme.label("%.1f m" % cur, "Value")
+	val.custom_minimum_size = Vector2(100, 0)
+	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	s.value_changed.connect(func(x): val.text = "%.1f m" % x)
 	s.drag_ended.connect(func(_c): _on_size_changed(axis, s.value))
 	s.focus_exited.connect(func(): _on_size_changed(axis, s.value))
@@ -562,8 +597,8 @@ func _refresh_inspector() -> void:
 
 func _spin_row(label: String, value: float, lo: float, hi: float, step: float, cb: Callable) -> HBoxContainer:
 	var row := HBoxContainer.new()
-	var l := _label(label, COL_MUTED, 18)
-	l.custom_minimum_size = Vector2(70, 0)
+	var l := UiTheme.label(label, "BodyMuted")
+	l.custom_minimum_size = Vector2(100, 0)
 	row.add_child(l)
 	var sb := SpinBox.new()
 	sb.min_value = lo
@@ -590,16 +625,26 @@ func _refresh_validation() -> void:
 	var issues: Array = validation["errors"] + validation["warnings"]
 	if issues.is_empty():
 		_issues_box.add_child(_label("✔ Layout is valid for every declared mode.", COL_OK, 19))
-	for it in issues:
+	var shown := issues if _issues_expanded or issues.size() <= MAX_ISSUES_SHOWN else issues.slice(0, MAX_ISSUES_SHOWN)
+	for it in shown:
 		var err := str(it["severity"]) == "error"
 		var b := Button.new()
+		# shape + word, never colour alone: ✖ error / ▲ warning
 		b.text = ("✖ " if err else "▲ ") + str(it["message"])
+		b.tooltip_text = "Click (A) to select the culprit"
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		b.add_theme_color_override("font_color", COL_DANGER if err else COL_WARN)
-		b.add_theme_font_size_override("font_size", 17)
+		b.add_theme_color_override("font_focus_color", COL_DANGER.lightened(0.3) if err else COL_WARN.lightened(0.3))
+		b.add_theme_color_override("font_hover_color", COL_DANGER.lightened(0.3) if err else COL_WARN.lightened(0.3))
 		b.pressed.connect(_on_issue_pressed.bind(it))
 		_issues_box.add_child(b)
+	if issues.size() > MAX_ISSUES_SHOWN:
+		var toggle := func() -> void:
+			_issues_expanded = not _issues_expanded
+			_need_validate = true
+		var more_text := "Show fewer" if _issues_expanded else "Show all %d issues" % issues.size()
+		_issues_box.add_child(_button(more_text, toggle, "", "FlatButton"))
 	vp.set_pins(issues)
 	_palette_colors()
 
@@ -624,19 +669,46 @@ func _palette_colors() -> void:
 		_palette.set_item_custom_fg_color(i, COL_TEXT if _placement_allowed(id).is_empty() else COL_MUTED)
 
 
+## Footer: context prompts (device glyphs from the shared PromptBar) plus one line of the
+## device's extra controls. Rebuilt only when the editing context or the device changes.
 func _refresh_hints() -> void:
-	if _hints == null:
+	if _hints == null or _prompts == null:
 		return
-	if Controls.last_device == "gamepad":
-		_hints.text = "LS cursor · RS orbit · LT/RT zoom · A place/select (A on selection = carry) · B cancel · X delete · Y rotate · LB/RB tabs · D-pad nudge/item · View panels · Menu: Start"
+	var pad := Controls.last_device == "gamepad"
+	var key := "%s|%d|%s|%s|%s" % [armed, selected, carrying, pad, _overlay != null]
+	if key == _hint_key:
+		return
+	_hint_key = key
+	var ps: Array = []
+	if carrying:
+		ps.append({"actions": ["ui_accept"], "text": "Drop"})
+		ps.append({"actions": ["ui_cancel"], "text": "Cancel"})
+	elif armed != "":
+		ps.append({"actions": ["ui_accept"], "text": "Place"})
+		ps.append({"actions": ["ui_alt"], "text": "Rotate"})
+		ps.append({"actions": ["ui_cancel"], "text": "Disarm", "call": func() -> void: _cancel()})
+	elif selected >= 0:
+		ps.append({"actions": ["ui_accept"], "text": "Move" if pad else "Select"})
+		ps.append({"actions": ["ui_alt"], "text": "Rotate", "call": func() -> void: _rotate(1)})
+		ps.append({"actions": ["ui_extra"], "text": "Delete", "call": _delete})
+		ps.append({"actions": ["ui_cancel"], "text": "Deselect", "call": func() -> void: _cancel()})
 	else:
-		_hints.text = "LMB place/select/drag (Alt: free) · RMB orbit/cancel · MMB pan · Wheel zoom · R rotate · Del delete · Ctrl+D dup · Ctrl+Z/Y undo/redo · Ctrl+S save · [ ] tabs · T team · G snap · F5 test · Esc menu"
+		ps.append({"actions": ["ui_accept"], "text": "Select"})
+	ps.append({"actions": ["ui_tab_prev", "ui_tab_next"], "text": "Palette"})
+	# keyboard Esc is both cancel and menu (it cancels first): show Menu only when nothing to cancel
+	if pad or ps.size() <= 2:
+		ps.append({"actions": ["pause"], "text": "Menu", "call": _open_menu})
+	_prompts.set_prompts(ps)
+	if pad:
+		_hints.text = "Left stick: cursor  ·  Right stick: orbit  ·  LT / RT: zoom  ·  D-pad: nudge / pick item  ·  View: side panels"
+	else:
+		_hints.text = "Drag to move (Alt: no snap)  ·  Right-drag: orbit  ·  Middle-drag: pan  ·  Wheel: zoom  ·  Ctrl+Z / Ctrl+Y  ·  Ctrl+D duplicate  ·  Ctrl+S save  ·  F5 test  ·  H help"
 
 
 func _status_msg(text: String, col := COL_TEXT, seconds := 4.0) -> void:
 	if _status:
 		_status.text = text
-		_status.add_theme_color_override("font_color", col)
+		_status.theme_type_variation = "Warning" if col == COL_WARN else ("Danger" if col == COL_DANGER else ("Success" if col == COL_OK else "BodyStrong"))
 		_status_until = Time.get_ticks_msec() / 1000.0 + seconds
 
 
@@ -662,6 +734,7 @@ func _process(dt: float) -> void:
 		_refresh_validation()
 	if _status and _status.text != "" and Time.get_ticks_msec() / 1000.0 > _status_until:
 		_status.text = ""
+	_refresh_hints()
 	if _overlay == null and _canvas_active():
 		_poll_sticks(dt)
 	_update_ghost()
@@ -1294,27 +1367,37 @@ func _test_play(format: String) -> void:
 func _make_overlay(title: String, width := 620) -> VBoxContainer:
 	_close_overlay()
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.55)
+	dim.color = Color(UiTheme.BG_DEEP, 0.72)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.add_child(center)
 	var panel := PanelContainer.new()
+	panel.theme_type_variation = "PanelDialog"
 	panel.custom_minimum_size = Vector2(width, 0)
 	center.add_child(panel)
 	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 8)
+	v.add_theme_constant_override("separation", UiTheme.GAP_S)
 	panel.add_child(v)
-	v.add_child(_header(title, 32))
+	v.add_child(UiTheme.label(title, "H2"))
 	_overlay = dim
+	_hint_key = ""
 	return v
+
+
+## Dialog/menu entry: the shared UiButton (gold focus ring, chevron, hover focuses, sounds).
+func _menu_button(text: String, cb: Callable, variation := "") -> UiButton:
+	var b := UiButton.new(text, variation)
+	b.pressed.connect(cb)
+	return b
 
 
 func _close_overlay() -> void:
 	if _overlay and is_instance_valid(_overlay):
 		_overlay.queue_free()
 	_overlay = null
+	_hint_key = ""
 	if is_inside_tree():
 		vp.grab_focus.call_deferred()
 
@@ -1327,25 +1410,25 @@ func _focus_first(v: Control) -> void:
 
 
 func _open_menu() -> void:
-	var v := _make_overlay("EDITOR MENU", 520)
+	var v := _make_overlay("EDITOR MENU", 640)
 	for entry in [["Save  (Ctrl+S)", _save], ["Load layout / example", _open_load_dialog], ["New layout on a base", _open_new_dialog],
 			["Test play  (F5)", _open_test_dialog], ["Export package", func(): _close_overlay(); _export()],
 			["Import package", _open_import_dialog], ["Controls", _open_help], ["Exit editor", _exit], ["Back to editing", _close_overlay]]:
-		var b := _button(str(entry[0]), entry[1])
+		var b := _menu_button(str(entry[0]), entry[1])
 		v.add_child(b)
 	_focus_first(v)
 
 
 func _open_new_dialog() -> void:
-	var v := _make_overlay("NEW LAYOUT", 620)
+	var v := _make_overlay("NEW LAYOUT", 980)
 	v.add_child(_label("Pick a base. The current layout can be restored with Undo.", COL_MUTED))
 	for b in ArenaCatalog.base_ids():
 		var bd := ArenaCatalog.base(b)
-		var btn := _button("%s — %s" % [str(bd.get("name", b)), str(bd.get("description", "")).substr(0, 90)], _new_layout_on.bind(str(b)))
+		var btn := _menu_button("%s — %s" % [str(bd.get("name", b)), str(bd.get("description", "")).substr(0, 90)], _new_layout_on.bind(str(b)))
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		v.add_child(btn)
-	v.add_child(_button("Cancel", _close_overlay))
+	v.add_child(_menu_button("Cancel", _close_overlay))
 	_focus_first(v)
 
 
@@ -1358,9 +1441,9 @@ func _new_layout_on(b: String) -> void:
 
 
 func _open_load_dialog() -> void:
-	var v := _make_overlay("LOAD LAYOUT", 760)
+	var v := _make_overlay("LOAD LAYOUT", 980)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 560)
+	scroll.custom_minimum_size = Vector2(0, 600)
 	v.add_child(scroll)
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1368,11 +1451,11 @@ func _open_load_dialog() -> void:
 	list.add_child(_label("Examples", COL_GOLD))
 	for e in ArenaLibrary.examples():
 		var id := str(e["id"])
-		list.add_child(_button("%s  ·  %s" % [str(e["name"]), str(ArenaCatalog.base(str(e["base"])).get("name", e["base"]))], func(): _close_overlay(); _open_content(id)))
+		list.add_child(_menu_button("%s  ·  %s" % [str(e["name"]), str(ArenaCatalog.base(str(e["base"])).get("name", e["base"]))], func(): _close_overlay(); _open_content(id)))
 	list.add_child(_label("Bases", COL_GOLD))
 	for e2 in ArenaLibrary.base_arenas():
 		var id2 := str(e2["id"])
-		list.add_child(_button(str(e2["name"]), func(): _close_overlay(); _open_content(id2)))
+		list.add_child(_menu_button(str(e2["name"]), func(): _close_overlay(); _open_content(id2)))
 	list.add_child(_label("Your layouts  (%s)" % ArenaLibrary.dir(), COL_GOLD))
 	var saved := ArenaLibrary.list_saved()
 	if saved.is_empty():
@@ -1380,66 +1463,66 @@ func _open_load_dialog() -> void:
 	for s in saved:
 		var p := str(s["path"])
 		var txt := "%s  ·  %s" % [str(s["name"]), str(s["base"])] if not s.has("error") else "%s  (damaged: %s)" % [p.get_file(), str(s["error"]).substr(0, 60)]
-		var b := _button(txt, func(): _close_overlay(); _open_file(p))
+		var b := _menu_button(txt, func(): _close_overlay(); _open_file(p))
 		b.disabled = s.has("error")
 		list.add_child(b)
-	v.add_child(_button("Cancel", _close_overlay))
+	v.add_child(_menu_button("Cancel", _close_overlay))
 	_focus_first(v)
 
 
 func _open_import_dialog() -> void:
-	var v := _make_overlay("IMPORT PACKAGE", 760)
+	var v := _make_overlay("IMPORT PACKAGE", 980)
 	v.add_child(_label("Packages found in %s and the downloads folder:" % ArenaPackage.packages_dir(), COL_MUTED))
 	var found := ArenaPackage.list_local()
 	if found.is_empty():
 		v.add_child(_label("No .zip packages yet. Put arena packages there and reopen this list.", COL_MUTED))
 	for f in found:
 		var p := str(f["path"])
-		v.add_child(_button("%s  (%d KB)" % [str(f["name"]), int(int(f["size"]) / 1024.0)], func(): _close_overlay(); _import(p)))
-	v.add_child(_button("Open packages folder", func(): OS.shell_open("file://" + ArenaPackage.packages_dir())))
-	v.add_child(_button("Cancel", _close_overlay))
+		v.add_child(_menu_button("%s  (%d KB)" % [str(f["name"]), int(int(f["size"]) / 1024.0)], func(): _close_overlay(); _import(p)))
+	v.add_child(_menu_button("Open packages folder", func(): OS.shell_open("file://" + ArenaPackage.packages_dir())))
+	v.add_child(_menu_button("Cancel", _close_overlay))
 	_focus_first(v)
 
 
 func _open_test_dialog() -> void:
-	var v := _make_overlay("TEST PLAY", 560)
+	var v := _make_overlay("TEST PLAY", 760)
 	var errs: Array = validation.get("errors", [])
 	if not errs.is_empty():
 		v.add_child(_label("%d validation error(s): the match will run, but fix them before sharing." % errs.size(), COL_WARN))
-	v.add_child(_button("1v1 against a bot", _test_play.bind("duel")))
-	v.add_child(_button("Free-for-all (you + 3 bots)", _test_play.bind("ffa")))
-	v.add_child(_button("2v2 teams (spawn clusters)", _test_play.bind("teams")))
-	v.add_child(_button("Watch 4 bots", _test_play.bind("watch")))
+	v.add_child(_menu_button("1v1 against a bot", _test_play.bind("duel")))
+	v.add_child(_menu_button("Free-for-all (you + 3 bots)", _test_play.bind("ffa")))
+	v.add_child(_menu_button("2v2 teams (spawn clusters)", _test_play.bind("teams")))
+	v.add_child(_menu_button("Watch 4 bots", _test_play.bind("watch")))
 	v.add_child(_label("Return to the editor any time with F5 or the View button.", COL_MUTED, 17))
-	v.add_child(_button("Cancel", _close_overlay))
+	v.add_child(_menu_button("Cancel", _close_overlay))
 	_focus_first(v)
 
 
 func _open_help() -> void:
-	var v := _make_overlay("ARENA EDITOR CONTROLS", 900)
+	var v := _make_overlay("ARENA EDITOR CONTROLS", 1240)
 	v.add_child(_label("MOUSE / KEYBOARD", COL_GOLD))
 	v.add_child(_label("Left click: place the armed item / select / drag (hold Alt for free placement)\nRight click: cancel · right drag: orbit · middle drag: pan · wheel: zoom\nR / Shift+R rotate 15° · Del delete · Ctrl+D duplicate · arrows nudge\nCtrl+Z undo · Ctrl+Y (or Ctrl+Shift+Z) redo · Ctrl+S save · F5 test play\n[ and ] palette tab · 1–9 palette item · T marker team · G grid snap · Esc cancel/menu", COL_TEXT, 18))
 	v.add_child(_label("CONTROLLER", COL_GOLD))
 	v.add_child(_label("Left stick: cursor · Right stick: orbit (up/down = tilt) · LT / RT: zoom\nA: place / select (A again on the selection carries it, A drops it)\nB: back / cancel · X: delete · Y: rotate 15° · LB / RB: palette tab\nD-pad: nudge the selection, or browse palette items when nothing is selected\nView: jump to the side panels (B returns) · Menu: editor menu · L3: grid snap · R3: reset camera", COL_TEXT, 18))
-	v.add_child(_button("Close", _close_overlay))
+	v.add_child(_menu_button("Close", _close_overlay))
 	_focus_first(v)
 
 
 func _dialog(title: String, body: String) -> void:
-	var v := _make_overlay(title, 760)
+	var v := _make_overlay(title, 980)
 	var l := _label(body, COL_TEXT, 18)
 	v.add_child(l)
-	v.add_child(_button("OK", _close_overlay))
+	v.add_child(_menu_button("OK", _close_overlay))
 	_focus_first(v)
 
 
 func _exit() -> void:
 	if stack.is_dirty():
-		var v := _make_overlay("UNSAVED CHANGES", 560)
+		var v := _make_overlay("UNSAVED CHANGES", 760)
 		v.add_child(_label("Leave the editor without saving?", COL_TEXT))
-		v.add_child(_button("Save and exit", func(): _save(); _leave()))
-		v.add_child(_button("Discard and exit", _leave))
-		v.add_child(_button("Keep editing", _close_overlay))
+		v.add_child(_menu_button("Save and exit", func(): _save(); _leave()))
+		v.add_child(_menu_button("Discard and exit", _leave, "DangerButton"))
+		v.add_child(_menu_button("Keep editing", _close_overlay))
 		_focus_first(v)
 		return
 	_leave()
@@ -1625,9 +1708,9 @@ func _on_key(k: InputEventKey) -> void:
 			_open_help()
 		KEY_F5:
 			_open_test_dialog()
-		KEY_BRACKETLEFT:
+		KEY_BRACKETLEFT, KEY_Q, KEY_PAGEUP:     # Q/E and PgUp/PgDn are the shared ui_tab_prev/next keys
 			_set_tab(tab - 1)
-		KEY_BRACKETRIGHT:
+		KEY_BRACKETRIGHT, KEY_E, KEY_PAGEDOWN:
 			_set_tab(tab + 1)
 		KEY_ENTER, KEY_KP_ENTER, KEY_SPACE:
 			if _canvas_active():
@@ -1660,8 +1743,22 @@ func _on_key(k: InputEventKey) -> void:
 # =====================================================================================
 
 ## Sets up a representative editing state for screenshots: a few placed items, a selection, an
-## armed tool with its ghost, and validation issues on screen.
-func debug_setup(_script := "") -> void:
+## armed tool with its ghost, and validation issues on screen. `overlay`: menu | help | load | test
+## opens that dialog on top.
+func debug_setup(overlay := "") -> void:
+	_debug_state()
+	match overlay:
+		"menu":
+			_open_menu()
+		"help":
+			_open_help()
+		"load":
+			_open_load_dialog()
+		"test":
+			_open_test_dialog()
+
+
+func _debug_state() -> void:
 	vp.yaw = deg_to_rad(32.0)
 	vp.pitch = deg_to_rad(50.0)
 	vp.dist = 15.5

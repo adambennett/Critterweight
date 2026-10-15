@@ -10,23 +10,21 @@ var _label: Label
 func _ready() -> void:
 	layer = 20
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# shared UI look (docs/UI.md): a chip under the fight HUD, never focusable
+	var root := Control.new()
+	root.theme = UiTheme.get_theme()
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(root)
 	var panel := PanelContainer.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.1, 0.11, 0.14, 0.85)
-	sb.border_color = Color("#C9A227")
-	sb.set_border_width_all(2)
-	sb.set_corner_radius_all(6)
-	sb.set_content_margin_all(8)
-	panel.add_theme_stylebox_override("panel", sb)
+	panel.theme_type_variation = "PanelToast"
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	panel.position = Vector2(-330, 112)
-	panel.custom_minimum_size = Vector2(660, 0)
-	add_child(panel)
-	_label = Label.new()
+	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	panel.offset_top = 150
+	root.add_child(panel)
+	_label = UiTheme.label("", "BodyStrong")
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_label.add_theme_font_override("font", load("res://assets/fonts/BarlowCondensed-700.woff2"))
-	_label.add_theme_font_size_override("font_size", 24)
-	_label.add_theme_color_override("font_color", Color("#F2F2EC"))
 	panel.add_child(_label)
 	_refresh()
 	Controls.device_changed.connect(func(_k): _refresh())
