@@ -112,6 +112,9 @@ func test_standard_spawn_episodes_are_not_repeats() -> void:
 	runner.resolver = func(_it: Dictionary) -> PolicyData: return p
 	runner.add_items(LabEval.items_for(std_only, "theta", "target", 0))
 	var dt := 1.0 / Engine.physics_ticks_per_second
+	# step in phase with physics (D-026), as TestCase.step_sim does
+	if not Engine.is_in_physics_frame():
+		await get_tree().physics_frame
 	var guard := 0
 	while runner.busy() and guard < 3000:
 		runner.step(dt)
