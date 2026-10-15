@@ -57,8 +57,8 @@ class Driver:
 
 ## Two fighters facing each other along world Z, roots `gap` metres apart (fighter 0 attacks +Z).
 func duel(att_id: String, def_id: String, gap: float, att_src: InputSource, def_src: InputSource = null,
-		rules_extra := {}, seed_value := 3) -> MatchSim:
-	var arena := ArenaDef.from_dict({"id": "kit_lab", "base": "octagon", "radius": 5.0, "wall_height": 2.4,
+		rules_extra := {}, seed_value := 3, arena_r := 5.0) -> MatchSim:
+	var arena := ArenaDef.from_dict({"id": "kit_lab", "base": "octagon", "radius": arena_r, "wall_height": 2.4,
 		"spawns": [[0, -gap * 0.5, 0], [0, gap * 0.5, 180]]})
 	var rules := {"rounds": 1, "round_time": 0, "intro_time": INTRO}
 	for k in rules_extra:
@@ -154,7 +154,7 @@ func run_move(att_id: String, opts: Dictionary) -> Dictionary:
 		var d := Driver.new()
 		d.starts = [{"t": at, "slot": slot, "ability": ability}]
 		src = d
-	var sim := duel(att_id, def_id, gap, src, opts.get("def_src", null), opts.get("rules", {}), int(opts.get("seed", 3)))
+	var sim := duel(att_id, def_id, gap, src, opts.get("def_src", null), opts.get("rules", {}), int(opts.get("seed", 3)), float(opts.get("arena_r", 5.0)))
 	var a := sim.fighters[0]
 	var b := sim.fighters[1]
 	var m: MoveDef = (a.creature.abilities if ability else a.creature.moves).get(slot) if slot != "" else null
