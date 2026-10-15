@@ -22,12 +22,13 @@ static func defaults() -> Dictionary:
 		"eval": {"opponents": [], "episodes": 6, "val_episodes": 6, "every": 5, "standard_spawns": true, "reference": ""},
 		"model": {"hidden": [32, 32], "activation": "tanh", "init_policy": "", "mode": "", "temperature": 1.0, "init_seed": 0, "out_scale": 0.01},
 		"es": {"pairs": 12, "sigma": 0.05, "lr": 0.02, "l2": 0.005, "episodes_per_candidate": 1},
-		"bc": {"datasets": [], "epochs": 60, "batch": 128, "lr": 0.003, "val_frac": 0.2, "patience": 8, "l2": 0.0001,
+		"bc": {"datasets": [], "epochs": 60, "batch": 128, "lr": 0.003, "val_frac": 0.2, "test_frac": 0.2, "patience": 8, "l2": 0.0001,
 			"rollouts": 6, "balance": false},
 		"record": {"teacher": "bot_regular", "episodes": 40, "dataset_id": "", "dataset_name": ""},
 		"target": {"policy": "", "compare": "random_init"},
 		"limits": {"max_wall_s": 1800.0, "max_generations": 60, "max_epochs": 60, "max_episodes": 0, "workers": 1,
-			"worlds": 2, "low_priority": true, "cpu_share": 1.0, "max_memory_mb": 3072},
+			"worlds": 2, "low_priority": true, "cpu_share": 1.0, "max_memory_mb": 3072,
+			"heartbeat_s": LabBatch.HEARTBEAT_TIMEOUT_S, "straggler_s": LabBatch.STRAGGLER_MIN_S},
 		"paths": {"run_dir": "", "library_dir": "", "datasets_dir": ""},
 		"output": {"save_to_library": true, "policy_name": ""},
 	}
@@ -74,6 +75,8 @@ static func normalize(raw: Dictionary) -> Dictionary:
 	_int(lim, "worlds", 1, 8)
 	_num(lim, "cpu_share", 0.1, 1.0)
 	_int(lim, "max_memory_mb", 256, 65536)
+	_int(lim, "heartbeat_s", 3, 600)
+	_num(lim, "straggler_s", 3.0, 3600.0)
 	lim["low_priority"] = bool(lim.get("low_priority", true))
 	var es: Dictionary = job["es"]
 	_int(es, "pairs", 1, 256)
@@ -86,6 +89,7 @@ static func normalize(raw: Dictionary) -> Dictionary:
 	_int(bc, "batch", 8, 4096)
 	_num(bc, "lr", 0.00001, 0.1)
 	_num(bc, "val_frac", 0.05, 0.5)
+	_num(bc, "test_frac", 0.05, 0.5)
 	_int(bc, "patience", 1, 1000)
 	_num(bc, "l2", 0.0, 0.1)
 	_int(bc, "rollouts", 0, 1000)

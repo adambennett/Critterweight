@@ -1,0 +1,6 @@
+2026-10-15 09:58:50 r0 recording 60 episodes of jabber into ../runs/home/lab/datasets/ev_teacher_jabber_vs_rookie (indices 0..59)
+2026-10-15 09:58:50 r0 run rec_jabber: record, creature dev_biped, 3 worker process(es) x 2 world(s)
+2026-10-15 09:58:50 r0 helper rank 1 started (pid 69600)
+2026-10-15 09:58:50 r0 helper rank 2 started (pid 57692)
+2026-10-15 10:00:05 r0 recorded 17170 samples from 60 episodes
+2026-10-15 10:00:05 r0 finished: completed — recorded 17170 samples from 60 episodes

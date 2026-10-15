@@ -5,11 +5,16 @@ extends LabTask
 ## same training episodes (common random numbers), shapes fitness by rank and takes one Adam
 ## step on the mean θ.
 ## Model selection: ES improves the noise-smoothed objective, so early on the mean θ can play
-## worse than its best perturbations. Every `eval.every` generations both θ and the generation's
-## best candidate ("elite") are evaluated on VALIDATION seeds; the best validated network is
-## kept. At the end the initial and the selected network are evaluated on separate TEST seeds
-## (and, if configured, a scripted reference on the same episodes), so the reported improvement
-## is measured on episodes neither training nor selection ever saw.
+## worse than its best perturbations. Every `eval.every` generations — and once more when
+## training stops, if generations ran since the last validation — both θ and the generation's
+## best candidate ("elite") are evaluated on VALIDATION seeds; the best validated network is kept
+## (the starting network competes too, validated before the first generation; if it is still the
+## best, the report and the run's message say so). At the end the initial and the selected
+## network are evaluated on separate TEST seeds (and, if configured, a scripted reference on the
+## same episodes), so the reported improvement is measured on episodes neither training nor
+## selection ever saw, with a paired test over those shared episodes.
+## A run started from a saved policy keeps that policy's play settings (temperature, perception
+## lag, decision rate, button mask).
 
 var es := LabES.new()
 var gen := 0
@@ -25,6 +30,8 @@ var elite := PackedFloat32Array()
 var elite_fit := -INF
 var last_val := {}
 var last_fit := {}
+## generation of the newest validation (-1: none yet)
+var val_gen := -1
 var _submitted := false
 var _gen_t0 := 0
 
@@ -37,6 +44,7 @@ func begin() -> void:
 		activation = init.net.activation
 		theta0 = init.net.params.duplicate()
 		act_mode = init.act_mode
+		play = LabTask.play_of(init)
 		note("starting from policy '%s' (%s, %d params)" % [init.name, str(init.training.get("approach", "?")), theta0.size()])
 	else:
 		hidden = PackedInt32Array(model["hidden"])
@@ -59,6 +67,9 @@ func begin() -> void:
 		best_source = str(ck.get("best_source", "theta"))
 		elite = LabIO.floats_b64(str(ck.get("elite", "")))
 		elite_fit = float(ck.get("elite_fit", -1e30))
+		val_gen = int(ck.get("val_gen", -1))
+		if typeof(ck.get("play")) == TYPE_DICTIONARY and not (ck["play"] as Dictionary).is_empty():
+			play = ck["play"]
 		phase = str(ck.get("phase", "gen"))
 		if phase not in ["gen", "val", "final"]:
 			phase = "gen"
@@ -136,7 +147,9 @@ func frame(_dt: float) -> void:
 			if not _submitted:
 				_check_limits()
 				if stop_requested != "":
-					phase = "final"
+					# generations ran since the last validation: validate θ and the last elite too,
+					# so the final selection can pick from them
+					phase = "val" if val_gen != gen else "final"
 					return
 				_gen_t0 = Time.get_ticks_msec()
 				batch.submit(_train_items(), _payload({"theta": es.theta}))
@@ -158,7 +171,7 @@ func frame(_dt: float) -> void:
 				var res2 := batch.ordered_results()
 				count_results(res2)
 				_record_val(res2)
-				phase = "gen"
+				phase = "gen" if stop_requested == "" else "final"
 				save_checkpoint(gen, _ck())
 		"final":
 			if not _submitted:
@@ -166,9 +179,10 @@ func frame(_dt: float) -> void:
 				var opps: Array = ev3["opponents"]
 				var n := int(ev3["episodes"])
 				var std := bool(ev3.get("standard_spawns", true))
-				var items := LabEval.items(job, "init", "test", opps, n, std, "init", 0)
-				items.append_array(LabEval.items(job, "best", "test", opps, n, std, "best", items.size()))
-				items.append_array(LabEval.reference_items(job, opps, n, std, items.size()))
+				var conds := LabEval.conditions(job, "test", opps, n, std)
+				var items := LabEval.items_for(conds, "init", "init", 0)
+				items.append_array(LabEval.items_for(conds, "best", "best", items.size()))
+				items.append_array(LabEval.reference_items_for(job, conds, items.size()))
 				batch.submit(items, _payload({"init": theta0, "best": best_theta}))
 				_submitted = true
 				progress["step"] = "final test evaluation (%d episodes)" % items.size()
@@ -234,9 +248,12 @@ func _record_val(res: Array) -> void:
 	var w := weights()
 	var s := LabEval.summarize(res, w, "val")
 	var v := float((s["reward"] as Dictionary)["mean"])
+	val_gen = gen
 	last_val = {"gen": gen, "eval_reward": v, "eval_reward_std": (s["reward"] as Dictionary)["std"], "eval_n": s["n"],
 		"eval_damage": LabEval.mean_term(res, "damage_dealt", "val"), "eval_taken": LabEval.mean_term(res, "damage_taken", "val"),
 		"eval_win_rate": s["win_rate"]}
+	if stop_requested != "":
+		last_val["at_stop"] = true
 	var cand := v
 	var cand_params := es.theta
 	var cand_src := "theta"
@@ -266,7 +283,7 @@ func _record_val(res: Array) -> void:
 func _ck() -> Dictionary:
 	return {"gen": gen, "es": es.to_dict(), "theta0": LabIO.b64_floats(theta0), "best_theta": LabIO.b64_floats(best_theta),
 		"best_val": best_val if is_finite(best_val) else -1e30, "best_gen": best_gen, "best_source": best_source,
-		"elite": LabIO.b64_floats(elite), "elite_fit": elite_fit if is_finite(elite_fit) else -1e30}
+		"elite": LabIO.b64_floats(elite), "elite_fit": elite_fit if is_finite(elite_fit) else -1e30, "val_gen": val_gen, "play": play}
 
 
 func _finish(res: Array) -> void:
@@ -285,29 +302,43 @@ func _finish(res: Array) -> void:
 			"best":
 				r_best.append(rw)
 	var t := LabStats.welch_t(r_best, r_init)
+	# both networks played the same test episodes: the paired test is the honest comparison
+	var pair := LabEval.compare(res, w, "best", "init")
 	note("test: initial %s" % LabEval.one_line(s_init))
-	note("test: trained %s (Welch t = %.2f)" % [LabEval.one_line(s_best), t])
+	note("test: trained %s" % LabEval.one_line(s_best))
+	note("test: trained − initial, %s" % LabEval.paired_line(pair))
 	var s_ref := LabEval.summarize(res, w, "reference")
+	var pair_ref := {}
 	if int(s_ref["n"]) > 0:
+		pair_ref = LabEval.compare(res, w, "best", "reference")
 		note("test: scripted reference (%s) %s" % [str(job["eval"].get("reference", "")), LabEval.one_line(s_ref)])
+		note("test: trained − reference, %s" % LabEval.paired_line(pair_ref))
 	var approach := "es" if str(job["model"].get("init_policy", "")) == "" else "bc_es"
+	var selected_initial := best_source == "initial"
 	var extra := {"generations": gen, "best_gen": best_gen, "best_source": best_source, "es": job["es"],
-		"selection": "best validation reward among the mean and each validation step's elite",
-		"test_eval": {"initial": s_init, "trained": s_best, "welch_t": t}, "val_best_reward": best_val}
+		"selection": "best validation reward among the starting network, the mean and each validation step's elite (also validated when training stops)",
+		"test_eval": {"initial": s_init, "trained": s_best, "paired": pair, "welch_t": t}, "val_best_reward": best_val}
 	if int(s_ref["n"]) > 0:
 		extra["test_eval"]["reference"] = s_ref
 		extra["test_eval"]["reference_kind"] = str(job["eval"].get("reference", ""))
+		extra["test_eval"]["paired_reference"] = pair_ref
+	if selected_initial:
+		extra["note"] = "no trained network beat the starting network on validation; this is the starting network"
 	var best_pol := make_policy(hidden, activation, best_theta, act_mode, approach, extra)
 	policy_id = publish_policy(best_pol, "best.policy.json", true)
 	var final_pol := make_policy(hidden, activation, es.theta, act_mode, approach, {"generations": gen, "note": "mean after the last generation (not selected)"})
 	final_pol.id = best_pol.id + "_last"
 	publish_policy(final_pol, "final.policy.json", false)
-	write_report({"approach": approach, "generations": gen, "best_gen": best_gen, "best_source": best_source, "episodes": episodes,
-		"sim_seconds": sim_seconds(), "wall_s": elapsed_s, "initial": s_init, "trained": s_best, "welch_t": t,
-		"reference": s_ref if int(s_ref["n"]) > 0 else {}, "reference_kind": str(job["eval"].get("reference", "")),
-		"policy_id": policy_id, "stop_reason": stop_requested, "seeds": {"job": int(job["seed"]), "train": "train:<seed>:<gen>:<k>",
+	write_report({"approach": approach, "generations": gen, "best_gen": best_gen, "best_source": best_source, "selected_initial": selected_initial,
+		"episodes": episodes, "sim_seconds": sim_seconds(), "wall_s": elapsed_s, "initial": s_init, "trained": s_best, "paired": pair, "welch_t": t,
+		"reference": s_ref if int(s_ref["n"]) > 0 else {}, "reference_kind": str(job["eval"].get("reference", "")), "paired_reference": pair_ref,
+		"play": play_settings(), "policy_id": policy_id, "stop_reason": stop_requested, "seeds": {"job": int(job["seed"]), "train": "train:<seed>:<gen>:<k>",
 			"validation": "val:<seed>:<i>", "test": "test:<seed>:<i>"}})
-	message = "completed (%s): trained policy %s" % [stop_requested if stop_requested != "" else "done", LabEval.one_line(s_best)]
+	var why := stop_requested if stop_requested != "" else "done"
+	if selected_initial:
+		message = "completed (%s): no trained network beat the starting network on validation, so the saved policy is the starting network — %s" % [why, LabEval.one_line(s_best)]
+	else:
+		message = "completed (%s): trained policy %s; vs its start: %s" % [why, LabEval.one_line(s_best), LabEval.paired_line(pair)]
 	finished = true
 	final_state = "completed"
 	phase = "done"

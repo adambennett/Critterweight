@@ -25,6 +25,10 @@ var progress := {}
 var report_path := ""
 var policy_id := ""
 var restored_elapsed := 0.0
+## How the learner plays (temperature, perception lag, decision rate, button mask): saved into
+## its policy and used for every episode it plays. The job's defaults unless a task sets it from
+## a starting or evaluated policy (play_of), so a policy is always played as it was saved.
+var play := {}
 
 
 func begin() -> void:
@@ -33,6 +37,19 @@ func begin() -> void:
 
 func frame(_dt: float) -> void:
 	pass
+
+
+## True while frame() itself keeps the CPU busy (e.g. behaviour-cloning epochs), so the worker
+## does not idle between frames.
+func busy() -> bool:
+	return false
+
+
+## Episodes per batch for tasks that cut a long list of episodes into batches (evaluation,
+## recording): a few per world slot, so a stop request takes effect within one short batch.
+func chunk_size() -> int:
+	var lim: Dictionary = job["limits"]
+	return maxi(4, int(lim["workers"]) * int(lim["worlds"]) * 3)
 
 
 ## Graceful stop (limits reached): finish the current step, evaluate, save, complete.
@@ -129,18 +146,37 @@ func load_checkpoint() -> Dictionary:
 	return {}
 
 
-## Common policy metadata for this job (creature, act mode, mask...).
-func policy_meta(mode: String) -> Dictionary:
-	var c: CreatureDef = Content.creature(str(job["creature"]))
-	return {"creature": str(job["creature"]), "mode": mode, "temperature": float(job["model"]["temperature"]),
-		"target_lag": 1, "decision_hz": PolicyActions.DEFAULT_DECISION_HZ, "mask": Array(PolicyActions.button_mask(c))}
+## The learner's play settings (see `play`): the job's defaults until a task sets them.
+func play_settings() -> Dictionary:
+	if play.is_empty():
+		var c: CreatureDef = Content.creature(str(job["creature"]))
+		play = {"temperature": float(job["model"]["temperature"]), "target_lag": 1, "decision_hz": PolicyActions.DEFAULT_DECISION_HZ,
+			"mask": Array(PolicyActions.button_mask(c))}
+	return play
 
 
-func payload(arch_hidden: PackedInt32Array, activation: String, mode: String, params: Dictionary) -> Dictionary:
+## A saved policy's own play settings.
+static func play_of(p: PolicyData) -> Dictionary:
+	return {"temperature": p.temperature, "target_lag": p.target_lag, "decision_hz": p.decision_hz, "mask": Array(p.button_mask)}
+
+
+## Payload metadata for parameters played in `mode` with `settings` (default: play_settings()).
+func policy_meta(mode: String, settings := {}) -> Dictionary:
+	var s: Dictionary = settings if not settings.is_empty() else play_settings()
+	return {"creature": str(job["creature"]), "mode": mode, "temperature": float(s.get("temperature", 1.0)),
+		"target_lag": int(s.get("target_lag", 1)), "decision_hz": int(s.get("decision_hz", PolicyActions.DEFAULT_DECISION_HZ)),
+		"mask": s.get("mask", [])}
+
+
+## A batch payload. `meta_by_key` gives parameter sets their own metadata (policy_meta).
+func payload(arch_hidden: PackedInt32Array, activation: String, mode: String, params: Dictionary, meta_by_key := {}) -> Dictionary:
 	var enc := {}
 	for k in params:
 		enc[k] = LabIO.b64_floats(params[k])
-	return {"arch": {"hidden": Array(arch_hidden), "activation": activation}, "meta": policy_meta(mode), "params": enc}
+	var p := {"arch": {"hidden": Array(arch_hidden), "activation": activation}, "meta": policy_meta(mode), "params": enc}
+	if not meta_by_key.is_empty():
+		p["meta_by_key"] = meta_by_key
+	return p
 
 
 ## A complete PolicyData from trained parameters plus training metadata.
@@ -148,7 +184,13 @@ func make_policy(arch_hidden: PackedInt32Array, activation: String, params: Pack
 	var p := PolicyData.create_new(str(job["creature"]), arch_hidden, activation, 1)
 	p.net.params = params.duplicate()
 	p.act_mode = mode
-	p.temperature = float(job["model"]["temperature"])
+	var s := play_settings()
+	p.temperature = float(s["temperature"])
+	p.target_lag = int(s["target_lag"])
+	p.decision_hz = int(s["decision_hz"])
+	var mask: Array = s["mask"]
+	if mask.size() == PolicyActions.BUTTON_COUNT:
+		p.button_mask = PackedByteArray(mask)
 	var nm := str(job["output"].get("policy_name", ""))
 	if nm == "":
 		nm = str(job.get("name", ""))

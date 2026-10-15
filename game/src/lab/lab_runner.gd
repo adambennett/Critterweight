@@ -3,8 +3,9 @@ extends Node
 ## Runs queued episodes in up to `max_worlds` parallel physics worlds inside one process. The
 ## owner calls `step(dt)` once per physics frame (each world advances exactly one tick per frame,
 ## because the physics server steps every active space once per frame).
-## Measured on the dev PC (docs/AI_LAB.md): one process sustains ~14 simulated seconds per wall
-## second regardless of the number of worlds (the work is single-threaded GDScript + Jolt), so
+## Measured on the dev PC (docs/AI_LAB.md): one process sustains roughly 8–16 simulated seconds
+## per wall second (busy vs idle PC) regardless of the number of worlds (the work is
+## single-threaded GDScript + Jolt), so
 ## throughput scales with worker PROCESSES; several worlds per process keep slots busy while an
 ## episode is being built or torn down.
 

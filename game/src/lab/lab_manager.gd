@@ -241,15 +241,29 @@ static func delete_run(run_dir: String) -> Error:
 	return OK
 
 
+## The evaluation job for a saved policy: scored with the policy's own training objective — the
+## preset AND its (possibly edited) weights — against the fixed baselines. The policy itself is
+## played with its saved settings (LabTaskEval).
+static func eval_job_for(p: PolicyData, policy_id: String, opponents: Array, episodes: int, workers: int) -> Dictionary:
+	var objective := {"preset": "aggressive"}
+	var tobj = p.training.get("objective")
+	if typeof(tobj) == TYPE_DICTIONARY:
+		var o: Dictionary = tobj
+		objective = {"preset": str(o.get("preset", "aggressive"))}
+		if typeof(o.get("weights")) == TYPE_DICTIONARY:
+			objective["weights"] = (o["weights"] as Dictionary).duplicate()
+	return {"kind": "eval", "name": "Evaluate %s" % p.name, "creature": p.creature, "seed": 1000,
+		"target": {"policy": policy_id, "compare": "random_init"}, "objective": objective,
+		"eval": {"opponents": opponents, "episodes": episodes, "standard_spawns": true}, "scenario": {"preset": "bots_low"},
+		"limits": {"workers": workers}}
+
+
 ## Starts an evaluation run for a saved policy against the fixed baselines.
 static func evaluate_policy(policy_id: String, opponents: Array, episodes: int, workers: int) -> Dictionary:
 	var p := PolicyLibrary.get_policy(policy_id)
 	if p == null:
 		return {"ok": false, "errors": PackedStringArray([PolicyLibrary.last_error(policy_id)]), "run_dir": ""}
-	var r := create_run({"kind": "eval", "name": "Evaluate %s" % p.name, "creature": p.creature, "seed": 1000,
-		"target": {"policy": policy_id, "compare": "random_init"}, "objective": {"preset": str((p.training.get("objective", {}) as Dictionary).get("preset", "aggressive")) if typeof(p.training.get("objective")) == TYPE_DICTIONARY else "aggressive"},
-		"eval": {"opponents": opponents, "episodes": episodes, "standard_spawns": true}, "scenario": {"preset": "bots_low"},
-		"limits": {"workers": workers}})
+	var r := create_run(eval_job_for(p, policy_id, opponents, episodes, workers))
 	if r["ok"]:
 		start(str(r["run_dir"]))
 	return r

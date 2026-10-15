@@ -1,0 +1,11 @@
+{
+  "kind": "eval",
+  "name": "Evaluate shipped Drill Hitter (ES)",
+  "creature": "dev_biped",
+  "seed": 5001,
+  "target": {"policy": "dev_biped_es_drill", "compare": "random_init"},
+  "objective": {"preset": "drill"},
+  "scenario": {"preset": "drill_dummy", "round_time": 6},
+  "eval": {"opponents": ["idle"], "episodes": 15, "standard_spawns": true, "reference": "jabber"},
+  "limits": {"workers": 3, "worlds": 2, "low_priority": false, "max_wall_s": 3600}
+}
