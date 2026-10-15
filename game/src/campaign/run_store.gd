@@ -35,22 +35,12 @@ func save(state: Dictionary, profile_id: String, slot := "") -> Error:
 	return Saves.write_json(slot_path(profile_id, s), KIND, RunState.VERSION, json_stable(state))
 
 
-## Godot's JSON reader does not read every 17-digit float back exactly (measured: about 1 value
-## in 7 comes back one ulp off), so a checksum over in-memory floats can fail Saves' verification
-## after a write, or a ticket check after a network hop. Round-tripping the data until its text
-## is a fixed point (usually 2 passes; at most 8 seen over 200k random values) yields data that
-## survives JSON bit-exactly. Numbers come back as floats, exactly like a loaded save.
+## Godot's JSON reader does not read every 17-digit float back exactly, and it misreads a large
+## whole number written as "N.0" by one (which changed 53-bit run seeds on save). Saves.stabilize
+## returns the JSON fixed point with whole numbers kept as integers, so the data survives the
+## file or a network hop bit-exactly and checksums computed now still verify after loading.
 static func json_stable(data):
-	var text := JSON.stringify(data, "", false, true)
-	var cur = JSON.parse_string(text)
-	for i in 24:
-		var t2 := JSON.stringify(cur, "", false, true)
-		if t2 == text:
-			return cur
-		text = t2
-		cur = JSON.parse_string(text)
-	push_warning("RunStore.json_stable: data did not reach a JSON fixed point")
-	return cur
+	return Saves.stabilize(data)
 
 
 ## One float that survives a JSON round trip exactly (for values written into profiles).
