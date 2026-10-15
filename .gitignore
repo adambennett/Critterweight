@@ -1,0 +1,18 @@
+# Godot caches / per-machine state
+game/.godot/
+game/*.translation
+*.tmp
+*.import.tmp
+
+# Build outputs (packaged builds are produced by tools/build/*.ps1; see README)
+build/
+dist/
+game/export_cache/
+
+# Local verification captures (curated evidence lives in docs/evidence/)
+captures/
+*.log
+
+# Tool dependencies
+tools/**/node_modules/
+__pycache__/

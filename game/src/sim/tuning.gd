@@ -1,0 +1,101 @@
+class_name Tuning
+## Global combat tuning. Defaults live here; content/core/tuning.json (and balance mods) may
+## override any key. Values are read through `Tuning.v("key")` so tests and mods see one source.
+
+static var values := {
+	# input
+	"input_buffer": 0.15,
+	# guard / parry
+	"guard_blend_time": 0.08,
+	"guard_damage_mult": 0.15,
+	"guard_stamina_per_damage": 1.4,
+	"guard_front_arc_deg": 80.0,
+	"guard_move_mult": 0.45,
+	"parry_window": 0.12,
+	"parry_stun": 0.55,
+	"parry_hype": 10.0,
+	"guard_break_stun": 0.9,
+	# dodge
+	"dodge_cooldown": 0.32,
+	"dodge_stamina": 14.0,
+	"dodge_evade_start": 0.02,
+	"dodge_evade_end": 0.2,
+	"dodge_recovery": 0.12,
+	# stamina / poise
+	"stamina_regen_delay": 0.55,
+	"stamina_low": 20.0,
+	"stamina_low_speed": 0.8,
+	"poise_regen_delay": 1.0,
+	"whiff_stamina_extra": 0.25,
+	"hit_stamina_refund": 0.35,
+	# damage model
+	"min_clean": 0.3,
+	"counter_mult": 1.25,
+	"counter_stun_bonus": 0.12,
+	"ref_mass": 80.0,
+	"max_single_hit": 40.0,
+	# combo protection
+	"combo_window": 1.1,
+	"combo_dmg_step": 0.08,
+	"combo_dmg_min": 0.5,
+	"combo_stun_step": 0.12,
+	"combo_stun_min": 0.35,
+	"stun_budget": 2.2,
+	"burst_knockback": 5.0,
+	"burst_invuln": 0.6,
+	# knockdown
+	"knockdown_min": 0.7,
+	"knockdown_auto_getup": 2.2,
+	"getup_time": 0.6,
+	"wakeup_invuln": 0.5,
+	"otg_damage_mult": 0.4,
+	"otg_max_hits": 2,
+	"ko_muscle": 0.0,
+	"knockdown_muscle": 0.06,
+	# hitstun physics
+	"stagger_muscle": 0.35,
+	"stagger_recover": 0.25,
+	# hype / juice
+	"hype_per_damage_dealt": 0.9,
+	"hype_per_damage_taken": 0.5,
+	"taunt_hype": 8.0,
+	"taunt_cooldown": 2.5,
+	"juice_duration": 8.0,
+	"juice_crash": 3.0,
+	"juice_crash_speed": 0.75,
+	# grabs
+	"grab_hold_max": 1.6,
+	"grab_mash_reduce": 0.12,
+	"grab_whiff_recovery": 0.4,
+	"throw_speed": 7.5,
+	"throw_up": 3.2,
+	"throw_damage": 9.0,
+	"pummel_damage": 3.0,
+	"pummel_max": 3,
+	"slam_min_speed": 4.0,
+	"slam_damage_per_ms": 2.2,
+	"slam_damage_max": 16.0,
+	# assistance
+	"soft_lock_range": 7.0,
+	"soft_lock_arc_deg": 110.0,
+	"attack_snap_deg": 70.0,
+	"target_sticky": 1.0,
+	# debug toggles for rig tuning
+	"dbg_ff": 1.0,
+	"dbg_gain": 1.0,
+	"dbg_reaction": 1.0,
+}
+
+
+static func v(key: String) -> float:
+	return float(values.get(key, 0.0))
+
+
+static func apply_overrides(d: Dictionary) -> PackedStringArray:
+	var unknown := PackedStringArray()
+	for k in d:
+		if values.has(k):
+			values[k] = float(d[k])
+		else:
+			unknown.append(str(k))
+	return unknown
