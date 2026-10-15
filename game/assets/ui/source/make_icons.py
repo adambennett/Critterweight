@@ -88,8 +88,9 @@ UI = {
                 '<circle cx="32" cy="32" r="5" fill="%s"/>' % (L, D, L),
     "practice": '<circle cx="32" cy="32" r="27" fill="%s"/><circle cx="32" cy="32" r="19.5" fill="%s"/>'
                 '<circle cx="32" cy="32" r="12.5" fill="%s"/><circle cx="32" cy="32" r="5.5" fill="%s"/>' % (L, D, L, D),
-    "versus": stroke("M6 12 L27 32 L6 52", 7) + stroke("M58 12 L37 32 L58 52", 7)
-              + '<polygon points="%s" fill="%s"/>' % (star_points(32, 32, 9, 3.8), L),
+    # two arrows driving into each other on a spark: "clash", not a close-X
+    "versus": stroke("M3 22 H22 M14 13 L23 22 L14 31", 6) + stroke("M61 42 H42 M50 33 L41 42 L50 51", 6)
+              + '<polygon points="%s" fill="%s"/>' % (star_points(32, 32, 11, 4.5), L),
     "quick": '<circle cx="32" cy="37" r="23" fill="%s"/><rect x="26" y="4" width="12" height="7" rx="2" fill="%s"/>'
              '<rect x="29.5" y="9" width="5" height="6" fill="%s"/>%s' % (L, L, L, stroke("M32 37 L32 23 M32 37 L42 43", 4.5, D)),
     "bot": '<rect x="10" y="18" width="44" height="38" rx="9" fill="%s"/><circle cx="32" cy="9" r="5" fill="%s"/>'

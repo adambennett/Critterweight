@@ -14,7 +14,7 @@ var _idle := 0.0
 var _data := {}
 
 
-func on_enter(_p: Dictionary) -> void:
+func on_enter(p: Dictionary) -> void:
 	MenuBackdrop.ensure()
 	add_backdrop_gradient(0.97, 0.85)
 	var f := build_frame("The people and the parts", "Credits")
@@ -23,7 +23,7 @@ func on_enter(_p: Dictionary) -> void:
 		{"actions": ["ui_cancel"], "text": "Back", "call": App.back}])
 	var body: VBoxContainer = f["body"]
 	_tabs = TabStrip.new()
-	_tabs.setup(["Credits", "Notices"], ["credits", "notices"], 0)
+	_tabs.setup(["Credits", "Notices"], ["credits", "notices"], 1 if str(p.get("tab", "")) == "notices" else 0)
 	_tabs.tab_changed.connect(func(_i: int) -> void: _show())
 	body.add_child(_tabs)
 	var row := UiTheme.hbox(0)

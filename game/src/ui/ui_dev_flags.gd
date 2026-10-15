@@ -60,7 +60,11 @@ static func _seed_window(spec: String) -> void:
 static func open_screen(screen: String) -> void:
 	match screen:
 		"main_menu":
-			App.goto("main_menu")
+			var mm := App.goto("main_menu")
+			var cat := arg("--ui-open", "")
+			if cat != "" and mm != null and mm.has_method("open_category"):
+				# after the screen's own deferred focus restore, so the sub-menu keeps focus
+				(Engine.get_main_loop() as SceneTree).process_frame.connect(func() -> void: mm.call("open_category", cat), CONNECT_ONE_SHOT)
 		"settings":
 			App.goto("main_menu")
 			App.push("settings", {"tab": arg("--ui-tab", "display")})
@@ -90,6 +94,12 @@ static func open_screen(screen: String) -> void:
 			_start_sample_match(false)
 			var t := (Engine.get_main_loop() as SceneTree).create_timer(2.4)
 			t.timeout.connect(func() -> void: MatchFlow.open_pause())
+		"ingame_settings":
+			_start_sample_match(false)
+			var t2 := (Engine.get_main_loop() as SceneTree).create_timer(2.4)
+			t2.timeout.connect(func() -> void:
+				MatchFlow.open_pause()
+				App.push("settings", {"in_game": true, "tab": arg("--ui-tab", "accessibility")}))
 		"match":
 			_start_sample_match(true)
 		"results":
@@ -104,7 +114,7 @@ static func open_screen(screen: String) -> void:
 				App.goto("main_menu")
 				return
 			App.goto("main_menu")
-			App.push(screen, {})
+			App.push(screen, {"tab": arg("--ui-tab", "")} if arg("--ui-tab", "") != "" else {})
 
 
 static func _sample_config(spectate: bool) -> Dictionary:

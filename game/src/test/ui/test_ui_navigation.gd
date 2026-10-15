@@ -573,6 +573,82 @@ func test_every_screen_has_focus_and_back() -> void:
 	expect_focus("title -> main menu")
 
 
+## UI-10 layout check: at 1280x800 (Steam Deck) and 1920x1080 every UI screen keeps its footer
+## prompts on screen and renders all visible text at >= 18 px (ART_DIRECTION "Deck legibility").
+## The headless root window is resized, so this measures real layout, not a mock.
+func test_layout_fits_and_text_is_readable() -> void:
+	await wait_frames(2)
+	await open_main_menu()
+	var root := get_tree().root
+	var old := root.size
+	for res in [Vector2i(1280, 800), Vector2i(1920, 1080)]:
+		root.size = res
+		await wait_frames(3)
+		var vr := get_viewport().get_visible_rect()
+		var px_per_du := get_viewport().get_final_transform().get_scale().y
+		check(absf(px_per_du * vr.size.y - float(res.y)) < 2.0, "the viewport maps to %s (%.3f px/du)" % [str(res), px_per_du])
+		var eight := []
+		for i in 8:
+			eight.append({"index": i, "team": i, "creature": "dev_biped", "name": "Fighter %d" % (i + 1), "health": 10.0 * i, "out": i < 7,
+				"stats": {"damage_dealt": 50.0 + i, "damage_taken": 40.0, "hits": 9, "blocks": 2, "parries": 1, "knockdowns": 1, "kos": i % 2}})
+		var result8 := {"winner_team": 7, "round_wins": {7: 1}, "rounds": 1, "time": 180.0, "fighters": eight}
+		var specs := [["main_menu", {}], ["settings", {"tab": "input"}], ["settings", {"tab": "diagnostics"}], ["profile", {}],
+			["credits", {}], ["tutorial_menu", {}], ["controls", {}], ["versus_setup", {"mode": "versus", "fighters": 8}],
+			["spectate", {"fighters": 8}], ["character_select", {"mode": "quick"}], ["pause", {"notice": "Controller disconnected. Reconnect it, or carry on with keyboard and mouse."}],
+			["results", {"result": result8, "config": {"ui": {"mode": "versus"}}}],
+			["text_entry", {"title": "Player name", "value": "Rookie"}]]
+		for s in specs:
+			var name_: String = s[0]
+			if name_ != "main_menu":
+				App.push(name_, (s[1] as Dictionary).duplicate())
+			await wait_frames(4)
+			_audit(App.top_screen(), "%s@%dx%d" % [name_, res.x, res.y], vr, px_per_du)
+			if name_ != "main_menu":
+				App.pop()
+				await wait_frames(2)
+		App.dialog("A dialog title that is fairly long", "Body text that wraps over more than one line to check the dialog grows correctly.",
+			[{"label": "Confirm", "id": "a"}, {"label": "Cancel", "id": "b", "cancel": true}])
+		await wait_frames(4)
+		_audit(App.top_screen(), "dialog@%dx%d" % [res.x, res.y], vr, px_per_du)
+		App.pop()
+		await wait_frames(2)
+	root.size = old
+	await wait_frames(2)
+
+
+func _audit(s: Screen, tag: String, vr: Rect2, px_per_du: float) -> void:
+	if not check(s != null, "%s: screen open" % tag):
+		return
+	var bars := 0
+	for b in s.find_children("*", "PromptBar", true, false):
+		var bar := b as Control
+		if not bar.is_visible_in_tree():
+			continue
+		bars += 1
+		var r := bar.get_global_rect()
+		check(r.end.y <= vr.end.y + 1.0 and r.position.y >= vr.position.y - 1.0 and r.end.x <= vr.end.x + 1.0,
+			"%s: footer prompts on screen (bar %s, view %s)" % [tag, str(r), str(vr.size)])
+	check(bars > 0, "%s: has a prompt bar" % tag)
+	var smallest := 999.0
+	var smallest_text := ""
+	for n in s.find_children("*", "", true, false):
+		var size_du := 0
+		var text := ""
+		if n is Label and (n as Label).is_visible_in_tree():
+			text = (n as Label).text
+			size_du = (n as Label).get_theme_font_size("font_size")
+		elif n is Button and (n as Button).is_visible_in_tree():
+			text = (n as Button).text
+			size_du = (n as Button).get_theme_font_size("font_size")
+		if text.strip_edges() == "":
+			continue
+		var px := size_du * px_per_du
+		if px < smallest:
+			smallest = px
+			smallest_text = text
+	check(smallest >= 18.0 - 0.01, "%s: smallest text '%s' is %.1f px (< 18 px)" % [tag, smallest_text.substr(0, 30), smallest])
+
+
 ## Text size and UI scale take effect immediately (UI-07, UI-04).
 func test_text_and_ui_scale_apply_live() -> void:
 	await wait_frames(2)

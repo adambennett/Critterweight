@@ -309,6 +309,15 @@ func items() -> Array[UiButton]:
 	return _items
 
 
+## Opens a category's sub-menu by id ("fight", "campaign", "create"); false if not available.
+func open_category(id: String) -> bool:
+	for i in _items.size():
+		if _items[i].route == id and _item_defs[i].has("children"):
+			_open_sub(i)
+			return true
+	return false
+
+
 func _ask_quit() -> void:
 	App.dialog("Leave the Circuit?", "Quit CRITTERWEIGHT and return to the desktop?",
 		[{"label": "Quit game", "id": "quit", "danger": true}, {"label": "Stay", "id": "stay", "cancel": true, "default": true}],

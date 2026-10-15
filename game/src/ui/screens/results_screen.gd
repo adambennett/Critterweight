@@ -40,8 +40,15 @@ func on_enter(p: Dictionary) -> void:
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub.add_theme_color_override("font_color", UiTheme.WARM)
 	bv.add_child(sub)
-	col.add_child(_table())
-	col.add_child(UiTheme.spacer())
+	# the stat table scrolls when 8 fighters do not fit (buttons and prompts always stay on screen)
+	var ts := ScrollContainer.new()
+	ts.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	ts.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	col.add_child(ts)
+	var tc := CenterContainer.new()
+	tc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ts.add_child(tc)
+	tc.add_child(_table())
 	var buttons := UiTheme.hbox(UiTheme.GAP_M)
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_child(buttons)

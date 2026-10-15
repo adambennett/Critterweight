@@ -52,8 +52,14 @@ func on_enter(p: Dictionary) -> void:
 	var poster := UiTheme.panel("PanelPoster")
 	poster.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	right.add_child(poster)
+	# the card scrolls (mouse wheel) so 8 fighters never push the footer off screen
+	var ps := ScrollContainer.new()
+	ps.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	ps.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	poster.add_child(ps)
 	_poster = UiTheme.vbox(UiTheme.GAP_S)
-	poster.add_child(_poster)
+	_poster.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ps.add_child(_poster)
 	_help = HelpPanel.new(_scroll)
 	_help.size_flags_vertical = Control.SIZE_SHRINK_END
 	_help.custom_minimum_size = Vector2(0, 190)
@@ -353,7 +359,6 @@ func _update_poster() -> void:
 		var who := "YOU" if str(s["kind"]) == "player" else ("DUMMY" if str(s["kind"]) == "dummy" else BotTiers.display_name(str(s["tier"])).to_upper())
 		row.add_child(UiTheme.label(who, "Caption"))
 		_poster.add_child(row)
-	_poster.add_child(UiTheme.spacer())
 	_error = UiTheme.label("", "Danger", true)
 	_error.visible = false
 	_poster.add_child(_error)
