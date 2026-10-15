@@ -276,3 +276,245 @@ func test_coop_scaling_plan() -> void:
 		if e["kind"] == "fighter":
 			fighters += 1
 	check_eq(fighters, 2, "single-fighter templates add a second fighter at 3+ players")
+
+
+# --- review regressions ----------------------------------------------------------------------------
+
+## Turns the first reachable node into `t` (rest / event ...) so a test can enter it directly.
+func _force_node(ctrl: RunController, t: String, event_id := "") -> String:
+	var nid := str(ctrl.available_nodes()[0])
+	var n := RunState.node(ctrl.state, nid)
+	n["type"] = t
+	n["encounter"] = ""
+	n["event"] = event_id
+	n.erase("hidden")
+	return nid
+
+
+func _two_player_run(seed_value: int) -> RunController:
+	var cfg := run_cfg("f_stoke", {"seed": seed_value})
+	cfg["players"].append({"id": "p1", "name": "Two", "profile_id": "t2", "fighter": "f_dozer"})
+	return RunController.start_run(cat(), cfg)
+
+
+## Review #1 (rules side): Train at a rest adds a technique pick while the phase stays "rest";
+## the node completes only once the pick is claimed. advance_if_done() is a harmless no-op then.
+func test_rest_train_pick_completes_the_node() -> void:
+	var ctrl := new_run({"seed": 4242})
+	var nid := _force_node(ctrl, "rest")
+	check(ctrl.choose_node(nid, "p0"), "entered the rest stop")
+	check(ctrl.rest_choose("p0", "train"), "train: %s" % ctrl.last_error)
+	check_eq(ctrl.phase(), "rest", "the node waits for the pick")
+	var pend := ctrl.pending_for("p0")
+	check_eq(pend.size(), 1, "Train adds one pick")
+	check_eq(str(pend[0]["kind"]) if not pend.is_empty() else "", "technique", "a technique pick")
+	check(not ctrl.advance_if_done(), "nothing to complete while the pick is pending")
+	if pend.is_empty():
+		return
+	check(ctrl.claim("p0", str(pend[0]["rid"]), str(pend[0]["options"][0])), "claim the technique")
+	check_eq(ctrl.phase(), "map", "claiming the pick completes the rest stop")
+	check_eq((ctrl.player("p0")["techniques"] as Array).size(), 1, "the technique was learned")
+
+
+## Review #4: Dose credit follows the profile's OWN ladder and the difficulty rules.
+func test_dose_credit_needs_the_profiles_own_ladder() -> void:
+	# a co-op guest on someone else's Dose 10 card, whose Dosage was never opened
+	var guest := Profiles.default_profile("guest", "Guest")
+	var ctrl := new_run({"seed": 103, "dose": 10})
+	play_synthetic(ctrl)
+	check_eq(ctrl.phase(), "victory", "precondition: the Dose 10 card was cleared")
+	var rep := CampaignProgression.finish_run(cat(), ctrl.state, "p0", guest)
+	check(bool(rep["dose_ineligible"]), "the report says Dose 10 is not on this ladder")
+	var lg: Dictionary = guest["ladder"]["off_the_street"]
+	check_eq(int(lg["unlocked"]), 1, "no Dose unlocked from someone else's card")
+	check_eq(int(lg["cleared"]), 0, "nothing cleared on this ladder")
+	check(bool(rep["ladder_open"]) and bool(lg["open"]), "a clear on Amateur still opens The Dosage (at Dose 1)")
+	check_eq(CampaignProgression.max_selectable_dose(guest, "off_the_street"), 1, "...so only Dose 1 is selectable")
+	var cos: Array = guest["unlocks"]["cosmetics"]
+	for c in ["badge_dose_10", "jacket_announcer_alt", "badge_lethal_dose", "chant_lethal_dose"]:
+		check(not cos.has(c), "no %s from an ineligible Dose" % c)
+	check(cos.has("title_f_stoke"), "the clear itself still earns the fighter title")
+	check(not (rep["achievements"] as Array).has("ach_fully_dosed"), "no Fully Dosed for an ineligible Dose 10")
+	check((rep["records"] as Array).is_empty(), "no Dose 10 records on this profile")
+	check((guest["campaign"]["boards"] as Dictionary).is_empty(), "no Dose 10 record board created")
+	check_eq(int(guest["records"]["runs"]["off_the_street"]["best_dose"]), 0, "best Dose unchanged")
+	# the same card on a profile that reached Dose 10 counts in full
+	var vet := Profiles.default_profile("vet", "Vet")
+	CampaignProgression.ensure_fields(vet)
+	vet["ladder"]["off_the_street"] = {"unlocked": 10, "cleared": 9, "open": true}
+	var rep2 := CampaignProgression.finish_run(cat(), ctrl.state, "p0", vet)
+	check(not bool(rep2["dose_ineligible"]), "eligible on its own ladder")
+	check((vet["unlocks"]["cosmetics"] as Array).has("badge_lethal_dose"), "Lethal Dose badge")
+	check((rep2["achievements"] as Array).has("ach_fully_dosed"), "Fully Dosed")
+	check(not (rep2["records"] as Array).is_empty(), "Dose 10 records")
+	check_eq(int(vet["ladder"]["off_the_street"]["cleared"]), 10, "Dose 10 cleared")
+	# a Dose above the highest unlocked one never unlocks anything
+	var mid := Profiles.default_profile("mid", "Mid")
+	CampaignProgression.ensure_fields(mid)
+	mid["ladder"]["off_the_street"] = {"unlocked": 2, "cleared": 1, "open": true}
+	check_eq(CampaignProgression.apply_ladder_clear(mid, "off_the_street", 6, true), 0, "Dose 6 on a Dose-2 ladder unlocks nothing")
+	check_eq(int(mid["ladder"]["off_the_street"]["unlocked"]), 2, "still Dose 2")
+	check_eq(CampaignProgression.apply_ladder_clear(mid, "off_the_street", 1, true), 0, "a lower Dose unlocks nothing")
+	check_eq(CampaignProgression.apply_ladder_clear(mid, "off_the_street", 2, true), 3, "the highest unlocked Dose unlocks the next")
+	# Sparring takes no Doses: nothing Dose-related is credited, whatever the ladder
+	var spar := new_run({"seed": 104, "dose": 3, "difficulty": "sparring"})
+	play_synthetic(spar)
+	var sp := Profiles.default_profile("sp", "Sp")
+	CampaignProgression.ensure_fields(sp)
+	sp["ladder"]["off_the_street"] = {"unlocked": 5, "cleared": 4, "open": true}
+	var rep3 := CampaignProgression.finish_run(cat(), spar.state, "p0", sp)
+	check(bool(rep3["dose_ineligible"]), "a Dose on Sparring is never eligible")
+	check(not (sp["unlocks"]["cosmetics"] as Array).has("badge_dose_3"), "no Dose badge from Sparring")
+	check_eq(int(sp["ladder"]["off_the_street"]["unlocked"]), 5, "ladder untouched")
+	# run creation clamps the Dose to what the profile may play
+	var fresh := Profiles.default_profile("fresh", "Fresh")
+	check_eq(CampaignProgression.clamp_dose(cat(), fresh, "off_the_street", "amateur", 7), 0, "closed Dosage: base card")
+	check_eq(CampaignProgression.clamp_dose(cat(), mid, "off_the_street", "pro", 7), 3, "clamped to the highest unlocked Dose")
+	check_eq(CampaignProgression.clamp_dose(cat(), mid, "off_the_street", "sparring", 2), 0, "Sparring: no Dose")
+
+
+## Review #12: Kid Lamprey's spar is a copy of you at 60% HP — no difficulty, Dose or party scaling.
+func test_spar_copy_is_sixty_percent_and_unscaled() -> void:
+	var ctrl := new_run({"seed": 106, "difficulty": "title_shot", "dose": 10})
+	var plan := EncounterBuilder.plan(cat(), ctrl.state, "evt_fight_spar", {"node_id": "x_evt", "kind": "event", "mini": true, "spar": true, "player": "p0"})
+	check_eq((plan["enemies"] as Array).size(), 1, "one sparring partner")
+	var e: Dictionary = plan["enemies"][0]
+	check_near(float(e["hp_mult"]), 0.6, 0.0001, "the template's 60% HP (not x Title Shot x Dose 2)")
+	check_near(float(e["dmg_mult"]), 1.0, 0.0001, "no difficulty/Dose damage scaling")
+	check((e["techniques"] as Array).is_empty(), "no Dose 6 extra technique for the copy")
+	check_near(float(e["start_hype"]), 0.0, 0.0001, "no Dose 6 starting Hype")
+	var built := EncounterBuilder.build_match(cat(), ctrl.state, plan, {"player_kinds": {"p0": "bot"}, "spar_player": "p0"})
+	check((built["errors"] as PackedStringArray).is_empty(), "the spar builds: %s" % str(built["errors"]))
+	var fighters: Array = built["config"].get("fighters", [])
+	check_eq(fighters.size(), 2, "you and your copy")
+	if fighters.size() == 2:
+		var mods: Dictionary = fighters[1]["mods"]
+		check_near(float(mods.get("max_health", 1.0)), 0.6, 0.0001, "the copy fights at 60% HP")
+		check_near(float(mods.get("damage", 1.0)), 1.0, 0.0001, "and hits like you")
+	# a normal fight on the same card IS scaled (the rule is specific to spars)
+	var normal := EncounterBuilder.plan(cat(), ctrl.state, "enc_a1_dock_rats", {"node_id": "x"})
+	check(float(normal["enemies"][0]["hp_mult"]) > 1.5, "normal fights keep difficulty/Dose scaling")
+
+
+## Review #13: a custom run proves nothing — it never sets Fight Camp milestone flags.
+func test_custom_fight_camp_runs_set_no_camp_milestones() -> void:
+	var prof := Profiles.default_profile("t", "T")
+	var ctrl := new_run({"seed": 105, "variant": "fight_camp", "custom": true, "custom_reasons": ["test build"]})
+	play_synthetic(ctrl)
+	check_eq(ctrl.phase(), "victory", "precondition: cleared")
+	CampaignProgression.finish_run(cat(), ctrl.state, "p0", prof)
+	var flags: Dictionary = prof["camp"]["flags"]
+	for f in ["beat_act1", "beat_act2", "beat_run"]:
+		check(not bool(flags.get(f, false)), "custom run: no %s" % f)
+	var normal := new_run({"seed": 115, "variant": "fight_camp"})   # another run id (credit is per run)
+	play_synthetic(normal)
+	check_eq(normal.phase(), "victory", "precondition: cleared")
+	CampaignProgression.finish_run(cat(), normal.state, "p0", prof)
+	for f2 in ["beat_act1", "beat_act2", "beat_run"]:
+		check(bool(flags.get(f2, false)), "standard run: %s" % f2)
+
+
+## Review #14: a boss's own phase-2 threshold from content is used; Dose 8 only brings it sooner.
+func test_boss_own_phase_two_threshold_is_used() -> void:
+	var c := cat()
+	c.boss_fights["fight_bilge"] = (c.boss_fights["fight_bilge"] as Dictionary).duplicate(true)   # this test's catalog only
+	c.boss_fights["fight_bilge"]["phase2_at"] = 0.4
+	var cases := [[0, 0.4, "the boss's own 40%"], [8, 0.65, "Dose 8 No Mercy: 65%"]]
+	for cs in cases:
+		var ctrl := new_run({"seed": 107, "dose": int(cs[0])})
+		var plan := EncounterBuilder.plan(c, ctrl.state, "boss_a1", {"node_id": "x", "kind": "boss"})
+		var built := EncounterBuilder.build_match(c, ctrl.state, plan, {"player_kinds": {"p0": "bot"}})
+		var mode = built["config"].get("mode")
+		check(mode is BossMode, "a boss fight")
+		if mode is BossMode:
+			check_near(float((mode as BossMode).cfg.get("phase2_at", -1.0)), float(cs[1]), 0.0001, str(cs[2]))
+	c.boss_fights["fight_bilge"]["phase2_at"] = 0.7
+	var d8 := new_run({"seed": 107, "dose": 8})
+	check_near(EncounterBuilder.boss_phase2_at(c, d8.state, c.boss_fights["fight_bilge"]), 0.7, 0.0001, "Dose 8 never makes phase 2 come later")
+
+
+## Review #5 (rules side): a group choice is only available while EVERY member can pay their
+## share; the autopilot picks only those; an event where nothing can be taken resolves by PASS.
+func test_group_event_choices_need_the_whole_party_to_pay() -> void:
+	var ctrl := _two_player_run(2024)
+	var nid := _force_node(ctrl, "event", "evt_the_belt")
+	ctrl.player("p0")["scrip"] = 200
+	ctrl.player("p1")["scrip"] = 20
+	check(ctrl.choose_node(nid, "p0"), "entered the event")
+	check_eq(ctrl.phase(), "event", "group event")
+	var sess: Dictionary = ctrl.session().get("event", {})
+	check_eq(EventRunner.available_choices(ctrl, sess, "p0"), ["window"], "Buy (50 Scrip each) is out: Two cannot pay their share")
+	var buy := {}
+	for ch in ctrl.event_view("p0").get("choices", []):
+		if str(ch["id"]) == "buy":
+			buy = ch
+	check(not bool(buy.get("available", true)) and str(buy.get("reason", "")).contains("Two"), "the reason names who cannot pay (%s)" % str(buy.get("reason", "")))
+	check(not ctrl.choose_event("p0", "buy"), "buying is refused")
+	check(ctrl.last_error.contains("Two"), "and the error says why (%s)" % ctrl.last_error)
+	check(not ctrl.choose_event("p0", EventRunner.PASS), "no passing while a choice is open")
+	check_eq(CampaignAutoPilot.choose_event(ctrl, "p0"), "window", "unattended play picks what the party can pay")
+	check(CampaignAutoPilot.settle(ctrl, ["p0", "p1"]), "the autopilot settles the group event")
+	check(ctrl.phase() != "event", "resolved")
+	# an event where nothing at all can be taken: PASS (no softlock), replayable
+	var c := cat()
+	c.events["evt_review_toll"] = {"id": "evt_review_toll", "type": "event", "title": "Toll", "text": "Pay up.", "group": true,
+		"choices": [{"id": "pay", "label": "Pay", "cost": {"scrip": 900}, "outcomes": [{"effects": [{"op": "nothing"}]}]}]}
+	var ctrl2 := _two_player_run(2025)
+	var nid2 := _force_node(ctrl2, "event", "evt_review_toll")
+	ctrl2.choose_node(nid2, "p0")
+	check(EventRunner.available_choices(ctrl2, ctrl2.session().get("event", {}), "p0").is_empty(), "nothing affordable")
+	check_eq(CampaignAutoPilot.choose_event(ctrl2, "p0"), EventRunner.PASS, "the autopilot passes")
+	check(CampaignAutoPilot.settle(ctrl2, ["p0", "p1"]), "and the event resolves")
+	check_eq(ctrl2.phase(), "map", "the party moved on")
+	var last_event := {}
+	for e in ctrl2.state["log"]:
+		if str(e["k"]) == "event":
+			last_event = e
+	check_eq(str(last_event.get("d", {}).get("choice", "")), EventRunner.PASS, "the pass is logged like any choice (replays reproduce it)")
+
+
+## Review #3/#6 (rules side): everything that changes the outcome is in the log, so a run
+## rebuilt from its own start config + log verifies — and a tampered state does not.
+func test_verify_rebuilds_runs_and_rejects_tampering() -> void:
+	var ctrl := new_run({"seed": 2468})
+	ctrl.choose_node(str(ctrl.available_nodes()[0]), "p0")
+	settle_node(ctrl)
+	check(ctrl.mark_custom([CampaignFlow.REASON_GAME_SPEED]), "the run becomes custom mid-way")
+	check(not ctrl.mark_custom([CampaignFlow.REASON_GAME_SPEED]), "once per reason")
+	play_synthetic(ctrl)
+	var wire = JSON.parse_string(JSON.stringify(RunStore.json_stable(ctrl.state), "", false, true))
+	var v := RunController.verify(cat(), wire)
+	check(bool(v["ok"]), "an honest run verifies: %s" % v["error"])
+	if v["ctrl"] != null:
+		check(bool((v["ctrl"] as RunController).state["custom"]), "the custom mark is replayed")
+	var tamper := {
+		"a forged Dose": func(s: Dictionary) -> void: s["dose"] = 10,
+		"forged Clout": func(s: Dictionary) -> void: s["players"][0]["clout"] = 50000,
+		"a forged result": func(s: Dictionary) -> void: s["result"]["victory"] = not bool(s["result"]["victory"]),
+		"a dropped decision": func(s: Dictionary) -> void: (s["log"] as Array).remove_at(3),
+		"a forged un-custom": func(s: Dictionary) -> void: s["custom"] = false,
+	}
+	for what in tamper:
+		var forged: Dictionary = (wire as Dictionary).duplicate(true)
+		(tamper[what] as Callable).call(forged)
+		check(not bool(RunController.verify(cat(), forged)["ok"]), "%s does not follow from the log" % what)
+	# incremental (party tickets): a continuation is checked from the last verified checkpoint
+	var run2 := new_run({"seed": 2470})
+	for i in 3:
+		run2.choose_node(str(run2.available_nodes()[0]), "p0")
+		settle_node(run2)
+	var first := RunController.verify(cat(), RunStore.json_stable(run2.state))
+	check(bool(first["ok"]), "checkpoint 1 verifies: %s" % first["error"])
+	for i2 in 2:
+		run2.choose_node(str(run2.available_nodes()[0]), "p0")
+		settle_node(run2)
+	var next_st: Dictionary = RunStore.json_stable(run2.state)
+	var inc := RunController.verify_from(cat(), first["ctrl"], next_st)
+	check(bool(inc["ok"]), "the continuation verifies incrementally: %s" % inc["error"])
+	var rewritten: Dictionary = next_st.duplicate(true)
+	rewritten["players"][0]["scrip"] = 9999
+	check(not bool(RunController.verify_from(cat(), first["ctrl"], rewritten)["ok"]), "a tampered continuation is rejected")
+	var other := new_run({"seed": 2471})
+	var o := RunController.verify_from(cat(), first["ctrl"], RunStore.json_stable(other.state))
+	check(bool(o["ok"]) and str((o["ctrl"] as RunController).state["run_id"]) == str(other.state["run_id"]),
+		"another run is never taken for a continuation: it is rebuilt on its own (full replay)")

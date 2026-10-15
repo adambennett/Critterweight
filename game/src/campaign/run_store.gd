@@ -3,7 +3,9 @@ extends RefCounted
 ## Suspended runs and co-op party tickets on disk (SAV-01/02/03).
 ##   <runs dir>/<profile id>/<slot>.json   kind "campaign_run", version RunState.VERSION
 ## Slots: off_the_street, fight_camp, bookie (one suspended run each per profile) and
-## party_<run id> (co-op: the host's run, or a member's replica checkpoint).
+## party_<run id> (co-op: the host's run, or a member's replica checkpoint). A new run never
+## silently takes an occupied slot: the menus ask first and CampaignFlow credits the old run as
+## abandoned (CampaignFlow.abandon_suspended) before the new one is saved.
 ## Writes go through Saves (temp -> verify -> .bak rotate -> rename, checksummed), so a crash at
 ## any point leaves a recoverable copy. Loading never deletes or rewrites anything; a damaged,
 ## newer-format or content-incompatible save produces a clear error and stays on disk.
@@ -102,23 +104,41 @@ func load_slot(profile_id: String, slot: String, catalog: CampaignCatalog) -> Di
 	return out
 
 
-## Suspended runs of a profile: [{slot, path, ok, error, summary}].
+## Suspended runs of a profile: [{slot, path, ok, error, summary}]. A slot is listed as soon as
+## ANY copy of it exists — also when a crash left only the verified .tmp or the .bak behind,
+## which load_slot recovers from.
 func list(profile_id: String, catalog: CampaignCatalog) -> Array:
 	var out := []
 	var dir := base_dir.path_join(Paths.slug(profile_id if profile_id != "" else "default"))
 	var d := DirAccess.open(dir)
 	if d == null:
 		return out
-	var files := d.get_files()
-	files.sort()
-	for f in files:
-		if not f.ends_with(".json"):
-			continue
-		var slot := f.get_basename()
-		var res := load_slot(profile_id, slot, catalog)
+	var slots := []
+	for f in d.get_files():
+		var s := slot_of_file(f)
+		if s != "" and not slots.has(s):
+			slots.append(s)
+	slots.sort()
+	for slot in slots:
+		var res := load_slot(profile_id, str(slot), catalog)
 		var st: Dictionary = res.get("state", {})
-		out.append({"slot": slot, "path": res["path"], "ok": res["ok"], "error": res["error"], "summary": summarize(st)})
+		out.append({"slot": str(slot), "path": res["path"], "ok": res["ok"], "error": res["error"], "summary": summarize(st)})
 	return out
+
+
+## The slot a file in a profile's runs folder belongs to: <slot>.json and the .json.tmp /
+## .json.bak copies Saves writes next to it ("" for anything else, e.g. a quarantined copy).
+static func slot_of_file(f: String) -> String:
+	for suffix in [".json.tmp", ".json.bak", ".json"]:
+		if f.ends_with(suffix) and f.length() > suffix.length():
+			return f.substr(0, f.length() - suffix.length())
+	return ""
+
+
+## True for a co-op party's slot (party_<run id>): it resumes only through the co-op host path
+## (CoopSession.host_resume), never as a solo run.
+static func is_party_slot(slot: String, summary: Dictionary = {}) -> bool:
+	return slot.begins_with("party_") or int(summary.get("players", 1)) > 1
 
 
 static func summarize(st: Dictionary) -> Dictionary:
@@ -138,9 +158,15 @@ func clear(profile_id: String, slot: String) -> void:
 	Saves.delete_save(slot_path(profile_id, slot))
 
 
-## Moves an unusable save aside instead of deleting it (abandoning a broken run).
+## Moves an unusable save aside instead of deleting it (abandoning a broken run) — every copy of
+## the slot (.json, .tmp, .bak), so a recoverable leftover cannot bring it back. Returns the new
+## path of the main file ("" if there was none).
 func quarantine(profile_id: String, slot: String) -> String:
-	return Saves.quarantine(slot_path(profile_id, slot))
+	var path := slot_path(profile_id, slot)
+	var main := Saves.quarantine(path)
+	Saves.quarantine(path + ".tmp")
+	Saves.quarantine(path + ".bak")
+	return main
 
 
 ## Save-format migrations. v0 (pre-release prototype) lacked claims/flags/log; future versions
@@ -164,6 +190,10 @@ static func migrate(data, from_version: int):
 # ---------------------------------------------------------------------------------------------
 # Co-op party tickets: every member keeps the last node-boundary checkpoint of the shared run so
 # any member can resume as the new host (CAMPAIGN.md §11 "Run ownership").
+# The checksum only detects damage in transit/on disk (anyone can recompute it). Authenticity
+# comes from CoopSession: a ticket is accepted only from the host's transport peer id, for the
+# party's run id + seed, and only if its state follows from its own decision log
+# (RunController.verify). A party slot is cleared when its run ends.
 # ---------------------------------------------------------------------------------------------
 
 static func make_ticket(state: Dictionary, host: String) -> Dictionary:

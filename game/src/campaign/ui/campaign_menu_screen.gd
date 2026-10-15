@@ -3,6 +3,11 @@ extends Screen
 ## (solo / co-op format), seed, suspended runs (resume / abandon), The Bookie's Table and the
 ## Cannery Ledger. Fully operable with a controller (focus moves between rows by geometry,
 ## ui_accept presses, ui_cancel goes back) and with mouse/keyboard.
+## One suspended run per variant: START RUN over an occupied slot asks first (abandon it and
+## start, resume it, or cancel); abandoning credits it as a defeat. Party runs are listed but
+## resume only through the co-op host path (CoopSession.host_resume), never as a solo run.
+
+const PARTY_RESUME_TEXT := "A co-op party's run: its host resumes it from the co-op lobby so the party can rejoin (it never continues as a solo run)."
 
 var catalog: CampaignCatalog
 var stand_ins := false
@@ -169,9 +174,7 @@ func _change_dose(delta: int) -> void:
 
 
 func _max_dose() -> int:
-	if not bool(catalog.difficulty(difficulty).get("dose_allowed", true)):
-		return 0
-	return CampaignProgression.max_selectable_dose(Profiles.current, variant)
+	return CampaignProgression.dose_cap(catalog, Profiles.current, variant, difficulty)
 
 
 func _dose_lines() -> Array:
@@ -209,17 +212,21 @@ func _refresh_runs() -> void:
 		return
 	for r in runs:
 		var s: Dictionary = r["summary"]
+		var party := RunStore.is_party_slot(str(r["slot"]), s)
 		var box := CampaignUI.panel()
 		var col := VBoxContainer.new()
 		box.add_child(col)
-		var head := "%s · Act %d · %s · %s%s" % [str(s.get("variant", "")).replace("_", " ").capitalize(), int(s.get("act", 1)),
-			", ".join(s.get("fighters", [])), str(s.get("difficulty", "")).capitalize(), (" · Dose %d" % int(s.get("dose", 0))) if int(s.get("dose", 0)) > 0 else ""]
+		var head := CampaignFlow.describe_suspended(catalog, s)
+		if party:
+			head = "PARTY RUN (%d players) · %s" % [int(s.get("players", 2)), head]
 		col.add_child(CampaignUI.label(head if not s.is_empty() else str(r["slot"]), 20))
 		if not bool(r["ok"]):
 			col.add_child(CampaignUI.label(str(r["error"]), 16, CampaignUI.DANGER))
+		elif party:
+			col.add_child(CampaignUI.label(PARTY_RESUME_TEXT, 16, CampaignUI.MUTED))
 		var hb := HBoxContainer.new()
 		var resume := CampaignUI.button("RESUME", _resume.bind(str(r["slot"])), 20)
-		resume.disabled = not bool(r["ok"])
+		resume.disabled = not bool(r["ok"]) or party
 		hb.add_child(resume)
 		hb.add_child(CampaignUI.button("ABANDON", _abandon.bind(str(r["slot"])), 20, CampaignUI.DANGER))
 		col.add_child(hb)
@@ -227,9 +234,13 @@ func _refresh_runs() -> void:
 
 
 func _resume(slot: String) -> void:
-	var res := RunStore.new().load_slot(Profiles.id() if Profiles.id() != "" else "default", slot, catalog)
+	var res := RunStore.new().load_slot(CampaignFlow.profile_key(), slot, catalog)
 	if not bool(res["ok"]):
 		CampaignUI.confirm(self, "Cannot resume", str(res["error"]), [{"label": "OK", "id": "ok"}], _after_modal)
+		return
+	if RunStore.is_party_slot(slot, RunStore.summarize(res["state"])):
+		# a party run only continues through the co-op host path (CoopSession.host_resume)
+		CampaignUI.confirm(self, "Party run", PARTY_RESUME_TEXT, [{"label": "OK", "id": "ok"}], _after_modal)
 		return
 	var f := CampaignFlow.resume(catalog, res["state"])
 	f.show_current()
@@ -244,17 +255,7 @@ func _on_abandon(id: String, slot: String) -> void:
 	if id != "yes":
 		_after_modal(id)
 		return
-	var store := RunStore.new()
-	var pid := Profiles.id() if Profiles.id() != "" else "default"
-	var res := store.load_slot(pid, slot, catalog)
-	if bool(res["ok"]):
-		var f := CampaignFlow.resume(catalog, res["state"])
-		f.ctrl.abandon()
-		CampaignProgression.finish_run(catalog, f.ctrl.state, "p0", Profiles.current)
-		Profiles.save()
-		store.clear(pid, slot)
-	else:
-		store.quarantine(pid, slot)
+	CampaignFlow.abandon_suspended(catalog, slot)
 	_refresh_runs()
 	_after_modal(id)
 
@@ -283,6 +284,33 @@ func _start_run() -> void:
 	var cfg := FightCamp.run_config(Profiles.current, {"variant": variant, "fighter": fighter, "difficulty": difficulty, "dose": dose,
 		"seed": seed_value, "coop_format": coop_format, "custom_reasons": CampaignFlow.custom_reasons(stand_ins)})
 	cfg["content_hash"] = Content.content_hash()
+	var slot := RunStore.slot_for(cfg)
+	var held := CampaignFlow.suspended_run(catalog, slot)
+	if held.is_empty():
+		_launch(cfg)
+		return
+	# one suspended run per variant: never replace it without asking
+	var buttons := [{"label": "ABANDON IT & START", "id": "replace", "danger": true}]
+	if bool(held.get("ok", false)):
+		buttons.append({"label": "RESUME IT", "id": "resume"})
+	buttons.append({"label": "CANCEL", "id": "cancel"})
+	CampaignUI.confirm(self, "Replace your suspended run?",
+		"You already have a suspended run: %s.\nStarting a new card abandons it — it counts as a defeat in your history." % CampaignFlow.describe_suspended(catalog, held.get("summary", {})),
+		buttons, _on_replace_choice.bind(cfg, slot))
+
+
+func _on_replace_choice(id: String, cfg: Dictionary, slot: String) -> void:
+	match id:
+		"replace":
+			CampaignFlow.abandon_suspended(catalog, slot)
+			_launch(cfg)
+		"resume":
+			_resume(slot)
+		_:
+			_after_modal(id)
+
+
+func _launch(cfg: Dictionary) -> void:
 	var f := CampaignFlow.start(catalog, cfg)
 	f.show_current()
 

@@ -12,6 +12,11 @@ extends RefCounted
 ## a second claim (double click, resent network message, replay after crash) is rejected.
 ## Fights that were in progress when the app quit are re-run from their start (their plan is
 ## stored in the node session; nothing from an unfinished fight is ever applied).
+## Pending picks may outlive the activity that granted them (Train at a rest, a pick from an
+## event or a consumable): the node completes only once they are claimed, so screens route to
+## the reward pick first whenever one is pending (CampaignFlow.current_screen).
+## Everything that changes the outcome is logged, so `verify()` can rebuild any state from its
+## own start config + log (co-op members check the host's checkpoints and result that way).
 
 signal changed(reason: String)
 
@@ -61,37 +66,132 @@ static func replay(cat: CampaignCatalog, start_cfg: Dictionary, log_entries: Arr
 	c.state = RunState.create(cat, start_cfg)
 	c.state["start_cfg"] = start_cfg.duplicate(true)
 	c._log("start", "", {})
-	for e in log_entries:
-		var k := str(e.get("k", ""))
-		var pid := str(e.get("p", ""))
-		var d: Dictionary = e.get("d", {})
-		match k:
-			"choose":
-				c.choose_node(str(d.get("node", "")), pid)
-			"fight":
-				c.complete_fight({"campaign": d.get("result", {})})
-			"claim":
-				c.claim(pid, str(d.get("rid", "")), str(d.get("choice", "")))
-			"reroll":
-				c.reroll(pid, str(d.get("rid", "")))
-			"event":
-				c.choose_event(pid, str(d.get("choice", "")))
-			"buy":
-				c.shop_buy(pid, str(d.get("slot", "")))
-			"service":
-				c.shop_service(pid, str(d.get("arg", "")))
-			"sell":
-				c.shop_sell(pid, str(d.get("item", "")))
-			"leave":
-				c.shop_leave(pid)
-			"rest":
-				c.rest_choose(pid, str(d.get("option", "")))
-			"consume":
-				c.use_consumable(pid, str(d.get("item", "")))
-			"abandon":
-				c.abandon()
+	c._apply_log(log_entries)
 	c.replaying = false
 	return c
+
+
+## Re-applies logged decisions to this run (replay; incremental verification).
+func _apply_log(log_entries: Array) -> void:
+	for e in log_entries:
+		if typeof(e) != TYPE_DICTIONARY:
+			continue   # not a decision (a damaged or forged log): verify() reports the mismatch
+		var k := str(e.get("k", ""))
+		var pid := str(e.get("p", ""))
+		var dv = e.get("d", {})
+		var d: Dictionary = dv if typeof(dv) == TYPE_DICTIONARY else {}
+		match k:
+			"choose":
+				choose_node(str(d.get("node", "")), pid)
+			"fight":
+				var fr = d.get("result", {})
+				complete_fight({"campaign": fr if typeof(fr) == TYPE_DICTIONARY else {}})
+			"claim":
+				claim(pid, str(d.get("rid", "")), str(d.get("choice", "")))
+			"reroll":
+				reroll(pid, str(d.get("rid", "")))
+			"event":
+				choose_event(pid, str(d.get("choice", "")))
+			"buy":
+				shop_buy(pid, str(d.get("slot", "")))
+			"service":
+				shop_service(pid, str(d.get("arg", "")))
+			"sell":
+				shop_sell(pid, str(d.get("item", "")))
+			"leave":
+				shop_leave(pid)
+			"rest":
+				rest_choose(pid, str(d.get("option", "")))
+			"consume":
+				use_consumable(pid, str(d.get("item", "")))
+			"custom":
+				var rs = d.get("reasons", [])
+				mark_custom(rs if typeof(rs) == TYPE_ARRAY else [])
+			"abandon":
+				abandon()
+
+
+## Rebuilds a run from its OWN start config and decision log and checks that `st` is exactly the
+## run that log produces. Co-op members accept the host's checkpoints (tickets) and final result
+## only this way: a forged or tampered state (Dose, Scrip, Clout, victory...) does not follow
+## from its log. Not compared: who is connected / bot-piloted (never logged) and the elapsed
+## time (fights are logged, menu time is not); floats are compared to 1e-4. Returns
+## {ok, error, ctrl}: ctrl is the rebuilt run (null when the state could not even be replayed).
+static func verify(cat: CampaignCatalog, st: Dictionary) -> Dictionary:
+	var out := {"ok": false, "error": "", "ctrl": null}
+	var cfg_v = st.get("start_cfg")
+	var log_v = st.get("log")
+	if typeof(cfg_v) != TYPE_DICTIONARY or typeof(log_v) != TYPE_ARRAY or (log_v as Array).is_empty():
+		out["error"] = "the run has no start config or decision log"
+		return out
+	var players_v = (cfg_v as Dictionary).get("players")
+	var party_ok := typeof(players_v) == TYPE_ARRAY and (players_v as Array).size() >= 1 and (players_v as Array).size() <= 4
+	if party_ok:
+		for p in players_v:
+			party_ok = party_ok and typeof(p) == TYPE_DICTIONARY
+	if not party_ok:
+		out["error"] = "the run's start config has no valid party"
+		return out
+	var probs := RunState.check(cat, st)
+	if not probs.is_empty():
+		out["error"] = "the run state is not valid here: %s" % probs[0]
+		return out
+	var rebuilt := replay(cat, cfg_v, (log_v as Array).slice(1))
+	out["ctrl"] = rebuilt
+	if digest(rebuilt.state) != digest(st):
+		out["error"] = "the run state does not follow from its decision log"
+		return out
+	out["ok"] = true
+	return out
+
+
+## verify() for a continuation of a run verified before (`base`, e.g. the previous party ticket):
+## only the decisions logged since are replayed onto a copy of it — a node instead of the whole
+## run. Anything that is not a plain continuation (history rewritten, another run) falls back to
+## the full verify(), which then decides.
+static func verify_from(cat: CampaignCatalog, base: RunController, st: Dictionary) -> Dictionary:
+	var log_v = st.get("log")
+	if base == null or typeof(log_v) != TYPE_ARRAY or (log_v as Array).size() < (base.state.get("log", []) as Array).size():
+		return verify(cat, st)
+	var c := RunController.new()
+	c.catalog = cat
+	c.state = base.state.duplicate(true)
+	c.replaying = true
+	c._apply_log((log_v as Array).slice((base.state.get("log", []) as Array).size()))
+	c.replaying = false
+	if digest(c.state) == digest(st):
+		return {"ok": true, "error": "", "ctrl": c}
+	return verify(cat, st)
+
+
+## Checksum of a run state without what a decision log does not determine (see verify()).
+static func digest(st: Dictionary) -> String:
+	var c: Dictionary = st.duplicate(true)
+	c.erase("elapsed")
+	if typeof(c.get("result")) == TYPE_DICTIONARY:
+		(c["result"] as Dictionary).erase("elapsed")
+	for p in c.get("players", []):
+		if typeof(p) == TYPE_DICTIONARY:
+			(p as Dictionary).erase("connected")
+			(p as Dictionary).erase("bot")
+	return Saves.checksum(_snapped(c))
+
+
+static func _snapped(v):
+	match typeof(v):
+		TYPE_FLOAT:
+			return snappedf(float(v), 0.0001)
+		TYPE_DICTIONARY:
+			var out := {}
+			for k in v:
+				out[str(k)] = _snapped(v[k])
+			return out
+		TYPE_ARRAY:
+			var arr := []
+			for e in v:
+				arr.append(_snapped(e))
+			return arr
+	return v
 
 
 # =============================================================================================
@@ -279,7 +379,8 @@ func complete_fight(result: Dictionary) -> bool:
 	var won := bool(camp.get("won", false))
 	var spar := bool(f.get("spar", false))
 	var tier := str(f.get("tier", "normal"))
-	var pres: Dictionary = camp.get("players", {})
+	var pres_v = camp.get("players", {})
+	var pres: Dictionary = pres_v if typeof(pres_v) == TYPE_DICTIONARY else {}
 	state["stats"]["fights"] = int(state["stats"].get("fights", 0)) + 1
 	if won:
 		state["stats"]["fights_won"] = int(state["stats"].get("fights_won", 0)) + 1
@@ -289,7 +390,8 @@ func complete_fight(result: Dictionary) -> bool:
 		reward_mults[str(p0["id"])] = float(BuildApplier.next_rules(p0, plan_arena).get("reward_mult", 1.0))
 	for p in players():
 		var pid := str(p["id"])
-		var r: Dictionary = pres.get(pid, {})
+		var rv = pres.get(pid, {})
+		var r: Dictionary = rv if typeof(rv) == TYPE_DICTIONARY else {}
 		var st: Dictionary = p["stats"]
 		st["fights"] = int(st.get("fights", 0)) + 1
 		if r.is_empty():
@@ -386,8 +488,12 @@ func complete_fight(result: Dictionary) -> bool:
 
 func _compact_result(camp: Dictionary) -> Dictionary:
 	var out := {"won": bool(camp.get("won", false)), "time": snappedf(float(camp.get("time", 0.0)), 0.01), "players": {}}
-	for pid in camp.get("players", {}):
-		var r: Dictionary = camp["players"][pid]
+	var pres_v = camp.get("players", {})
+	var pres: Dictionary = pres_v if typeof(pres_v) == TYPE_DICTIONARY else {}
+	for pid in pres:
+		if typeof(pres[pid]) != TYPE_DICTIONARY:
+			continue
+		var r: Dictionary = pres[pid]
 		var c := {}
 		for k in ["hp", "hype", "out", "knockdowns", "kos", "minion_kos", "damage_dealt", "damage_taken", "biggest_hit", "taunts", "downs", "hit_by_boss"]:
 			if r.has(k):
@@ -857,6 +963,27 @@ func abandon() -> void:
 	_end_run(false, true)
 
 
+## Marks the run custom for `reasons` (statistics and history only: no records, ladder or
+## unlocks — CampaignProgression). A run never becomes un-custom; new reasons are added. Logged,
+## so replays and co-op members reproduce it. Returns true if anything changed.
+func mark_custom(reasons: Array) -> bool:
+	if is_over():
+		return false
+	var have: Array = (state.get("custom_reasons", []) as Array).duplicate()
+	var added := []
+	for r in reasons:
+		if not have.has(str(r)) and not added.has(str(r)):
+			added.append(str(r))
+	if added.is_empty():
+		return false
+	have.append_array(added)
+	state["custom_reasons"] = have
+	state["custom"] = true
+	_log("custom", "", {"reasons": added})
+	_commit("custom")
+	return true
+
+
 func add_time(seconds: float) -> void:
 	state["elapsed"] = float(state.get("elapsed", 0.0)) + maxf(0.0, seconds)
 
@@ -891,6 +1018,15 @@ func _try_complete_node() -> void:
 	if not _node_activity_done() or has_pending():
 		return
 	_complete_node()
+
+
+## Completes the current node if its activity is finished and no pick is pending. Every
+## transition already does this; calling it again is harmless and repairs runs saved between
+## the two by older builds. Returns true if the run moved on.
+func advance_if_done() -> bool:
+	var before := phase()
+	_try_complete_node()
+	return phase() != before
 
 
 func _complete_node() -> void:

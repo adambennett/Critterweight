@@ -7,6 +7,7 @@ extends CampaignTestCase
 
 var _root := ""
 var _profile := {}
+var _speed = 1.0               ## the accessibility game speed setting, restored after each test
 
 
 ## A CampaignFlow whose fights are settled by the test (no presented MatchScene).
@@ -16,6 +17,15 @@ class TestFlow:
 
 	func launch_fight() -> void:
 		fights_requested += 1
+
+
+## A real CampaignFlow (presented fights) whose catalog's stand-ins do not count as a custom
+## reason, so a test can watch the game-speed reason on its own.
+class NoStandInFlow:
+	extends CampaignFlow
+
+	func uses_stand_ins() -> bool:
+		return false
 
 
 func make_flow(cfg: Dictionary) -> TestFlow:
@@ -29,6 +39,7 @@ func make_flow(cfg: Dictionary) -> TestFlow:
 
 
 func before_each() -> void:
+	_speed = Settings.get_value("access.game_speed")
 	_root = Paths.root
 	Paths.root = temp_dir("ui_root_%d" % Time.get_ticks_usec())
 	_profile = Profiles.current
@@ -41,7 +52,9 @@ func after_each() -> void:
 	App.set_scene(null)
 	var t := App.get_node_or_null("BookieTable")
 	if t:
+		t.name = "BookieTable_done"
 		t.queue_free()
+	Settings.set_value("access.game_speed", _speed, false, false)
 	Paths.root = _root
 	Profiles.current = _profile
 	super.after_each()
@@ -297,3 +310,356 @@ func test_bookie_screen_setup_live_and_stop() -> void:
 	check_eq(top().screen_name, "campaign_menu", "left to the campaign menu")
 	check(App.get_node_or_null("BookieTable") == null, "the table was released")
 	check_near(Engine.time_scale, 1.0, 0.001, "game speed restored")
+
+
+# --- review regressions ----------------------------------------------------------------------------
+
+## Turns the first reachable node into a rest stop.
+func _rest_node(ctrl: RunController) -> String:
+	var nid := str(ctrl.available_nodes()[0])
+	var n := RunState.node(ctrl.state, nid)
+	n["type"] = "rest"
+	n["encounter"] = ""
+	n.erase("hidden")
+	return nid
+
+
+## Counts screen changes; past `limit` it breaks a screen loop from outside (so a regression
+## fails this test instead of freezing the suite) by settling the node by force.
+func _loop_guard(ctrl: RunController, limit := 40) -> Array:
+	var changes := [0]
+	var on_screen := func(_s: String) -> void:
+		changes[0] += 1
+		if changes[0] == limit:
+			ctrl.state["phase"] = "map"
+			ctrl.state["node"] = {}
+	App.screen_changed.connect(on_screen)
+	return [changes, on_screen]
+
+
+func _end_guard(guard: Array) -> int:
+	App.screen_changed.disconnect(guard[1])
+	return int(guard[0][0])
+
+
+## Review #1: Rest -> Train opens the technique pick (no screen loop), and the pick completes
+## the rest stop.
+func test_rest_train_opens_the_pick_without_a_loop() -> void:
+	var f := make_flow(run_cfg("f_stoke", {"seed": 4242}))
+	f.intro_seen = {1: true, 2: true, 3: true}
+	var nid := _rest_node(f.ctrl)
+	f.choose_node(nid)
+	await wait_frames(2)
+	check_eq(top().screen_name, "rest", "the rest stop")
+	var guard := _loop_guard(f.ctrl)
+	var cards: Array = top().get("_cards")
+	await press(cards[1])                     # TRAIN
+	await wait_frames(3)
+	var changes := _end_guard(guard)
+	check(changes <= 3, "Train moved on once, no screen loop (%d screen changes)" % changes)
+	check_eq(top().screen_name, "reward", "Train opens the technique pick")
+	check_eq(str(f.ctrl.pending_for("p0")[0]["kind"]) if not f.ctrl.pending_for("p0").is_empty() else "", "technique", "a technique pick")
+	await press(top().default_focus())
+	await wait_frames(2)
+	check_eq(f.ctrl.phase(), "map", "the pick completed the rest stop")
+	check_eq(top().screen_name, "run_map", "back on the map")
+
+
+## Walks a run (synthetic results) until a real rest stop is reachable and enters it.
+func _walk_into_rest(ctrl: RunController) -> bool:
+	for i in 40:
+		if ctrl.is_over():
+			return false
+		var av := ctrl.available_nodes()
+		for id in av:
+			if str(RunState.node(ctrl.state, str(id)).get("type", "")) == "rest":
+				return ctrl.choose_node(str(id), "p0")
+		ctrl.choose_node(str(av[0]), "p0")
+		settle_node(ctrl)
+	return false
+
+
+## Review #1: a run saved in the stuck state (Train taken, its pick pending, phase still
+## "rest") resumes straight into the pick.
+func test_stuck_rest_save_resumes_into_the_pick() -> void:
+	var ctrl := RunController.start_run(cat(), run_cfg("f_stoke", {"seed": 4343}))
+	check(_walk_into_rest(ctrl), "reached a rest stop on the card")
+	check(ctrl.rest_choose("p0", "train"), "Train: %s" % ctrl.last_error)
+	check_eq(ctrl.phase(), "rest", "precondition: the state older builds froze on")
+	var rs := RunStore.new()
+	rs.save(ctrl.state, CampaignFlow.profile_key())
+	var res := rs.load_slot(CampaignFlow.profile_key(), "off_the_street", cat())
+	check(bool(res["ok"]), "the stuck save loads: %s" % res["error"])
+	var f := CampaignFlow.resume(cat(), res["state"])
+	f.intro_seen = {1: true, 2: true, 3: true}
+	var guard := _loop_guard(f.ctrl)
+	f.show_current()
+	await wait_frames(3)
+	var changes := _end_guard(guard)
+	check(changes <= 2, "resume shows one screen (%d screen changes)" % changes)
+	check_eq(top().screen_name, "reward", "RESUME opens the pending technique pick")
+	await press(top().default_focus())
+	await wait_frames(2)
+	check_eq(f.ctrl.phase(), "map", "and the run goes on")
+
+
+## Review #1: the same at The Bookie's Table when the player has taken over.
+func test_bookie_attended_rest_train_opens_the_pick() -> void:
+	var t := BookieTable.new()
+	t.name = "BookieTable"
+	App.add_child(t)
+	t.setup(cat(), run_cfg("f_stoke", {"seed": 4444}), {})
+	t.unattended = false
+	var bf := BookieFlow.for_table(t)
+	t.ctrl.choose_node(_rest_node(t.ctrl), "p0")
+	bf.show_current()
+	await wait_frames(2)
+	check_eq(top().screen_name, "rest", "the player decides the rest stop")
+	var guard := _loop_guard(t.ctrl)
+	var cards: Array = top().get("_cards")
+	await press(cards[1])
+	await wait_frames(3)
+	var changes := _end_guard(guard)
+	check(changes <= 3, "no screen loop at the table (%d screen changes)" % changes)
+	check_eq(top().screen_name, "reward", "Train opens the pick at the table too")
+
+
+## Review #2: START RUN over a suspended run of the same variant asks first; CANCEL keeps it,
+## ABANDON IT & START credits it as an abandoned defeat and deals the new card.
+func test_menu_asks_before_replacing_a_suspended_run() -> void:
+	var old := CampaignFlow.start(cat(), run_cfg("f_stoke", {"seed": 111}))
+	var old_id := str(old.ctrl.state["run_id"])
+	App.goto("campaign_menu", {"stand_ins": true})
+	await wait_frames(3)
+	await press(find_exact(top(), "START RUN"))
+	check(CampaignUI.has_modal(top()), "START RUN asks before replacing the suspended run")
+	await press(find_exact(top(), "CANCEL"))
+	var held := CampaignFlow.suspended_run(cat(), "off_the_street")
+	check_eq(str(held.get("summary", {}).get("run_id", "")), old_id, "CANCEL keeps the suspended run")
+	check((Profiles.current["history"] as Array).is_empty(), "and credits nothing")
+	await press(find_exact(top(), "START RUN"))
+	await press(find_button(top(), "ABANDON IT"))
+	await wait_frames(3)
+	check_eq(top().screen_name, "run_map", "the new card is dealt")
+	var now := CampaignFlow.suspended_run(cat(), "off_the_street")
+	var new_id := str(now.get("summary", {}).get("run_id", ""))
+	check(new_id != "" and new_id != old_id, "the slot holds the new run")
+	var hist: Array = Profiles.current["history"]
+	check(not hist.is_empty() and str(hist[0]["run_id"]) == old_id and not bool(hist[0]["victory"]), "the old run is in the history as a defeat")
+	check_eq(int(Profiles.current["records"]["runs"]["off_the_street"]["attempts"]), 1, "counted as an attempt")
+
+
+## Review #2: the hub's sign-up sheet asks the same (dialog: abandon it / resume it / keep it),
+## and the services never replace a suspended Fight Camp run without that answer.
+func test_hub_sign_up_asks_before_replacing_a_suspended_run() -> void:
+	var old := CampaignFlow.start(cat(), run_cfg("f_stoke", {"seed": 222, "variant": "fight_camp"}))
+	var old_id := str(old.ctrl.state["run_id"])
+	var sv := HubServices.new(HubState.new(Profiles.current))
+	sv.stand_ins = true
+	var r := sv.start_run({"fighter": "f_stoke", "difficulty": "amateur", "dose": 0})
+	check(not bool(r.get("ok", true)) and bool(r.get("needs_confirm", false)), "the services ask instead of replacing")
+	check_eq(str(CampaignFlow.suspended_run(cat(), "fight_camp").get("summary", {}).get("run_id", "")), old_id, "nothing replaced")
+	App.goto("hub_board", {"kind": "run", "stand_ins": true})
+	await wait_frames(3)
+	await press(find_button(top(), "SIGN THE WAIVER"))
+	await wait_frames(2)
+	check_eq(top().screen_name, "dialog", "signing asks first")
+	top().call("choose", "keep")
+	await wait_frames(2)
+	check_eq(top().screen_name, "hub_board", "KEEP IT returns to the sheet")
+	check_eq(str(CampaignFlow.suspended_run(cat(), "fight_camp").get("summary", {}).get("run_id", "")), old_id, "the run is kept")
+	await press(find_button(top(), "SIGN THE WAIVER"))
+	await wait_frames(2)
+	top().call("choose", "replace")
+	await wait_frames(3)
+	check_eq(top().screen_name, "run_map", "the new card is dealt")
+	var new_id := str(CampaignFlow.suspended_run(cat(), "fight_camp").get("summary", {}).get("run_id", ""))
+	check(new_id != "" and new_id != old_id, "the slot holds the new run")
+	var hist: Array = Profiles.current["history"]
+	check(not hist.is_empty() and str(hist[0]["run_id"]) == old_id, "the old run was credited as abandoned")
+
+
+## Review #4: the hub's sign-up sheet offers Doses only on difficulties that take them.
+func test_hub_sign_up_offers_no_dose_on_sparring() -> void:
+	Profiles.current["ladder"]["fight_camp"] = {"unlocked": 3, "cleared": 2, "open": true}
+	App.goto("hub_board", {"kind": "run", "stand_ins": true})
+	await wait_frames(3)
+	var diff_row: OptionRow = null
+	var dose_row: OptionRow = null
+	for c in top().find_children("*", "OptionRow", true, false):
+		var row := c as OptionRow
+		if row.label_text == "Difficulty":
+			diff_row = row
+		elif row.label_text == "The Dosage":
+			dose_row = row
+	check(diff_row != null and dose_row != null, "the sheet has Difficulty and Dosage rows")
+	if diff_row == null or dose_row == null:
+		return
+	for i in diff_row.options.size():
+		if str(diff_row.get_value()) == "amateur":
+			break
+		diff_row._on_step(1)
+	check_eq(dose_row.options, [0, 1, 2, 3], "Amateur: the base card and Doses 1-3")
+	dose_row.set_value(2)
+	for i in diff_row.options.size():
+		if str(diff_row.get_value()) == "sparring":
+			break
+		diff_row._on_step(1)
+	check_eq(str(diff_row.get_value()), "sparring", "Sparring picked")
+	check_eq(dose_row.options, [0], "Sparring: no Dose on offer")
+	check_eq(int(dose_row.get_value()), 0, "the Dose fell back to the base card")
+
+
+## Review #4: whatever a caller asks for, a run is created only at a Dose the active profile may
+## play (menu, hub sheet and "Raise the Dose" all start through CampaignFlow.start).
+func test_run_creation_clamps_the_dose() -> void:
+	Profiles.current["ladder"]["off_the_street"] = {"unlocked": 3, "cleared": 2, "open": true}
+	var f := CampaignFlow.start(cat(), run_cfg("f_stoke", {"seed": 556, "dose": 7}))
+	check_eq(int(f.ctrl.state["dose"]), 3, "Dose 7 asked, Dose 3 unlocked: Dose 3")
+	f.abandon()
+	var f2 := CampaignFlow.start(cat(), run_cfg("f_stoke", {"seed": 557, "dose": 2, "difficulty": "sparring"}))
+	check_eq(int(f2.ctrl.state["dose"]), 0, "no Dose on Sparring")
+	f2.abandon()
+	Profiles.current["ladder"]["off_the_street"] = {"unlocked": 1, "cleared": 0, "open": false}
+	var f3 := CampaignFlow.start(cat(), run_cfg("f_stoke", {"seed": 558, "dose": 1}))
+	check_eq(int(f3.ctrl.state["dose"]), 0, "The Dosage closed: the base card")
+
+
+## Review #11: a party's slot is listed but never resumed as a solo run (only the co-op host
+## path resumes it); abandoning credits the local member.
+func test_menu_never_resumes_a_party_run_solo() -> void:
+	var cfg := run_cfg("f_stoke", {"seed": 333})
+	cfg["players"].append({"id": "p1", "name": "Two", "profile_id": "someone_else", "fighter": "f_dozer"})
+	var party := RunController.start_run(cat(), cfg)
+	var slot := RunStore.slot_for(party.state)
+	RunStore.new().save(party.state, CampaignFlow.profile_key(), slot)
+	var s := App.goto("campaign_menu", {"stand_ins": true})
+	await wait_frames(3)
+	var resume := find_exact(s, "RESUME")
+	check(resume != null and resume.disabled, "a party run cannot be resumed solo from the menu")
+	s.call("_resume", slot)
+	await wait_frames(2)
+	check_eq(top().screen_name, "campaign_menu", "no solo run was started")
+	check(CampaignUI.has_modal(top()), "the menu explains how party runs resume")
+	App.back()
+	await wait_frames(1)
+	s.call("_on_abandon", "yes", slot)
+	await wait_frames(1)
+	check(CampaignFlow.suspended_run(cat(), slot).is_empty(), "abandoning clears the party slot")
+	check_eq(int(Profiles.current["records"]["runs"]["off_the_street"]["attempts"]), 1, "credited as an attempt")
+
+
+## Review #6: "custom" is re-checked before every fight (the game speed may have been lowered
+## since the run started); once custom, a run stays custom.
+func test_custom_rechecked_at_each_fight() -> void:
+	var f := NoStandInFlow.new()
+	f.catalog = cat()
+	f.store = RunStore.new()
+	f.ctrl = RunController.start_run(cat(), run_cfg("f_stoke", {"seed": 4545}))
+	f._hook()
+	check(not bool(f.ctrl.state["custom"]), "a standard run")
+	f.ctrl.choose_node(str(f.ctrl.available_nodes()[0]), "p0")
+	Settings.set_value("access.game_speed", 0.8, false, false)
+	f.launch_fight()
+	await wait_frames(2)
+	check(bool(f.ctrl.state["custom"]), "slowed down before the fight: the run is custom now")
+	check((f.ctrl.state["custom_reasons"] as Array).has(CampaignFlow.REASON_GAME_SPEED), "for reduced game speed")
+	App.set_scene(null)
+	Settings.set_value("access.game_speed", 1.0, false, false)
+	f.ctrl.complete_fight(fake_result(f.ctrl))
+	settle_node(f.ctrl)
+	f.ctrl.choose_node(str(f.ctrl.available_nodes()[0]), "p0")
+	if f.ctrl.phase() == "fight":
+		f.launch_fight()
+		await wait_frames(2)
+		App.set_scene(null)
+	check(bool(f.ctrl.state["custom"]), "back at full speed, the run stays custom")
+
+
+## Review #6: "Run it back" decides custom afresh from the reasons that apply now.
+func test_run_it_back_rechecks_custom() -> void:
+	var f := NoStandInFlow.new()
+	f.catalog = cat()
+	f.store = RunStore.new()
+	f.ctrl = RunController.start_run(cat(), run_cfg("f_stoke", {"seed": 4646, "custom": true, "custom_reasons": [CampaignFlow.REASON_GAME_SPEED]}))
+	f._hook()
+	f.abandon()
+	await wait_frames(2)
+	Settings.set_value("access.game_speed", 1.0, false, false)
+	f.restart(true)
+	await wait_frames(2)
+	var nf: CampaignFlow = top().get("flow")
+	check(nf != null and nf != f, "a new card")
+	if nf == null:
+		return
+	check(not bool(nf.ctrl.state["custom"]), "full speed now: the run back is a standard run")
+	nf.abandon()
+	await wait_frames(2)
+	Settings.set_value("access.game_speed", 0.7, false, false)
+	var nf2 := NoStandInFlow.new()
+	nf2.catalog = cat()
+	nf2.store = RunStore.new()
+	nf2.ctrl = nf.ctrl
+	nf2.restart(true)
+	await wait_frames(2)
+	var nf3: CampaignFlow = top().get("flow")
+	check(nf3 != null and bool(nf3.ctrl.state["custom"]), "slowed down now: the run back is custom")
+	check(nf3 != null and (nf3.ctrl.state["custom_reasons"] as Array).has(CampaignFlow.REASON_GAME_SPEED), "for reduced game speed")
+
+
+## Review #7: a presented fight counts once — its simulated time — not also its wall-clock time.
+func test_fight_time_counts_once() -> void:
+	var f := CampaignFlow.start(cat(), run_cfg("f_stoke", {"seed": 4747}))
+	var fight_id := ""
+	for id in f.ctrl.available_nodes():
+		if str(RunState.node(f.ctrl.state, str(id)).get("type", "")) == "fight":
+			fight_id = str(id)
+	check(fight_id != "", "a fight on row 1")
+	f.ctrl.choose_node(fight_id, "p0")
+	var before := float(f.ctrl.state["elapsed"])
+	f.launch_fight()
+	check(App.current_scene is MatchScene, "a presented fight")
+	var until := Time.get_ticks_msec() + 1300
+	while Time.get_ticks_msec() < until:
+		await wait_frames(1)               # the fight takes 1.3 s of real time...
+	var res := fake_result(f.ctrl)
+	res["campaign"]["time"] = 0.5          # ...and reports 0.5 s of fight time
+	f._on_match_finished(res)
+	await wait_frames(2)
+	var added := float(f.ctrl.state["elapsed"]) - before
+	check(added >= 0.5 - 0.001, "the fight's own time counts (%.2f s)" % added)
+	check(added < 0.5 + 0.4, "the fight's wall-clock time is not counted on top (%.2f s added)" % added)
+
+
+## Review #8: the Bookie's speed applies to every presented fight, not just the first: a
+## finished MatchScene resets Engine.time_scale, so each fight re-applies k x at the fixed
+## 1/120 s step.
+func test_bookie_speed_holds_for_every_presented_fight() -> void:
+	var t := BookieTable.new()
+	t.name = "BookieTable"
+	App.add_child(t)
+	t.setup(cat(), run_cfg("f_stoke", {"seed": 99}), {})
+	t.speed = 4.0
+	var bf := BookieFlow.for_table(t)
+	bf.watching = true
+	t.running = true
+	SimSpeed.set_scale(t.speed)
+	t.ctrl.choose_node(str(t.ctrl.available_nodes()[0]), "p0")
+	var built := t.ctrl.match_config({"bot_tier_players": "contender", "player_kinds": {"p0": "bot"}})
+	check((built["errors"] as PackedStringArray).is_empty(), "the fight builds")
+	for i in 2:
+		var done := [false]
+		var run := func() -> void:
+			await bf.run_fight(t, built["config"])
+			done[0] = true
+		run.call()
+		await wait_physics(8)
+		check_near(Engine.time_scale, 4.0, 0.001, "fight %d runs at the table's 4x" % (i + 1))
+		check_near(get_physics_process_delta_time(), 1.0 / 120.0, 0.00001, "fight %d steps the fixed 1/120 s" % (i + 1))
+		bf.abort_fight()
+		var budget := 0
+		while not done[0] and budget < 120:
+			budget += 1
+			await wait_frames(1)
+		await wait_frames(2)               # the finished MatchScene leaves the tree (and resets time_scale)
+	t.running = false
