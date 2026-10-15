@@ -45,6 +45,8 @@ var event_seq := 0
 var hittables: Array = []        ## mode objects weapons can strike (see register_hittable)
 var hazards = null               ## optional ArenaHazards runner (timed hazards, pickups)
 var gravity := 9.81              ## arena gravity_mult x rules gravity_mult (low-grav rules)
+var profiling := false           ## bench: accumulate per-section costs (usec) into `prof`
+var prof := {}
 var _prev_speed := {}            ## fighter index -> root speed last tick (slam detection)
 var _fighter_root: Node3D
 
@@ -238,6 +240,7 @@ func _exit_tree() -> void:
 func step(dt: float) -> void:
 	tick_count += 1
 	time += dt
+	var t0 := Time.get_ticks_usec() if profiling else 0
 	for f in fighters:
 		if not f.despawned:
 			f.focus_point = mode.focus_point(f) if mode else null
@@ -252,16 +255,26 @@ func step(dt: float) -> void:
 			f.input.move = Vector3.ZERO
 			f.input.held = 0
 			f._buffer.clear()
+	var t1 := Time.get_ticks_usec() if profiling else 0
 	for f in fighters:
 		if not f.despawned:
 			f.sim_tick(dt)
+	var t2 := Time.get_ticks_usec() if profiling else 0
 	combat.detect_hits()
+	var t3 := Time.get_ticks_usec() if profiling else 0
 	effects.update(dt)
 	if hazards != null:
 		hazards.update(dt)
 	_environment_checks()
 	if mode and not is_finished:
 		mode.tick(dt)
+	if profiling:
+		var t4 := Time.get_ticks_usec()
+		prof["input"] = float(prof.get("input", 0.0)) + (t1 - t0)
+		prof["fighters"] = float(prof.get("fighters", 0.0)) + (t2 - t1)
+		prof["combat"] = float(prof.get("combat", 0.0)) + (t3 - t2)
+		prof["effects_mode"] = float(prof.get("effects_mode", 0.0)) + (t4 - t3)
+		prof["ticks"] = float(prof.get("ticks", 0.0)) + 1.0
 
 
 func _environment_checks() -> void:

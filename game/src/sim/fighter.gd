@@ -353,6 +353,14 @@ func sim_tick(dt: float) -> void:
 	if _hover_until > time:
 		rig.hover_height += _hover_extra
 		motor.tuck = true
+	if sim and sim.profiling:
+		var a := Time.get_ticks_usec()
+		motor.update(dt)
+		var b := Time.get_ticks_usec()
+		rig.step(dt)
+		sim.prof["motor"] = float(sim.prof.get("motor", 0.0)) + (b - a)
+		sim.prof["rig"] = float(sim.prof.get("rig", 0.0)) + (Time.get_ticks_usec() - b)
+		return
 	motor.update(dt)
 	rig.step(dt)
 
