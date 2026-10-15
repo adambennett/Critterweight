@@ -7,7 +7,7 @@
   "tags": ["fighter", "quadruped", "lunker"],
   "stats": {
     "health": 130, "walk_speed": 3, "accel": 24, "turn_rate": 4.5, "stamina": 95, "stamina_regen": 12, "poise": 85,
-    "poise_regen": 15, "dodge_distance": 3.2, "dodge_time": 0.3, "power": 1, "defense": 1, "weight": 1
+    "poise_regen": 15, "dodge_distance": 3.2, "dodge_time": 0.3, "power": 1.2, "defense": 1, "weight": 1
   },
   "body": {
     "id": "f_dozer_body",
@@ -142,17 +142,17 @@
       ]
     },
     "heavy_charged": {
-      "name": "Quarry Ram", "duration": 1.35, "damage": 16, "charge_damage": 0.12, "knockback": 7.7, "launch": 5,
+      "name": "Quarry Ram", "duration": 1.35, "damage": 16, "charge_damage": 0.12, "knockback": 7.7, "launch": 5.4,
       "stun": 0.8, "poise": 50, "stamina": 16, "vmin": 1.5, "vref": 6.5, "speed": 1.6, "move_mult": 0, "turn_rate": 1.5,
       "lunge": [[0, 0.5, 6]], "element": "grit", "buildup": 45, "armor": [[0, 1.35]], "guard_break": 2,
       "on_hit": [{"if": {"target_guarding": true}, "do": [{"type": "guard_crush", "mult": 2}]}],
-      "hit": [{"t0": 0.5, "t1": 0.8, "weapons": ["horn", "head", "snout"]}],
+      "hit": [{"t0": 0.3, "t1": 0.8, "weapons": ["horn", "head", "snout"]}],
       "keys": [
         {"t": 0, "joints": {"neck": [-14, 0, 0], "head": [-12, 0, 0]}, "lean": [-8, 0, 0], "height": 0.04},
-        {"t": 0.12, "joints": {"neck": [22, 0, 0], "head": [20, 0, 0]}, "lean": [10, 0, 0], "height": -0.06},
-        {"t": 0.46, "joints": {"neck": [24, 0, 0], "head": [22, 0, 0]}, "lean": [10, 0, 0], "height": -0.08},
-        {"t": 0.62, "joints": {"neck": [-28, 0, 0], "head": [-24, 0, 0]}, "lean": [-12, 0, 0], "height": 0.1},
-        {"t": 0.85, "joints": {"neck": [-30, 0, 0], "head": [-26, 0, 0]}, "lean": [-12, 0, 0], "height": 0.1},
+        {"t": 0.12, "joints": {"neck": [2, 0, 0], "head": [-4, 0, 0]}, "lean": [5, 0, 0], "height": -0.03},
+        {"t": 0.46, "joints": {"neck": [4, 0, 0], "head": [-2, 0, 0]}, "lean": [6, 0, 0], "height": -0.04},
+        {"t": 0.62, "joints": {"neck": [-32, 0, 0], "head": [-28, 0, 0]}, "lean": [-5, 0, 0], "height": 0.03},
+        {"t": 0.85, "joints": {"neck": [-34, 0, 0], "head": [-28, 0, 0]}, "lean": [-5, 0, 0], "height": 0.03},
         {"t": 1.35}
       ]
     },
@@ -374,7 +374,7 @@
     "range": [1.2, 1.5], "charge_heavy": 0.35,
     "abilities": {
       "ability1": {"min": 3, "max": 6.5, "when": [{"wall_behind_target": 3}, {"min": 4}]},
-      "ability2": {"max": 7, "when": [{"target_ranged": true, "min": 3}, {"self_poise_below": 0.5, "max": 2.5}]}
+      "ability2": {"max": 7, "chance": 0.6, "when": [{"target_ranged": true, "min": 3.5}, {"self_poise_below": 0.45, "max": 2.5}]}
     }
   }
 }

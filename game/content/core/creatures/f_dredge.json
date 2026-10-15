@@ -8,7 +8,7 @@
   "stats": {
     "health": 140, "walk_speed": 2.6, "side_speed": 3.2, "accel": 22, "turn_rate": 5.5, "stamina": 90,
     "stamina_regen": 12, "poise": 90, "poise_regen": 15, "dodge_distance": 2.2, "dodge_side_distance": 3,
-    "dodge_time": 0.3, "power": 1, "defense": 1, "weight": 1
+    "dodge_time": 0.3, "power": 0.92, "defense": 1, "weight": 1
   },
   "body": {
   "id": "f_dredge_body",
