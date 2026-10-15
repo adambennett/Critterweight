@@ -62,6 +62,8 @@ func reload(mod_packages: Array) -> void:
 	if not errors.is_empty():
 		for e2 in errors:
 			Log.w("content", e2)
+	# the player's own presets sit on top of packages (never part of the content hash)
+	RulePresets.register_all()
 	reloaded.emit()
 
 
@@ -331,6 +333,31 @@ func package_list() -> Array:
 		out.append({"id": p["id"], "version": p["version"], "hash": str(p.get("hash", "")),
 			"client_only": bool(man.get("client_only", false))})
 	return out
+
+
+## Adds an entry that does not come from a package on disk (user rules presets, user arenas).
+## Runtime entries are cleared by reload(); their owners re-register on `reloaded`. They are not
+## part of the gameplay content hash (multiplayer hosts send such entries in full).
+func register_runtime(kind: String, entry: Dictionary, pid := "user") -> void:
+	if not tables.has(kind) or str(entry.get("id", "")) == "":
+		return
+	var copy := entry.duplicate(true)
+	copy["_package"] = pid
+	copy["_file"] = "%s/%s/%s" % [pid, kind, str(entry["id"])]
+	tables[kind][str(entry["id"])] = copy
+	origins["%s/%s" % [kind, str(entry["id"])]] = pid
+	if kind == "arenas":
+		arenas.erase(str(entry["id"]))
+	if kind in CREATURE_KINDS:
+		creatures.erase(str(entry["id"]))
+
+
+func unregister_runtime(kind: String, id: String) -> void:
+	if tables.has(kind):
+		tables[kind].erase(id)
+	origins.erase("%s/%s" % [kind, id])
+	arenas.erase(id)
+	creatures.erase(id)
 
 
 ## Package id that defined an entry ("core" or a mod id), or "".

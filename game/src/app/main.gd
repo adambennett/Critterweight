@@ -94,7 +94,11 @@ func _start(mode: String) -> void:
 func _boot_game() -> void:
 	var direct := arg_value("--screen", "")
 	if direct != "" and App.has_screen(direct):
-		App.goto(direct)
+		var params := {}
+		var kv := arg_value("--screen-arg", "")       # e.g. --screen rules_editor --screen-arg edit=duel
+		if "=" in kv:
+			params[kv.split("=")[0]] = kv.split("=")[1]
+		App.goto(direct, params)
 	elif App.has_screen("title"):
 		App.goto("title")
 	else:
