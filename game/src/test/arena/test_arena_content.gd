@@ -127,6 +127,20 @@ func test_schema_accepts_layouts_and_rejects_bad_base() -> void:
 	check(Schema.validate_named({"id": "m:x", "name": "X", "base": "m:volcano"}, "arena").is_empty(), "namespaced mod base accepted")
 
 
+## A match context can pick the look (campaign gullet_day / gullet_title); gameplay is unchanged.
+func test_context_variant_changes_only_the_look() -> void:
+	var a := Content.arena("arena_gullet")
+	var day := a.with_variant("day")
+	check_eq(day.variant, "day", "variant applied")
+	check(day != a and a.variant == "night", "a copy; the shared content arena is untouched")
+	check_eq(day.all_props().size(), a.all_props().size(), "same props")
+	check_eq(day.spawns.size(), a.spawns.size(), "same spawns")
+	check(a.with_variant("off_the_street") == a and a.with_variant("") == a, "unknown names are ignored")
+	var cfg := App.resolve_match_config({"arena": "arena_gullet", "rules": {"mode": "standard"}, "seed": 1,
+		"fighters": [], "context": {"campaign": true, "variant": "title_night"}})
+	check_eq((cfg["arena"] as ArenaDef).variant, "title_night", "App applies context.variant")
+
+
 ## Format-1 files (the bundled rust_bucket mod's "The Drain") keep validating and loading:
 ## [x, z, yaw] spawns with yaws past 50, and marker objects whose pos is the floor form [x, z].
 func test_format1_mod_arena_still_loads() -> void:

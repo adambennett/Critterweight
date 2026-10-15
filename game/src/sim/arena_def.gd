@@ -598,6 +598,16 @@ func variant_def() -> Dictionary:
 	return vs.get(variant, {})
 
 
+## The same arena in another look (lighting/dressing only). Returns self when `v` is empty, the
+## current variant, or not a variant of this base (callers may pass any context string).
+func with_variant(v: String) -> ArenaDef:
+	if v == "" or v == variant or not (base_def.get("variants", {}) as Dictionary).has(v):
+		return self
+	var d := to_dict()     # JSON-safe, base_def included for base arenas
+	d["variant"] = v
+	return ArenaDef.from_dict(d, source)
+
+
 func supports_mode(m: String) -> bool:
 	return modes.is_empty() or modes.has(m.trim_prefix("mode_"))
 

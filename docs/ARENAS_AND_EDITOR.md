@@ -168,8 +168,9 @@ inside a Saves envelope (kind `arena_layout`, version 2, checksum). **Format 2**
 
 Public API kept for other systems: `ArenaDef.from_dict/to_dict`, `clamp_point`, `inside` (clear of walls; open edges
 never block), `on_floor`, `spawn_point(i, count)` (spreads fighters over the ring), `marker_points`, `markers_of`,
-`team_spawns`, `content_hash`. User layouts resolve through `ArenaLibrary.resolve(id)` (content first, then the user's
-folder); `App.resolve_match_config` uses it.
+`team_spawns`, `content_hash`, `with_variant(look)`. User layouts resolve through `ArenaLibrary.resolve(id)` (content
+first, then the user's folder); `App.resolve_match_config` uses it and applies `context.variant` when it names one of
+the base's looks (the campaign's `gullet_day` / `gullet_title` fights).
 
 ## 6. Runtime (`ArenaHazards`) — for views, bots, audio and tools
 
@@ -188,6 +189,10 @@ registered as `MatchSim.hazards` (`MatchSim.step` calls `update(dt)` after effec
   (with `arena: true`), `ringout_return`.
 * Rules (rules editor › Arena): `hazards` (on/off), `hazard_timer_mult` (0.25–4× time between events), `ringouts`
   (off = guard walls), plus `ringout_damage` / `ringout_eliminates` and per-match `gravity_mult`.
+* `hazards_live()`: the base's timed hazards run only while `rules.hazards` is on **and** the mode does not own a
+  `hazards` runner. Campaign fights (CampaignMatchMode / BossMode) schedule their hazards from campaign data
+  (CampaignHazards), so on the same bases the arena's own timers stay off and their decals hide — nothing fires twice.
+  Props, pickups, quirks and ring-outs keep working in every mode.
 
 ## 7. Audio cues (`Audio.sfx`, ids from `assets/audio/bank.json`)
 
@@ -237,7 +242,7 @@ own match bridge. The editor plays no hazard audio.
 
 ```powershell
 $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
-& $g --headless --path game --fixed-fps 120 -- --test src/test/arena/     # 45 arena tests
+& $g --headless --path game --fixed-fps 120 -- --test src/test/arena/     # 46 arena tests
 & $g --headless --path game --fixed-fps 120 -- --test                    # full suite
 ```
 
@@ -246,7 +251,7 @@ $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 * `test_arena_hazards.gd` — deterministic hazard cycles per seed, gutter soak, crane hook, plates and mats, magnet and
   scrap bundle, wind vs hover, fans, destructibles and their zones, weapon damage on low props, drains, pickups, Rooftop
   ring-out (8%, nearest edge marker, invulnerability), `ringout_eliminates`, mode overrides of `on_ringout`, team
-  clusters, the rules switches.
+  clusters, the rules switches, modes that own their hazards (campaign).
 * `test_arena_validation.gd` — budget, caps, clear floor, spawn safety (props, pits, edges), clusters, bounds, mode
   markers, issue refs carry editor uids.
 * `test_arena_editor.gd` — undo/redo command stack, save/load and v1 migration, saved layouts playable and registered in
