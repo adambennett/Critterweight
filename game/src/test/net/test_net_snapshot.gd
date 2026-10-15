@@ -122,7 +122,9 @@ func test_hud_mirror_drives_real_fight_hud() -> void:
 		{"slot": 0, "gen": 1, "creature": "dev_biped", "scale": 1.0, "team": 0, "name": "Alice", "kind": "net", "despawned": false},
 		{"slot": 1, "gen": 1, "creature": "dev_biped", "scale": 1.0, "team": 1, "name": "Bob", "kind": "bot", "despawned": false}]})
 	var mirror := NetHudMirror.new()
-	mirror.build({"rules": {"rounds": 3, "round_time": 99, "lives": 1}, "mode": "standard"}, rep)
+	mirror.build({"rules": {"rounds": 3, "round_time": 99, "lives": 1}, "mode": "standard", "you": 0}, rep)
+	check_eq(mirror.sim.fighters[0].controller_kind, "player", "this client's own fighter is presented as the local player")
+	check_eq(mirror.sim.fighters[1].controller_kind, "bot", "others keep their kind")
 	var c := Content.creature("dev_biped")
 	var rots: Array[Quaternion] = []
 	for s in c.body.segments.size():

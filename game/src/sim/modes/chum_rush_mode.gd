@@ -199,7 +199,9 @@ func _offer_picks() -> void:
 		for i in 3:
 			choices.append(pool[rng.randi_range(0, pool.size() - 1)])
 		pending_pick[f.index] = choices
-		if f.controller_kind != "player":
+		# local players choose in the pick panel, remote players ("net") through a mode.pick
+		# request to the server (which also times out unanswered picks); others take the first
+		if f.controller_kind != "player" and f.controller_kind != "net":
 			choose_pick(f.index, 0)
 	sim.emit_event({"type": "pick_offered", "wave": wave})
 

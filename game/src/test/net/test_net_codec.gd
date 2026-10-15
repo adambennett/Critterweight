@@ -408,3 +408,5 @@ func test_rate_limiter() -> void:
 		if rl.take():
 			ok += 1
 	check_eq(ok, 5, "burst capacity")
+	await wait_physics(13)
+	check(rl.take(), "refills with (wall-clock or simulated) time")

@@ -38,6 +38,7 @@ const VIOLATION_DECAY := 2.0
 const LOBBY_MIN_INTERVAL_MS := 100
 const COUNTDOWN_RESEND_MS := 1000
 const BEACON_MS := 1000
+const PICK_TIMEOUT_MS := 20000
 
 var cfg := {}
 var dedicated := false
@@ -59,6 +60,7 @@ var match_id := 0
 var match_info := {}
 var sim: MatchSim = null
 var scene: Node = null
+var _sim_id := 0                  ## instance id of the running match's sim (detects a freed sim)
 var last_result := {}
 var started_ms := 0
 var _ev_cursor := 0
@@ -79,6 +81,9 @@ var _stats_ms := 0
 var _rtt_ms := 0
 var _wait_notice_ms := 0
 var _bot_serial := 0
+## A remote player's unanswered mode pick (Chum Rush supplements) is taken for them after this.
+var pick_timeout_ms := PICK_TIMEOUT_MS
+var _pick_since := {}             ## fighter index -> ms its pending pick was first seen
 var _roster: Array = []           ## per fighter slot: {gen, obj, rig, creature, scale, despawned, team, name, kind, player}
 var _gens := PackedByteArray()
 
@@ -820,6 +825,32 @@ func handle_mode_request(pid: int, t: String, payload: Dictionary) -> void:
 				_violation(p, 1.0, "unknown mode request '%s'" % t)
 
 
+## Mode picks offered to remote players (Chum Rush supplements between waves) must not let one
+## player stall the match: an unanswered pick is taken for them (first offer) after
+## pick_timeout_ms. Local and bot fighters choose on their own.
+func _check_mode_picks(now: int) -> void:
+	if sim == null or not is_instance_valid(sim) or sim.mode == null or phase != PHASE_MATCH:
+		_pick_since.clear()
+		return
+	var pend = sim.mode.get("pending_pick")
+	if typeof(pend) != TYPE_DICTIONARY or not sim.mode.has_method("choose_pick"):
+		return
+	var pd: Dictionary = pend
+	for k in _pick_since.keys():
+		if not pd.has(k):
+			_pick_since.erase(k)
+	for k in pd.keys():
+		var i := int(k)
+		if i < 0 or i >= sim.fighters.size() or sim.fighters[i].controller_kind != "net":
+			continue
+		if not _pick_since.has(i):
+			_pick_since[i] = now
+		elif now - int(_pick_since[i]) >= pick_timeout_ms:
+			_pick_since.erase(i)
+			sim.mode.call("choose_pick", i, 0)
+			notice("%s's pick was made automatically (no answer within %d s)." % [sim.fighters[i].display_name, roundi(pick_timeout_ms / 1000.0)])
+
+
 func _handle_ping(p: NetPlayer, data: PackedByteArray) -> void:
 	var r := NetReader.new(data, 1)
 	var echo := r.u32()
@@ -1037,6 +1068,10 @@ func _bot_takeover(p: NetPlayer) -> void:
 	bot.label_text = "%s (bot)" % p.name
 	sim.set_input_source(p.fighter, bot)
 	f.controller_kind = "bot"
+	# a pick offered to the player (e.g. Chum Rush supplements) is taken by the bot right away
+	var pend = sim.mode.get("pending_pick") if sim.mode else null
+	if typeof(pend) == TYPE_DICTIONARY and (pend as Dictionary).has(p.fighter) and sim.mode.has_method("choose_pick"):
+		sim.mode.call("choose_pick", p.fighter, 0)
 
 
 ## Kicks a player (admin / host / violations). Kicked players are banned for kick_ban_seconds.
@@ -1306,6 +1341,7 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 		sim = scene.get("sim")
 	if sim == null:
 		return "the match could not be created"
+	_sim_id = sim.get_instance_id()
 	sim.finished.connect(_on_sim_finished)
 	_ev_cursor = 0
 	_tick_counter = 0
@@ -1408,10 +1444,11 @@ func _viewers() -> Array:
 
 
 func _replicate() -> void:
-	if sim == null:
-		return
-	if not is_instance_valid(sim):
+	# (a freed sim compares equal to null: check the remembered instance instead)
+	if _sim_id != 0 and not is_instance_id_valid(_sim_id):
 		_lost_match_scene()
+		return
+	if sim == null:
 		return
 	var changed := _check_roster()
 	if not changed.is_empty():
@@ -1563,6 +1600,7 @@ func _lost_match_scene() -> void:
 	Log.w("net", "match %d: the host's match scene was removed; ending the match" % match_id)
 	sim = null
 	scene = null
+	_sim_id = 0
 	if phase != PHASE_MATCH:
 		return
 	_aborting = "the host left the match"
@@ -1642,6 +1680,7 @@ func _teardown_match() -> void:
 			scene.queue_free()
 	sim = null
 	scene = null
+	_sim_id = 0
 	match_info = {}
 	current_entry = {}
 
@@ -1684,6 +1723,7 @@ func _housekeeping() -> void:
 	if lan and now - _beacon_ms >= BEACON_MS:
 		_beacon_ms = now
 		lan.announce(beacon_info())
+	_check_mode_picks(now)
 	if now - int(perf["window_start_ms"]) >= 1000:
 		var span := float(now - int(perf["window_start_ms"])) / 1000.0
 		perf["out_bps"] = float(transport.wire_out - int(perf["window_out"])) / span

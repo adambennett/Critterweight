@@ -6,6 +6,9 @@ extends TestCase
 var _nodes: Array = []
 
 
+## Note: the full suite runs with `--fixed-fps`, where frames run faster than real time; the
+## server's rate limits refill by simulated time too (NetRateLimiter), so in-process clients
+## sending 60 inputs per simulated second are not mistaken for floods.
 func after_each() -> void:
 	for n in _nodes:
 		if is_instance_valid(n):
@@ -335,6 +338,75 @@ func test_host_scene_removed_mid_match() -> void:
 	check(Net.is_session_active(), "the session itself continues")
 	check(await _until(func() -> bool: return c.state == NetClient.State.LOBBY, 6.0), "back in the lobby")
 	Net.leave()
+
+
+## Chum Rush supplement picks offered to a remote player wait for its own choice (a `mode.pick`
+## request the server validates); an unanswered pick is taken for it after the timeout and a
+## dropped player's bot takes it at once, so one player can never stall the break between waves.
+func test_mode_picks_for_remote_players_inprocess() -> void:
+	# supplements are campaign content; the test brings three plain ones of its own
+	var sups: Array[String] = []
+	for i in 3:
+		sups.append("nettest_supplement_%d" % i)
+		Content.register_runtime("supplements", {"id": sups[i], "name": "Test supplement %d" % i, "mods": {"damage": 1.05}}, "test")
+	await _mode_picks_session()
+	for id in sups:
+		Content.unregister_runtime("supplements", id)
+
+
+func _mode_picks_session() -> void:
+	var port := _port()
+	var server := _server(port, {}, [{"rules": "chum_rush", "arena": "the_gullet", "weight": 1, "bots": 0,
+		"rules_override": {"round_time": 300}}])
+	var a := _client(port, {"name": "Picker"})
+	check(await _until(func() -> bool: return a.state == NetClient.State.LOBBY, 6.0), "admitted")
+	a.send_lobby(NetProtocol.LQ_READY, true)
+	check(await _until(func() -> bool: return server.sim != null and a.my_fighter >= 0 and server.sim.mode.phase == MatchMode.Phase.FIGHT, 20.0), "chum rush running")
+	if server.sim == null or a.my_fighter < 0:
+		return
+	var me := a.my_fighter
+	var mode = server.sim.mode
+	mode.call("_offer_picks")
+	check((mode.get("pending_pick") as Dictionary).has(me), "the remote player's pick waits for its choice")
+	var offered: Array = ((mode.get("pending_pick") as Dictionary).get(me, []) as Array).duplicate()
+	check(await _until(func() -> bool: return _hud_picks(a).has(me), 3.0), "the offer reached the client (mode HUD state)")
+	a.send_app("mode.pick", {"choice": 1})
+	check(await _until(func() -> bool: return not (mode.get("pending_pick") as Dictionary).has(me), 3.0), "the choice was applied")
+	if offered.size() > 1:
+		check_eq(_last_pick(server, me), str(offered[1]), "the chosen supplement")
+	server.pick_timeout_ms = 400
+	mode.call("_offer_picks")
+	var offered2: Array = ((mode.get("pending_pick") as Dictionary).get(me, []) as Array).duplicate()
+	check(await _until(func() -> bool: return not (mode.get("pending_pick") as Dictionary).has(me), 4.0), "an unanswered pick is taken after the timeout")
+	if not offered2.is_empty():
+		check_eq(_last_pick(server, me), str(offered2[0]), "the first offer was taken")
+	server.pick_timeout_ms = 60000
+	mode.call("_offer_picks")
+	a.drop()
+	check(await _until(func() -> bool: return not (mode.get("pending_pick") as Dictionary).has(me), 4.0), "the bot holding a dropped player's fighter takes its pick")
+
+
+func _hud_picks(c: NetClient) -> Array:
+	var out: Array = []
+	var snap := c.replica.latest()
+	if snap.is_empty():
+		return out
+	var hud = (snap.get("mode", {}) as Dictionary).get("hud", {})
+	var picks = hud.get("picks", {}) if typeof(hud) == TYPE_DICTIONARY else {}
+	if typeof(picks) == TYPE_DICTIONARY:
+		for k in picks:
+			out.append(int(k))
+	return out
+
+
+func _last_pick(server: NetServer, idx: int) -> String:
+	var up := ""
+	if server.sim == null:
+		return up
+	for ev in server.sim.events:
+		if str(ev.get("type", "")) == "pick_taken" and int(ev.get("fighter", -1)) == idx:
+			up = str(ev.get("upgrade", ""))
+	return up
 
 
 ## MOD-05 authority: the server repeats the content check on hello, so a client that lies about

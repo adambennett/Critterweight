@@ -28,3 +28,16 @@ func test_playlist_template_is_valid() -> void:
 	p.validate()
 	check(p.errors.is_empty(), "template validates: %s" % str(p.errors))
 	check_eq(p.valid_entries().size(), 5, "all template entries valid")
+
+
+## Packaged servers write the example files out with `--server --write-example-config <path>`.
+func test_write_example_config() -> void:
+	var dir := temp_dir("example_config_%d" % Time.get_ticks_usec())
+	var cfg_path := dir.path_join("server.cfg")
+	check_eq(NetDedicated.write_example_config(cfg_path), 0, "written")
+	var res := NetServerConfig.parse_file(cfg_path)
+	check((res["errors"] as Array).is_empty() and (res["warnings"] as Array).is_empty(), "the written config is valid as is")
+	var pl := NetPlaylist.load_file(dir.path_join("custom_rotation.example.json"))
+	pl.validate()
+	check(pl.errors.is_empty(), "the playlist template next to it is valid")
+	check_eq(NetDedicated.write_example_config(cfg_path), 2, "existing files are never overwritten")

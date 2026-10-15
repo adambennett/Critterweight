@@ -90,6 +90,32 @@ func run(args: PackedStringArray) -> int:
 	return 0
 
 
+## `--server --write-example-config <path>`: writes the commented reference configuration and,
+## next to it, the playlist template - packaged servers carry them only inside the executable.
+## Never overwrites a file. Returns the process exit code (0 written, 2 refused/failed).
+static func write_example_config(path: String) -> int:
+	var files := {path: "res://server/server.example.cfg",
+		path.get_base_dir().path_join("custom_rotation.example.json"): "res://server/playlists/custom_rotation.example.json"}
+	for dst in files:
+		if FileAccess.file_exists(str(dst)):
+			printerr("%s already exists; nothing was written (move it away or pick another name)" % dst)
+			return 2
+	for dst2 in files:
+		var text := FileAccess.get_file_as_string(str(files[dst2]))
+		if text == "":
+			printerr("cannot read %s from the game package" % files[dst2])
+			return 2
+		var f := FileAccess.open(str(dst2), FileAccess.WRITE)
+		if f == null:
+			printerr("cannot write %s: %s" % [dst2, error_string(FileAccess.get_open_error())])
+			return 2
+		f.store_string(text)
+		f.close()
+		print("wrote %s" % dst2)
+	print("Edit the config, then start the server with --config %s" % path)
+	return 0
+
+
 ## Servers load exactly the mods their configuration names (server.mods / --mods), from
 ## server.mods_dir (--mods-dir) when given, else from the user mods folder of this server's data
 ## directory - never a player's mod set. Mods are data only (docs/MODDING.md). Returns "" or why

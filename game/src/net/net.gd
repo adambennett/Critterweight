@@ -212,6 +212,11 @@ func start_dedicated(cfg: Dictionary) -> Error:
 
 ## `--server [--config <path>] [overrides]` (main.gd). Exits the process on fatal errors.
 func start_dedicated_from_cli(args: PackedStringArray) -> void:
+	var wi := args.find("--write-example-config")
+	if wi >= 0:
+		var dst := args[wi + 1] if wi + 1 < args.size() and not args[wi + 1].begins_with("--") else "server.cfg"
+		get_tree().quit(NetDedicated.write_example_config(dst))
+		return
 	dedicated_ctl = NetDedicated.new()
 	add_child(dedicated_ctl)
 	var code := dedicated_ctl.run(args)

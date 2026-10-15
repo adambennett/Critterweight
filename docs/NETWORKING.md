@@ -184,7 +184,7 @@ mode: [u8 phase][u8 round][u16 timer x10][u8 flags][i8 winner][i8 round winner]
 Segment **positions are not sent**: every rigid body sits on its joint pivot (BodyDef invariant), so
 clients rebuild them by forward kinematics (`origin_child = origin_parent + rot_parent *
 (pivot_child - pivot_parent)`). Measured against the live simulation: worst segment error
-1.96 mm / 0.125 deg (`test_net_snapshot.gd`). Static props and hazard zones are not sent (the arena
+under 2 mm / 0.125 deg (`test_net_snapshot.gd`). Static props and hazard zones are not sent (the arena
 definition in MATCH_START builds them).
 
 **Roster** (`ROSTER` and MATCH_START): per slot `{generation, creature id, body scale, team, name,
@@ -224,12 +224,16 @@ effect entities, a rig stand-in (root position and velocity) and the replicated 
 mirrors `MatchScene._on_event`; `test_net_parity.gd` fails if `MatchScene` reacts to an event that
 `NetMatchScene` does not. Large jumps (> 2.5 m between snapshots: respawn, round reset, blink) snap
 instead of sliding. Mode choices offered to the local player (Chum Rush supplement picks) open the
-same pick panel and are sent as a `mode.pick` request that the server validates. Damage numbers
+same pick panel and are sent as a `mode.pick` request that the server validates; the server takes
+the first offer for a remote player who has not answered after 20 s, and a dropped player's bot
+takes it at once, so nobody can stall the break between waves. Damage numbers
 follow `gameplay.damage_numbers`; achievements tied to the local player's own fighter (JUICE KO,
 hat trick, wave 20) unlock from the server's events, like local play. **Spectators** get the
 broadcast auto-director (`SpectatorDirector` on the mirror) and the same controls as local
 AI-vs-AI spectating: Y / R director or free camera, LB/RB (Q/E) lock on a fighter, X / Delete hide
-the HUD. Playback speed stays 1x online.
+the HUD. Playback speed stays 1x online. KO stars and callouts match local play; the F3 combat
+debug drawing needs the simulation's bodies, so it exists for local players and the
+listen host only.
 
 **Aim assist** (`access.target_assist`: low 0.5, normal 1.0, high 1.8) is part of the fighter's
 modifiers in the authoritative simulation: a client sends its level in HELLO and again
@@ -414,7 +418,43 @@ authority:
 
 ## 15. Measured bandwidth and server cost
 
-MEASUREMENTS_PLACEHOLDER
+All numbers are **LOOPBACK on one machine** (i7-7700K, Windows 10): the processes talk through
+127.0.0.1, so they show what the protocol sends and what the server costs, not real-network
+latency. The machine was also running other test suites at the time, which inflates frame-time
+maxima and interpolation delays; ranges give the spread over the runs on 2026-10-15.
+
+**Per-client bandwidth and server cost** (`test_net_measure.gd`: dedicated server, bots fill, one
+scripted human client through the conditioner relay at 1 ms, whose counters see every datagram;
+20 s window in the fight; "wire" adds 28 B IPv4 + UDP header per packet):
+
+| Scenario | Down per client | Up per client | Packets/s down / up | Snapshot | Sim logic per tick | Net per tick | Server CPU |
+|---|---|---|---|---|---|---|---|
+| Duel, 2 fighters | 7.6-7.9 KB/s (8.6-8.9 wire) | 4.1-5.0 KB/s (5.8-6.9 wire) | 37-38 / 61-71 | 233 B | 0.85-0.98 ms | 0.34 ms | 24-26 % of one core |
+| Free-for-all, 8 fighters | 22.0-22.1 KB/s (23.1-23.4 wire) | 4.8 KB/s (6.9 wire) | 46 / 77 | 689-701 B | 3.1-3.7 ms | 0.63 ms | 62-65 % of one core |
+
+* Downstream grows with fighters (a fighter's 13 segment rotations + vitals are most of a
+  snapshot); upstream is flat (60 input packets/s, 4 samples each, plus pings and ENet acks).
+* The longest physics frame (simulation + Jolt step, average of the per-second maxima) was 8.2 ms
+  (duel) and 17.2 ms (8 fighters) on a quiet machine and about 21 ms under the extra load.
+* **Server CPU target not met**: docs/DESIGN.md asks for < 35 % of one core with 8 fighters; the
+  server uses 62-65 %. Networking is 0.6 ms of the 8.3 ms tick; the rest is the simulation
+  (fighter logic + physics), which is where optimisation has to happen.
+
+**Snapshot encoding** (`test_net_snapshot.gd`): positions rebuilt by forward kinematics are within
+2 mm (1.96-1.99 mm) / 0.125 deg of the live simulation; snapshot bodies are 259 B with 2 fighters and 889 B with
+8 (13-segment test creature, every vital and status filled).
+
+**Smoothing and degraded links** (`test_net_multiprocess.gd`, adaptive interpolation): plain
+loopback duel 39-89 ms interpolation delay depending on machine load; packaged release builds
+(`tools/verify/net_session_check.ps1`) 30 snapshots/s and 52-90 ms; with the conditioner at
+80 +- 20 ms one-way and 2 % loss: RTT max 180-250 ms, interpolation 80-116 ms, jitter p95 34-76 ms,
+1-2 % of packets dropped, about 1 % of rendered frames starved - the match still completes with the
+correct result.
+
+**Soak** (`test_net_soak.gd --soak-minutes 10`): see the numbers below, refreshed with every
+requirement-level run.
+
+SOAK_RESULTS
 
 ## 16. Tests
 
@@ -439,6 +479,13 @@ $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 | `test_net_server_examples.gd` | Example configs and the playlist template stay valid |
 | `test_net_measure.gd` | Bandwidth and server cost (duel, 8-fighter FFA) |
 | `test_net_soak.gd` | Long run with bots and bonus modes; memory/CPU/log trends |
+
+**Packaged builds** (exported executables, not the editor binary): `tools/verify/net_session_check.ps1`
+starts the packaged dedicated server from a config, lets two packaged scripted clients play a duel
+to the end, has a windowed packaged spectator save a rendered frame of the online match, checks the
+TCP admin (`status`, a wrong token is refused) and the graceful shutdown (exit code 0), and scans
+every log for errors. `tools/verify/run_verification.ps1` runs it as step 2b (`-SkipNet` skips it).
+Also LOOPBACK on one PC.
 
 ## 17. Known gaps
 

@@ -6,7 +6,9 @@ binary as the game (Godot 4.5.1) started with `--server`; networking design and 
 [NETWORKING.md](NETWORKING.md).
 
 > Verification status: everything below has been run on **one Windows 10 machine over loopback
-> (127.0.0.1)** by the automated tests (`-- --test net`). Linux commands come from the same code
+> (127.0.0.1)** by the automated tests (`-- --test net`); the packaged Windows server and game
+> executables were checked the same way (`tools/verify/net_session_check.ps1`: config start, a
+> full duel between two packaged clients, a spectator frame, TCP admin, graceful shutdown). Linux commands come from the same code
 > paths and the official Linux export template but have not been run on a Linux host here;
 > off-machine internet play (NAT, port forwarding, real packet loss) has not been tested.
 
@@ -27,6 +29,15 @@ Copy one of the example configs from `game/server/` next to the executable and e
 | `lan_party.cfg` | Password-protected LAN server, Fight Night playlist |
 | `always_on.cfg` | Public always-on server: Bargain Bin rotation, bots, showcase matches when empty |
 | `playlists/custom_rotation.example.json` | Template for a server-local playlist file |
+
+The packages carry these files inside the executable only. To get the commented reference config
+(and the playlist template next to it) as editable files in a packaged install, run:
+
+```text
+CritterweightServer.console.exe --headless -- --server --write-example-config server.cfg
+```
+
+It writes `server.cfg` and `custom_rotation.example.json` and never overwrites existing files.
 
 **From source** (no export needed): use the editor binary with the project folder:
 
@@ -248,7 +259,7 @@ while (($l = $r.ReadLine()) -ne ".") { $l }
 
 | File (under the user-data folder) | Content |
 |---|---|
-| `logs/server.log` (+ `.1`, `.2`) | All server log lines; rotates at 2 MB, 3 generations kept (bounded) |
+| `logs/server.log` (+ `.1`, `.2`) | All server log lines, written to disk at least once a second; rotates at 2 MB, 3 generations kept (bounded) |
 | `server/status.json` | Rewritten every 5 s: state, phase, players, tick cost, traffic, memory, pid |
 | `server/playlist_state_<id>.json` | Playlist history (restart persistence) |
 

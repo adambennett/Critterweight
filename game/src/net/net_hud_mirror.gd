@@ -55,9 +55,11 @@ var sim: MatchSim = null
 var mode: MirrorMode = null
 var _gen := {}                   ## slot -> roster generation applied
 var _fallback: CreatureDef = null
+var _me := -1                    ## this client's own fighter slot (-1 spectator)
 
 
 func build(info: Dictionary, replica: NetReplica) -> void:
+	_me = int(info.get("you", -1))
 	sim = MatchSim.new()
 	sim.name = "NetMirrorSim"
 	sim.running = false
@@ -97,7 +99,9 @@ func sync_roster(replica: NetReplica) -> void:
 		var f2 := sim.fighters[i]
 		f2.team = int(e["team"])
 		f2.display_name = str(e["name"])
-		f2.controller_kind = str(e["kind"])
+		# the server drives this client's fighter as "net"; here it is the local player (HUD "YOU"
+		# tag, control hints), exactly like a local fighter in MatchScene
+		f2.controller_kind = "player" if i == _me and str(e["kind"]) == "net" else str(e["kind"])
 		f2.set("despawned", bool(e["despawned"]))
 		for k in f2.flags.keys():
 			if typeof(f2.flags[k]) == TYPE_BOOL:

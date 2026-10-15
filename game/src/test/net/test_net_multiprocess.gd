@@ -103,33 +103,37 @@ func test_handshake_rejections() -> void:
 	_no_child_errors([srv, first])
 
 
-## MOD-05 end to end: a dedicated server loads exactly the mods its config names (server.mods);
-## a client without them is refused on its own side with Mods.compare() wording and structured
-## lists for the UI; a client started with `--mods` (the same package) joins and plays the mod's
-## rules preset.
+## MOD-05 / NET-05 end to end: a dedicated server loads exactly the mods its config names
+## (server.mods); a client without them is refused on its own side with Mods.compare() wording and
+## structured lists for the UI; a presenting client started with `--mods` (the same packages) joins
+## and plays the mod's rules preset in the mod's authored arena (props and a hazard) through the
+## real network path.
 func test_server_mods_and_join_compare() -> void:
 	u = U.new(self, "server_mods")
 	var port: int = u.base_port
-	var pl: String = u.playlist("moon.json", [{"rules": "moon_rules:moon_brawl", "arena": "the_gullet", "weight": 1,
+	var pl: String = u.playlist("moon.json", [{"rules": "moon_rules:moon_brawl", "arena": "rust_bucket:the_drain", "weight": 1,
 		"rules_override": {"round_time": 40}}])
-	var srv := await _start_server("srv", u.server_sections(port, {"server": {"mods": "moon_rules"},
+	var srv := await _start_server("srv", u.server_sections(port, {"server": {"mods": "moon_rules, rust_bucket"},
 		"match": {"playlist": pl, "lobby_time": 3}}))
-	check(u.out(srv).contains("moon_rules 1.0.0"), "server log lists the loaded mod")
+	check(u.out(srv).contains("moon_rules 1.0.0") and u.out(srv).contains("rust_bucket 1.0.0"), "server log lists the loaded mods")
 	u.spawn("vanilla", u.client_args(port, "Vanilla", "idle", ["--quit-after", "20"]))
 	var rv: Dictionary = await u.wait_json(u.result_path("Vanilla"), _done, 25.0)
 	var fail: Dictionary = rv.get("failure", {})
 	check_eq(int(fail.get("code", -1)), NetProtocol.R_CONTENT, "client without the mod refused (%s)" % str(fail.get("message", "")))
 	check(str(fail.get("details", [])).contains("Missing mod: moon_rules 1.0.0"), "Mods.compare wording: %s" % str(fail.get("details", [])))
-	check_eq(fail.get("mods", {}).get("missing", []), ["moon_rules"], "structured: missing")
-	var modded: int = u.spawn("modded", u.client_args(port, "Moony", "aggressive", ["--mods", "moon_rules", "--ready",
-		"--stop-after-matches", "1", "--quit-after", "100"]))
+	var missing: Array = fail.get("mods", {}).get("missing", [])
+	missing.sort()
+	check_eq(missing, ["moon_rules", "rust_bucket"], "structured: missing")
+	var modded: int = u.spawn("modded", u.client_args(port, "Moony", "aggressive", ["--mods", "moon_rules,rust_bucket", "--ready",
+		"--present", "--stop-after-matches", "1", "--quit-after", "100"]))
 	var rm: Dictionary = await u.wait_json(u.result_path("Moony"), _done, 110.0)
-	check(bool(rm.get("connected", false)), "client with the same mod joined")
+	check(bool(rm.get("connected", false)), "client with the same mods joined")
 	var ms: Array = rm.get("matches", [])
 	check(not ms.is_empty() and str(ms[0].get("rules_id", "")) == "moon_rules:moon_brawl", "played the mod's rules preset")
+	check(not ms.is_empty() and str(ms[0].get("arena_id", "")) == "rust_bucket:the_drain", "in the mod's authored arena")
 	check_eq((rm.get("results", []) as Array).size(), 1, "match finished with a result")
 	var st: String = await u.admin(port + 1, ["AUTH " + U.admin_token(), "status"])
-	check(st.contains("moon_rules@1.0.0"), "admin status lists the packages: %s" % st.right(200))
+	check(st.contains("moon_rules@1.0.0") and st.contains("rust_bucket@1.0.0"), "admin status lists the packages: %s" % st.right(200))
 	_no_child_errors([srv, modded])
 
 
