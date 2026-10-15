@@ -1,5 +1,6 @@
 extends "res://src/test/kits/dd_kit_base.gd"
 ## DOZER (f_dozer) kit verification — docs/kits/f_dozer.md, ROSTER.md §4.
+## Requirements: CNT-01 (finished fighter kits), CMB-06 (grab/throw/pummel layer).
 ## Every move: connects at its intended range against a standing dummy and misses outside it;
 ## damage / knockback / launch / build-up / properties; guard-crush; cooldowns; JUICE; grab,
 ## pummel, throws; physical sanity (upright, no spin-out, no self-clip, cage, 1.6 m cap).
@@ -244,6 +245,25 @@ func test_bulldoze_carry_splat_bonk_recovery() -> void:
 	release(sim2)
 
 
+func test_bulldoze_splat_ko_ends_round_cleanly() -> void:
+	# engine fix: a wall splat that KOs the carried victim ends the round, and the winner's celebrate()
+	# drops the carry in the middle of Fighter._finish_charge (it then called pos() on null)
+	var sim := kit_sim(ID, dummy(100.0), 3.4, null, null, {}, 3.2)
+	var d := sim.fighters[0]
+	var v := sim.fighters[1]
+	await run(sim, 0.4)
+	start(d, "ability1")
+	for i in 288:
+		await run(sim, DT)
+		if v.health > 2.0 and count_events(sim.events, "carry") > 0:
+			v.health = 2.0   # carried: the wall splat will be the KO
+	check(count_events(sim.events, "carry") == 1, "the target is carried")
+	check(count_events(sim.events, "round_end") == 1, "the splat KO ends the round")
+	check(count_events(sim.events, "splat") == 1, "the KO splat is still reported")
+	check(d._carried == null, "nothing left carried")
+	release(sim)
+
+
 func test_bulldoze_cooldown_and_armor() -> void:
 	var sim := kit_sim(ID, dummy(), 4.0, InputSource.Scripted.new([{"t0": 0.3, "t1": 0.33, "press": ["ability1"]},
 		{"t0": 3.0, "t1": 3.03, "press": ["ability1"]}, {"t0": 8.6, "t1": 8.63, "press": ["ability1"]}]), null, {}, 9.0, Vector3(6.0, 0, -6.0))
@@ -294,16 +314,24 @@ func test_juice_landslide() -> void:
 	check(count_events(r["events"], "juice") == 1, "JUICE activates at 100 Hype")
 	check(r["b_states"].has("knockdown"), "the 6 m ground-wave line knocks down a target 3.5 m ahead")
 	var bulldozes := 0
-	var boulders := 0
 	for ev in r["events"]:
 		if ev["type"] == "move_start" and int(ev["fighter"]) == 0 and str(ev["slot"]) == "ability1@juiced":
 			bulldozes += 1
-		if ev["type"] == "prop_spawn":
-			boulders += 1
 	check(bulldozes == 2, "Bulldoze has no cooldown during Landslide (%d uses 2.2 s apart)" % bulldozes)
-	check(boulders >= 1, "a Bulldoze hit drops a boulder prop")
 	check(count_events(r["events"], "juice_end") == 1, "JUICE ends after 6 s")
 	release(r)
+	# a juiced Bulldoze hit drops a boulder (target 7 m away: beyond the 6 m wave, inside the 10 m charge)
+	var rb := await measure_move(ID, "juice", 7.0, {"rules": {"start_hype": 100}, "via": [{"t0": 0.0, "press": ["juice"]},
+		{"t0": 0.9, "press": ["ability1"]}], "dur": 3.0, "radius": 9.0, "dummy": dummy(100.0)})
+	var hit_t := -1.0
+	var boulder_t := -1.0
+	for ev in rb["events"]:
+		if ev["type"] == "hit" and int(ev["fighter"]) == 0 and str(ev.get("move", "")).ends_with("ability1@juiced") and hit_t < 0.0:
+			hit_t = float(ev["tick"]) * DT
+		if ev["type"] == "prop_spawn" and str(ev.get("prop", "")) == "boulder" and boulder_t < 0.0:
+			boulder_t = float(ev["tick"]) * DT
+	check(hit_t > 0.0, "the juiced Bulldoze reaches a target 7 m away")
+	check(boulder_t > 0.0 and absf(boulder_t - hit_t) < 0.05, "its hit drops a boulder prop (hit %.2f s, boulder %.2f s)" % [hit_t, boulder_t])
 	# permanent armor: a heavy hit during the JUICE does not stagger him
 	var sim := kit_sim(ID, "f_dredge", 1.4, InputSource.Scripted.new([{"t0": 0.2, "t1": 0.23, "press": ["juice"]}]), null, {"start_hype": 100})
 	var dz := sim.fighters[0]

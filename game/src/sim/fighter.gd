@@ -1136,12 +1136,13 @@ func _finish_charge(hit_wall := false) -> void:
 	if c.is_empty():
 		return
 	if hit_wall:
-		if _carried and not _carried.is_out():
+		var v := _carried   # a splat KO can end the round, and celebrate() drops the carry mid-call
+		if v and not v.is_out():
 			var sp: Dictionary = c.get("splat", {"damage": 5.0, "stun": 0.4, "knockdown": true})
 			var by := self
-			sim.combat.apply_simple_damage(by, _carried, float(sp.get("damage", 5.0)) + float(mods.get("splat_damage_add", 0.0)), "wall_splat", {"stun": float(sp.get("stun", 0.4)), "knockdown": bool(sp.get("knockdown", true)), "poise": float(mods.get("splat_poise_add", 0.0))})
-			hooks.fire("wall_splat", {"other": _carried})
-			_emit({"type": "splat", "pos": _carried.pos(), "by": index})
+			sim.combat.apply_simple_damage(by, v, float(sp.get("damage", 5.0)) + float(mods.get("splat_damage_add", 0.0)), "wall_splat", {"stun": float(sp.get("stun", 0.4)), "knockdown": bool(sp.get("knockdown", true)), "poise": float(mods.get("splat_poise_add", 0.0))})
+			hooks.fire("wall_splat", {"other": v})
+			_emit({"type": "splat", "pos": v.pos(), "by": index})
 		elif float(c.get("wall_stagger", 0.6)) > 0.0:
 			_end_carry()
 			stun(float(c.get("wall_stagger", 0.6)), true)
