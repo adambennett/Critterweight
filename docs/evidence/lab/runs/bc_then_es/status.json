@@ -1,0 +1,1 @@
+{"state":"completed","message":"completed (generation limit (16)): trained policy n=20 reward 88.67 ± 35.68 (95% CI 73.04..104.31) win 80% [58–92%]","pid":32268,"kind":"es","run_id":"bc_then_es","updated":1792047863.8210001,"report":"<evidence>/bc_then_es/report.json","policy_id":"u_dev_biped_tmxszb464","final":true}

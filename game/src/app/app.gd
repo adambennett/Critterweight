@@ -167,9 +167,13 @@ func set_scene(n: Node) -> void:
 func resolve_match_config(cfg: Dictionary) -> Dictionary:
 	var out := cfg.duplicate()
 	var a = cfg.get("arena", "the_gullet")
-	out["arena"] = a if a is ArenaDef else Content.arena(str(a))
+	out["arena"] = a if a is ArenaDef else ArenaLibrary.resolve(str(a))   # content first, then saved/imported layouts
 	if out["arena"] == null:
 		out["arena"] = Content.arena("the_gullet")
+	# a context may name the arena's look (campaign: gullet_day / gullet_title); unknown names are ignored
+	var ctx = cfg.get("context", {})
+	if typeof(ctx) == TYPE_DICTIONARY:
+		out["arena"] = (out["arena"] as ArenaDef).with_variant(str((ctx as Dictionary).get("variant", "")))
 	var r = cfg.get("rules", "duel")
 	var rules: Dictionary = r if typeof(r) == TYPE_DICTIONARY else Content.get_entry("rules", str(r))
 	out["rules"] = rules.duplicate(true)

@@ -1,0 +1,2 @@
+2026-10-15 02:16:51 [WARN] lab: helper rank 2 stopped responding; re-running its 8 episodes here
+2026-10-15 02:17:17 [WARN] lab: helper rank 1 stopped responding; re-running its 12 episodes here
