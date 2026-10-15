@@ -3,7 +3,11 @@ extends TestCase
 ## scripted player), failures give hints, retry/skip work, and completion is saved.
 ## Run fast with --fixed-fps 120.
 
-const PLAYER := "dev_biped"
+## The fighter taking the course: TUTORIAL_CREATURE=<id> runs the whole course with another
+## fighter (tools/verify runs it for every roster fighter).
+static func _player_id() -> String:
+	var e := OS.get_environment("TUTORIAL_CREATURE")
+	return e if e != "" and Content.creature(e) != null else "dev_biped"
 
 
 class Driver:
@@ -28,7 +32,7 @@ func _sim(index: int) -> MatchSim:
 	fresh_world().add_child(sim)
 	var mode := TutorialMode.new()
 	mode.start_index = index
-	var c := Content.creature(PLAYER)
+	var c := Content.creature(_player_id())
 	sim.setup({"arena": Tutorial.practice_cage(), "seed": 4, "mode": mode,
 		"rules": {"id": "tutorial", "name": "Tutorial", "mode": "tutorial", "round_time": 0.0, "intro_time": 0.0},
 		"fighters": [{"creature": c, "team": 0, "source": null, "kind": "player"}, {"creature": c, "team": 1, "source": null, "kind": "scripted"}]})
@@ -57,7 +61,7 @@ func _run(index: int, plan: Callable, limit := 40.0) -> TutorialMode:
 func test_exercises_load_with_live_prompts() -> void:
 	var list := Tutorial.exercises()
 	check_eq(list.size(), 10, "ten exercises")
-	var c := Content.creature(PLAYER)
+	var c := Content.creature(_player_id())
 	for ex in list:
 		for key in ["title", "goal", "intro", "success", "hint", "check", "dummy"]:
 			check(str(ex.get(key, "")) != "", "%s has %s" % [ex.get("id", "?"), key])

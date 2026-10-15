@@ -94,6 +94,9 @@ func fresh_world() -> Node:
 func step_sim(sim: MatchSim, seconds: float) -> void:
 	var dt := 1.0 / Engine.physics_ticks_per_second
 	var n := int(seconds / dt)
+	# step in phase with physics no matter where the caller was (idle vs physics frame)
+	if not Engine.is_in_physics_frame():
+		await get_tree().physics_frame
 	for i in n:
 		sim.step(dt)
 		await get_tree().physics_frame
