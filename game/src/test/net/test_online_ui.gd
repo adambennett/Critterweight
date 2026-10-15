@@ -4,8 +4,9 @@ extends TestCase
 ## tabs, back, hosting through the Online screen, the lobby with a real guest, starting a match,
 ## the online results card, the automatic return to the lobby, leaving; error dialogs for a
 ## refused join (wrong password, another game version, full session, timeout) and for being
-## kicked; the LAN tab; joining a host running in ANOTHER process through the Join tab (recent
-## server); layout at 1280x800 and 1920x1080. Everything runs over 127.0.0.1 on this machine.
+## kicked; the LAN tab; a dedicated server's lobby (vote with A, ready with Y); joining a host
+## running in ANOTHER process through the Join tab (recent server); layout at 1280x800 and
+## 1920x1080. Everything runs over 127.0.0.1 on this machine.
 
 const U := preload("res://src/test/net/net_test_util.gd")
 
@@ -341,6 +342,47 @@ func test_join_errors_and_kick_show_reasons() -> void:
 	await press_joy(JOY_BUTTON_A, 4)
 	check_eq(top_name(), "online", "and leaves the player on the Online screen")
 	expect_focus("after the kick")
+
+
+## A dedicated server's lobby: joined through the Join tab's form (typed "address:port"), the
+## eyebrow says dedicated server, the playlist vote is offered and A votes, Y readies up.
+func test_dedicated_server_lobby_vote_and_ready() -> void:
+	await wait_frames(2)
+	var port := _port()
+	var srv := NetServer.new()
+	add_child(srv)
+	_nodes.append(srv)
+	check_eq(srv.start({"name": "Gullet Nights", "port": port, "lan_discovery": false, "max_players": 4, "timeout": 5,
+		"lobby_time": 600, "vote_candidates": 3}, true), OK, "a dedicated server (in this process)")
+	var pl := NetPlaylist.from_dict(Content.get_entry("playlists", "fight_night"), "content")
+	pl.validate()
+	srv.set_playlist(pl)
+	var s := await open_online("join") as OnlineScreen
+	# typing "address:port" fills both fields (what a keyboard player does)
+	s.call("_on_address_typed", "127.0.0.1:%d" % port)
+	await wait_frames(2)
+	check(await nav_to("join"), "reached Join")
+	await press_joy(JOY_BUTTON_A, 4)
+	check(await until(func() -> bool: return top_name() == "lobby", 8.0), "the lobby opens (top=%s)" % top_name())
+	var lob := App.top_screen()
+	check(await until(func() -> bool: return find_label(lob, "DEDICATED SERVER") != null, 4.0), "the eyebrow says dedicated server")
+	check(await until(func() -> bool: return lob.find_children("*", "UiButton", true, false).any(
+		func(b) -> bool: return b.has_meta("focus_key") and str(b.get_meta("focus_key")) == "vote0"), 6.0), "the playlist vote is offered")
+	check(await nav_to("vote0"), "reached the first entry")
+	await press_joy(JOY_BUTTON_A, 4)
+	var me_id := Net.local_peer_id()
+	check(await until(func() -> bool: return srv.players.has(me_id) and int((srv.players[me_id] as NetPlayer).vote) == 0, 4.0),
+		"A voted for it on the server")
+	var voted := func() -> bool:
+		for b in App.top_screen().find_children("*", "UiButton", true, false):
+			if b.has_meta("focus_key") and str(b.get_meta("focus_key")) == "vote0":
+				return (b as UiButton).text.contains("YOUR VOTE")
+		return false
+	check(await until(voted, 4.0), "and the button says so")
+	expect_focus("after voting")
+	# last: with everyone ready the server's countdown drops to 3 s and the match takes over
+	await press_joy(JOY_BUTTON_Y, 4)
+	check(await until(func() -> bool: return srv.players.has(me_id) and (srv.players[me_id] as NetPlayer).ready, 4.0), "Y readied up")
 
 
 ## LAN tab (same machine): an announced session is listed with its name, rules and players and a

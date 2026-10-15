@@ -215,8 +215,9 @@ Online screens (`src/test/net/test_online_ui.gd`, network owner, LOOPBACK): tabs
 screen, a guest joining, copy invite, the rules dialog, Y starts a match, the online results card, the automatic return
 to the lobby, leaving with the confirmation; joining a host in **another process** through the Join tab's recent-server
 entry, readying with Y, playing the host's match and coming back; refusal dialogs (wrong password, another game
-version, full, nobody answering) and a kick with the host's reason; the LAN tab (listed session, password prompt); the same layout audit for
-every tab and a lobby with a guest.
+version, full, nobody answering) and a kick with the host's reason; the LAN tab (listed session, password prompt); a
+dedicated server's lobby joined by a typed `address:port` (playlist vote with A, ready with Y); the same layout audit
+for every tab and a lobby with a guest.
 
 Dev flags (handled by the title screen): `--ui-screen <name>` (any screen, plus `practice`, `countdown`, `pause`,
 `ingame_settings`, `match`, `results` = a real 7 s bot round, `gallery`), `--ui-tab <id>`, `--ui-open <category>`,
