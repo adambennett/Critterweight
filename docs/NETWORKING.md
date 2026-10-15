@@ -92,7 +92,7 @@ is a **protocol violation**. Layouts are documented in `src/net/net_protocol.gd`
 | 67 | LOBBY | S->C | | lobby state (dictionary) |
 | 68 | CHAT | S->C | | from id, name, text |
 | 69 | NOTICE | S->C | | text |
-| 70 | MATCH_START | S->C (ch 1) | | match info (arena dictionary, rules, mode, roster, your fighter, tick/snapshot rates) |
+| 70 | MATCH_START | S->C (ch 1) | | match info (arena dictionary + content hash, arena package for a player-made layout, rules, mode, roster, AI Lab policies with their hashes, your fighter, tick/snapshot rates) |
 | 71 | SNAPSHOT | S->C (ch 2) | | match id, tick, input ack, body (§6) |
 | 72 | EVENTS | S->C (ch 1) | | base tick, events (§6) |
 | 73 | MATCH_END | S->C (ch 1) | | result (winner, rounds, stats, players, entry, aborted) |
@@ -221,8 +221,9 @@ dictionary root, only plain value types, finite numbers, strings <= 8192 chars, 
 
 ## 7. Client presentation
 
-`NetMatchScene` reuses the local views: `ArenaView` (built from the arena dictionary in
-MATCH_START, so authored layouts need no download), `CreatureView` per roster slot, `Vfx`,
+`NetMatchScene` reuses the local views: `ArenaView` (built from the arena definition the client
+checked before the match: its own copy, or the host's layout package, see §13), `CreatureView` per
+roster slot, `Vfx`,
 `FightCamera`, `FightHud`, `ModeView` and the audio bridge. A **presentation mirror**
 (`NetHudMirror`) is a `MatchSim` with `Fighter` objects that are never stepped: it carries
 replicated vitals, statuses, cooldowns, targets, mode timers/scores/`hud_state()`/`view_state()`,
@@ -263,7 +264,7 @@ ping, vote}], `settings` {rules, rules_name, arena, arena_name, mode, bots, bot_
 rules_override, bot_policy}, `vote` {open, candidates [{index, key, name, rules_name, arena_name,
 mode, weight, min_players, max_players}], tally}, `playlist` {id, name, valid, invalid, errors},
 `entry`, `match_id`, `options` {creatures, rules, arenas, bot_difficulties, bot_policies [{id,
-name, creature}]}, `last_result`.
+name, creature, hash}]} (listen hosts; dedicated servers list only creatures), `last_result`.
 
 * Players get stable session ids (1 = server/listen host, joiners from 2) and lobby slots; joiners
   beyond `max_players` become spectators when spectator slots are free, otherwise `server_full`.
@@ -275,7 +276,11 @@ name, creature}]}, `last_result`.
   `match.bot_policy`; used in turn across bot slots, each bot fights as its policy's creature, a
   missing or incompatible policy falls back to the scripted AI). Policies run only on the server;
   clients see a fighter of kind `policy` and need nothing (policies are not gameplay content and
-  not part of the content hash; the creature they drive is). Teams follow the
+  not part of the join content hash; the creature they drive is). Each policy is identified by its
+  own content hash, the sha256 checksum of its canonical file form that `PolicyIO` verifies on load:
+  the lobby options carry it, MATCH_START lists `policies` [{fighter, id, name, hash}] (hash empty
+  when the policy was unavailable and a scripted bot fought), and the server logs it per match.
+  Teams follow the
   local setup: duel/ffa own team each, teams/tag round-robin honouring requests, co-op humans on
   team 0 (bots join them, or oppose them when the preset has 2+ teams). Presets' `players: [min,
   max]` bound everything.
@@ -366,16 +371,32 @@ cost, traffic, memory, objects/nodes/orphans).
   version. Players enable the same mods (Mods screen, or `--mods id1,id2`); dedicated servers load
   exactly `server.mods` (SERVER.md).
 * **Player-made rules presets** (`user:<name>`, saved on one machine and registered as runtime
-  content) and arenas are not part of the content hash: MATCH_START carries the full rules and
-  arena dictionaries, so clients never need those files (tested: a listen host plays its own
-  `user:` preset with a guest that does not have it). Creatures must exist locally.
-* **No content downloads.** Servers never send package files: rules presets and arenas already
-  travel in full, and mod packages must be installed by the player (the join error names each one).
+  content) are not part of the content hash: MATCH_START carries the full rules dictionary, so
+  clients never need the preset file (tested: a listen host plays its own `user:` preset with a
+  guest that does not have it). Creatures must exist locally.
+* **Player-made arenas** (`user:<slug>` layouts from the arena editor, `ArenaLibrary`) travel as
+  an **arena package**: the host exports the layout with `ArenaPackage.export_package` (schema
+  checked, hashed; cached per content hash; about 1.2 KB for a typical layout, capped at 512 KB)
+  and MATCH_START carries the bytes plus `arena_hash` (`ArenaDef.content_hash()`). Before
+  anything is built, the client (`NetClient._prepare_arena`) refuses oversized packages unopened,
+  imports the package with `ArenaPackage.import_bytes` (zip pre-scan, path whitelist, size and
+  ratio caps, sha256 per file, schema, `ArenaDef` checks, package hash) into a sandbox folder
+  (`downloads/net_arenas`, emptied before each import; never the player's own arena list, so
+  nothing is registered as the player's content), loads it through `ArenaLibrary.load_layout`
+  and rebuilds the `ArenaDef`. If the import fails, the package lacks the announced arena, the
+  layout has errors or its content hash differs from `arena_hash`, the client leaves with a
+  content reason that says so. Arenas from packages use the local copy and the same hash comparison (a different
+  copy blocks the match). Tested: `test_net_loopback::test_arena_checks_before_the_match` and the
+  listen-host process test (`--user-arena`).
+* **No mod downloads.** Servers never send mod package files: rules presets and player-made
+  arenas travel as data (above), and mod packages must be installed by the player (the join error
+  names each one).
   The former setting `network.allow_downloads` did nothing and was removed from Settings. A future
   download path would stream the server's `.critmod` (data-only, D-016) into the user `downloads`
   folder and hand it to `Mods.import_package()` after the player confirms, so every package check
   in docs/MODDING.md still applies.
-* Playlists and AI Lab policies are server-only data and are not part of the hash.
+* Playlists and AI Lab policies are server-only data and are not part of the hash (each policy
+  in a match is named with its own checksum, §8).
 * **Rules are validated twice** with the rules editor's own validator (`RulesValidator`, via
   `NetProtocol.rules_problem`): the host/server refuses invalid presets or overrides
   (`host_set` returns the reason, playlist entries are skipped with it, `start_match` refuses), and
@@ -492,10 +513,24 @@ loopback duel 39-89 ms interpolation delay depending on machine load; packaged r
 about 2 % of packets dropped (as configured), 1-2 % of rendered frames starved - the match still
 completes with the correct result.
 
-**Soak** (`test_net_soak.gd --soak-minutes 10`): see the numbers below, refreshed with every
-requirement-level run.
+**Soak** (`test_net_soak.gd --soak-minutes 10`, LOOPBACK): a dedicated server rotates the
+playlist (duel, free-for-all, 2v2, Spotlight Hog, Chum Rush; voting, bot fill, 30-35 s rounds)
+for 10 minutes while a scripted fighter and a presenting spectator stay connected; the server's
+status and the OS view of its process are sampled every 15 s (40 samples), then it is shut down
+through the TCP admin.
 
-SOAK_RESULTS
+| Run (2026-10-15) | Matches | Server static memory | Working set | Server CPU (10-min average) | Logs after exit | Exit |
+|---|---|---|---|---|---|---|
+| commit 597ade7 (final tree) | 13 | 70.2 MB in the first lobby, 104-106 MB from the first match on; slope -0.11 MB/min (2nd half) | 195 -> 196 MB, slope 0.00 MB/min | 29.6 % of one core | 8998 B, 1 file | 0 (graceful) |
+| before the arenas merge | 14 | 61.2 MB in the first lobby, 95-97 MB from the first match on; slope -0.02 MB/min | 183 -> 186 MB, slope 0.00 MB/min | 28.9 % of one core | 9220 B, 1 file | 0 (graceful) |
+
+In the final run the simulation took 1.24 ms per tick on average over the samples (highest
+one-second average 2.90 ms), the server sent 29.5 KB/s on average to the two clients (peak
+47.2 KB/s in 8-fighter modes) and received 4.3 KB/s; orphan nodes stayed at 0 and the object
+count moved with the mode's fighters (1636-2337) without a trend; the presenting spectator's
+working set was 130-231 MB. The step in static memory at the first match is what that match
+loads and keeps cached (content definitions, scripts, physics resources); it stays flat for the
+remaining nine minutes, so it is not growth.
 
 ## 16. Tests
 
@@ -514,8 +549,8 @@ $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 | `test_net_codec.gd` | Writer/reader, bounds, quantization error, event codec round trip, 3000-buffer fuzz + every truncation, input clamping, remote-input redundancy/jitter buffer, payload sanitizer, beacons, reasons, password proof, config parser (incl. `server.mods`), package-list codec, content verdict over `Mods.compare`, assist clamping, rate limiter |
 | `test_net_playlist.gd` | Weight distribution (10 000 draws), distinct candidates, repeat avoidance + relaxation, vote/tie/no-vote rules, min players + bot fill, invalid entries/missing content messages, persistence, shipped playlists |
 | `test_net_snapshot.gd` | FK reconstruction vs live sim, snapshot sizes, roster generations, interpolation/teleport/generation switch, event scheduling, mirror driving the real FightHud |
-| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, timeout, LAN discovery, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (+ clamp, `LQ_ASSIST`), live network settings + invite text |
-| `test_net_multiprocess.gd` | Independent processes: dedicated match (hits, KO, results, presenting client), rejections (password, full, protocol, build, content refused on the client with Mods.compare wording), server mods (`server.mods` + client `--mods`, vanilla client refused, modded client plays the mod's preset, admin status lists packages), damage injection, disconnect + rejoin, stdin console shutdown, TCP admin auth/kick/ban/shutdown, 80 +- 20 ms / 2 % loss match, listen host (own `user:` rules preset sent in full to a guest without it, guest aim assist applied) + remote client + app round trip, bonus modes (Chum Rush, Absolute Unit), LAN discovery, playlist rotation + votes + invalid entries + restart persistence |
+| `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, oversized/flood, host leaving, timeout, LAN discovery, host scene removed mid-match, mode picks for remote players (+ pick timeout), party relay (limits, session end), arena checks before the match (local hash, mismatch, damaged and oversized packages, sandboxed import round trip), AI Lab policy bots (policy hash in the options and MATCH_START) + rules validation, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (`LQ_ASSIST`, snapped levels, `match.player_assist`), live network settings + invite text |
+| `test_net_multiprocess.gd` | Independent processes: dedicated match (hits, KO, results, presenting client), rejections (password, full, protocol, build, content refused on the client with Mods.compare wording), server mods (`server.mods` + client `--mods`, vanilla client refused, modded client plays the mod's preset, admin status lists packages), damage injection, disconnect + rejoin, stdin console shutdown, TCP admin auth/kick/ban/shutdown, 80 +- 20 ms / 2 % loss match, listen host (own `user:` rules preset sent in full and own `user:` arena sent as a package to a guest without either, guest aim assist applied, party messages) + remote client + app round trip, bonus modes (Chum Rush, Absolute Unit), LAN discovery, playlist rotation + votes + invalid entries + restart persistence |
 | `test_net_parity.gd` | NetMatchScene handles every event MatchScene reacts to; reports event types without a codec id |
 | `test_net_server_examples.gd` | Example configs and the playlist template stay valid |
 | `test_net_measure.gd` | Bandwidth and server cost (duel, 8-fighter FFA) |
@@ -539,8 +574,8 @@ Also LOOPBACK on one PC.
 * No host migration: when a listen host leaves, the session ends with a clear reason.
 * Rejoin tokens live in memory: a restarted client within the same game session can rejoin
   (`Net.rejoin()`), a restarted game cannot.
-* No in-game content download: players install missing mods themselves (the join error names
-  them); rules presets and arenas need none (sent in full).
+* No in-game mod download: players install missing mods themselves (the join error names
+  them); rules presets travel in full and player-made arenas as checked layout packages (§13).
 * Server CPU with 8 fighters is 61-65 % of one core (target < 35 %); the cost is the simulation,
   not networking (§15).
 * Co-op: the party message channel the campaign's `NetPartyTransport` needs is in place and

@@ -508,13 +508,24 @@ func _prepare_arena(info: Dictionary) -> String:
 		if bytes.size() > NetProtocol.MAX_ARENA_PACKAGE:
 			return "The host's arena package is too large (%d KB)." % int(bytes.size() / 1024.0)
 		var sandbox := Paths.dir("downloads").path_join("net_arenas")
+		# only the current match's layout lives here: earlier imports never pile up or get reused
+		DirAccess.make_dir_recursive_absolute(sandbox)
+		for old in DirAccess.get_files_at(sandbox):
+			DirAccess.remove_absolute(sandbox.path_join(old))
 		var res := ArenaPackage.import_bytes(bytes, sandbox)
 		if not bool(res.get("ok", false)):
 			return "The host's arena '%s' was refused: %s" % [aid, "; ".join(PackedStringArray(res.get("errors", [])))]
+		var listed := false
+		for d in res.get("arenas", []):
+			listed = listed or str((d as Dictionary).get("id", "")) == aid
+		if not listed:
+			return "The host's arena package does not contain arena '%s'." % aid
 		var lr := ArenaLibrary.load_layout(ArenaLibrary.path_for(aid, sandbox))
 		if not bool(lr.get("ok", false)):
 			return "The host's arena '%s' could not be loaded after import." % aid
 		def = ArenaDef.from_dict(lr["data"], "user")
+		if def.id != aid:
+			return "The host's arena package does not contain arena '%s'." % aid
 		arena_imported = aid
 	else:
 		def = Content.arena(aid)

@@ -157,7 +157,7 @@ full, so playlists may use mod presets as long as the players have the mod.
 | `results_time` | int | 12 | 2-120 s | Results display before the next lobby |
 | `empty_behavior` | enum | idle | idle/showcase | Without players: no simulation, or bot matches on the rotation |
 | `vote_candidates` | int | 3 | 1-5 | Entries offered per vote (also capped by the playlist) |
-| `bot_policy` | text | (empty) | policy ids, comma separated | AI Lab policies for bot slots (used in turn; each bot fights as its policy's creature; unavailable ones fall back to the scripted AI). Entries can set their own `bot_policy` |
+| `bot_policy` | text | (empty) | policy ids, comma separated | AI Lab policies for bot slots (used in turn; each bot fights as its policy's creature; unavailable ones fall back to the scripted AI). Policies come from the server's user data folder (`policies/`, e.g. copied from a player's AI Lab export), the built-ins and loaded mods; the log names each policy with the first 16 characters of its checksum per match. Entries can set their own `bot_policy` |
 | `player_assist` | bool | true | | true: each remote player's aim-assist level (low/normal/high, snapped to those) applies to their fighter; false: everyone gets normal |
 
 ### [admin]

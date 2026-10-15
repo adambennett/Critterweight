@@ -506,6 +506,26 @@ func test_arena_checks_before_the_match() -> void:
 	check_eq(c._prepare_arena(pinfo), "", "imported into the sandbox and verified")
 	check_eq(c.arena_imported, "user:loopback_cage")
 	check(Content.arena("user:loopback_cage") == null, "sandboxed: not added to the player's own arenas")
+	var wrong_id := {"arena_id": "user:other_cage", "arena_hash": a.content_hash(), "arena_package": bytes}
+	check(c._prepare_arena(wrong_id).contains("does not contain"), "a package without the announced arena is refused")
+	# the whole MATCH_START path: rules that fail the rules editor's validation, or a different
+	# arena, end the session with a content reason before anything is built
+	var broken_rules := {"name": "Broken", "mode": "standard", "format": "duel", "teams": 2, "players": [2, 2], "win": "none"}
+	var cases := [
+		["invalid rules", {"fighters": [], "arena": good.to_dict(), "arena_id": "the_gullet", "arena_hash": good.content_hash(), "rules": broken_rules}],
+		["arena hash differs", {"fighters": [], "arena": good.to_dict(), "arena_id": "the_gullet", "arena_hash": "0".repeat(64),
+			"rules": Content.get_entry("rules", "duel")}]]
+	for cs in cases:
+		var c2 := NetClient.new()
+		c2.present = false
+		c2.install_scene = false
+		_nodes.append(c2)
+		var got: Array = []
+		c2.failed.connect(func(r: Dictionary) -> void: got.append(r))
+		c2._on_match_start(cs[1])
+		check(got.size() == 1 and int(got[0].get("code", 0)) == NetProtocol.R_CONTENT,
+			"%s: the client leaves with a content reason (%s)" % [cs[0], str(got)])
+		check(c2.state == NetClient.State.CLOSED and c2.match_info.is_empty(), "%s: no match was built" % cs[0])
 
 
 ## AI Lab policies fill bot slots in a server match (the server runs them; clients only see the
@@ -528,6 +548,17 @@ func test_policy_bots_and_rules_validation_inprocess() -> void:
 		check_eq(f.creature.id, pol.creature, "as the policy's own creature")
 		check(server.sim.input_sources[bot] is PolicyInputSource, "driven by PolicyInputSource on the server")
 		check(await _until(func() -> bool: return str(a.replica.roster.get(bot, {}).get("kind", "")) == "policy", 3.0), "clients see a policy fighter, nothing to load")
+		# the exact trained network is identified by its content hash (the checksum PolicyIO verifies)
+		var want := str(pol.to_dict().get("checksum", ""))
+		check_eq(want.length(), 64, "policy checksum is a sha256")
+		var listed: Array = a.match_info.get("policies", [])
+		check(listed.size() == 1 and int(listed[0].get("fighter", -1)) == bot and str(listed[0].get("id", "")) == pid
+			and str(listed[0].get("hash", "")) == want, "MATCH_START names the policy and its hash: %s" % str(listed))
+		var opt_hash := ""
+		for o in server._policy_options():   # a listen host's lobby options (dedicated: playlist decides)
+			if str(o.get("id", "")) == pid:
+				opt_hash = str(o.get("hash", ""))
+		check_eq(opt_hash, want, "the host's policy options carry the same hash")
 	# invalid rules are refused by the authority with the validator's reason
 	var bad := {"name": "Broken", "mode": "standard", "format": "duel", "teams": 2, "players": [2, 2], "win": "none"}
 	var err := server.start_match("broken", bad, "the_gullet", 2, 2, 1, "regular", {})

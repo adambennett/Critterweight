@@ -89,6 +89,7 @@ var _pick_since := {}             ## fighter index -> ms its pending pick was fi
 var _policy_cache: Array = []
 var _policy_cache_ms := 0
 var _arena_pkg_cache := {}        ## arena content hash -> ArenaPackage bytes
+var _policy_hashes := {}          ## PolicyData instance id -> checksum
 var _roster: Array = []           ## per fighter slot: {gen, obj, rig, creature, scale, despawned, team, name, kind, player}
 var _gens := PackedByteArray()
 
@@ -224,8 +225,8 @@ func _arena_package_bytes(arena: ArenaDef) -> PackedByteArray:
 	return bytes
 
 
-## AI Lab policies the host can put into bot slots: [{id, name, creature}] (valid ones, at most
-## 64; refreshed every few seconds because the list reads the user policy folder).
+## AI Lab policies the host can put into bot slots: [{id, name, creature, hash}] (valid ones, at
+## most 64; refreshed every few seconds because the list reads the user policy folder).
 func _policy_options() -> Array:
 	var now := Time.get_ticks_msec()
 	if _policy_cache_ms == 0 or now - _policy_cache_ms > 5000:
@@ -233,8 +234,24 @@ func _policy_options() -> Array:
 		_policy_cache.clear()
 		for p in PolicyLibrary.list():
 			if typeof(p) == TYPE_DICTIONARY and bool(p.get("valid", false)) and _policy_cache.size() < 64:
-				_policy_cache.append({"id": str(p.get("id", "")), "name": str(p.get("name", "")), "creature": str(p.get("creature", ""))})
+				var pid := str(p.get("id", ""))
+				_policy_cache.append({"id": pid, "name": str(p.get("name", "")), "creature": str(p.get("creature", "")),
+					"hash": _policy_hash(PolicyLibrary.get_policy(pid))})
 	return _policy_cache.duplicate(true)
+
+
+## A policy's content hash: the sha256 checksum of its canonical file form (PolicyData.to_dict,
+## the same checksum PolicyIO verifies on load), so players and logs can tell exactly which
+## trained network drove a bot. Cached per loaded PolicyData ("" when unavailable).
+func _policy_hash(pol: PolicyData) -> String:
+	if pol == null:
+		return ""
+	var key := pol.get_instance_id()
+	if not _policy_hashes.has(key):
+		if _policy_hashes.size() > 128:
+			_policy_hashes.clear()
+		_policy_hashes[key] = str(pol.to_dict().get("checksum", ""))
+	return _policy_hashes[key]
 
 
 ## Connection timeout in seconds (application heartbeat and ENet), applied immediately.
@@ -1459,6 +1476,7 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 			e["mods"] = {"assist": p2.assist if bool(cfg.get("player_assist", true)) else 1.0}
 		p2.fighter = i
 		fighters.append(e)
+	var policy_list: Array = []      ## [{fighter, id, name, hash}] for MATCH_START and the log
 	for b in n_bots:
 		var idx := chosen.size() + b
 		var cid := str(playable[_rng.randi() % playable.size()]) if not playable.is_empty() else ""
@@ -1476,6 +1494,10 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 			e2["kind"] = "policy"
 			e2["policy_id"] = pid
 			e2["name"] = "%s %d" % [pol.name if pol != null and pol.name != "" else "Lab bot", b + 1]
+			# the exact network is identified by its checksum ("" = missing or incompatible: the
+			# scripted bot PolicyInputSource.for_match falls back to fights instead)
+			var usable := pol != null and PolicyLibrary.compatibility(pol, cdef.id) == ""
+			policy_list.append({"fighter": idx, "id": pid, "name": str(e2["name"]), "hash": _policy_hash(pol) if usable else ""})
 		if dedicated:
 			if pid != "":
 				e2["source"] = PolicyInputSource.for_match(e2, seed_v * 31 + idx, idx)
@@ -1522,6 +1544,11 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 		"snapshot_rate": int(cfg["snapshot_rate"]), "fighters": fl, "entry": current_entry, "seed": seed_v}
 	if not arena_pkg.is_empty():
 		match_info["arena_package"] = arena_pkg
+	if not policy_list.is_empty():
+		match_info["policies"] = policy_list
+		for pe in policy_list:
+			Log.i("net", "fighter %d: AI Lab policy '%s' %s" % [int(pe["fighter"]), str(pe["id"]),
+				str(pe["hash"]).substr(0, 16) if str(pe["hash"]) != "" else "(unavailable: scripted bot)"])
 	phase = PHASE_MATCH
 	phase_until = 0
 	for p5 in players.values():
