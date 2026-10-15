@@ -9,10 +9,19 @@ const FILE := "recording.json"
 
 static var _cfg := {}
 static var _loaded := false
+## tests redirect the switch file
+static var config_path_override := ""
 
 
 static func _path() -> String:
+	if config_path_override != "":
+		return config_path_override
 	return Paths.dir("lab").path_join(FILE)
+
+
+static func reload() -> void:
+	_loaded = false
+	_cfg = {}
 
 
 static func config() -> Dictionary:
