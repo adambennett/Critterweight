@@ -15,8 +15,16 @@ const OVERLAY := "res://src/hub/ui/hub_spar_overlay.gd"
 const TAPE_OVERLAY := "res://src/hub/ui/hub_tape_overlay.gd"
 
 
+## The real Kid Lamprey once his kit parses cleanly (the campaign's usability check: installed AND a
+## valid CreatureDef with no problems); until then a roster stand-in named Kid Lamprey.
+static func kid_ready() -> bool:
+	if Content.creature(KID) == null:
+		return false
+	return not CampaignCatalog.shared().resolver.usable_entry(KID).is_empty()
+
+
 static func kid_creature(me: String) -> String:
-	if Content.creature(KID) != null:
+	if kid_ready():
 		return KID
 	for fallback in ["f_gusto", "f_jitters", "f_stoke"]:
 		if fallback != me and Content.creature(fallback) != null:

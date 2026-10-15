@@ -131,13 +131,15 @@ static func build_run(b: HubBoard, p: Dictionary) -> void:
 		return
 	var o := sv.run_options()
 	var fighters: Array = o.get("fighters", [])
+	var use_standins := func() -> void:
+		b.close()
+		b.open_child("run", {"stand_ins": true})
 	if fighters.is_empty():
 		b.text_line("\"The Commission has no fighters cleared for the card yet.\" (The roster's fight kits are still being finished.)", "Warning")
-		var use_standins := func() -> void:
-			b.close()
-			b.open_child("run", {"stand_ins": true})
-		b.button("Use development stand-ins (custom run)", use_standins, "Development stand-ins",
-			"Missing kits are replaced by a placeholder body so you can try the card; the run is marked custom (no records).")
+		# development stand-ins are a developer tool (CampaignFlow.dev_tools): hidden in normal play
+		if CampaignFlow.dev_tools():
+			b.button("Use development stand-ins (custom run)", use_standins, "Development stand-ins",
+				"Missing kits are replaced by a placeholder body so you can try the card; the run is marked custom (no records).")
 		b.button("Campaign menu (suspended runs, co-op lobby)", sv.open_campaign_menu)
 		b.focus_first()
 		return
@@ -182,6 +184,9 @@ static func build_run(b: HubBoard, p: Dictionary) -> void:
 			CampaignFlow.describe_suspended(sv.catalog(), held.get("summary", {})), "Warning")
 	b.button("Campaign menu (suspended runs, co-op lobby)", sv.open_campaign_menu, "Campaign menu",
 		"Resume a suspended Fight Camp run, host co-op, or open the Cannery Ledger.", "", "campaign")
+	if CampaignFlow.dev_tools() and not sv.stand_ins and fighters.size() < CampaignCatalog.shared().roster().size():
+		b.button("Use development stand-ins (unfinished kits)", use_standins, "Development stand-ins",
+			"Developer tool: fighters whose kits are unfinished get a placeholder body; the run is marked custom (no records).")
 	b.set_status("Clout %d  ·  Cannery upgrades owned %d / 24 (they apply to this run)." % [st.clout(), st.upgrades_owned()])
 	b.focus_first()
 

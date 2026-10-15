@@ -63,6 +63,11 @@ func end_move(f: Fighter, _m: MoveDef) -> void:
 
 func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 	var t := str(e.get("type", ""))
+	# a fighter whose element changes during the fight (a boss's element cycle) re-elements its
+	# elemental areas/projectiles too; neutral effects stay neutral
+	if f and f.mods.has("effect_element") and str(e.get("element", "")) != "" and t in ["projectile", "area", "chain_arc", "delayed"]:
+		e = e.duplicate()
+		e["element"] = str(f.mods["effect_element"])
 	var p := _point(f, e)
 	match t:
 		"projectile":

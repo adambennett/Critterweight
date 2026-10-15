@@ -117,19 +117,30 @@ func test_grab_carry_and_heave_a_crate() -> void:
 	check(mode.carried_by(player()).is_empty(), "hands are free again")
 
 
+## The rule (HubMode.throw_strength): a fighter's crate range follows their BEST throw in the kit
+## relative to the roster average, times a body factor — checked for every roster fighter with the
+## kit numbers actually installed, then the design consequences on the dock's 3 / 5 / 8 m rings.
 func test_throw_distance_follows_the_fighter() -> void:
-	make_hub("f_jitters")
-	var jit := mode.throw_distance(player(), 1.0, HubWorld.CRATE_MASS)
-	make_hub("f_dredge")
-	var dre := mode.throw_distance(player(), 1.0, HubWorld.CRATE_MASS)
-	make_hub("f_stoke")
-	var sto := mode.throw_distance(player(), 1.0, HubWorld.CRATE_MASS)
-	var tap := mode.throw_distance(player(), 0.0, HubWorld.CRATE_MASS)
-	check(dre > sto and sto > jit, "Dredge throws farther than Stoke, Stoke farther than Jitters (%.1f / %.1f / %.1f)" % [dre, sto, jit])
-	check(jit < 8.0, "Jitters cannot reach the 8 m ring at full heave (%.1f)" % jit)
-	check(jit > 5.4, "but Jitters reaches the 5 m ring (%.1f)" % jit)
-	check(sto > 8.4, "Stoke reaches the 8 m ring (%.1f)" % sto)
-	check(tap < 4.0, "a quick toss is short (%.1f)" % tap)
+	var ref := HubMode.roster_best_throw()
+	var full := {}
+	var tap := {}
+	var cfg := HubContent.activity("crates")
+	var ring8_near := 8.0 - float((HubLayout.CRATE_RINGS[2] as Dictionary)["r"])
+	for fid in ["f_stoke", "f_jitters", "f_dredge", "f_dozer", "f_gusto", "f_slurry"]:
+		make_hub(fid)
+		var c := player().creature
+		var expect := clampf(HubMode.best_throw(c) / ref * HubMode.body_factor(player().rig.total_mass), 0.6, 1.5)
+		check_near(HubMode.throw_strength(player()), expect, 0.0001, "%s: best throw %.1f m / roster %.2f m x body %.2f" % [fid, HubMode.best_throw(c), ref, HubMode.body_factor(player().rig.total_mass)])
+		full[fid] = mode.throw_distance(player(), 1.0, HubWorld.CRATE_MASS)
+		tap[fid] = mode.throw_distance(player(), 0.0, HubWorld.CRATE_MASS)
+		check_near(float(full[fid]), float(cfg.get("full_distance", 8.9)) * expect, 0.001, "%s: a full heave lands %.1f m out" % [fid, float(full[fid])])
+	print("crate heave (m): ", full)
+	check(full["f_dredge"] > full["f_stoke"] and full["f_dozer"] > full["f_stoke"], "the heavy grapplers out-throw Stoke (%s)" % str(full))
+	check(full["f_stoke"] > full["f_jitters"], "Stoke out-throws Jitters (%.1f / %.1f)" % [full["f_stoke"], full["f_jitters"]])
+	check(full["f_jitters"] < ring8_near, "Jitters cannot reach the 8 m ring at full heave (%.1f)" % full["f_jitters"])
+	check(full["f_jitters"] >= 5.0, "but Jitters can still land the 5 m ring (%.1f)" % full["f_jitters"])
+	check(full["f_stoke"] >= ring8_near, "Stoke's full heave reaches the 8 m ring (%.1f)" % full["f_stoke"])
+	check(tap["f_stoke"] < 4.0, "a quick toss is short (%.1f)" % tap["f_stoke"])
 
 
 func test_hits_on_npcs_are_shrugged_off_and_nobody_goes_down() -> void:

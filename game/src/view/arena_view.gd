@@ -121,9 +121,12 @@ func _build_environment() -> void:
 			"drydock":
 				sm.set_shader_parameter("top", _c("sky_top", "#8FA2AE"))
 				sm.set_shader_parameter("horizon", _c("sky_horizon", "#DCE3E6"))
-				sm.set_shader_parameter("bottom", Color("#6E7C84"))
-				sm.set_shader_parameter("clouds", 0.8)
-				sm.set_shader_parameter("cloud_color", Color("#E6EBEE"))
+				sm.set_shader_parameter("bottom", _c("sky_bottom", "#6E7C84"))
+				sm.set_shader_parameter("clouds", float(variant.get("clouds", 0.8)))
+				sm.set_shader_parameter("cloud_color", _c("cloud_color", "#E6EBEE"))
+				# night looks (Pier Night) bring the stars and the moon out
+				sm.set_shader_parameter("stars", float(variant.get("stars", 0.0)))
+				sm.set_shader_parameter("moon", float(variant.get("moon", 0.0)))
 			"rooftop":
 				sm.set_shader_parameter("top", Color("#070B16"))
 				sm.set_shader_parameter("horizon", Color("#2A2342"))

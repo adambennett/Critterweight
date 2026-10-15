@@ -35,6 +35,7 @@ var _last_bark := -99.0
 var _greeted := {}
 var _suppress_sub := false
 var _last_space := ""
+var _qa_juice := OS.get_cmdline_user_args().has("--hub-juice")
 
 
 func start(p: Dictionary) -> void:
@@ -108,6 +109,17 @@ func start(p: Dictionary) -> void:
 	if str(p.get("cam_yaw", "")) != "":
 		camera.yaw = deg_to_rad(float(p["cam_yaw"]))
 		camera.snap()
+	# QA captures: --hub-zoom <factor> moves the camera closer (0.5 = half the distance)
+	var zoom_arg := Cannery.cli("--hub-zoom")
+	if zoom_arg != "":
+		camera._zoom = clampf(float(zoom_arg), 0.25, 2.0)
+		camera.snap()
+	# QA captures: --hub-pitch <deg> holds the camera at one pitch (low angles show faces and gear)
+	var pitch_arg := Cannery.cli("--hub-pitch")
+	if pitch_arg != "":
+		camera.pitch_lock = clampf(float(pitch_arg), 5.0, 85.0)
+		camera.pitch_deg = camera.pitch_lock
+		camera.snap()
 	# QA captures: --hub-pos x,y,z[,yaw_deg] places the fighter inside the arrival space
 	# (never split_floats an empty string: Godot 4.5 aborts on it)
 	var pos_arg := Cannery.cli("--hub-pos")
@@ -165,6 +177,8 @@ func _make_creature_view() -> void:
 	add_child(creature_view)
 	creature_view.setup(f.creature, Color("#f2f2ec"))
 	creature_view.gore_level = int({"full": 2, "reduced": 1, "off": 0}.get(str(Settings.get_value("access.gore")), 2))
+	# the locker's cosmetics (gold tooth, lid, belt, scarf, Sizzle) — all on show in the hub
+	FighterCosmetics.dress(creature_view, state.profile)
 	creature_view.snap_transforms(f.rig.segment_transforms())
 
 
@@ -209,6 +223,8 @@ func _process(dt: float) -> void:
 	_time += dt
 	creature_view.render(Engine.get_physics_interpolation_fraction())
 	creature_view.hype = player().hype / 100.0
+	if _qa_juice:
+		creature_view.juice_amount = 1.0       # QA captures: --hub-juice shows the JUICE glow (Sizzle)
 	camera.target = player().pos()
 	var board := App.top_screen() as HubBoard
 	var shift := Vector2.ZERO
@@ -556,8 +572,10 @@ func _on_state_changed(kind: String, data: Dictionary) -> void:
 		"cosmetic":
 			if str(data.get("id", "")) == "hub_pet_blister":
 				state.equip("pet", "hub_pet_blister")
+			view.props.refresh_world()       # a fished-up can lands on the locker-room shelf
 		"loadout":
-			pass
+			if creature_view:
+				FighterCosmetics.dress(creature_view, state.profile)
 
 
 ## An NPC speaks: a bubble over their head plus their voice (babble for speakers with a grain bank).
