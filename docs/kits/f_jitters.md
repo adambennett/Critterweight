@@ -136,8 +136,8 @@ damage-over-time is extra (per bout).
 | Slurry mirror | regular | 20 | 9–11 | 45 / 55 | 6.59 vs 6.72 | 2.94 vs 2.91 | 5.7 vs 7.1 |
 | Jitters mirror | regular | 48 | 22–26 | 46 / 54 | 6.63 vs 6.53 | 6.62 vs 6.52 | — |
 
-Final kit (after the campaign-technique pass and the pad Squash fix) on top of main 9533454; the
-same seeds before the pad Squash fix gave 29–19 / 28–20. A 20-bout sample carries about ±11 %
+Final kit (after the campaign-technique pass and the pad Squash fix) on top of main 7e5419f (the
+regular sample is identical on 9533454); the same seeds before the pad Squash fix gave 29–19 / 28–20. A 20-bout sample carries about ±11 %
 noise: the first 20 Jitters-mirror bouts alone went 6–14 (14–6 in an earlier run), so the 48-bout
 mirror is the one to read. Time-outs (decided on health fraction): 1 of 48 regular, 6 of 48 pro,
 none in the Slurry mirror (the zoner closes in once its lobs are on cooldown), 1 of 48 in the
