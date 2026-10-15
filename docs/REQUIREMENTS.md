@@ -126,7 +126,7 @@ see notes) · `—` not started · `~` partial (details in Evidence).
 ## Art, animation, graphics, audio, tone [12]
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
-| ART-01 | Art direction guide | ~ | docs/design/ART_DIRECTION.md (in progress) |
+| ART-01 | Art direction guide | I | docs/design/ART_DIRECTION.md: style statement, silhouettes/proportions, global/element/fighter palettes, stylized PBR materials, active-ragdoll animation principles, per-element VFX shape language (readable without colour), impact/hit-flash rules, UI style and typography, wordmark, readability in 4-8 fighter scenes, asset standards for the forge pipeline |
 | ART-02 | Cohesive cartoony 3D style, original creatures; representative fighter & arena early | I | Forged original creatures (docs/evidence/art), The Gullet arena; tools/forge |
 | ART-03 | glTF import path validated; PBR, soft shadows, SSAO, HDR tonemapping; scalable quality | I | glTF pipeline (forge -> .glb -> Godot import; runtime GLTFDocument for mods), PBR hints, AgX, SSAO, soft shadows, quality presets |
 | ART-04 | Readable locomotion, attacks, abilities, hit reactions, blocking, knockdowns/recovery, win/loss per anatomy | — | |
