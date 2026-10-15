@@ -80,7 +80,9 @@ func buy_upgrade(id: String) -> Dictionary:
 	return r
 
 
-## What Snappington's desk offers: {fighters, difficulties: [{id, name, desc}], max_dose, doses: [{level, name}], clout}
+## What Snappington's desk offers: {fighters, difficulties: [{id, name, desc, dose_allowed}],
+## max_dose, doses: [{level, name}], clout}. Doses are only offered on difficulties that take
+## them (never Sparring) — the sign-up sheet filters by `dose_allowed`.
 func run_options() -> Dictionary:
 	if backend:
 		return backend.call("run_options", state.profile)
@@ -89,7 +91,8 @@ func run_options() -> Dictionary:
 	var diffs := []
 	for did in o.get("difficulties", []):
 		var d := cat.difficulty(str(did))
-		diffs.append({"id": str(did), "name": str(d.get("name", did)), "desc": str(d.get("desc", ""))})
+		diffs.append({"id": str(did), "name": str(d.get("name", did)), "desc": str(d.get("desc", "")),
+			"dose_allowed": bool(d.get("dose_allowed", true))})
 	o["difficulties"] = diffs
 	var doses := [{"level": 0, "name": "Base card"}]
 	for lv in range(1, int(o.get("max_dose", 0)) + 1):
@@ -111,18 +114,50 @@ func run_config(choices: Dictionary) -> Dictionary:
 	return cfg
 
 
-## Starts a Fight Camp run from Snappington's desk. choices: {fighter, difficulty, dose, seed_text, coop_format}.
-## Leaves the hub (the campaign flow takes over the screen). Returns {ok, error}.
+## The Fight Camp run suspended in this profile's slot ({} if none): {slot, ok, error, summary}.
+func suspended_run() -> Dictionary:
+	if backend:
+		return backend.call("suspended_run", state.profile) if backend.has_method("suspended_run") else {}
+	return CampaignFlow.suspended_run(catalog(), "fight_camp")
+
+
+## Starts a Fight Camp run from Snappington's desk. choices: {fighter, difficulty, dose,
+## seed_text, coop_format, replace_suspended}. There is one suspended Fight Camp run per profile:
+## while one exists this returns {ok: false, needs_confirm: true, suspended} and starts nothing;
+## with replace_suspended the old run is credited as abandoned first. Leaves the hub (the
+## campaign flow takes over the screen). Returns {ok, error}.
 func start_run(choices: Dictionary) -> Dictionary:
 	if backend:
 		return backend.call("start_run", state.profile, choices)
 	if str(choices.get("fighter", "")) == "":
 		return {"ok": false, "error": "Pick a fighter first."}
+	var held := suspended_run()
+	if bool(held.get("newer", false)):
+		# a newer game version's run is never replaced, moved or deleted
+		return {"ok": false, "error": "Your suspended Fight Camp run was saved by a newer version of the game. It stays as it is; play it with that version."}
+	if not held.is_empty() and not bool(choices.get("replace_suspended", false)):
+		return {"ok": false, "needs_confirm": true, "suspended": held,
+			"error": "You already have a suspended Fight Camp run. Resume it, or abandon it to sign a new card."}
 	var cfg := run_config(choices)
+	if not held.is_empty():
+		CampaignFlow.abandon_suspended(catalog(), str(held["slot"]))
 	Profiles.save()
 	App.set_scene(null)
 	var f := CampaignFlow.start(catalog(), cfg)
 	f.show_current()
+	return {"ok": true, "error": ""}
+
+
+## Resumes the suspended Fight Camp run (leaves the hub). Returns {ok, error}.
+func resume_run() -> Dictionary:
+	if backend:
+		return backend.call("resume_run", state.profile) if backend.has_method("resume_run") else {"ok": false, "error": "unavailable"}
+	var res := RunStore.new().load_slot(CampaignFlow.profile_key(), "fight_camp", catalog())
+	if not bool(res["ok"]):
+		return {"ok": false, "error": str(res["error"])}
+	Profiles.save()
+	App.set_scene(null)
+	CampaignFlow.resume(catalog(), res["state"]).show_current()
 	return {"ok": true, "error": ""}
 
 

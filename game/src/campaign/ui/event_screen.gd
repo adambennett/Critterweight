@@ -1,6 +1,7 @@
 extends Screen
 ## Random event: speaker, title, text, then the choices — each with its risk tag (text + colour),
 ## Scrip cost and description; unavailable choices stay visible but disabled with the reason.
+## When nothing at all can be taken, MOVE ON passes (EventRunner.PASS) — no softlock.
 ## After a choice: the outcome text and every applied effect line, then CONTINUE (which may
 ## start an event fight, open a pick, or return to the map).
 
@@ -23,7 +24,8 @@ func _build() -> void:
 	_buttons.clear()
 	var view := ctrl.event_view(flow.me)
 	if view.is_empty():
-		flow.show_current.call_deferred()
+		if flow.current_screen() != "event":
+			flow.show_current.call_deferred()
 		return
 	_title = str(view.get("title", "Event"))
 	if str(view.get("chosen", "")) != "":
@@ -46,8 +48,14 @@ func _build() -> void:
 		v.add_child(CampaignUI.label("Only %s can answer this one." % str(view.get("decider", "")), 20, CampaignUI.MUTED))
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 10)
+	var any_available := false
 	for ch in view.get("choices", []):
 		list.add_child(_choice_button(ch, can_decide))
+		any_available = any_available or bool(ch.get("available", false))
+	if can_decide and not any_available:
+		var pass_b := CampaignUI.button("NOTHING YOU CAN TAKE — MOVE ON", _choose.bind(EventRunner.PASS), 24, CampaignUI.MUTED)
+		list.add_child(pass_b)
+		_buttons.append(pass_b)
 	v.add_child(CampaignUI.scroll(list))
 	_msg = CampaignUI.label("", 20, CampaignUI.DANGER)
 	v.add_child(_msg)

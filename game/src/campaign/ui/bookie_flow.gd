@@ -5,6 +5,9 @@ extends CampaignFlow
 ## the table (a fight is next, the run ended, or the player hands back), it returns to the
 ## Bookie screen and releases the table's loop. Runs at the table are not autosaved (the table
 ## is a session); they are credited by the table to the "bookie" record board.
+## Screens follow CampaignFlow.current_screen (a pending pick first — e.g. Train at a rest).
+## Every presented fight re-applies the table's speed (SimSpeed: k x physics ticks at the fixed
+## 1/120 s step): a finished MatchScene resets Engine.time_scale on its way out.
 
 var table: BookieTable
 var watching := true             ## fights presented (true) or fast-forwarded headless (false)
@@ -76,6 +79,9 @@ func run_fight(t: BookieTable, config: Dictionary) -> Dictionary:
 	_fight_done = false
 	_fight_result = {}
 	MatchFlow.last_config = {}     # no "Restart fight" into an unrelated earlier match
+	# the previous presented fight's MatchScene reset Engine.time_scale when it ended/left the
+	# tree (physics ticks stayed at k x): restore the table's speed and the fixed sim step
+	SimSpeed.set_scale(t.speed)
 	_scene = App.start_match(config, _on_presented_finished)
 	App.push("bookie", {"overlay": true})
 	var space := _scene.get_world_3d().space if _scene.get_world_3d() else RID()
@@ -126,22 +132,15 @@ func show_current() -> void:
 	if table.unattended:
 		return_to_table()
 		return
-	match ctrl.phase():
-		"map":
-			App.goto("run_map", {"flow": self})
-		"event":
-			App.goto("event", {"flow": self})
-		"shop":
-			App.goto("shop", {"flow": self})
-		"rest":
-			App.goto("rest", {"flow": self})
-		"reward":
-			if ctrl.pending_for(me).is_empty():
-				return_to_table()
-			else:
-				App.goto("reward", {"flow": self})
-		_:
+	ctrl.advance_if_done()
+	var screen := current_screen()
+	if screen == "run_map" and ctrl.phase() != "map":
+		screen = ""          # this player's part of the node is done: the table moves on
+	match screen:
+		"", "fight", "summary":
 			return_to_table()
+		_:
+			App.goto(screen, {"flow": self})
 
 
 ## Back to the Bookie screen; the table continues (fight next, or Teddy decides again).
