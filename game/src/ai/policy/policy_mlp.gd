@@ -324,10 +324,16 @@ class Grad:
 	var gcols: Array = []     ## per layer PackedVector4Array (nob * nib * 4 columns)
 	var gb: Array = []        ## per layer PackedVector4Array (nob)
 
+	## Note: `(arr[i] as PackedVector4Array).fill()` would fill a temporary copy in GDScript;
+	## fresh zeroed arrays are assigned back instead.
 	func zero() -> void:
 		for l in gcols.size():
-			(gcols[l] as PackedVector4Array).fill(Vector4())
-			(gb[l] as PackedVector4Array).fill(Vector4())
+			var c := PackedVector4Array()
+			c.resize((gcols[l] as PackedVector4Array).size())
+			gcols[l] = c
+			var b := PackedVector4Array()
+			b.resize((gb[l] as PackedVector4Array).size())
+			gb[l] = b
 
 
 func make_grad() -> Grad:

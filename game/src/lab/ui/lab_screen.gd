@@ -994,8 +994,13 @@ func _fight() -> void:
 	var me := _player_creature.get_item_text(_player_creature.selected) if _player_creature.selected >= 0 else p.creature
 	App.start_match({"arena": "the_gullet", "rules": "duel", "fighters": [
 		{"creature": me, "team": 0, "kind": "player", "name": "You"},
-		{"creature": p.creature, "team": 1, "kind": "policy", "policy_id": p.id, "name": p.name}]},
-		func(_r: Dictionary) -> void: App.goto("lab", {"tab": 2}))
+		{"creature": p.creature, "team": 1, "kind": "policy", "policy_id": p.id, "name": p.name}]}, _back_to_lab)
+
+
+## Match end -> free the match scene and return to the Policies tab.
+static func _back_to_lab(_result: Dictionary) -> void:
+	App.set_scene(null)
+	App.goto("lab", {"tab": 2})
 
 
 func _spectate() -> void:
@@ -1015,9 +1020,8 @@ func _spectate() -> void:
 	else:
 		opp["kind"] = "script"
 		opp["source"] = LabOpponents.create(key, randi(), Content.creature(p.creature))
-	App.start_match({"arena": "the_gullet", "rules": "duel", "fighters": [
-		{"creature": p.creature, "team": 0, "kind": "policy", "policy_id": p.id, "name": p.name}, opp]},
-		func(_r: Dictionary) -> void: App.goto("lab", {"tab": 2}))
+	App.start_match({"arena": "the_gullet", "rules": {"rounds": 1, "round_time": 60, "mode": "standard"}, "fighters": [
+		{"creature": p.creature, "team": 0, "kind": "policy", "policy_id": p.id, "name": p.name}, opp]}, _back_to_lab)
 
 
 # =====================================================================================
