@@ -188,7 +188,7 @@ func _place_nodes() -> void:
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			b.clip_text = true
 			b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-			b.add_theme_font_size_override("font_size", 16)
+			b.add_theme_font_size_override("font_size", 19)
 			var fnt := CampaignUI.font("700")
 			if fnt:
 				b.add_theme_font_override("font", fnt)
@@ -295,7 +295,7 @@ func _side_panel() -> Control:
 	for se in p.get("side_effects", []):
 		build.add_child(CampaignUI.label("Side effect: %s — %s" % [ctrl.catalog.item_name(str(se)), ctrl.catalog.item(str(se)).get("effect", "")], 17, CampaignUI.DANGER))
 	if (p.get("supplements", []) as Array).is_empty() and (p.get("techniques", []) as Array).is_empty():
-		build.add_child(CampaignUI.label("Nothing yet. Win fights to pick supplements.", 17, CampaignUI.MUTED))
+		build.add_child(CampaignUI.label("Nothing yet. Win fights to pick supplements.", 20, CampaignUI.MUTED))
 	box.add_child(CampaignUI.scroll(build))
 	var cons: Dictionary = p.get("consumables", {})
 	for cid in cons:

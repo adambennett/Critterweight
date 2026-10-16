@@ -28,6 +28,8 @@ var attended := false
 var watch := true
 var keep_going := true
 var _focusables: Array = []
+var _setup_focus := ""           ## the setup row to focus after a rebuild
+var _intro_played := false
 var _live_box: Control
 var _msg: Label
 var _dirty := false
@@ -122,67 +124,123 @@ func _refresh() -> void:
 # ---------------------------------------------------------------------------------------------
 
 func _build_setup() -> void:
-	var v := CampaignUI.scaffold(self, "THE BOOKIE'S TABLE", "Teddy Two-Tooth deals a fight card and rolls the dice. The AI fights every bout; you can watch, bet on your build, or take over the decisions.")
-	var rows := VBoxContainer.new()
-	rows.add_theme_constant_override("separation", 10)
-	v.add_child(CampaignUI.scroll(rows))
+	if return_to_hub:
+		# over the Cannery (its scene stays loaded for the walk back): a dark screen, no backdrop swap
+		var dim := ColorRect.new()
+		dim.color = Color(CampaignUI.BG, 0.94)
+		dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(dim)
+	else:
+		MenuBackdrop.ensure()
+		add_backdrop_gradient(0.97, 0.75)
+	var fr := build_frame("Campaign", "The Bookie's Table")
+	var body: VBoxContainer = fr["body"]
+	body.add_child(UiTheme.label("Teddy Two-Tooth deals a fight card and rolls the dice. The AI fights every bout; you can watch, bet on your build, or take over the decisions.", "Caption", true))
+	var cols := UiTheme.hbox(UiTheme.GAP_L)
+	cols.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_child(cols)
+	var left := UiTheme.panel("PanelSolid", 18.0)
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.size_flags_stretch_ratio = 1.6
+	cols.add_child(left)
+	var scroll := FocusScroll.new(8)
+	left.add_child(scroll)
+	var right := UiTheme.vbox(UiTheme.GAP_M)
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right.custom_minimum_size = Vector2(480, 0)
+	cols.add_child(right)
+	var note := UiTheme.panel("PanelPoster")
+	note.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	right.add_child(note)
+	var nv := UiTheme.vbox(UiTheme.GAP_S)
+	note.add_child(nv)
+	nv.add_child(UiTheme.label("THE TABLE", "Eyebrow"))
+	nv.add_child(UiTheme.label("The table keeps its own record board. Clout is paid at 50 % and The Dosage never unlocks here.", "Body", true))
+	var help := HelpPanel.new(self)
+	help.size_flags_vertical = Control.SIZE_SHRINK_END
+	help.custom_minimum_size = Vector2(0, 190)
+	right.add_child(help)
+	var c := scroll.content
 	var fs := [["Random", "random"]]
 	for fid in catalog.available_fighters():
 		fs.append([CampaignUI.fighter_name(catalog, str(fid)), str(fid)])
+	var start := UiButton.new("DEAL THE CARD", "PrimaryButton", "fight")
+	start.custom_minimum_size = Vector2(0, 64)
+	start.set_help("Deal the card", "Teddy deals and the table starts. Shortcut: Y / R.")
+	start.pressed.connect(_start_table)
+	start.disabled = fs.size() == 1
+	_focusables.append(start)
 	if fs.size() == 1:
 		# development stand-ins are a developer tool (CampaignFlow.dev_tools): hidden in normal play
 		if CampaignFlow.dev_tools():
-			rows.add_child(CampaignUI.label("No roster fighters are installed yet. Enable development stand-ins to deal a card (runs are marked custom).", 20, CampaignUI.DANGER))
-			var en := CampaignUI.button("ENABLE DEV STAND-INS", _enable_stand_ins, 22)
-			rows.add_child(en)
+			c.add_child(UiTheme.label("No roster fighters are installed yet. Enable development stand-ins to deal a card (runs are marked custom).", "Danger", true))
+			var en := UiButton.new("ENABLE DEV STAND-INS")
+			en.pressed.connect(_enable_stand_ins)
+			c.add_child(en)
 			_focusables.append(en)
 		else:
-			rows.add_child(CampaignUI.label("No roster fighters are cleared for the table yet. Teddy deals once their fight kits are finished.", 20, CampaignUI.DANGER))
+			c.add_child(UiTheme.label("No roster fighters are cleared for the table yet. Teddy deals once their fight kits are finished.", "Danger", true))
 	else:
-		_row(rows, "FIGHTER", fs, fighter, _set_fighter)
-	_row(rows, "CARD", [["Off the Street", "off_the_street"], ["Fight Camp (Clout to the Cannery)", "fight_camp"]], variant, _set_variant)
+		_option(c, "fighter", "Fighter", fs, fighter, "Who fights the card. Random lets Teddy pick.", _set_fighter)
+	_option(c, "card", "Card", [["Off the Street", "off_the_street"], ["Fight Camp", "fight_camp"]], variant,
+		"Which card Teddy deals. Fight Camp pays Clout to the Cannery.", _set_variant)
 	var ds := []
 	for did in catalog.difficulty_ids():
 		ds.append([str(catalog.difficulties[did].get("name", did)), str(did)])
-	_row(rows, "DIFFICULTY", ds, difficulty, _set_difficulty)
+	_option(c, "difficulty", "Difficulty", ds, difficulty, str(catalog.difficulty(difficulty).get("desc", "")), _set_difficulty)
 	var ts := []
 	var tids := catalog.bot_tiers.keys()
 	tids.sort_custom(func(a, b): return int(catalog.bot_tiers[a].get("order", 0)) < int(catalog.bot_tiers[b].get("order", 0)))
 	for tid in tids:
 		ts.append([str(catalog.bot_tiers[tid].get("name", tid)), str(tid)])
-	_row(rows, "TEDDY'S DICE (how well the AI fights for you)", ts, tier, _set_tier)
-	_row(rows, "DECISIONS", [["Teddy decides (unattended)", "teddy"], ["I decide", "me"]], "me" if attended else "teddy", _set_decisions)
-	_row(rows, "FIGHTS", [["Watch them", "watch"], ["Fast-forward", "ff"]], "watch" if watch else "ff", _set_watch)
-	_row(rows, "WHEN A RUN ENDS", [["Deal another card", "yes"], ["Stop", "no"]], "yes" if keep_going else "no", _set_keep)
-	rows.add_child(CampaignUI.label("The table keeps its own record board. Clout is paid at 50% and The Dosage never unlocks here.", 18, CampaignUI.MUTED))
-	var hb := HBoxContainer.new()
-	hb.add_theme_constant_override("separation", 14)
-	var start := CampaignUI.button("DEAL THE CARD", _start_table, 30)
-	start.disabled = fs.size() == 1
-	hb.add_child(start)
-	var back := CampaignUI.button("BACK", _leave, 24, CampaignUI.MUTED)
-	hb.add_child(back)
-	v.add_child(hb)
-	_focusables.append(start)
-	_focusables.append(back)
-	_msg = CampaignUI.label("", 20, CampaignUI.DANGER)
-	v.add_child(_msg)
-	var f := default_focus()
-	if f:
-		f.call_deferred("grab_focus")
+	_option(c, "tier", "Teddy's dice", ts, tier, "How well the AI fights for you: from the Punching Bag up to the Hall-of-Famer.", _set_tier)
+	_option(c, "decisions", "Decisions", [["Teddy decides", "teddy"], ["I decide", "me"]], "me" if attended else "teddy",
+		"Teddy decides: the table runs unattended and he makes every pick between fights. 'I decide' opens the normal campaign screens for you.", _set_decisions)
+	_option(c, "fights", "Fights", [["Watch them", "watch"], ["Fast-forward", "ff"]], "watch" if watch else "ff",
+		"Watch each bout, or fast-forward to the results.", _set_watch)
+	_option(c, "keep", "When a run ends", [["Deal another card", "yes"], ["Stop", "no"]], "yes" if keep_going else "no",
+		"Keep the table running card after card, or stop after one.", _set_keep)
+	c.add_child(UiTheme.spacer(false, 2))
+	c.add_child(start)
+	_msg = UiTheme.label("", "Danger", true)
+	c.add_child(_msg)
+	scroll.wrap_focus.call_deferred()
+	var bar: PromptBar = fr["prompts"]
+	bar.set_prompts([{"actions": ["ui_accept"], "text": "Select"}, {"actions": ["ui_left", "ui_right"], "text": "Change"},
+		{"actions": ["ui_alt"], "text": "Deal the card", "call": _start_table}, {"actions": ["ui_cancel"], "text": "Back", "call": _leave}])
+	var key := _setup_focus
+	_setup_focus = ""
+	if key != "":
+		for f in _focusables:
+			if f is Control and (f as Control).has_meta("focus_key") and str((f as Control).get_meta("focus_key")) == key:
+				(f as Control).call_deferred("grab_focus")
+				return
+	var df := default_focus()
+	if df:
+		df.call_deferred("grab_focus")
+	if not _intro_played:
+		_intro_played = true
+		play_intro()
 
 
-func _row(parent: Control, title: String, opts: Array, current: String, on_pick: Callable) -> void:
-	parent.add_child(CampaignUI.label(title, 22, CampaignUI.INK, "900"))
-	var fl := HFlowContainer.new()
-	fl.add_theme_constant_override("h_separation", 8)
-	fl.add_theme_constant_override("v_separation", 8)
+## One choice row from the shared kit: picking a value calls `on_pick` (which rebuilds the screen)
+## and keeps the focus on this row.
+func _option(parent: Control, key: String, title: String, opts: Array, current: String, help: String, on_pick: Callable) -> void:
+	var ids: Array = []
+	var lbls: Array[String] = []
 	for o in opts:
-		var id := str(o[1])
-		var b := CampaignUI.button(("> %s" % o[0]) if id == current else str(o[0]), on_pick.bind(id), 22, CampaignUI.GOOD if id == current else CampaignUI.ACCENT)
-		fl.add_child(b)
-		_focusables.append(b)
-	parent.add_child(fl)
+		ids.append(str(o[1]))
+		lbls.append(str(o[0]))
+	var r := OptionRow.new(title)
+	r.setup(ids, lbls, current)
+	r.set_help(title, help)
+	r.set_meta("focus_key", key)
+	r.value_changed.connect(func(v) -> void:
+		_setup_focus = key
+		on_pick.call(str(v)))
+	parent.add_child(r)
+	_focusables.append(r)
 
 
 func _set_fighter(id: String) -> void:

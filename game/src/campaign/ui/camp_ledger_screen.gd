@@ -36,7 +36,8 @@ func _build() -> void:
 	for st in tabs:
 		var sid := str(st["id"])
 		var label := str(st["name"]) + ((" · " + str(st["npc"])) if str(st.get("npc", "")) != "" else "")
-		var b := CampaignUI.button(("> " + label) if sid == station else label, _pick_station.bind(sid), 20,
+		# the chosen station is the green chip (no text marker)
+		var b := CampaignUI.button(label, _pick_station.bind(sid), 20,
 			CampaignUI.GOOD if sid == station else CampaignUI.ACCENT)
 		filters.add_child(b)
 		_focusables.append(b)
@@ -56,6 +57,8 @@ func _build() -> void:
 	_note = ""
 	v.add_child(_msg)
 	var back := CampaignUI.button("BACK", _leave, 22, CampaignUI.MUTED)
+	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	back.custom_minimum_size = Vector2(260, 48)
 	v.add_child(back)
 	_focusables.append(back)
 	var f: Control = focus_target if focus_target else default_focus()
