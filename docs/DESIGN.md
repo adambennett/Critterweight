@@ -60,7 +60,7 @@ realises them and the committed numeric targets.
 | Difficulty | 4 presets (Sparring, Amateur, Pro, Title Shot); ladder The Dosage, Dose 1–10 |
 | Fight Camp | ≥20 permanent upgrades; hub The Cannery: ≥5 spaces, ≥6 NPCs, ≥4 activities, ≥8 secrets |
 | Bonus modes | 4 (MODES.md) |
-| Bots | 5 skill tiers: Punching Bag, Journeyman, Contender, Headliner, Hall-of-Famer |
+| Bots | 5 skill tiers: Punching Bag, Journeyman, Contender, Headliner, Hall-of-Famer (behaviour, profiles and measured ladder: docs/BOTS.md) |
 | Audio | ≥7 music tracks, full SFX set, ≥150 announcer lines (subtitled babble) |
 | AI Lab | 2 training approaches (evolution strategies, behaviour cloning) + sample policies |
 

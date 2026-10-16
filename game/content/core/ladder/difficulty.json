@@ -18,19 +18,14 @@
      "records": "title_shot", "rest_heal": 0.0, "dose_allowed": true},
 
     {"id": "punching_bag", "type": "bot_tier", "name": "Punching Bag", "order": 0, "profile": "rookie",
-     "desc": "Reaction 0.45 s, 30% mistakes, never parries.",
-     "overrides": {"reaction": 0.45, "mistake": 0.30, "parry": 0.0}},
+     "desc": "Reaction 0.5 s, many mistakes, never parries or punishes. A button-masher beats it."},
     {"id": "journeyman", "type": "bot_tier", "name": "Journeyman", "order": 1, "profile": "regular",
-     "desc": "Reaction 0.32 s, 18% mistakes, rare parries.",
-     "overrides": {"reaction": 0.32, "mistake": 0.18, "parry": 0.04}},
+     "desc": "Reaction 0.36 s, 18% mistakes, rare parries, punishes now and then."},
     {"id": "contender", "type": "bot_tier", "name": "Contender", "order": 2, "profile": "pro",
-     "desc": "Reaction 0.24 s, 10% mistakes, parries a quarter of the time.",
-     "overrides": {"reaction": 0.24, "mistake": 0.10, "parry": 0.25}},
+     "desc": "Reaction 0.25 s, 10% mistakes, real combos, parries and punishes now and then."},
     {"id": "headliner", "type": "bot_tier", "name": "Headliner", "order": 3, "profile": "champion",
-     "desc": "Reaction 0.18 s, 5% mistakes, parries 40%, uses techniques well.",
-     "overrides": {"reaction": 0.18, "mistake": 0.05, "parry": 0.40, "ability": 0.85}},
-    {"id": "hall_of_famer", "type": "bot_tier", "name": "Hall-of-Famer", "order": 4, "profile": "champion",
-     "desc": "Reaction 0.14 s, 2% mistakes, reads charge-ups. Dose 10 and custom matches only.",
-     "overrides": {"reaction": 0.14, "mistake": 0.02, "parry": 0.45, "dodge": 0.36, "combo": 0.95, "ability": 0.9}}
+     "desc": "Reaction 0.15 s, 5% mistakes: blocks strings, parries, punishes button-mashing, uses techniques well."},
+    {"id": "hall_of_famer", "type": "bot_tier", "name": "Hall-of-Famer", "order": 4, "profile": "hall_of_famer",
+     "desc": "Reaction 0.09 s, 1% mistakes, reads charge-ups and mashing. Dose 10 and custom matches only."}
   ]
 }

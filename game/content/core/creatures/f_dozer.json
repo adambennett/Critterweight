@@ -374,7 +374,7 @@
     "range": [1.2, 1.5], "charge_heavy": 0.35,
     "abilities": {
       "ability1": {"min": 3, "max": 6.5, "when": [{"wall_behind_target": 3}, {"min": 4}]},
-      "ability2": {"max": 7, "chance": 0.6, "when": [{"target_ranged": true, "min": 3.5}, {"self_poise_below": 0.45, "max": 2.5}]}
+      "ability2": {"max": 7, "chance": 0.6, "when": [{"target_ranged": true, "min": 3.5}, {"self_poise_below": 0.45, "max": 2.5}, {"target_mashing": true, "max": 2.5}]}
     }
   }
 }
