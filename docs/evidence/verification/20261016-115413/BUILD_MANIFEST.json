@@ -1,0 +1,342 @@
+﻿{
+    "product":  "Critterweight",
+    "version":  "0.9.2",
+    "git_revision":  "a8f0a54",
+    "working_tree_dirty":  false,
+    "built_at":  "2026-10-16T11:32:30",
+    "godot":  "4.5.1.stable.official.f62fdbde1",
+    "targets":  [
+                    {
+                        "target":  "Windows Desktop",
+                        "folder":  "Critterweight-windows-x64",
+                        "binary":  "Critterweight.exe",
+                        "files":  [
+                                      {
+                                          "path":  "AI_LAB.md",
+                                          "bytes":  35735,
+                                          "sha256":  "06620a88ba2036b2fb6d8229326a0412cbbe10495fb2c83ea3fd43228162c198"
+                                      },
+                                      {
+                                          "path":  "CREDITS.md",
+                                          "bytes":  1475,
+                                          "sha256":  "3640f0a12cc9881ffc326b02c922b02c1058e874546c0afc4369f1b91fd9bc18"
+                                      },
+                                      {
+                                          "path":  "Critterweight.exe",
+                                          "bytes":  135095288,
+                                          "sha256":  "11bd255d6372578b1f26e0665e0bd97c2eca8db70ca0aefc4130e2d04d5b1132"
+                                      },
+                                      {
+                                          "path":  "MODDING.md",
+                                          "bytes":  20649,
+                                          "sha256":  "9e8c939f51fdace3b59bf3d39113748733af261209b4605fa5b5b0f2da82a69e"
+                                      },
+                                      {
+                                          "path":  "OFL-Barlow.txt",
+                                          "bytes":  4470,
+                                          "sha256":  "b4cc842153e834885f3f9385ce26de4e1213d3ffbe473a6c0519e5522a8e3608"
+                                      },
+                                      {
+                                          "path":  "OFL-Bungee.txt",
+                                          "bytes":  4380,
+                                          "sha256":  "ff43f39d2143afa2ef0a7009629d25f62de23f0614ecdaea6dd07f6c58c5d2b1"
+                                      },
+                                      {
+                                          "path":  "PLAYER_GUIDE.md",
+                                          "bytes":  11022,
+                                          "sha256":  "327dc95b6a35cd49c1efcdedc25a20ea0c5bf61db7a99f2bfd3213be6ce09960"
+                                      },
+                                      {
+                                          "path":  "README.md",
+                                          "bytes":  5361,
+                                          "sha256":  "7ec56dace5d9f8fe3bc46769ac0963824c6c567fa33c2ec14cb003fb440caf84"
+                                      },
+                                      {
+                                          "path":  "THIRD_PARTY.md",
+                                          "bytes":  7427,
+                                          "sha256":  "643505a7044be47582be990c6ff16435beed277a96f6094e06507da21985ca63"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/pack_mod.py",
+                                          "bytes":  3167,
+                                          "sha256":  "c3ac003e1b3aa8ea611a5dc2c7db3ed5f96564a1a55d78aee1775ef41b2b052d"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/moon_rules/manifest.json",
+                                          "bytes":  513,
+                                          "sha256":  "539b0e663a8286c266335cd58d2a3aef1502d0e6d21fd56b91a0b82834ee3b61"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/moon_rules/playlists/moon_night.json",
+                                          "bytes":  409,
+                                          "sha256":  "0385787189f3e8c8e3b521155d253b0c1506d74e96ad7446adaf5bc1c532c833"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/moon_rules/rules/juice_frenzy.json",
+                                          "bytes":  421,
+                                          "sha256":  "f053506270d1a107142cdcad0f6da27bc5b6d6bcdf6a6494fde6cc5b38e12fad"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/moon_rules/rules/moon_brawl.json",
+                                          "bytes":  607,
+                                          "sha256":  "78f33df81ca33feadc7451ca5afd8c5a9854c63f24eaf4b9335796d220f13fd9"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/rust_bucket/manifest.json",
+                                          "bytes":  474,
+                                          "sha256":  "a6b5824ba0ec353c880ffdd9d6b5dc0094cf9847f0d470ce9149602cc7b0f3e7"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/rust_bucket/arenas/the_drain.json",
+                                          "bytes":  906,
+                                          "sha256":  "cb70a269e3a4eeff8dd5415bbd5ce3276335b4864e993d9fde1de1f3e420d6b9"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/stoke_variants/manifest.json",
+                                          "bytes":  514,
+                                          "sha256":  "f139aa256eeb0755214f8a3460ab83c94e2fb6f7f2a598e4808cd579bb77dabb"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/stoke_variants/creatures/overheated_stoke.json",
+                                          "bytes":  700,
+                                          "sha256":  "de11e545ddc1e5f20ec351df773bee38c906f29bb048eccf54a9ab2de8908887"
+                                      }
+                                  ],
+                        "archive":  "Critterweight-windows-x64.zip",
+                        "archive_sha256":  "641ad5a59fcede1ccc355514b8a8d52ee159add6a53fc6e66c1804d6511e7662"
+                    },
+                    {
+                        "target":  "Linux",
+                        "folder":  "Critterweight-linux-x86_64",
+                        "binary":  "Critterweight.x86_64",
+                        "files":  [
+                                      {
+                                          "path":  "AI_LAB.md",
+                                          "bytes":  35735,
+                                          "sha256":  "06620a88ba2036b2fb6d8229326a0412cbbe10495fb2c83ea3fd43228162c198"
+                                      },
+                                      {
+                                          "path":  "CREDITS.md",
+                                          "bytes":  1475,
+                                          "sha256":  "3640f0a12cc9881ffc326b02c922b02c1058e874546c0afc4369f1b91fd9bc18"
+                                      },
+                                      {
+                                          "path":  "Critterweight.x86_64",
+                                          "bytes":  108528360,
+                                          "sha256":  "8c3cc70b0848e45ead272d3afea26f1b80e68e77a963edd3eb6022276d6b0ae5"
+                                      },
+                                      {
+                                          "path":  "MODDING.md",
+                                          "bytes":  20649,
+                                          "sha256":  "9e8c939f51fdace3b59bf3d39113748733af261209b4605fa5b5b0f2da82a69e"
+                                      },
+                                      {
+                                          "path":  "OFL-Barlow.txt",
+                                          "bytes":  4470,
+                                          "sha256":  "b4cc842153e834885f3f9385ce26de4e1213d3ffbe473a6c0519e5522a8e3608"
+                                      },
+                                      {
+                                          "path":  "OFL-Bungee.txt",
+                                          "bytes":  4380,
+                                          "sha256":  "ff43f39d2143afa2ef0a7009629d25f62de23f0614ecdaea6dd07f6c58c5d2b1"
+                                      },
+                                      {
+                                          "path":  "PLAYER_GUIDE.md",
+                                          "bytes":  11022,
+                                          "sha256":  "327dc95b6a35cd49c1efcdedc25a20ea0c5bf61db7a99f2bfd3213be6ce09960"
+                                      },
+                                      {
+                                          "path":  "README.md",
+                                          "bytes":  5361,
+                                          "sha256":  "7ec56dace5d9f8fe3bc46769ac0963824c6c567fa33c2ec14cb003fb440caf84"
+                                      },
+                                      {
+                                          "path":  "THIRD_PARTY.md",
+                                          "bytes":  7427,
+                                          "sha256":  "643505a7044be47582be990c6ff16435beed277a96f6094e06507da21985ca63"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/pack_mod.py",
+                                          "bytes":  3167,
+                                          "sha256":  "c3ac003e1b3aa8ea611a5dc2c7db3ed5f96564a1a55d78aee1775ef41b2b052d"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/moon_rules/manifest.json",
+                                          "bytes":  513,
+                                          "sha256":  "539b0e663a8286c266335cd58d2a3aef1502d0e6d21fd56b91a0b82834ee3b61"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/moon_rules/playlists/moon_night.json",
+                                          "bytes":  409,
+                                          "sha256":  "0385787189f3e8c8e3b521155d253b0c1506d74e96ad7446adaf5bc1c532c833"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/moon_rules/rules/juice_frenzy.json",
+                                          "bytes":  421,
+                                          "sha256":  "f053506270d1a107142cdcad0f6da27bc5b6d6bcdf6a6494fde6cc5b38e12fad"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/moon_rules/rules/moon_brawl.json",
+                                          "bytes":  607,
+                                          "sha256":  "78f33df81ca33feadc7451ca5afd8c5a9854c63f24eaf4b9335796d220f13fd9"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/rust_bucket/manifest.json",
+                                          "bytes":  474,
+                                          "sha256":  "a6b5824ba0ec353c880ffdd9d6b5dc0094cf9847f0d470ce9149602cc7b0f3e7"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/rust_bucket/arenas/the_drain.json",
+                                          "bytes":  906,
+                                          "sha256":  "cb70a269e3a4eeff8dd5415bbd5ce3276335b4864e993d9fde1de1f3e420d6b9"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/stoke_variants/manifest.json",
+                                          "bytes":  514,
+                                          "sha256":  "f139aa256eeb0755214f8a3460ab83c94e2fb6f7f2a598e4808cd579bb77dabb"
+                                      },
+                                      {
+                                          "path":  "example-mod-sources/stoke_variants/creatures/overheated_stoke.json",
+                                          "bytes":  700,
+                                          "sha256":  "de11e545ddc1e5f20ec351df773bee38c906f29bb048eccf54a9ab2de8908887"
+                                      }
+                                  ],
+                        "archive":  "Critterweight-linux-x86_64.tar.gz",
+                        "archive_sha256":  "da3e3859b5fa97492ff7d74ffbfc61309d6a63636054af58285249754b302c00"
+                    },
+                    {
+                        "target":  "Windows Server",
+                        "folder":  "Critterweight-server-windows-x64",
+                        "binary":  "CritterweightServer.exe",
+                        "files":  [
+                                      {
+                                          "path":  "CREDITS.md",
+                                          "bytes":  1475,
+                                          "sha256":  "3640f0a12cc9881ffc326b02c922b02c1058e874546c0afc4369f1b91fd9bc18"
+                                      },
+                                      {
+                                          "path":  "CritterweightServer.console.exe",
+                                          "bytes":  188928,
+                                          "sha256":  "6ec44a9953684c37b801f77bcf5a4ea492ec0f74635255bc10a903b1f53d2e08"
+                                      },
+                                      {
+                                          "path":  "CritterweightServer.exe",
+                                          "bytes":  106884592,
+                                          "sha256":  "649be4fce1bb4aa43fb116e8d914d2cd3880545b30fc7db23786464b2d3dbf25"
+                                      },
+                                      {
+                                          "path":  "OFL-Barlow.txt",
+                                          "bytes":  4470,
+                                          "sha256":  "b4cc842153e834885f3f9385ce26de4e1213d3ffbe473a6c0519e5522a8e3608"
+                                      },
+                                      {
+                                          "path":  "OFL-Bungee.txt",
+                                          "bytes":  4380,
+                                          "sha256":  "ff43f39d2143afa2ef0a7009629d25f62de23f0614ecdaea6dd07f6c58c5d2b1"
+                                      },
+                                      {
+                                          "path":  "README.md",
+                                          "bytes":  5361,
+                                          "sha256":  "7ec56dace5d9f8fe3bc46769ac0963824c6c567fa33c2ec14cb003fb440caf84"
+                                      },
+                                      {
+                                          "path":  "SERVER.md",
+                                          "bytes":  19536,
+                                          "sha256":  "5e548b0585731725b2ac5b947967b8ec4af99fade79a46202c4a706cf95275b9"
+                                      },
+                                      {
+                                          "path":  "THIRD_PARTY.md",
+                                          "bytes":  7427,
+                                          "sha256":  "643505a7044be47582be990c6ff16435beed277a96f6094e06507da21985ca63"
+                                      },
+                                      {
+                                          "path":  "config-examples/always_on.cfg",
+                                          "bytes":  974,
+                                          "sha256":  "1ecb42211abe0fa79ce9e790273e533acaa02bff4346a6d6d6ad420ba59ad51b"
+                                      },
+                                      {
+                                          "path":  "config-examples/lan_party.cfg",
+                                          "bytes":  466,
+                                          "sha256":  "134a93c0607ee28b6598b256739dbb71e81c239add710f1d27e2bad8330fded5"
+                                      },
+                                      {
+                                          "path":  "config-examples/server.example.cfg",
+                                          "bytes":  4077,
+                                          "sha256":  "212ce57408b1ca5f8a3d48fc601ab53ff58e80ea8efc58a2d768e7a86970693d"
+                                      },
+                                      {
+                                          "path":  "config-examples/playlists/custom_rotation.example.json",
+                                          "bytes":  1103,
+                                          "sha256":  "b2eab75c1220d4158ac29bdc03b2955b1b60dcf943da57ef3e01f5b74599dada"
+                                      }
+                                  ],
+                        "archive":  "Critterweight-server-windows-x64.zip",
+                        "archive_sha256":  "bc6b28b6ac8bc03a43ac700b81690cd61c5e5a175b12264d4d3ccfcd148847c8"
+                    },
+                    {
+                        "target":  "Linux Server",
+                        "folder":  "Critterweight-server-linux-x86_64",
+                        "binary":  "CritterweightServer.x86_64",
+                        "files":  [
+                                      {
+                                          "path":  "CREDITS.md",
+                                          "bytes":  1475,
+                                          "sha256":  "3640f0a12cc9881ffc326b02c922b02c1058e874546c0afc4369f1b91fd9bc18"
+                                      },
+                                      {
+                                          "path":  "CritterweightServer.x86_64",
+                                          "bytes":  80317664,
+                                          "sha256":  "3d709b1c9d1d8a648beda62b2508fca5c6abf75166e50ae72d031e857c0b46a4"
+                                      },
+                                      {
+                                          "path":  "OFL-Barlow.txt",
+                                          "bytes":  4470,
+                                          "sha256":  "b4cc842153e834885f3f9385ce26de4e1213d3ffbe473a6c0519e5522a8e3608"
+                                      },
+                                      {
+                                          "path":  "OFL-Bungee.txt",
+                                          "bytes":  4380,
+                                          "sha256":  "ff43f39d2143afa2ef0a7009629d25f62de23f0614ecdaea6dd07f6c58c5d2b1"
+                                      },
+                                      {
+                                          "path":  "README.md",
+                                          "bytes":  5361,
+                                          "sha256":  "7ec56dace5d9f8fe3bc46769ac0963824c6c567fa33c2ec14cb003fb440caf84"
+                                      },
+                                      {
+                                          "path":  "SERVER.md",
+                                          "bytes":  19536,
+                                          "sha256":  "5e548b0585731725b2ac5b947967b8ec4af99fade79a46202c4a706cf95275b9"
+                                      },
+                                      {
+                                          "path":  "THIRD_PARTY.md",
+                                          "bytes":  7427,
+                                          "sha256":  "643505a7044be47582be990c6ff16435beed277a96f6094e06507da21985ca63"
+                                      },
+                                      {
+                                          "path":  "config-examples/always_on.cfg",
+                                          "bytes":  974,
+                                          "sha256":  "1ecb42211abe0fa79ce9e790273e533acaa02bff4346a6d6d6ad420ba59ad51b"
+                                      },
+                                      {
+                                          "path":  "config-examples/lan_party.cfg",
+                                          "bytes":  466,
+                                          "sha256":  "134a93c0607ee28b6598b256739dbb71e81c239add710f1d27e2bad8330fded5"
+                                      },
+                                      {
+                                          "path":  "config-examples/server.example.cfg",
+                                          "bytes":  4077,
+                                          "sha256":  "212ce57408b1ca5f8a3d48fc601ab53ff58e80ea8efc58a2d768e7a86970693d"
+                                      },
+                                      {
+                                          "path":  "config-examples/playlists/custom_rotation.example.json",
+                                          "bytes":  1103,
+                                          "sha256":  "b2eab75c1220d4158ac29bdc03b2955b1b60dcf943da57ef3e01f5b74599dada"
+                                      }
+                                  ],
+                        "archive":  "Critterweight-server-linux-x86_64.tar.gz",
+                        "archive_sha256":  "00e31d259892d4aeab8dc4b595648d3f1dccfe52a3078738307b3cee05ee3b70"
+                    }
+                ],
+    "tag":  "v0.9.2"
+}

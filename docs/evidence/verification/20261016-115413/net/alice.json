@@ -1,0 +1,287 @@
+{
+	"app_messages": [],
+	"candidates_seen": [
+		"duel"
+	],
+	"chat": [],
+	"connected": true,
+	"damage_dealt": 85.5719091892242,
+	"damage_taken": 0.0,
+	"disconnect": {
+		"code": 13,
+		"details": [],
+		"message": "You left the session.",
+		"title": "Left session"
+	},
+	"done": true,
+	"events": {
+		"arena_corner_shove": 8,
+		"elimination": 1,
+		"getup": 2,
+		"glance": 1,
+		"hit": 17,
+		"knockdown": 2,
+		"ko": 1,
+		"match_end": 1,
+		"match_start": 1,
+		"move_start": 38,
+		"round_end": 1,
+		"round_intro": 1,
+		"round_start": 1
+	},
+	"exit_reason": "disconnected: left",
+	"failure": {
+
+	},
+	"forged_sent": 0,
+	"health_seen": {
+		"0": 0.0,
+		"1": 110.0
+	},
+	"hits_dealt": 17,
+	"hits_taken": 0,
+	"join_error": 0,
+	"kicked": {
+
+	},
+	"lobby_last": {
+		"countdown": 2.991,
+		"match_id": 1,
+		"phase": "results",
+		"players": [
+			{
+				"connected": true,
+				"cosmetics": {
+
+				},
+				"creature": "f_jitters",
+				"fighter": 0,
+				"host": false,
+				"id": 2,
+				"name": "Bob",
+				"ping": 10,
+				"ready": false,
+				"slot": 0,
+				"spectator": false,
+				"team": -1,
+				"vote": -1
+			},
+			{
+				"connected": true,
+				"cosmetics": {
+
+				},
+				"creature": "f_stoke",
+				"fighter": 1,
+				"host": false,
+				"id": 3,
+				"name": "Alice",
+				"ping": 9,
+				"ready": false,
+				"slot": 1,
+				"spectator": false,
+				"team": -1,
+				"vote": -1
+			}
+		],
+		"playlist": {
+			"errors": [],
+			"id": "verify_duel",
+			"invalid": 0,
+			"name": "Verification duel",
+			"valid": 1
+		},
+		"settings": {
+			"arena": "the_gullet",
+			"arena_name": "The Gullet",
+			"bot_difficulty": "regular",
+			"bot_policy": [],
+			"bots": 0,
+			"mode": "standard",
+			"party_relay": true,
+			"player_assist": true,
+			"rules": "duel",
+			"rules_name": "Standard Duel",
+			"rules_override": {
+
+			}
+		}
+	},
+	"lobby_phases": [
+		"lobby",
+		"match",
+		"results"
+	],
+	"matches": [
+		{
+			"arena_id": "the_gullet",
+			"arena_imported": "",
+			"arena_name": "The Gullet",
+			"damage_mult": 1.0,
+			"entry": {
+				"arena": "the_gullet",
+				"arena_name": "The Gullet",
+				"index": 0,
+				"key": "duel",
+				"max_players": 2,
+				"min_players": 2,
+				"mode": "standard",
+				"name": "Standard Duel @ The Gullet",
+				"rules": "duel",
+				"rules_name": "Standard Duel",
+				"weight": 1.0
+			},
+			"fighters": 2,
+			"match_id": 1,
+			"mode": "standard",
+			"rules_id": "duel",
+			"rules_known_here": true,
+			"rules_name": "Standard Duel",
+			"t_ms": 3063,
+			"you": 1
+		}
+	],
+	"max_snapshot_slots": 2,
+	"my_health_max": 110.0,
+	"my_health_min": 110.0,
+	"my_health_min_before_kick": 110.0,
+	"name": "Alice",
+	"notices": [
+		{
+			"t_ms": 37,
+			"text": "Alice joined."
+		},
+		{
+			"t_ms": 511,
+			"text": "Viewer joined (spectating)."
+		},
+		{
+			"t_ms": 3053,
+			"text": "Next: Standard Duel @ The Gullet - no votes: highest weight."
+		},
+		{
+			"t_ms": 14053,
+			"text": "Viewer left (server_shutdown)."
+		}
+	],
+	"party_events": [],
+	"party_messages": [],
+	"party_run_messages": [],
+	"pid": 27616,
+	"player_id": 3,
+	"results": [
+		{
+			"aborted": false,
+			"entry": {
+				"arena": "the_gullet",
+				"arena_name": "The Gullet",
+				"index": 0,
+				"key": "duel",
+				"max_players": 2,
+				"min_players": 2,
+				"mode": "standard",
+				"name": "Standard Duel @ The Gullet",
+				"rules": "duel",
+				"rules_name": "Standard Duel",
+				"weight": 1.0
+			},
+			"fighters": [
+				{
+					"creature": "f_jitters",
+					"health": 0.0,
+					"index": 0,
+					"kind": "net",
+					"name": "Bob",
+					"out": true,
+					"stats": {
+						"blocks": 0,
+						"damage_dealt": 0.0,
+						"damage_taken": 85.5719088015763,
+						"hits": 0,
+						"knockdowns": 2,
+						"kos": 0,
+						"parries": 0,
+						"throws": 0
+					},
+					"team": 0
+				},
+				{
+					"creature": "f_stoke",
+					"health": 110.0,
+					"index": 1,
+					"kind": "net",
+					"name": "Alice",
+					"out": false,
+					"stats": {
+						"blocks": 0,
+						"damage_dealt": 85.5719088015763,
+						"damage_taken": 0.0,
+						"hits": 17,
+						"knockdowns": 0,
+						"kos": 1,
+						"parries": 0,
+						"throws": 0
+					},
+					"team": 1
+				}
+			],
+			"match_id": 1,
+			"mode": "standard",
+			"players": {
+				"0": 2,
+				"1": 3
+			},
+			"rounds": 1,
+			"t_ms": 23744,
+			"winner_team": 1
+		}
+	],
+	"roster_updates": 2,
+	"script": "aggressive",
+	"snapshots": 651,
+	"stats": {
+		"buffer_ms": 30.5144962958579,
+		"events": 75,
+		"frames": 2601,
+		"in_by_channel": [
+			20458,
+			10828,
+			158193,
+			0
+		],
+		"in_kbps": 11.7060546875,
+		"inputs_sent": 1302,
+		"interp_delay_ms": 39.0003277671803,
+		"jitter_ms": 0.666666666671034,
+		"late": 0,
+		"loss": 0.0,
+		"malformed": 0,
+		"out_kbps": 4.6513671875,
+		"payload_in_total": 189479,
+		"payload_out_total": 88696,
+		"roster_updates": 2,
+		"rtt_max_ms": 9.0,
+		"rtt_ms": 9.0,
+		"rtt_var_ms": 3.0,
+		"snapshot_rate": 30.0,
+		"snapshots": 651,
+		"starved_frames": 0,
+		"state": "CLOSED",
+		"wire_in_total": 198281,
+		"wire_out_total": 103445
+	},
+	"t_ms": 24749,
+	"token_hex": "da562addef59377da9f3ab346e85c28c",
+	"votes": [],
+	"welcome": {
+		"dedicated": true,
+		"motd": "",
+		"player_id": 3,
+		"rejoined": false,
+		"server_name": "Verification Server",
+		"snapshot_rate": 30,
+		"spectator": false,
+		"spectator_because_full": false,
+		"tick_rate": 120
+	}
+}

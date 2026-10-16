@@ -1,0 +1,208 @@
+{
+    "started":  "2026-10-16T11:54:13",
+    "steps":  [
+                  {
+                      "name":  "packaged script check",
+                      "status":  "pass",
+                      "detail":  "checked 378 scripts, 0 failures"
+                  },
+                  {
+                      "name":  "packaged test suite",
+                      "status":  "pass",
+                      "detail":  "tests: 677 run, 0 failed, 672 passed, 5 skipped in 1762.6 s"
+                  },
+                  {
+                      "name":  "server load, 8 fighters (\u003c 35 % of one core)",
+                      "status":  "pass",
+                      "detail":  "main thread busy 30.0% (MEASURE ffa8 (LOOPBACK, 8 fighters, 20 s): per client down 34.2 KB/s (wire 35.4), up 4.9 KB/s (wire 7.1), 46/80 pkt/s; snapshot 1018 B; server sim 1.75 ms/tick,)"
+                  },
+                  {
+                      "name":  "boot to first menu (\u003c 10 s)",
+                      "status":  "pass",
+                      "detail":  "3948 ms to \u0027title\u0027, peak working set 617 MB"
+                  },
+                  {
+                      "name":  "memory: 8-fighter match, 25 s (\u003c 4 GB)",
+                      "status":  "pass",
+                      "detail":  "peak working set 585 MB"
+                  },
+                  {
+                      "name":  "capture title",
+                      "status":  "pass",
+                      "detail":  "capture_title.png"
+                  },
+                  {
+                      "name":  "capture main_menu",
+                      "status":  "pass",
+                      "detail":  "capture_main_menu.png"
+                  },
+                  {
+                      "name":  "capture settings",
+                      "status":  "pass",
+                      "detail":  "capture_settings.png"
+                  },
+                  {
+                      "name":  "capture mods",
+                      "status":  "pass",
+                      "detail":  "capture_mods.png"
+                  },
+                  {
+                      "name":  "capture rules_editor",
+                      "status":  "pass",
+                      "detail":  "capture_rules_editor.png"
+                  },
+                  {
+                      "name":  "capture tutorial",
+                      "status":  "pass",
+                      "detail":  "capture_tutorial.png"
+                  },
+                  {
+                      "name":  "capture duel",
+                      "status":  "pass",
+                      "detail":  "capture_duel.png"
+                  },
+                  {
+                      "name":  "capture ffa8",
+                      "status":  "pass",
+                      "detail":  "capture_ffa8.png"
+                  },
+                  {
+                      "name":  "capture spectate",
+                      "status":  "pass",
+                      "detail":  "capture_spectate.png"
+                  },
+                  {
+                      "name":  "capture spotlight_hog",
+                      "status":  "pass",
+                      "detail":  "capture_spotlight_hog.png"
+                  },
+                  {
+                      "name":  "capture chumball",
+                      "status":  "pass",
+                      "detail":  "capture_chumball.png"
+                  },
+                  {
+                      "name":  "capture absolute_unit",
+                      "status":  "pass",
+                      "detail":  "capture_absolute_unit.png"
+                  },
+                  {
+                      "name":  "capture chum_rush",
+                      "status":  "pass",
+                      "detail":  "capture_chum_rush.png"
+                  },
+                  {
+                      "name":  "capture tag_team",
+                      "status":  "pass",
+                      "detail":  "capture_tag_team.png"
+                  },
+                  {
+                      "name":  "capture arena_drydock",
+                      "status":  "pass",
+                      "detail":  "capture_arena_drydock.png"
+                  },
+                  {
+                      "name":  "capture arena_crusher",
+                      "status":  "pass",
+                      "detail":  "capture_arena_crusher.png"
+                  },
+                  {
+                      "name":  "capture arena_rooftop",
+                      "status":  "pass",
+                      "detail":  "capture_arena_rooftop.png"
+                  },
+                  {
+                      "name":  "capture character_select",
+                      "status":  "pass",
+                      "detail":  "capture_character_select.png"
+                  },
+                  {
+                      "name":  "capture versus_setup",
+                      "status":  "pass",
+                      "detail":  "capture_versus_setup.png"
+                  },
+                  {
+                      "name":  "capture arena_editor",
+                      "status":  "pass",
+                      "detail":  "capture_arena_editor.png"
+                  },
+                  {
+                      "name":  "capture lab",
+                      "status":  "pass",
+                      "detail":  "capture_lab.png"
+                  },
+                  {
+                      "name":  "capture online",
+                      "status":  "pass",
+                      "detail":  "capture_online.png"
+                  },
+                  {
+                      "name":  "capture campaign_menu",
+                      "status":  "pass",
+                      "detail":  "capture_campaign_menu.png"
+                  },
+                  {
+                      "name":  "capture spectate_setup",
+                      "status":  "pass",
+                      "detail":  "capture_spectate_setup.png"
+                  },
+                  {
+                      "name":  "capture profile",
+                      "status":  "pass",
+                      "detail":  "capture_profile.png"
+                  },
+                  {
+                      "name":  "capture hub",
+                      "status":  "pass",
+                      "detail":  "capture_hub.png"
+                  },
+                  {
+                      "name":  "capture bookie",
+                      "status":  "pass",
+                      "detail":  "capture_bookie.png"
+                  },
+                  {
+                      "name":  "capture camp_ledger",
+                      "status":  "pass",
+                      "detail":  "capture_camp_ledger.png"
+                  },
+                  {
+                      "name":  "net: dedicated server start (server package) online duel, 2 packaged clients (LOOPBACK) online spectator frame (windowed packaged client) server TCP admin (token, 127.0.0.1) server TCP admin refuses a wrong token server graceful shutdown no errors logged (server, clients, spectator)",
+                      "status":  [
+                                     "pass",
+                                     "pass",
+                                     "pass",
+                                     "pass",
+                                     "pass",
+                                     "pass",
+                                     "pass"
+                                 ],
+                      "detail":  [
+                                     "\u0027Verification Server\u0027 on UDP 47538, playlist verify_duel, pid 16952",
+                                     "authoritative result reached both; attacker won: True; Alice hits 17; Bob lowest health 0.0; 30.0 snapshots/s, interpolation 39 ms, RTT 9.0 ms",
+                                     "capture_online_spectator.png",
+                                     "Verification Server | phase results | up 29s | players 1/4 (+0 reserved) | spectators 0",
+                                     "ERR auth",
+                                     "exit code 0",
+                                     "5 logs scanned"
+                                 ]
+                  },
+                  {
+                      "name":  "bench busy8",
+                      "status":  "pass",
+                      "detail":  "avg 255.3 fps, p95 5.683 ms, p99 6.703 ms, \u003e16.7 ms 0.0%"
+                  },
+                  {
+                      "name":  "bench duel",
+                      "status":  "pass",
+                      "detail":  "avg 541.4 fps, p95 2.747 ms, p99 3.542 ms, \u003e16.7 ms 0.0%"
+                  },
+                  {
+                      "name":  "bench server sim (8 fighters)",
+                      "status":  "pass",
+                      "detail":  "1.96 ms/tick wall, 2.42 ms/tick CPU: 29% of one core at 120 Hz (target \u003c 35%)"
+                  }
+              ],
+    "finished":  "2026-10-16T12:30:24",
+    "output":  "C:\\Users\\eX_Di\\git\\PokemonMMA\\PokeMMA\\docs\\evidence\\verification\\20261016-115413"
+}

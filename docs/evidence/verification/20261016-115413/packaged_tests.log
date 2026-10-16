@@ -1,0 +1,1415 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-16 11:54:23 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413
+2026-10-16 11:54:23 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
+2026-10-16 11:54:23 [INFO] app: Critterweight 0.9.2 (a8f0a54) (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/arena/test_arena_content.gd::test_base_arenas_ship_required_markers (1 ms)
+ok    res://src/test/arena/test_arena_content.gd::test_base_geometry_and_dimensions (0 ms)
+ok    res://src/test/arena/test_arena_content.gd::test_catalog_has_full_palette (11 ms)
+ok    res://src/test/arena/test_arena_content.gd::test_context_variant_changes_only_the_look (0 ms)
+ok    res://src/test/arena/test_arena_content.gd::test_every_base_and_layout_loads_and_validates (70 ms)
+ok    res://src/test/arena/test_arena_content.gd::test_example_layout_budgets_match_spec (40 ms)
+ok    res://src/test/arena/test_arena_content.gd::test_format1_mod_arena_still_loads (1 ms)
+ok    res://src/test/arena/test_arena_content.gd::test_round_trip_to_dict_from_dict (7 ms)
+ok    res://src/test/arena/test_arena_content.gd::test_schema_accepts_layouts_and_rejects_bad_base (6 ms)
+ok    res://src/test/arena/test_arena_content.gd::test_spawn_point_spreads_fighters (0 ms)
+ok    res://src/test/arena/test_arena_editor.gd::test_command_stack_undo_redo_round_trip (22 ms)
+ok    res://src/test/arena/test_arena_editor.gd::test_malicious_packages_are_rejected (164 ms)
+ok    res://src/test/arena/test_arena_editor.gd::test_package_export_import_round_trip (69 ms)
+ok    res://src/test/arena/test_arena_editor.gd::test_save_load_round_trip_and_migration (42 ms)
+2026-10-16 11:54:23 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/arena/test_arena_editor.gd::test_saved_layouts_are_playable_in_normal_matches (172 ms)
+ok    res://src/test/arena/test_arena_editor.gd::test_stack_is_bounded_and_tracks_dirty (0 ms)
+ok    res://src/test/arena/test_arena_editor_screen.gd::test_controller_carry_moves_items (303 ms)
+ok    res://src/test/arena/test_arena_editor_screen.gd::test_controller_place_rotate_delete_undo (267 ms)
+ok    res://src/test/arena/test_arena_editor_screen.gd::test_layout_fits_and_text_is_readable (105 ms)
+ok    res://src/test/arena/test_arena_editor_screen.gd::test_mouse_select_drag_and_keyboard (336 ms)
+2026-10-16 11:54:25 [INFO] match: start ? on layout_drydock_pitch: f_dozer/t0/bot, f_dozer/t1/bot, f_dozer/t2/bot, f_dozer/t3/bot
+ok    res://src/test/arena/test_arena_editor_screen.gd::test_test_play_round_trip_restores_session (235 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_campaign_style_modes_own_the_hazards (434 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_crane_hook_lifts_then_drops (319 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_crane_magnet_pulls_and_drops_a_scrap_bundle (125 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_destructible_props_break_into_their_zones (5 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_drain_pair_teleports_with_cooldown (24 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_electrified_plate_zaps_and_mats_insulate (40 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_fan_and_wind_push_but_hover_ignores_wind (137 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_hazards_cycle_deterministically_for_a_seed (1155 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_mode_ringout_override_is_honoured (40 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_pickups_heal_hype_and_respawn (4 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_props_take_damage_before_breaking (4 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_ringout_eliminates_rule (42 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_rooftop_ringout_respawns_at_nearest_edge_marker (193 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_rules_switch_hazards_timers_and_ringouts (389 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_solid_props_without_splat_stop_projectiles (19 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_team_matches_start_in_team_clusters (10 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_tidal_gutter_soaks_fighters_in_it (55 ms)
+ok    res://src/test/arena/test_arena_hazards.gd::test_weapons_damage_low_props_without_proxies (3 ms)
+ok    res://src/test/arena/test_arena_validation.gd::test_blocked_spawn_points_at_the_spawn (12 ms)
+ok    res://src/test/arena/test_arena_validation.gd::test_clean_base_layouts_pass (47 ms)
+ok    res://src/test/arena/test_arena_validation.gd::test_hazard_and_pickup_caps (26 ms)
+ok    res://src/test/arena/test_arena_validation.gd::test_issue_refs_carry_editor_uids (7 ms)
+ok    res://src/test/arena/test_arena_validation.gd::test_missing_mode_markers (18 ms)
+ok    res://src/test/arena/test_arena_validation.gd::test_over_budget (37 ms)
+ok    res://src/test/arena/test_arena_validation.gd::test_spawn_near_pit_or_open_edge (29 ms)
+ok    res://src/test/arena/test_arena_validation.gd::test_team_clusters_and_bounds (15 ms)
+ok    res://src/test/arena/test_arena_validation.gd::test_too_little_clear_floor (26 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_all_lines_have_ids_subtitles_and_triggers (1 ms)
+2026-10-16 11:54:28 [WARN] audio: unknown sound id 'line:no_such_line'
+ok    res://src/test/audio/test_audio_announcer.gd::test_announce_emits_subtitle_and_substitutes_names (0 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_babble_plan (1 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_priority_interrupt_and_queue_rules (0 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_sim_event_mapping (0 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_trigger_picks_most_specific_line_and_rotates (1 ms)
+ok    res://src/test/audio/test_audio_babble.gd::test_babble_speaks_a_line_headless (1401 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_bank_loads_and_every_id_resolves (323 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_every_creature_has_a_voice_in_the_bank (0 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_frequent_sounds_have_variations (0 ms)
+skip  res://src/test/audio/test_audio_bank.gd::test_literal_ids_in_code_exist (scans GDScript source; exported builds ship compiled scripts (runs in the source suite))
+skip  res://src/test/audio/test_audio_bank.gd::test_manifest_matches_files_on_disk (exported builds ship imported samples, not the source .wav files)
+ok    res://src/test/audio/test_audio_bank.gd::test_music_tracks_loops_and_layers (34 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_no_file_peaks_above_minus_one_dbfs (5 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_required_ids_present (1 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_size_budget (5 ms)
+ok    res://src/test/campaign/test_campaign_bookie.gd::test_pause_and_take_over (31 ms)
+bookie: 3 unattended runs in 43.7 s, 31 transitions
+ok    res://src/test/campaign/test_campaign_bookie.gd::test_unattended_three_complete_runs (43724 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_disconnect_bot_takes_over_then_rejoin (228 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_everyone_leaves_run_suspended_and_resumable (196 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_group_event_vote_never_loops (177 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_host_change_only_from_the_elected_successor (124 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_host_departure_resumes_from_member_replica (152 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_host_dose_clamped_to_own_ladder (42 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_host_results_must_follow_their_log (975 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_member_choice_on_group_event_is_a_vote (152 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_members_ignore_host_messages_from_other_members (127 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_party_slots_cleared_at_run_end (2476 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_party_vote_drives_the_route (120 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_party_vote_tie_goes_to_captain (78 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_pause_budget_per_player (80 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_per_player_picks_without_duplication (130 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_progression_credited_per_player (885 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_route_vote_rules (1 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_tag_team_format (48 ms)
+ok    res://src/test/campaign/test_campaign_coop.gd::test_vote_timer_with_abstainers (120 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_boss_cannot_skip_phase_two (35 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_boss_fights_two_phases_telegraphs_and_daze (1637 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_downed_and_revive_in_coop (45 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_knockouts_before_the_bell_end_the_fight (163 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_plain_fight_runs_and_reports (1498 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_poise_break_dazes_the_boss_and_only_then_grabbable (36 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_rematch_elite_is_phase_one_only (43 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_ringout_return_is_not_a_defeat (37 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_sudden_death_judges_time_up_health_and_keeps_hp (37 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_tag_bout_swaps_and_regenerates (1444 ms)
+ok    res://src/test/campaign/test_campaign_fights.gd::test_waves_and_timer_fight (8240 ms)
+ok    res://src/test/campaign/test_campaign_full_runs.gd::test_fight_camp_defeat_at_the_act_one_boss (8151 ms)
+ok    res://src/test/campaign/test_campaign_full_runs.gd::test_fight_camp_victory_with_real_fights (72850 ms)
+ok    res://src/test/campaign/test_campaign_full_runs.gd::test_off_the_street_defeat_with_real_fights (1054 ms)
+full run (Off the Street): victory nodes=21 fights=14 in 62.0 s
+ok    res://src/test/campaign/test_campaign_full_runs.gd::test_off_the_street_victory_with_real_fights (61998 ms)
+ok    res://src/test/campaign/test_campaign_generation.gd::test_dose10_forces_commissioners_cut (25 ms)
+ok    res://src/test/campaign/test_campaign_generation.gd::test_every_node_resolves_to_valid_content (412 ms)
+ok    res://src/test/campaign/test_campaign_generation.gd::test_map_validity_500_seeds (6726 ms)
+ok    res://src/test/campaign/test_campaign_generation.gd::test_rarity_guarantees_and_distinct_offers (94 ms)
+ok    res://src/test/campaign/test_campaign_generation.gd::test_same_seed_same_card (51 ms)
+ok    res://src/test/campaign/test_campaign_generation.gd::test_seed_text_round_trip (0 ms)
+ok    res://src/test/campaign/test_campaign_generation.gd::test_streams_independent_of_call_order (0 ms)
+ok    res://src/test/campaign/test_campaign_generation.gd::test_synergy_weights_favor_owned_tags (300 ms)
+ok    res://src/test/campaign/test_campaign_generation.gd::test_varied_cards (218 ms)
+2026-10-16 11:58:05 [WARN] saves: recovered off_the_street.json from .bak (off_the_street.json: invalid JSON at line 0: Expected 'true', 'false', or 'null', got 'garbage')
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_damaged_main_file_recovers_from_backup (91 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_damaged_save_reported_and_kept (23 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_fight_in_progress_reruns_from_start (56 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_floats_json_cannot_round_trip_still_save_and_travel (76 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_fresh_seed_run_resumes_identically (93 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_inconsistent_state_rejected (59 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_migration_from_v0 (52 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_missing_save (22 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_newer_format_rejected (50 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_no_duplicate_rewards_across_resume (79 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_party_ticket_integrity (48 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_removed_content_blocks_resume_non_destructively (59 ms)
+2026-10-16 11:58:06 [WARN] saves: recovered off_the_street.json from .tmp ()
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_resume_after_crash_during_write (101 ms)
+2026-10-16 11:58:06 [WARN] saves: recovered off_the_street.json from .tmp ()
+2026-10-16 11:58:06 [WARN] saves: recovered off_the_street.json from .tmp ()
+2026-10-16 11:58:06 [WARN] saves: recovered off_the_street.json from .bak ()
+2026-10-16 11:58:06 [WARN] saves: quarantined off_the_street.json.bak -> off_the_street.json.bak.damaged-1792166286
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_slots_with_only_tmp_or_bak_are_listed (115 ms)
+ok    res://src/test/campaign/test_campaign_persistence.gd::test_suspend_and_resume_mid_run (131 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_boss_own_phase_two_threshold_is_used (50 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_coop_scaling_plan (40 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_custom_fight_camp_runs_set_no_camp_milestones (136 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_custom_runs_keep_stats_but_no_records (129 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_difficulty_and_dose_modifiers (36 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_dose_credit_needs_the_profiles_own_ladder (140 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_duplicate_rewards_are_rejected (33 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_event_choice_and_outcome (33 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_fight_camp_meta_applies_only_in_fight_camp (45 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_fight_rewards_and_hp_carry (38 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_finish_run_progression_off_the_street (76 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_group_event_choices_need_the_whole_party_to_pay (48 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_ladder_unlock_rule (0 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_replay_reproduces_the_run (120 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_reroll_costs_and_limits (36 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_rest_train_pick_completes_the_node (26 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_shop_rest_event_flows (44 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_spar_copy_is_sixty_percent_and_unscaled (34 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_synthetic_defeat_ends_run (32 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_synthetic_run_to_victory (77 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_title_contender_counts_fight_camp_doses (136 ms)
+ok    res://src/test/campaign/test_campaign_run.gd::test_verify_rebuilds_runs_and_rejects_tampering (501 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_bookie_attended_rest_train_opens_the_pick (66 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_bookie_screen_setup_live_and_stop (181 ms)
+2026-10-16 11:58:09 [INFO] match: start ? on arena_gullet: f_stoke/t0/campaign_bot, f_dozer/t1/npc, f_dredge/t1/npc
+2026-10-16 11:58:09 [INFO] match: start ? on arena_gullet: f_stoke/t0/campaign_bot, f_dozer/t1/npc, f_dredge/t1/npc
+ok    res://src/test/campaign/test_campaign_ui.gd::test_bookie_speed_holds_for_every_presented_fight (162 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_camp_ledger_buys_with_clout (64 ms)
+2026-10-16 11:58:12 [INFO] platform: achievement unlocked: Off the Street
+2026-10-16 11:58:12 [INFO] platform: achievement unlocked: Order in the Court
+ui walk visited: ["reward", "run_map", "shop", "event", "rest"]
+ok    res://src/test/campaign/test_campaign_ui.gd::test_controller_walks_the_map_and_screens_to_the_summary (3501 ms)
+2026-10-16 11:58:12 [INFO] match: start ? on arena_drydock: f_stoke/t0/player, blister_sludge/t1/npc, blister_sludge/t1/npc, blister_sludge/t1/npc, scrapling_basic/t1/npc, scrapling_basic/t1/npc
+ok    res://src/test/campaign/test_campaign_ui.gd::test_custom_rechecked_at_each_fight (246 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_every_decision_screen_builds_with_focus (114 ms)
+2026-10-16 11:58:13 [INFO] match: start ? on arena_gullet: f_stoke/t0/player, scrapling_pelter/t1/npc, scrapling_pelter/t1/npc, scrapling_pelter/t1/npc, scrapling_basic/t1/npc
+ok    res://src/test/campaign/test_campaign_ui.gd::test_fight_time_counts_once (1502 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_asks_before_replacing_a_suspended_run (238 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_offers_no_dose_on_sparring (30 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_menu_asks_before_replacing_a_suspended_run (183 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_menu_never_deals_over_a_newer_versions_run (64 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_menu_never_resumes_a_party_run_solo (126 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_menu_starts_a_run_and_shows_the_map (79 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_rest_train_opens_the_pick_without_a_loop (185 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_run_creation_clamps_the_dose (145 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_run_it_back_rechecks_custom (167 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_run_map_modal_traps_focus_and_back_closes_it (65 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_stuck_rest_save_resumes_into_the_pick (131 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_unbuildable_fight_offers_forfeit (22 ms)
+ok    res://src/test/campaign/test_technique_lint.gd::test_minion_loadout_patches_hit_their_base_bodies (24 ms)
+ok    res://src/test/campaign/test_technique_lint.gd::test_technique_patches_and_hooks_hit_their_fighters (51 ms)
+ok    res://src/test/core/test_build_info.gd::test_label_formats (0 ms)
+ok    res://src/test/core/test_combat_rules.gd::test_fixed_step_runs_are_reproducible_across_processes (7513 ms)
+ok    res://src/test/core/test_combat_rules.gd::test_out_of_range_strikes_never_damage (271 ms)
+ok    res://src/test/core/test_combat_rules.gd::test_strikes_in_range_land_and_guard_reduces_damage (762 ms)
+ok    res://src/test/core/test_combat_rules.gd::test_stun_budget_breaks_infinite_pressure (807 ms)
+ok    res://src/test/core/test_containment.gd::test_bots_steer_away_from_open_edges (3 ms)
+ok    res://src/test/core/test_containment.gd::test_spawned_minions_start_inside_and_stay_inside (4479 ms)
+ok    res://src/test/core/test_content_audit.gd::test_arenas_have_safe_spawns_inside_bounds (2 ms)
+ok    res://src/test/core/test_content_audit.gd::test_bundled_example_mods_validate (10 ms)
+2026-10-16 11:58:30 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 11:58:30 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/core/test_content_audit.gd::test_core_package_loads_without_errors (257 ms)
+ok    res://src/test/core/test_content_audit.gd::test_every_creature_parses_and_assets_exist (16 ms)
+ok    res://src/test/core/test_content_audit.gd::test_tutorial_achievements_and_presets_complete (0 ms)
+ok    res://src/test/core/test_content_targets.gd::test_arena_bases_and_example_layouts (5 ms)
+ok    res://src/test/core/test_content_targets.gd::test_audio_and_lab_targets (1 ms)
+ok    res://src/test/core/test_content_targets.gd::test_campaign_content (1 ms)
+ok    res://src/test/core/test_content_targets.gd::test_difficulty_ladder_and_bot_tiers (0 ms)
+ok    res://src/test/core/test_content_targets.gd::test_elements_and_reactions (1 ms)
+ok    res://src/test/core/test_content_targets.gd::test_fight_camp_upgrades_and_bonus_modes (0 ms)
+ok    res://src/test/core/test_content_targets.gd::test_six_playable_fighters_and_npc_cast (0 ms)
+ok    res://src/test/core/test_elements.gd::test_buildup_triggers_status_at_threshold (3 ms)
+ok    res://src/test/core/test_elements.gd::test_effect_element_override_follows_the_fighter (3 ms)
+ok    res://src/test/core/test_elements.gd::test_matchup_matrix_is_mild_and_cyclic (0 ms)
+ok    res://src/test/core/test_elements.gd::test_max_three_element_statuses (3 ms)
+ok    res://src/test/core/test_elements.gd::test_reaction_short_out_consumes_soaked_and_damages (3 ms)
+ok    res://src/test/core/test_elements.gd::test_self_element_immunity_from_own_attacks (3 ms)
+ok    res://src/test/core/test_kit_engine_ext.gd::test_bot_ability_rules_fire_on_conditions (170 ms)
+ok    res://src/test/core/test_kit_engine_ext.gd::test_bot_heavy_tap_and_charge_rule (29 ms)
+ok    res://src/test/core/test_kit_engine_ext.gd::test_hover_lifts_then_lands_and_replants (151 ms)
+ok    res://src/test/core/test_kit_engine_ext.gd::test_throw_hook_slot_and_throw_stun (30 ms)
+ok    res://src/test/core/test_kit_engine_ext.gd::test_zones_ignore_hovering_fighters (163 ms)
+ok    res://src/test/core/test_modes.gd::test_absolute_unit_is_crowned_scaled_and_scores (2290 ms)
+ok    res://src/test/core/test_modes.gd::test_chum_rush_waves_spawn_and_slots_are_reused (3447 ms)
+ok    res://src/test/core/test_modes.gd::test_chumball_ball_moves_and_scores_or_times_out (2473 ms)
+ok    res://src/test/core/test_modes.gd::test_score_mode_presets_respawn_knocked_out_fighters (2935 ms)
+ok    res://src/test/core/test_modes.gd::test_spotlight_hog_scores_and_swings (8676 ms)
+ok    res://src/test/core/test_modes_extra.gd::test_practice_refills_and_dummy_guards (515 ms)
+ok    res://src/test/core/test_modes_extra.gd::test_tag_team_swaps_and_resting_partner_regenerates (498 ms)
+NAIVE masher vs punching_bag: masher won 11 / 12, bot won 1 (M = masher, b = bot) { "dozer": "MM", "dredge": "Mb", "gusto": "MM", "jitters": "MM", "slurry": "MM", "stoke": "MM" }
+ok    res://src/test/core/test_naive_play.gd::test_a_button_masher_beats_the_punching_bag (24374 ms)
+NAIVE masher vs hall_of_famer: masher won 1 / 6, bot won 5 (M = masher, b = bot) { "dozer": "M", "dredge": "b", "gusto": "b", "jitters": "b", "slurry": "b", "stoke": "b" }
+ok    res://src/test/core/test_naive_play.gd::test_the_masher_mostly_loses_to_a_hall_of_famer (13879 ms)
+NAIVE masher vs headliner: masher won 1 / 6, bot won 5 (M = masher, b = bot) { "dozer": "M", "dredge": "b", "gusto": "b", "jitters": "b", "slurry": "b", "stoke": "b" }
+ok    res://src/test/core/test_naive_play.gd::test_the_masher_mostly_loses_to_a_headliner (13601 ms)
+NAIVE Journeyman series skipped (set NAIVE_BOUTS)
+ok    res://src/test/core/test_naive_play.gd::test_zz_a_journeyman_is_about_even_with_the_masher (0 ms)
+2026-10-16 11:59:43 [WARN] saves: recovered dmg.json from .bak (dmg.json: invalid JSON at line 0: Expected key)
+ok    res://src/test/core/test_persistence.gd::test_damaged_main_falls_back_to_backup (22 ms)
+2026-10-16 11:59:43 [WARN] saves: recovered crash.json from .tmp ()
+ok    res://src/test/core/test_persistence.gd::test_interrupted_write_recovers_newest_valid_copy (15 ms)
+ok    res://src/test/core/test_persistence.gd::test_migration_runs_for_older_versions (9 ms)
+ok    res://src/test/core/test_persistence.gd::test_newer_version_is_left_untouched (9 ms)
+ok    res://src/test/core/test_persistence.gd::test_round_trip_preserves_data (10 ms)
+ok    res://src/test/core/test_persistence.gd::test_settings_coercion_and_presets (2 ms)
+ok    res://src/test/core/test_persistence.gd::test_tampered_checksum_is_detected (14 ms)
+ok    res://src/test/core/test_persistence.gd::test_unicode_and_space_paths (11 ms)
+2026-10-16 11:59:43 [WARN] saves: recovered dmg.json from .bak (dmg.json: invalid JSON at line 0: Expected key)
+2026-10-16 11:59:43 [WARN] saves: quarantined dmg.json -> dmg.json.damaged-1792166383
+2026-10-16 11:59:43 [WARN] saves: quarantined dmg.json -> dmg.json.damaged-1792166383-2
+2026-10-16 11:59:43 [WARN] saves: quarantined dmg.json -> dmg.json.damaged-1792166383-3
+ok    res://src/test/core/test_persistence_safety.gd::test_a_write_never_deletes_the_only_valid_copy (49 ms)
+2026-10-16 11:59:43 [WARN] saves: not writing off_the_street.json: off_the_street.json was saved by a newer version of the game (format v2 > v1) and stays untouched
+2026-10-16 11:59:44 [WARN] saves: quarantined fight_camp.json -> fight_camp.json.damaged-1792166384
+ok    res://src/test/core/test_persistence_safety.gd::test_newer_campaign_runs_are_never_moved_or_deleted (22 ms)
+2026-10-16 11:59:44 [WARN] profiles: Your profile list was saved by a newer version of the game. It is left untouched; profiles this version can read are listed, and changes to the list are not saved.
+2026-10-16 11:59:44 [WARN] profiles: The profile 'champ' was saved by a newer version of the game. It is left untouched and cannot be used in this version.
+2026-10-16 11:59:44 [WARN] profiles: The profile 'champ' was saved by a newer version of the game; it was not deleted.
+ok    res://src/test/core/test_persistence_safety.gd::test_profiles_from_a_newer_version_are_never_overwritten (121 ms)
+2026-10-16 11:59:44 [WARN] saves: recovered clock_tmp.json from .tmp ()
+ok    res://src/test/core/test_persistence_safety.gd::test_recovery_follows_the_write_order_not_the_clock (40 ms)
+2026-10-16 11:59:44 [WARN] saves: not writing future.json: future.json was saved by a newer version of the game (format v9 > v1) and stays untouched
+2026-10-16 11:59:44 [WARN] saves: not writing future.json: future.json was saved by a newer version of the game (format v9 > v1) and stays untouched
+2026-10-16 11:59:44 [WARN] saves: not writing future_bak.json: future_bak.json.bak was saved by a newer version of the game (format v7 > v1) and stays untouched
+ok    res://src/test/core/test_persistence_safety.gd::test_saves_never_overwrite_a_newer_format (40 ms)
+2026-10-16 11:59:44 [WARN] settings: Settings were saved by a newer version of the game. Defaults are in use and that file is left untouched: changes you make now are not saved. (settings.json was saved by a newer version of the game (format v2 > v1). It was left untouched.)
+2026-10-16 11:59:44 [WARN] settings: Settings could not be read (settings_damaged.json: invalid JSON at line 0: Expected key). Defaults are in use; the damaged file was kept.
+2026-10-16 11:59:44 [WARN] saves: quarantined settings_damaged.json -> settings_damaged.json.damaged-1792166384
+ok    res://src/test/core/test_persistence_safety.gd::test_settings_from_a_newer_version_are_left_untouched (31 ms)
+ok    res://src/test/core/test_roster_lint.gd::test_complete_kits (0 ms)
+ok    res://src/test/core/test_roster_lint.gd::test_distinct_elements_and_three_builds (0 ms)
+melee reach: f_stoke.l1 1.08, f_stoke.l2 1.15, f_stoke.l3 1.04, f_stoke.heavy 1.14, f_stoke.heavy_charged 1.12, f_stoke.finisher 1.12, f_stoke.dash_attack 0.86, f_stoke.grab 0.88, f_stoke.pummel 0.00, f_stoke.taunt 0.00, f_dredge.l1 1.30, f_dredge.l2 1.22, f_dredge.l3 1.30, f_dredge.heavy 1.40, f_dredge.heavy@juiced 1.40, f_dredge.heavy_charged 1.45, f_dredge.finisher 1.45, f_dredge.dash_attack 0.80, f_dredge.grab 1.32, f_dredge.pummel 0.00, f_dredge.taunt 0.00, f_gusto.l1 1.20, f_gusto.l2 0.50, f_gusto.l3 1.04, f_gusto.heavy 1.00, f_gusto.heavy_charged 0.36, f_gusto.finisher 0.10, f_gusto.dash_attack 0.86, f_gusto.grab 1.20, f_gusto.pummel 0.00, f_gusto.taunt 0.00, f_gusto.l1@hovering 0.50, f_gusto.heavy@hovering 0.34, f_dozer.l1 1.26, f_dozer.l2 0.00, f_dozer.l3 1.26, f_dozer.heavy 1.18, f_dozer.heavy_charged 1.26, f_dozer.finisher 1.26, f_dozer.dash_attack 1.26, f_dozer.grab 1.18, f_dozer.pummel 0.00, f_dozer.taunt 0.00, f_slurry.l1 0.44, f_slurry.l2 0.00, f_slurry.l3 0.44, f_slurry.heavy 0.00, f_slurry.heavy_charged 0.44, f_slurry.finisher 0.00, f_slurry.dash_attack 0.44, f_slurry.grab 0.44, f_slurry.pummel 0.00, f_slurry.taunt 0.00, f_jitters.l1 0.18, f_jitters.l2 0.18, f_jitters.l3 0.20, f_jitters.heavy 0.20, f_jitters.heavy@pad_launched 0.20, f_jitters.heavy_charged 0.20, f_jitters.finisher 0.00, f_jitters.dash_attack 0.20, f_jitters.grab 0.30, f_jitters.pummel 0.00, f_jitters.taunt 0.00
+ok    res://src/test/core/test_roster_lint.gd::test_melee_reach_cap (1 ms)
+ok    res://src/test/core/test_rules_hardening.gd::test_fighter_mods_are_whitelisted_and_clamped (23 ms)
+ok    res://src/test/core/test_rules_hardening.gd::test_match_sim_clamps_rule_modifiers_at_use (16 ms)
+ok    res://src/test/core/test_rules_hardening.gd::test_preset_import_checks_the_size_before_reading (26 ms)
+ok    res://src/test/core/test_rules_presets.gd::test_custom_preset_drives_a_match (42 ms)
+ok    res://src/test/core/test_rules_presets.gd::test_every_core_preset_and_mode_default_validates (6 ms)
+ok    res://src/test/core/test_rules_presets.gd::test_invalid_combinations_are_explained (1 ms)
+ok    res://src/test/core/test_rules_presets.gd::test_normalize_clamps_and_keeps_unknown_keys (0 ms)
+2026-10-16 11:59:44 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/core/test_rules_presets.gd::test_presets_save_version_duplicate_rename_export_import_delete (205 ms)
+ok    res://src/test/core/test_save_floats.gd::test_53_bit_integers_round_trip_exactly (2226 ms)
+ok    res://src/test/core/test_save_floats.gd::test_random_doubles_round_trip_through_saves (2245 ms)
+ok    res://src/test/core/test_schema.gd::test_invalid_arena_reports_paths (0 ms)
+ok    res://src/test/core/test_schema.gd::test_manifest_requires_semver (1 ms)
+ok    res://src/test/core/test_schema.gd::test_valid_arena_passes (0 ms)
+ok    res://src/test/core/test_spectator.gd::test_director_cuts_to_big_moments_and_varies_shots (11 ms)
+ok    res://src/test/core/test_spectator.gd::test_viewer_lock_cycles_and_returns_to_auto (45 ms)
+    tut_ability with dev_biped vs npc_kid_lamprey: success after 1.00 s
+ok    res://src/test/core/test_tutorial.gd::test_ability_connects (73 ms)
+ok    res://src/test/core/test_tutorial.gd::test_dodge_drill_heavy_is_a_real_threat (315 ms)
+    tut_dodge with dev_biped vs npc_kid_lamprey: success after 5.00 s
+ok    res://src/test/core/test_tutorial.gd::test_dodge_then_dash_attack (309 ms)
+    tut_heavy with test_kitless_biped vs npc_kid_lamprey: success after 1.25 s
+    tut_dodge with test_kitless_biped vs npc_kid_lamprey: success after 4.75 s
+ok    res://src/test/core/test_tutorial.gd::test_exercises_adapt_to_missing_slots (860 ms)
+ok    res://src/test/core/test_tutorial.gd::test_exercises_load_with_live_prompts (1 ms)
+    tut_finish with dev_biped vs npc_kid_lamprey: success after 15.75 s
+ok    res://src/test/core/test_tutorial.gd::test_finisher_then_juice (1046 ms)
+    tut_footwork with dev_biped vs npc_kid_lamprey: success after 6.25 s
+ok    res://src/test/core/test_tutorial.gd::test_footwork (382 ms)
+    tut_freestyle with dev_biped vs npc_kid_lamprey: success after 35.75 s
+ok    res://src/test/core/test_tutorial.gd::test_freestyle_round_can_be_won (2581 ms)
+    tut_grab with dev_biped vs npc_kid_lamprey: success after 1.00 s
+ok    res://src/test/core/test_tutorial.gd::test_grab_and_throw_through_guard (73 ms)
+    tut_guard with dev_biped vs npc_kid_lamprey: success after 4.50 s
+ok    res://src/test/core/test_tutorial.gd::test_guard_string (275 ms)
+    tut_heavy with dev_biped vs npc_kid_lamprey: success after 2.75 s
+ok    res://src/test/core/test_tutorial.gd::test_heavy_then_charged (173 ms)
+    tut_hands with dev_biped vs npc_kid_lamprey: success after 1.75 s
+ok    res://src/test/core/test_tutorial.gd::test_light_string (120 ms)
+    tut_parry with dev_biped vs npc_kid_lamprey: success after 6.75 s
+ok    res://src/test/core/test_tutorial.gd::test_parries (402 ms)
+ok    res://src/test/core/test_tutorial.gd::test_partner_fits_every_fighter (8 ms)
+ok    res://src/test/core/test_tutorial.gd::test_retry_skip_and_progress_saved (1195 ms)
+ok    res://src/test/core/test_tutorial.gd::test_rushed_string_gets_rhythm_advice (244 ms)
+bag challenge (dev_biped jab-jab-heavy): score 673, hits 22, best combo 1, tier 2
+ok    res://src/test/hub/test_hub_activities.gd::test_bag_challenge_scores_real_hits_and_pays_clout (1633 ms)
+ok    res://src/test/hub/test_hub_activities.gd::test_bag_points_formula (4 ms)
+ok    res://src/test/hub/test_hub_activities.gd::test_bag_tier_belongs_to_who_started_it (5 ms)
+ok    res://src/test/hub/test_hub_activities.gd::test_bag_tiers_are_per_fighter (9 ms)
+ok    res://src/test/hub/test_hub_activities.gd::test_chum_drill_counts_dodges_guards_and_hits (762 ms)
+ok    res://src/test/hub/test_hub_activities.gd::test_chum_drill_parry_and_dodge (3 ms)
+ok    res://src/test/hub/test_hub_activities.gd::test_crate_toss_foul_and_jitters_hint (4 ms)
+crate toss (Stoke, aimed): 80 points, rings [1, 1, 1, 1, 1, 0, 0, -1, 2, -1]
+ok    res://src/test/hub/test_hub_activities.gd::test_crate_toss_scores_rings_and_pays_tiers (509 ms)
+ok    res://src/test/hub/test_hub_activities.gd::test_ring_sparring_config (27 ms)
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_attachments_fit_every_body_and_follow_it (165 ms)
+2026-10-16 12:00:00 [INFO] hub: view build ms: structure 6 dressing 22 commit 2 water+npcs 12 props+upgrades 15 ambient 8; batch verts 35082
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_fished_cans_sit_on_the_locker_shelf (109 ms)
+2026-10-16 12:00:00 [INFO] match: start ? on the_gullet: f_stoke/t0/player, f_dredge/t1/bot
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_only_the_profile_owner_is_dressed_in_a_match (318 ms)
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_sizzle_is_stoke_only_and_frames_show_on_results_and_profile (157 ms)
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_the_gold_tooth_is_the_gag_piece (10 ms)
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_the_locker_only_offers_what_shows (11 ms)
+2026-10-16 12:00:01 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:01 [INFO] hub: view build ms: structure 6 dressing 22 commit 3 water+npcs 13 props+upgrades 16 ambient 8; batch verts 35082
+2026-10-16 12:00:01 [INFO] hub: sim build ms: 5
+2026-10-16 12:00:02 [INFO] hub: view build ms: structure 7 dressing 22 commit 3 water+npcs 5 props+upgrades 18 ambient 5; batch verts 35082
+2026-10-16 12:00:02 [WARN] ui: missing icon res://assets/ui/icons/station.svg
+ok    res://src/test/hub/test_hub_flow.gd::test_boards_freeze_the_hubs_clocks (3218 ms)
+2026-10-16 12:00:04 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:04 [INFO] hub: view build ms: structure 7 dressing 23 commit 3 water+npcs 13 props+upgrades 15 ambient 7; batch verts 35082
+2026-10-16 12:00:04 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:04 [INFO] hub: view build ms: structure 6 dressing 22 commit 2 water+npcs 13 props+upgrades 15 ambient 7; batch verts 35082
+2026-10-16 12:00:04 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:04 [INFO] hub: view build ms: structure 6 dressing 22 commit 2 water+npcs 12 props+upgrades 14 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_flow.gd::test_campaign_menu_from_the_desk_goes_back_to_the_hub (409 ms)
+2026-10-16 12:00:04 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:04 [INFO] hub: view build ms: structure 6 dressing 22 commit 2 water+npcs 13 props+upgrades 15 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_flow.gd::test_dev_stand_ins_apply_to_one_sign_up_only (130 ms)
+2026-10-16 12:00:04 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:04 [INFO] hub: view build ms: structure 7 dressing 22 commit 2 water+npcs 13 props+upgrades 16 ambient 7; batch verts 35082
+2026-10-16 12:00:05 [INFO] match: start tutorial on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/scripted
+2026-10-16 12:00:05 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:05 [INFO] hub: view build ms: structure 6 dressing 22 commit 2 water+npcs 12 props+upgrades 15 ambient 7; batch verts 35082
+2026-10-16 12:00:05 [INFO] match: start tutorial on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/scripted
+ok    res://src/test/hub/test_hub_flow.gd::test_lessons_return_by_a_route_not_a_stored_lambda (398 ms)
+2026-10-16 12:00:05 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:05 [INFO] hub: view build ms: structure 6 dressing 23 commit 2 water+npcs 14 props+upgrades 15 ambient 7; batch verts 35082
+2026-10-16 12:00:05 [INFO] match: start hub_spar on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/bot
+2026-10-16 12:00:05 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:05 [INFO] hub: view build ms: structure 6 dressing 22 commit 2 water+npcs 12 props+upgrades 15 ambient 6; batch verts 35082
+2026-10-16 12:00:05 [INFO] match: start tape_1973 on the_gullet: boss_snappington/t0/bot, f_dozer/t1/bot
+2026-10-16 12:00:05 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:05 [INFO] hub: view build ms: structure 6 dressing 23 commit 2 water+npcs 13 props+upgrades 14 ambient 6; batch verts 35082
+2026-10-16 12:00:05 [INFO] match: start tutorial on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/scripted
+2026-10-16 12:00:05 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:05 [INFO] hub: view build ms: structure 6 dressing 22 commit 2 water+npcs 12 props+upgrades 15 ambient 6; batch verts 35082
+2026-10-16 12:00:05 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:05 [INFO] hub: view build ms: structure 6 dressing 20 commit 2 water+npcs 6 props+upgrades 15 ambient 5; batch verts 35082
+2026-10-16 12:00:05 [INFO] match: start hub_spar on arena_rooftop: f_stoke/t0/player, npc_kid_lamprey/t1/bot
+2026-10-16 12:00:06 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:06 [INFO] hub: view build ms: structure 7 dressing 23 commit 3 water+npcs 13 props+upgrades 16 ambient 7; batch verts 35082
+2026-10-16 12:00:06 [INFO] match: start hub_spar on practice_cage: f_stoke/t0/player, f_dredge/t1/bot
+ok    res://src/test/hub/test_hub_flow.gd::test_match_audio_survives_every_hub_scene_swap (900 ms)
+2026-10-16 12:00:06 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:06 [INFO] hub: view build ms: structure 6 dressing 22 commit 3 water+npcs 12 props+upgrades 15 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_flow.gd::test_pet_none_hides_the_blister (95 ms)
+2026-10-16 12:00:06 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:06 [INFO] hub: view build ms: structure 7 dressing 22 commit 3 water+npcs 13 props+upgrades 15 ambient 7; batch verts 35082
+2026-10-16 12:00:06 [INFO] match: start tutorial on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/scripted
+2026-10-16 12:00:06 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:06 [INFO] hub: view build ms: structure 7 dressing 23 commit 2 water+npcs 12 props+upgrades 14 ambient 6; batch verts 35082
+2026-10-16 12:00:06 [INFO] match: start hub_spar on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/bot
+2026-10-16 12:00:06 [INFO] match: start hub_spar on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/bot
+2026-10-16 12:00:06 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:06 [INFO] hub: view build ms: structure 6 dressing 22 commit 2 water+npcs 12 props+upgrades 15 ambient 6; batch verts 35082
+2026-10-16 12:00:06 [INFO] match: start tape_1973 on the_gullet: boss_snappington/t0/bot, f_dozer/t1/bot
+ok    res://src/test/hub/test_hub_flow.gd::test_restart_fight_restarts_the_spar_and_walks_back_in (533 ms)
+2026-10-16 12:00:06 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:06 [INFO] hub: view build ms: structure 6 dressing 22 commit 2 water+npcs 13 props+upgrades 15 ambient 7; batch verts 35082
+2026-10-16 12:00:06 [INFO] match: start hub_spar on arena_rooftop: f_stoke/t0/player, npc_kid_lamprey/t1/bot
+2026-10-16 12:00:07 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:07 [INFO] hub: view build ms: structure 6 dressing 22 commit 3 water+npcs 13 props+upgrades 14 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_flow.gd::test_rooftop_practice_walks_back_onto_the_roof (257 ms)
+2026-10-16 12:00:07 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:07 [INFO] hub: view build ms: structure 6 dressing 23 commit 2 water+npcs 13 props+upgrades 14 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_flow.gd::test_switching_fighters_calls_off_the_challenge (412 ms)
+2026-10-16 12:00:07 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:07 [INFO] hub: view build ms: structure 6 dressing 22 commit 3 water+npcs 12 props+upgrades 15 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_flow.gd::test_the_hub_is_not_an_online_match (166 ms)
+ok    res://src/test/hub/test_hub_geometry.gd::test_every_space_reachable_on_foot (6001 ms)
+ok    res://src/test/hub/test_hub_geometry.gd::test_layout_data_is_consistent (1 ms)
+ok    res://src/test/hub/test_hub_geometry.gd::test_stairs_reach_the_office_and_back (478 ms)
+ok    res://src/test/hub/test_hub_geometry.gd::test_thrown_crate_flies_over_the_dock_edge (31 ms)
+ok    res://src/test/hub/test_hub_geometry.gd::test_walls_and_blockers_hold (683 ms)
+ok    res://src/test/hub/test_hub_interactions.gd::test_a_press_interacts_instead_of_dodging (62 ms)
+ok    res://src/test/hub/test_hub_interactions.gd::test_every_interactable_fires (731 ms)
+ok    res://src/test/hub/test_hub_interactions.gd::test_grab_carry_and_heave_a_crate (428 ms)
+ok    res://src/test/hub/test_hub_interactions.gd::test_hits_on_npcs_are_shrugged_off_and_nobody_goes_down (235 ms)
+crate heave (m): { "f_stoke": 7.85294117647059, "f_jitters": 6.08905335491147, "f_dredge": 12.1365154514926, "f_dozer": 11.5052811112925, "f_gusto": 7.91755512692774, "f_slurry": 9.85225087810677 }
+ok    res://src/test/hub/test_hub_interactions.gd::test_throw_distance_follows_the_fighter (23 ms)
+ok    res://src/test/hub/test_hub_interactions.gd::test_transitions_and_fast_walk (83 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_01_02_loose_panel_and_crawlspace_tooth (162 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_03_sleeping_scrapling_wakes_and_is_caught (323 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_04_belt_case_taunts (330 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_05_booth_tape_while_crouched (33 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_06_freight_elevator_parts (84 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_07_roof_sign_letter (38 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_08_pier_ladder_splash_and_fishing (1897 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_09_boiler_face_scorch_hits (337 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_09b_non_scorch_hits_do_not_count (4 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_10_ice_bath (1395 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_found_secrets_persist_into_the_world (4 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_hidden_items_are_not_solid (40 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_lost_letter_and_parts_come_back (176 ms)
+ok    res://src/test/hub/test_hub_secrets.gd::test_ludlow_hints_one_per_visit (8 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_boiler_room_key_trains_against_saved_builds (253 ms)
+2026-10-16 12:00:21 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:21 [INFO] hub: view build ms: structure 6 dressing 25 commit 2 water+npcs 13 props+upgrades 14 ambient 7; batch verts 35082
+2026-10-16 12:00:21 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:21 [INFO] hub: view build ms: structure 6 dressing 21 commit 2 water+npcs 13 props+upgrades 16 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_services.gd::test_bookie_table_and_lab_terminal_for_real (317 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_every_station_lists_its_upgrades (5 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_injected_backend_is_used (3 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_purchase_flow_spends_clout_and_respects_gates (3 ms)
+2026-10-16 12:00:22 [INFO] hub: view build ms: structure 6 dressing 21 commit 2 water+npcs 13 props+upgrades 15 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_services.gd::test_purchases_change_the_world (72 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_snappington_run_options_and_config (4 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_start_run_hands_over_to_the_campaign (62 ms)
+2026-10-16 12:00:22 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:22 [INFO] hub: view build ms: structure 6 dressing 22 commit 3 water+npcs 13 props+upgrades 15 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_ui.gd::test_boards_and_hud_fit_and_read_at_1280x800 (372 ms)
+2026-10-16 12:00:22 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:22 [INFO] hub: view build ms: structure 7 dressing 23 commit 3 water+npcs 13 props+upgrades 17 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_ui.gd::test_every_board_has_focus_and_b_returns_to_walking (1126 ms)
+2026-10-16 12:00:23 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:23 [INFO] hub: view build ms: structure 6 dressing 22 commit 3 water+npcs 13 props+upgrades 15 ambient 7; batch verts 35082
+2026-10-16 12:00:24 [INFO] platform: achievement unlocked: Ludlow's Confidant
+ok    res://src/test/hub/test_hub_ui.gd::test_first_secret_unlocks_confidant (680 ms)
+2026-10-16 12:00:24 [INFO] hub: sim build ms: 4
+2026-10-16 12:00:24 [INFO] hub: view build ms: structure 6 dressing 23 commit 2 water+npcs 13 props+upgrades 15 ambient 7; batch verts 35082
+ok    res://src/test/hub/test_hub_ui.gd::test_interact_talks_instead_of_dodging (213 ms)
+ok    res://src/test/hub/test_hub_unlocks.gd::test_dev_stand_ins_stay_hidden_in_normal_play (81 ms)
+ok    res://src/test/hub/test_hub_unlocks.gd::test_kid_lamprey_switches_to_his_real_kit_automatically (67 ms)
+ok    res://src/test/hub/test_hub_unlocks.gd::test_pier_night_is_a_hidden_chum_rush_look (90 ms)
+ok    res://src/test/hub/test_hub_unlocks.gd::test_rooftop_full_neon_replaces_the_night_look_once_unlocked (28 ms)
+ok    res://src/test/hub/test_hub_unlocks.gd::test_vintage_bellows_calls_matches_when_selected (2 ms)
+wander f_stoke: 16 legs, 11 reached, 0 timed out, 4 waypoints skipped, 2 rides, visits { "main_floor": 7, "med_bay": 1, "loading_dock": 1, "locker_room": 2, "booth": 1, "juice_bar": 1, "boiler_room": 1, "office": 1 }, min root y 0.57 at (-4.062245, 0.573827, 2.748143), longest outside 0.00 s, longest down 0.00 s
+wander f_dredge: 17 legs, 12 reached, 0 timed out, 1 waypoints skipped, 2 rides, visits { "main_floor": 6, "med_bay": 1, "locker_room": 3, "boiler_room": 1, "booth": 1, "loading_dock": 1 }, min root y 0.39 at (-5.6646, 0.391523, 1.556896), longest outside 0.00 s, longest down 0.00 s
+wander f_dozer: 16 legs, 10 reached, 0 timed out, 2 waypoints skipped, 3 rides, visits { "main_floor": 7, "med_bay": 1, "juice_bar": 1, "crawlspace": 1, "loading_dock": 2, "pier": 1, "office": 1, "boiler_room": 1, "roof": 1 }, min root y 0.66 at (-5.128418, 0.655189, -1.320767), longest outside 0.00 s, longest down 0.00 s
+wander f_gusto: 25 legs, 16 reached, 0 timed out, 2 waypoints skipped, 4 rides, visits { "main_floor": 10, "med_bay": 1, "juice_bar": 1, "office": 1, "loading_dock": 3, "locker_room": 2, "booth": 1, "boiler_room": 1, "crawlspace": 1, "roof": 1, "pier": 1 }, min root y 0.99 at (21.97678, 0.986519, -41.90609), longest outside 0.00 s, longest down 0.00 s
+wander f_slurry: 23 legs, 14 reached, 0 timed out, 1 waypoints skipped, 4 rides, visits { "main_floor": 7, "med_bay": 1, "juice_bar": 1, "office": 1, "roof": 1, "boiler_room": 1, "locker_room": 2, "booth": 1, "loading_dock": 2, "pier": 1 }, min root y 0.16 at (10.62234, 0.159881, -2.558272), longest outside 0.00 s, longest down 0.00 s
+wander f_jitters: 29 legs, 20 reached, 0 timed out, 3 waypoints skipped, 4 rides, visits { "main_floor": 8, "med_bay": 1, "crawlspace": 1, "locker_room": 2, "booth": 1, "roof": 1, "office": 1, "juice_bar": 1, "boiler_room": 1, "loading_dock": 2, "pier": 1 }, min root y 0.36 at (-2.43445, 0.35567, -2.824778), longest outside 0.00 s, longest down 0.00 s
+ok    res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world (56085 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_armor_shrugs_lights_in_startup (480 ms)
+boss_bilge vs f_stoke (smoke)                A  1 / B  1 / draw 0  (A  50%)  hits/bout A 6.5 B 27.5  dmg/hit A 8.8 B 7.2  end HP A 6% B 42%  KOs 2  avg 45 s
+boss_conduit vs f_stoke (smoke)              A  1 / B  1 / draw 0  (A  50%)  hits/bout A 9.5 B 23.0  dmg/hit A 7.1 B 7.4  end HP A 18% B 32%  KOs 0  avg 63 s
+boss_snappington vs f_stoke (smoke)          A  0 / B  2 / draw 0  (A   0%)  hits/bout A 4.5 B 21.5  dmg/hit A 7.9 B 10.3  end HP A 0% B 65%  KOs 2  avg 54 s
+ok    res://src/test/kits/test_kit_bosses.gd::test_balance_vs_roster (22765 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_bilge_signature_moves (781 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_boss_kits_complete_and_valid (0 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_boss_mode_contract (399 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_conduit_signature_moves (618 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_moves_connect_in_range_and_miss_outside (7954 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_snappington_signature_moves (970 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_zz_campaign_warnings (0 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_zz_debug_bout (0 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_zz_debug_move (0 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_zz_heights (0 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_zz_quick_balance (0 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_zz_report_ranges (0 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_airborne_flag_and_spring_pad_skip (118 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_ballistic_flights_not_ground_braked (165 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_bot_avoid_zones_hint (19 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_bot_kit_hints (19 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_bot_range_needs_tools_hint (20 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_charge_bounce (19 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_debuff_require_status (19 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_hook_emerge_event (36 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_hook_hit_part_condition (3 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_keyed_joints_skip_gait_wave (23 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_kit_trait_stats (3 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_lob_arrive_height (85 ms)
+ok    res://src/test/kits/test_kit_extensions_sj.gd::test_projectile_burst_on_hit_option (240 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_bulldoze_carry_splat_bonk_recovery (507 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_bulldoze_cooldown_and_armor (513 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_bulldoze_splat_ko_ends_round_cleanly (161 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_charge_hold_is_stationary (69 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_cooldown_hook_action (14 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_dust_bowl (358 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_every_move_is_physically_sane (1785 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_grab_reach_pummel_and_throws (682 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_gravel_toss_cone (333 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_hoof_stomp_pulse (316 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_horn_lunge_armor_and_reach (678 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_juice_landslide (778 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_kit_is_complete_and_clean (0 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_light_string_and_finisher_via_input (169 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_moves_connect_in_range_and_miss_outside (1620 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_pummel_interval (131 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_quarry_ram (705 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_scoop_launches (130 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_shoulder_barge (119 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_taunt_hype (133 ms)
+MEASURE f_dozer l1             gap=1.50 hit_t=0.142 dmg=4.2 (core q=0.41) kb=0.38 m rise=0.04 stun=0.25 s hits=1
+MEASURE f_dozer l2             gap=1.45 hit_t=0.192 dmg=5.8 (core q=1.00) kb=0.60 m rise=0.04 stun=0.29 s hits=1
+MEASURE f_dozer l3             gap=1.40 hit_t=0.267 dmg=5.4 (leg q=1.00) kb=0.19 m rise=1.13 stun=0.50 s hits=1
+MEASURE f_dozer heavy          gap=1.50 hit_t=0.317 dmg=14.3 (core q=1.00) kb=1.73 m rise=0.06 stun=0.60 s hits=1
+MEASURE f_dozer heavy_charged  gap=2.60 hit_t=0.308 dmg=10.9 (leg q=0.77) kb=3.15 m rise=1.20 stun=0.75 s hits=1
+MEASURE f_dozer finisher       gap=1.40 hit_t=0.183 dmg=11.4 (leg q=1.00) kb=2.50 m rise=0.04 stun=0.60 s hits=2
+MEASURE f_dozer dash_attack    gap=2.80 hit_t=0.300 dmg=4.2 (leg q=0.88) kb=1.89 m rise=0.07 stun=0.39 s hits=1
+MEASURE f_dozer ability1       gap=3.40 hit_t=0.708 dmg=8.0 (leg q=0.89) kb=3.96 m rise=0.06 stun=1.21 s hits=1
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_zy_measure_table (1442 ms)
+BALANCE dozer mirror: 2 bouts: side0 1 wins, 218 dmg in 22 hits (9.9/hit), 1 KOs, used { "ability1": 7, "charged": 2, "dodge": 12, "grab": 11, "ability2": 1, "splat": 1 }; side1 1 wins, 216 dmg in 24 hits (9.0/hit), 1 KOs, used { "ability1": 6, "ability2": 1, "dodge": 3, "splat": 1, "grab": 3, "wall_bonk": 1, "charged": 1 }; 0 draws; avg 65 s
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_zz_balance (10003 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_anchor_drop_counter_armor_and_grab (910 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_bilge_pump_shoves_into_wall_for_splat (293 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_charge_hold_is_stationary (71 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_charged_heavy_hull_breaker (546 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_crusher_slam_armor_and_wave_line (808 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_double_clamp_hold_on_soaked (347 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_every_move_is_physically_sane (1890 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_grab_reach_pummel_and_throws (708 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_heavy_variant_still_charges (189 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_juice_high_tide (717 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_kit_is_complete_and_clean (0 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_light_string_and_finisher_via_input (182 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_moves_connect_in_range_and_miss_outside (2102 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_scuttle_check_forward_and_sideways (247 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_side_dash_is_longer_and_flags (112 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_side_walk_is_faster (97 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_taunt_hype_and_no_armor (95 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_tide_spit_projectile_puddle_cooldown (637 ms)
+MEASURE f_dredge l1             gap=1.35 hit_t=0.183 dmg=4.5 (core q=0.98) kb=0.64 m rise=0.04 stun=0.30 s hits=1
+MEASURE f_dredge l2             gap=1.35 hit_t=0.275 dmg=5.7 (core q=1.00) kb=1.37 m rise=0.05 stun=0.40 s hits=1
+MEASURE f_dredge l3             gap=1.35 hit_t=0.258 dmg=3.9 (arm q=1.00) kb=1.10 m rise=0.04 stun=0.50 s hits=1
+MEASURE f_dredge heavy          gap=1.30 hit_t=0.400 dmg=3.7 (core q=1.00) kb=0.82 m rise=0.04 stun=0.20 s hits=1
+MEASURE f_dredge heavy_charged  gap=1.30 hit_t=-1.000 dmg=0.0 (- q=0.00) kb=0.00 m rise=0.04 stun=0.00 s hits=0
+MEASURE f_dredge finisher       gap=1.30 hit_t=0.192 dmg=9.2 (core q=1.00) kb=2.33 m rise=0.07 stun=0.50 s hits=1
+MEASURE f_dredge dash_attack    gap=2.20 hit_t=0.283 dmg=4.4 (leg q=1.00) kb=2.09 m rise=0.09 stun=0.40 s hits=1
+MEASURE f_dredge ability1       gap=4.00 hit_t=0.650 dmg=5.5 (core q=1.00) kb=1.03 m rise=0.04 stun=0.30 s hits=1
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_zy_measure_table (1453 ms)
+BALANCE dredge vs dozer: 2 bouts: f_dredge 1 wins, 267 dmg in 49 hits (5.4/hit), 2 KOs, used { "ability1": 9, "grab": 6, "dodge": 5, "ability2": 5, "counter": 4, "juice": 2, "charged": 2 }; f_dozer 1 wins, 290 dmg in 42 hits (6.9/hit), 1 KOs, used { "dodge": 13, "grab": 3, "ability2": 3, "ability1": 3, "juice": 2, "splat": 1 }; 0 draws; avg 66 s
+BALANCE dredge mirror: 2 bouts: side0 1 wins, 209 dmg in 62 hits (3.4/hit), 0 KOs, used { "ability1": 10, "grab": 7, "ability2": 7, "counter": 3, "juice": 2, "dodge": 7 }; side1 1 wins, 247 dmg in 55 hits (4.5/hit), 1 KOs, used { "dodge": 14, "grab": 10, "ability2": 5, "juice": 2, "ability1": 9, "splat": 1, "counter": 1 }; 0 draws; avg 88 s
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_zz_balance (25152 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_downdraft_leap_direct_hit_and_landing_area (435 ms)
+2026-10-16 12:02:53 [WARN] sim: fighter 1 left the cage at (1.00, 0.62, 6.80); pulled back
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_gust_bomb_projectile_burst_and_reflect (914 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_hang_time_hover_zone_immunity_and_aerials (988 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_hurricane_strut_juice (487 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_multi_hits_and_wind_push (580 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_skid_kick_from_dodge_and_cheap_dodges (176 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_stats_slots_and_data (1 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_strikes_connect_in_range_and_miss_beyond (5279 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_talon_snatch_pecks_and_throws (915 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_taunt_guard_and_parry (595 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_winded_follow_ups_launch_and_trip (744 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_zz_lab (0 ms)
+ok    res://src/test/kits/test_kit_f_gusto.gd::test_zz_showcase (0 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_arc_lash_homing_pulse_cooldown (377 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_bot_pest_uses_kit (707 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_campaign_techniques_deliver (814 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_creature_parses_cleanly (1 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_guard_and_parry (378 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_headbonk_bounces_back (76 ms)
+  L1 Slap                      vs dev_biped  @0.8  dmg   2.8  part leg    kb +0.50 m  max reach 0.66 (l1:slap_l)
+  L2 Double Slap               vs dev_biped  @0.8  dmg   3.4  part leg    kb +0.62 m  max reach 0.66 (l2:slap_r)
+  L3 Headbonk                  vs f_slurry   @1.1  dmg   7.0  part core   kb +0.97 m  max reach 0.36 (l3:cap)
+  Heavy Squash                 vs dev_biped  @1.5  dmg   8.2  part core   kb +0.97 m  max reach 0.20 (heavy:body_slam)
+  Charged Heavy Super Squash   vs f_slurry   @2.5  dmg  26.4  part head   kb +1.73 m  max reach 0.20 (heavy_charged:body_slam)
+  Finisher Static Cling        vs dev_biped  @1.1  dmg  11.3  part core   kb +0.03 m  max reach 0.66 (l1:slap_l)
+  Dash Attack Pinball          vs f_slurry   @3.0  dmg   7.7  part core   kb +2.02 m  max reach 0.20 (dash_attack:body_slam)
+  Ability 1 Arc Lash           vs dev_biped  @5.0  dmg   7.5  part core   kb +0.44 m  max reach 0.00 ()
+  JUICE Overcharge burst       vs dev_biped  @2.6  dmg  14.4  part core   kb +2.00 m  max reach 0.00 ()
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_moves_connect_in_range_and_whiff_outside (3574 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_overcharge_activation_and_end (491 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_overcharge_state_effects (313 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_pad_squash_slam_connects (215 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_pinball_wall_bounce_and_pad_bonus (215 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_slippery_hold_and_quick_getup (657 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_spring_pad_launches (225 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_squash_landing_circle (232 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_static_cling_jolt_hype (150 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_suction_hug_zaps_and_throws (542 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_super_squash_launch_crush_landing (492 ms)
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_taunt (116 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_bot_trapper_uses_kit (731 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_campaign_techniques_deliver (750 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_coil_grab_pummel_and_throws (630 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_creature_parses_cleanly (0 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_drain_dive_invuln_distance_refund (249 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_head_butt_guard_and_parry (169 ms)
+  L1 Head Butt                 vs f_jitters  @1.3  dmg   5.7  part core   kb +0.73 m  max reach 1.39 (l1:fang)
+  L2 Tail Flick                vs dev_biped  @1.3  dmg   2.3  part leg    kb +0.65 m  max reach 1.53 (l2:tail_tip)
+  L3 Fang Snap                 vs f_jitters  @1.3  dmg   8.0  part core   kb -0.36 m  max reach 1.40 (l3:fang)
+  Heavy Tail Sweep             vs f_jitters  @1.3  dmg  13.0  part core   kb +3.03 m  max reach 1.51 (heavy:tail_tip)
+  Charged Heavy Rear & Crash   vs dev_biped  @1.4  dmg  26.1  part head   kb +2.15 m  max reach 1.32 (heavy_charged:head)
+  Finisher Venom Spit          vs dev_biped  @3.0  dmg   8.0  part core   kb +1.45 m  max reach 1.32 (l1:fang)
+  Dash Attack Slither Strike   vs f_jitters  @3.0  dmg   6.9  part core   kb +2.37 m  max reach 1.45 (dash_attack:fang)
+  Ability 1 Sludge Lob         vs dev_biped  @6.0  dmg   6.0  part core   kb +0.89 m  max reach 0.00 ()
+  Ability 2 Drain Dive         vs f_jitters  @5.4  dmg   5.0  part core   kb +0.24 m  max reach 0.00 ()
+  JUICE Overflow wave          vs dev_biped  @3.0  dmg   9.2  part core   kb +1.33 m  max reach 0.00 ()
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_moves_connect_in_range_and_whiff_outside (4371 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_overflow_juice_activation_and_end (438 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_overflow_state_spit_and_heal (199 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_rear_and_crash_armor_puddle_guard_crush (559 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_slither_strike_puddle_bonus (187 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_sludge_lob_charges_cooldown_and_puddle (570 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_tail_sweep_multi_target_and_gunked_trip (430 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_taunt (214 ms)
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_venom_spit_reflect_guard_no_parry (351 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_charged_heavy_hold_armor_and_overhand_armor (234 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_clinch_pummel_and_throws (716 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_gut_furnace_feeds_on_sizzle (317 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_haymaker_guard_crush_and_sizzle_knock_up (652 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_knockback_scale_side_shove_and_turn (835 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_light_string_and_finisher (390 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_meltdown_juice (425 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_stats_slots_and_data (0 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_steam_vent_cone_push_projectiles_and_cooldown (826 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_stoke_step_from_dodge_launches (129 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_stoke_the_fire_buff (1309 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_strikes_connect_in_range_and_miss_beyond (4714 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_taunt_guard_and_parry (592 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_zz_balance (0 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_zz_lab (0 ms)
+ok    res://src/test/kits/test_kit_f_stoke.gd::test_zz_showcase (0 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_blister_death_pop (182 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_blister_inflate_and_pop (112 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_blister_moves_connect_in_range_and_miss_outside (577 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_blisters_never_inflate_side_by_side (680 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_campaign_loadouts_really_differ (73 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_chum_rush_resolves_pelter_variant (1 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_lid_up_shields_only_the_front (470 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_minion_kits_complete_and_valid (0 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_pelter_lobs_bolts_and_keeps_distance (723 ms)
+SCRAPLING TTK: dev_biped light -> 4 clean hits (dead true, 5.2 s)
+SCRAPLING TTK: dev_biped heavy -> 1 clean hits (dead true, 8.7 s)
+SCRAPLING TTK: npc_kid_lamprey light -> 4 clean hits (dead true, 15.9 s)
+SCRAPLING TTK: npc_kid_lamprey heavy -> 1 clean hits (dead true, 11.8 s)
+SCRAPLING TTK: f_dredge light -> 5 clean hits (dead true, 19.2 s)
+SCRAPLING TTK: f_dozer light -> 2 clean hits (dead false, 20.0 s)
+ok    res://src/test/kits/test_kit_minions.gd::test_scrapling_dies_in_a_few_clean_hits (4810 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_scrapling_moves_connect_in_range_and_miss_outside (1556 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_scrapling_pack_takes_turns (1248 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_thrown_blister_is_a_live_bomb (281 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_thrown_scrapling_is_a_projectile (273 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_zz_debug_contacts (0 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_zz_debug_lid (0 ms)
+ok    res://src/test/kits/test_kit_minions.gd::test_zz_report_ranges (0 ms)
+ok    res://src/test/kits/test_kit_npc_extensions.gd::test_bot_hints_rest_bulky_and_keep_distance (1232 ms)
+ok    res://src/test/kits/test_kit_npc_extensions.gd::test_hook_events_validate_and_not_condition (14 ms)
+ok    res://src/test/kits/test_kit_npc_extensions.gd::test_knocked_out_hook_fires_unless_vetoed (57 ms)
+ok    res://src/test/kits/test_kit_npc_extensions.gd::test_self_damage_lethal_only_when_asked (18 ms)
+ok    res://src/test/kits/test_kit_npc_extensions.gd::test_shield_status_guards_its_arc (19 ms)
+ok    res://src/test/kits/test_kit_npc_extensions.gd::test_thrown_hook_acts_for_the_thrower_at_the_landing (106 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_abilities_cooldowns_and_counter_stance (747 ms)
+smoke kid vs f_stoke rookie                  A  0 / B  4 / draw 0  (A   0%)  hits/bout A 6.3 B 9.8  dmg/hit A 3.4 B 8.8  end HP A 0% B 78%  KOs 4  avg 29 s
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_balance_vs_roster (7883 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_charged_heavy_armor_shrugs_lights (186 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_grab_pummel_and_throws (697 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_guard_blocks_and_parry_staggers (545 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_juice_feeding_frenzy (507 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_kit_is_complete_and_valid (0 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_moves_connect_in_range_and_miss_outside (3067 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_string_shove_launch_and_stun (541 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_taunt_builds_hype (118 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_tutorial_partner_behaviours (6574 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_debug_contacts (0 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_debug_tutorial (0 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_quick_balance (0 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_report_ranges (0 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_string_contacts (0 ms)
+ok    res://src/test/lab/test_lab_bc.gd::test_bc_generalises_on_held_out_episodes (837 ms)
+ok    res://src/test/lab/test_lab_bc.gd::test_bc_job_reports_test_episode_accuracy (282 ms)
+ok    res://src/test/lab/test_lab_bc.gd::test_bc_overfits_a_tiny_dataset (1233 ms)
+ok    res://src/test/lab/test_lab_bc.gd::test_bc_refuses_datasets_with_too_few_episodes (32 ms)
+ok    res://src/test/lab/test_lab_bc.gd::test_bc_split_is_by_whole_episodes_three_ways (6 ms)
+ok    res://src/test/lab/test_lab_bc.gd::test_dataset_shards_round_trip_and_validation (49 ms)
+ok    res://src/test/lab/test_lab_datasets.gd::test_copies_of_a_seeded_episode_share_a_split (30 ms)
+ok    res://src/test/lab/test_lab_datasets.gd::test_identical_rerecordings_are_loaded_once (29 ms)
+ok    res://src/test/lab/test_lab_datasets.gd::test_recording_again_adds_new_episodes (15676 ms)
+ok    res://src/test/lab/test_lab_docs.gd::test_documented_commands_resolve_from_the_game_folder (2 ms)
+2026-10-16 12:04:26 [INFO] match: start ? on the_gullet: dev_biped/t0/player, dev_biped/t1/bot
+ok    res://src/test/lab/test_lab_recording.gd::test_nothing_is_recorded_when_disabled (91 ms)
+2026-10-16 12:04:26 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/captures/tests/lab_rec_606080980/datasets/human_dev_biped)
+2026-10-16 12:04:26 [INFO] match: start ? on the_gullet: dev_biped/t0/player, dev_biped/t1/bot
+2026-10-16 12:04:27 [INFO] recorder: saved 39 samples to C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/captures/tests/lab_rec_606080980/datasets/human_dev_biped/shard_human_20261016T160427_8912_8626.bin
+ok    res://src/test/lab/test_lab_recording.gd::test_player_matches_are_recorded_when_enabled (538 ms)
+ok    res://src/test/lab/test_lab_stats.gd::test_paired_test_uses_episode_pairs (1 ms)
+ok    res://src/test/lab/test_lab_stats.gd::test_spawns_follow_the_seed_and_the_layout (5 ms)
+ok    res://src/test/lab/test_lab_stats.gd::test_standard_spawn_episodes_are_not_repeats (557 ms)
+ok    res://src/test/lab/test_lab_stats.gd::test_student_t_intervals_for_small_samples (0 ms)
+ok    res://src/test/lab/test_lab_worker.gd::test_crash_and_resume_from_checkpoint (31239 ms)
+ok    res://src/test/lab/test_lab_worker.gd::test_es_improves_on_the_drill_task (47381 ms)
+ok    res://src/test/lab/test_lab_worker.gd::test_helper_heartbeat_rule (0 ms)
+ok    res://src/test/lab/test_lab_worker.gd::test_pause_resume_cancel (9860 ms)
+ok    res://src/test/lab/test_lab_worker.gd::test_silent_worker_with_a_live_process_is_not_resumed (136 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_a_helper_that_never_delivers_cannot_hang_the_run (9837 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_an_idle_helper_backs_off (12541 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_bc_starts_helpers_only_for_the_rollouts (6156 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_cpu_throttle_keeps_the_long_run_share (26 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_es_validates_the_last_generations_before_selecting (9372 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_evaluation_and_recording_stop_at_the_time_limit (14682 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_evaluation_plays_the_policy_as_saved (19 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_helpers_exit_when_the_coordinator_dies (25073 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_idle_helper_scans_back_off (1651 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_long_pause_keeps_the_helpers (31704 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_resume_grants_a_heartbeat_grace_period (0 ms)
+ok    res://src/test/lab/test_lab_worker_faults.gd::test_straggler_deadline_rule (0 ms)
+ok    res://src/test/lab/test_policy_contract.gd::test_action_apply_and_classify_round_trip (10 ms)
+ok    res://src/test/lab/test_policy_contract.gd::test_feature_names_match_size (0 ms)
+ok    res://src/test/lab/test_policy_contract.gd::test_masks_and_choice (0 ms)
+ok    res://src/test/lab/test_policy_contract.gd::test_observation_shape_bounds_and_determinism (56 ms)
+ok    res://src/test/lab/test_policy_contract.gd::test_only_perceivable_state_is_observed (33 ms)
+ok    res://src/test/lab/test_policy_contract.gd::test_perception_lag_uses_previous_snapshot (23 ms)
+ok    res://src/test/lab/test_policy_contract.gd::test_recorder_reproduces_policy_actions (242 ms)
+ok    res://src/test/lab/test_policy_contract.gd::test_target_seen_in_fighter_space (29 ms)
+ok    res://src/test/lab/test_policy_contract.gd::test_wall_rays_see_the_cage (19 ms)
+    inference: 367 decisions, 116.1 us per decision (worst 240 us), 118.4 us per tick for 8 fighters
+ok    res://src/test/lab/test_policy_inference.gd::test_eight_policy_fighters_fit_the_budget (579 ms)
+ok    res://src/test/lab/test_policy_io.gd::test_content_policies_are_size_capped_before_reading (18 ms)
+ok    res://src/test/lab/test_policy_io.gd::test_invalid_user_files_can_be_renamed_and_deleted (33 ms)
+ok    res://src/test/lab/test_policy_io.gd::test_library_operations (70 ms)
+ok    res://src/test/lab/test_policy_io.gd::test_loading_never_executes_code (5 ms)
+2026-10-16 12:07:48 [WARN] policy: policy 'nope' unavailable (no policy with id 'nope'); a scripted bot fights instead
+2026-10-16 12:07:48 [WARN] policy: policy 'u_dev_biped_tn0ct0725' unavailable (trained for 'dev_biped', not 'someone_else'); a scripted bot fights instead
+ok    res://src/test/lab/test_policy_io.gd::test_match_hook_falls_back_safely (19 ms)
+2026-10-16 12:07:48 [WARN] policy: recovered rec.policy.json from rec.policy.json.bak
+ok    res://src/test/lab/test_policy_io.gd::test_recovers_from_backup_when_main_file_is_damaged (24 ms)
+ok    res://src/test/lab/test_policy_io.gd::test_rejects_damaged_files (44 ms)
+ok    res://src/test/lab/test_policy_io.gd::test_rejects_incompatible_or_malformed_contents (23 ms)
+ok    res://src/test/lab/test_policy_io.gd::test_rejects_oversized_file_before_parsing (13 ms)
+ok    res://src/test/lab/test_policy_io.gd::test_round_trip_is_exact (23 ms)
+ok    res://src/test/lab/test_policy_mlp.gd::test_backward_matches_finite_differences (3 ms)
+ok    res://src/test/lab/test_policy_mlp.gd::test_centered_ranks (0 ms)
+ok    res://src/test/lab/test_policy_mlp.gd::test_es_noise_is_reproducible (0 ms)
+ok    res://src/test/lab/test_policy_mlp.gd::test_es_optimises_a_synthetic_objective (25 ms)
+ok    res://src/test/lab/test_policy_mlp.gd::test_fast_forward_matches_reference (7 ms)
+ok    res://src/test/lab/test_policy_mlp.gd::test_init_is_deterministic_from_seed (2 ms)
+ok    res://src/test/lab/test_policy_mlp.gd::test_param_count_and_layout (0 ms)
+ok    res://src/test/lab/test_policy_samples.gd::test_drill_sample_hits_a_standing_dummy (2744 ms)
+ok    res://src/test/lab/test_policy_samples.gd::test_shipped_policies_validate (17 ms)
+2026-10-16 12:07:52 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:52 [WARN] content: co_direct: presentation-only (client_only) package contains 'rules/', which was not loaded
+2026-10-16 12:07:52 [WARN] content: co_direct: presentation-only (client_only) package contains tuning.json, which was not loaded
+2026-10-16 12:07:52 [WARN] content: cased_mod: 'Rules/' was not loaded; content folders are lowercase ('rules/')
+2026-10-16 12:07:52 [INFO] mods: loaded 1 mod(s): cased_mod
+2026-10-16 12:07:52 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_client_only_packages_cannot_carry_gameplay_in_any_spelling (728 ms)
+2026-10-16 12:07:52 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:52 [WARN] content: declared_mod/rules/duel.json: replaces the core entry 'duel' but the player has not allowed it; it was not loaded
+2026-10-16 12:07:53 [WARN] content: phantom_mod/rules/x.json: "override": there is no core rules entry 'brand_new_bare_id' to replace
+2026-10-16 12:07:53 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_core_override_needs_consent_even_when_declared (653 ms)
+2026-10-16 12:07:53 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:53 [WARN] content: sneaky_override/rules/duel.json: replaces the core entry 'duel', so the manifest must declare the 'replaces_core' capability (players are asked before such a mod loads); it was not loaded
+2026-10-16 12:07:53 [WARN] content: sneaky_override/tuning.json: changes core values, so the package must declare the 'replaces_core' capability and the player must allow it; it was not loaded
+2026-10-16 12:07:53 [INFO] mods: loaded 1 mod(s): sneaky_override
+2026-10-16 12:07:53 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_core_override_without_declared_capability_is_refused (430 ms)
+2026-10-16 12:07:53 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:54 [INFO] mods: loaded 1 mod(s): link_mod
+2026-10-16 12:07:54 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_folder_links_are_never_followed_validated_copied_exported_or_loaded (463 ms)
+2026-10-16 12:07:54 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:54 [WARN] content: ws_entry/rules/r.json#ws_entry:r
+.id: 'ws_entry:r\n' does not match ^([a-z0-9_]+:)?[a-z0-9_]+$
+2026-10-16 12:07:54 [INFO] mods: loaded 1 mod(s): ws_entry
+2026-10-16 12:07:54 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_ids_and_versions_with_whitespace_or_control_characters_are_rejected (484 ms)
+2026-10-16 12:07:54 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:54 [INFO] mods: loaded 1 mod(s): swap_mod
+2026-10-16 12:07:55 [INFO] mods: loaded 1 mod(s): swap_mod
+2026-10-16 12:07:55 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_import_never_leaves_the_installed_mod_uninstalled (631 ms)
+2026-10-16 12:07:55 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:res_glb: asset path art.model 'res://assets/models/creatures/f_stoke.glb' must be a relative path inside the package (no res://, user://, drive or absolute paths)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:res_scene: asset path art.model 'res://src/app/main.tscn' must be a relative path inside the package (no res://, user://, drive or absolute paths)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:user_path: asset path art.model 'user://x.glb' must be a relative path inside the package (no res://, user://, drive or absolute paths)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:drive: asset path art.model 'C:/Windows/notepad.exe' must be a relative path inside the package (no res://, user://, drive or absolute paths)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:absolute: asset path art.model '/etc/passwd' must be a relative path inside the package (no res://, user://, drive or absolute paths)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:traversal: asset path art.model '../outside.glb' must stay inside the package (no '..', '.' or empty folder names)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:missing: asset path art.model 'models/missing.glb' is not a file in the package (names are case-sensitive)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:wrong_ext: asset path art.model 'models/notes.txt' must be a png/jpg/jpeg/webp/glb/ogg/wav file
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:bare_word: asset path art.model 'model' must be a png/jpg/jpeg/webp/glb/ogg/wav file
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:case: asset path art.model 'Models/Real.glb' is not a file in the package (names are case-sensitive)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:nested_list: asset path art.textures[1] '../escape.png' must stay inside the package (no '..', '.' or empty folder names)
+2026-10-16 12:07:55 [WARN] content: asset_mod/creatures/c.json#asset_mod:backslash: asset path art.icon 'textures\\ok.png' must be a relative path inside the package (no res://, user://, drive or absolute paths)
+2026-10-16 12:07:55 [INFO] mods: loaded 1 mod(s): asset_mod
+2026-10-16 12:07:55 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_mod_asset_paths_must_be_validated_package_files (430 ms)
+2026-10-16 12:07:55 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:56 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_mod_text_cannot_restyle_or_hide_the_mods_screen (374 ms)
+2026-10-16 12:07:56 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:56 [WARN] content: tuning.json: 'guard_damage_mult' must be a finite number
+2026-10-16 12:07:56 [INFO] mods: loaded 1 mod(s): tune_mod
+2026-10-16 12:07:56 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:56 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_mod_tuning_is_undone_when_the_mod_is_disabled (582 ms)
+2026-10-16 12:07:56 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:57 [WARN] content: second_tweak/rules/duel.json: 'duel' is already replaced by 'first_tweak'; two mods cannot replace the same core entry (disable one of them)
+2026-10-16 12:07:57 [WARN] content: thief_mod/rules/r.json: 'owner_mod:r' belongs to 'owner_mod'; a mod can only add its own 'thief_mod:' entries and never replaces another mod's or the player's entries
+2026-10-16 12:07:57 [WARN] content: thief_mod/rules/r.json: 'user:glass' belongs to 'user'; a mod can only add its own 'thief_mod:' entries and never replaces another mod's or the player's entries
+2026-10-16 12:07:57 [INFO] mods: loaded 4 mod(s): first_tweak, owner_mod, second_tweak, thief_mod
+2026-10-16 12:07:57 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_mods_never_replace_other_mods_or_player_entries (553 ms)
+2026-10-16 12:07:57 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:57 [WARN] mods: mod sets unreadable (modsets.json was saved by a newer version of the game (format v2 > v1). It was left untouched.); starting with an empty set
+2026-10-16 12:07:57 [WARN] mods: modsets.json is read-only for this session (written by a newer game version)
+2026-10-16 12:07:57 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_newer_mod_sets_file_is_left_untouched (276 ms)
+2026-10-16 12:07:57 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:57 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_unportable_entry_names_are_rejected (377 ms)
+2026-10-16 12:07:58 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:58 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_walker_skips_links_and_import_copies_only_validated_files (317 ms)
+2026-10-16 12:07:58 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:58 [WARN] mods: agree.critmod: the zip reader sees 'rules/r.json', which was not checked; not unpacked
+2026-10-16 12:07:58 [WARN] mods: agree.critmod: the zip reader sees 'manifest.json', which was not checked; not unpacked
+2026-10-16 12:07:58 [WARN] mods: agree.critmod: 'manifest.json' unpacked to a different size than checked; not unpacked
+2026-10-16 12:07:58 [WARN] mods: agree_swap-1.0.0.critmod changed since it was checked; not unpacked
+2026-10-16 12:07:58 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:58 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mod_hardening.gd::test_zip_directory_and_zip_reader_must_agree (470 ms)
+2026-10-16 12:07:58 [INFO] mods: loaded 3 mod(s): moon_rules, rust_bucket, stoke_variants
+2026-10-16 12:07:59 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mods.gd::test_bundled_examples_validate_and_load (322 ms)
+2026-10-16 12:07:59 [INFO] mods: loaded 1 mod(s): cosmetic_lines
+2026-10-16 12:07:59 [INFO] mods: loaded 2 mod(s): cosmetic_lines, gameplay_bits
+2026-10-16 12:07:59 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mods.gd::test_client_only_mods_do_not_affect_compatibility (464 ms)
+2026-10-16 12:07:59 [INFO] mods: loaded 1 mod(s): duel_tweak
+2026-10-16 12:07:59 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:07:59 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mods.gd::test_core_override_needs_consent_and_changes_hash (436 ms)
+2026-10-16 12:08:00 [WARN] content: ext_test/creatures/v.json: extends unknown creature 'no_such_creature'
+2026-10-16 12:08:00 [WARN] content: ext_test/creatures/v.json: 'extends' chain ext_test:loop_a -> ext_test:loop_b -> ext_test:loop_a is circular or deeper than 4
+2026-10-16 12:08:00 [WARN] content: ext_test/creatures/v.json: extends unknown creature 'ext_test:loop_a'
+2026-10-16 12:08:00 [INFO] mods: loaded 1 mod(s): ext_test
+2026-10-16 12:08:00 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mods.gd::test_creature_extends_merges_and_validates (320 ms)
+2026-10-16 12:08:00 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mods.gd::test_dependencies_order_cycles_and_versions (342 ms)
+2026-10-16 12:08:00 [INFO] mods: loaded 1 mod(s): sample_mod
+2026-10-16 12:08:00 [INFO] mods: loaded 1 mod(s): sample_mod
+2026-10-16 12:08:01 [INFO] mods: loaded 1 mod(s): sample_mod
+2026-10-16 12:08:01 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 12:08:01 [INFO] mods: loaded 1 mod(s): sample_mod
+2026-10-16 12:08:01 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mods.gd::test_install_upgrade_downgrade_remove_and_recover (880 ms)
+2026-10-16 12:08:01 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mods.gd::test_rule_hooks_mods_and_gravity_reach_fighters (248 ms)
+2026-10-16 12:08:02 [WARN] content: loose_ids/rules/r.json: mod ids must start with 'loose_ids:' (got 'plain_id'); to replace a core entry deliberately set "override": true and declare the 'replaces_core' capability
+2026-10-16 12:08:02 [INFO] mods: loaded 1 mod(s): loose_ids
+2026-10-16 12:08:02 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/mods/test_mods.gd::test_unsafe_and_invalid_packages_are_rejected (391 ms)
+ok    res://src/test/net/test_net_codec.gd::test_assist_level_on_the_wire (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_beacon_codec (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_content_verdict (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_event_codec_roundtrip (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_event_codec_survives_garbage (172 ms)
+ok    res://src/test/net/test_net_codec.gd::test_input_sample_codec_is_strict (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_lan_compatibility_lines (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_package_list_codec (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_parse_address (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_password_proof_never_contains_password (1 ms)
+ok    res://src/test/net/test_net_codec.gd::test_payload_sanitizer (3 ms)
+ok    res://src/test/net/test_net_codec.gd::test_position_quantization_and_clamp (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_quaternion_quantization_error (14 ms)
+ok    res://src/test/net/test_net_codec.gd::test_rate_limiter (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_reader_never_reads_past_end (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_reason_texts_are_ui_ready (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_recent_servers_list (217 ms)
+ok    res://src/test/net/test_net_codec.gd::test_remote_input_redundancy_and_jitter_buffer (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_server_config_parser (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_server_mods_config (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_text_truncates_on_character_boundary (0 ms)
+ok    res://src/test/net/test_net_codec.gd::test_writer_reader_roundtrip (0 ms)
+2026-10-16 12:08:02 [INFO] net: arena 'user:loopback_cage' packaged for the players: 1233 bytes
+2026-10-16 12:08:02 [INFO] net: client closed: content_mismatch - Your installed content or mods differ from the server's. Match the packages listed below, then try again.
+2026-10-16 12:08:02 [INFO] net: client closed: content_mismatch - Your installed content or mods differ from the server's. Match the packages listed below, then try again.
+ok    res://src/test/net/test_net_loopback.gd::test_arena_checks_before_the_match (64 ms)
+2026-10-16 12:08:02 [INFO] net: dedicated server 'Loop' listening on UDP *:42242 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:02 [INFO] net: connecting to 127.0.0.1:42242
+2026-10-16 12:08:02 [INFO] net: connecting to 127.0.0.1:42242
+2026-10-16 12:08:02 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4691 nodes=25 orphans=0
+2026-10-16 12:08:02 [INFO] net: player 2 'Steady' joined from 127.0.0.1
+2026-10-16 12:08:02 [INFO] net: player 3 'Shaky' joined from 127.0.0.1
+2026-10-16 12:08:02 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:02 [INFO] net: joined 'Loop' as player 3
+2026-10-16 12:08:05 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-16 12:08:05 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-16 12:08:05 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:05 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_assist_reaches_server_fighter_inprocess (3064 ms)
+2026-10-16 12:08:05 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-16 12:08:05 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-16 12:08:05 [INFO] net: dedicated server 'Loop' listening on UDP *:42244 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:05 [INFO] net: connecting to 127.0.0.1:42244
+2026-10-16 12:08:05 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4748 nodes=24 orphans=0
+2026-10-16 12:08:05 [INFO] net: rejected 127.0.0.1: content_mismatch content differs [Not on the server: phantom_mod 1.0.0 (disable it to join)]
+2026-10-16 12:08:05 [INFO] net: client closed: content_mismatch - Your installed content or mods differ from the server's. Match the packages listed below, then try again.
+2026-10-16 12:08:05 [INFO] net: connecting to 127.0.0.1:42244
+2026-10-16 12:08:05 [INFO] net: player 2 'Dandy' joined from 127.0.0.1
+2026-10-16 12:08:05 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:05 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:05 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_content_check_on_server_inprocess (54 ms)
+2026-10-16 12:08:05 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-16 12:08:05 [INFO] net: dedicated server 'Loop' listening on UDP *:42246 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:05 [INFO] net: connecting to 127.0.0.1:42246
+2026-10-16 12:08:05 [INFO] net: connecting to 127.0.0.1:42246
+2026-10-16 12:08:05 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4815 nodes=25 orphans=0
+2026-10-16 12:08:05 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:08:05 [INFO] net: player 3 'Ben' joined from 127.0.0.1
+2026-10-16 12:08:05 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:05 [INFO] net: joined 'Loop' as player 3
+2026-10-16 12:08:08 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-16 12:08:08 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-16 12:08:08 [INFO] net: listen server 'Hosty's session' listening on UDP *:42248 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:08 [INFO] net: server closing (host_left): The host left the session.
+2026-10-16 12:08:08 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:08 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_cosmetics_travel_with_players_inprocess (3075 ms)
+2026-10-16 12:08:08 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:08:08 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-16 12:08:08 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-16 12:08:08 [INFO] net: listen server 'Hosty's session' listening on UDP *:42250 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:08 [INFO] net: connecting to 127.0.0.1:42250
+2026-10-16 12:08:08 [INFO] net: player 2 'Guest' joined from 127.0.0.1
+2026-10-16 12:08:08 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:08:09 [INFO] net: server closing (host_left): The host left the session.
+2026-10-16 12:08:09 [INFO] net: client closed: host_left - The host left the session.
+ok    res://src/test/net/test_net_loopback.gd::test_host_leaving_ends_session (14 ms)
+2026-10-16 12:08:09 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:08:09 [INFO] net: listen server 'Hosty's session' listening on UDP *:42252 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:09 [INFO] net: connecting to 127.0.0.1:42252
+2026-10-16 12:08:09 [INFO] net: player 2 'Guest' joined from 127.0.0.1
+2026-10-16 12:08:09 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:08:09 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_dozer)
+2026-10-16 12:08:09 [INFO] match: start duel on the_gullet: f_dozer/t0/player, f_dozer/t1/net
+2026-10-16 12:08:09 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-16 12:08:09 [WARN] net: match 1: the host's match scene was removed; ending the match
+2026-10-16 12:08:11 [INFO] net: server closing (host_left): The host left the session.
+ok    res://src/test/net/test_net_loopback.gd::test_host_scene_removed_mid_match (2067 ms)
+2026-10-16 12:08:11 [INFO] net: dedicated server 'Loop' listening on UDP *:42254 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:11 [INFO] net: connecting to 127.0.0.1:42254
+2026-10-16 12:08:11 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:08:11 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4811 nodes=25 orphans=0
+2026-10-16 12:08:11 [INFO] net: player 2 'Troll' joined from 127.0.0.1
+2026-10-16 12:08:11 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:11 [WARN] net: kicking player 2 'Troll': being rude
+2026-10-16 12:08:11 [INFO] net: player 2 'Troll' removed (kicked: being rude)
+2026-10-16 12:08:11 [INFO] net: server idle (no players)
+2026-10-16 12:08:11 [INFO] net: client closed: kicked - You were removed from the session: being rude
+2026-10-16 12:08:11 [INFO] net: connecting to 127.0.0.1:42254
+2026-10-16 12:08:11 [INFO] net: rejected 127.0.0.1: kicked being rude [You can rejoin in 30 s.]
+2026-10-16 12:08:11 [INFO] net: client closed: kicked - You were removed from the session: being rude
+2026-10-16 12:08:11 [INFO] net: connecting to 127.0.0.1:42254
+2026-10-16 12:08:11 [INFO] net: player 3 'Spammer' joined from 127.0.0.1
+2026-10-16 12:08:11 [INFO] net: joined 'Loop' as player 3
+2026-10-16 12:08:11 [WARN] net: protocol violation by player 3 'Spammer': unexpected message id 71 (score 6.0)
+2026-10-16 12:08:11 [WARN] net: protocol violation by player 3 'Spammer': unexpected message id 71 (score 12.0)
+2026-10-16 12:08:11 [WARN] net: protocol violation by player 3 'Spammer': unexpected message id 71 (score 18.0)
+2026-10-16 12:08:11 [WARN] net: protocol violation by player 3 'Spammer': unexpected message id 71 (score 24.0)
+2026-10-16 12:08:11 [WARN] net: kicking player 3 'Spammer': protocol violation (unexpected message id 71)
+2026-10-16 12:08:11 [INFO] net: player 3 'Spammer' removed (kicked: protocol violation (unexpected message id 71))
+2026-10-16 12:08:11 [INFO] net: server idle (no players)
+2026-10-16 12:08:11 [INFO] net: client closed: protocol_violation - The connection sent invalid data and was closed (protocol violation).
+protocol violation (unexpected message id 71)
+2026-10-16 12:08:11 [INFO] net: connecting to 127.0.0.1:42254
+2026-10-16 12:08:11 [INFO] net: player 4 'Fine' joined from 127.0.0.1
+2026-10-16 12:08:11 [INFO] net: joined 'Loop' as player 4
+2026-10-16 12:08:11 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:11 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_kick_ban_and_violations_inprocess (59 ms)
+2026-10-16 12:08:11 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-16 12:08:11 [INFO] net: dedicated server 'LAN Test Box' listening on UDP *:42256 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:11 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4807 nodes=23 orphans=0
+2026-10-16 12:08:11 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:11 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_lan_discovery_inprocess (12 ms)
+2026-10-16 12:08:11 [INFO] net: dedicated server 'Loop' listening on UDP *:42258 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:11 [INFO] net: connecting to 127.0.0.1:42258
+2026-10-16 12:08:11 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4809 nodes=24 orphans=0
+2026-10-16 12:08:11 [INFO] net: player 2 'Picker' joined from 127.0.0.1
+2026-10-16 12:08:11 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:14 [INFO] net: playlist pick: chum_rush@the_gullet (no votes: highest weight)
+2026-10-16 12:08:14 [INFO] net: match 1 started: chum_rush on the_gullet, 1 fighters (1 humans, 0 bots)
+2026-10-16 12:08:14 [INFO] net: client closed: timeout - No response from the other side (timed out). Check your network connection.
+2026-10-16 12:08:14 [INFO] net: player 2 'Picker' disconnected (timeout); slot reserved for 20 s
+2026-10-16 12:08:14 [INFO] net: match 1 finished: winner team -1 (aborted: everyone left)
+2026-10-16 12:08:14 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:14 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_mode_picks_for_remote_players_inprocess (3553 ms)
+2026-10-16 12:08:14 [INFO] net: listen server 'Hosty's session' listening on UDP *:42240 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:14 [INFO] net: connecting to 127.0.0.1:42240
+2026-10-16 12:08:14 [INFO] net: player 2 'Guest' joined from 127.0.0.1
+2026-10-16 12:08:14 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:08:14 [INFO] net: LAN announcements off
+2026-10-16 12:08:14 [INFO] net: LAN announcements on
+2026-10-16 12:08:14 [INFO] net: LAN browser listening on UDP 32952
+2026-10-16 12:08:14 [INFO] net: server closing (host_left): The host left the session.
+2026-10-16 12:08:14 [INFO] net: dedicated server 'Loop' listening on UDP *:42245 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:14 [INFO] net: connecting to 127.0.0.1:42245
+2026-10-16 12:08:14 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4836 nodes=26 orphans=0
+2026-10-16 12:08:14 [INFO] net: client closed: host_left - The host left the session.
+2026-10-16 12:08:14 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:08:14 [INFO] net: player 2 'Joiner' joined from 127.0.0.1
+2026-10-16 12:08:14 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:14 [INFO] net: client closed: left - You left the session.
+2026-10-16 12:08:14 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:14 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_network_settings_apply_live (283 ms)
+2026-10-16 12:08:14 [INFO] net: dedicated server 'Loop' listening on UDP *:42242 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:14 [INFO] net: connecting to 127.0.0.1:42242
+2026-10-16 12:08:14 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4808 nodes=24 orphans=0
+2026-10-16 12:08:14 [INFO] net: player 2 'Bigmouth' joined from 127.0.0.1
+2026-10-16 12:08:14 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:14 [WARN] net: kicking player 2 'Bigmouth': oversized message
+2026-10-16 12:08:14 [INFO] net: player 2 'Bigmouth' removed (kicked: oversized message)
+2026-10-16 12:08:14 [INFO] net: server idle (no players)
+2026-10-16 12:08:14 [INFO] net: client closed: protocol_violation - The connection sent invalid data and was closed (protocol violation).
+oversized message
+2026-10-16 12:08:14 [INFO] net: connecting to 127.0.0.1:42242
+2026-10-16 12:08:14 [INFO] net: player 3 'Flooder' joined from 127.0.0.1
+2026-10-16 12:08:14 [INFO] net: joined 'Loop' as player 3
+2026-10-16 12:08:14 [WARN] net: protocol violation by player 3 'Flooder': input rate (score 0.3)
+2026-10-16 12:08:14 [WARN] net: protocol violation by player 3 'Flooder': input rate (score 0.5)
+2026-10-16 12:08:14 [WARN] net: protocol violation by player 3 'Flooder': input rate (score 0.8)
+2026-10-16 12:08:14 [WARN] net: protocol violation by player 3 'Flooder': input rate (score 1.0)
+2026-10-16 12:08:14 [WARN] net: protocol violation by player 3 'Flooder': input rate (score 1.3)
+2026-10-16 12:08:14 [WARN] net: protocol violation by player 3 'Flooder': input rate (score 1.5)
+2026-10-16 12:08:14 [WARN] net: protocol violation by player 3 'Flooder': input rate (score 1.7)
+2026-10-16 12:08:14 [WARN] net: protocol violation by player 3 'Flooder': input rate (score 2.0)
+2026-10-16 12:08:14 [WARN] net: kicking player 3 'Flooder': protocol violation (input rate)
+2026-10-16 12:08:14 [INFO] net: player 3 'Flooder' removed (kicked: protocol violation (input rate))
+2026-10-16 12:08:14 [INFO] net: server idle (no players)
+2026-10-16 12:08:14 [INFO] net: client closed: protocol_violation - The connection sent invalid data and was closed (protocol violation).
+protocol violation (input rate)
+2026-10-16 12:08:14 [INFO] net: connecting to 127.0.0.1:42242
+2026-10-16 12:08:15 [INFO] net: player 4 'Polite' joined from 127.0.0.1
+2026-10-16 12:08:15 [INFO] net: joined 'Loop' as player 4
+2026-10-16 12:08:15 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:15 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_oversized_and_flood_inprocess (74 ms)
+2026-10-16 12:08:15 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-16 12:08:15 [INFO] net: listen server 'Hosty's session' listening on UDP *:42244 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:15 [INFO] net: connecting to 127.0.0.1:42244
+2026-10-16 12:08:15 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:08:15 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:08:15 [INFO] net: party run run_7B7SWCY2344_5 open: 2 seats, host seat 1
+2026-10-16 12:08:15 [INFO] net: player 2 'Ann' took seat 2 of party run run_7B7SWCY2344_5
+2026-10-16 12:08:15 [INFO] net: party run run_7B7SWCY2344_5 closed
+2026-10-16 12:08:15 [INFO] net: server closing (host_left): The host left the session.
+ok    res://src/test/net/test_net_loopback.gd::test_party_new_run_from_the_lobby_inprocess (80 ms)
+2026-10-16 12:08:15 [INFO] net: listen server 'Hosty's session' listening on UDP *:42246 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:15 [INFO] net: connecting to 127.0.0.1:42246
+2026-10-16 12:08:15 [INFO] net: connecting to 127.0.0.1:42246
+2026-10-16 12:08:15 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:08:15 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:08:15 [INFO] net: player 3 'Ben' joined from 127.0.0.1
+2026-10-16 12:08:15 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:08:15 [INFO] net: joined 'Hosty's session' as player 3
+2026-10-16 12:08:15 [WARN] net: protocol violation by player 2 'Ann': bad relay request (score 1.0)
+2026-10-16 12:08:15 [WARN] net: protocol violation by player 2 'Ann': bad app payload: string longer than 8192 characters (score 6.0)
+2026-10-16 12:08:15 [INFO] net: client closed: timeout - No response from the other side (timed out). Check your network connection.
+2026-10-16 12:08:15 [INFO] net: player 3 'Ben' disconnected (timeout); slot reserved for 60 s
+2026-10-16 12:08:15 [INFO] net: server closing (host_left): The host left the session.
+ok    res://src/test/net/test_net_loopback.gd::test_party_relay_inprocess (211 ms)
+ok    res://src/test/net/test_net_loopback.gd::test_party_run_member_checks (122 ms)
+2026-10-16 12:08:15 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:08:15 [INFO] net: listen server 'Hosty's session' listening on UDP *:42248 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:15 [INFO] net: connecting to 127.0.0.1:42248
+2026-10-16 12:08:15 [INFO] net: connecting to 127.0.0.1:42248
+2026-10-16 12:08:15 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:08:15 [INFO] net: player 3 'Cid' joined from 127.0.0.1
+2026-10-16 12:08:15 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:08:15 [INFO] net: joined 'Hosty's session' as player 3
+2026-10-16 12:08:15 [INFO] net: party run run_TESTSEATS_7 open: 2 seats, host seat 2
+2026-10-16 12:08:15 [INFO] net: player 2 'Ann' took seat 1 of party run run_TESTSEATS_7
+2026-10-16 12:08:15 [INFO] net: client closed: left - You left the session.
+2026-10-16 12:08:15 [INFO] net: player 2 'Ann' removed (left)
+2026-10-16 12:08:15 [INFO] net: player 3 'Cid' took seat 1 of party run run_TESTSEATS_7
+2026-10-16 12:08:15 [INFO] net: party run run_TESTSEATS_7 closed
+2026-10-16 12:08:15 [INFO] net: server closing (host_left): The host left the session.
+ok    res://src/test/net/test_net_loopback.gd::test_party_seats_inprocess (271 ms)
+2026-10-16 12:08:15 [INFO] net: dedicated server 'Loop' listening on UDP *:42250 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:15 [INFO] net: connecting to 127.0.0.1:42250
+2026-10-16 12:08:15 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:08:15 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4811 nodes=25 orphans=0
+2026-10-16 12:08:15 [INFO] net: player 2 'Solo' joined from 127.0.0.1
+2026-10-16 12:08:15 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:18 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-16 12:08:18 [WARN] policy: dev_biped has changed since this policy was trained; it still works but may play worse
+2026-10-16 12:08:18 [INFO] net: fighter 1: AI Lab policy 'dev_biped_es_drill' 82e1e217cce5fcc0
+2026-10-16 12:08:18 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (1 humans, 1 bots)
+2026-10-16 12:08:18 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:18 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_policy_bots_and_rules_validation_inprocess (3073 ms)
+2026-10-16 12:08:18 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-16 12:08:18 [INFO] net: dedicated server 'Loop' listening on UDP *:42252 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:18 [INFO] net: connecting to 127.0.0.1:42252
+2026-10-16 12:08:18 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4859 nodes=24 orphans=0
+2026-10-16 12:08:18 [INFO] net: rejected 127.0.0.1: bad_password wrong password
+2026-10-16 12:08:18 [INFO] net: client closed: bad_password - This session is password protected and the password was not accepted.
+2026-10-16 12:08:18 [INFO] net: connecting to 127.0.0.1:42252
+2026-10-16 12:08:18 [INFO] net: player 2 'Ok' joined from 127.0.0.1
+2026-10-16 12:08:18 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:18 [INFO] net: connecting to 127.0.0.1:42252
+2026-10-16 12:08:18 [INFO] net: rejected 127.0.0.1: server_full 1/1 players, 0/0 spectators
+2026-10-16 12:08:18 [INFO] net: client closed: server_full - All player and spectator slots are taken. Try again later.
+2026-10-16 12:08:18 [INFO] net: connecting to 127.0.0.1:42252
+2026-10-16 12:08:18 [INFO] net: client closed: incompatible_protocol - The server uses a different network protocol. Both sides need the same game version.
+2026-10-16 12:08:18 [INFO] net: connecting to 127.0.0.1:42252
+2026-10-16 12:08:18 [INFO] net: client closed: incompatible_build - The server runs a different game version. Both sides need the same version to play together.
+2026-10-16 12:08:18 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:18 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_rejections_inprocess (57 ms)
+2026-10-16 12:08:18 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-16 12:08:18 [INFO] net: dedicated server 'Loop' listening on UDP *:42254 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:18 [INFO] net: connecting to 127.0.0.1:42254
+2026-10-16 12:08:18 [INFO] net: connecting to 127.0.0.1:42254
+2026-10-16 12:08:18 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4866 nodes=25 orphans=0
+2026-10-16 12:08:18 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:08:18 [INFO] net: player 3 'Ben' joined from 127.0.0.1
+2026-10-16 12:08:18 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:18 [INFO] net: joined 'Loop' as player 3
+2026-10-16 12:08:21 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-16 12:08:21 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-16 12:08:22 [INFO] net: client closed: timeout - No response from the other side (timed out). Check your network connection.
+2026-10-16 12:08:22 [INFO] net: player 2 'Ann' disconnected (timeout); slot reserved for 20 s
+2026-10-16 12:08:22 [INFO] net: connecting to 127.0.0.1:42254
+2026-10-16 12:08:22 [INFO] net: player 2 'Ann' rejoined from 127.0.0.1 (fighter 0)
+2026-10-16 12:08:22 [INFO] net: joined 'Loop' as player 2 (rejoined)
+2026-10-16 12:08:25 [INFO] net: match 1 finished: winner team 0
+2026-10-16 12:08:27 [INFO] net: server closing (server_shutdown): Maintenance
+2026-10-16 12:08:27 [INFO] net: client closed: server_shutdown - The server shut down: Maintenance
+2026-10-16 12:08:27 [INFO] net: client closed: server_shutdown - The server shut down: Maintenance
+2026-10-16 12:08:27 [INFO] net: server closed (server_shutdown): Maintenance
+ok    res://src/test/net/test_net_loopback.gd::test_session_flow_inprocess (8144 ms)
+2026-10-16 12:08:27 [INFO] net: dedicated server 'Loop' listening on UDP *:42256 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:08:27 [WARN] net: client network conditioner active: latency 1 ms one-way, jitter +-0 ms, loss 0.0%
+2026-10-16 12:08:27 [INFO] net: connecting to 127.0.0.1:42256 via conditioner :57810
+2026-10-16 12:08:27 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=4909 nodes=24 orphans=0
+2026-10-16 12:08:27 [INFO] net: player 2 'Faraway' joined from 127.0.0.1
+2026-10-16 12:08:27 [INFO] net: joined 'Loop' as player 2
+2026-10-16 12:08:30 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-16 12:08:30 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (1 humans, 1 bots)
+2026-10-16 12:08:32 [INFO] net: player 2 'Faraway' timed out (no data for 5 s)
+2026-10-16 12:08:32 [INFO] net: player 2 'Faraway' disconnected (timed out); slot reserved for 20 s
+2026-10-16 12:08:32 [INFO] net: match 1 finished: winner team -1 (aborted: everyone left)
+2026-10-16 12:08:32 [INFO] net: client closed: timeout - No response from the other side (timed out). Check your network connection.
+2026-10-16 12:08:32 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:08:32 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_timeout_inprocess (5032 ms)
+    MEASURE duel (LOOPBACK, 2 fighters, 20 s): per client down 9.1 KB/s (wire 10.0), up 4.6 KB/s (wire 6.4), 36/66 pkt/s; snapshot 289 B; server sim 0.49 ms/tick, net 0.145 ms/tick, longest physics frame 1.53 ms (avg of 1 s maxima), main thread busy 10.5%, process CPU 2.6% of one core (CritterweightServer.exe)
+    MEASURE ffa8 (LOOPBACK, 8 fighters, 20 s): per client down 34.2 KB/s (wire 35.4), up 4.9 KB/s (wire 7.1), 46/80 pkt/s; snapshot 1018 B; server sim 1.75 ms/tick, net 0.278 ms/tick, longest physics frame 4.38 ms (avg of 1 s maxima), main thread busy 30.0%, process CPU 26.3% of one core (CritterweightServer.exe)
+ok    res://src/test/net/test_net_measure.gd::test_measure_duel_and_ffa8 (71032 ms)
+    LOOPBACK bonus modes: roster updates 9, max slots 6, events 231
+ok    res://src/test/net/test_net_multiprocess.gd::test_bonus_modes_over_network (72817 ms)
+ok    res://src/test/net/test_net_multiprocess.gd::test_client_cannot_inject_damage (12037 ms)
+    LOOPBACK + conditioner (80+-20 ms one-way, 2% loss): RTT max 188 ms, interp 81 ms, jitter p95 42 ms, dropped 176/7996, starved frames 139/9736
+ok    res://src/test/net/test_net_multiprocess.gd::test_conditioner_profile_still_completes_match (91277 ms)
+    LOOPBACK duel: Alice hits 18, Bob min health 0.0, Alice in 11.9 KB/s out 4.7 KB/s, interp 39 ms
+ok    res://src/test/net/test_net_multiprocess.gd::test_dedicated_match_two_clients (37377 ms)
+ok    res://src/test/net/test_net_multiprocess.gd::test_disconnect_and_rejoin (37406 ms)
+ok    res://src/test/net/test_net_multiprocess.gd::test_handshake_rejections (10708 ms)
+ok    res://src/test/net/test_net_multiprocess.gd::test_lan_discovery_between_processes (3741 ms)
+ok    res://src/test/net/test_net_multiprocess.gd::test_listen_host_with_remote_client (25599 ms)
+ok    res://src/test/net/test_net_multiprocess.gd::test_party_run_resumed_through_the_lobby (8839 ms)
+    LOOPBACK playlist rotation: b_ffa -> c_teams -> b_ffa
+ok    res://src/test/net/test_net_multiprocess.gd::test_playlist_rotation_voting_and_restart (61646 ms)
+ok    res://src/test/net/test_net_multiprocess.gd::test_server_mods_and_join_compare (61550 ms)
+ok    res://src/test/net/test_net_multiprocess.gd::test_shutdown_via_console_is_announced (7146 ms)
+ok    res://src/test/net/test_net_multiprocess.gd::test_tcp_admin_is_local_and_authenticated (17179 ms)
+skip  res://src/test/net/test_net_parity.gd::test_codec_knows_emitted_event_types (reads GDScript source; exported builds ship compiled scripts (runs in the source suite))
+skip  res://src/test/net/test_net_parity.gd::test_net_scene_handles_every_local_event (reads GDScript source; exported builds ship compiled scripts (runs in the source suite))
+ok    res://src/test/net/test_net_party_campaign.gd::test_party_run_fight_camp_tag_saved_and_resumed (120504 ms)
+ok    res://src/test/net/test_net_party_campaign.gd::test_party_run_off_the_street_simultaneous (93766 ms)
+ok    res://src/test/net/test_net_party_play.gd::test_campaign_match_checks (0 ms)
+ok    res://src/test/net/test_net_party_play.gd::test_coop_session_views_on_every_machine (135 ms)
+2026-10-16 12:20:44 [INFO] net: listen server 'Hosty's session' listening on UDP *:44242 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:20:44 [INFO] net: connecting to 127.0.0.1:44242
+2026-10-16 12:20:44 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:20:44 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:20:45 [INFO] net: party run run_00000000004_9 open: 2 seats, host seat 1
+2026-10-16 12:20:45 [INFO] net: player 2 'Ann' took seat 2 of party run run_00000000004_9
+2026-10-16 12:20:45 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_stoke)
+2026-10-16 12:20:45 [INFO] match: start ? on arena_gullet: f_stoke/t0/player, f_dozer/t0/net, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc
+2026-10-16 12:20:45 [INFO] net: match 1 started: campaign fight 'Hot Pipes' (campaign), 8 fighters, party { 0: 1, 1: 2 }
+2026-10-16 12:20:45 [WARN] net: match 1: the host's match scene was removed; ending the match
+2026-10-16 12:20:45 [WARN] net: party run run_00000000004_9: the fight did not finish (the host left the match); it is played again
+2026-10-16 12:20:49 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_stoke)
+2026-10-16 12:20:49 [INFO] match: start ? on arena_gullet: f_stoke/t0/player, f_dozer/t0/net, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc
+2026-10-16 12:20:49 [INFO] net: match 2 started: campaign fight 'Hot Pipes' (campaign), 8 fighters, party { 0: 1, 1: 2 }
+2026-10-16 12:20:51 [INFO] net: match 2 finished: winner team 0
+2026-10-16 12:20:51 [INFO] net: party run run_00000000004_9 closed
+2026-10-16 12:20:51 [INFO] net: server closing (host_left): The host left the session.
+ok    res://src/test/net/test_net_party_play.gd::test_party_fight_replayed_when_the_hosts_match_is_lost_inprocess (6305 ms)
+2026-10-16 12:20:51 [INFO] net: listen server 'Hosty's session' listening on UDP *:44244 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:20:51 [INFO] net: connecting to 127.0.0.1:44244
+2026-10-16 12:20:51 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:20:51 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:20:51 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:20:51 [INFO] net: party run run_00000000004_9 open: 2 seats, host seat 1
+2026-10-16 12:20:51 [INFO] net: player 2 'Ann' took seat 2 of party run run_00000000004_9
+2026-10-16 12:20:51 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_stoke)
+2026-10-16 12:20:51 [INFO] match: start ? on arena_gullet: f_stoke/t0/player, f_dozer/t0/net, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc
+2026-10-16 12:20:51 [INFO] net: match 1 started: campaign fight 'Hot Pipes' (campaign), 8 fighters, party { 0: 1, 1: 2 }
+2026-10-16 12:20:52 [INFO] net: match 1 frozen (ref timeout)
+2026-10-16 12:20:52 [INFO] net: match 1 resumed (ref timeout)
+2026-10-16 12:20:53 [INFO] net: match 1 finished: winner team 0
+2026-10-16 12:20:57 [INFO] net: party run run_00000000004_9 closed
+2026-10-16 12:20:57 [INFO] net: server closing (host_left): The host left the session.
+ok    res://src/test/net/test_net_party_play.gd::test_party_fight_simultaneous_inprocess (6367 ms)
+2026-10-16 12:20:57 [INFO] net: listen server 'Hosty's session' listening on UDP *:44246 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:20:57 [INFO] net: connecting to 127.0.0.1:44246
+2026-10-16 12:20:57 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:20:57 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:20:57 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:20:57 [INFO] net: party run run_00000000004_9 open: 2 seats, host seat 1
+2026-10-16 12:20:57 [INFO] net: player 2 'Ann' took seat 2 of party run run_00000000004_9
+2026-10-16 12:20:57 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_stoke)
+2026-10-16 12:20:57 [INFO] match: start ? on arena_gullet: f_stoke/t0/player, f_dozer/t0/net, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc
+2026-10-16 12:20:57 [INFO] net: match 1 started: campaign fight 'Hot Pipes' (campaign), 6 fighters, party { 0: 1, 1: 2 }
+2026-10-16 12:20:59 [INFO] net: match 1 finished: winner team 0
+2026-10-16 12:20:59 [INFO] net: party run run_00000000004_9 closed
+2026-10-16 12:20:59 [INFO] net: server closing (host_left): The host left the session.
+ok    res://src/test/net/test_net_party_play.gd::test_party_fight_tag_inprocess (2150 ms)
+2026-10-16 12:20:59 [INFO] net: listen server 'Hosty's session' listening on UDP *:44248 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:20:59 [INFO] net: connecting to 127.0.0.1:44248
+2026-10-16 12:20:59 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:20:59 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:20:59 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:20:59 [INFO] net: party run run_00000000004_9 open: 2 seats, host seat 1
+2026-10-16 12:20:59 [INFO] net: player 2 'Ann' took seat 2 of party run run_00000000004_9
+2026-10-16 12:20:59 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_stoke)
+2026-10-16 12:20:59 [INFO] match: start ? on arena_gullet: f_stoke/t0/player, f_dozer/t0/net, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc
+2026-10-16 12:21:00 [INFO] net: match 1 started: campaign fight 'Hot Pipes' (campaign), 8 fighters, party { 0: 1, 1: 2 }
+2026-10-16 12:21:00 [INFO] net: client closed: timeout - No response from the other side (timed out). Check your network connection.
+2026-10-16 12:21:00 [INFO] net: player 2 'Ann' disconnected (timeout); slot reserved for 60 s
+2026-10-16 12:21:00 [INFO] net: connecting to 127.0.0.1:44248
+2026-10-16 12:21:00 [INFO] net: player 2 'Ann' rejoined from 127.0.0.1 (fighter 1)
+2026-10-16 12:21:00 [INFO] net: joined 'Hosty's session' as player 2 (rejoined)
+2026-10-16 12:21:01 [INFO] net: match 1 finished: winner team 0
+2026-10-16 12:21:01 [INFO] net: party run run_00000000004_9 closed
+2026-10-16 12:21:01 [INFO] net: server closing (host_left): The host left the session.
+ok    res://src/test/net/test_net_party_play.gd::test_party_member_drop_and_rejoin_mid_fight_inprocess (2011 ms)
+2026-10-16 12:21:01 [INFO] net: listen server 'Hosty's session' listening on UDP *:44250 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:21:01 [INFO] net: connecting to 127.0.0.1:44250
+2026-10-16 12:21:01 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:21:01 [INFO] net: player 2 'Ann' joined from 127.0.0.1
+2026-10-16 12:21:01 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:21:01 [INFO] net: party run run_00000000004_9 open: 2 seats, host seat 1
+2026-10-16 12:21:01 [INFO] net: player 2 'Ann' took seat 2 of party run run_00000000004_9
+2026-10-16 12:21:02 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_stoke)
+2026-10-16 12:21:02 [INFO] match: start ? on arena_gullet: f_stoke/t0/player, f_dozer/t0/net, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc, scrapling_hot_pipe/t1/npc
+2026-10-16 12:21:02 [INFO] net: match 1 started: campaign fight 'Hot Pipes' (campaign), 8 fighters, party { 0: 1, 1: 2 }
+2026-10-16 12:21:05 [INFO] net: match 1 finished: winner team 0
+2026-10-16 12:21:05 [INFO] net: party run run_00000000004_9 closed
+2026-10-16 12:21:05 [INFO] net: server closing (host_left): The host left the session.
+ok    res://src/test/net/test_net_party_play.gd::test_party_member_revives_a_downed_ally_inprocess (3173 ms)
+2026-10-16 12:21:05 [INFO] recorder: saved 40 samples to C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_stoke/shard_human_20261016T162105_8912_6673.bin
+ok    res://src/test/net/test_net_party_play.gd::test_party_payloads_travel_packed (50 ms)
+2026-10-16 12:21:05 [INFO] net: server closed (host_left): The host left the session.
+ok    res://src/test/net/test_net_playlist.gd::test_candidates_are_distinct_and_avoid_repeats (8 ms)
+ok    res://src/test/net/test_net_playlist.gd::test_invalid_entries_are_reported_and_skipped (2 ms)
+ok    res://src/test/net/test_net_playlist.gd::test_min_players_and_bot_fill (1 ms)
+ok    res://src/test/net/test_net_playlist.gd::test_shipped_playlists_are_valid (3 ms)
+ok    res://src/test/net/test_net_playlist.gd::test_state_persists_across_restarts (9 ms)
+ok    res://src/test/net/test_net_playlist.gd::test_vote_resolution_rules (1 ms)
+ok    res://src/test/net/test_net_playlist.gd::test_weights_are_relative_probabilities (235 ms)
+ok    res://src/test/net/test_net_server_examples.gd::test_example_configs_parse_and_resolve_playlists (5 ms)
+ok    res://src/test/net/test_net_server_examples.gd::test_playlist_template_is_valid (2 ms)
+wrote C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/captures/tests/example_config_1604643422/server.cfg
+wrote C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/captures/tests/example_config_1604643422/custom_rotation.example.json
+Edit the config, then start the server with --config C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/captures/tests/example_config_1604643422/server.cfg
+ok    res://src/test/net/test_net_server_examples.gd::test_write_example_config (11 ms)
+    FK reconstruction: worst segment position error 2.49 mm, rotation error 0.105 deg
+ok    res://src/test/net/test_net_snapshot.gd::test_fk_reconstruction_matches_simulation (225 ms)
+ok    res://src/test/net/test_net_snapshot.gd::test_hud_mirror_drives_real_fight_hud (6 ms)
+ok    res://src/test/net/test_net_snapshot.gd::test_replica_interpolation_teleports_and_events (0 ms)
+ok    res://src/test/net/test_net_snapshot.gd::test_roster_codec_and_generations (1 ms)
+    snapshot sizes (dev_biped, 13 segments): 2 fighters 259 B, 8 fighters 889 B
+ok    res://src/test/net/test_net_snapshot.gd::test_snapshot_sizes_fit_one_packet (240 ms)
+    SOAK (LOOPBACK, 2.0 min): matches 2, static mem 0.0 -> 0.0 MB (slope 0.00 MB/min, 2nd half), working set 162 -> 167 MB (slope 0.45 MB/min), server CPU 15.9% of one core, logs 2993 B in 1 files
+    report: C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/captures/tests/net/soak/soak_report.json
+ok    res://src/test/net/test_net_soak.gd::test_soak_server_with_bots (125136 ms)
+2026-10-16 12:23:11 [INFO] net: dedicated server 'Gullet Nights' listening on UDP *:38690 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:23:11 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=5103 nodes=73 orphans=0
+2026-10-16 12:23:11 [INFO] net: connecting to 127.0.0.1:38690
+2026-10-16 12:23:11 [INFO] net: player 2 'Rookie' joined from 127.0.0.1
+2026-10-16 12:23:11 [INFO] net: joined 'Gullet Nights' as player 2
+2026-10-16 12:23:11 [INFO] toast: [info] Rookie joined.
+2026-10-16 12:23:11 [INFO] toast: [success] Voted for Teams 2v2 @ The Gullet.
+2026-10-16 12:23:11 [INFO] net: client closed: left - You left the session.
+2026-10-16 12:23:11 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:23:11 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_online_ui.gd::test_dedicated_server_lobby_vote_and_ready (468 ms)
+2026-10-16 12:23:11 [INFO] net: listen server 'Rookie's session' listening on UDP *:38692 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:23:11 [INFO] net: connecting to 127.0.0.1:38692
+2026-10-16 12:23:11 [INFO] net: player 2 'Guesty' joined from 127.0.0.1
+2026-10-16 12:23:11 [INFO] toast: [info] Guesty joined.
+2026-10-16 12:23:11 [INFO] net: joined 'Rookie's session' as player 2
+2026-10-16 12:23:11 [INFO] toast: [success] Invite copied: paste it to your friends.
+2026-10-16 12:23:11 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_dozer)
+2026-10-16 12:23:11 [INFO] match: start duel on the_gullet: f_dozer/t0/player, f_dozer/t1/net
+2026-10-16 12:23:11 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-16 12:23:14 [INFO] net: match 1 finished: winner team -1
+2026-10-16 12:23:14 [INFO] recorder: saved 178 samples to C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_dozer/shard_human_20261016T162314_8912_2641.bin
+2026-10-16 12:23:16 [INFO] net: server closing (host_left): The host left the session.
+2026-10-16 12:23:16 [INFO] net: client closed: host_left - The host left the session.
+2026-10-16 12:23:16 [INFO] net: server closed (host_left): The host left the session.
+ok    res://src/test/net/test_online_ui.gd::test_host_lobby_match_and_back_to_lobby (4888 ms)
+2026-10-16 12:23:16 [INFO] net: dedicated server 'Locked' listening on UDP *:38694 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:23:16 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=5132 nodes=73 orphans=0
+2026-10-16 12:23:16 [INFO] net: connecting to 127.0.0.1:38694
+2026-10-16 12:23:16 [INFO] net: rejected 127.0.0.1: bad_password wrong password
+2026-10-16 12:23:16 [INFO] net: client closed: bad_password - This session is password protected and the password was not accepted.
+2026-10-16 12:23:16 [WARN] net: Wrong password: This session is password protected and the password was not accepted. []
+2026-10-16 12:23:16 [INFO] net: connecting to 127.0.0.1:38694
+2026-10-16 12:23:16 [INFO] net: client closed: incompatible_build - The server runs a different game version. Both sides need the same version to play together.
+2026-10-16 12:23:16 [WARN] net: Incompatible build: The server runs a different game version. Both sides need the same version to play together. ["Server game version: 0.9.2", "Your game version: 9.9.9"]
+2026-10-16 12:23:16 [INFO] net: connecting to 127.0.0.1:38694
+2026-10-16 12:23:16 [INFO] net: player 2 'First' joined from 127.0.0.1
+2026-10-16 12:23:16 [INFO] net: joined 'Locked' as player 2
+2026-10-16 12:23:16 [INFO] net: connecting to 127.0.0.1:38694
+2026-10-16 12:23:16 [INFO] net: rejected 127.0.0.1: server_full 1/1 players, 0/0 spectators
+2026-10-16 12:23:16 [INFO] net: client closed: server_full - All player and spectator slots are taken. Try again later.
+2026-10-16 12:23:16 [WARN] net: Server full: All player and spectator slots are taken. Try again later. []
+2026-10-16 12:23:16 [INFO] net: connecting to 127.0.0.1:38696
+2026-10-16 12:23:23 [INFO] net: client closed: connect_failed - Could not reach the server. Check the address and port, and that the host's port is reachable (port forwarding for internet play).
+2026-10-16 12:23:23 [WARN] net: Connection failed: Could not reach the server. Check the address and port, and that the host's port is reachable (port forwarding for internet play). ["No answer from 127.0.0.1:38696 within 5 s."]
+2026-10-16 12:23:23 [INFO] net: client closed: left - You left the session.
+2026-10-16 12:23:23 [INFO] net: player 2 'First' removed (left)
+2026-10-16 12:23:23 [INFO] net: server idle (no players)
+2026-10-16 12:23:23 [INFO] net: connecting to 127.0.0.1:38694
+2026-10-16 12:23:23 [INFO] net: player 3 'Rookie' joined from 127.0.0.1
+2026-10-16 12:23:23 [INFO] net: joined 'Locked' as player 3
+2026-10-16 12:23:23 [INFO] toast: [info] Rookie joined.
+2026-10-16 12:23:23 [WARN] net: kicking player 3 'Rookie': testing kicks
+2026-10-16 12:23:23 [INFO] net: player 3 'Rookie' removed (kicked: testing kicks)
+2026-10-16 12:23:23 [INFO] net: server idle (no players)
+2026-10-16 12:23:23 [INFO] net: client closed: kicked - You were removed from the session: testing kicks
+2026-10-16 12:23:23 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:23:23 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_online_ui.gd::test_join_errors_and_kick_show_reasons (6872 ms)
+2026-10-16 12:23:26 [INFO] net: connecting to 127.0.0.1:58252
+2026-10-16 12:23:26 [INFO] net: joined 'Hosty's session' as player 2
+2026-10-16 12:23:26 [INFO] toast: [info] Rookie joined.
+2026-10-16 12:23:43 [INFO] net: client closed: left - You left the session.
+ok    res://src/test/net/test_online_ui.gd::test_join_other_process_through_screens (19810 ms)
+2026-10-16 12:23:43 [INFO] net: dedicated server 'Basement Cage' listening on UDP *:38698 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:23:43 [INFO] net: LAN browser listening on UDP 38699
+2026-10-16 12:23:43 [INFO] stats: phase=idle players=0 spect=0 match=0 fighters=0 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=0.00 out=0.0KB/s in=0.0KB/s mem=0.0MB objects=5138 nodes=73 orphans=0
+2026-10-16 12:23:43 [INFO] net: server closing (server_shutdown)
+2026-10-16 12:23:43 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_online_ui.gd::test_lan_tab_lists_sessions_and_asks_for_password (31 ms)
+2026-10-16 12:23:43 [INFO] net: listen server 'Rookie's session' listening on UDP *:38700 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:23:43 [INFO] net: connecting to 127.0.0.1:38700
+2026-10-16 12:23:43 [INFO] net: player 2 'Layout Guest' joined from 127.0.0.1
+2026-10-16 12:23:43 [INFO] toast: [info] Layout Guest joined.
+2026-10-16 12:23:43 [INFO] net: joined 'Rookie's session' as player 2
+2026-10-16 12:23:43 [INFO] net: server closing (host_left): The host left the session.
+2026-10-16 12:23:43 [INFO] net: client closed: left - You left the session.
+2026-10-16 12:23:43 [INFO] net: server closed (host_left): The host left the session.
+2026-10-16 12:23:43 [INFO] net: listen server 'Rookie's session' listening on UDP *:38700 (protocol 5, game 0.9.2, content cdd1583110f3)
+2026-10-16 12:23:43 [INFO] net: connecting to 127.0.0.1:38700
+2026-10-16 12:23:43 [INFO] net: player 2 'Layout Guest' joined from 127.0.0.1
+2026-10-16 12:23:43 [INFO] toast: [info] Layout Guest joined.
+2026-10-16 12:23:43 [INFO] net: joined 'Rookie's session' as player 2
+2026-10-16 12:23:43 [INFO] net: server closing (host_left): The host left the session.
+2026-10-16 12:23:44 [INFO] net: client closed: left - You left the session.
+2026-10-16 12:23:44 [INFO] net: server closed (host_left): The host left the session.
+ok    res://src/test/net/test_online_ui.gd::test_online_layout_fits_and_text_is_readable (802 ms)
+ok    res://src/test/net/test_online_ui.gd::test_online_screen_tabs_focus_and_back (87 ms)
+skip  res://src/test/ui/test_settings_wired.gd::test_every_visible_setting_is_read_somewhere (scans GDScript source; exported builds ship compiled scripts (runs in the source suite))
+ok    res://src/test/ui/test_ui_navigation.gd::test_every_screen_has_focus_and_back (347 ms)
+ok    res://src/test/ui/test_ui_navigation.gd::test_layout_fits_and_text_is_readable (440 ms)
+    viewport (1920.0, 1920.0), window (64, 64)
+2026-10-16 12:23:45 [INFO] toast: [warning] H was taken from Light attack.
+2026-10-16 12:23:45 [INFO] toast: [warning] Y was taken from Heavy attack (hold to charge). Heavy attack (hold to charge) now has no controller binding.
+2026-10-16 12:23:45 [INFO] toast: [success] Taunt / cheer: default bindings restored.
+2026-10-16 12:23:45 [INFO] toast: [success] Controls settings reset to defaults.
+2026-10-16 12:23:45 [INFO] toast: [info] Display settings reverted.
+ok    res://src/test/ui/test_ui_navigation.gd::test_menu_settings_round_trip (309 ms)
+2026-10-16 12:23:45 [INFO] match: start duel on the_gullet: f_dozer/t0/bot, f_dozer/t1/bot
+ok    res://src/test/ui/test_ui_navigation.gd::test_online_match_does_not_pause (85 ms)
+ok    res://src/test/ui/test_ui_navigation.gd::test_stick_keyboard_mouse_and_prompts (36 ms)
+ok    res://src/test/ui/test_ui_navigation.gd::test_text_and_ui_scale_apply_live (25 ms)
+ok    res://src/test/ui/test_ui_navigation.gd::test_text_entry_with_controller (67 ms)
+2026-10-16 12:23:45 [INFO] toast: [error] Everyone is on Team A. Put at least one fighter on another team.
+2026-10-16 12:23:45 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261016-115413/lab/datasets/human_f_dozer)
+2026-10-16 12:23:45 [INFO] match: start duel on the_gullet: f_dozer/t0/player, f_dredge/t1/bot
+2026-10-16 12:23:45 [INFO] toast: [warning] Controller disconnected.
+2026-10-16 12:23:45 [INFO] toast: [success] Controller connected.
+ok    res://src/test/ui/test_ui_navigation.gd::test_versus_pause_disconnect_and_quit (207 ms)
+tests: 677 run, 0 failed, 672 passed, 5 skipped in 1762.6 s
