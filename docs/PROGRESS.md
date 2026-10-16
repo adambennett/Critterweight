@@ -115,7 +115,12 @@ Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the camp
    3 m/s lunge against Dredge's 1.55 m. So Slurry wins every jab exchange from just outside Dredge's range.
    **Done (2026-10-16, D-034):** Slurry's L1 hit window now opens at 0.13 s (was 0.09) and its lunge is
    2.4 m/s (was 3.0). Dozer vs Slurry is 6-6 (was 3-9) and Slurry vs Stoke 7-5 (was 9-3), but Dredge vs
-   Slurry is still 0-12, so a second cause sits in Dredge's own play. The other options were:
+   Slurry is still 0-12, so a second cause sits in Dredge's own play. Slurry's jab still lands 35 times against
+   5 for Dredge's. Dredge's bot holds 1.25-1.6 m, where Slurry's lunge reaches and Dredge's claw does not.
+   Tried at 12 bouts per pairing; neither variant was a clear win, so Dredge is unchanged:
+   - range 1.05-1.4 m with aggression 0: Slurry 3-9, Dozer 6-6, Stoke 8-4, Gusto 5-7, but Jitters 1-11 (was 4-8);
+   - range 1.15-1.5 m: Slurry 1-11, Jitters 3-9, Dozer 9-3.
+   Next: per-opponent spacing, or Dredge's kit reach, measured on 36-bout pairings. The other options were:
    - Slurry L1 start-up 0.09 to about 0.12 s, or a shorter lunge;
    - or Dredge's bot keeping a closer range than its [1.25, 1.6] m.
 
