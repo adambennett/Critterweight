@@ -120,8 +120,11 @@ func _build() -> void:
 	_details.focus_mode = Control.FOCUS_NONE
 	panel.add_child(_details)
 
-	var bar := HBoxContainer.new()
-	bar.add_theme_constant_override("separation", 10)
+	# a flow, not a row: at 1280x800 the seven buttons are wider than the window and a row pushed
+	# the whole screen past its right edge; here they wrap to a second line instead
+	var bar := HFlowContainer.new()
+	bar.add_theme_constant_override("h_separation", 10)
+	bar.add_theme_constant_override("v_separation", 10)
 	root.add_child(bar)
 	_first_button = _button("Import package…", _import_dialog)
 	bar.add_child(_first_button)
@@ -132,9 +135,6 @@ func _build() -> void:
 	bar.add_child(_button("Rescan", func():
 		Mods.refresh()
 		Mods.apply()))
-	var sp2 := Control.new()
-	sp2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bar.add_child(sp2)
 	bar.add_child(_button("Back", func(): App.back()))
 
 	_overlay = PanelContainer.new()

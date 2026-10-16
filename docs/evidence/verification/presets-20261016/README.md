@@ -25,3 +25,15 @@ The `capture_1280x800_*.jpg` files are the packaged game at 1280x800 with the de
   Seed field fills the row (`capture_1280x800_campaign_menu_fixed.jpg`, from source).
 - 8-fighter HUD: two rows of four plates. Names and health are readable, the sub-labels (Hype, ability
   readiness) are small but legible, and Settings > Display > UI scale enlarges them.
+
+**Layout sweep at 1280x800, from source after 0.9.2.** It covered mods, rules editor, tutorial, versus and
+spectate setup, arena editor, AI Lab, online, profile, Bookie and Cannery ledger. Two more bugs were found and
+fixed:
+- **Mods screen.** Its bottom bar of seven buttons was wider than the window, so the whole screen ran past
+  the right edge: "Delete set", the notice text, the details panel and "Back" were cut off. The bar is now a
+  flow that wraps (`sweep_1280x800_mods*.jpg`).
+- **Tutorial.** Granny's coach box and the menu hint covered the fight HUD's control-prompt strip at every
+  resolution (1600x900 too); Light, Heavy and Guard were hidden. Both now sit above the strip
+  (`sweep_1280x800_tutorial*.jpg`).
+
+The other screens fit at 1280x800.

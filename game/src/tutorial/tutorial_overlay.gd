@@ -73,12 +73,13 @@ func _lbl(size: int, heavy := false, color := Color(1, 1, 1)) -> Label:
 
 
 func _build() -> void:
-	# coach box (bottom left)
+	# coach box (bottom left), above the fight HUD's control-prompt strip (16-78 px from the bottom),
+	# which it used to cover (Light / Heavy / Guard hidden under the box)
 	var coach := _panel(Color(0.07, 0.05, 0.09, 0.88))
 	coach.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	coach.offset_left = 32
-	coach.offset_bottom = -32
-	coach.offset_top = -250
+	coach.offset_bottom = -92
+	coach.offset_top = -310
 	coach.offset_right = 820
 	coach.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(coach)
@@ -112,13 +113,13 @@ func _build() -> void:
 	_progress = _lbl(26, true, Color(0.6, 1.0, 0.65))
 	_progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ob.add_child(_progress)
-	# prompt (bottom right)
+	# prompt (bottom right), above the HUD's control-prompt strip as well
 	_prompt = _lbl(22, false, Color(1, 1, 1, 0.85))
 	_prompt.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	_prompt.offset_left = -520
 	_prompt.offset_right = -32
-	_prompt.offset_top = -64
-	_prompt.offset_bottom = -28
+	_prompt.offset_top = -128
+	_prompt.offset_bottom = -92
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	add_child(_prompt)
 	# menu
