@@ -120,7 +120,18 @@ Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the camp
    Tried at 12 bouts per pairing; neither variant was a clear win, so Dredge is unchanged:
    - range 1.05-1.4 m with aggression 0: Slurry 3-9, Dozer 6-6, Stoke 8-4, Gusto 5-7, but Jitters 1-11 (was 4-8);
    - range 1.15-1.5 m: Slurry 1-11, Jitters 3-9, Dozer 9-3.
-   Next: per-opponent spacing, or Dredge's kit reach, measured on 36-bout pairings. The other options were:
+   Next: per-opponent spacing, or Dredge's kit reach, measured on 36-bout pairings.
+
+   Per-move breakdowns of the other extreme pairings (4 Contender bouts each, different seeds):
+   - **Jitters vs Stoke 4-0.** Stoke's jab lands 7 times against Jitters, against 19 times on Gusto. Jitters
+     outhits him with L1 21x, L2 12x, arc lash and squash landings. Stoke's strikes seem to miss the small
+     body.
+   - **Gusto vs Stoke 1-3.** Gusto's projectile does most of its damage (32 hits, 191); Stoke wins with
+     L1 19x and heavy.
+   - **Dozer vs Jitters 2-2**, against 11-1 in the round robin.
+
+   Seeds swing these pairings far more than the ±14 % a 12-bout sample suggests. **Measure on 36 or more
+   bouts before tuning any of them.** The other options were:
    - Slurry L1 start-up 0.09 to about 0.12 s, or a shorter lunge;
    - or Dredge's bot keeping a closer range than its [1.25, 1.6] m.
 
