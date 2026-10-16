@@ -105,7 +105,23 @@ verification will be repeated for the release candidate.
 - **Two PCs or the internet:** online play has only run over loopback on one PC.
 - **Steam Deck and Linux runtime:** the Linux game and server packages are built and pass the
   portability checks, but they have not been run on Linux or a Deck. No Linux environment is available
-  here.
+  here. The exact remaining checks:
+  - **Ubuntu 24.04 LTS x86-64, game package:**
+    - boot to the title with a fresh profile;
+    - the tutorial;
+    - a duel and an 8-fighter match with a controller;
+    - sound on the default device;
+    - settings saved and reloaded;
+    - join a Windows host's lobby and play a match.
+  - **Ubuntu 24.04, server package:** start with the example config; a Windows client joins; TCP admin
+    works; graceful shutdown.
+  - **Steam Deck (SteamOS 3), native Linux build:**
+    - the Deck preset at 1280x800 holds 60 fps in the busy 8-fighter scene;
+    - controller navigation and glyphs in every menu;
+    - text readable at 1280x800;
+    - suspend and resume mid-match;
+    - a campaign fight;
+    - Proton only as a fallback.
 - **Physical controller:** controller paths are verified with injected input events only (ARN-03, UI-02).
 - **Player judgement:** readability, feel and balance have not been playtested by the user. Bot-measured
   balance is in docs/BOTS.md and PROGRESS.md: some matchups are lopsided, and the Journeyman bot loses
