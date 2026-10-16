@@ -42,18 +42,16 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
 3. **Roster balance pass**: cross-roster round robin (`--bench roster --bouts 12 --tier pro`) had Stoke
    at 25 % and Slurry at 71 % (4 bouts/pair, before the bot changes); target 40–60 % overall, 30–70 % per
    pairing; plus reliable mashed strings for every kit (snippet: a masher must land l1-l2-l3).
-4. **Server CPU** (PERF-04, target < 35 % of one core at 8 fighters): **not met.** Quiet machine,
-   packaged build (2026-10-16):
-   - `test_net_measure`, the real server process (CPU time incl. threads):
-     - 8 fighters: **43.2 %**. Main thread 1.76 ms sim + 0.28 ms network per tick.
-     - duel: 20.4 %.
-   - `--bench sim --n 8`, simulation only: 2.48 ms CPU per tick, 29.7 %.
+4. **Server CPU** (PERF-04, target < 35 % of one core at 8 fighters): **met** on 2026-10-16.
+   Packaged dedicated server, quiet machine, `test_net_measure` (1 client + 7 bots): 29.5-31.9 %
+   main-thread load, duel 10-12 %. Two engine fixes got it there:
+   - Godot's frame limiter busy-waited part of every frame on Windows. The server now paces its own
+     frames (D-031).
+   - The server export runs one physics worker thread (D-030).
 
-   So about 0.9 ms per tick of the server's cost is engine, physics-thread and frame-pacing
-   overhead, and it is already there with 2 fighters. The old bench "96 %" figure double-counted
-   (`docs/evidence/verification/20261015-211605/NOTES.md`). Next: try worker-thread and frame-pacing
-   settings for the `dedicated_server` feature tag (behaviour-neutral, Jolt is thread-count
-   deterministic), then the per-fighter motor/rig GDScript.
+   `run_verification.ps1` now checks the figure from the packaged suite. Remaining optional
+   headroom: the bot history's body-surface query (0.24 ms per tick for 7 bots) and the rig's
+   segment springs.
 5. **Final verification** (VER-03/04/05/07, PERF-01/02/03/05, DEL-01/06): quiet machine, then
    `tools/verify/run_verification.ps1 -Build` (packaged suite, captures with exit codes, benches,
    online session check), portability check, an independent whole-brief audit, `docs/VERIFICATION.md`,

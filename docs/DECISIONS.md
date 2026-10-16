@@ -193,3 +193,12 @@ The pool's threads mostly woke for small Jolt jobs and cost more than they saved
 6 % either way. The server is authoritative, so its physics thread count changes nothing that a client or a
 replay sees. The game itself (rendering, listen hosting, AI Lab workers) keeps the full pool.
 `test_net_measure` measures the server package itself whenever it runs inside a packaged game.
+
+## D-031 The dedicated server paces its own frames
+
+The server no longer uses `Engine.max_fps` to run one frame per tick. It sets `max_fps` to 0 and the
+low-processor sleep to 0, and sleeps until the next frame is due with `OS.delay_usec`, keeping an absolute
+schedule. On Windows, Godot 4.5.1's frame limiter busy-waits through part of every frame: an empty project at
+120 or 60 fps used 4.5 % of a core, all in user time on the main thread. The same loop paced by a plain sleep
+used 0.0 %, with the same 120 frames and 120 physics ticks per second. An idle dedicated server dropped from
+8.3 % to 0.1 %. Physics steps still follow real time, so a stall is caught up exactly as before.

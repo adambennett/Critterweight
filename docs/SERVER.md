@@ -267,7 +267,7 @@ while (($l = $r.ReadLine()) -ne ".") { $l }
 | File (under the user-data folder) | Content |
 |---|---|
 | `logs/server.log` (+ `.1`, `.2`) | All server log lines, written to disk at least once a second; rotates at 2 MB, 3 generations kept (bounded) |
-| `server/status.json` | Rewritten every 5 s: state, phase, players, tick cost, traffic, memory, pid |
+| `server/status.json` | Rewritten every 5 s: state, phase, players, tick cost, traffic, memory, pid; `paced_wall_us` / `paced_sleep_us` give the main-thread load between two files (1 − sleep ÷ wall) |
 | `server/playlist_state_<id>.json` | Playlist history (restart persistence) |
 
 A `stats:` line is logged every `stats_interval` seconds:

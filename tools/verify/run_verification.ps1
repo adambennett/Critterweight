@@ -59,6 +59,14 @@ if ($chk.code -eq 0) { Record "packaged script check" "pass" $line } else { Reco
 $t = RunExe @("--headless", "--fixed-fps", "120", "--", "--user-root", $userRoot, "--test") "packaged_tests.log"
 $sum = ($t.text | Select-String "^tests: ").Line
 if ($t.code -eq 0) { Record "packaged test suite" "pass" $sum } else { Record "packaged test suite" "fail" "$sum (exit $($t.code))" }
+# PERF-04: test_net_measure ran the dedicated server package with 8 fighters (1 client + bots) on
+# loopback; its main-thread load comes from the server's own frame pacing (DESIGN.md: < 35 %)
+$ffa = ($t.text | Select-String "MEASURE ffa8").Line
+if ($ffa -and $ffa -match "main thread busy ([\d.]+)%") {
+	$busy = [double]$Matches[1]
+	$st = if ($busy -lt 35.0) { "pass" } else { "fail" }
+	Record "server load, 8 fighters (< 35 % of one core)" $st ("main thread busy {0:N1}% ({1})" -f $busy, $ffa.Trim().Substring(0, [Math]::Min(160, $ffa.Trim().Length)))
+} else { Record "server load, 8 fighters" "fail" "no MEASURE ffa8 line in packaged_tests.log" }
 
 # Runs the packaged game and samples its working set until it exits (release builds do not track
 # their own static memory, so process memory is measured from outside).

@@ -40,6 +40,7 @@ func _measure(name_: String, rules: String, fighters: int, seconds: float) -> Di
 	var r0: Dictionary = await u.wait_json(u.result_path("Probe"), has_counters, 5.0)
 	var c0: Dictionary = r0.get("stats", {}).get("conditioner", {})
 	var p0 := SOAK.proc_usage(srv)
+	var st0: Dictionary = U.read_json(status_path)
 	var t0 := Time.get_ticks_msec()
 	var sim_samples: Array = []
 	var phys_samples: Array = []
@@ -69,6 +70,12 @@ func _measure(name_: String, rules: String, fighters: int, seconds: float) -> Di
 	var cpu := 0.0
 	if not p0.is_empty() and not p1.is_empty():
 		cpu = (float(p1["cpu_s"]) - float(p0["cpu_s"])) / span * 100.0
+	# the server's main-thread load from its own frame pacing (exact for short bursts of work,
+	# which sampled OS CPU accounting under-counts); the status file is rewritten every 5 s
+	var busy := -1.0
+	var dwall := float(st1.get("paced_wall_us", 0)) - float(st0.get("paced_wall_us", 0))
+	if dwall >= 5e6:
+		busy = 100.0 * (1.0 - (float(st1.get("paced_sleep_us", 0)) - float(st0.get("paced_sleep_us", 0))) / dwall)
 	var rep := {"label": "LOOPBACK on one machine (i7-7700K, Windows 10), one human client + bots", "scenario": name_,
 		"server_binary": srv_exe.get_file() if srv_exe != "" else "game executable with --server",
 		"rules": rules, "fighters": int(st1.get("fighters", 0)), "window_s": span,
@@ -78,13 +85,13 @@ func _measure(name_: String, rules: String, fighters: int, seconds: float) -> Di
 		"snapshot_bytes_avg": float(st1.get("snapshot_bytes_avg", 0.0)), "last_snapshot_size": int(st1.get("last_snapshot_size", 0)),
 		"server_sim_ms_per_tick_avg": sim_avg, "server_physics_frame_max_ms_avg": phys_avg,
 		"server_net_ms_per_tick_avg": float(st1.get("net_ms_avg", 0.0)), "server_net_ms_per_tick_max": float(st1.get("net_ms_max", 0.0)),
-		"server_cpu_percent_one_core": cpu, "server_mem_static_mb": float(st1.get("mem_static_mb", 0.0)),
+		"server_cpu_percent_one_core": cpu, "server_main_thread_busy_percent": busy, "server_mem_static_mb": float(st1.get("mem_static_mb", 0.0)),
 		"client_snapshot_rate": float(r1.get("stats", {}).get("snapshot_rate", 0.0)),
 		"client_interp_ms": float(r1.get("stats", {}).get("interp_delay_ms", 0.0))}
 	u.write_json("report.json", rep)
-	print("    MEASURE %s (LOOPBACK, %d fighters, %.0f s): per client down %.1f KB/s (wire %.1f), up %.1f KB/s (wire %.1f), %.0f/%.0f pkt/s; snapshot %d B; server sim %.2f ms/tick, net %.3f ms/tick, longest physics frame %.2f ms (avg of 1 s maxima), CPU %.1f%% of one core (%s)" % [
+	print("    MEASURE %s (LOOPBACK, %d fighters, %.0f s): per client down %.1f KB/s (wire %.1f), up %.1f KB/s (wire %.1f), %.0f/%.0f pkt/s; snapshot %d B; server sim %.2f ms/tick, net %.3f ms/tick, longest physics frame %.2f ms (avg of 1 s maxima), main thread busy %.1f%%, process CPU %.1f%% of one core (%s)" % [
 		name_, int(rep["fighters"]), span, rep["down_kBps_payload"], rep["down_kBps_wire_ipv4"], rep["up_kBps_payload"], rep["up_kBps_wire_ipv4"],
-		rep["down_packets_per_s"], rep["up_packets_per_s"], int(rep["last_snapshot_size"]), sim_avg, float(rep["server_net_ms_per_tick_avg"]), phys_avg, cpu,
+		rep["down_packets_per_s"], rep["up_packets_per_s"], int(rep["last_snapshot_size"]), sim_avg, float(rep["server_net_ms_per_tick_avg"]), phys_avg, busy, cpu,
 		rep["server_binary"]])
 	var errs: Array = u.errors(srv) + u.errors(cli)
 	check(errs.is_empty(), "no errors: %s" % str(errs.slice(0, 5)))

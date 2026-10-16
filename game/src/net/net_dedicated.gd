@@ -29,6 +29,10 @@ var _shutdown_at_ms := 0
 var _shutdown_msg := ""
 var _shutdown_restart := false
 var _close_started := false
+var _frame_us := 0                 ## frame period (one frame per server tick), 0 = not pacing
+var _next_frame_us := 0
+var _pace_start_us := 0
+var _slept_us := 0                 ## time spent waiting for the next frame since pacing started
 
 
 func run(args: PackedStringArray) -> int:
@@ -61,7 +65,14 @@ func run(args: PackedStringArray) -> int:
 		printerr("Server mods could not be loaded; not starting. %s" % mod_err)
 		return 2
 	Engine.physics_ticks_per_second = int(cfg["tick_rate"])
-	Engine.max_fps = int(cfg["tick_rate"])
+	# one frame per tick, paced by _pace() rather than Engine.max_fps: Godot's frame limiter
+	# busy-waits through part of every frame on Windows (4.5 % of a core at any frame rate,
+	# measured on an empty project), a plain sleep does not (D-031)
+	Engine.max_fps = 0
+	OS.low_processor_usage_mode_sleep_usec = 0
+	_frame_us = 1000000 / int(cfg["tick_rate"])
+	_next_frame_us = Time.get_ticks_usec()
+	_pace_start_us = _next_frame_us
 	Engine.max_physics_steps_per_frame = 8
 	var playlist := _load_playlist(str(cfg["playlist"]))
 	server = NetServer.new()
@@ -252,6 +263,7 @@ func _stdin_loop() -> void:
 
 
 func _process(_dt: float) -> void:
+	_pace()
 	if server == null:
 		return
 	_stdin_mutex.lock()
@@ -277,6 +289,24 @@ func _process(_dt: float) -> void:
 		_begin_close()
 
 
+## Sleeps until the next frame is due, keeping an absolute schedule (an oversleep is made up by
+## the next frame); physics steps keep following real time. Like Godot's own limiter, the schedule
+## never drifts more than one frame from now, so a stall is not followed by a sprint. The time
+## slept also measures the main thread's load (status: paced_wall_us / paced_sleep_us): unlike
+## sampled OS CPU accounting, it stays exact for a thread that works in short bursts.
+func _pace() -> void:
+	if _frame_us <= 0:
+		return
+	_next_frame_us += _frame_us
+	var now := Time.get_ticks_usec()
+	if _next_frame_us > now:
+		OS.delay_usec(_next_frame_us - now)
+		var after := Time.get_ticks_usec()
+		_slept_us += after - now
+		now = after
+	_next_frame_us = clampi(_next_frame_us, now - _frame_us, now + _frame_us)
+
+
 func _write_status(state: String) -> void:
 	var s := server.status() if server else {}
 	s["state"] = state
@@ -285,6 +315,10 @@ func _write_status(state: String) -> void:
 	s["pid"] = OS.get_process_id()
 	s["time"] = Time.get_datetime_string_from_system(true)
 	s["log"] = Log.log_path()
+	if _frame_us > 0:
+		# main-thread load = 1 - sleep / wall between two status files (see _pace)
+		s["paced_wall_us"] = Time.get_ticks_usec() - _pace_start_us
+		s["paced_sleep_us"] = _slept_us
 	var f := FileAccess.open(Paths.file("server", "status.json.tmp"), FileAccess.WRITE)
 	if f == null:
 		return

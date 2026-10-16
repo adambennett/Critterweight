@@ -684,6 +684,8 @@ scripted human client through the conditioner relay at 1 ms, whose counters see 
 |---|---|---|---|---|---|---|---|
 | Duel, 2 fighters | 6.5-8.5 KB/s (7.5-9.5 wire) | 4.1-5.0 KB/s (5.8-6.9 wire) | 33-38 / 61-71 | 209-285 B | 0.68-1.01 ms (up to 1.30 under load) | 0.19-0.42 ms | 20-27 % of one core |
 | Free-for-all, 8 fighters | 16.8-28.8 KB/s (17.8-29.9 wire) | 4.4-5.3 KB/s (6.3-7.5 wire) | 35-46 / 69-81 | 663-893 B | 2.7-3.7 ms (4.1-6.8 with the CPU saturated by parallel jobs) | 0.39-0.77 ms | 52-68 % of one core |
+| Duel, 2026-10-16, quiet, packaged server | 9.3-10.4 KB/s (10.3-11.5 wire) | 4.7-4.8 KB/s (6.6 wire) | 36-38 / 67-69 | 289-311 B | 0.49-0.55 ms | 0.14-0.17 ms | **10.2-11.5 % main-thread load** |
+| Free-for-all, 2026-10-16, quiet, packaged server | 29.6-31.8 KB/s (30.7-33.1 wire) | 4.7-5.0 KB/s (6.7-7.1 wire) | 41-45 / 74-79 | 951-1033 B | 1.75-1.91 ms | 0.28-0.30 ms | **29.5-31.9 % main-thread load** |
 
 * Downstream grows with fighters (a fighter's 13 segment rotations + vitals are most of a
   snapshot); upstream is flat (60 input packets/s, 4 samples each, plus pings and ENet acks).
@@ -693,9 +695,18 @@ scripted human client through the conditioner relay at 1 ms, whose counters see 
 * The longest physics frame (simulation + Jolt step, average of the per-second maxima) was
   2.5-8.2 ms (duel) and 15.6-28.1 ms (8 fighters); the upper ends are runs with other jobs
   saturating the CPU.
-* **Server CPU target not met**: docs/DESIGN.md asks for < 35 % of one core with 8 fighters; the
-  server uses 52-68 %. Networking is about 0.4-0.8 ms of the 8.3 ms tick; the rest is the
-  simulation (fighter logic + physics), which is where optimisation has to happen.
+* **Server load target met (2026-10-16)**. DESIGN.md asks for < 35 % of one core with 8 fighters. The
+  rows dated 2026-10-15 come from loaded machines (52-68 %). They are also inflated by two engine effects,
+  both fixed:
+  - Godot's frame limiter busy-waits part of every frame on Windows. The dedicated server now paces its own
+    frames (DECISIONS D-031); an idle server went from 8.3 % to 0.1 %.
+  - The physics worker pool woke all 8 threads for small Jolt jobs. The server export runs one worker
+    thread (D-030).
+
+  The dated quiet-machine rows measure the dedicated server package (`CritterweightServer.exe`, 1 client +
+  7 bots). Their load is the main thread's busy share, from the server's own pacing: 1 − time slept ÷ wall
+  time. Windows' sampled process-CPU accounting under-counts a thread that works in short bursts and then
+  sleeps (2-4 % reported for a 10 % duel), so it is printed only for reference.
 * `test_net_measure.gd` asserts bandwidth limits and that the 8-fighter server keeps real time
   (simulation + networking under the 8.33 ms tick); the quiet-machine simulation figure is printed
   as a reference, because parallel jobs on a shared machine inflate wall-clock tick times.

@@ -174,6 +174,7 @@ func _sim_cost(n: int) -> void:
 		report["cpu_core_share_at_120hz_pct"] = float(report["cpu_ms_per_tick"]) * 120.0 / 10.0
 	report["core_share_at_120hz_pct"] = report.get("cpu_core_share_at_120hz_pct", report["wall_core_share_at_120hz_pct"])
 	report["core_share_target_pct"] = 35.0
+	report["state_hash"] = state_hash(sim)
 	var sections := {}
 	var nt := maxf(1.0, float(sim.prof.get("ticks", 1.0)))
 	for k in sim.prof:
@@ -352,6 +353,20 @@ func _tiers(bouts: int, round_time: float) -> void:
 	report["bouts_per_pair"] = bouts
 	report["round_time"] = round_time
 	report["tiers"] = out
+
+
+## Bit-exact fingerprint of a simulation's state (every body's transform and velocities, each
+## fighter's health, state and lives, the event count): an optimisation that changes no behaviour
+## leaves it unchanged for the same seed, duration and build settings.
+static func state_hash(sim: MatchSim) -> String:
+	var ctx := HashingContext.new()
+	ctx.start(HashingContext.HASH_SHA256)
+	for f in sim.fighters:
+		ctx.update(var_to_bytes([f.health, int(f.state), f.lives, f.despawned]))
+		for rb in f.rig.bodies:
+			ctx.update(var_to_bytes([rb.global_transform, rb.linear_velocity, rb.angular_velocity]))
+	ctx.update(var_to_bytes([sim.events.size(), sim.tick_count]))
+	return ctx.finish().hex_encode().substr(0, 16)
 
 
 ## CPU time this process has used so far, all threads, in ms (-1 when it cannot be read).
