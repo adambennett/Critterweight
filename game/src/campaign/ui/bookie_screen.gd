@@ -457,6 +457,12 @@ func _set_speed(k: float) -> void:
 	_refresh()
 
 
+func _cycle_camera() -> void:
+	var i := BookieTable.CAMERAS.find(table.camera)
+	table.set_camera(str(BookieTable.CAMERAS[(i + 1) % BookieTable.CAMERAS.size()]))
+	_refresh()
+
+
 func _toggle_take_over() -> void:
 	if table.unattended:
 		table.take_over()
@@ -528,7 +534,7 @@ func _build_overlay() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var anchor := MarginContainer.new()
 	anchor.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	anchor.offset_top = -86
+	anchor.offset_top = -BookieFlow.OVERLAY_BAR_H
 	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(anchor)
 	var bar := CampaignUI.panel(Color(CampaignUI.BG, 0.88))
@@ -551,6 +557,10 @@ func _build_overlay() -> void:
 			CampaignUI.GOOD if is_equal_approx(table.speed, k) else CampaignUI.ACCENT)
 		row.add_child(sb)
 		_focusables.append(sb)
+	var cm := CampaignUI.button("CAMERA: %s" % str(BookieTable.CAMERA_LABELS.get(table.camera, "Broadcast")).to_upper(), _cycle_camera, 20)
+	cm.tooltip_text = "Broadcast framing, the director's cuts between the fighters, or a free camera (stick / WASD moves it)."
+	row.add_child(cm)
+	_focusables.append(cm)
 	var tk := CampaignUI.button("HAND BACK" if not table.unattended else "TAKE OVER", _toggle_take_over, 20)
 	tk.tooltip_text = "Take over the decisions from the next decision point (the AI keeps fighting)."
 	row.add_child(tk)

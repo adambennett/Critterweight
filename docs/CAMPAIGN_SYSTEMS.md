@@ -469,7 +469,14 @@ bout and either the player or "Teddy" (`CampaignAutoPilot`) makes the decisions.
 plugs in a presented match (`BookieFlow.run_fight` via `App.start_match` with an overlay control
 bar) or the headless fast-forward runner. Every presented fight re-applies the table's speed
 (`SimSpeed.set_scale`: k × physics ticks at the fixed 1/120 s step) — a finished `MatchScene`
-resets `Engine.time_scale` when it ends and leaves the tree. Attended decisions reuse the normal
+resets `Engine.time_scale` when it ends and leaves the tree. The same goes for the table's **camera
+preset**, `set_camera()`, which the overlay bar's CAMERA button cycles:
+- **Broadcast:** the standard fight framing.
+- **Director:** the spectators' auto-director, which cuts between the fighters and the action.
+- **Free:** a free camera, moved with the stick or WASD.
+`BookieFlow.apply_camera` applies the preset to every presented fight and live when it changes. The
+overlay bar lifts the fight HUD (`FightHud.set_bottom_inset`), so the fighter plates are never under it.
+Attended decisions reuse the normal
 campaign screens through `BookieFlow` (same routing as `CampaignFlow`, pending picks first).
 Results go to the `bookie` record board with Clout at 50%; the table never unlocks Doses or
 achievements.

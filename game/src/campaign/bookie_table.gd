@@ -24,6 +24,7 @@ var profile: Dictionary = {}          ## credited at the end of each run (Profil
 var unattended := true
 var paused := false
 var speed := 1.0
+var camera := "broadcast"             ## presented fights: broadcast | director | free (BookieFlow.apply_camera)
 var fighter_tier := "contender"       ## Teddy's dice
 var think_delay := 0.6                ## seconds between automatic decisions (0 = instant)
 var keep_going := false               ## unattended: deal a new card after each run
@@ -60,6 +61,15 @@ func _new_card(seed_value: int) -> void:
 ## Deals a fresh card with the same settings (e.g. after a run ended and the loop stopped).
 func deal(seed_value := 0) -> void:
 	_new_card(seed_value)
+
+
+const CAMERAS := ["broadcast", "director", "free"]
+const CAMERA_LABELS := {"broadcast": "Broadcast", "director": "Director", "free": "Free"}
+
+
+func set_camera(c: String) -> void:
+	camera = c if c in CAMERAS else "broadcast"
+	changed.emit("camera")
 
 
 func set_speed(k: float) -> void:

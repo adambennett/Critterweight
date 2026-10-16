@@ -683,3 +683,47 @@ func test_bookie_speed_holds_for_every_presented_fight() -> void:
 			await wait_frames(1)
 		await wait_frames(2)               # the finished MatchScene leaves the tree (and resets time_scale)
 	t.running = false
+
+
+## AI-04 "speed/camera": the table's camera preset (broadcast / director / free) applies to every
+## presented fight, and changing it mid-fight moves the live camera.
+func test_bookie_camera_preset_holds_for_every_presented_fight() -> void:
+	var t := BookieTable.new()
+	t.name = "BookieTable"
+	App.add_child(t)
+	t.setup(cat(), run_cfg("f_stoke", {"seed": 99}), {})
+	t.set_camera("director")
+	var bf := BookieFlow.for_table(t)
+	bf.watching = true
+	t.running = true
+	SimSpeed.set_scale(t.speed)
+	t.ctrl.choose_node(str(t.ctrl.available_nodes()[0]), "p0")
+	var built := t.ctrl.match_config({"bot_tier_players": "contender", "player_kinds": {"p0": "bot"}})
+	check((built["errors"] as PackedStringArray).is_empty(), "the fight builds")
+	var expect := [FightCamera.Mode.SPECTATE, FightCamera.Mode.FREE]
+	for i in 2:
+		var done := [false]
+		var run := func() -> void:
+			await bf.run_fight(t, built["config"])
+			done[0] = true
+		run.call()
+		await wait_physics(8)
+		var scene: MatchScene = bf._scene
+		check(scene != null, "fight %d is presented" % (i + 1))
+		if scene == null:
+			break
+		check_eq(scene.camera.mode, expect[i], "fight %d opens on the table's camera preset" % (i + 1))
+		if i == 0:
+			check(scene.director != null, "the director camera has its director")
+			t.set_camera("free")
+			check_eq(scene.camera.mode, FightCamera.Mode.FREE, "switching mid-fight moves the live camera")
+		else:
+			t.set_camera("broadcast")
+			check_eq(scene.camera.mode, FightCamera.Mode.FIGHT, "back to the broadcast framing")
+		bf.abort_fight()
+		var budget := 0
+		while not done[0] and budget < 120:
+			budget += 1
+			await wait_frames(1)
+		await wait_frames(2)
+	t.running = false

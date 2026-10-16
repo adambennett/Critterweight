@@ -19,6 +19,9 @@ var ui_scale := 1.0
 
 
 var _top: HBoxContainer
+var _margin: MarginContainer
+var _hints: Control                ## the controls-hint strip (bottom-anchored in duels)
+var _hints_bottom := false
 var _bottom: GridContainer
 
 
@@ -33,6 +36,7 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_margin = margin
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 28)
 	add_child(margin)
@@ -133,6 +137,18 @@ func _add_control_hints(n: int) -> void:
 	strip.offset_left = -720
 	strip.offset_right = 720
 	add_child(strip)
+	_hints = strip
+	_hints_bottom = n <= 2
+
+
+## Lifts the bottom of the HUD by `px` (the fighter plates, and the hint strip in duels), so a control
+## bar laid over the match (The Bookie's Table) never hides them.
+func set_bottom_inset(px: float) -> void:
+	if _margin:
+		_margin.add_theme_constant_override("margin_bottom", 28 + int(px))
+	if _hints and _hints_bottom:
+		_hints.offset_top = -78.0 - px
+		_hints.offset_bottom = -16.0 - px
 
 
 func _label(t: String, size: int, font: Font) -> Label:

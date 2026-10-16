@@ -9,6 +9,8 @@ extends CampaignFlow
 ## Every presented fight re-applies the table's speed (SimSpeed: k x physics ticks at the fixed
 ## 1/120 s step): a finished MatchScene resets Engine.time_scale on its way out.
 
+const OVERLAY_BAR_H := 86              ## the Bookie's control bar over a presented fight (BookieScreen)
+
 var table: BookieTable
 var watching := true             ## fights presented (true) or fast-forwarded headless (false)
 var log_lines: Array = []        ## newest first: what happened at the table (for the live view)
@@ -51,6 +53,9 @@ func _on_fight_started(info: Dictionary) -> void:
 
 
 func _on_changed(what: String) -> void:
+	if what == "camera":
+		apply_camera(table.camera)
+		return
 	if what != "phase" or table.transitions.is_empty():
 		return
 	var tr: Dictionary = table.transitions.back()
@@ -83,6 +88,9 @@ func run_fight(t: BookieTable, config: Dictionary) -> Dictionary:
 	# tree (physics ticks stayed at k x): restore the table's speed and the fixed sim step
 	SimSpeed.set_scale(t.speed)
 	_scene = App.start_match(config, _on_presented_finished)
+	apply_camera(t.camera)
+	if is_instance_valid(_scene) and _scene.hud:
+		_scene.hud.set_bottom_inset(OVERLAY_BAR_H)
 	App.push("bookie", {"overlay": true})
 	var space := _scene.get_world_3d().space if _scene.get_world_3d() else RID()
 	var frozen := false
@@ -101,6 +109,28 @@ func run_fight(t: BookieTable, config: Dictionary) -> Dictionary:
 	_scene = null
 	App.goto("bookie", {})
 	return _fight_result
+
+
+## Points the presented fight's camera at the table's preset (AI-04 "speed/camera"): the standard
+## broadcast framing, the spectators' auto-director (cuts between the fighters and the action), or
+## the free camera (stick / WASD moves it, as when spectating).
+func apply_camera(preset: String) -> void:
+	if not is_instance_valid(_scene) or _scene.camera == null:
+		return
+	var cam: FightCamera = _scene.camera
+	match preset:
+		"director":
+			if _scene.director == null:
+				_scene.director = SpectatorDirector.new(_scene.sim)
+			cam.mode = FightCamera.Mode.SPECTATE
+		"free":
+			if cam.mode != FightCamera.Mode.FREE:
+				cam.free_pos = cam.global_position
+				cam.free_yaw = cam.global_rotation.y
+				cam.free_pitch = clampf(cam.global_rotation.x, -1.2, 0.2)
+			cam.mode = FightCamera.Mode.FREE
+		_:
+			cam.mode = FightCamera.Mode.FIGHT
 
 
 func _on_presented_finished(result: Dictionary) -> void:
