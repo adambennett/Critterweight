@@ -29,17 +29,24 @@ func _build() -> void:
 	var dose := int(s.get("dose", 0))
 	var diff := str(ctrl.catalog.difficulty(str(s.get("difficulty", ""))).get("name", s.get("difficulty", "")))
 	var variant := "The Bookie's Table" if str(s.get("mode", "")) == "bookie" else str(s.get("variant", "")).replace("_", " ").capitalize()
-	var sub := "%s · %s · %s%s · %s · %s · seed %s" % [fname, variant, diff, (" · Dose %d" % dose) if dose > 0 else "", where,
-		CampaignUI.fmt_time(float(s.get("elapsed", 0.0))), str(s.get("seed_text", ""))]
-	var v := CampaignUI.scaffold(self, heading, sub)
+	# only the parts the run has (a fresh or abandoned run may lack a variant or a typed seed)
+	var parts := []
+	for part in [fname, variant, diff, ("Dose %d" % dose) if dose > 0 else "", where, CampaignUI.fmt_time(float(s.get("elapsed", 0.0))),
+			("seed %s" % s["seed_text"]) if str(s.get("seed_text", "")) != "" else ""]:
+		if str(part).strip_edges() != "":
+			parts.append(str(part))
+	var v := CampaignUI.scaffold(self, heading, "  ·  ".join(parts))
 	(v.get_child(0) as Label).add_theme_color_override("font_color", CampaignUI.ACCENT if victory else CampaignUI.DANGER)
 	var cols := HBoxContainer.new()
 	cols.add_theme_constant_override("separation", 22)
-	cols.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(cols)
 	cols.add_child(_column("THE NUMBERS", _stats_lines(s)))
 	cols.add_child(_column("THE BUILD", _build_lines(me)))
 	cols.add_child(_column("THE TAKE", _reward_lines()))
+	# the panels hold their content; the buttons stay at the bottom of the screen
+	var push := Control.new()
+	push.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(push)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 16)
@@ -81,16 +88,19 @@ func _build() -> void:
 func _column(title: String, lines: Array) -> Control:
 	var pnl := CampaignUI.panel()
 	pnl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	pnl.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	pnl.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	pnl.custom_minimum_size = Vector2(0, 360)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 6)
-	box.add_child(CampaignUI.label(title, 28, CampaignUI.ACCENT, "900"))
+	box.add_theme_constant_override("separation", 8)
+	box.add_child(CampaignUI.label(title, 30, CampaignUI.ACCENT, "900"))
 	for l in lines:
 		if typeof(l) == TYPE_ARRAY:
-			box.add_child(CampaignUI.label(str(l[0]), 20, l[1], "700"))
+			box.add_child(CampaignUI.label(str(l[0]), 24, l[1], "700"))
 		else:
-			box.add_child(CampaignUI.label(str(l), 20))
-	pnl.add_child(CampaignUI.scroll(box))
+			box.add_child(CampaignUI.label(str(l), 24))
+	var sc := CampaignUI.scroll(box)
+	sc.custom_minimum_size = Vector2(0, 340)
+	pnl.add_child(sc)
 	return pnl
 
 

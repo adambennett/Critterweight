@@ -1,8 +1,9 @@
 extends Screen
-## Campaign menu: variant (Off the Street / Fight Camp), fighter, difficulty, Dose, party
-## (solo / co-op format), seed, suspended runs (resume / abandon), The Bookie's Table and the
-## Cannery Ledger. Fully operable with a controller (focus moves between rows by geometry,
-## ui_accept presses, ui_cancel goes back) and with mouse/keyboard.
+## Campaign menu ("The Fight Card"): variant (Off the Street / Fight Camp), fighter, difficulty,
+## Dose, co-op format, seed, suspended runs (resume / abandon), The Bookie's Table and the Cannery
+## Ledger. Built from the shared menu kit (frame, option rows, help panel, prompt bar) like the
+## versus setup, so it reads as part of the same game; fully operable with a controller and with
+## mouse/keyboard.
 ## One suspended run per variant: START RUN over an occupied slot asks first (abandon it and
 ## start, resume it, or cancel); abandoning credits it as a defeat. Party runs are listed but
 ## resume only through the co-op host path (CoopSession.host_resume), never as a solo run.
@@ -18,13 +19,12 @@ var fighter := ""
 var difficulty := "amateur"
 var dose := 0
 var coop_format := "simultaneous"
-var seed_edit: LineEdit
+var seed_text := ""                ## typed seed (or any words); empty = a random card
+var _scroll: FocusScroll
+var _help: HelpPanel
 var _status: Label
-var _rows: VBoxContainer
 var _start: Button
 var _runs_box: VBoxContainer
-var _diff_desc: Label
-var _dose_label: Label
 
 
 func on_enter(p: Dictionary) -> void:
@@ -43,41 +43,77 @@ func on_enter(p: Dictionary) -> void:
 func _build() -> void:
 	for c in get_children():
 		c.queue_free()
-	var v := CampaignUI.scaffold(self, "THE FIGHT CARD", "Three acts. Branching routes. Shady supplements. One belt.")
-	var cols := HBoxContainer.new()
-	cols.add_theme_constant_override("separation", 28)
+	if return_to_hub:
+		# over the Cannery (its scene stays loaded for the walk back): a dark screen, no backdrop swap
+		var dim := ColorRect.new()
+		dim.color = Color(CampaignUI.BG, 0.94)
+		dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(dim)
+	else:
+		MenuBackdrop.ensure()
+		add_backdrop_gradient(0.97, 0.75)
+	var f := build_frame("Campaign", "The Fight Card")
+	var body: VBoxContainer = f["body"]
+	body.add_child(UiTheme.label("Three acts. Branching routes. Shady supplements. One belt.", "Caption"))
+	var cols := UiTheme.hbox(UiTheme.GAP_L)
 	cols.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	v.add_child(cols)
-	_rows = VBoxContainer.new()
-	_rows.add_theme_constant_override("separation", 12)
-	_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	cols.add_child(CampaignUI.scroll(_rows))
-	var right := VBoxContainer.new()
-	right.custom_minimum_size = Vector2(520, 0)
-	right.add_theme_constant_override("separation", 10)
+	body.add_child(cols)
+	var left := UiTheme.panel("PanelSolid", 18.0)
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.size_flags_stretch_ratio = 1.6
+	cols.add_child(left)
+	_scroll = FocusScroll.new(8)
+	left.add_child(_scroll)
+	var right := UiTheme.vbox(UiTheme.GAP_M)
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right.custom_minimum_size = Vector2(500, 0)
 	cols.add_child(right)
-	_build_rows()
-	right.add_child(CampaignUI.label("SUSPENDED RUNS", 26, CampaignUI.ACCENT, "900"))
-	_runs_box = VBoxContainer.new()
-	_runs_box.add_theme_constant_override("separation", 8)
-	right.add_child(_runs_box)
+	var runs := UiTheme.panel("PanelPoster")
+	runs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	right.add_child(runs)
+	var rs := ScrollContainer.new()
+	rs.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	rs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	runs.add_child(rs)
+	var rv := UiTheme.vbox(UiTheme.GAP_S)
+	rv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rs.add_child(rv)
+	rv.add_child(UiTheme.label("SUSPENDED RUNS", "Eyebrow"))
+	_runs_box = UiTheme.vbox(UiTheme.GAP_S)
+	_runs_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rv.add_child(_runs_box)
+	# the other campaign tables, beside the run form (START RUN -> right reaches them)
+	right.add_child(_button("THE BOOKIE'S TABLE (autobattler)", "", func(): App.goto("bookie", {"stand_ins": stand_ins, "from_hub": return_to_hub}), "",
+		"The Bookie's Table", "Teddy Two-Tooth deals a card and the AI fights it: watch, bet on your build, or take over the decisions."))
+	right.add_child(_button("CANNERY LEDGER (Fight Camp upgrades)", "", func(): App.push("camp_ledger", {"station": ""}), "",
+		"Cannery Ledger", "Spend Clout on Fight Camp upgrades. They apply only in Fight Camp runs."))
+	# the prompt bar's Back covers the main menu; from the Cannery a button says where Back goes
+	if return_to_hub:
+		right.add_child(_button("BACK TO THE CANNERY", "", _leave, "back"))
+	_help = HelpPanel.new(self)
+	_help.size_flags_vertical = Control.SIZE_SHRINK_END
+	_help.custom_minimum_size = Vector2(0, 190)
+	right.add_child(_help)
+	_status = UiTheme.label("", "Caption", true)
+	body.add_child(_status)
+	var bar: PromptBar = f["prompts"]
+	bar.set_prompts([{"actions": ["ui_accept"], "text": "Select"}, {"actions": ["ui_left", "ui_right"], "text": "Change"},
+		{"actions": ["ui_alt"], "text": "Start run", "call": _start_run}, {"actions": ["ui_cancel"], "text": "Back", "call": App.back}])
 	_refresh_runs()
-	right.add_child(CampaignUI.button("THE BOOKIE'S TABLE (autobattler)", func(): App.goto("bookie", {"stand_ins": stand_ins, "from_hub": return_to_hub})))
-	right.add_child(CampaignUI.button("CANNERY LEDGER (Fight Camp upgrades)", func(): App.push("camp_ledger", {"station": ""})))
-	right.add_child(CampaignUI.button("BACK TO THE CANNERY" if return_to_hub else "BACK", _leave, 24, CampaignUI.MUTED))
-	_status = CampaignUI.label("", 20, CampaignUI.MUTED)
-	v.add_child(_status)
+	_build_rows()
 	_update_status()
+	play_intro()
 
 
-func _build_rows() -> void:
-	for c in _rows.get_children():
-		c.queue_free()
-	_row("VARIANT", [["Off the Street", "off_the_street"], ["Fight Camp", "fight_camp"]], variant, _pick_variant)
-	var fs := []
-	for fid in catalog.available_fighters():
-		var info := catalog.fighter_info(str(fid))
-		fs.append(["%s  ·  %s" % [info.get("name", fid), Elements.display_name(str(info.get("element", "")))], str(fid)])
+func _build_rows(focus_key := "") -> void:
+	_scroll.clear()
+	var c := _scroll.content
+	c.add_child(UiTheme.label("NEW RUN", "Eyebrow"))
+	_option(c, "variant", "Campaign", ["off_the_street", "fight_camp"], ["Off the Street", "Fight Camp"], variant,
+		"Off the Street is the standard run. Fight Camp deals the same kind of card, and the Cannery upgrades you bought with Clout apply.",
+		func(v) -> void: _pick_variant(str(v)))
+	var fs := catalog.available_fighters()
 	if fs.is_empty():
 		var pending := 0
 		var first_problem := ""
@@ -92,96 +128,110 @@ func _build_rows() -> void:
 			why = "%d roster fighters are installed but their kits are not usable yet (%s)." % [pending, first_problem]
 		# development stand-ins are a developer tool (CampaignFlow.dev_tools): hidden in normal play
 		if CampaignFlow.dev_tools():
-			_rows.add_child(CampaignUI.label(why + " Enable development stand-ins to try the campaign (runs are marked custom).", 20, CampaignUI.DANGER))
-			_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS", func(): App.goto("campaign_menu", {"stand_ins": true, "from_hub": return_to_hub})))
+			c.add_child(UiTheme.label(why + " Enable development stand-ins to try the campaign (runs are marked custom).", "Danger", true))
+			c.add_child(_button("ENABLE DEV STAND-INS", "", func(): App.goto("campaign_menu", {"stand_ins": true, "from_hub": return_to_hub})))
 		else:
-			_rows.add_child(CampaignUI.label(why + " The card opens once their fight kits are cleared.", 20, CampaignUI.DANGER))
+			c.add_child(UiTheme.label(why + " The card opens once their fight kits are cleared.", "Danger", true))
 	else:
-		_row("FIGHTER", fs, fighter, _pick_fighter)
-		if not stand_ins and CampaignFlow.dev_tools() and catalog.available_fighters().size() < catalog.roster().size():
-			_rows.add_child(CampaignUI.button("ENABLE DEV STAND-INS (unfinished kits)", func(): App.goto("campaign_menu", {"stand_ins": true, "from_hub": return_to_hub})))
-	var ds := []
+		var names: Array = []
+		for fid in fs:
+			var info := catalog.fighter_info(str(fid))
+			names.append("%s  ·  %s" % [info.get("name", fid), Elements.display_name(str(info.get("element", "")))])
+		_option(c, "fighter", "Fighter", fs, names, fighter, "Who you take through the card: the run's rewards, supplements and scars stay with this fighter.",
+			func(v) -> void: _pick_fighter(str(v)))
+		if not stand_ins and CampaignFlow.dev_tools() and fs.size() < catalog.roster().size():
+			c.add_child(_button("ENABLE DEV STAND-INS (unfinished kits)", "", func(): App.goto("campaign_menu", {"stand_ins": true, "from_hub": return_to_hub})))
+	var dids: Array = []
+	var dnames: Array = []
 	for did in catalog.difficulty_ids():
-		ds.append([str(catalog.difficulties[did].get("name", did)), str(did)])
-	_row("DIFFICULTY", ds, difficulty, _pick_difficulty)
-	_diff_desc = CampaignUI.label(str(catalog.difficulty(difficulty).get("desc", "")), 18, CampaignUI.MUTED)
-	_rows.add_child(_diff_desc)
-	var dh := HBoxContainer.new()
-	dh.add_theme_constant_override("separation", 10)
-	dh.add_child(CampaignUI.inline_label("THE DOSAGE", 22, CampaignUI.INK, "900"))
-	var minus := CampaignUI.button("  -  ", _change_dose.bind(-1))
-	var plus := CampaignUI.button("  +  ", _change_dose.bind(1))
-	minus.disabled = dose <= 0
-	plus.disabled = dose >= _max_dose()
-	dh.add_child(minus)
-	var dname := "Base card" if dose == 0 else "Dose %d: %s" % [dose, catalog.dose(dose).get("name", "")]
-	_dose_label = CampaignUI.inline_label(dname, 22)
-	dh.add_child(_dose_label)
-	dh.add_child(plus)
-	_rows.add_child(dh)
-	if dose > 0:
-		_rows.add_child(CampaignUI.label("Active: " + "; ".join(_dose_lines()), 18, CampaignUI.MUTED))
-	elif _max_dose() == 0:
-		_rows.add_child(CampaignUI.label("Clear a run on Amateur or harder to open The Dosage.", 18, CampaignUI.MUTED))
-	_row("CO-OP FORMAT", [["Simultaneous (default)", "simultaneous"], ["Tag-team", "tag"]], coop_format, _pick_format)
-	_rows.add_child(CampaignUI.label(_coop_note(), 18, CampaignUI.MUTED))
-	var sh := HBoxContainer.new()
-	sh.add_child(CampaignUI.inline_label("SEED", 22, CampaignUI.INK, "900"))
-	seed_edit = LineEdit.new()
-	seed_edit.placeholder_text = "random (or type a seed / any words)"
-	# fills the row: a fixed 420 px squeezed the label out of a 1280x800 window
-	seed_edit.custom_minimum_size = Vector2(240, 44)
-	seed_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	seed_edit.focus_mode = Control.FOCUS_ALL
-	sh.add_child(seed_edit)
-	_rows.add_child(sh)
+		dids.append(str(did))
+		dnames.append(str(catalog.difficulties[did].get("name", did)))
+	_option(c, "difficulty", "Difficulty", dids, dnames, difficulty, str(catalog.difficulty(difficulty).get("desc", "")),
+		func(v) -> void: _pick_difficulty(str(v)))
+	var cap := _max_dose()
+	var dose_ids: Array = []
+	var dose_names: Array = []
+	for l in range(0, cap + 1):
+		dose_ids.append(l)
+		dose_names.append("Base card" if l == 0 else "Dose %d: %s" % [l, catalog.dose(l).get("name", "")])
+	var dose_help := "Clear a run on Amateur or harder to open The Dosage."
+	if cap > 0:
+		dose_help = "Each Dose adds a twist to the card." if dose == 0 else "Active: " + "; ".join(_dose_lines())
+	_option(c, "dose", "The Dosage", dose_ids, dose_names, dose, dose_help, func(v) -> void: _set_dose(int(v)))
+	_option(c, "format", "Co-op format", ["simultaneous", "tag"], ["Simultaneous", "Tag-team"], coop_format, _coop_note(),
+		func(v) -> void: _pick_format(str(v)))
+	var sr := TextFieldRow.new("Seed")
+	sr.placeholder = "Random"
+	sr.setup(seed_text, 40)
+	sr.set_help("Seed", "Type a number or any words to deal that card again (share it with a friend). Empty deals a random card.")
+	sr.set_meta("focus_key", "seed")
+	sr.value_changed.connect(func(v) -> void: seed_text = str(v))
+	c.add_child(sr)
 	if variant == "fight_camp":
 		CampaignProgression.ensure_fields(Profiles.current)
-		_rows.add_child(CampaignUI.label("Clout: %d  ·  Cannery upgrades owned: %d (apply ONLY in Fight Camp runs)" % [
-			int(Profiles.current["camp"].get("clout", 0)), (Profiles.current["camp"].get("upgrades", {}) as Dictionary).size()], 18, CampaignUI.MUTED))
-	_start = CampaignUI.button("START RUN", _start_run, 30)
+		c.add_child(UiTheme.label("Clout: %d  ·  Cannery upgrades owned: %d (they apply only in Fight Camp runs)" % [
+			int(Profiles.current["camp"].get("clout", 0)), (Profiles.current["camp"].get("upgrades", {}) as Dictionary).size()], "Caption", true))
+	c.add_child(UiTheme.spacer(false, 2))
+	_start = _button("START RUN", "PrimaryButton", _start_run, "fight", "Start run", "Deals the card and opens the route map. Shortcut: Y / R.")
+	_start.custom_minimum_size = Vector2(0, 76)
+	_start.set_meta("focus_key", "start")
 	_start.disabled = fighter == ""
-	_rows.add_child(_start)
-	_start.call_deferred("grab_focus")
+	c.add_child(_start)
+	_scroll.wrap_focus.call_deferred()
+	_focus_key.call_deferred(focus_key if focus_key != "" else "start")
 
 
-func _row(title: String, opts: Array, current: String, on_pick: Callable) -> void:
-	_rows.add_child(CampaignUI.label(title, 22, CampaignUI.INK, "900"))
-	var flow := HFlowContainer.new()
-	flow.add_theme_constant_override("h_separation", 8)
-	flow.add_theme_constant_override("v_separation", 8)
-	for o in opts:
-		var id := str(o[1])
-		var b := CampaignUI.button(("> %s" % o[0]) if id == current else str(o[0]), on_pick.bind(id), 22, CampaignUI.GOOD if id == current else CampaignUI.ACCENT)
-		flow.add_child(b)
-	_rows.add_child(flow)
+## One choice row from the shared kit; picking a value rebuilds the rows (help texts follow it)
+## and keeps the focus on this row.
+func _option(c: Control, key: String, title: String, ids: Array, names: Array, current, help: String, on_pick: Callable) -> void:
+	var lbls: Array[String] = []
+	for n in names:
+		lbls.append(str(n))
+	var r := OptionRow.new(title)
+	r.setup(ids, lbls, current)
+	r.set_help(title, help)
+	r.set_meta("focus_key", key)
+	r.value_changed.connect(func(v) -> void:
+		on_pick.call(v)
+		_build_rows(key))
+	c.add_child(r)
+
+
+func _button(text: String, variation: String, on_press: Callable, icon := "", help_title := "", help_text := "") -> UiButton:
+	var b := UiButton.new(text, variation, icon)
+	if help_title != "":
+		b.set_help(help_title, help_text)
+	b.pressed.connect(on_press)
+	return b
+
+
+func _focus_key(key: String) -> void:
+	for f in _scroll.focusables():
+		if f.has_meta("focus_key") and str(f.get_meta("focus_key")) == key and f.is_visible_in_tree():
+			f.grab_focus()
+			return
 
 
 func _pick_variant(id: String) -> void:
 	variant = id
 	dose = mini(dose, _max_dose())
-	_build_rows()
 
 
 func _pick_fighter(id: String) -> void:
 	fighter = id
-	_build_rows()
 
 
 func _pick_difficulty(id: String) -> void:
 	difficulty = id
 	dose = mini(dose, _max_dose())
-	_build_rows()
 
 
 func _pick_format(id: String) -> void:
 	coop_format = id
-	_build_rows()
 
 
-func _change_dose(delta: int) -> void:
-	dose = clampi(dose + delta, 0, _max_dose())
-	_build_rows()
+func _set_dose(v: int) -> void:
+	dose = clampi(v, 0, _max_dose())
 
 
 func _max_dose() -> int:
@@ -212,6 +262,7 @@ func _update_status() -> void:
 	if not catalog.errors.is_empty():
 		lines.append("Content errors: %s" % catalog.errors[0])
 	_status.text = "\n".join(lines)
+	_status.visible = not lines.is_empty()
 
 
 func _refresh_runs() -> void:
@@ -219,27 +270,27 @@ func _refresh_runs() -> void:
 		c.queue_free()
 	var runs := RunStore.new().list(Profiles.id() if Profiles.id() != "" else "default", catalog)
 	if runs.is_empty():
-		_runs_box.add_child(CampaignUI.label("No suspended runs.", 18, CampaignUI.MUTED))
+		_runs_box.add_child(UiTheme.label("No suspended runs. A run you suspend from the route map waits here.", "BodyMuted", true))
 		return
 	for r in runs:
 		var s: Dictionary = r["summary"]
 		var party := RunStore.is_party_slot(str(r["slot"]), s)
-		var box := CampaignUI.panel()
-		var col := VBoxContainer.new()
+		var box := UiTheme.panel("PanelSolid", 12.0)
+		var col := UiTheme.vbox(UiTheme.GAP_S)
 		box.add_child(col)
 		var head := CampaignFlow.describe_suspended(catalog, s)
 		if party:
 			head = "PARTY RUN (%d players) · %s" % [int(s.get("players", 2)), head]
-		col.add_child(CampaignUI.label(head if not s.is_empty() else str(r["slot"]), 20))
+		col.add_child(UiTheme.label(head if not s.is_empty() else str(r["slot"]), "BodyStrong", true))
 		if not bool(r["ok"]):
-			col.add_child(CampaignUI.label(str(r["error"]), 16, CampaignUI.DANGER))
+			col.add_child(UiTheme.label(str(r["error"]), "Danger", true))
 		elif party:
-			col.add_child(CampaignUI.label(PARTY_RESUME_TEXT, 16, CampaignUI.MUTED))
-		var hb := HBoxContainer.new()
-		var resume := CampaignUI.button("RESUME", _resume.bind(str(r["slot"])), 20)
+			col.add_child(UiTheme.label(PARTY_RESUME_TEXT, "Caption", true))
+		var hb := UiTheme.hbox(UiTheme.GAP_S)
+		var resume := _button("RESUME", "", _resume.bind(str(r["slot"])), "forward")
 		resume.disabled = not bool(r["ok"]) or party
 		hb.add_child(resume)
-		hb.add_child(CampaignUI.button("ABANDON", _abandon.bind(str(r["slot"])), 20, CampaignUI.DANGER))
+		hb.add_child(_button("ABANDON", "DangerButton", _abandon.bind(str(r["slot"])), "close"))
 		col.add_child(hb)
 		_runs_box.add_child(box)
 
@@ -309,7 +360,7 @@ func _leave() -> void:
 func _start_run() -> void:
 	if fighter == "":
 		return
-	var seed_value := RunRng.text_to_seed(seed_edit.text) if seed_edit and seed_edit.text.strip_edges() != "" else 0
+	var seed_value := RunRng.text_to_seed(seed_text) if seed_text.strip_edges() != "" else 0
 	var cfg := FightCamp.run_config(Profiles.current, {"variant": variant, "fighter": fighter, "difficulty": difficulty, "dose": dose,
 		"seed": seed_value, "coop_format": coop_format, "custom_reasons": CampaignFlow.custom_reasons(stand_ins)})
 	cfg["content_hash"] = Content.content_hash()

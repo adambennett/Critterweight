@@ -113,6 +113,8 @@ static func card(width := 340.0, height := 280.0, accent := ACCENT) -> Array:
 	var b := Button.new()
 	b.focus_mode = Control.FOCUS_ALL
 	b.custom_minimum_size = Vector2(width, height)
+	# keeps its height in a row that fills the screen (a stretched card was mostly empty space)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.add_theme_stylebox_override("normal", style(PANEL_HI, accent.darkened(0.45), 2, 14))
 	b.add_theme_stylebox_override("hover", style(PANEL_HI.lightened(0.06), accent.lightened(0.1), 4, 14))

@@ -47,7 +47,7 @@ func _build() -> void:
 	v.add_child(row)
 	var options: Array = _entry.get("options", [])
 	for id in options:
-		var parts := CampaignUI.card(360, 360, CampaignUI.GOOD if kind == "technique" else CampaignUI.ACCENT)
+		var parts := CampaignUI.card(360, 290, CampaignUI.GOOD if kind == "technique" else CampaignUI.ACCENT)
 		var b: Button = parts[0]
 		var extra := []
 		if kind == "supplement":

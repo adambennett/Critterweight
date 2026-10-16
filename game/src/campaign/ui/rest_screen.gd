@@ -40,7 +40,7 @@ func _build() -> void:
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(row)
 	for o in ctrl.rest_options(flow.me):
-		var parts := CampaignUI.card(360, 260, CampaignUI.NODE_COLORS["rest"])
+		var parts := CampaignUI.card(360, 220, CampaignUI.NODE_COLORS["rest"])
 		var b: Button = parts[0]
 		var cv: VBoxContainer = parts[1]
 		var head := CampaignUI.label(str(o.get("label", "")).to_upper(), 34, CampaignUI.INK, "900")
