@@ -230,10 +230,14 @@ func _roster(bouts: int, tier: String, round_time: float) -> void:
 		per[id] = {"wins": 0, "losses": 0, "draws": 0, "hits": 0, "damage": 0.0, "moves": 0, "seconds": 0.0}
 	var pairs := {}
 	var dt := 1.0 / Engine.physics_ticks_per_second
+	# --pair a,b plays one pairing only (e.g. --pair f_dredge,f_slurry)
+	var only := _arg("--pair", "").split(",", false)
 	for a_i in ids.size():
 		for b_i in range(a_i, ids.size()):
 			var a := str(ids[a_i])
 			var b := str(ids[b_i])
+			if only.size() == 2 and not ((a == only[0] and b == only[1]) or (a == only[1] and b == only[0])):
+				continue
 			var pr := {"a_wins": 0, "b_wins": 0, "draws": 0}
 			for k in bouts:
 				var sv := SubViewport.new()

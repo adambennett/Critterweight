@@ -71,6 +71,11 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
    Diagnose each extreme pairing the way the masher work did (per-bout hits / states, then kit or AI
    personality), with the user's playtest feedback first.
 
+   Started on Slurry vs Dredge with `--bench roster --pair f_dredge,f_slurry`: Slurry lands about 50 hits a
+   minute at about 4 damage each against Dredge's 13 at 5, out-damaging him about 3:1. Giving Dredge's bot
+   `avoid_zones` changed nothing (still 0-12), so the puddles are not the cause. Next: a per-move breakdown
+   of those small hits.
+
    Also needed: **reliable mashed strings for every kit.** A roster-wide test, kept out of the suite until
    the kits are tuned, has the masher stand where his first jab reaches, mash Light for 2 s against a
    standing dummy and check l1-l2-l3. Results on 2026-10-16:
