@@ -75,3 +75,7 @@ lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
 lights_and_shadows/positional_shadow/soft_shadow_filter_quality=3
 environment/defaults/default_clear_color=Color(0.07, 0.06, 0.09, 1)
 textures/default_filters/anisotropic_filtering_level=3
+
+[threading]
+
+worker_pool/max_threads.dedicated_server=1

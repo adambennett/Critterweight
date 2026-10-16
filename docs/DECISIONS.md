@@ -180,3 +180,16 @@ console log must reach a service manager (systemd, a Windows service wrapper) an
 and must survive a crash or kill. Found when the packaged tests read a running server's log: release builds
 buffered it in 4 KB blocks, so its `ready:` line was invisible for minutes. The game prints only log lines
 (no per-frame output), so flushing each one costs nothing measurable.
+
+## D-030 The dedicated server runs one worker thread
+
+The server export (`dedicated_server` feature) sets `threading/worker_pool/max_threads` to 1. Measured on
+the packaged 8-fighter server (`test_net_measure`, quiet i7-7700K):
+- all 8 logical cores: 45.6 % of one core;
+- 2 threads: 40.4 %;
+- 1 thread: 36.4 %.
+
+The pool's threads mostly woke for small Jolt jobs and cost more than they saved. An idle server is about
+6 % either way. The server is authoritative, so its physics thread count changes nothing that a client or a
+replay sees. The game itself (rendering, listen hosting, AI Lab workers) keeps the full pool.
+`test_net_measure` measures the server package itself whenever it runs inside a packaged game.

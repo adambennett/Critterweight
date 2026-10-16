@@ -52,13 +52,29 @@ static func project_dir() -> String:
 	return "" if OS.has_feature("template") else ProjectSettings.globalize_path("res://")
 
 
+## The dedicated server package's executable when this is a packaged game sitting in a dist folder
+## next to it (dist/Critterweight-windows-x64 + dist/Critterweight-server-windows-x64), else "".
+## It takes the same arguments as the game started with --server, but it is the build players run
+## as a server (dedicated_server feature: its own engine settings).
+static func server_package_exe() -> String:
+	if not OS.has_feature("template"):
+		return ""
+	var dist := OS.get_executable_path().get_base_dir().get_base_dir()
+	var exe := dist.path_join("Critterweight-server-windows-x64/CritterweightServer.exe") if OS.get_name() == "Windows" \
+		else dist.path_join("Critterweight-server-linux-x86_64/CritterweightServer.x86_64")
+	return exe if FileAccess.file_exists(exe) else ""
+
+
 func path(rel: String) -> String:
 	return root.path_join(rel)
 
 
 ## Spawns `game --headless --log-file .. -- <args> --user-root <root>/<label>`. `piped` = with
-## stdin/stdout pipes (for console tests). Returns the pid (or -1).
-func spawn(label: String, args: Array, piped := false) -> int:
+## stdin/stdout pipes (for console tests); `exe` = another executable (e.g. the server package).
+## Returns the pid (or -1).
+func spawn(label: String, args: Array, piped := false, exe := "") -> int:
+	if exe == "":
+		exe = OS.get_executable_path()
 	# a restarted process (same label) logs to a new file: on Windows the previous log can still be
 	# locked for a moment after its process exited, and stale lines must never be read as new
 	var n := int(_spawned.get(label, 0)) + 1
@@ -75,11 +91,11 @@ func spawn(label: String, args: Array, piped := false) -> int:
 	full.append("--user-root")
 	full.append(path(label))
 	if not piped:
-		var pid := OS.create_process(OS.get_executable_path(), full)
+		var pid := OS.create_process(exe, full)
 		if pid > 0:
 			procs[pid] = {"label": label, "log": logf, "stdio": null, "stderr": null, "out": "", "err": ""}
 		return pid
-	var res := OS.execute_with_pipe(OS.get_executable_path(), full, false)
+	var res := OS.execute_with_pipe(exe, full, false)
 	if res.is_empty():
 		return -1
 	var pid2: int = res["pid"]
