@@ -73,8 +73,16 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
 
    Started on Slurry vs Dredge with `--bench roster --pair f_dredge,f_slurry`: Slurry lands about 50 hits a
    minute at about 4 damage each against Dredge's 13 at 5, out-damaging him about 3:1. Giving Dredge's bot
-   `avoid_zones` changed nothing (still 0-12), so the puddles are not the cause. Next: a per-move breakdown
-   of those small hits.
+   `avoid_zones` changed nothing (still 0-12), so the puddles are not the cause. A per-move breakdown
+   (4 Contender bouts) found the cause: Slurry's **L1 Head Butt** landed 37 times for 213 damage, against
+   7 Dredge L1 hits. The jab starts in 0.09 s against Dredge's 0.16 s, and it reaches 1.7 m root gap with a
+   3 m/s lunge against Dredge's 1.55 m. So Slurry wins every jab exchange from just outside Dredge's range.
+   Balance options, a kit design call best made with playtest feedback:
+   - Slurry L1 start-up 0.09 to about 0.12 s, or a shorter lunge;
+   - or Dredge's bot keeping a closer range than its [1.25, 1.6] m.
+
+   Breakdown tool: `test_zz_diag_pair.gd`, in the session scratchpad's balance_handoff folder (DIAG_A /
+   DIAG_B / DIAG_TIER env).
 
    Also needed: **reliable mashed strings for every kit.** A roster-wide test, kept out of the suite until
    the kits are tuned, has the masher stand where his first jab reaches, mash Light for 2 s against a
