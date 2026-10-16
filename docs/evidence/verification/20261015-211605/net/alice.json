@@ -1,0 +1,209 @@
+{
+	"app_messages": [],
+	"candidates_seen": [
+		"duel"
+	],
+	"chat": [],
+	"connected": true,
+	"damage_dealt": 0.0,
+	"damage_taken": 0.0,
+	"disconnect": {
+
+	},
+	"done": true,
+	"events": {
+		"match_start": 1,
+		"round_intro": 1,
+		"round_start": 1,
+		"sudden_death": 1,
+		"timeout": 1
+	},
+	"exit_reason": "quit-after",
+	"failure": {
+
+	},
+	"forged_sent": 0,
+	"health_seen": {
+		"0": 130.0,
+		"1": 130.0
+	},
+	"hits_dealt": 0,
+	"hits_taken": 0,
+	"join_error": 0,
+	"kicked": {
+
+	},
+	"lobby_last": {
+		"countdown": -1.0,
+		"match_id": 1,
+		"phase": "match",
+		"players": [
+			{
+				"connected": true,
+				"cosmetics": {
+
+				},
+				"creature": "f_dozer",
+				"fighter": 0,
+				"host": false,
+				"id": 2,
+				"name": "Bob",
+				"ping": 9,
+				"ready": false,
+				"slot": 0,
+				"spectator": false,
+				"team": -1,
+				"vote": -1
+			},
+			{
+				"connected": true,
+				"cosmetics": {
+
+				},
+				"creature": "f_dozer",
+				"fighter": 1,
+				"host": false,
+				"id": 3,
+				"name": "Alice",
+				"ping": 14,
+				"ready": false,
+				"slot": 1,
+				"spectator": false,
+				"team": -1,
+				"vote": -1
+			}
+		],
+		"playlist": {
+			"errors": [],
+			"id": "verify_duel",
+			"invalid": 0,
+			"name": "Verification duel",
+			"valid": 1
+		},
+		"settings": {
+			"arena": "the_gullet",
+			"arena_name": "The Gullet",
+			"bot_difficulty": "regular",
+			"bot_policy": [],
+			"bots": 0,
+			"mode": "standard",
+			"party_relay": true,
+			"player_assist": true,
+			"rules": "duel",
+			"rules_name": "Standard Duel",
+			"rules_override": {
+
+			}
+		}
+	},
+	"lobby_phases": [
+		"lobby",
+		"match"
+	],
+	"matches": [
+		{
+			"arena_id": "the_gullet",
+			"arena_imported": "",
+			"arena_name": "The Gullet",
+			"damage_mult": 1.0,
+			"entry": {
+				"arena": "the_gullet",
+				"arena_name": "The Gullet",
+				"index": 0,
+				"key": "duel",
+				"max_players": 2,
+				"min_players": 2,
+				"mode": "standard",
+				"name": "Standard Duel @ The Gullet",
+				"rules": "duel",
+				"rules_name": "Standard Duel",
+				"weight": 1.0
+			},
+			"fighters": 2,
+			"match_id": 1,
+			"mode": "standard",
+			"rules_id": "duel",
+			"rules_known_here": true,
+			"rules_name": "Standard Duel",
+			"t_ms": 2904,
+			"you": 1
+		}
+	],
+	"max_snapshot_slots": 2,
+	"my_health_max": 130.0,
+	"my_health_min": 130.0,
+	"my_health_min_before_kick": 130.0,
+	"name": "Alice",
+	"notices": [
+		{
+			"t_ms": 46,
+			"text": "Alice joined."
+		},
+		{
+			"t_ms": 2895,
+			"text": "Next: Standard Duel @ The Gullet - no votes: highest weight."
+		},
+		{
+			"t_ms": 4553,
+			"text": "Viewer joined (spectating)."
+		},
+		{
+			"t_ms": 17969,
+			"text": "Viewer left (server_shutdown)."
+		}
+	],
+	"party_events": [],
+	"party_messages": [],
+	"party_run_messages": [],
+	"pid": 17924,
+	"player_id": 3,
+	"results": [],
+	"roster_updates": 2,
+	"script": "aggressive",
+	"snapshots": 5013,
+	"stats": {
+		"buffer_ms": 13.7725667298696,
+		"events": 5,
+		"frames": 20046,
+		"in_by_channel": [
+			18502,
+			5888,
+			1785627,
+			0
+		],
+		"in_kbps": 11.5654296875,
+		"inputs_sent": 10026,
+		"interp_delay_ms": 39.0613419701008,
+		"jitter_ms": 0.666666666688798,
+		"late": 0,
+		"loss": 0.0,
+		"malformed": 0,
+		"out_kbps": 4.6201171875,
+		"payload_in_total": 1810017,
+		"payload_out_total": 682635,
+		"roster_updates": 2,
+		"rtt_max_ms": 8.0,
+		"rtt_ms": 8.0,
+		"rtt_var_ms": 3.0,
+		"snapshot_rate": 30.0,
+		"snapshots": 5013,
+		"starved_frames": 20,
+		"state": "MATCH",
+		"wire_in_total": 1868511,
+		"wire_out_total": 790819
+	},
+	"t_ms": 170005,
+	"token_hex": "066bb488946bf7710f63863be5e21db9",
+	"votes": [],
+	"welcome": {
+		"dedicated": true,
+		"motd": "",
+		"player_id": 3,
+		"rejoined": false,
+		"server_name": "Verification Server",
+		"snapshot_rate": 30,
+		"spectator": false,
+		"spectator_because_full": false,
+		"tick_rate": 120
+	}
+}

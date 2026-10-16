@@ -1,0 +1,48 @@
+{
+  "bench": "sim",
+  "boot_ms": 2517,
+  "cores": 8,
+  "cpu": "Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz",
+  "date": "2026-10-15T23:17:22",
+  "engine": "4.5.1-stable (official)",
+  "estimated_core_share_at_120hz_pct": 96.396,
+  "fighters": 8,
+  "game_version": "0.9.1",
+  "headless": true,
+  "hits": 158,
+  "memory_static_mb": 0.0,
+  "os": "Windows",
+  "physics_frame_ms": {
+    "max": 62.785,
+    "mean": 6.352,
+    "min": 2.876,
+    "n": 7200,
+    "p50": 3.973,
+    "p95": 5.163,
+    "p99": 62.785
+  },
+  "realtime_factor": 4.32115796662726,
+  "renderer": "",
+  "section_ms_per_tick": {
+    "combat": 0.067,
+    "effects_mode": 0.184,
+    "fighters": 1.083,
+    "input": 0.344,
+    "motor": 0.321,
+    "rig": 0.376
+  },
+  "setup_ms": 15.544,
+  "sim_logic_ms_per_tick": {
+    "max": 4.791,
+    "mean": 1.681,
+    "min": 1.156,
+    "n": 7200,
+    "p50": 1.606,
+    "p95": 2.182,
+    "p99": 3.523
+  },
+  "sim_seconds": 60.0,
+  "total_ms": 16429,
+  "wall_ms_per_tick": 1.92849541666667,
+  "wall_seconds": 13.885167
+}

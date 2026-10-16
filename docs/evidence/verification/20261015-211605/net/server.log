@@ -1,0 +1,29 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-15 23:12:59 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261015-211605/net/server
+2026-10-15 23:12:59 [INFO] app: Critterweight 0.9.1 (1f941a3) (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-15 23:12:59 [INFO] server: content: core 1.0.0; gameplay hash cdd1583110f3
+2026-10-15 23:12:59 [INFO] playlist: no saved playlist state (first run)
+2026-10-15 23:12:59 [INFO] net: dedicated server 'Verification Server' listening on UDP *:47692 (protocol 5, game 0.9.1, content cdd1583110f3)
+2026-10-15 23:12:59 [INFO] server: TCP admin listening on 127.0.0.1:47693 (token required)
+2026-10-15 23:12:59 [INFO] server: ready: 'Verification Server' on UDP 47692, 4 players max, playlist 'Verification duel' (1 valid entries)
+2026-10-15 23:13:03 [INFO] net: player 2 'Bob' joined from 127.0.0.1
+2026-10-15 23:13:03 [INFO] net: player 3 'Alice' joined from 127.0.0.1
+2026-10-15 23:13:06 [INFO] net: playlist pick: duel (no votes: highest weight)
+2026-10-15 23:13:06 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-15 23:13:08 [INFO] net: player 4 'Viewer' joined from 127.0.0.1 as spectator
+2026-10-15 23:13:21 [INFO] net: player 4 'Viewer' removed (server_shutdown)
+2026-10-15 23:13:57 [INFO] stats: phase=match players=2 spect=0 match=1 fighters=2 sim_ms(1s avg/max)=0.41/0.90 phys_frame_max_ms=2.05 out=18.9KB/s in=9.2KB/s mem=0.0MB objects=1941 nodes=134 orphans=0
+2026-10-15 23:14:57 [INFO] stats: phase=match players=2 spect=0 match=1 fighters=2 sim_ms(1s avg/max)=0.39/0.82 phys_frame_max_ms=1.38 out=23.1KB/s in=9.2KB/s mem=0.0MB objects=1939 nodes=134 orphans=0
+2026-10-15 23:15:53 [INFO] net: player 2 'Bob' disconnected (server_shutdown); slot reserved for 60 s
+2026-10-15 23:15:53 [INFO] net: player 3 'Alice' disconnected (server_shutdown); slot reserved for 60 s
+2026-10-15 23:15:53 [INFO] net: match 1 finished: winner team -1 (aborted: everyone left)
+2026-10-15 23:15:54 [INFO] admin: TCP admin authenticated from 127.0.0.1
+2026-10-15 23:15:54 [INFO] admin: [tcp] status
+2026-10-15 23:15:54 [WARN] admin: TCP admin authentication failed
+2026-10-15 23:15:54 [INFO] admin: TCP admin authenticated from 127.0.0.1
+2026-10-15 23:15:54 [INFO] admin: [tcp] shutdown Verification finished
+2026-10-15 23:15:54 [WARN] server: shutdown requested: Verification finished
+2026-10-15 23:15:54 [INFO] net: server closing (server_shutdown): Verification finished
+2026-10-15 23:15:54 [INFO] net: server closed (server_shutdown): Verification finished
+2026-10-15 23:15:54 [WARN] server: server stopped

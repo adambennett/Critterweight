@@ -172,3 +172,11 @@ a gap or tap a parry for the string's next hit. Found: a
 button-masher beat the Headliner 5 of 6, the tier bench was flat (Headliner 4-8 vs Contender, Hall-of-Famer 7-5 vs
 Punching Bag), and the old timed-parry branch raised the guard before its press, so it never parried. Tables and
 behaviour: docs/BOTS.md.
+
+## D-029 Printed lines are flushed in release builds too
+
+`application/run/flush_stdout_on_print` is on for every build, not only debug ones. A dedicated server's
+console log must reach a service manager (systemd, a Windows service wrapper) and its `--log-file` line by line,
+and must survive a crash or kill. Found when the packaged tests read a running server's log: release builds
+buffered it in 4 KB blocks, so its `ready:` line was invisible for minutes. The game prints only log lines
+(no per-frame output), so flushing each one costs nothing measurable.

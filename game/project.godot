@@ -9,6 +9,7 @@ config/name="Critterweight"
 config/description="Physical creature cage fighting."
 config/version="0.9.1"
 run/main_scene="res://src/app/main.tscn"
+run/flush_stdout_on_print=true
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Critterweight"
 config/features=PackedStringArray("4.5", "Forward Plus")

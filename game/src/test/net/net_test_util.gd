@@ -46,8 +46,10 @@ static func _wipe(dir: String) -> void:
 		DirAccess.remove_absolute(dir.path_join(sub))
 
 
+## The project folder for `--path`, or "" in an exported build: there globalize_path("res://")
+## is empty and the executable carries its own pack (a `--path ""` child never wrote a file).
 static func project_dir() -> String:
-	return ProjectSettings.globalize_path("res://")
+	return "" if OS.has_feature("template") else ProjectSettings.globalize_path("res://")
 
 
 func path(rel: String) -> String:
@@ -64,7 +66,10 @@ func spawn(label: String, args: Array, piped := false) -> int:
 	var logf := path("%s.engine.log" % label) if n == 1 else path("%s.%d.engine.log" % [label, n])
 	if FileAccess.file_exists(logf):
 		DirAccess.remove_absolute(logf)
-	var full := PackedStringArray(["--headless", "--log-file", logf, "--path", project_dir(), "--"])
+	var full := PackedStringArray(["--headless", "--log-file", logf])
+	if project_dir() != "":
+		full.append_array(["--path", project_dir()])
+	full.append("--")
 	for a in args:
 		full.append(str(a))
 	full.append("--user-root")

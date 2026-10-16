@@ -156,7 +156,10 @@ if (-not $SkipBench) {
 	RunExe @("--headless", "--fixed-fps", "120", "--", "--user-root", $userRoot, "--bench", "sim", "--n", "8", "--duration", "60", "--out", $json2) "bench_sim8.log" | Out-Null
 	if (Test-Path $json2) {
 		$r2 = Get-Content $json2 | ConvertFrom-Json
-		Record "bench server sim (8 fighters)" "pass" ("{0:N2} ms/tick wall, ~{1:N0}% of one core at 120 Hz" -f $r2.wall_ms_per_tick, $r2.estimated_core_share_at_120hz_pct)
+		# DESIGN.md target: < 35 % of one core at 8 fighters (process CPU time incl. physics threads)
+		$share = [double]$r2.core_share_at_120hz_pct
+		$st = if ($share -lt [double]$r2.core_share_target_pct) { "pass" } else { "fail" }
+		Record "bench server sim (8 fighters)" $st ("{0:N2} ms/tick wall, {1:N2} ms/tick CPU: {2:N0}% of one core at 120 Hz (target < {3:N0}%)" -f $r2.wall_ms_per_tick, $r2.cpu_ms_per_tick, $share, $r2.core_share_target_pct)
 	} else { Record "bench server sim" "fail" "no report" }
 } else { Record "benchmarks" "skipped" "-SkipBench" }
 

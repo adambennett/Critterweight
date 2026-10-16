@@ -4,6 +4,9 @@ extends TestCase
 ## This test fails when someone adds feedback for a new event to MatchScene but not to the
 ## networked scene. It also reports event types the compact codec does not have a 1-byte id for
 ## (they still replicate, as strings).
+## Both tests read GDScript source, so they are skipped in exported builds (scripts ship compiled).
+
+const SOURCE_ONLY := "reads GDScript source; exported builds ship compiled scripts (runs in the source suite)"
 
 
 static func handled_events(path: String) -> Array:
@@ -26,6 +29,9 @@ static func handled_events(path: String) -> Array:
 
 
 func test_net_scene_handles_every_local_event() -> void:
+	if OS.has_feature("template"):
+		skip(SOURCE_ONLY)
+		return
 	var local := handled_events("res://src/app/match_scene.gd")
 	var net := handled_events("res://src/net/net_match_scene.gd")
 	check(local.size() >= 10, "parsed MatchScene event handlers (%d)" % local.size())
@@ -37,6 +43,9 @@ func test_net_scene_handles_every_local_event() -> void:
 
 
 func test_codec_knows_emitted_event_types() -> void:
+	if OS.has_feature("template"):
+		skip(SOURCE_ONLY)
+		return
 	var re := RegEx.new()
 	re.compile("\"type\":\\s*\"([a-z0-9_]+)\"")
 	var found: Array = []

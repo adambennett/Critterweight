@@ -12,6 +12,7 @@ func run(filter: String) -> void:
 	files.sort()
 	var total := 0
 	var failed := 0
+	var skipped := 0
 	var t_start := Time.get_ticks_msec()
 	for path in files:
 		var script = load(path)
@@ -42,20 +43,30 @@ func run(filter: String) -> void:
 			var ms := Time.get_ticks_msec() - t0
 			total += 1
 			var ok := tc._failures.is_empty()
+			var skip := ok and tc._skipped != ""
 			if not ok:
 				failed += 1
-			_results.append({"test": key, "ok": ok, "errors": tc._failures.duplicate(), "ms": ms})
-			print("%s  %s (%d ms)" % ["ok  " if ok else "FAIL", key, ms])
+			elif skip:
+				skipped += 1
+			var entry := {"test": key, "ok": ok, "errors": tc._failures.duplicate(), "ms": ms}
+			if skip:
+				entry["skipped"] = tc._skipped
+			_results.append(entry)
+			if skip:
+				print("skip  %s (%s)" % [key, tc._skipped])
+			else:
+				print("%s  %s (%d ms)" % ["ok  " if ok else "FAIL", key, ms])
 			for e in tc._failures:
 				print("        " + str(e))
 			tc.queue_free()
 			await get_tree().process_frame
-	var summary := "tests: %d run, %d failed, %d passed in %.1f s" % [total, failed, total - failed, (Time.get_ticks_msec() - t_start) / 1000.0]
+	var summary := "tests: %d run, %d failed, %d passed, %d skipped in %.1f s" % [total, failed, total - failed - skipped, skipped,
+		(Time.get_ticks_msec() - t_start) / 1000.0]
 	print(summary)
 	var out_path: String = get_parent().arg_value("--test-out", Paths.dir("captures").path_join("test_results.json"))
 	var f := FileAccess.open(out_path, FileAccess.WRITE)
 	if f:
-		f.store_string(JSON.stringify({"summary": summary, "total": total, "failed": failed, "results": _results,
+		f.store_string(JSON.stringify({"summary": summary, "total": total, "failed": failed, "skipped": skipped, "results": _results,
 			"version": ProjectSettings.get_setting("application/config/version"), "time": Time.get_datetime_string_from_system()}, "\t"))
 		f.close()
 	get_tree().quit(failed)

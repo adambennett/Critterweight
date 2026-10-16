@@ -6,6 +6,7 @@ extends Node
 
 var _failures: Array = []
 var _current := ""
+var _skipped := ""
 
 
 func before_each() -> void:
@@ -18,6 +19,13 @@ func after_each() -> void:
 
 func fail(msg: String) -> void:
 	_failures.append("%s: %s" % [_current, msg])
+
+
+## Marks the running test as skipped because it cannot run in this build (e.g. it reads GDScript
+## source, which exported builds ship compiled). The runner reports it as "skip", never as passed;
+## return right after calling it.
+func skip(reason: String) -> void:
+	_skipped = reason
 
 
 func check(cond: bool, msg := "expected condition to hold") -> bool:

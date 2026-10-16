@@ -47,5 +47,6 @@ func test_documented_commands_resolve_from_the_game_folder() -> void:
 				for part in v.trim_prefix("\"").trim_suffix("\"").split(";", false):
 					check(path_ok(part), "%s:%d: '%s %s' is resolved from game/ (write ../%s)" % [rel, n, toks[i], part, part])
 	if checked == 0:
-		return   # docs not available next to this build
+		skip("the docs are not next to this build (exported builds)")
+		return
 	check(checked >= 10, "documented commands found (%d)" % checked)

@@ -1,0 +1,1 @@
+{"id": "verify_duel", "name": "Verification duel", "voting": {"enabled": false, "candidates": 1}, "entries": [{"id": "duel", "rules": "duel", "arena": "the_gullet", "weight": 1, "rules_override": {"rounds": 1, "round_time": 60}}]}

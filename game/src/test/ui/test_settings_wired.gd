@@ -19,7 +19,7 @@ func _scripts(dir: String, out: Dictionary) -> void:
 
 func test_every_visible_setting_is_read_somewhere() -> void:
 	if OS.has_feature("template"):
-		check(true, "source scan skipped in an exported build")
+		skip("scans GDScript source; exported builds ship compiled scripts (runs in the source suite)")
 		return
 	var sources := {}
 	_scripts("res://src", sources)

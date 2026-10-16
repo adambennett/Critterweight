@@ -135,7 +135,9 @@ Step "dedicated server start ($srvKind)" "pass" ("'{0}' on UDP {1}, playlist {2}
 
 # 2. two scripted packaged clients play the duel to the end; a windowed spectator saves a frame
 $clients = @()
-foreach ($c in @(@{ n = "Alice"; s = "aggressive"; x = @() }, @{ n = "Bob"; s = "passive"; x = @("--present") })) {
+# fighters named as in test_net_multiprocess: the scripted attacker swings within 1.7 m of the target's
+# root, which two large default fighters (Dozer vs Dozer) never reach - that duel timed out unresolved
+foreach ($c in @(@{ n = "Alice"; s = "aggressive"; x = @("--creature", "f_stoke") }, @{ n = "Bob"; s = "passive"; x = @("--present", "--creature", "f_jitters") })) {
 	$lc = $c.n.ToLower()
 	$a = @("--headless", "--log-file", (Join-Path $Out "$lc.log"), "--", "--user-root", (Join-Path $UserRoot $lc), "--net-client",
 		"--connect", "127.0.0.1:$Port", "--name", $c.n, "--script", $c.s, "--ready", "--stop-after-matches", "1", "--quit-after", "170",

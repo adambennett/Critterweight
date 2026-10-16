@@ -1,0 +1,11 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti SUPER
+
+2026-10-15 23:09:06 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261015-211605
+2026-10-15 23:09:07 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
+2026-10-15 23:09:07 [INFO] app: Critterweight 0.9.1 (1f941a3) (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-15 23:09:07 [INFO] toast: [success] XInput Controller connected.
+2026-10-15 23:09:07 [INFO] lab: recording this match for imitation learning (C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261015-211605/lab/datasets/human_f_stoke)
+2026-10-15 23:09:07 [INFO] match: start tutorial on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/scripted
+CAPTURED C:\Users\eX_Di\git\PokemonMMA\PokeMMA\docs\evidence\verification\20261015-211605\capture_tutorial.png (1600, 900)
+2026-10-15 23:09:10 [INFO] recorder: saved 45 samples to C:/Users/eX_Di/AppData/Local/Temp/critterweight-verify-20261015-211605/lab/datasets/human_f_stoke/shard_human_20261016T030910_69364_1862.bin

@@ -187,11 +187,14 @@ static func rel_from(base: String, target: String) -> String:
 ## Run folders and the dataset root are given RELATIVE to the working directory (../...), as in
 ## the documented commands: helper shards were once dropped for such paths.
 func test_recording_again_adds_new_episodes() -> void:
+	# an exported build has no project folder to be relative to (globalize_path("res://") is empty
+	# there): its paths stay absolute and only the relative-path part is not exercised
+	var exported := OS.has_feature("template")
 	var cwd := ProjectSettings.globalize_path("res://").trim_suffix("/")
 	var ds_root := rel_from(cwd, dir.path_join("datasets"))
 	var run1 := rel_from(cwd, dir.path_join("rec1"))
 	var run2 := rel_from(cwd, dir.path_join("rec2"))
-	check(run1.begins_with("..") or not OS.get_name() in ["Windows", "Linux"], "the run folder is relative (%s)" % run1)
+	check(exported or run1.begins_with("..") or not OS.get_name() in ["Windows", "Linux"], "the run folder is relative (%s)" % run1)
 	DirAccess.make_dir_recursive_absolute(dir.path_join("rec1"))
 	DirAccess.make_dir_recursive_absolute(dir.path_join("rec2"))
 	_record_job(run1, ds_root, 4)

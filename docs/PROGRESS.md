@@ -42,13 +42,25 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
 3. **Roster balance pass**: cross-roster round robin (`--bench roster --bouts 12 --tier pro`) had Stoke
    at 25 % and Slurry at 71 % (4 bouts/pair, before the bot changes); target 40–60 % overall, 30–70 % per
    pairing; plus reliable mashed strings for every kit (snippet: a masher must land l1-l2-l3).
-4. **Server CPU** (PERF-04): 8-fighter server measured 52–68 % of one core vs the 35 % DESIGN target
-   (cost is per-fighter motor/rig GDScript); profile with `--bench sim --n 8` on a quiet machine and
-   optimise without behaviour changes.
+4. **Server CPU** (PERF-04, target < 35 % of one core at 8 fighters): **not met.** Quiet machine,
+   packaged build (2026-10-16):
+   - `test_net_measure`, the real server process (CPU time incl. threads):
+     - 8 fighters: **43.2 %**. Main thread 1.76 ms sim + 0.28 ms network per tick.
+     - duel: 20.4 %.
+   - `--bench sim --n 8`, simulation only: 2.48 ms CPU per tick, 29.7 %.
+
+   So about 0.9 ms per tick of the server's cost is engine, physics-thread and frame-pacing
+   overhead, and it is already there with 2 fighters. The old bench "96 %" figure double-counted
+   (`docs/evidence/verification/20261015-211605/NOTES.md`). Next: try worker-thread and frame-pacing
+   settings for the `dedicated_server` feature tag (behaviour-neutral, Jolt is thread-count
+   deterministic), then the per-fighter motor/rig GDScript.
 5. **Final verification** (VER-03/04/05/07, PERF-01/02/03/05, DEL-01/06): quiet machine, then
    `tools/verify/run_verification.ps1 -Build` (packaged suite, captures with exit codes, benches,
    online session check), portability check, an independent whole-brief audit, `docs/VERIFICATION.md`,
    README refresh, ledger digest (`python tools/verify/ledger_digest.py --open`), release 1.0.0-rc.1.
+   A first packaged run on 0.9.1 (`docs/evidence/verification/20261015-211605`) passed boot,
+   memory, all 31 captures and the frame benches. Its 21 test failures and the session-check duel
+   were packaged-only test problems, fixed after 0.9.1 (NOTES.md there).
 
 ## Known issues in the current preview
 

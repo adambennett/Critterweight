@@ -145,6 +145,7 @@ func _sim_cost(n: int) -> void:
 	var ticks := int(dur / dt)
 	var step_ms := PackedFloat32Array()
 	var phys_ms := PackedFloat32Array()
+	var cpu0 := process_cpu_ms()
 	var wall0 := Time.get_ticks_usec()
 	for k in ticks:
 		var a := Time.get_ticks_usec()
@@ -154,16 +155,25 @@ func _sim_cost(n: int) -> void:
 		await get_tree().physics_frame
 		phys_ms.append(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0)
 	var wall := (Time.get_ticks_usec() - wall0) / 1e6
+	var cpu1 := process_cpu_ms()
 	report["sim_seconds"] = dur
 	report["wall_seconds"] = wall
 	report["realtime_factor"] = dur / maxf(wall, 1e-6)
 	report["sim_logic_ms_per_tick"] = _stats(step_ms)
-	report["physics_frame_ms"] = _stats(phys_ms)
-	var per_tick := float(report["sim_logic_ms_per_tick"]["mean"]) + float(report["physics_frame_ms"]["mean"])
-	report["estimated_core_share_at_120hz_pct"] = per_tick * 120.0 / 10.0
+	# TIME_PHYSICS_PROCESS is the engine's worst physics frame of each second (and includes the
+	# sim step, which runs inside the physics frame): informative only, never added to the cost
+	report["physics_frame_max_ms"] = _stats(phys_ms)
 	report["hits"] = sim.events.filter(func(e): return e["type"] == "hit").size()
 	report["memory_static_mb"] = Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
+	# the loop runs flat out (--fixed-fps), so wall time per tick is everything one tick costs on
+	# the main thread; process CPU time also counts the physics worker threads
 	report["wall_ms_per_tick"] = wall * 1000.0 / maxf(1.0, ticks)
+	report["wall_core_share_at_120hz_pct"] = float(report["wall_ms_per_tick"]) * 120.0 / 10.0
+	if cpu0 >= 0.0 and cpu1 >= cpu0:
+		report["cpu_ms_per_tick"] = (cpu1 - cpu0) / maxf(1.0, ticks)
+		report["cpu_core_share_at_120hz_pct"] = float(report["cpu_ms_per_tick"]) * 120.0 / 10.0
+	report["core_share_at_120hz_pct"] = report.get("cpu_core_share_at_120hz_pct", report["wall_core_share_at_120hz_pct"])
+	report["core_share_target_pct"] = 35.0
 	var sections := {}
 	var nt := maxf(1.0, float(sim.prof.get("ticks", 1.0)))
 	for k in sim.prof:
@@ -342,6 +352,25 @@ func _tiers(bouts: int, round_time: float) -> void:
 	report["bouts_per_pair"] = bouts
 	report["round_time"] = round_time
 	report["tiers"] = out
+
+
+## CPU time this process has used so far, all threads, in ms (-1 when it cannot be read).
+## Windows asks PowerShell (whole milliseconds, so no locale decimal separator); Linux reads
+## utime + stime from /proc/self/stat (clock ticks, 100 per second).
+static func process_cpu_ms() -> float:
+	if OS.get_name() == "Windows":
+		var out := []
+		var code := OS.execute("powershell", ["-NoProfile", "-NonInteractive", "-Command",
+			"[int64](Get-Process -Id %d).TotalProcessorTime.TotalMilliseconds" % OS.get_process_id()], out, true)
+		var s := str(out[0]).strip_edges() if not out.is_empty() else ""
+		return s.to_float() if code == 0 and s.is_valid_int() else -1.0
+	if FileAccess.file_exists("/proc/self/stat"):
+		var stat := FileAccess.get_file_as_string("/proc/self/stat")
+		var parts := stat.substr(stat.rfind(")") + 2).split(" ")
+		# after "pid (comm) ": state is field 0, utime field 11, stime field 12
+		if parts.size() > 12:
+			return (parts[11].to_float() + parts[12].to_float()) * 10.0
+	return -1.0
 
 
 static func _to_f(a: PackedInt32Array) -> PackedFloat32Array:

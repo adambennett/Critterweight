@@ -77,8 +77,8 @@ func test_no_file_peaks_above_minus_one_dbfs() -> void:
 func test_manifest_matches_files_on_disk() -> void:
 	# the report's measurements only mean something if they describe the committed files
 	if OS.has_feature("template"):
-		# exported builds ship imported samples, not the source .wav files; the stream checks above
-		# cover the packaged game
+		# the stream checks above cover the packaged game
+		skip("exported builds ship imported samples, not the source .wav files")
 		return
 	var m := _manifest()
 	var files: Dictionary = m.get("files", {})
@@ -160,6 +160,7 @@ func test_size_budget() -> void:
 ## runtime: the menu once asked for a "menu_theme" track that was never in the bank).
 func test_literal_ids_in_code_exist() -> void:
 	if OS.has_feature("template"):
+		skip("scans GDScript source; exported builds ship compiled scripts (runs in the source suite)")
 		return
 	var re := RegEx.create_from_string('Audio\\.(music|sfx|ui|ambience)\\("([^"]+)"')
 	var missing := []

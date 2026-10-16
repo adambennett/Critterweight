@@ -57,7 +57,8 @@ func test_fixed_step_runs_are_reproducible_across_processes() -> void:
 		var out := []
 		# an exported build carries its own game data; the editor binary needs --path
 		var pre := [] if OS.has_feature("template") else ["--path", ProjectSettings.globalize_path("res://")]
-		var code := OS.execute(exe, ["--headless"] + pre + ["--fixed-fps", "120", "--", "--probe", "spar"], out, true)
+		# its own user root: a test process must never touch the player's real profile
+		var code := OS.execute(exe, ["--headless"] + pre + ["--fixed-fps", "120", "--", "--probe", "spar", "--user-root", temp_dir("probe_spar")], out, true)
 		check_eq(code, 0, "probe process exit code")
 		var lines := []
 		for chunk in out:
