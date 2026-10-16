@@ -1,12 +1,12 @@
 # Progress
 
-## Status (2026-10-16) — paused for the playtest week at v0.9.5
+## Status (2026-10-16) — paused for the playtest week at v0.9.6
 
 Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
 "Remaining for the release candidate" must be done before a completion audit can pass.
 
-**Fixed after v0.9.5 (2026-10-16).** Astra reviewed the code and found two bugs:
+**Fixed in v0.9.6 (2026-10-16).** Astra reviewed the code and found two bugs:
 - Chum Rush supplement picks did nothing: the mode read a format no supplement uses. The mode now applies
   the campaign format, and offers only OTC and Prescription supplements, never side effects.
 - Chumball counted KOs as goals.

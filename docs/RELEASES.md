@@ -52,6 +52,7 @@ GitHub release with the assets (`gh`). `-DryRun` does everything except pushing 
 
 | Version | Tag | Date | Notes |
 |---|---|---|---|
+| 0.9.6 (preview, playtest build) | [v0.9.6](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.6) -> 68673c1 | 2026-10-16 | Review fixes: Chum Rush supplement picks apply (OTC/Prescription offers), Chumball KOs no longer score, Rooftop railings along the short edges (were fencing the floor), bots steer round props (Swarm Night stall), flaky resume test fixed; protocol 5 |
 | 0.9.5 (preview, playtest build) | [v0.9.5](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.5) -> d699dfa | 2026-10-16 | Slurry's Head Butt starts at 0.13 s with a shorter lunge (D-034): Dozer vs Slurry 6-6 (was 3-9), Slurry vs Stoke 7-5 (was 9-3); Fight Camp full-run test on seed 1003; protocol 5 |
 | 0.9.4 (preview, playtest build) | [v0.9.4](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.4) -> f908db2 | 2026-10-16 | UI polish pass: the Fight Card and Bookie setup on the shared menu kit, compact reward/rest cards, tidier run summary, readable route map, cleaner Ledger; 3-4 player co-op tests; protocol 5 |
 | 0.9.3 (preview, playtest build) | [v0.9.3](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.3) -> fd71dc9 | 2026-10-16 | Tutorial coach box no longer covers the controls bar; Mods and campaign screens fit 1280x800; preset/Deck-resolution checks; full packaged verification of 0.9.2 passed; protocol 5 |
