@@ -494,7 +494,10 @@ func _resolve_builtins() -> void:
 				if bool(b.get("span", false)):
 					var params: Dictionary = p["params"]
 					params["length"] = a.distance_to(bb) - float(b.get("span_trim", 0.0))
-					p["yaw"] = atan2(n.x, n.y) + PI * 0.5
+					# the length runs along local +X (ArenaCatalog footprints): +X along the edge,
+					# +Z out through it. (A quarter turn more once laid the rooftop's railings
+					# across the floor, fencing the arena in half.)
+					p["yaw"] = atan2(n.x, n.y)
 		if p.has("pos2"):
 			p["pos2"] = _scale_pos(p["pos2"])
 		builtins.append(p)

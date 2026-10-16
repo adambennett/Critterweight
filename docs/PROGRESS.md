@@ -6,6 +6,12 @@ Work is **paused at a playable preview**, not at the finished release candidate.
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
 "Remaining for the release candidate" must be done before a completion audit can pass.
 
+**Fixed after v0.9.5 (2026-10-16).** Astra reviewed the code and found two bugs:
+- Chum Rush supplement picks did nothing: the mode read a format no supplement uses. The mode now applies
+  the campaign format, and offers only OTC and Prescription supplements, never side effects.
+- Chumball counted KOs as goals.
+Also fixed: the rooftop railings and bot steering (Swarm Night, below). All have regression tests.
+
 **Audio revamp in parallel (from 2026-10-16).** The user has a separate agent (Astra, in the Codex app)
 re-producing the music and sound in Ableton Live 12. It works in its own clone on the B: drive, on the
 branch `audio/ableton-revamp`, and ends in a draft pull request. It changes only the audio area
@@ -138,11 +144,16 @@ Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the camp
      L1 19x and heavy.
    - **Dozer vs Jitters 2-2**, against 11-1 in the round robin.
 
-   **Open issue, Swarm Night:** after D-034 the seed-1002 Fight Camp test run with Dredge reaches Act 3's
-   Swarm Night: the rooftop, about 12 minions shed from the open edges. It loses that fight outright even
-   with the test's 5x damage and +300/+450 HP build, so the cause is not damage; ring-outs are likely. The
-   test now uses seed 1003, because it is about the Fight Camp loop. **Investigate:** play the encounter
-   alone with Dredge's bot, or another fighter's, and read the loss reason.
+   **Swarm Night, resolved 2026-10-16:** the seed-1002 Fight Camp test run with Dredge lost Act 3's Swarm
+   Night on the rooftop. It wasn't damage: Dredge took 15-26 HP. Bots on both sides stood still for minutes,
+   then sudden death dropped Dredge to 1 HP and a minion finished him. Two causes, both fixed:
+   - **Level bug:** the rooftop's two railings had a quarter turn too much (`ArenaDef` yaw of spanning
+     edge builtins). They lay across the floor from each short side toward the middle and, with the HVAC
+     units, fenced the arena in half. This was visible in play too.
+   - **Bots didn't steer round props.** They now bend along a prop face in their way, and two bots on
+     opposite sides go round the same side (docs/BOTS.md).
+   Seeds 1002-1004 now clear the fight in 20-60 s, and the full-run test is back on seed 1002 as the
+   regression check.
 
    Seeds swing these pairings far more than the ±14 % a 12-bout sample suggests. **Measure on 36 or more
    bouts before tuning any of them.** The other options were:

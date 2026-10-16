@@ -165,3 +165,28 @@ func test_format1_mod_arena_still_loads() -> void:
 	var mod_a := Content.arena("rust_bucket:the_drain")
 	if mod_a != null:
 		check_eq(mod_a.markers_of("goal").size(), 2, "the bundled example's goals")
+
+
+## Regression (2026-10-16): spanning edge builtins (the rooftop's railings) once got a quarter
+## turn too much and lay across the floor, fencing the arena in half: bots on either side froze
+## in Act 3's Swarm Night. Each one must lie along its own edge, inside the arena's footprint.
+func test_spanning_edge_builtins_lie_along_their_edge() -> void:
+	var a = Content.arena("arena_rooftop")
+	var seen := 0
+	for b in a.all_props():
+		var bid := str(b.get("id", ""))
+		if not (bid in ["railing_w", "railing_e"]):
+			continue
+		seen += 1
+		var e: Dictionary = a.edge_on_side(bid.substr(bid.length() - 1))
+		var n: Vector2 = e["n"]
+		var y := float(b["yaw"])
+		var along := Vector2(cos(y), -sin(y))         # local +X, the railing's length (ArenaCatalog)
+		check(absf(along.dot(n)) < 0.01, "%s runs along its edge (length axis . normal = %.2f)" % [bid, along.dot(n)])
+		var half := float(b["params"]["length"]) * 0.5
+		var pos: Vector3 = b["pos"]
+		for end in [-1.0, 1.0]:
+			var p: Vector2 = Vector2(pos.x, pos.z) + along * half * float(end)
+			var a2: Vector2 = e["a"]
+			check(absf((p - a2).dot(n)) < 0.2, "%s end %s sits on the edge line" % [bid, p])
+	check_eq(seen, 2, "both rooftop railings checked")

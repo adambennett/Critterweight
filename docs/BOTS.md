@@ -183,3 +183,16 @@ point blank, the bodies end up overlapping, only the stomp and grabs work there,
 string's next hit — a horn — whiffs, so taps timed for it parry nothing); the Gusto (dodges for guard, short
 guard holds) and Slurry (keeps range, needs its tools) kit personalities hand a masher openings; Stoke's string
 leaves no gap to hit back in. Kit balance tables in `docs/kits/` were measured with the earlier bots.
+
+## Obstacle steering (2026-10-16)
+
+Bots walk round solid props in their way (`BotBrain._steer_around`, applied before the edge-safety filter):
+- A ray at hip height follows the intended move, on the prop layer only, so fighters never trigger it.
+- A steep prop face within 1.2 m past the body bends the move along that face, eased off it so the body
+  clears the corner. Ramps and other sloped surfaces don't count.
+- A glancing move keeps its own direction along the face.
+- Head on, the lower fighter index turns one way and the higher the other. That way two bots on opposite
+  sides of a prop go round the same side and meet, instead of circling it forever.
+
+Before this, a bot and its target on opposite sides of the rooftop's HVAC units (or a railing) could each
+walk into the prop for minutes. Swarm Night lost to sudden death that way; PROGRESS.md has the case.

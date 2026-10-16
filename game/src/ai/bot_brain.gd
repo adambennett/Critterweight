@@ -170,7 +170,7 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 	if _t >= _next_think:
 		_next_think = _t + float(p["think"]) * rng.randf_range(0.7, 1.3)
 		_think(f, sim)
-	f.input.move = _edge_safe(f, sim, _move)
+	f.input.move = _edge_safe(f, sim, _steer_around(f, sim, _move))
 	f.input.set_held(FighterInput.GUARD, _guard_held_now())
 	f.input.set_held(FighterInput.GRAB, _t < _hold_until)
 	f.input.set_held(FighterInput.HEAVY, _t < _heavy_hold_until)
@@ -208,6 +208,39 @@ func _edge_safe(f: Fighter, sim: MatchSim, mv: Vector3) -> Vector3:
 		mv += inward * out
 	mv += inward * (1.0 - d / EDGE_CAUTION) * lerpf(0.5, 1.0, float(p["spacing"]))
 	return mv.limit_length(1.0)
+
+
+const OBSTACLE_LOOK := 1.2       ## m past its body the bot looks ahead for a solid prop in its way
+var _ray := PhysicsRayQueryParameters3D.new()
+
+
+## Walks around solid props in the way (HVAC units, crates, pillars, railings). A ray at hip height
+## follows the intended move; a steep prop face within OBSTACLE_LOOK bends the move along the face.
+## Head-on, the lower fighter index turns one way and the higher the other, so two bots on opposite
+## sides of a prop go round the SAME side and meet instead of circling it (Swarm Night's rooftop
+## HVAC units once froze a fight for minutes). A glancing move keeps its own direction along the
+## face; ramps and other sloped or low surfaces are walked over as before.
+func _steer_around(f: Fighter, sim: MatchSim, mv: Vector3) -> Vector3:
+	var flat := Vector3(mv.x, 0.0, mv.z)
+	if sim == null or flat.length() < 0.2 or f.rig == null or not f.rig.is_inside_tree():
+		return mv
+	var from := f.pos()
+	var dir := flat.normalized()
+	_ray.from = from
+	_ray.to = from + dir * (0.45 + OBSTACLE_LOOK)
+	_ray.collision_mask = Rig.LAYER_PROPS
+	var hit := f.rig.get_world_3d().direct_space_state.intersect_ray(_ray)
+	if hit.is_empty():
+		return mv
+	var n: Vector3 = hit["normal"]
+	if absf(n.y) > 0.5:
+		return mv
+	n = Vector3(n.x, 0.0, n.z).normalized()
+	var t := n.cross(Vector3.UP)
+	var comp := dir.dot(t)
+	var side := signf(comp) if absf(comp) >= 0.35 else (-1.0 if f.target and f.target.index < f.index else 1.0)
+	# slide along the face, eased off it so the body clears the corner
+	return (t * side + n * 0.25).normalized() * flat.length() + Vector3(0.0, mv.y, 0.0)
 
 
 func _perceived() -> Dictionary:
