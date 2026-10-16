@@ -27,6 +27,28 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
   release), `tools/verify/run_verification.ps1` (packaged checks), `tools/dev/run_suite.ps1` (one full
   suite at a time), `tools/verify/ledger_digest.py`, portability check.
 
+## UI polish pass (2026-10-16)
+
+On request, every menu and in-game screen was screenshotted at 1600x900 and 1280x800 and polished. Done:
+- **Campaign screens.** The Fight Card and the Bookie's Table setup were rebuilt on the shared menu kit
+  (option rows, help panel, prompt bar), so they match Versus and Settings. Reward and rest cards no longer
+  stretch. The run summary is tidied and its subtitle glitch fixed. Route-map labels are larger, and the
+  Ledger's chips and Back button are cleaned up.
+- **Tutorial.** The coach box covered the controls bar at every resolution.
+- **Mods screen.** Its buttons overflowed at 1280x800.
+- **Campaign menu.** Labels collapsed at 1280x800.
+
+Checked and fine: main menu, character select, versus/spectate, settings, online, the lobby (hosted),
+profile, rules and arena editors, AI Lab, credits, pause, the results card, the fight HUD (duel and
+8 fighters), the hub, the event and shop screens. Evidence is in
+`docs/evidence/verification/presets-20261016`.
+
+The capture tool for screens that need game state (`test_zz_capture_ui.gd`: windowed run, CAPTURE_UI_DIR)
+is in the session scratchpad's balance_handoff folder, not in the repo.
+
+Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the campaign modal dialogs
+(CampaignUI.confirm) still use the older campaign style.
+
 ## Remaining for the release candidate (exact next actions)
 
 1. **Online co-op follow-ups** (COOP-01..06 mostly done). Party runs are played end to end over the network
