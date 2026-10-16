@@ -40,7 +40,7 @@ public) to see its releases.
 
 ```powershell
 # from the repository root, on a clean, pushed main
-powershell -ExecutionPolicy Bypass -File tools/build/release.ps1 -Version 0.9.1 -Bump -Prerelease -NotesFile notes.md
+powershell -ExecutionPolicy Bypass -File tools/build/release.ps1 -Version 0.9.2 -Bump -Prerelease -NotesFile notes.md
 ```
 
 `release.ps1` sets the version (with `-Bump`) and commits it, checks the tree is clean and on `main`,
@@ -52,5 +52,6 @@ GitHub release with the assets (`gh`). `-DryRun` does everything except pushing 
 
 | Version | Tag | Date | Notes |
 |---|---|---|---|
+| 0.9.2 (preview, playtest build) | [v0.9.2](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.2) -> a8f0a54 | 2026-10-16 | Top bots beat button-mashing (Headliner 17/24, Hall-of-Famer 20/24); point-blank bursts guardable; dedicated server ~30 % of a core (own frame pacing, one worker thread) with line-flushed logs; packaged-test fixes; protocol 5 |
 | 0.9.1 (preview, playtest build) | [v0.9.1](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.1) -> 1f941a3 | 2026-10-15 | Online co-op campaign runs end to end (both campaigns and formats, loopback-tested), smarter top bots; protocol 5 |
 | 0.9.0 (preview) | [v0.9.0](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.0) -> 82653e6 | 2026-10-15 | First published build: six fighters, both campaigns + hub, modes, editors, mods, AI Lab, online versus; online co-op runs sync route votes only; balance/bot tuning in progress |
