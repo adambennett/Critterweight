@@ -42,7 +42,12 @@ func sig(v) -> String:
 func _rounded(v):
 	match typeof(v):
 		TYPE_FLOAT:
-			return snappedf(float(v), 0.000001)
+			# whole numbers stay exact (a resumed run's 53-bit seed reads back as a float, and snapping
+			# it to 1e-6 can knock it off the integer, so fresh-seed resumes looked different)
+			var f := float(v)
+			if is_finite(f) and floorf(f) == f and absf(f) <= Saves.MAX_EXACT_INT:
+				return int(f)
+			return snappedf(f, 0.000001)
 		TYPE_DICTIONARY:
 			var out := {}
 			for k in v:
