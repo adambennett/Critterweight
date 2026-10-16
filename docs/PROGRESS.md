@@ -69,8 +69,22 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
    | Slurry over Stoke | 9-3 |
 
    Diagnose each extreme pairing the way the masher work did (per-bout hits / states, then kit or AI
-   personality), with the user's playtest feedback first. Also needed: reliable mashed strings for every
-   kit (snippet: a masher must land l1-l2-l3).
+   personality), with the user's playtest feedback first.
+
+   Also needed: **reliable mashed strings for every kit.** A roster-wide test, kept out of the suite until
+   the kits are tuned, has the masher stand where his first jab reaches, mash Light for 2 s against a
+   standing dummy and check l1-l2-l3. Results on 2026-10-16:
+   - Gusto: nothing lands;
+   - Dozer: l1 only;
+   - Jitters: misses l1;
+   - Slurry: misses l2;
+   - Stoke: misses l3;
+   - Dredge: all three.
+
+   The results swing with the starting distance, because each strike's knockback pushes the target out
+   of the next strike's reach. Tune string knockback and lunges per kit so a mashed string connects. The
+   test is `test_mash_strings.gd`, in the session scratchpad's balance_handoff folder; recreate it from
+   this description if it is gone.
 4. **Server CPU** (PERF-04, target < 35 % of one core at 8 fighters): **met** on 2026-10-16.
    Packaged dedicated server, quiet machine, `test_net_measure` (1 client + 7 bots): 29.5-31.9 %
    main-thread load, duel 10-12 %. Two engine fixes got it there:
