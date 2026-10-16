@@ -29,11 +29,22 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
 
 ## Remaining for the release candidate (exact next actions)
 
-1. **Online co-op follow-ups** (COOP-01..06 mostly done in 0.9.1): party runs are played end to end over
-   the network in both campaigns and formats (two humans in separate processes, loopback). Remaining:
-   a real two-PC/internet session, a multi-process test with 3-4 humans incl. group-event votes and the
-   Captain's move-on, crediting a member who returns after the host left the summary, sturdier scripted
-   test fighters (tests currently rely on fixed seeds 193/4), dedicated-server party runs.
+1. **Online co-op follow-ups** (COOP-01..06 mostly done). Party runs are played end to end over the network
+   in both campaigns and formats (loopback):
+   - two humans in separate processes;
+   - since 2026-10-16, **three**: `test_party_run_three_players_majority_route` seats a host plus two
+     members with their own fighters, three human-driven fighters fight together, a route vote splits 2-1
+     and the majority decides, and each profile is credited once.
+
+   Remaining:
+   - a real two-PC/internet session;
+   - 4 humans;
+   - a group event decided by vote, and the Captain's tie-break;
+   - the Captain's "move on" for an idle member (no pilot hooks yet: an idle-at flag for a member and a
+     move-on press for the host);
+   - crediting a member who returns after the host left the summary;
+   - sturdier scripted test fighters (tests rely on fixed seeds 193/4);
+   - dedicated-server party runs.
 2. **Bot difficulty** (AI-01, UI-12): **top tiers met** on 2026-10-16 (D-032, D-033, docs/BOTS.md).
    Acceptance seeds against a pure masher:
    - Headliner 17 / 24 (77 % on 48 bouts), target ≥ 70 %;

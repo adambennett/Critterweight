@@ -62,6 +62,62 @@ static func _levels(d) -> Dictionary:
 	return out
 
 
+## Three humans in separate processes (host + two members), Off the Street, simultaneous: everyone
+## seated with their own fighter, a fight where three human-driven fighters fight together, a route
+## vote split 2-1 (Ben wants a fight at row 2, the host and Ann the event) that the majority
+## decides, and the run's end credited once to each of the three profiles.
+func test_party_run_three_players_majority_route() -> void:
+	u = U.new(self, "party_three")
+	var port: int = u.base_port
+	# seed 193: Dock Rats (minions) | Sponsor Read (a personal event) | the shop | Hot Pipes
+	var route := "a1r1l0,a1r2l1,a1r3l1,a1r4l3"
+	var ben_route := "a1r1l0,fight,a1r3l1,a1r4l3"
+	var budget := U.SERVER_READY_S + 360.0
+	var host: int = u.spawn("host", _host_args(port, "Hosty", ["--creature", "f_stoke", "--party-new", "off_the_street:simultaneous",
+		"--party-seed", "193", "--party-difficulty", "sparring", "--party-route", route, "--party-pick", "first", "--party-shop", "leave",
+		"--party-event-wait", "4", "--party-forfeit-fight", "2", "--party-forfeit-after", "8", "--quit-after", str(budget + 60.0)]))
+	check(host > 0, "host process spawned")
+	var r0: Dictionary = await u.wait_json(u.result_path("Hosty"), func(d: Dictionary) -> bool: return bool(d.get("connected", false)), U.SERVER_READY_S)
+	check(bool(r0.get("connected", false)), "the host's session is up")
+	var ann: int = u.spawn("ann", u.client_args(port, "Ann", "aggressive", ["--creature", "f_jitters", "--party-ui", "--party-route", route,
+		"--party-pick", "last", "--party-shop", "leave", "--quit-after", str(budget)]))
+	var ben: int = u.spawn("ben", u.client_args(port, "Ben", "aggressive", ["--creature", "f_dredge", "--party-ui", "--party-route", ben_route,
+		"--party-pick", "first", "--party-shop", "leave", "--quit-after", str(budget)]))
+	var ra: Dictionary = await u.wait_json(u.result_path("Ann"), func(d: Dictionary) -> bool: return bool(d.get("done", false)), budget)
+	var rb: Dictionary = await u.wait_json(u.result_path("Ben"), func(d: Dictionary) -> bool: return bool(d.get("done", false)), 60.0)
+	var rh: Dictionary = await u.wait_json(u.result_path("Hosty"), func(d: Dictionary) -> bool: return bool(d.get("done", false)), 60.0)
+	var ph := _party(rh)
+	var pa := _party(ra)
+	var pb := _party(rb)
+	check_eq(str(ph.get("deal_error", "?")), "", "the host dealt the run from the lobby")
+	var dealt: Array = ph.get("dealt_players", [])
+	check_eq(dealt.map(func(p: Dictionary) -> String: return str(p.get("fighter", ""))), ["f_stoke", "f_jitters", "f_dredge"], "three players, each with their lobby fighter")
+	check_eq(ph.get("started_with_missing", ["?"]), [], "started once both members had their seats")
+	var fights: Array = ph.get("fights", [])
+	check(not fights.is_empty(), "fights were played on the session")
+	if not fights.is_empty():
+		var kinds: Array = (fights[0].get("fighters", []) as Array).map(func(f: Dictionary) -> String: return str(f.get("kind", "")))
+		check(kinds.slice(0, 3) == ["player", "net", "net"], "three human-driven fighters: the host's local, both members' from their input streams: %s" % str(kinds.slice(0, 4)))
+	var st: Dictionary = ph.get("state", {})
+	check(int(st.get("fights_won", 0)) >= 1, "the party won its first fight (%s)" % str(st))
+	# the route vote at row 2: the host and Ann the event, Ben a fight - the majority decides
+	var path: Array = st.get("path", [])
+	check(path.size() >= 2 and str(path[1]) == "a1r2l1", "the majority's stop was taken at row 2: %s" % str(path))
+	var ben_votes: Array = (pb.get("decisions", []) as Array).filter(func(d: Dictionary) -> bool: return str(d.get("kind", "")) == "vote")
+	var at_row1: Array = ben_votes.filter(func(d: Dictionary) -> bool: return str(d.get("position", "")) == "a1r1l0")
+	var ben_row2 := str(at_row1[0].get("detail", "")) if not at_row1.is_empty() else ""
+	check(ben_row2 != "" and not ben_row2.begins_with("a1r2l1"), "Ben voted for another stop at row 2 and was outvoted: %s" % str(ben_votes))
+	# the end: the host forfeited fight 2, the run is over, each of the three credited once
+	check(bool(st.get("over", false)), "the run ended (%s)" % str(st.get("phase", "")))
+	for p in [ph, pa, pb]:
+		var who := str(p.get("role", "?")) + " " + str(p.get("seat", ""))
+		check_eq(str(p.get("top", "")), "run_summary", "%s: the run summary" % who)
+		check_eq(int(p.get("credited_on_disk", -1)), 1, "%s: the run credited once to their own profile (on disk)" % who)
+	check_eq(int(pa.get("state", {}).get("log_size", -1)), int(st.get("log_size", -2)), "Ann's replica ends with the host's run")
+	check_eq(int(pb.get("state", {}).get("log_size", -1)), int(st.get("log_size", -2)), "Ben's replica ends with the host's run")
+	_no_child_errors([host, ann, ben])
+
+
 ## Off the Street, simultaneous allied combat (the default format).
 func test_party_run_off_the_street_simultaneous() -> void:
 	u = U.new(self, "party_ots")
