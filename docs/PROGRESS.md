@@ -130,6 +130,12 @@ Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the camp
      L1 19x and heavy.
    - **Dozer vs Jitters 2-2**, against 11-1 in the round robin.
 
+   **Open issue, Swarm Night:** after D-034 the seed-1002 Fight Camp test run with Dredge reaches Act 3's
+   Swarm Night: the rooftop, about 12 minions shed from the open edges. It loses that fight outright even
+   with the test's 5x damage and +300/+450 HP build, so the cause is not damage; ring-outs are likely. The
+   test now uses seed 1003, because it is about the Fight Camp loop. **Investigate:** play the encounter
+   alone with Dredge's bot, or another fighter's, and read the loss reason.
+
    Seeds swing these pairings far more than the ±14 % a 12-bout sample suggests. **Measure on 36 or more
    bouts before tuning any of them.** The other options were:
    - Slurry L1 start-up 0.09 to about 0.12 s, or a shorter lunge;
