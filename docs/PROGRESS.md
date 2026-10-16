@@ -113,7 +113,9 @@ Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the camp
    (4 Contender bouts) found the cause: Slurry's **L1 Head Butt** landed 37 times for 213 damage, against
    7 Dredge L1 hits. The jab starts in 0.09 s against Dredge's 0.16 s, and it reaches 1.7 m root gap with a
    3 m/s lunge against Dredge's 1.55 m. So Slurry wins every jab exchange from just outside Dredge's range.
-   Balance options, a kit design call best made with playtest feedback:
+   **Done (2026-10-16, D-034):** Slurry's L1 hit window now opens at 0.13 s (was 0.09) and its lunge is
+   2.4 m/s (was 3.0). Dozer vs Slurry is 6-6 (was 3-9) and Slurry vs Stoke 7-5 (was 9-3), but Dredge vs
+   Slurry is still 0-12, so a second cause sits in Dredge's own play. The other options were:
    - Slurry L1 start-up 0.09 to about 0.12 s, or a shorter lunge;
    - or Dredge's bot keeping a closer range than its [1.25, 1.6] m.
 

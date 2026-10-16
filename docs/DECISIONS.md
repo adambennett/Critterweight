@@ -230,3 +230,13 @@ mistakes 15 %. Outcomes against a pure masher on the acceptance seeds:
 
 The ladder stays ordered.
 
+
+## D-034 Slurry's Head Butt starts like the other jabs
+
+Slurry's L1 hit window opened at 0.09 s with a 3 m/s lunge reaching a 1.7 m root gap. That made it faster
+and longer than every other jab (0.14-0.16 s): bots and players lost every jab exchange from just outside
+their own range (37 vs 7 jab hits against Dredge in 4 bouts). It now opens at 0.13 s with a 2.4 m/s lunge.
+Round robin at 12 bouts:
+- Dozer vs Slurry 6-6 (was 3-9);
+- Slurry vs Stoke 7-5 (was 9-3);
+- Dredge vs Slurry still 0-12, a separate cause in Dredge's play, still open.

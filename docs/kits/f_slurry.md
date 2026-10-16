@@ -21,7 +21,7 @@ gaps measured in the test setup (dev_biped = tall biped dummy; Jitters = 0.9 m b
 
 | Slot | Move | Weapon | S/A/R | Dmg | KB (seen) | Stun | Poise | Stam | CD | Sludge | Connects at | Properties |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| L1 | Head Butt | head + fang | 0.09/0.15/0.20 | 5 | 3.2 (0.73 m) | 0.30 | 8 | 5 | — | 12 | Jitters 0.9–1.7, dev_biped 0.9–1.5 | bows then drives the head ~1.3 m forward (3 m/s lunge), low enough to hit a 0.9 m target |
+| L1 | Head Butt | head + fang | 0.13/0.11/0.20 | 5 | 2.4 (0.58 m) | 0.30 | 8 | 5 | — | 12 | Jitters 0.9–1.7, dev_biped 0.9–1.5 | bows then drives the head ~1.3 m forward (3 m/s lunge), low enough to hit a 0.9 m target |
 | L2 | Tail Flick | tail tip | 0.14/0.22/0.20 | 4 | 3.0 (0.65 m) | 0.25 | 5 | 4 | — | 12 | dev_biped 1.1–1.5, Jitters 0.9–1.7 | whole body spins, the tail whips in from behind at knee height |
 | L3 | Fang Snap | fang + head | 0.12/0.11/0.37 | 7 | pull (−0.36 m) | 0.45 | 12 | 7 | — | 22 | Jitters 0.9–1.7, dev_biped 1.1–1.5 | bite, jerk back, **pull** (yank 0.14 s after the bite) |
 | Heavy | Tail Sweep | tail tip | 0.32/0.34/0.29 | 12 | 6.0 (3.0 m on 45 kg) | 0.50 | 25 | 11 | — | 28 | Jitters 1.1–2.1, dev_biped 1.3–1.7 | ~220° spin sweep at knee height with a 3.2 m/s slide, **multi-target**, **trips Gunked targets** |
