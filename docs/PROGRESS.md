@@ -42,9 +42,35 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
 
    The ladder is ordered. Still open: the Journeyman wins only 5 / 24 (target "about even", 25-75 %); its
    reaction cannot block a jab stream. The Dozer mirror is still the hardest kit for the Headliner.
-3. **Roster balance pass**: cross-roster round robin (`--bench roster --bouts 12 --tier pro`) had Stoke
-   at 25 % and Slurry at 71 % (4 bouts/pair, before the bot changes); target 40–60 % overall, 30–70 % per
-   pairing; plus reliable mashed strings for every kit (snippet: a masher must land l1-l2-l3).
+3. **Roster balance pass**. Measured 2026-10-16 with the new bots:
+   `--bench roster --bouts 12 --tier pro`, The Gullet, mirrors included.
+
+   Overall win rates, target 40-60 %:
+
+   | Fighter | Win rate |
+   |---|---|
+   | Dozer | 56 % |
+   | Dredge | **38 %** |
+   | Gusto | 43 % |
+   | Jitters | 57 % |
+   | Slurry | 60 % |
+   | Stoke | 46 % |
+
+   Earlier: Stoke 25 %, Slurry 71 %. 7 of 15 pairings are outside 30-70 %:
+
+   | Pairing | Result |
+   |---|---|
+   | Slurry over Dredge | 12-0 |
+   | Stoke over Gusto | 11-1 |
+   | Dozer over Jitters | 11-1 |
+   | Jitters over Stoke | 11-1 |
+   | Slurry over Dozer | 9-3 |
+   | Dozer over Dredge | 9-3 |
+   | Slurry over Stoke | 9-3 |
+
+   Diagnose each extreme pairing the way the masher work did (per-bout hits / states, then kit or AI
+   personality), with the user's playtest feedback first. Also needed: reliable mashed strings for every
+   kit (snippet: a masher must land l1-l2-l3).
 4. **Server CPU** (PERF-04, target < 35 % of one core at 8 fighters): **met** on 2026-10-16.
    Packaged dedicated server, quiet machine, `test_net_measure` (1 client + 7 bots): 29.5-31.9 %
    main-thread load, duel 10-12 %. Two engine fixes got it there:
