@@ -142,6 +142,16 @@ func test_removed_content_blocks_resume_non_destructively() -> void:
 	check(not bool(r["ok"]), "a run with removed content does not resume")
 	check(str(r["error"]).contains("gone_mod:sup_vanished") and str(r["error"]).contains("tech_removed_thing"), "names every missing id: %s" % r["error"])
 	check(FileAccess.file_exists(store.slot_path("tester", "off_the_street")), "save kept for when the mod returns")
+	# SAV-02 missing-mod case: when the mod (and the technique) are back, the same save resumes
+	var c := cat()
+	c.supplements["gone_mod:sup_vanished"] = {"id": "gone_mod:sup_vanished", "type": "supplement", "name": "Vanished", "rarity": "otc", "stack": 1, "apply": {}}
+	c.techniques["tech_removed_thing"] = {"id": "tech_removed_thing", "name": "Removed Thing", "apply": {}}
+	var back := store.load_slot("tester", "off_the_street", c)
+	c.supplements.erase("gone_mod:sup_vanished")
+	c.techniques.erase("tech_removed_thing")
+	check(bool(back["ok"]), "with the mod back, the kept save resumes: %s" % back["error"])
+	if bool(back["ok"]):
+		check_eq(sig(back["state"]), sig(ctrl.state), "and continues exactly where it was suspended")
 
 
 func test_newer_format_rejected() -> void:
