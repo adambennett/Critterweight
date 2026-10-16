@@ -32,6 +32,11 @@ extends RefCounted
 ##   * Progression: at run end the host sends the final state; each member credits ONLY their
 ##     own profile (CampaignProgression.finish_run, idempotent per run and player) with the run
 ##     rebuilt from its log — Dose credit then follows that member's own ladder.
+##   * Start: a run dealt in a lobby can be HELD (host_new(..., hold = true)) while members take
+##     their seats: nothing is decided until release(); run_state carries "live" so members know
+##     when the run is on (the UI then leaves the lobby for the campaign screens).
+## Views for screens on every machine (host and members alike): vote_view(), pause_view(),
+## fight_view(), is_live(). Member-side views are built from the host's messages only.
 ## Time is advanced explicitly with tick(dt) (loopback tests run timers instantly).
 
 signal changed(reason: String)
@@ -71,6 +76,16 @@ var _run_seed := 0
 var _verified: RunController = null   ## member: the run rebuilt from the last accepted ticket's log
 var _host_claim := ""                 ## member: the successor's host_changed, held until the old host is gone
 var _event_dropped := {}              ## host: {node, ids} group-event choices that failed this node
+var held := false                     ## host: dealt but not started (members are taking their seats)
+var live := false                     ## member: the host's run is on (run_state "live")
+var last_error := ""                  ## why the local player's last act() was refused (host-side acts)
+var vote_info := {}                   ## member: the open vote as the host announced it
+var pause_info := {}                  ## member: {paused, by, until, budget} from paused/resumed
+var fight_info := {}                  ## member: the last fight_start announcement
+## The latest event outcome at this node, for every machine's event screen (presentation only;
+## the node may already be complete and its event gone from the state): {node, title, choice,
+## by, texts}. The host fills it when an event resolves and sends it with run_state.
+var last_event := {}
 
 
 func _init(t: PartyTransport, cat: CampaignCatalog, member_id: String) -> void:
@@ -96,12 +111,14 @@ func state() -> Dictionary:
 
 ## Host: starts a new party run. cfg.players must list every member (ids == transport ids). The
 ## Dose is clamped to what the host's own profile may play (members are credited by their own).
-static func host_new(t: PartyTransport, cat: CampaignCatalog, cfg: Dictionary, run_store: RunStore = null, prof: Dictionary = {}) -> CoopSession:
+## `hold`: the run waits (no votes, no decisions) until release() - members take their seats first.
+static func host_new(t: PartyTransport, cat: CampaignCatalog, cfg: Dictionary, run_store: RunStore = null, prof: Dictionary = {}, hold := false) -> CoopSession:
 	var s := CoopSession.new(t, cat, t.local_id())
 	s.host_id = s.me
 	s.store = run_store
 	s.profile = prof
 	s.profile_id = str(prof.get("id", s.me))
+	s.held = hold
 	var c: Dictionary = cfg.duplicate(true)
 	if not prof.is_empty():
 		c["dose"] = CampaignProgression.clamp_dose(cat, prof, str(c.get("variant", "off_the_street")), str(c.get("difficulty", "amateur")), int(c.get("dose", 0)))
@@ -109,6 +126,29 @@ static func host_new(t: PartyTransport, cat: CampaignCatalog, cfg: Dictionary, r
 	s._init_budgets()
 	s._after_change("start")
 	return s
+
+
+## Host: starts a held run (members who are not here yet are played by bots until they rejoin).
+func release() -> void:
+	if not is_host() or not held or ctrl == null:
+		return
+	held = false
+	for p in ctrl.players():
+		var pid := str(p["id"])
+		var here := pid == me or transport.peers().has(pid)
+		p["connected"] = here
+		p["bot"] = not here
+	_rejoin.clear()          # everyone here already has their fighter; latecomers rejoin as usual
+	decision_since = clock
+	_after_change("live")
+
+
+## True once the run is on: the host released it (or resumed / migrated it), or - on a member -
+## the host's run_state said so.
+func is_live() -> bool:
+	if ctrl == null:
+		return false
+	return not held if is_host() else live
 
 
 ## Host: resumes a suspended party run (any member's replica or the host's own save).
@@ -162,9 +202,10 @@ func tick(dt: float) -> void:
 
 
 func _host_tick() -> void:
-	if ctrl == null:
+	if ctrl == null or held:
 		return
-	if pause_until > 0.0 and clock >= pause_until:
+	# a ref timeout belongs to its fight: it ends with the budget, or when the fight is over
+	if pause_until > 0.0 and (clock >= pause_until or ctrl.phase() != "fight"):
 		_resume_pause(pause_by)
 	_track_decision_point()
 	var phase := ctrl.phase()
@@ -228,7 +269,9 @@ func _open_vote() -> void:
 		return
 	vote = RouteVote.new(opts, _humans(), ctrl.captain(), clock + float(coop_rules().get("vote_time", 10.0)),
 		int(ctrl.state.get("seed", 1)), "%s/%d" % [ctrl.state.get("position", "start"), int(ctrl.state.get("act", 1))])
-	transport.send("", "vote_open", {"options": opts, "captain": vote.captain, "seconds": float(coop_rules().get("vote_time", 10.0))})
+	transport.send("", "vote_open", {"options": opts, "captain": vote.captain, "seconds": float(coop_rules().get("vote_time", 10.0)),
+		"voters": vote.voters})
+	changed.emit("vote")
 
 
 func _resolve_vote() -> void:
@@ -251,13 +294,17 @@ func _open_event_vote() -> void:
 		if not (_event_dropped["ids"] as Array).has(id):
 			opts.append(str(id))
 	if opts.is_empty():
+		var before_ev := ctrl.event_view(ctrl.captain())
 		if ctrl.choose_event(ctrl.captain(), EventRunner.PASS):
+			_note_event(before_ev, "party")
 			transport.send("", "notice", {"text": "Nobody can take any of these options: the party moves on."})
 			_after_change("event_pass")
 		return
 	event_vote = RouteVote.new(opts, _humans(), ctrl.captain(), clock + float(coop_rules().get("vote_time", 10.0)),
 		int(ctrl.state.get("seed", 1)), "event/%s/%d" % [node, (_event_dropped["ids"] as Array).size()])
-	transport.send("", "vote_open", {"options": opts, "captain": event_vote.captain, "event": true, "seconds": float(coop_rules().get("vote_time", 10.0))})
+	transport.send("", "vote_open", {"options": opts, "captain": event_vote.captain, "event": true, "seconds": float(coop_rules().get("vote_time", 10.0)),
+		"voters": event_vote.voters})
+	changed.emit("vote")
 
 
 ## Applies the group event vote. A choice that fails (a member's Scrip changed since the vote
@@ -268,7 +315,9 @@ func _resolve_event_vote() -> void:
 	var counts := event_vote.counts()
 	var opt := str(r["option"])
 	event_vote = null
+	var before_ev := ctrl.event_view(ctrl.captain())
 	if ctrl.choose_event(ctrl.captain(), opt):
+		_note_event(before_ev, "party")
 		transport.send("", "vote_result", {"event": true, "choice": opt, "reason": r["reason"], "tie": r["tie"], "counts": counts})
 		_after_change("event_vote")
 		return
@@ -276,6 +325,7 @@ func _resolve_event_vote() -> void:
 	var text := "The party's pick '%s' could not be done (%s); vote again." % [opt, ctrl.last_error]
 	transport.send("", "error", {"text": text, "type": "event_choice"})
 	notice.emit(text)
+	changed.emit("vote")
 
 
 ## Disconnected members are decided for immediately; idle ones after 2x the absent time
@@ -309,7 +359,16 @@ func _auto_decide_for_absent(force := false) -> void:
 			pids = []
 		else:
 			pids = [pids[0]]
-	if not pids.is_empty() and CampaignAutoPilot.settle(ctrl, pids):
+	if pids.is_empty():
+		return
+	var before_ev := ctrl.event_view(str(pids[0])) if ctrl.phase() == "event" else {}
+	var log_n := (ctrl.state.get("log", []) as Array).size()
+	if CampaignAutoPilot.settle(ctrl, pids):
+		var lg: Array = ctrl.state.get("log", [])
+		for i in range(log_n, lg.size()):
+			if str((lg[i] as Dictionary).get("k", "")) == "event" and not before_ev.is_empty():
+				_note_event(before_ev, str(pids[0]))
+				break
 		_after_change("auto")
 
 
@@ -330,12 +389,21 @@ func _apply_rejoins() -> void:
 
 
 func request_pause(pid: String) -> bool:
-	if pause_until > 0.0 or float(pause_left.get(pid, 0.0)) <= 0.0 or ctrl == null or ctrl.phase() != "fight":
+	if ctrl == null or ctrl.phase() != "fight":
+		last_error = "a ref timeout can only be called during a fight"
+		return false
+	if pause_until > 0.0:
+		last_error = "the fight is already paused"
+		return false
+	if float(pause_left.get(pid, 0.0)) <= 0.0:
+		last_error = "your ref timeouts for this run are used up"
 		return false
 	pause_by = pid
 	pause_started = clock
 	pause_until = clock + float(pause_left[pid])
-	transport.send("", "paused", {"by": pid, "seconds": float(pause_left[pid])})
+	transport.send("", "paused", {"by": pid, "seconds": float(pause_left[pid]), "budget": pause_left.duplicate()})
+	notice.emit("Ref timeout called by %s (%d s)." % [name_of(pid), int(pause_left[pid])])
+	changed.emit("paused")
 	return true
 
 
@@ -346,11 +414,67 @@ func _resume_pause(pid: String) -> void:
 	pause_by = ""
 	pause_until = -1.0
 	pause_started = -1.0
-	transport.send("", "resumed", {})
+	transport.send("", "resumed", {"budget": pause_left.duplicate()})
+	notice.emit("Fight resumed.")
+	changed.emit("resumed")
 
 
 func is_paused() -> bool:
-	return pause_until > 0.0
+	if is_host():
+		return pause_until > 0.0
+	return bool(pause_info.get("paused", false))
+
+
+## The ref timeout as every machine sees it: {paused, by, left (s), budget: {pid: s}}.
+func pause_view() -> Dictionary:
+	if is_host():
+		return {"paused": pause_until > 0.0, "by": pause_by, "left": maxf(0.0, pause_until - clock) if pause_until > 0.0 else 0.0,
+			"budget": pause_left.duplicate()}
+	var v := pause_info.duplicate()
+	v["left"] = maxf(0.0, float(v.get("until", 0.0)) - clock) if bool(v.get("paused", false)) else 0.0
+	if not v.has("budget"):
+		v["budget"] = {}
+	return v
+
+
+## Seconds of ref timeout this machine's player has left in the run.
+func my_pause_budget() -> float:
+	var b: Dictionary = pause_view().get("budget", {})
+	return float(b.get(me, coop_rules().get("pause_budget", 30.0)))
+
+
+## The vote on screen for every machine: {} or {open, event, options, votes {voter: option},
+## voters, captain, left (s)}.
+func vote_view() -> Dictionary:
+	if is_host():
+		var v: RouteVote = vote if vote != null else event_vote
+		if v == null:
+			return {}
+		return {"open": true, "event": v == event_vote, "options": v.options.duplicate(), "votes": v.votes.duplicate(),
+			"voters": v.voters.duplicate(), "captain": v.captain, "left": maxf(0.0, v.deadline - clock)}
+	if vote_info.is_empty() or not bool(vote_info.get("open", false)):
+		return {}
+	var out := vote_info.duplicate(true)
+	out["left"] = maxf(0.0, float(out.get("until", 0.0)) - clock)
+	return out
+
+
+## The fight being set up / played at this node: {encounter, name, rule_tags} ({} = none).
+func fight_view() -> Dictionary:
+	if ctrl == null or ctrl.phase() != "fight":
+		return {}
+	if not fight_info.is_empty():
+		return fight_info.duplicate()
+	var plan := ctrl.current_plan()
+	return {"encounter": str(plan.get("encounter", "")), "name": str(plan.get("name", "")), "rule_tags": plan.get("rule_tags", [])}
+
+
+func name_of(pid: String) -> String:
+	if ctrl != null:
+		var p := ctrl.player(pid)
+		if not p.is_empty():
+			return str(p.get("name", pid))
+	return pid
 
 
 ## Host: applies a finished fight (from the network match or a headless run).
@@ -362,8 +486,27 @@ func complete_fight(result: Dictionary) -> bool:
 	return ok
 
 
+## Remembers an event's outcome right after it resolved (`before` = its view just before).
+func _note_event(before: Dictionary, by: String) -> void:
+	var chosen := ""
+	var log_v: Array = ctrl.state.get("log", [])
+	for i in range(log_v.size() - 1, -1, -1):
+		if str((log_v[i] as Dictionary).get("k", "")) == "event":
+			chosen = str((log_v[i] as Dictionary).get("d", {}).get("choice", ""))
+			break
+	var label_text := chosen
+	for c in before.get("choices", []):
+		if str((c as Dictionary).get("id", "")) == chosen:
+			label_text = str((c as Dictionary).get("label", chosen))
+	last_event = {"node": str(ctrl.state.get("position", "")), "title": str(before.get("title", "Event")), "choice": label_text,
+		"by": by, "texts": ctrl.last_texts.duplicate()}
+
+
 func _after_change(reason: String) -> void:
-	transport.send("", "run_state", {"state": ctrl.state, "host": host_id, "reason": reason})
+	var msg := {"state": ctrl.state, "host": host_id, "reason": reason, "live": not held}
+	if not last_event.is_empty() and str(last_event.get("node", "")) == str(ctrl.state.get("position", "")):
+		msg["event"] = last_event
+	transport.send("", "run_state", msg)
 	if ctrl.phase() == "map" or ctrl.is_over():
 		ticket = RunStore.make_ticket(ctrl.state, host_id)
 		transport.send("", "ticket", ticket)
@@ -372,6 +515,7 @@ func _after_change(reason: String) -> void:
 				store.clear(profile_id, RunStore.slot_for(ctrl.state))   # a finished run is no suspended run
 			else:
 				store.save(ctrl.state, profile_id, RunStore.slot_for(ctrl.state))
+				store.save_party_seat(profile_id, RunStore.slot_for(ctrl.state), me)
 	changed.emit(reason)
 
 
@@ -386,36 +530,56 @@ func _on_message(from: String, type: String, payload: Dictionary) -> void:
 		_member_message(from, type, payload)
 
 
-func _host_message(from: String, type: String, payload: Dictionary) -> void:
+## Applies a member's (or the host's own) intent. Returns whether it was accepted; a refused one
+## leaves the reason in last_error and is answered with "error" (to a member).
+func _host_message(from: String, type: String, payload: Dictionary) -> bool:
 	if ctrl == null:
-		return
+		return false
 	last_seen[from] = clock
+	last_error = ""
 	var ok := true
 	match type:
 		"hello":
-			transport.send(from, "run_state", {"state": ctrl.state, "host": host_id, "reason": "hello"})
+			transport.send(from, "run_state", {"state": ctrl.state, "host": host_id, "reason": "hello", "live": not held})
 			if not ticket.is_empty():
 				transport.send(from, "ticket", ticket)
-			return
+			if ctrl.is_over():
+				# a member who was away when the run ended still gets the final result to credit
+				transport.send(from, "run_end", {"state": ctrl.state})
+			var vv := vote_view()
+			if not vv.is_empty():
+				# a member arriving mid-vote sees it at once (and may still vote)
+				transport.send(from, "vote_open", {"options": vv["options"], "captain": vv["captain"], "seconds": vv["left"],
+					"event": vv["event"], "voters": vv["voters"]})
+				transport.send(from, "vote_update", {"votes": vv["votes"], "event": vv["event"]})
+			return true
+	if held and not type in ["rejoin", "move_on", "pause", "resume"]:
+		return _refuse(from, type, "the run has not started yet")
+	match type:
 		"vote":
-			if vote:
-				ok = vote.cast(from, str(payload.get("node", "")))
-				if ok:
-					transport.send("", "vote_update", {"votes": vote.votes})
-			return
+			if vote == null:
+				return _refuse(from, type, "no route vote is open")
+			if not vote.cast(from, str(payload.get("node", ""))):
+				return _refuse(from, type, "'%s' is not a stop you can vote for" % str(payload.get("node", "")))
+			transport.send("", "vote_update", {"votes": vote.votes})
+			changed.emit("vote")
+			return true
 		"event_choice":
 			if ctrl.phase() == "event" and bool(ctrl.session().get("event", {}).get("group", false)):
 				# a group event is never decided by one member: their choice is their vote
 				if event_vote == null:
 					_open_event_vote()
 				if event_vote == null:
-					return       # resolved without a vote (nothing anyone could take)
-				if event_vote.cast(from, str(payload.get("choice", ""))):
-					transport.send("", "vote_update", {"votes": event_vote.votes, "event": true})
-				else:
-					transport.send(from, "error", {"text": "'%s' is not one of the options the party can take" % str(payload.get("choice", "")), "type": type})
-				return
+					return true       # resolved without a vote (nothing anyone could take)
+				if not event_vote.cast(from, str(payload.get("choice", ""))):
+					return _refuse(from, type, "'%s' is not one of the options the party can take" % str(payload.get("choice", "")))
+				transport.send("", "vote_update", {"votes": event_vote.votes, "event": true})
+				changed.emit("vote")
+				return true
+			var before_ev := ctrl.event_view(from)
 			ok = ctrl.choose_event(from, str(payload.get("choice", "")))
+			if ok:
+				_note_event(before_ev, from)
 		"pick":
 			ok = ctrl.claim(from, str(payload.get("rid", "")), str(payload.get("choice", "")))
 		"reroll":
@@ -433,35 +597,53 @@ func _host_message(from: String, type: String, payload: Dictionary) -> void:
 		"consume":
 			ok = ctrl.use_consumable(from, str(payload.get("item", "")))
 		"pause":
-			ok = request_pause(from)
-			return
+			if not request_pause(from):
+				return _refuse(from, type, last_error)
+			return true
 		"resume":
+			if pause_until < 0.0 or from != pause_by:
+				return _refuse(from, type, "only whoever called the ref timeout can end it early")
 			_resume_pause(from)
-			return
+			return true
 		"rejoin":
 			if not ctrl.player(from).is_empty():
 				_rejoin.append(from)
-				if ctrl.phase() == "map":
+				if ctrl.phase() == "map" and not held:
 					_apply_rejoins()
-			return
+			return true
 		"move_on":
-			if from == ctrl.captain() and clock - decision_since >= float(coop_rules().get("absent_time", 60.0)):
-				_auto_decide_for_absent(true)
-			return
+			if from != ctrl.captain():
+				return _refuse(from, type, "only the Captain can move on for absent players")
+			if clock - decision_since < float(coop_rules().get("absent_time", 60.0)):
+				return _refuse(from, type, "absent players get %d s before the Captain can move on" % int(coop_rules().get("absent_time", 60.0)))
+			_auto_decide_for_absent(true)
+			return true
 		_:
-			return
+			return false
 	if not ok:
-		transport.send(from, "error", {"text": ctrl.last_error, "type": type})
-	else:
-		_after_change(type)
+		return _refuse(from, type, ctrl.last_error)
+	_after_change(type)
+	return true
 
 
-## Host-side API for the host's own player (UI calls these; same rules as members' intents).
-func act(type: String, payload: Dictionary) -> void:
+func _refuse(from: String, type: String, text: String) -> bool:
+	last_error = text
+	if from != me:
+		transport.send(from, "error", {"text": text, "type": type})
+	return false
+
+
+## The local player's intent (UI): applied at once on the host (same rules as members' intents;
+## false + last_error when refused), sent to the host from a member (true = sent; a refusal comes
+## back as a notice).
+func act(type: String, payload: Dictionary) -> bool:
 	if is_host():
-		_host_message(me, type, payload)
-	else:
-		transport.send(host_id, type, payload)
+		return _host_message(me, type, payload)
+	if ctrl == null:
+		last_error = "the run has not arrived from the host yet"
+		return false
+	transport.send(host_id, type, payload)
+	return true
 
 
 ## A member's inbox. `from` is the transport's peer id: everything here except host_changed is
@@ -477,6 +659,14 @@ func _member_message(from: String, type: String, payload: Dictionary) -> void:
 			var st = payload.get("state", {})
 			if typeof(st) == TYPE_DICTIONARY and _is_party_run(st):
 				ctrl = RunController.from_state(catalog, st)
+				live = bool(payload.get("live", true))
+				var ev = payload.get("event", {})
+				last_event = (ev as Dictionary).duplicate(true) if typeof(ev) == TYPE_DICTIONARY else {}
+				if ctrl.phase() != "map":
+					vote_info = {}
+				if ctrl.phase() != "fight":
+					fight_info = {}
+					pause_info = {}
 				changed.emit(str(payload.get("reason", "state")))
 		"ticket":
 			_accept_ticket(payload)
@@ -485,11 +675,39 @@ func _member_message(from: String, type: String, payload: Dictionary) -> void:
 		"run_end":
 			_accept_run_end(payload)
 		"error":
-			notice.emit("Not accepted: %s" % str(payload.get("text", "")))
+			last_error = str(payload.get("text", ""))
+			notice.emit("Not accepted: %s" % last_error)
+			changed.emit("refused")
+		"vote_open":
+			var opts = payload.get("options", [])
+			var voters = payload.get("voters", [])
+			vote_info = {"open": true, "event": bool(payload.get("event", false)), "options": opts if typeof(opts) == TYPE_ARRAY else [],
+				"voters": voters if typeof(voters) == TYPE_ARRAY else [], "captain": str(payload.get("captain", "")), "votes": {},
+				"until": clock + clampf(float(payload.get("seconds", 10.0)), 0.0, 120.0)}
+			changed.emit("vote")
+		"vote_update":
+			var vs = payload.get("votes", {})
+			if not vote_info.is_empty() and typeof(vs) == TYPE_DICTIONARY:
+				vote_info["votes"] = (vs as Dictionary).duplicate()
+				changed.emit("vote")
+		"vote_result":
+			vote_info = {}
+			changed.emit("vote")
+		"fight_start":
+			fight_info = {"encounter": str(payload.get("encounter", "")), "name": str(payload.get("name", "")),
+				"rule_tags": payload.get("rule_tags", []) if typeof(payload.get("rule_tags", [])) == TYPE_ARRAY else []}
+			changed.emit("fight_start")
 		"paused":
-			notice.emit("Ref timeout called by %s (%d s)." % [payload.get("by", "?"), int(payload.get("seconds", 0))])
+			var b = payload.get("budget", {})
+			pause_info = {"paused": true, "by": str(payload.get("by", "")), "until": clock + clampf(float(payload.get("seconds", 0.0)), 0.0, 120.0),
+				"budget": (b as Dictionary).duplicate() if typeof(b) == TYPE_DICTIONARY else {}}
+			notice.emit("Ref timeout called by %s (%d s)." % [name_of(str(payload.get("by", "?"))), int(payload.get("seconds", 0))])
+			changed.emit("paused")
 		"resumed":
+			var b2 = payload.get("budget", {})
+			pause_info = {"paused": false, "budget": (b2 as Dictionary).duplicate() if typeof(b2) == TYPE_DICTIONARY else pause_info.get("budget", {})}
 			notice.emit("Fight resumed.")
+			changed.emit("resumed")
 		_:
 			pass
 
@@ -529,6 +747,7 @@ func _accept_ticket(t: Dictionary) -> void:
 			store.clear(profile_id, RunStore.slot_for(st))
 		else:
 			store.save(st, profile_id, RunStore.slot_for(st))
+			store.save_party_seat(profile_id, RunStore.slot_for(st), me)
 
 
 ## The host's final result: credited only when it is this party's run and follows from its own

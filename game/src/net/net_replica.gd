@@ -41,6 +41,9 @@ var frames := 0
 var jitter_ms := 0.0
 var events_received := 0
 var roster_updates := 0
+## Resolves roster creatures that are not content creatures: func(id: String, scale: float) ->
+## CreatureDef (NetClient sets it for campaign fights: minion loadouts, dev stand-ins).
+var creature_lookup: Callable = Callable()
 
 
 func reset(info: Dictionary) -> void:
@@ -77,6 +80,8 @@ func apply_roster_entry(e: Dictionary) -> bool:
 	var body_changed := prev.is_empty() or int(prev["gen"]) != int(entry["gen"])
 	if body_changed:
 		entry["def"] = NetSnapshot.roster_creature(entry)
+		if entry["def"] == null and creature_lookup.is_valid() and not bool(entry["despawned"]):
+			entry["def"] = creature_lookup.call(str(entry["creature"]), float(entry["scale"]))
 	else:
 		entry["def"] = prev.get("def")
 	roster[slot] = entry

@@ -52,6 +52,14 @@ static func title(text: String, size := 54) -> Label:
 	return l
 
 
+## A short label for a row (HBox): no wrapping - a wrapping label in a row gets no width of its
+## own and shrinks to one letter per line.
+static func inline_label(text: String, size := 22, color := INK, weight := "600") -> Label:
+	var l := label(text, size, color, weight)
+	l.autowrap_mode = TextServer.AUTOWRAP_OFF
+	return l
+
+
 static func style(color: Color, border := Color(0, 0, 0, 0), width := 0, radius := 10) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = color
@@ -151,7 +159,10 @@ static func describe_item(v: VBoxContainer, cat: CampaignCatalog, id: String, ex
 			tag_text = rarity_text(r) + (" · CONSUMABLE" if bool(d.get("consumable", false)) else "")
 	var icon := ShapeIcon.new(shape, col)
 	tag.add_child(icon)
-	tag.add_child(_quiet(label(tag_text, 17, col, "700")))
+	# a wrapping label in a row needs the row's width (else it shrinks to one letter per line)
+	var tl := _quiet(label(tag_text, 17, col, "700"))
+	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tag.add_child(tl)
 	v.add_child(tag)
 	v.add_child(_quiet(label(str(d.get("name", id)), 30, INK, "900")))
 	if str(d.get("effect", "")) != "":
@@ -191,7 +202,29 @@ static func scaffold(screen: Control, heading: String, sub := "") -> VBoxContain
 	v.add_child(title(heading))
 	if sub != "":
 		v.add_child(label(sub, 22, MUTED))
+	# online party runs: who is deciding what, the Captain, the vote (CoopFlow keeps it current)
+	var fl = screen.get("flow")
+	if fl is CampaignFlow and (fl as CampaignFlow).is_party():
+		var strip := label((fl as CampaignFlow).party_text(), 18, ACCENT, "700")
+		strip.name = "PartyStrip"
+		v.add_child(strip)
+		screen.set_meta("party_strip", strip)
 	return v
+
+
+## Party runs: after a decision was sent to the party's host, the screen waits for the host's
+## answer (the shared run then refreshes it): its buttons are disabled and `msg` says so.
+static func wait_for_party(screen: Control, msg: Label) -> void:
+	var stack: Array = [screen]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n is BaseButton:
+			(n as BaseButton).disabled = true
+			(n as BaseButton).focus_mode = Control.FOCUS_NONE
+		stack.append_array(n.get_children())
+	if msg != null and is_instance_valid(msg):
+		msg.text = "Sent - waiting for the party's host..."
+		msg.add_theme_color_override("font_color", MUTED)
 
 
 static func scroll(child: Control) -> ScrollContainer:

@@ -93,6 +93,10 @@ var _policy_hashes := {}          ## PolicyData instance id -> checksum
 ## Open co-op party run (party seats, see party_open): {run_id, info, host_seat,
 ## seats: [{id, name, fighter, session}]}; empty = no party run, party ids are session ids.
 var party := {}
+var frozen := false               ## a co-op ref timeout holds the running match (set_frozen)
+var _frozen_space := RID()
+var _results_s := -1              ## results phase length of the running match (-1 = cfg results_time)
+var _bot_maker: Callable = Callable()   ## campaign fights: func(Fighter) -> InputSource for a member who drops
 var _roster: Array = []           ## per fighter slot: {gen, obj, rig, creature, scale, despawned, team, name, kind, player}
 var _gens := PackedByteArray()
 
@@ -385,7 +389,7 @@ func _physics_process(dt: float) -> void:
 		PHASE_IDLE:
 			_tick_idle()
 	var t1 := Time.get_ticks_usec()
-	if sim != null and dedicated and (phase == PHASE_MATCH or phase == PHASE_RESULTS):
+	if sim != null and dedicated and not frozen and (phase == PHASE_MATCH or phase == PHASE_RESULTS):
 		sim.step(dt)
 		var sim_us := Time.get_ticks_usec() - t1
 		perf["sim_us_total"] = int(perf["sim_us_total"]) + sim_us
@@ -1421,9 +1425,16 @@ func _bot_takeover(p: NetPlayer) -> void:
 	if f.controller_kind == "bot":
 		return
 	_bot_serial += 1
-	var bot := BotBrain.new(str(cfg.get("bot_difficulty", "regular")), int(match_info.get("seed", 1)) * 31 + 977 * _bot_serial + p.fighter)
-	bot.set_personality(f.creature.ai)
-	bot.label_text = "%s (bot)" % p.name
+	var bot: InputSource = null
+	if _bot_maker.is_valid():
+		# a co-op campaign fight: the party run's own bot rules (tier capped at Contender)
+		bot = _bot_maker.call(f)
+	if bot == null:
+		var bb := BotBrain.new(str(cfg.get("bot_difficulty", "regular")), int(match_info.get("seed", 1)) * 31 + 977 * _bot_serial + p.fighter)
+		bb.set_personality(f.creature.ai)
+		bot = bb
+	if bot is BotBrain:
+		(bot as BotBrain).label_text = "%s (bot)" % p.name
 	sim.set_input_source(p.fighter, bot)
 	f.controller_kind = "bot"
 	# a pick offered to the player (e.g. Chum Rush supplements) is taken by the bot right away
@@ -1833,6 +1844,134 @@ func _team_layout(rules: Dictionary, chosen: Array, total: int) -> Array[int]:
 	return out
 
 
+## Listen host: plays a co-op campaign fight of the party run (NetPartyRuns) as a match of this
+## session. `cfg_m`: EncounterBuilder.build_match's config - the party's fighters with their
+## builds and carried HP, the enemies with their brains, the campaign mode (party format: tag or
+## simultaneous). `owners`: fighter index -> session player id of the party's human members. The
+## host's own fighter is its local player ("player"); a connected member's fighter is driven by
+## a NetRemoteInput fed from that member's input stream ("net"); a member who is away keeps the
+## party bot the builder gave them, and gets the fighter back if they reconnect mid-fight
+## (_bind_rejoin). `info`: plain campaign details for every client ({name, encounter, rule_tags,
+## format, stand_in, run_id, node}); a client presents the fight like any match (NetMatchScene)
+## after its own campaign checks (NetProtocol.campaign_match_problem). `bot_maker`: what drives
+## a member's fighter if they drop mid-fight (the run's bot rules). The result goes out like any
+## match's (match_finished, MATCH_END); `results_s` is this match's results phase. Returns "" or
+## why not.
+func start_campaign_match(cfg_m: Dictionary, owners: Dictionary, info: Dictionary, bot_maker: Callable = Callable(), results_s := 4) -> String:
+	if dedicated or local_player_id <= 0:
+		return "campaign fights are hosted by a player (listen host)"
+	if phase != PHASE_LOBBY:
+		return "a match is already running"
+	var fighters: Array = cfg_m.get("fighters", [])
+	if fighters.is_empty() or fighters.size() > NetProtocol.MAX_SLOTS:
+		return "a campaign fight needs 1-%d fighters" % NetProtocol.MAX_SLOTS
+	if not (cfg_m.get("mode") is MatchMode) or not (cfg_m.get("arena") is ArenaDef):
+		return "the campaign fight was not built"
+	var camp := NetProtocol.campaign_match_problem({"mode": (cfg_m["mode"] as MatchMode).id(), "rules": cfg_m.get("rules", {}), "campaign": info})
+	if camp != "":
+		return "invalid campaign fight: %s" % camp
+	for p in players.values():
+		var np: NetPlayer = p
+		np.fighter = -1
+		np.input = null
+	var chosen: Array[NetPlayer] = []
+	for k in owners:
+		var i := int(k)
+		var np2: NetPlayer = players.get(int(owners[k]))
+		if np2 == null or np2.spectator or i < 0 or i >= fighters.size():
+			continue
+		var e: Dictionary = fighters[i]
+		np2.fighter = i
+		chosen.append(np2)
+		if np2.peer == -1:
+			e["kind"] = "player"
+			e.erase("source")
+		elif np2.connected and np2.peer > 0:
+			np2.input = NetRemoteInput.new(np2.id, np2.name)
+			e["kind"] = "net"
+			e["source"] = np2.input
+			var m: Dictionary = (e.get("mods", {}) as Dictionary).duplicate()
+			m["assist"] = np2.assist if bool(cfg.get("player_assist", true)) else 1.0
+			e["mods"] = m
+		if not np2.cosmetics.is_empty():
+			e["cosmetics"] = np2.cosmetics.duplicate()
+	match_id += 1
+	_aborting = ""
+	_results_s = clampi(results_s, 1, 60)
+	current_entry = {"key": "campaign:%s" % str(info.get("encounter", "")), "name": str(info.get("name", "Campaign fight")),
+		"campaign": true, "rules": "campaign", "arena": (cfg_m["arena"] as ArenaDef).id}
+	cfg_m["online"] = true
+	if not cfg_m.has("audio_context"):
+		cfg_m["audio_context"] = "coop"
+	scene = App.start_match(cfg_m, func(_r: Dictionary) -> void: pass)
+	sim = scene.get("sim") if scene != null else null
+	if sim == null:
+		_results_s = -1
+		return "the campaign fight could not be created"
+	_bot_maker = bot_maker
+	_sim_id = sim.get_instance_id()
+	sim.finished.connect(_on_sim_finished)
+	_ev_cursor = 0
+	_tick_counter = 0
+	_roster.clear()
+	_gens = PackedByteArray()
+	_check_roster()
+	# the arena exactly as the simulation runs it (its look/variant included), so every client
+	# rebuilds and hash-checks the same layout
+	var arena: ArenaDef = sim.arena
+	var public_rules := {}
+	var rules: Dictionary = cfg_m.get("rules", {})
+	for k in rules:
+		if not str(k).begins_with("_"):
+			public_rules[k] = rules[k]
+	match_info = {"match_id": match_id, "arena": arena.to_dict(), "arena_id": arena.id, "arena_hash": arena.content_hash(),
+		"rules": public_rules, "rules_id": "campaign", "mode": sim.mode.id(), "tick_rate": int(cfg["tick_rate"]),
+		"snapshot_rate": int(cfg["snapshot_rate"]), "fighters": _roster_public(), "entry": current_entry,
+		"seed": int(cfg_m.get("seed", 0)), "campaign": info.duplicate(true)}
+	var dressed := {}
+	for np3 in chosen:
+		if not np3.cosmetics.is_empty():
+			dressed[str(np3.fighter)] = np3.cosmetics.duplicate()
+	if not dressed.is_empty():
+		match_info["cosmetics"] = dressed
+	phase = PHASE_MATCH
+	phase_until = 0
+	for p5 in players.values():
+		var np5: NetPlayer = p5
+		np5.ready = false
+		if np5.peer > 0 and np5.connected:
+			_send_match_start(np5)
+	_lobby_dirty = true
+	Log.i("net", "match %d started: campaign fight '%s' (%s), %d fighters, party %s" % [match_id, str(info.get("name", "")),
+		sim.mode.id(), sim.fighters.size(), str(owners)])
+	match_started.emit(match_info)
+	return ""
+
+
+## Co-op ref timeout: holds (or releases) the running match - no simulation steps and the physics
+## space inactive - while snapshots keep going out (clients see the frozen fight).
+func set_frozen(on: bool) -> void:
+	if on and (sim == null or phase != PHASE_MATCH):
+		return
+	if on == frozen:
+		return
+	frozen = on
+	if sim != null and is_instance_valid(sim):
+		sim.paused = on
+		var w := sim.get_world_3d() if sim.is_inside_tree() else null
+		if w != null:
+			_frozen_space = w.space
+	if _frozen_space.is_valid():
+		PhysicsServer3D.space_set_active(_frozen_space, not on)
+	if not on:
+		_frozen_space = RID()
+	Log.i("net", "match %d %s (ref timeout)" % [match_id, "frozen" if on else "resumed"])
+
+
+func _results_time() -> int:
+	return _results_s if _results_s > 0 else int(cfg["results_time"])
+
+
 func _send_match_start(p: NetPlayer) -> void:
 	if sim == null or match_info.is_empty():
 		return
@@ -1996,9 +2135,9 @@ func _on_sim_finished(result: Dictionary) -> void:
 		if np.fighter >= 0:
 			owners[np.fighter] = np.id
 	last_result["players"] = owners
-	last_result["next_in"] = int(cfg["results_time"])
+	last_result["next_in"] = _results_time()
 	phase = PHASE_RESULTS
-	phase_until = Time.get_ticks_msec() + int(cfg["results_time"]) * 1000
+	phase_until = Time.get_ticks_msec() + _results_time() * 1000
 	if playlist and not current_entry.is_empty() and _aborting == "":
 		var e := playlist.find_entry(str(current_entry.get("key", "")))
 		if not e.is_empty():
@@ -2022,13 +2161,14 @@ func _lost_match_scene() -> void:
 	sim = null
 	scene = null
 	_sim_id = 0
+	set_frozen(false)
 	if phase != PHASE_MATCH:
 		return
 	_aborting = "the host left the match"
 	last_result = {"match_id": match_id, "winner_team": -1, "aborted": true, "abort_reason": _aborting,
-		"entry": current_entry.duplicate(true), "players": {}, "next_in": int(cfg["results_time"]), "fighters": []}
+		"entry": current_entry.duplicate(true), "players": {}, "next_in": _results_time(), "fighters": []}
 	phase = PHASE_RESULTS
-	phase_until = Time.get_ticks_msec() + int(cfg["results_time"]) * 1000
+	phase_until = Time.get_ticks_msec() + _results_time() * 1000
 	for v in _viewers():
 		_send_match_end_to(v)
 	_lobby_dirty = true
@@ -2089,6 +2229,9 @@ func _finish_results() -> void:
 
 
 func _teardown_match() -> void:
+	set_frozen(false)
+	_results_s = -1
+	_bot_maker = Callable()
 	if sim != null and is_instance_valid(sim):
 		if sim.finished.is_connected(_on_sim_finished):
 			sim.finished.disconnect(_on_sim_finished)

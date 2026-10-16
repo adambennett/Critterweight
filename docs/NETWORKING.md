@@ -69,7 +69,7 @@ fighter in a slot before any event refers to them; snapshots carry the match id 
 when they belong to another match. Disconnects carry a reason code (ENet disconnect data) as a
 fallback when the reason message itself could not be delivered.
 
-## 5. Protocol (version 4)
+## 5. Protocol (version 5)
 
 Every packet: `[u8 message id][payload]`. Ids 1-63 client->server, 64-127 server->client; the wrong
 direction, an unknown id, the wrong channel, an oversized payload or a failed bounds-checked decode
@@ -92,7 +92,7 @@ is a **protocol violation**. Layouts are documented in `src/net/net_protocol.gd`
 | 67 | LOBBY | S->C | | lobby state (dictionary) |
 | 68 | CHAT | S->C | | from id, name, text |
 | 69 | NOTICE | S->C | | text |
-| 70 | MATCH_START | S->C (ch 1) | | match info (arena dictionary + content hash, arena package for a player-made layout, rules, mode, roster, AI Lab policies with their hashes, your fighter, tick/snapshot rates) |
+| 70 | MATCH_START | S->C (ch 1) | | match info (arena dictionary + content hash - its look as `variant` -, arena package for a player-made layout, rules, mode, roster, AI Lab policies with their hashes, your fighter, tick/snapshot rates; a co-op campaign fight adds `campaign` {name, encounter, rule_tags, format, stand_in, run_id, node, tier} and carries the campaign's own fixed rules, checked by `NetProtocol.campaign_match_problem` instead of the rules editor's validator) |
 | 71 | SNAPSHOT | S->C (ch 2) | | match id, tick, input ack, body (§6) |
 | 72 | EVENTS | S->C (ch 1) | | base tick, events (§6) |
 | 73 | MATCH_END | S->C (ch 1) | | result (winner, rounds, stats, players, entry, aborted) |
@@ -391,10 +391,11 @@ cost, traffic, memory, objects/nodes/orphans).
 
 ## 13. Version compatibility
 
-* `NetProtocol.VERSION` (now **4**: party seats, cosmetics, arena packages and policy hashes in
-  MATCH_START; 3 = content package lists with hashes in the challenge and hello, aim assist; 2 =
-  11-button input samples, roster generations, mode view/HUD state) must match exactly; it is
-  bumped whenever any layout changes.
+* `NetProtocol.VERSION` (now **5**: co-op campaign fights on the session - MATCH_START `campaign`
+  with the campaign's own rules/mode, the arena's look as its variant - and packed party payloads;
+  4 = party seats, cosmetics, arena packages and policy hashes in MATCH_START; 3 = content package
+  lists with hashes in the challenge and hello, aim assist; 2 = 11-button input samples, roster
+  generations, mode view/HUD state) must match exactly; it is bumped whenever any layout changes.
 * The game version (`application/config/version`) must match exactly.
 * Content: the content verdict above over `Mods.compare()` (gameplay packages, ids, versions,
   package hashes) and `Content.content_hash()` (all gameplay kinds of every loaded package).
@@ -433,7 +434,9 @@ cost, traffic, memory, objects/nodes/orphans).
   `NetProtocol.rules_problem`): the host/server refuses invalid presets or overrides
   (`host_set` returns the reason, playlist entries are skipped with it, `start_match` refuses), and
   a client checks the rules dictionary in MATCH_START again and leaves with a clear reason if it
-  fails.
+  fails. A co-op campaign fight is the exception: its rules are the campaign's fixed one-round set
+  (`rounds`, `round_time` 10-900 s, `mode` campaign/boss, `friendly_fire`, `lives`; nothing else
+  may ride along), checked on both sides by `NetProtocol.campaign_match_problem`.
 
 ## 14. API for UI and systems (`Net` autoload)
 
@@ -508,7 +511,9 @@ pings and countdowns), sends the player's choices (`set_creature`, `set_team`, `
 `set_ready`, `vote`), drives the host settings through `host_set` (errors shown as toasts),
 starts with `host_start` (errors in a dialog), copies `invite_text()`, explains the active rules
 and the online restrictions (`LobbyScreen.rules_explained`), and drives party runs through
-`NetPartyRuns` (offer a suspended run, start a new one, claim a seat, route votes, suspend).
+`NetPartyRuns` (deal a new one - campaign, co-op format, difficulty -, offer a suspended one,
+take or rejoin a seat, start it, suspend / leave it); once a run is on, the campaign screens
+take over (below).
 
 **App message channel (co-op campaign, custom systems)** - plain-data messages with server
 authority:
@@ -583,6 +588,86 @@ authority:
   `test_net_multiprocess::test_party_run_resumed_through_the_lobby`
   (independent processes: Ben resumes the run Ann hosted, Ann claims seat 1 by run id, both vote,
   the run moves on identically on both machines).
+* **Party runs played online** (COOP-01..06; both campaigns, both co-op formats, 2-4 humans on a
+  listen host). The whole run is played on the session:
+  * **Start.** The host deals a run in the lobby (Off the Street / Fight Camp, simultaneous /
+    tag-team, difficulty; each player's lobby fighter; for Fight Camp each player's own Cannery
+    levels, which members send once per session as the request `party.meta` and the host clamps
+    to the installed upgrades) or offers a suspended one; the run is HELD (`CoopSession.held`,
+    nothing decided) while members take their seats, then Start releases it (absent seats: bots
+    until they rejoin). `run_state` says `live`, and every machine's `CoopFlow` moves from the lobby
+    to the campaign screens. `NetPartyRuns.start_ticking()` ticks the run from a node under Net
+    whatever the screen.
+  * **Between fights** every machine shows the real campaign screens (map with the route vote and
+    its votes per stop, reward picks, events, shop, rest, run summary) bound to its view of the
+    run: the host's authoritative RunController, a member's replica from `run_state`. Every
+    decision is `CoopSession.act` - applied at once on the host with the same rules as a member's
+    intent, sent from a member (the screen waits; a refusal comes back as a notice and the screen
+    is rebuilt). Screens rebuild only when this player's own part changed (others' purchases and
+    votes update a party line: who is shopping, picking, voting, the Captain, the vote timer). An
+    event's outcome reaches every member (`run_state.event`: title, choice, who decided, lines)
+    and stays on screen until CONTINUE. Host-only: suspending the run for everyone, forfeiting a
+    fight, retrying / forfeiting a fight that could not be built; the Captain may "move on" for
+    absent players after the absent time.
+  * **Fights.** At a fight node the host builds the match from the run
+    (`RunController.match_config`: every member's fighter with their build and carried HP, the
+    encounter, the party format) and plays it on the session
+    (`NetServer.start_campaign_match(config, owners, info, bot_maker)`): its own fighter is its
+    local player, a connected member's fighter is driven by a NetRemoteInput from that member's
+    input stream, an absent member's by the run's bot (tier capped at Contender), handed back if
+    they reconnect mid-fight (`_bind_rejoin`; a member who drops mid-fight gets the run's bot,
+    `bot_maker`). Members present it with NetMatchScene (campaign creatures that are not content
+    creatures - minion loadouts, dev stand-ins - resolve through the campaign resolver,
+    presentation only; a benched tag partner's camera follows the teammate who is in and a hint
+    names Switch Target = tag in, Taunt = cheer, Ability 1 = assist). Tag-outs, assists, cheers,
+    downed/revive and waves are the campaign mode's own rules on the host's simulation. The
+    authoritative result goes into `CoopSession.complete_fight` once (the fight's claim key);
+    members verify the run that follows from it against their decision logs (tickets). A fight the
+    host's game never finished (its match scene removed) is played again from its start; an event
+    spar is played by its decider alone (the others watch). Campaign fights have a 4 s results
+    phase and no versus results card; when the session is back in its lobby, OnlineFlow returns
+    every machine to the screen the run calls for.
+  * **Ref timeouts** (pause menu during a party fight, everyone): `CoopSession`'s per-player
+    30 s budget; the host freezes the match (`NetServer.set_frozen`: no simulation steps, physics
+    space inactive, snapshots keep going) and every machine shows a REF TIMEOUT banner with the
+    caller and the time left; the caller may end it early. Menus never pause.
+  * **Disconnect / rejoin / host departure.** A member who drops keeps their seat for the rejoin
+    grace: their fighter is the run's bot, their decisions are auto-chosen; reconnecting with the
+    rejoin token gives the fighter back at once and the lobby takes the seat again
+    automatically (decisions return at the next map, CoopSession). A member whose reservation ran
+    out rejoins by run id from the lobby (their party save). When the listen host leaves (SESSION >
+    Leave, the pause menu's Quit during a fight, or closing the game), the session ends for everyone
+    (no host migration on Net): the host's leave does not withdraw the run first (`OnlineFlow.leave`
+    / a session that went offline → `NetPartyRuns.close(false)`),
+    so every member's dialog says the run is saved at its last stop and how to resume it (rejoin
+    when offered again, or host it from their own party save). A host leaving mid-fight ends that
+    match unscored: the run stays at the fight, which is played again after the resume.
+  * **Save / resume.** Every node boundary saves the run on the host and a verified ticket on
+    every member (`party_<run id>` plus `party_<run id>.seat`: which player this machine is,
+    because profile ids repeat between machines); the host's "Suspend" ends it for everyone; any
+    member can later offer the run from the lobby and the others take their seats by run id.
+  * **End.** Each member credits only their own profile once (CoopSession, CampaignProgression
+    keyed by run and player) and sees the run summary with every member's line; the party save is
+    cleared.
+  * **Payload size.** A whole run state is ~55 KB / ~5000 values for two players late in a run
+    (more with four), near the app channel's 64 KB / 8192-value limits: party payloads above 4 KB
+    travel deflated (`{_z, _n}`, `NetProtocol.pack_party_payload`), unpacked with a 2 MB cap and
+    the same plain-data checks (`unpack_party_payload`).
+  Tested (all LOOPBACK): `test_net_party_play.gd` (in-process: fights on the session in both
+  formats, a member's tag-in and assist from the bench over the network, a member reviving a
+  downed ally by holding Grab with her own controller, a ref timeout freezing the match, the
+  result applied once, per-player picks, a member dropping and reconnecting mid-fight, a lost host
+  scene replaying the fight, held runs, member-side views, packed payloads) and
+  `test_net_party_campaign.gd` (independent processes through the real lobby and campaign screens:
+  an Off the Street run in the simultaneous format - fights, a ref timeout from the member's pause
+  menu freezing the host's match with the banner on both screens and her budget charged,
+  per-player picks, an event the member decides, a shop where only the host buys, a member
+  dropping mid-fight and rejoining, the host forfeiting, the run's end credited once per member on
+  disk -, and a Fight Camp run in the tag format - each member's Cannery levels, tag-ins / assists /
+  cheers from the bench, the host suspending, a new session resuming the run from the party saves
+  through the lobby's seats (an event the member answers, rest for both, the next fight), then the
+  host leaving the session mid-fight: the member is told why and that the run is saved, and the run
+  stays at that fight).
 
 ## 15. Measured bandwidth and server cost
 
@@ -666,6 +751,8 @@ $g = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 | `test_net_loopback.gd` | In-process server + clients: handshake, app channel both ways, authoritative input, drop + bot takeover + rejoin, results + lobby return, shutdown message, rejections, kick/ban, violation kick, oversized/flood, host leaving, timeout, LAN discovery, host scene removed mid-match, mode picks for remote players (+ pick timeout), party relay (authenticated sender ids, limits, session end), party seats (claims, seat-stamped and seat-routed messages, outsiders kept out), a new party run dealt from the lobby (session ids as seats, "new" offer, second offer refused), arena checks before the match (local hash, mismatch, damaged and oversized packages, sandboxed import round trip), AI Lab policy bots (policy hash in the options and MATCH_START) + rules validation, server-side content check (forged package list refused, client_only allowed), aim assist into fighter mods (`LQ_ASSIST`, snapped levels, `match.player_assist`), live network settings + invite text |
 | `test_net_multiprocess.gd` | Independent processes: dedicated match (hits, KO, results, presenting client), rejections (password, full, protocol, build, content refused on the client with Mods.compare wording), server mods (`server.mods` + client `--mods`, vanilla client refused, modded client plays the mod's preset, admin status lists packages), damage injection, disconnect + rejoin, stdin console shutdown, TCP admin auth/kick/ban/shutdown, 80 +- 20 ms / 2 % loss match, listen host (own `user:` rules preset sent in full and own `user:` arena sent as a package to a guest without either, guest aim assist applied, party messages) + remote client + app round trip, bonus modes (Chum Rush, Absolute Unit), LAN discovery, playlist rotation + votes + invalid entries + restart persistence, a suspended co-op party run resumed through the lobby (seat claimed by run id, CoopSession on both machines, route vote) |
 | `test_online_ui.gd` | The Online and Lobby screens driven with controller events, focus checked after every step: tabs and back; host through the Online screen, a guest joins, copy invite, rules dialog, Y starts the match, online results card, automatic return to the lobby, leave; join a host running in another process through the Join tab's recent entry, ready with Y, play its match, come back; refusal dialogs (wrong password, another game version, full, nobody answering) and a kick with its reason; LAN tab (listed session, password prompt); a dedicated server's lobby joined by a typed address:port (playlist vote, ready); layout (footer on screen, text >= 18 px at 1280x800 and 1920x1080) |
+| `test_net_party_play.gd` | Online party runs in-process (listen host + an emulated member speaking the party protocol through the relay): CoopSession views on every machine (held run, votes, refused acts, ref timeout, shared event outcome); campaign fights on the session in the simultaneous and tag formats (member drives her own fighter, presents the fight, tags in and calls an assist from the bench, revives a downed ally by holding Grab), a ref timeout freezing the match, the result applied once, per-player picks and the claim ledger, a member dropping and reconnecting mid-fight (run's bot, then her input again), a lost host scene replaying the fight; packed party payloads, campaign MATCH_START checks |
+| `test_net_party_campaign.gd` | Online party runs between independent processes through the real lobby + campaign screens (scripted pilot pressing the buttons, scripted fight input, fixed map routes): Off the Street / simultaneous (fights, the member's ref timeout freezing the host's match, per-player picks, member-decided event, shop where only the host buys, member drop + token rejoin, host forfeit, run end credited once per member on disk) and Fight Camp / tag (members' Cannery levels, tag-ins / assists / cheers from the bench, suspend, a new session resuming the run through the lobby's seats, event, rest for both, next fight, host leaving mid-fight with the member's dialog and the run kept at that fight) |
 | `test_net_parity.gd` | NetMatchScene handles every event MatchScene reacts to; reports event types without a codec id |
 | `test_net_server_examples.gd` | Example configs and the playlist template stay valid |
 | `test_net_measure.gd` | Bandwidth and server cost (duel, 8-fighter FFA) |
@@ -696,12 +783,16 @@ Also LOOPBACK on one PC.
 * Event types added after the event codec's id table was fixed (arena hazards and props, bosses, ring-out return,
   campaign events; `test_net_parity` lists them) travel with their type name instead of a 1-byte
   id: they work, the event packets are just a little larger. Giving them ids is a protocol bump.
-* Co-op: party runs are started (new) or resumed (suspended) from the lobby through party seats
-  and `NetPartyRuns` (resuming tested between processes up to the first route vote, dealing a
-  new run in-process). The lobby plays the
-  route votes; the other campaign stops (fights, shops, events) are not yet played online - the
-  run waits in the lobby and stays in everyone's party save. Co-op runs are otherwise verified
-  over the loopback transport.
+* Co-op party runs are played online end to end (§14 "Party runs played online"), tested between
+  processes on one machine (LOOPBACK) with two humans; three- and four-player parties are covered
+  only by the loopback-transport tests (test_campaign_coop) and in-process code paths. Party runs
+  need a listen host (dedicated servers do not host them). When the listen host leaves, the
+  session ends: the run is recovered from the party saves (no live host migration on Net, by
+  design). A member's own decisions return at the next map after a reconnect (their fighter at
+  once). Fights are not verified bit-exactly between machines - members verify the run that follows
+  from the host's logged result, not the fight itself (the host is the authority). A member who is
+  away when the run ends is credited only if they reconnect while the host is still on the run
+  summary; otherwise their party save keeps the run at the last stop they saw.
 * The Online and Lobby screens are tested headless with injected controller events and LOOPBACK
   sessions (one process, and a host in a second process); not tested with a second machine or a
   real controller on a real network.

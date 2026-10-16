@@ -327,7 +327,7 @@ func _confirm_leave() -> void:
 		[{"label": "Leave", "id": "leave", "danger": true}, {"label": "Stay", "id": "stay", "cancel": true}],
 		func(id: String) -> void:
 			if id == "leave":
-				OnlineFlow.end()
+				OnlineFlow.end(false)
 				Net.leave()
 				_show_tab())
 

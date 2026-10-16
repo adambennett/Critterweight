@@ -4,6 +4,10 @@ extends Screen
 ## reachable next nodes as focusable buttons. Controller: up/down cycles the reachable nodes,
 ## left/right jumps between the map and the side panel, A/Enter enters, B/Esc offers to suspend.
 ## Mouse: click. Side panel: fighter, HP, Scrip, Hype carry, build, consumables, suspend/abandon.
+## Online party runs: pressing a reachable stop is this player's VOTE (each stop shows its votes;
+## the majority decides, the Captain breaks ties, the timer resolves it); the side panel offers
+## the Captain's "move on" for absent players and suspend (host: for everyone) / leave (member);
+## at a fight the map says the fight is being set up while the host starts it on the session.
 
 var flow: CampaignFlow
 var ctrl: RunController
@@ -13,11 +17,13 @@ var _reachable: Array = []       ## Buttons of reachable nodes (focus order)
 var _side_buttons: Array = []
 var _first: Control = null
 var _msg: Label
+var _fight_pending := false
 
 
 func on_enter(p: Dictionary) -> void:
 	flow = p.get("flow")
 	ctrl = flow.ctrl
+	_fight_pending = bool(p.get("fight_pending", false))
 	_build()
 	if str(p.get("fight_error", "")) != "" and ctrl.phase() == "fight":
 		_show_fight_error(str(p["fight_error"]))
@@ -26,6 +32,10 @@ func on_enter(p: Dictionary) -> void:
 
 
 func _show_fight_error(errors: String) -> void:
+	if flow.is_party():
+		CampaignUI.confirm(self, "Fight unavailable", "%s\n\nThe party run is saved at the last stop. Try again, forfeit the fight (it counts as a loss for the party) or suspend the run for everyone." % errors,
+			[{"label": "TRY AGAIN", "id": "retry"}, {"label": "SUSPEND PARTY RUN", "id": "suspend"}, {"label": "FORFEIT FIGHT", "id": "forfeit", "danger": true}], _on_fight_error)
+		return
 	CampaignUI.confirm(self, "Fight unavailable", "This fight could not be built:\n%s\n\nYour run is saved. Install the missing content (or enable development stand-ins) and resume, or forfeit the fight (it counts as a loss)." % errors,
 		[{"label": "SUSPEND RUN", "id": "suspend"}, {"label": "FORFEIT FIGHT", "id": "forfeit", "danger": true}], _on_fight_error)
 
@@ -36,11 +46,15 @@ func _on_fight_error(id: String) -> void:
 			flow.forfeit_fight()
 		"suspend":
 			flow.suspend()
+		"retry":
+			if flow.has_method("retry_fight"):
+				flow.call("retry_fight")
 		_:
 			_after_modal(id)
 
 
 func _build() -> void:
+	ctrl = flow.ctrl
 	for c in get_children():
 		c.queue_free()
 	_node_buttons.clear()
@@ -71,16 +85,66 @@ func _build() -> void:
 		ic.custom_minimum_size = Vector2(30, 30)
 		ic.lit = true
 		hb.add_child(ic)
-		hb.add_child(CampaignUI.label(str(CampaignUI.NODE_NAMES[t]) if t != "mystery" else "? MYSTERY", 18, CampaignUI.MUTED))
+		hb.add_child(CampaignUI.inline_label(str(CampaignUI.NODE_NAMES[t]) if t != "mystery" else "? MYSTERY", 18, CampaignUI.MUTED))
 		foot.add_child(hb)
 	v.add_child(foot)
 	_msg = CampaignUI.label("\n".join(flow.notices) if not flow.notices.is_empty() else "", 20, CampaignUI.DANGER)
 	flow.notices.clear()
 	v.add_child(_msg)
+	if flow.is_party() and _msg.text == "":
+		_msg.text = _party_status()
+		_msg.add_theme_color_override("font_color", CampaignUI.ACCENT)
 	_wire_focus()
+	refresh_party()
 	var f := default_focus()
 	if f:
 		f.call_deferred("grab_focus")
+
+
+## Party runs: what the map is waiting for (the vote, a fight being set up, the others).
+func _party_status() -> String:
+	var ph := ctrl.phase()
+	if ph == "fight":
+		var plan := ctrl.current_plan()
+		return "FIGHT: %s - the host is starting it for the whole party..." % str(plan.get("name", "next fight"))
+	if ph == "map":
+		var vv := flow.vote_view()
+		if vv.is_empty():
+			return "The route vote opens in a moment."
+		var mine := str((vv.get("votes", {}) as Dictionary).get(flow.me, ""))
+		if mine != "":
+			return "You voted for %s. %d s left - the most votes win, the Captain breaks ties." % [_stop_name(mine), ceili(float(vv.get("left", 0.0)))]
+		return "Vote for the next stop: %d s left. The most votes win, the Captain breaks ties." % ceili(float(vv.get("left", 0.0)))
+	if ctrl.is_over():
+		return ""
+	return "Your part here is done - waiting for the rest of the party."
+
+
+func _stop_name(id: String) -> String:
+	var t := ctrl.visible_type(id)
+	return str(CampaignUI.NODE_NAMES.get(t, t)) if t != "mystery" else "? MYSTERY"
+
+
+## CoopFlow: votes and timers change without rebuilding the map (focus stays put).
+func refresh_party() -> void:
+	if not flow.is_party() or _msg == null or not is_instance_valid(_msg):
+		return
+	var vv := flow.vote_view()
+	var votes: Dictionary = vv.get("votes", {})
+	for id in _node_buttons:
+		var b: Button = _node_buttons[id]
+		if not is_instance_valid(b) or not b.has_meta("base_text"):
+			continue
+		var n := 0
+		for voter in votes:
+			if str(votes[voter]) == str(id):
+				n += 1
+		var t := str(b.get_meta("base_text"))
+		if not vv.is_empty() and not b.disabled:
+			t += "\nVOTES %d%s" % [n, "  (yours)" if str(votes.get(flow.me, "")) == str(id) else ""]
+		b.text = t
+	if flow.notices.is_empty():
+		_msg.text = _party_status()
 
 
 func _node_style(bg: Color, border: Color, width: int) -> StyleBoxFlat:
@@ -116,6 +180,8 @@ func _place_nodes() -> void:
 				txt += "\nYOU ARE HERE"
 			elif done:
 				txt += "\ncleared"
+			elif on and flow.is_party():
+				b.set_meta("base_text", txt)     # refresh_party adds the votes line
 			elif on:
 				txt += "\nreachable"
 			b.text = txt
@@ -179,6 +245,14 @@ func _wire_focus() -> void:
 
 
 func _enter(id: String) -> void:
+	if flow.is_party():
+		if flow.choose_node(id):
+			_msg.text = "Voted for %s." % _stop_name(id)
+			_msg.add_theme_color_override("font_color", CampaignUI.GOOD)
+		else:
+			_msg.text = "Can't vote for that: %s" % flow.error_text()
+			_msg.add_theme_color_override("font_color", CampaignUI.DANGER)
+		return
 	if not flow.choose_node(id):
 		_msg.text = "Can't go there: %s" % ctrl.last_error
 
@@ -229,6 +303,9 @@ func _side_panel() -> Control:
 		ub.tooltip_text = str(ctrl.catalog.item(str(cid)).get("effect", ""))
 		box.add_child(ub)
 		_side_buttons.append(ub)
+	if flow.is_party():
+		_party_buttons(box)
+		return box
 	var sus := CampaignUI.button("HAND BACK TO TEDDY" if flow.is_bookie() else "SUSPEND RUN (save & quit)", _confirm_suspend, 20)
 	box.add_child(sus)
 	_side_buttons.append(sus)
@@ -238,11 +315,38 @@ func _side_panel() -> Control:
 	return box
 
 
-func _use(cid: String) -> void:
-	if ctrl.use_consumable(flow.me, cid):
-		_build()
+## Party runs: the Captain may move on for absent players; the host suspends the run for everyone
+## (it stays in every party save), a member leaves it (a bot takes over until they rejoin).
+func _party_buttons(box: VBoxContainer) -> void:
+	if ctrl.captain() == flow.me and ctrl.phase() != "map" and ctrl.phase() != "fight" and not ctrl.is_over():
+		var mo := CampaignUI.button("MOVE ON FOR ABSENT PLAYERS", _move_on, 20)
+		mo.tooltip_text = "Captain: decide for players who are away (after %d s idle)." % int(ctrl.catalog.rules.get("coop", {}).get("absent_time", 60.0))
+		box.add_child(mo)
+		_side_buttons.append(mo)
+	var host: bool = flow.has_method("is_host") and bool(flow.call("is_host"))
+	var sus := CampaignUI.button("SUSPEND PARTY RUN (everyone)" if host else "LEAVE THE PARTY RUN", _confirm_suspend, 20,
+		CampaignUI.ACCENT if host else CampaignUI.DANGER)
+	box.add_child(sus)
+	_side_buttons.append(sus)
+
+
+func _move_on() -> void:
+	if flow.has_method("move_on") and bool(flow.call("move_on")):
+		_msg.text = "Moving on for the absent players..."
+		_msg.add_theme_color_override("font_color", CampaignUI.GOOD)
 	else:
-		_msg.text = ctrl.last_error
+		_msg.text = flow.error_text()
+		_msg.add_theme_color_override("font_color", CampaignUI.DANGER)
+
+
+func _use(cid: String) -> void:
+	if not flow.do_consume(cid):
+		_msg.text = flow.error_text()
+		return
+	if flow.is_party():
+		CampaignUI.wait_for_party(self, _msg)
+	else:
+		_build()
 
 
 func _maybe_act_intro() -> void:
@@ -277,6 +381,14 @@ func _on_abandon(id: String) -> void:
 
 
 func _confirm_suspend() -> void:
+	if flow.is_party():
+		if flow.has_method("is_host") and bool(flow.call("is_host")):
+			CampaignUI.confirm(self, "Suspend the party run?", "Everyone goes back to the lobby. The run is saved at the last stop in every member's party save: offer it again from the lobby to continue (a fight in progress starts over).",
+				[{"label": "SUSPEND FOR EVERYONE", "id": "yes"}, {"label": "STAY", "id": "no"}], _on_suspend)
+		else:
+			CampaignUI.confirm(self, "Leave the party run?", "A bot plays your fighter (and makes your choices) until you rejoin from the lobby. The run stays in your party saves.",
+				[{"label": "LEAVE", "id": "yes", "danger": true}, {"label": "STAY", "id": "no"}], _on_suspend)
+		return
 	if flow.is_bookie():
 		CampaignUI.confirm(self, "Hand back to Teddy?", "Teddy makes the decisions again from here; you can take over at any time.",
 			[{"label": "HAND BACK", "id": "yes"}, {"label": "KEEP DECIDING", "id": "no"}], _on_suspend)

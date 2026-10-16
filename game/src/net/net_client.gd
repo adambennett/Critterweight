@@ -71,6 +71,9 @@ var _win_out := 0
 var _stats := {"snapshot_rate": 0.0, "in_kbps": 0.0, "out_kbps": 0.0}
 var inputs_sent := 0
 var malformed := 0
+var _camp_stand_in := ""            ## the running campaign fight's stand-in creature ("" = none)
+var _camp_catalog: CampaignCatalog = null
+var _camp_catalog_stand_in := ""
 
 
 func _ready() -> void:
@@ -457,12 +460,23 @@ func _on_match_start(info: Dictionary) -> void:
 	if not (info.get("fighters") is Array) or not (info.get("arena") is Dictionary) or not (info.get("rules") is Dictionary):
 		malformed += 1
 		return
-	# the full rules dictionary is checked again here with the rules editor's validator
-	var bad_rules := NetProtocol.rules_problem(info["rules"])
-	if bad_rules != "":
-		Log.e("net", "the server's rules failed validation: %s" % bad_rules)
-		leave(NetProtocol.describe(NetProtocol.R_CONTENT, ["The server's rules failed validation here: %s" % bad_rules]))
-		return
+	if info.has("campaign"):
+		# a co-op campaign fight of the host's party run: its own fixed rules and mode
+		var bad_camp := NetProtocol.campaign_match_problem(info)
+		if bad_camp != "":
+			Log.e("net", "the host's campaign fight was refused: %s" % bad_camp)
+			leave(NetProtocol.describe(NetProtocol.R_CONTENT, ["The host's campaign fight could not be shown here: %s" % bad_camp]))
+			return
+		_camp_stand_in = str((info["campaign"] as Dictionary).get("stand_in", ""))
+		replica.creature_lookup = _campaign_creature
+	else:
+		replica.creature_lookup = Callable()
+		# the full rules dictionary is checked again here with the rules editor's validator
+		var bad_rules := NetProtocol.rules_problem(info["rules"])
+		if bad_rules != "":
+			Log.e("net", "the server's rules failed validation: %s" % bad_rules)
+			leave(NetProtocol.describe(NetProtocol.R_CONTENT, ["The server's rules failed validation here: %s" % bad_rules]))
+			return
 	var bad_arena := _prepare_arena(info)
 	if bad_arena != "":
 		Log.e("net", "arena problem: %s" % bad_arena)
@@ -529,6 +543,11 @@ func _prepare_arena(info: Dictionary) -> String:
 		arena_imported = aid
 	else:
 		def = Content.arena(aid)
+		# the host may run one of the arena's looks (a campaign context, an unlocked upgrade): the
+		# same installed layout in that variant
+		var want_variant := str((info.get("arena", {}) as Dictionary).get("variant", ""))
+		if def != null and want_variant != "" and def.variant != want_variant:
+			def = def.with_variant(want_variant)
 	if def == null:
 		# not installed here (an older host sent no package): use the layout from MATCH_START
 		def = ArenaDef.from_dict(info.get("arena", {}), "net")
@@ -538,6 +557,25 @@ func _prepare_arena(info: Dictionary) -> String:
 		return "Your copy of arena '%s' differs from the host's (content hash). Update or reinstall it." % aid
 	info["_arena_def"] = def
 	return ""
+
+
+## A campaign fight's creatures that are not plain content creatures (minion loadouts, a dev
+## stand-in the host runs with): resolved like the host's campaign does, for presentation only.
+func _campaign_creature(id: String, scale: float) -> CreatureDef:
+	if _camp_catalog == null or _camp_catalog_stand_in != _camp_stand_in:
+		_camp_catalog = CampaignCatalog.new(Content, _camp_stand_in)
+		_camp_catalog_stand_in = _camp_stand_in
+	var d := _camp_catalog.resolver.creature_dict(id)
+	if d.is_empty():
+		return null
+	var body = d.get("body")
+	if typeof(body) == TYPE_DICTIONARY and scale > 0.0:
+		var base_scale := float((body as Dictionary).get("scale", 1.0))
+		if absf(base_scale - scale) > 0.001:
+			(body as Dictionary)["scale"] = scale
+	var errs := PackedStringArray()
+	var c := CreatureResolver.parse(d, errs)
+	return c if c != null and errs.is_empty() else null
 
 
 func _end_match_presentation() -> void:

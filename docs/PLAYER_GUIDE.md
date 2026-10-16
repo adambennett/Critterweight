@@ -104,12 +104,27 @@ looks only, and everyone needs the same game version and gameplay mods. After a 
 for a few seconds, then everyone is back in the lobby. B leaves (asks first); when the host closes the
 lobby the session ends for everyone.
 
-**Co-op party runs** (host, in the lobby): *Start a new party run* deals an Off the Street run for the 2–4
-players who are not spectating, or pick a suspended party run and *Offer this run*; the members take their
-seats (*Take my seat* for a new run, *Rejoin this run* for a suspended one, checked against their own save)
-and the host starts it. The online party run currently plays the route
-votes; the other campaign stops are played in the campaign screens, which do not run online party runs
-yet — the run waits and stays in everyone's party save.
+**Co-op party runs** (host, in the lobby): choose the *Campaign* (Off the Street, or Fight Camp — then
+everyone's own Cannery upgrades apply to their own fighter), the *Co-op format* (Simultaneous: everyone
+fights at once and revives downed allies by holding Grab next to them; Tag-team: one fighter in at a time)
+and the *Difficulty*, then *Deal a new party run* for the 2–4 players who are not spectating (each plays
+their lobby fighter) — or pick a suspended party run and *Offer this run*. The members take their seats
+(*Take my seat* for a new run, *Rejoin this run* for a suspended one, checked against their own save) and
+the host starts it (Y / R); anyone still missing is played by a bot until they come back.
+
+From then on everyone plays the run in the campaign screens. On the map, pressing a stop is your **vote**
+(the most votes win, the Captain breaks ties, the timer decides for anyone who does not vote); each stop
+shows its votes and the line under the title shows what everyone is doing. Rewards, the shop and rest are
+**your own** choices for your own fighter; a personal event is answered by whoever answers first, a group
+event is a vote, and everyone sees what happened. Fights are played together: in Simultaneous everyone is in
+the cage; in Tag-team the benched partner presses *Switch Target* to tag in, *Taunt* to cheer (Hype for the
+fighter who is in) and *Ability 1* for an assist. A fight cannot be paused, but anyone can call a **ref
+timeout** from the pause menu (it freezes the fight for everyone; 30 seconds per player per run). Only the
+host can suspend the run for everyone or forfeit a fight; anyone else can *Leave the party run* (a bot plays
+their fighter until they rejoin). If you lose your connection, join again: you get your fighter back at
+once and your seat in the lobby automatically. If the host leaves, the session ends — the run is saved at
+its last stop in everyone's party saves and anyone can offer it again later. At the end each player's own
+profile is credited once (Clout, records, history).
 
 **When something goes wrong** the game says why and leaves you on the Online screen: nobody answered
 (check the address and port, and that the host's port is reachable), wrong password, session full,
