@@ -76,7 +76,12 @@ Deck.
 (`docs/PROGRESS.md`). The working screenshots were not committed; the committed before/after evidence is
 the sweep in `presets-20261016`.
 
-**6. Audio:** the windowed showcase (`audio_showcase.gd -- --quick`) plays the whole chain with real output
+**6. Client soak:** 2026-10-16, `docs/evidence/verification/client-soak-20261016/` (`--bench client_soak`). 48 presented
+matches back to back, about 32 minutes of fighting at 4x, each left the way the app leaves it. Memory
+levels off at 326 MB after the first loads (+0.003 MB per match afterwards), nodes stay at 976, orphan
+nodes at 0, and video memory is flat: no leak.
+
+**7. Audio:** the windowed showcase (`audio_showcase.gd -- --quick`) plays the whole chain with real output
 and exits 0 when everything played (docs/AUDIO.md §7).
 
 ## Changes since the last full packaged verification

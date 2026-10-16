@@ -25,6 +25,10 @@ It works in its own clone at B:\Critterweight-art, on the branch `art/creature-r
 pull request. It changes only the forge definitions, the generated models, view-side code and the art docs,
 never the creature bodies, stats or moves. Decision number **D-041** is reserved for its art decision.
 Merge it after the user approves and a full suite passes.
+**The user's instruction (2026-10-16): don't merge the art pull request straight away.** First publish a separate
+"alt" pre-release built from `main` plus that branch, so the user can compare the two builds side by side.
+For example, a local `alt/creature-art` branch tagged `v<next>-alt.1`. Note that `release.ps1` releases
+from `main` only, so it will need a branch option. Merge into `main` only if the user picks the new art.
 
 ## Integrated on `main` (all merged, full suite green before each release)
 
