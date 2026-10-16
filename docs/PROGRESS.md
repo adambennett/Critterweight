@@ -1,10 +1,18 @@
 # Progress
 
-## Status (2026-10-16) — paused for the playtest week at v0.9.4
+## Status (2026-10-16) — paused for the playtest week at v0.9.5
 
 Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
 "Remaining for the release candidate" must be done before a completion audit can pass.
+
+**Audio revamp in parallel (from 2026-10-16).** The user has a separate agent (Astra, in the Codex app)
+re-producing the music and sound in Ableton Live 12. It works in its own clone on the B: drive, on the
+branch `audio/ableton-revamp`, and ends in a draft pull request. It changes only the audio area
+(`game/assets/audio`, `tools/audio`, `game/src/audio`, the audio tests and docs). Decision number
+**D-040** is reserved for its audio decision, which supersedes D-013 for the replaced assets. The pull
+request is merged into `main` only after the user approves it by listening, followed by a green full
+suite. Don't edit audio files on `main` meanwhile.
 
 ## Integrated on `main` (all merged, full suite green before each release)
 
@@ -178,7 +186,7 @@ Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the camp
 
 ## Known issues in the current preview
 
-- Online play tested on one PC only (loopback); 3-4 human parties only in-process.
+- Online play tested on one PC only (loopback); 3-4 human parties tested in separate processes on that PC.
 - Some matchups lopsided (roster balance pass pending); the Journeyman bot still loses to button-mashing (the top tiers beat it since 2026-10-16).
 - Linux packages built and portability-checked but not run on Linux (no Linux environment here; disclosed).
 - Boot to the title is ~7.5 s packaged on this PC (target < 10 s cold).
