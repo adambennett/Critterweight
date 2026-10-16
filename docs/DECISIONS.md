@@ -202,3 +202,31 @@ schedule. On Windows, Godot 4.5.1's frame limiter busy-waits through part of eve
 120 or 60 fps used 4.5 % of a core, all in user time on the main thread. The same loop paced by a plain sleep
 used 0.0 %, with the same 120 frames and 120 physics ticks per second. An idle dedicated server dropped from
 8.3 % to 0.1 %. Physics steps still follow real time, so a stall is caught up exactly as before.
+
+## D-032 A burst at the attacker's own body is guarded by facing him
+
+An instant area whose centre lies within 1.6 m of the attacker's root comes from the attacker for guarding:
+`EffectsSystem.area` sets `guard_from` to his position, and `Combat.deliver` checks the guard against it.
+Examples are a stomp at his hoof or a burst around his fist. Knockback still pushes away from the area's
+centre, and thrown or placed areas and zones keep their centre. Found in the Dozer mirror: at point blank the
+hoof stomp's centre lay beside or behind the defender, so a front guard never blocked it. That cost human
+players too, not only bots.
+
+## D-033 Top bots learn what a masher's stream allows
+
+These are reaction-limited habits a good player has, still with no input reading. Full details are in
+`docs/BOTS.md` "Measurements".
+- **Gap counters adapt per target.** An interrupted one asks for a wider gap next time; three net losses stop
+  them.
+- **Own ranges are learned across neighbouring distance bands.**
+- **A walking attacker is extrapolated over the bot's reaction delay and his wind-up when judging reach.**
+- **The guard bridges a read stream's gaps.** A read button-masher is blocked pre-emptively.
+
+Reads were raised (Headliner 0.9, Contender 0.6, Journeyman 0.5), and the Journeyman got block 0.45 and
+mistakes 15 %. Outcomes against a pure masher on the acceptance seeds:
+- Headliner: 17 / 24;
+- Hall-of-Famer: 20 / 24;
+- Punching Bag: loses 23 / 24 (stays forgiving).
+
+The ladder stays ordered.
+

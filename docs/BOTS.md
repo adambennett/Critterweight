@@ -26,9 +26,9 @@ what a player's controller writes — and every combat rule applies to it unchan
 | Tier (profile) | reaction | think | mistakes | block / parry / dodge shares | punish | read | combo | aggression |
 |---|---|---|---|---|---|---|---|---|
 | Punching Bag (`rookie`) | 0.50 s | 0.20 s | 35 % | 0.12 / 0 / 0.04 | 0 | 0 | 0.2 | 0.40 |
-| Journeyman (`regular`) | 0.36 s | 0.14 s | 18 % | 0.35 / 0.05 / 0.12 | 0.25 | 0.3 | 0.5 | 0.55 |
-| Contender (`pro`) | 0.25 s | 0.10 s | 10 % | 0.55 / 0.25 / 0.22 | 0.5 | 0.45 | 0.75 | 0.62 |
-| Headliner (`champion`) | 0.15 s | 0.07 s | 5 % | 0.75 / 0.4 / 0.3 | 0.75 | 0.75 | 0.9 | 0.66 |
+| Journeyman (`regular`) | 0.36 s | 0.14 s | 15 % | 0.45 / 0.05 / 0.12 | 0.25 | 0.5 | 0.5 | 0.55 |
+| Contender (`pro`) | 0.25 s | 0.10 s | 10 % | 0.55 / 0.25 / 0.22 | 0.5 | 0.6 | 0.75 | 0.62 |
+| Headliner (`champion`) | 0.15 s | 0.07 s | 5 % | 0.75 / 0.4 / 0.3 | 0.75 | 0.9 | 0.9 | 0.66 |
 | Hall-of-Famer (`hall_of_famer`) | 0.09 s | 0.04 s | 1 % | 1.0 / 0.55 / 0.36 | 1.0 | 1.0 | 1.0 | 0.75 |
 
 Creature `ai` blocks add their personality offsets (aggression, block, dodge, ability, grab) on top.
@@ -94,7 +94,44 @@ the bot's `read` skill notices the mashing); Dozer's Dust Bowl (`ability2`) uses
 
 ## Measurements
 
-**Status: tuning unfinished.** Main's string-cancel rule (a string goes on only once the strike has landed or
+**Current code (2026-10-16), acceptance run** (`NAIVE_BOUTS=4`: 24 mirror bouts per tier at the test's
+seeds, The Gullet, one 45 s round). M = masher won, b = bot won. The wide-sample column plays 8 bouts per
+fighter (48 per tier).
+
+| Tier | bot won (acceptance) | Stoke | Dredge | Gusto | Dozer | Slurry | Jitters | 48-bout sample | Target |
+|---|---|---|---|---|---|---|---|---|---|
+| Punching Bag | 1 / 24 (masher 96 %) | MMMM | MbMM | MMMM | MMMM | MMMM | MMMM | - | masher >= 65 %: met |
+| Journeyman | 5 / 24 (masher 79 %) | MMMM | Mbbb | MMMM | MMMM | MMMM | MbMb | 9 / 48 | masher 25-75 %: **not met** |
+| Headliner | 17 / 24 (71 %) | bbbb | bbbb | bMbb | MMMM | bMbM | bbbb | 37 / 48 (77 %) | >= 70 %: met |
+| Hall-of-Famer | 20 / 24 (83 %) | bbbb | bbbb | bbMb | MbbM | bbMb | bbbb | 42 / 48 (88 %) | >= 80 %: met |
+
+What changed (D-033):
+- **Gap counters are learned.** Each one his next hit interrupts asks for 0.04 s more gap. After three more
+  lost than landed, the bot taps parries instead. Gusto's had lost 14 of 15.
+- **Ranges are learned faster.** A whiff or connect at one distance band also counts for the bands next to
+  it, so ranges are learned in a few tries.
+- **A walking attacker's reach is extrapolated.** The bot counts what he covers over its reaction delay and
+  his wind-up. The Slurry bot had judged 44 of a masher's attacks out of reach and taken them unguarded.
+- **Pressure is blocked.** Under a stream of attacks it has read, the bot's guard bridges the short gaps
+  (0.25 s). A read masher is blocked pre-emptively even mid-stream. A guard raised afresh for every hit was
+  still coming up when the hit landed.
+- **Reads were raised:** Headliner 0.75 to 0.9, Contender 0.45 to 0.6, Journeyman 0.3 to 0.5. Journeyman
+  block also went to 0.45 and its mistakes to 15 %.
+- **Combat fix (D-032).** A burst at the attacker's own body, such as Dozer's hoof stomp, is guarded by facing
+  him. At point blank its centre used to lie beside or behind the defender.
+
+Tier ladder (`--bench tiers --bouts 12`, 60 s rounds):
+- Journeyman 9-3 vs Punching Bag;
+- Contender 10-2 vs Journeyman;
+- Headliner 9-3 vs Contender;
+- Hall-of-Famer 5-7 vs Headliner on 12 bouts (noise), **23-13 (64 %) on 36 bouts** (`--pair headliner,hall_of_famer`);
+- Hall-of-Famer 12-0 vs Punching Bag.
+
+Open: the Journeyman still loses about four in five to the masher. Its 0.36 s reaction cannot block a jab
+stream, and raising reads, block, fewer mistakes or a 0.33 s reaction moved it by little. The Dozer mirror is
+still the hardest kit for the Headliner.
+
+**Earlier diagnostic runs (before 2026-10-16).** Main's string-cancel rule (a string goes on only once the strike has landed or
 its hit frames are over, e34d9b5) made the button-masher much stronger: his Lights now land instead of being
 cancelled before contact. The numbers below are diagnostic runs (The Gullet, one 45 s round, mirror matches over
 the six roster fighters, seeds 7000 + 17k — not yet the acceptance seeds of `test_naive_play`); M = masher won,

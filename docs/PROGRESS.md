@@ -34,11 +34,14 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
    a real two-PC/internet session, a multi-process test with 3-4 humans incl. group-event votes and the
    Captain's move-on, crediting a member who returns after the host left the summary, sturdier scripted
    test fighters (tests currently rely on fixed seeds 193/4), dedicated-server party runs.
-2. **Bot difficulty** (AI-01, UI-12): 0.9.1 has string-aware blocks/punishes (Headliner 58 %, Hall-of-Famer 80 %
-   vs a pure masher on diagnostic seeds). Target: Headliner ≥ 70 %, Hall-of-Famer ≥ 80 %, Punching Bag still loses ≥ 65 % to the masher
-   (docs/BOTS.md next steps: Gusto/Slurry/Dozer-mirror habits, Journeyman re-measure) while keeping the tier
-   ladder monotonic (`--bench tiers --bouts 12`). Test: `test_naive_play` (handoff material in the bots
-   branch).
+2. **Bot difficulty** (AI-01, UI-12): **top tiers met** on 2026-10-16 (D-032, D-033, docs/BOTS.md).
+   Acceptance seeds against a pure masher:
+   - Headliner 17 / 24 (77 % on 48 bouts), target ≥ 70 %;
+   - Hall-of-Famer 20 / 24 (88 % on 48), target ≥ 80 %;
+   - Punching Bag loses 23 / 24, so it stays forgiving.
+
+   The ladder is ordered. Still open: the Journeyman wins only 5 / 24 (target "about even", 25-75 %); its
+   reaction cannot block a jab stream. The Dozer mirror is still the hardest kit for the Headliner.
 3. **Roster balance pass**: cross-roster round robin (`--bench roster --bouts 12 --tier pro`) had Stoke
    at 25 % and Slurry at 71 % (4 bouts/pair, before the bot changes); target 40–60 % overall, 30–70 % per
    pairing; plus reliable mashed strings for every kit (snippet: a masher must land l1-l2-l3).
@@ -63,7 +66,7 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
 ## Known issues in the current preview
 
 - Online play tested on one PC only (loopback); 3-4 human parties only in-process.
-- Some matchups lopsided; top bot tiers can be beaten by mashing.
+- Some matchups lopsided (roster balance pass pending); the Journeyman bot still loses to button-mashing (the top tiers beat it since 2026-10-16).
 - Linux packages built and portability-checked but not run on Linux (no Linux environment here; disclosed).
 - Boot to the title is ~7.5 s packaged on this PC (target < 10 s cold).
 

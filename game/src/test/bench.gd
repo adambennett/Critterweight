@@ -305,6 +305,10 @@ func _tiers(bouts: int, round_time: float) -> void:
 	for i in tiers.size() - 1:
 		pairs.append([tiers[i], tiers[i + 1]])
 	pairs.append([tiers[0], tiers[tiers.size() - 1]])
+	# --pair lower,higher measures one rung only (e.g. --pair headliner,hall_of_famer)
+	var only := _arg("--pair", "").split(",", false)
+	if only.size() == 2:
+		pairs = [[only[0], only[1]]]
 	var dt := 1.0 / Engine.physics_ticks_per_second
 	var out := {}
 	for pi in pairs.size():

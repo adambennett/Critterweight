@@ -21,15 +21,15 @@ const PROFILES := {
 	"rookie": {"reaction": 0.5, "think": 0.2, "aggression": 0.4, "block": 0.12, "parry": 0.0, "dodge": 0.04,
 		"combo": 0.2, "ability": 0.2, "grab": 0.08, "mistake": 0.35, "spacing": 0.25, "juice": 0.4, "wake": 0.9, "mash_escape": 0.35,
 		"punish": 0.0, "read": 0.0, "heavy": 0.2},
-	"regular": {"reaction": 0.36, "think": 0.14, "aggression": 0.55, "block": 0.35, "parry": 0.05, "dodge": 0.12,
-		"combo": 0.5, "ability": 0.45, "grab": 0.18, "mistake": 0.18, "spacing": 0.5, "juice": 0.75, "wake": 0.6, "mash_escape": 0.6,
-		"punish": 0.25, "read": 0.3, "heavy": 0.28},
+	"regular": {"reaction": 0.36, "think": 0.14, "aggression": 0.55, "block": 0.45, "parry": 0.05, "dodge": 0.12,
+		"combo": 0.5, "ability": 0.45, "grab": 0.18, "mistake": 0.15, "spacing": 0.5, "juice": 0.75, "wake": 0.6, "mash_escape": 0.6,
+		"punish": 0.25, "read": 0.5, "heavy": 0.28},
 	"pro": {"reaction": 0.25, "think": 0.1, "aggression": 0.62, "block": 0.55, "parry": 0.25, "dodge": 0.22,
 		"combo": 0.75, "ability": 0.65, "grab": 0.28, "mistake": 0.1, "spacing": 0.75, "juice": 0.9, "wake": 0.4, "mash_escape": 0.85,
-		"punish": 0.5, "read": 0.45, "heavy": 0.28},
+		"punish": 0.5, "read": 0.6, "heavy": 0.28},
 	"champion": {"reaction": 0.15, "think": 0.07, "aggression": 0.66, "block": 0.75, "parry": 0.4, "dodge": 0.3,
 		"combo": 0.9, "ability": 0.8, "grab": 0.35, "mistake": 0.05, "spacing": 0.92, "juice": 1.0, "wake": 0.25, "mash_escape": 1.0,
-		"punish": 0.75, "read": 0.75, "heavy": 0.28},
+		"punish": 0.75, "read": 0.9, "heavy": 0.28},
 	# Hall-of-Famer (CAMPAIGN.md difficulty tiers): the quickest reads, near-flawless, reads charge-ups
 	"hall_of_famer": {"reaction": 0.09, "think": 0.04, "aggression": 0.75, "block": 1.0, "parry": 0.55, "dodge": 0.36,
 		"combo": 1.0, "ability": 0.85, "grab": 0.38, "mistake": 0.01, "spacing": 0.95, "juice": 1.0, "wake": 0.2, "mash_escape": 1.0,
@@ -129,6 +129,7 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 		_last_blocked = {}
 		_answer = {}
 		_per_atk = false
+		_gap_lost = 0
 		_last_target = tgt
 	if tgt:
 		_history.append({"t": _t, "pos": tgt.pos(), "state": tgt.state, "slot": tgt.move_slot, "st": tgt.state_time,
@@ -141,6 +142,9 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 	if _own_src != "" and (f.state != Fighter.State.ATTACK or f.move_slot != _own_slot or f.state_time < _own_st):
 		var how := "hit" if (_own_hit or f.state == Fighter.State.GRABBING) else ("intr" if f.state in [Fighter.State.HITSTUN, Fighter.State.GUARD_BREAK, Fighter.State.KNOCKDOWN, Fighter.State.HELD] else "miss")
 		_tally("%s_%s" % [_own_src, how])
+		if _own_src.begins_with("gc_"):
+			# a gap that keeps closing on it is wider in its head than on his buttons: it learns
+			_gap_lost = _gap_lost + 1 if how == "intr" else (maxi(0, _gap_lost - 1) if how == "hit" else _gap_lost)
 		if how != "intr" and _own_band >= 0:
 			_learn_range(_own_slot.split("@")[0], _own_band, how == "hit")
 		_own_src = ""
@@ -208,6 +212,20 @@ func _edge_safe(f: Fighter, sim: MatchSim, mv: Vector3) -> Vector3:
 
 func _perceived() -> Dictionary:
 	return _history[0] if not _history.is_empty() else {}
+
+
+## How fast the target was coming at this bot (m/s along -`dir`, >= 0) when it last saw him: from
+## the perceived position and one about 0.05 s later in what it saw (reaction-delayed, like a player).
+func _closing_speed(dir: Vector3) -> float:
+	if _history.size() < 2:
+		return 0.0
+	var a: Dictionary = _history[0]
+	var b: Dictionary = _history[mini(6, _history.size() - 1)]
+	var dt := float(b["t"]) - float(a["t"])
+	if dt <= 0.0:
+		return 0.0
+	var v: Vector3 = (b["pos"] - a["pos"]) / dt
+	return maxf(0.0, -Vector2(v.x, v.z).dot(Vector2(dir.x, dir.z)))
 
 
 func _queue(b: int, delay: float) -> void:
@@ -407,13 +425,16 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 		_move = dir * 0.4
 		return
 	# ---- guard up inside the opponent's reach: a strike from neutral comes out faster than any
-	# reaction, so a careful player keeps the guard up while he can be hit and is not attacking ----
-	if not attacking and f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD] and _t >= _guard_until \
-			and dist < _threat_reach(tgt) + 0.2 and per_state != Fighter.State.GUARD \
+	# reaction, so a careful player keeps the guard up while he can be hit and is not attacking.
+	# A read button-masher is blocked even mid-stream (his next jab is already on its way, and the
+	# reader does not trade with him); his walking in is counted over the reaction it sees him by ----
+	var read_mash := _mashing() and rng.randf() < _pv("read")
+	if (not attacking or read_mash) and f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD] and _t >= _guard_until \
+			and dist - _closing_speed(dir) * float(p["reaction"]) < _threat_reach(tgt) + 0.2 and per_state != Fighter.State.GUARD \
 			and (f.stamina > 30.0 or rng.randf() >= _pv("read")):
-		if rng.randf() < 1.0 - exp(-float(p["block"]) * GUARD_RATE * float(p["think"])):
+		if read_mash or rng.randf() < 1.0 - exp(-float(p["block"]) * GUARD_RATE * float(p["think"])):
 			_hold_guard(f, _t + rng.randf_range(0.25, 0.55))
-			_tally("guard_up")
+			_tally("guard_up_mash" if read_mash else "guard_up")
 	if _kit_movement(f, dist, dir):   # kit hints: dash_in / dash_out
 		return
 	# ---- footwork ----
@@ -481,6 +502,7 @@ var _own_slot := ""
 var _own_st := 0.0
 var _own_tgt_blocks := 0             ## the target's blocks when the own attack began
 var _string_done_for := -1
+var _gap_lost := 0                   ## gap counters (_after_block) interrupted minus landed, this target
 
 
 ## Goes on with a Light string (next Light, or Heavy for the Finisher) once per own move, when
@@ -585,10 +607,15 @@ func _connect_chance(c: CreatureDef, slot: String, sd: float) -> float:
 	return (float(obs[0]) + prior * 2.0) / (float(obs[1]) + 2.0)
 
 
+## Records one own attack at `band`; it also tells about the bands next to it (a whiff at 1.0 m
+## says the same move likely whiffs at 0.75 and 1.25 m), so ranges are learned in a few tries.
 func _learn_range(slot: String, band: int, hit: bool) -> void:
-	var key := "%s|%d" % [slot, band]
-	var obs: Array = _conn.get(key, [0, 0])
-	_conn[key] = [int(obs[0]) + (1 if hit else 0), int(obs[1]) + 1]
+	for b in [band - 1, band, band + 1]:
+		if b < 0 or b > 15:
+			continue
+		var key := "%s|%d" % [slot, b]
+		var obs: Array = _conn.get(key, [0, 0])
+		_conn[key] = [int(obs[0]) + (1 if hit else 0), int(obs[1]) + 1]
 
 
 # =====================================================================================
@@ -890,7 +917,10 @@ func _react(f: Fighter, tgt: Fighter, per: Dictionary, attacking: bool, dist: fl
 	var eta := start + float(info["first"]) - _t        # until its first hit frame
 	var over := start + float(info["last"]) - _t        # until its last threat has passed
 	var free := start + float(info["dur"]) - _t         # until the attacker can act again
-	var in_reach := dist < float(info["reach"]) + 0.55 + _my_bulk
+	# an attacker walking in keeps closing: what it sees is a reaction old, and he goes on walking
+	# through his wind-up, so count what he covers by his first hit frame (extrapolated, as a player does)
+	var closing := _closing_speed(dir) * (float(p["reaction"]) + maxf(eta, 0.0))
+	var in_reach := dist - closing < float(info["reach"]) + 0.55 + _my_bulk
 	var committal := float(info["cancel"]) >= float(info["dur"]) - 0.05 or str(info["cls"]) in ["heavy", "ability", "juice"]
 	# a cancelable move (a Light in a string) threatens a follow-up until it ends: a guard raised
 	# on seeing it covers the next hits even when this one is already past
@@ -941,7 +971,10 @@ func _react(f: Fighter, tgt: Fighter, per: Dictionary, attacking: bool, dist: fl
 		return false
 	match kind:
 		"block", "parry":
-			_hold_guard(f, _t + maxf(guard_end, 0.0) + 0.1)
+			# under a read stream of attacks the guard bridges the short gaps between them: a guard
+			# raised afresh for every hit is still coming up when the next one lands
+			var bridge := PRESSURE_BRIDGE_S if _pressured() and rng.randf() < _pv("read") else 0.0
+			_hold_guard(f, _t + maxf(guard_end, 0.0) + 0.1 + bridge)
 			if kind == "block":
 				_move = -dir * 0.2
 			return true
@@ -952,6 +985,9 @@ func _react(f: Fighter, tgt: Fighter, per: Dictionary, attacking: bool, dist: fl
 
 ## A masher's next press waits a little for his button (he presses on a beat, not on the frame).
 const STRING_PRESS_LAG := 0.015
+const GAP_LEARN_S := 0.04
+const GAP_GIVE_UP := 3
+const PRESSURE_BRIDGE_S := 0.25
 
 
 ## After blocking a Light of a string, the bot knows from that move's animation when the attacker can
@@ -975,8 +1011,10 @@ func _after_block(f: Fighter, tgt: Fighter, dist: float, dir: Vector3) -> bool:
 	var step := c.light_string.find(str(mv["slot"]).split("@")[0])
 	if step < 0 or rng.randf() >= _pv("read"):
 		return false   # not a Light of his string (Heavies and abilities are punished as openings)
-	if _pv("punish") > 0.0:
-		var o := _pick_punish(f, _next_threat_after(c, mv, bt) - _t - 0.02, dist, dir)
+	# every gap counter his next hit interrupted asks for GAP_LEARN_S more gap; after GAP_GIVE_UP more
+	# lost than landed it stops hitting back in his string and taps parries instead (learned per target)
+	if _pv("punish") > 0.0 and _gap_lost < GAP_GIVE_UP:
+		var o := _pick_punish(f, _next_threat_after(c, mv, bt) - _t - 0.02 - GAP_LEARN_S * _gap_lost, dist, dir)
 		if not o.is_empty() and int(o["btn"]) != FighterInput.GRAB:
 			_tally("gap_counter")
 			_commit(o, _t, "gc")

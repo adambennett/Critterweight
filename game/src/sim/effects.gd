@@ -235,11 +235,19 @@ func area(f: Fighter, e: Dictionary, p: Vector3) -> void:
 			_:
 				if Vector2(o.pos().x - p.x, o.pos().z - p.z).length() > r + 0.3:
 					continue
-		effect_hit(f, o, e, origin if shape != "circle" else p)
+		# a burst at the attacker's own body (a stomp at his hoof) comes from him: a guard facing him
+		# blocks it even when, at point blank, its centre lies beside or behind the defender
+		var guard_from = f.pos() if f and Vector2(p.x - f.pos().x, p.z - f.pos().z).length() <= ATTACHED_BURST_M else null
+		effect_hit(f, o, e, origin if shape != "circle" else p, guard_from)
+
+
+## Instant areas centred this close to the attacker's root count as coming from him for guarding.
+const ATTACHED_BURST_M := 1.6
 
 
 ## Applies an effect's damage package to a target (projectiles, areas, zones, reactions).
-func effect_hit(f: Fighter, o: Fighter, e: Dictionary, from: Vector3) -> void:
+## `guard_from` (a Vector3) overrides where the hit comes from for the target's guard.
+func effect_hit(f: Fighter, o: Fighter, e: Dictionary, from: Vector3, guard_from = null) -> void:
 	var away := o.pos() - from
 	away.y = 0.0
 	away = away.normalized() if away.length_squared() > 1e-6 else (f.forward() if f else Vector3.FORWARD)
@@ -260,6 +268,8 @@ func effect_hit(f: Fighter, o: Fighter, e: Dictionary, from: Vector3) -> void:
 		"unblockable": bool(e.get("unblockable", false)), "parryable": bool(e.get("parryable", false)),
 		"from": from, "status": e.get("status", {}), "splat": e.get("splat", {}), "melee": false,
 		"no_otg_limit": false, "ally": f != null and not sim.are_enemies(f, o)}
+	if guard_from is Vector3:
+		h["guard_from"] = guard_from
 	sim.combat.deliver(f, o, h)
 
 

@@ -218,7 +218,8 @@ func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 			return
 	# guard / parry
 	var from: Vector3 = h.get("from", a.pos() if a else b.pos())
-	var guarding := not bool(h.get("unblockable", false)) and not b.statuses.flag("no_guard") and (b.guards_against(from) or (bool(h.get("guard_seg", false)) and b.state == Fighter.State.GUARD))
+	var guard_from: Vector3 = h.get("guard_from", from)   # attacker-attached bursts: see EffectsSystem.area
+	var guarding := not bool(h.get("unblockable", false)) and not b.statuses.flag("no_guard") and (b.guards_against(guard_from) or (bool(h.get("guard_seg", false)) and b.state == Fighter.State.GUARD))
 	if guarding:
 		var melee := bool(h.get("melee", false))
 		if b.in_parry_window(a) and (melee or bool(h.get("parryable", false))):
