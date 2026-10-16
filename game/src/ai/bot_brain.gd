@@ -84,6 +84,8 @@ var _parries_seen := -1
 var _contact := {}                ## seen slot -> learned delay from its first hit frame to contact with this bot
 var _contacts_pending: Array = [] ## contact times (bot clock) not yet matched to a seen attack
 var _c_counts: Array = [-1, -1, -1]   ## own blocks, own parries, the target's hits at the last poll
+var _blocked_at := -1.0           ## bot clock of a block just felt, until the gap after it is judged
+var _last_blocked := {}           ## the attack (seen, or counted along the string) last blocked
 var tally := {}                    ## decisions taken, by kind (tests and tuning read it)
 var _tap_track := -1.0            ## a parry tap whose outcome is tallied (parried / blocked / hit)
 var _tap_check := -1.0
@@ -124,6 +126,7 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 	if tgt != _last_target:
 		_history.clear()
 		_seen.clear()
+		_last_blocked = {}
 		_answer = {}
 		_per_atk = false
 		_last_target = tgt
@@ -439,8 +442,9 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	if mistake:
 		_move = _move.rotated(Vector3.UP, rng.randf_range(-1.0, 1.0))
 	if personality.has("taunt_when"):
-		_kit_taunt(f, tgt, dist, dir, per)
-	elif rng.randf() < 0.01 and f.hype < 100.0 and dist > 3.0:
+		if not _taunt_risky():
+			_kit_taunt(f, tgt, dist, dir, per)
+	elif rng.randf() < 0.01 and f.hype < 100.0 and dist > 3.0 and not _taunt_risky():
 		f.input.press(FighterInput.TAUNT)
 
 
@@ -621,12 +625,16 @@ func _note_seen(tgt: Fighter) -> void:
 
 ## Contacts the bot feels (a hit blocked, parried or taken) teach it how long after an attack's
 ## first hit frame that attack actually reaches it (a lunge connects late in its window): taps on
-## a masher's pattern aim at that. A contact is matched to the seen attack whose time span holds it, now or as
-## soon as that attack has been seen.
+## a masher's pattern aim at that. A contact belongs to the seen attack whose hit frames hold it,
+## matched now or as soon as that attack has been seen (the next hit of a string often lands
+## before a slow reaction has seen it begin).
 func _note_contact(f: Fighter, blocks: int) -> void:
 	var tgt := f.target
 	var now := [blocks, int(f.stats_record.get("parries", 0)), int(tgt.stats_record.get("hits", 0)) if tgt else 0]
 	var touched := int(_c_counts[0]) >= 0 and (int(now[0]) > int(_c_counts[0]) or int(now[1]) > int(_c_counts[1]) or int(now[2]) > int(_c_counts[2]))
+	if int(_c_counts[0]) >= 0 and int(now[0]) > int(_c_counts[0]):
+		_blocked_at = _t      # felt at once: the gap after it is judged now (_gap_counter)
+		_next_think = minf(_next_think, _t)
 	_c_counts = now
 	if touched:
 		_contacts_pending.append(_t)
@@ -641,7 +649,9 @@ func _match_contacts() -> void:
 		for i in range(_seen.size() - 1, -1, -1):
 			var mv: Dictionary = _seen[i]
 			var after_first := ct - float(mv["start"]) - float(mv["info"]["first"])
-			if after_first >= -0.03 and after_first <= float(mv["info"]["dur"]):
+			if after_first > _hit_span(mv["info"]):
+				break   # after the newest seen attack's hit frames: an attack not seen yet
+			if after_first >= -0.03:
 				var k := str(mv["slot"])
 				_contact[k] = lerpf(float(_contact.get(k, after_first)), clampf(after_first, 0.0, 0.3), 0.4)
 				done = true
@@ -649,6 +659,11 @@ func _match_contacts() -> void:
 		if not done and _t - ct < 1.0:
 			keep.append(ct)
 	_contacts_pending = keep
+
+
+## How long after its first hit frame a contact belongs to a seen attack (see _move_info).
+static func _hit_span(info: Dictionary) -> float:
+	return float(info.get("span", float(info["last"]) - float(info["first"]) + 0.06))
 
 
 ## Expected delay from a seen attack's first hit frame to its contact with this bot (learned).
@@ -709,6 +724,10 @@ func _move_info(c: CreatureDef, slot: String) -> Dictionary:
 				hits = true
 		info["threat"] = hits or m.kind == "grab"
 	_info_cache[key] = info
+	# a contact belongs to this move from its first hit frame through its hit frames (and a little
+	# travel), or until the attacker's next move could strike at the earliest
+	var nxt := _next_threat_after(c, {"start": 0.0, "slot": slot, "info": info}, 0.0)
+	info["span"] = maxf(float(info["last"]) - float(info["first"]) + 0.06, nxt - float(info["first"]) - 0.01)
 	return info
 
 
@@ -847,11 +866,24 @@ func _pressured() -> bool:
 	return n >= 5 and lights >= 3
 
 
+## A reader does not taunt an opponent who keeps attacking (>= 3 attacks seen begin in the last
+## 3 s) or never defends (a button-masher comes straight in): a taunt is a long free opening.
+func _taunt_risky() -> bool:
+	var n := 0
+	for s in _seen:
+		if float(s["start"]) >= _t - float(p["reaction"]) - 3.0:
+			n += 1
+	var masher := _seen.size() >= 5 and _t - _seen_defend_t >= MASHER_NO_DEFENCE
+	return (n >= 3 or masher) and rng.randf() < _pv("read")
+
+
 ## Answers the newest attack seen begin (once per attack) and keeps that answer up. Returns
 ## true when it decided this think step.
 func _react(f: Fighter, tgt: Fighter, per: Dictionary, attacking: bool, dist: float, dir: Vector3) -> bool:
 	if _seen.is_empty():
 		return false
+	if _blocked_at >= 0.0 and _after_block(f, tgt, dist, dir):
+		return true
 	var mv: Dictionary = _seen[_seen.size() - 1]
 	var info: Dictionary = mv["info"]
 	var start := float(mv["start"])
@@ -918,11 +950,98 @@ func _react(f: Fighter, tgt: Fighter, per: Dictionary, attacking: bool, dist: fl
 	return false
 
 
+## A masher's next press waits a little for his button (he presses on a beat, not on the frame).
+const STRING_PRESS_LAG := 0.015
+
+
+## After blocking a Light of a string, the bot knows from that move's animation when the attacker can
+## strike again: his cancel point (reached once the strike has landed) plus the start-up of his
+## quickest follow-up (the next hit of his string, which loops, or his Finisher), or his move's end
+## plus a fresh move's start-up. The blocked move is the attack it saw begin, or - when the hit came
+## before a slow reaction saw it - the next Light of the string it counts along (a guess: a Finisher
+## instead fools it). With a gap wider than its own quickest fitting move the bot hits back (read);
+## otherwise, reading the string going on, it taps a parry for the string's next hit (parry share),
+## guard held until then. Returns true when it acted.
+func _after_block(f: Fighter, tgt: Fighter, dist: float, dir: Vector3) -> bool:
+	var bt := _blocked_at
+	_blocked_at = -1.0
+	var c := tgt.creature
+	var mv := _blocked_move(c, bt)
+	if mv.is_empty():
+		return false
+	_last_blocked = mv
+	var info: Dictionary = mv["info"]
+	var start := float(mv["start"])
+	var step := c.light_string.find(str(mv["slot"]).split("@")[0])
+	if step < 0 or rng.randf() >= _pv("read"):
+		return false   # not a Light of his string (Heavies and abilities are punished as openings)
+	if _pv("punish") > 0.0:
+		var o := _pick_punish(f, _next_threat_after(c, mv, bt) - _t - 0.02, dist, dir)
+		if not o.is_empty() and int(o["btn"]) != FighterInput.GRAB:
+			_tally("gap_counter")
+			_commit(o, _t, "gc")
+			return true
+	if rng.randf() < minf(1.0, float(p["parry"]) * 2.0):
+		var ns := str(c.light_string[(step + 1) % c.light_string.size()])
+		var next_start := start + maxf(float(info["cancel"]), bt - start) + STRING_PRESS_LAG
+		var at := next_start + float(_move_info(c, ns)["first"]) + _contact_after_first(ns) - PARRY_LEAD + _jitter()
+		if at > _t + 0.012:
+			_hold_guard(f, at)
+			_parry_tap(at, 0.25)
+			_tally("block_tap")
+			return true
+	return false
+
+
+## The attack whose hit was blocked at `bt`: the newest attack known (seen begin, or counted along
+## the string at an earlier block) when its hit frames hold `bt`; past them, the next Light of the
+## string, taken to have begun when such a hit lands. {} when nothing fits.
+func _blocked_move(c: CreatureDef, bt: float) -> Dictionary:
+	var ref: Dictionary = _seen[_seen.size() - 1]
+	if not _last_blocked.is_empty() and float(_last_blocked["start"]) > float(ref["start"]):
+		ref = _last_blocked
+	var since := bt - float(ref["start"]) - float(ref["info"]["first"])
+	if since < -0.03:
+		return {}
+	if since <= _hit_span(ref["info"]):
+		return ref
+	var step := c.light_string.find(str(ref["slot"]).split("@")[0])
+	if step < 0 or bt - float(ref["start"]) > float(ref["info"]["dur"]) + 0.4:
+		return {}
+	var ns := str(c.light_string[(step + 1) % c.light_string.size()])
+	var ni := _move_info(c, ns)
+	return {"slot": ns, "info": ni, "start": bt - float(ni["first"]) - _contact_after_first(ns)}
+
+
+## Earliest time (bot clock) the attacker can threaten again after seen attack `mv` connected at
+## `hit_t`: its cancel point plus the quickest follow-up's start-up (string moves), or its end plus
+## the quickest fresh move's.
+func _next_threat_after(c: CreatureDef, mv: Dictionary, hit_t: float) -> float:
+	var info: Dictionary = mv["info"]
+	var start := float(mv["start"])
+	var string: Array = c.light_string
+	var fresh := 9.0
+	for s in [str(string[0]) if not string.is_empty() else "l1", "heavy", "grab"]:
+		if c.moves.has(s):
+			fresh = minf(fresh, float(_move_info(c, s)["first"]))
+	var nxt := start + float(info["dur"]) + fresh
+	var step := string.find(str(mv["slot"]).split("@")[0])
+	if step >= 0:
+		var cancel_at := start + maxf(float(info["cancel"]), hit_t - start)
+		for s in [str(string[(step + 1) % string.size()]), "finisher"]:
+			if c.moves.has(s):
+				nxt = minf(nxt, cancel_at + float(_move_info(c, s)["first"]))
+	return nxt
+
+
 ## The answer to one seen attack: "parry", "dodge", "counter", "armor", "block" or "none".
 func _choose_answer(f: Fighter, tgt: Fighter, per: Dictionary, info: Dictionary, eta: float, over: float, dist: float, dir: Vector3) -> String:
 	var heavyish := str(info["cls"]) in ["heavy", "ability", "juice"]
 	var light := str(info["cls"]) == "light"
 	var mash := _pressured() and _pv("read") > 0.0
+	# a parry tap already planned for this hit (after blocking the one before it) stands
+	if light and _tap_at > _t and _tap_at - _t < 0.3:
+		return "parry"
 	if _kit_ability(f, tgt, dist, dir, per, true):   # kit hint: reactive abilities (counters, armor)
 		return "counter"
 	var sidestep := not (light and mash and rng.randf() < _pv("read"))   # a read masher is blocked, not sidestepped
@@ -941,10 +1060,6 @@ func _choose_answer(f: Fighter, tgt: Fighter, per: Dictionary, info: Dictionary,
 	# armored against Lights right now (Dust Bowl, JUICE...): trade instead of guarding
 	if light and f._armor_covers("light"):
 		return "none"
-	# a masher's pattern: tap a parry for his next hit. Timing a pattern is a read (a tier with no
-	# parry share never taps)
-	if light and mash and float(p["parry"]) > 0.0 and rng.randf() < _pv("read") * 0.8 and _beat_tap():
-		return "parry"
 	# button-mashing: blow through the Lights with an armored move (read)
 	if light and mash and _t >= _armor_next and rng.randf() < _pv("read") * 0.45:
 		for o in _own_options(f):
@@ -972,7 +1087,10 @@ func _choose_answer(f: Fighter, tgt: Fighter, per: Dictionary, info: Dictionary,
 	if roll < pp and not bool(info["unblockable"]) and eta - PARRY_LEAD > 0.012:
 		_parry_tap(_t + eta - PARRY_LEAD + _jitter())
 		return "parry"
-	if roll >= pp and roll < pp + pd and (heavyish or bool(info["unblockable"])):
+	# under pressure a dodge's recovery hands the stream free hits: a reader blocks the Heavy (and
+	# punishes it) instead
+	var dodge_ok := bool(info["unblockable"]) or not (mash and rng.randf() < _pv("read"))
+	if roll >= pp and roll < pp + pd and (heavyish or bool(info["unblockable"])) and dodge_ok:
 		_dodge(f, dir, eta)
 		return "dodge"
 	if bool(info["unblockable"]):
@@ -1031,50 +1149,6 @@ func _dodge(f: Fighter, dir: Vector3, eta: float) -> void:
 	_guard_until = _t
 	_queue(FighterInput.DODGE, clampf(eta - 0.06, 0.0, 0.3))
 	_busy_until = _t + clampf(eta - 0.06, 0.0, 0.3) + 0.05
-
-
-## Rhythm read: a button-masher repeats the same pattern (Light, Light, Light, Finisher...), so
-## after a given move his next hit comes a steady time later. From the attacks it has SEEN begin
-## (reaction-delayed) the bot learns those gaps and chains them forward to time a parry tap for
-## his next hit - anticipation from what it saw, never from the attacker's input. Returns true
-## when it tapped.
-func _beat_tap() -> bool:
-	if _seen.size() < 4:
-		return false
-	# gaps between consecutive hits seen in one flurry, keyed by the earlier move
-	var gaps := {}
-	var after := {}
-	for i in range(1, _seen.size()):
-		var a: Dictionary = _seen[i - 1]
-		var b: Dictionary = _seen[i]
-		if float(b["start"]) - float(a["start"]) > 1.0:
-			continue
-		var gap := (float(b["start"]) + float(b["info"]["first"])) - (float(a["start"]) + float(a["info"]["first"]))
-		var key := str(a["slot"])
-		if not gaps.has(key):
-			gaps[key] = []
-		(gaps[key] as Array).append(gap)
-		after[key] = str(b["slot"])
-	var cur: Dictionary = _seen[_seen.size() - 1]
-	var slot := str(cur["slot"])
-	var at := float(cur["start"]) + float(cur["info"]["first"])
-	for step in 6:
-		var g: Array = gaps.get(slot, [])
-		if g.is_empty():
-			return false
-		g = g.slice(maxi(0, g.size() - 3))
-		g.sort()
-		if float(g[g.size() - 1]) - float(g[0]) > 0.08 or float(g[g.size() / 2]) < 0.08:
-			return false
-		at += float(g[g.size() / 2])
-		slot = str(after[slot])
-		if at >= _t + 0.07:
-			if at - _t > 0.5:
-				return false
-			_parry_tap(at + _contact_after_first(slot) - PARRY_LEAD + _jitter(), 0.25)
-			_tally("beat_tap")
-			return true
-	return false
 
 
 ## A parried attacker is stunned (parry_stun) and the guard may cancel into anything for a moment:

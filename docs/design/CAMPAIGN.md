@@ -299,10 +299,10 @@ Pick **one**:
 |---|---|---|---|---|---|
 | **Sparring** | × 0.8 | × 0.7 | Punching Bag (reaction 0.5 s, 35% mistakes, no parries or punishes) | Scrip × 0.85, Clout × 0.6 | Flagged "Sparring" on boards |
 | **Amateur** (default) | × 1.0 | × 1.0 | Journeyman (reaction 0.36 s, 18% mistakes, rare parries) | × 1.0 | Standard |
-| **Pro** | × 1.2 | × 1.25 | Contender (reaction 0.26 s, 10% mistakes, parries a quarter of the time) | Scrip × 1.15, Clout × 1.4 | Standard |
-| **Title Shot** | × 1.4 | × 1.5 | Headliner (reaction 0.16 s, 5% mistakes, parries 40%, punishes, reads button-mashing, uses techniques well) | Scrip × 1.3, Clout × 2.0 | Required for Dose 6+ records |
+| **Pro** | × 1.2 | × 1.25 | Contender (reaction 0.25 s, 10% mistakes, parries a quarter of the time) | Scrip × 1.15, Clout × 1.4 | Standard |
+| **Title Shot** | × 1.4 | × 1.5 | Headliner (reaction 0.15 s, 5% mistakes, parries 40%, punishes, reads button-mashing, uses techniques well) | Scrip × 1.3, Clout × 2.0 | Required for Dose 6+ records |
 
-Bot tiers above Headliner: **Hall-of-Famer** (reaction 0.1 s, 1% mistakes, reads charge-ups and mashing) exists only on Dose 10 and in custom matches. Bots never get hidden stat buffs; difficulty is HP/damage multipliers plus skill. Tier numbers were retuned against measured play (D-028, docs/BOTS.md).
+Bot tiers above Headliner: **Hall-of-Famer** (reaction 0.09 s, 1% mistakes, reads charge-ups and mashing) exists only on Dose 10 and in custom matches. Bots never get hidden stat buffs; difficulty is HP/damage multipliers plus skill. Tier numbers were retuned against measured play (D-028, docs/BOTS.md).
 
 ## 9. The Dosage (challenge ladder)
 

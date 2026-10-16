@@ -27,9 +27,9 @@ what a player's controller writes — and every combat rule applies to it unchan
 |---|---|---|---|---|---|---|---|---|
 | Punching Bag (`rookie`) | 0.50 s | 0.20 s | 35 % | 0.12 / 0 / 0.04 | 0 | 0 | 0.2 | 0.40 |
 | Journeyman (`regular`) | 0.36 s | 0.14 s | 18 % | 0.35 / 0.05 / 0.12 | 0.25 | 0.3 | 0.5 | 0.55 |
-| Contender (`pro`) | 0.26 s | 0.10 s | 10 % | 0.55 / 0.25 / 0.22 | 0.5 | 0.45 | 0.75 | 0.62 |
-| Headliner (`champion`) | 0.16 s | 0.07 s | 5 % | 0.75 / 0.4 / 0.3 | 0.75 | 0.75 | 0.9 | 0.66 |
-| Hall-of-Famer (`hall_of_famer`) | 0.10 s | 0.04 s | 1 % | 1.0 / 0.55 / 0.36 | 1.0 | 1.0 | 1.0 | 0.75 |
+| Contender (`pro`) | 0.25 s | 0.10 s | 10 % | 0.55 / 0.25 / 0.22 | 0.5 | 0.45 | 0.75 | 0.62 |
+| Headliner (`champion`) | 0.15 s | 0.07 s | 5 % | 0.75 / 0.4 / 0.3 | 0.75 | 0.75 | 0.9 | 0.66 |
+| Hall-of-Famer (`hall_of_famer`) | 0.09 s | 0.04 s | 1 % | 1.0 / 0.55 / 0.36 | 1.0 | 1.0 | 1.0 | 0.75 |
 
 Creature `ai` blocks add their personality offsets (aggression, block, dodge, ability, grab) on top.
 Reaction time is the strongest lever between two bots: a perception delay plus the ~0.04 s it takes a fresh
@@ -49,17 +49,27 @@ evenly across that threshold (measured: a Headliner at 0.13 s beat a 0.22 s Cont
   ∝ block share); good readers do not raise a guard on spec below 30 stamina.
 * **Punishes.** A blocked, dodged or whiffed move that cannot be cancelled (Heavies, Finishers, abilities) is
   punished with the strongest own move whose start-up and range fit the opening; a parried attacker (stunned)
-  likewise. Lights in a string are not punished: the kits' strings are tight by design.
+  likewise.
+* **After a blocked Light (`read`).** The bot feels the block at once and knows from the blocked move's
+  animation when the attacker can strike again: its cancel point (a string goes on only once the strike has
+  landed) plus the start-up of his quickest follow-up (the string's next hit — strings loop — or his
+  Finisher). The blocked move is the one it saw begin, or, when a slow reaction has not seen it yet, the next
+  Light of the string it counts along (a Finisher instead fools it). A gap wider than its own quickest fitting
+  move is hit back (Dredge's, Slurry's and Gusto's middle hits leave one; Stoke's string leaves none);
+  otherwise the parry share decides a **parry tap** timed for the string's next hit, guard held until then.
+  Contacts it feels (blocks, parries, hits) teach it how late each of the attacker's moves actually reaches
+  it, which those taps aim at.
 * **Strings.** Decided once per Light, after its hit frames: better players continue what lands (or what the
   next hit of the string can still reach — Dozer's Hoof Stomp after a Light that sails past at point blank)
   and stop a blocked or whiffed string; worse ones press on regardless.
 * **Reads (`read`).** **Pressure** (≥ 5 attacks begun in the last 2 s it saw, mostly Lights — from a masher or
-  a fast bot): a fuller guard, parry taps on the pattern of the hits (the gap after each move, learned from
-  what it saw, aimed at when those hits have been reaching it), a move whose armor covers Lights from its first
-  frame (Dozer's and Dredge's Heavies), kit tools gated by the `target_mashing` hint condition (Dozer's Dust
-  Bowl), a step back out of the pocket when too close for its own strikes. A **button-masher** — pressure from
-  someone not seen guarding or dodging for 8 s (any bot defends sooner) — is also not traded with in neutral
-  (the reader waits for the openings his stream gives) and is misread less often (mistakes × (1 − read/2)). **Charge-ups:** a Heavy held in its wind-up (the move time it sees stands still) is not
+  a fast bot): a fuller guard, a move whose armor covers Lights from its first frame (Dozer's and Dredge's
+  Heavies), kit tools gated by the `target_mashing` hint condition (Dozer's Dust Bowl), a step back out of the
+  pocket when too close for its own strikes, and Heavies blocked (then punished) instead of dodged — a dodge's
+  recovery hands the stream free hits. A **button-masher** — pressure from someone not seen guarding or dodging
+  for 8 s (any bot defends sooner) — is also not traded with in neutral (the reader waits for the openings his
+  stream gives) and is misread less often (mistakes × (1 − read/2)). A reader does not taunt an opponent who
+  keeps attacking or never defends. **Charge-ups:** a Heavy held in its wind-up (the move time it sees stands still) is not
   parry-tapped (its release cannot be timed) but grabbed (a grab beats charge armor) or stepped away from.
   Winded readers sidestep Heavies instead of blocking them (a blocked Heavy below 20 stamina breaks the
   guard).
@@ -84,7 +94,30 @@ the bot's `read` skill notices the mashing); Dozer's Dust Bowl (`ability2`) uses
 
 ## Measurements
 
-MEASUREMENTS_PLACEHOLDER
+**Status: tuning unfinished.** Main's string-cancel rule (a string goes on only once the strike has landed or
+its hit frames are over, e34d9b5) made the button-masher much stronger: his Lights now land instead of being
+cancelled before contact. The numbers below are diagnostic runs (The Gullet, one 45 s round, mirror matches over
+the six roster fighters, seeds 7000 + 17k — not yet the acceptance seeds of `test_naive_play`); M = masher won,
+b = bot won.
+
+| Run (code) | Tier | masher won | Stoke | Dredge | Gusto | Dozer | Slurry | Jitters |
+|---|---|---|---|---|---|---|---|---|
+| main's rule, before the after-block reads | Punching Bag | 12 / 12 | MM | MM | MM | MM | MM | MM |
+| same | Journeyman | 10 / 12 | MM | bb | MM | MM | MM | MM |
+| same | Headliner | 7 / 12 | MM | bb | MM | MM | Mb | bb |
+| same | Hall-of-Famer | 4 / 12 | bb | bb | Mb | MM | Mb | bb |
+| this commit (after-block reads) | Headliner | 10 / 24 | bbbb | bbbb | MMMb | MMMb | MMMM | bbbb |
+| same | Hall-of-Famer | 4 / 20 | bbbb | bbbb | bbbb | MMMM | bbbb | (not run) |
+
+Targets: the masher beats the Punching Bag ≥ 65 % (met), loses to the Headliner ≥ 70 % (58 % — not met: the
+Gusto, Dozer and Slurry kits), to the Hall-of-Famer ≥ 80 % (80 % of 20 — at the line), Journeyman about even
+(not re-measured after the after-block reads).
+
+Tier bench before main's cancel rule (`--bench tiers --bouts 12`, 60 s rounds, commit 1b4b1ce, Contender /
+Headliner / Hall-of-Famer reactions then 0.26 / 0.16 / 0.10 s): Journeyman 10–2 vs Punching Bag, Contender 8–4
+vs Journeyman, Headliner 6–6 vs Contender, Hall-of-Famer 8–4 vs Headliner, Hall-of-Famer 12–0 vs Punching Bag
+(main at 8986502: 7–5, 6–6, 4–8, 8–2, 7–5). 36-bout ladder runs then: Contender 67 % vs Journeyman, Headliner
+64 % vs Contender, Hall-of-Famer 78 % vs Headliner. Not re-run on the current code.
 
 ## How it was tuned (and what did not work)
 
@@ -100,11 +133,16 @@ Headliner at 0.13 s beat a 0.22 s Contender 81 %, at 0.16 s only 50 %; more aggr
 a larger parry share or perfect punish/read alone moved the rung by little or nothing (±10 % noise at 18–36
 bouts). Parry taps timed off the seen wind-up work; adding the learned contact delay to *those* taps made them
 fire on attacks a reaction-delayed bot cannot time and cost the Contender its well-timed late guard presses
-(its successful parries fell from 22 to 12 per 36 bouts), so the contact delay is used only for taps on a
-masher's pattern, where it lifted the Hall-of-Famer from 71 % to 92 % against the masher. A "gap read"
-(counter-pokes between a string's hits) never fired: the kits' strings leave no gap wider than a jab start-up.
+(its successful parries fell from 22 to 12 per 36 bouts), so the contact delay is used only for taps after a
+block. Under main's cancel rule, parry taps chained forward from the rhythm of the attacks seen begin ("beat
+taps") parried only 7 of 123 hits against the masher: a tap planned for a hit two moves ahead dropped the guard
+for the hit in between, and contacts were matched to the previous move when the next had not been seen yet.
+Taps anchored on a felt block (the string's next hit, guard held until the tap) parried 11 of 22 and replaced
+them; contacts now belong only to the move whose hit frames (or the time before the attacker's next move could
+strike) hold them.
 
 Known limits: the Dozer mirror still favours the masher against the top tiers (his Hoof Stomps are area hits at
-point blank, the bodies end up overlapping, and only the stomp and grabs work there); Stoke's own masher is weak
-for a kit reason (its Light cancel windows open as the hit frames start, so pressing every 0.18 s cancels each
-jab before the fist arrives). Kit balance tables in `docs/kits/` were measured with the earlier bots.
+point blank, the bodies end up overlapping, only the stomp and grabs work there, and after a blocked stomp the
+string's next hit — a horn — whiffs, so taps timed for it parry nothing); the Gusto (dodges for guard, short
+guard holds) and Slurry (keeps range, needs its tools) kit personalities hand a masher openings; Stoke's string
+leaves no gap to hit back in. Kit balance tables in `docs/kits/` were measured with the earlier bots.

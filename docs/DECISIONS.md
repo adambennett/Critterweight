@@ -165,8 +165,10 @@ dodged or whiffed moves that cannot be cancelled, a parried attacker) with the s
 with a read masher in neutral); reach is judged to the target's body, and during the fight the bot learns how its
 own moves connect and when an attack reaches it. Perception stays reaction-delayed, nothing is read from the
 opponent's input, and every action is a `FighterInput`. Tier reactions are spaced evenly across the jab-blocking
-threshold (0.50 / 0.36 / 0.26 / 0.16 / 0.10 s) because reaction time is the strongest skill lever between two
-bots (measured); campaign tiers name the same profiles (their stale overrides were dropped). Found: a
+threshold (0.50 / 0.36 / 0.25 / 0.15 / 0.09 s) because reaction time is the strongest skill lever between two
+bots (measured); campaign tiers name the same profiles (their stale overrides were dropped). After a blocked
+Light the bot uses what the blocked move's animation tells (when the attacker can strike again) to hit back in
+a gap or tap a parry for the string's next hit. Found: a
 button-masher beat the Headliner 5 of 6, the tier bench was flat (Headliner 4-8 vs Contender, Hall-of-Famer 7-5 vs
 Punching Bag), and the old timed-parry branch raised the guard before its press, so it never parried. Tables and
 behaviour: docs/BOTS.md.

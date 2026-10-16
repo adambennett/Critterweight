@@ -97,7 +97,7 @@ func test_a_button_masher_beats_the_punching_bag() -> void:
 	# and the easiest bot stays forgiving: slow, no parry taps, visible mistakes
 	var t: Dictionary = r["tally"]
 	check(float(BotBrain.PROFILES[BotTiers.brain_tier("punching_bag")]["reaction"]) >= 0.45, "Punching Bag reactions stay slow")
-	check(int(t.get("ans_parry", 0)) + int(t.get("beat_tap", 0)) == 0, "the Punching Bag never taps a parry (%s)" % str(t))
+	check(int(t.get("ans_parry", 0)) + int(t.get("block_tap", 0)) == 0, "the Punching Bag never taps a parry (%s)" % str(t))
 	check(int(t.get("ans_mistake", 0)) >= bouts, "the Punching Bag visibly misreads attacks (%d mistakes in %d bouts)" % [t.get("ans_mistake", 0), bouts])
 
 
