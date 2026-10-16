@@ -32,14 +32,17 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
 1. **Online co-op follow-ups** (COOP-01..06 mostly done). Party runs are played end to end over the network
    in both campaigns and formats (loopback):
    - two humans in separate processes;
-   - since 2026-10-16, **three**: `test_party_run_three_players_majority_route` seats a host plus two
-     members with their own fighters, three human-driven fighters fight together, a route vote splits 2-1
-     and the majority decides, and each profile is credited once.
+   - since 2026-10-16, **three and four**:
+     - `test_party_run_three_players_majority_route` seats a host plus two members, each with their own
+       fighter, and three human-driven fighters fight together. A route vote splits 2-1 and the majority
+       decides.
+     - `test_party_run_four_players_captain_breaks_tie` does the same with four humans. The vote ties
+       2-2 and the Captain breaks it.
+     - In both, each profile is credited once.
 
    Remaining:
    - a real two-PC/internet session;
-   - 4 humans;
-   - a group event decided by vote, and the Captain's tie-break;
+   - a group event decided by vote;
    - the Captain's "move on" for an idle member (no pilot hooks yet: an idle-at flag for a member and a
      move-on press for the host);
    - crediting a member who returns after the host left the summary;
