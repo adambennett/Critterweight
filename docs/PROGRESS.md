@@ -1,6 +1,6 @@
 # Progress
 
-## Status (2026-10-15) — paused for the playtest week
+## Status (2026-10-15) — paused for the playtest week at v0.9.1
 
 Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
@@ -29,12 +29,14 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
 
 ## Remaining for the release candidate (exact next actions)
 
-1. **Online co-op runs end to end** (COOP-01..06, NET-05): fights, shops and events of an online party
-   run must be played over the network in both formats (simultaneous and tag), with disconnect/rejoin
-   and party save/resume through the lobby. State: see the networking branch report in the release
-   notes / `docs/NETWORKING.md`; online party runs currently sync the route votes.
-2. **Bot difficulty** (AI-01, UI-12): the top tiers must beat a button-masher (target: Headliner wins
-   ≥ 70 %, Hall-of-Famer ≥ 80 %, Punching Bag still loses ≥ 65 % to the masher) while keeping the tier
+1. **Online co-op follow-ups** (COOP-01..06 mostly done in 0.9.1): party runs are played end to end over
+   the network in both campaigns and formats (two humans in separate processes, loopback). Remaining:
+   a real two-PC/internet session, a multi-process test with 3-4 humans incl. group-event votes and the
+   Captain's move-on, crediting a member who returns after the host left the summary, sturdier scripted
+   test fighters (tests currently rely on fixed seeds 193/4), dedicated-server party runs.
+2. **Bot difficulty** (AI-01, UI-12): 0.9.1 has string-aware blocks/punishes (Headliner 58 %, Hall-of-Famer 80 %
+   vs a pure masher on diagnostic seeds). Target: Headliner ≥ 70 %, Hall-of-Famer ≥ 80 %, Punching Bag still loses ≥ 65 % to the masher
+   (docs/BOTS.md next steps: Gusto/Slurry/Dozer-mirror habits, Journeyman re-measure) while keeping the tier
    ladder monotonic (`--bench tiers --bouts 12`). Test: `test_naive_play` (handoff material in the bots
    branch).
 3. **Roster balance pass**: cross-roster round robin (`--bench roster --bouts 12 --tier pro`) had Stoke
@@ -50,7 +52,7 @@ published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open:
 
 ## Known issues in the current preview
 
-- Online co-op runs: route votes only (fights/shops/events not yet online).
+- Online play tested on one PC only (loopback); 3-4 human parties only in-process.
 - Some matchups lopsided; top bot tiers can be beaten by mashing.
 - Linux packages built and portability-checked but not run on Linux (no Linux environment here; disclosed).
 - Boot to the title is ~7.5 s packaged on this PC (target < 10 s cold).
