@@ -108,14 +108,14 @@ func _build_rows() -> void:
 	_rows.add_child(_diff_desc)
 	var dh := HBoxContainer.new()
 	dh.add_theme_constant_override("separation", 10)
-	dh.add_child(CampaignUI.label("THE DOSAGE", 22, CampaignUI.INK, "900"))
+	dh.add_child(CampaignUI.inline_label("THE DOSAGE", 22, CampaignUI.INK, "900"))
 	var minus := CampaignUI.button("  -  ", _change_dose.bind(-1))
 	var plus := CampaignUI.button("  +  ", _change_dose.bind(1))
 	minus.disabled = dose <= 0
 	plus.disabled = dose >= _max_dose()
 	dh.add_child(minus)
 	var dname := "Base card" if dose == 0 else "Dose %d: %s" % [dose, catalog.dose(dose).get("name", "")]
-	_dose_label = CampaignUI.label(dname, 22)
+	_dose_label = CampaignUI.inline_label(dname, 22)
 	dh.add_child(_dose_label)
 	dh.add_child(plus)
 	_rows.add_child(dh)
@@ -126,10 +126,12 @@ func _build_rows() -> void:
 	_row("CO-OP FORMAT", [["Simultaneous (default)", "simultaneous"], ["Tag-team", "tag"]], coop_format, _pick_format)
 	_rows.add_child(CampaignUI.label(_coop_note(), 18, CampaignUI.MUTED))
 	var sh := HBoxContainer.new()
-	sh.add_child(CampaignUI.label("SEED", 22, CampaignUI.INK, "900"))
+	sh.add_child(CampaignUI.inline_label("SEED", 22, CampaignUI.INK, "900"))
 	seed_edit = LineEdit.new()
 	seed_edit.placeholder_text = "random (or type a seed / any words)"
-	seed_edit.custom_minimum_size = Vector2(420, 44)
+	# fills the row: a fixed 420 px squeezed the label out of a 1280x800 window
+	seed_edit.custom_minimum_size = Vector2(240, 44)
+	seed_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	seed_edit.focus_mode = Control.FOCUS_ALL
 	sh.add_child(seed_edit)
 	_rows.add_child(sh)

@@ -1,0 +1,12 @@
+| deck | 1280x800 | 306.7 | 5.308 | 6.458 | 0.0 % |
+| low | 1920x1080 | 312.9 | 5.267 | 6.301 | 0.0 % |
+| medium | 1920x1080 | 255.6 | 5.695 | 6.6 | 0.0 % |
+| high | 1920x1080 | 252.5 | 5.819 | 6.992 | 0.0 % |
+| ultra | 1920x1080 | 238.7 | 5.981 | 7.277 | 0.0 % |
+capture main_menu: exit 0, ok
+capture character_select: exit 0, ok
+capture settings: exit 0, ok
+capture campaign_menu: exit 0, ok
+capture duel: exit 0, ok
+capture ffa8: exit 0, ok
+capture hub: exit 0, ok
