@@ -20,6 +20,12 @@ branch `audio/ableton-revamp`, and ends in a draft pull request. It changes only
 request is merged into `main` only after the user approves it by listening, followed by a green full
 suite. Don't edit audio files on `main` meanwhile.
 
+**Creature art revamp in parallel (from 2026-10-16).** A second Astra agent redesigns the creature models.
+It works in its own clone at B:\Critterweight-art, on the branch `art/creature-revamp`, and ends in a draft
+pull request. It changes only the forge definitions, the generated models, view-side code and the art docs,
+never the creature bodies, stats or moves. Decision number **D-041** is reserved for its art decision.
+Merge it after the user approves and a full suite passes.
+
 ## Integrated on `main` (all merged, full suite green before each release)
 
 - Combat: active-ragdoll rigs, contact-validated hits, guard/parry/dodge, grabs, elements and reactions,

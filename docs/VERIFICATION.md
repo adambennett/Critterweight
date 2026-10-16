@@ -1,0 +1,109 @@
+# Verification report
+
+**Current build: preview 0.9.6 (tag `v0.9.6` → `68673c1`), 2026-10-16.** This is a preview, not the
+release candidate. The release-candidate run, the whole-brief audit (VER-07) and the open items in
+`docs/PROGRESS.md` are still to do. This report records what has been verified so far, how, on which
+build, and where the evidence is. It leaves out what has not been verified. Requirement-level states live
+in `docs/REQUIREMENTS.md`.
+
+Machine for every result below: Windows 10 (19045), i7-7700K, RTX 4070 Ti Super, Godot 4.5.1 (official
+build). Networking results are **loopback** on this one PC unless stated otherwise.
+
+## Builds
+
+Every release is a GitHub pre-release with the Windows game (`.exe`, `.zip`), the Windows and Linux
+dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`docs/RELEASES.md`).
+
+| Version | Commit | Source suite before release | Packaged checks |
+|---|---|---|---|
+| 0.9.6 | 68673c1 | 682 / 682 passed (2026-10-16) | release smoke: script check, packaged boot to the title in 4.5 s |
+| 0.9.5 | d699dfa | 679 / 679 passed | release smoke, boot 4.4 s |
+| 0.9.4 | f908db2 | full suite green | release smoke |
+| 0.9.3 | fd71dc9 | full suite green | release smoke |
+| 0.9.2 | a8f0a54 | full suite green | **full packaged verification: every step passed** (below) |
+
+## How it is verified
+
+**1. Source suite:** `tools/dev/run_suite.ps1`. It runs the whole Godot test suite headless at 120 Hz, at
+below-normal priority, one full run at a time on the machine. It covers:
+- unit and property tests;
+- headless match simulations;
+- campaign runs with real bot-fought fights in both variants;
+- networking in separate processes (dedicated server, listen host, latency/loss conditioner,
+  disconnect/rejoin, incompatible content, playlists, 2-4 player co-op runs);
+- the AI Lab;
+- mod hardening;
+- UI navigation;
+- the audio bank.
+
+About 38 minutes. A release needs a green run of the exact commit.
+
+**2. Release smoke:** `tools/build/release.ps1`. On the packaged game it runs a script check and a boot to
+the title screen before anything is published.
+
+**3. Full packaged verification:** `tools/verify/run_verification.ps1`, on the packages `release.ps1`
+built. Its steps:
+- the whole test suite inside the exported game;
+- dedicated-server load with 8 fighters;
+- boot time and memory;
+- captures from the real packaged renderer of every mode, arena and main screen;
+- an online session between two packaged clients and the server package;
+- frame-time benches.
+
+**Latest full run: 0.9.2, `docs/evidence/verification/20261016-115413/NOTES.md`. Every step passed.**
+
+| Check | Result (packaged 0.9.2) |
+|---|---|
+| Packaged suite | 677 tests: 672 passed, 5 skipped (source-only checks), 0 failed, 29 min |
+| Server load, 8 fighters (PERF-04) | 30.0 % of one core (budget < 35 %) |
+| Boot to the title / memory in an 8-fighter match | 3.9 s / 585 MB |
+| Captures | 28 steps, 31 images, all passed (committed as JPEG) |
+| Online session (`net_session_check.ps1`) | Duel result on both clients; 30 snapshots/s, 39 ms interpolation, 9 ms RTT; TCP admin, token refusal and shutdown OK; no log errors |
+| Frame bench, 1920x1080 High | 8 fighters 255 fps on average, p99 6.7 ms, no frame over 16.7 ms; duel 541 fps |
+
+The earlier run on 0.9.1 (`20261015-211605/NOTES.md`) found 21 packaged-only test failures and a duel
+check that could not resolve. All were test or tooling problems, and they were fixed in 0.9.2. That run
+also corrected a wrong server-CPU figure.
+
+**4. Presets and 1280x800:** packaged 0.9.2, `docs/evidence/verification/presets-20261016/`. Every quality
+preset runs the busy 8-fighter scene with no frame over 16.7 ms; the Deck preset runs at 1280x800. The
+folder has 1280x800 captures of the main screens and a layout sweep of the rest, which found three layout
+bugs; there are before and after captures of each fix. These measurements are from this PC, not a Steam
+Deck.
+
+**5. UI polish pass:** 2026-10-16. Every menu and in-game screen was screenshotted at 1600x900 and
+1280x800 from source builds, and the rough ones were reworked. Those changes shipped in 0.9.3 and 0.9.4
+(`docs/PROGRESS.md`). The working screenshots were not committed; the committed before/after evidence is
+the sweep in `presets-20261016`.
+
+**6. Audio:** the windowed showcase (`audio_showcase.gd -- --quick`) plays the whole chain with real output
+and exits 0 when everything played (docs/AUDIO.md §7).
+
+## Changes since the last full packaged verification
+
+From 0.9.3 to 0.9.6:
+- the UI polish pass;
+- the Slurry balance change (D-034);
+- the review fixes:
+  - Chum Rush supplement picks;
+  - Chumball KO scoring;
+  - the Rooftop railings;
+  - bots steering round props;
+  - a flaky resume test.
+
+Each was released after a green source suite and the release smoke. The regression tests are named in
+`docs/PROGRESS.md`. The Rooftop fix was also checked against before and after captures. The full packaged
+verification will be repeated for the release candidate.
+
+## Not verified (disclosed gaps)
+
+- **Two PCs or the internet:** online play has only run over loopback on one PC.
+- **Steam Deck and Linux runtime:** the Linux game and server packages are built and pass the
+  portability checks, but they have not been run on Linux or a Deck. No Linux environment is available
+  here.
+- **Physical controller:** controller paths are verified with injected input events only (ARN-03, UI-02).
+- **Player judgement:** readability, feel and balance have not been playtested by the user. Bot-measured
+  balance is in docs/BOTS.md and PROGRESS.md: some matchups are lopsided, and the Journeyman bot loses
+  most bouts to button-mashing.
+- **Final audit:** the whole-brief audit (VER-07) and a full packaged verification of the release
+  candidate are still to do.

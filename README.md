@@ -82,6 +82,8 @@ Architecture [`ARCHITECTURE`](docs/ARCHITECTURE.md) · Design and budgets [`DESI
 [`DECISIONS`](docs/DECISIONS.md) · UI [`UI`](docs/UI.md) · Modding [`MODDING`](docs/MODDING.md) · Platform/Steam
 deferral [`PLATFORM`](docs/PLATFORM.md) · Audio [`AUDIO`](docs/AUDIO.md) · Art [`ART_PIPELINE`](docs/ART_PIPELINE.md),
 [`CREATURES`](docs/CREATURES.md) · Kits [`kits/`](docs/kits) · Third-party inventory [`THIRD_PARTY`](docs/THIRD_PARTY.md).
+Status: requirement ledger [`REQUIREMENTS`](docs/REQUIREMENTS.md) · verification report [`VERIFICATION`](docs/VERIFICATION.md) ·
+progress and next actions [`PROGRESS`](docs/PROGRESS.md) · releases [`RELEASES`](docs/RELEASES.md).
 
 ## Licence and provenance
 
