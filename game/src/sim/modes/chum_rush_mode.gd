@@ -25,7 +25,9 @@ var downs := 0
 var enemies: Array = []          ## Array[Fighter] alive this wave
 var _despawn_at := {}            ## fighter index -> time
 var pending_pick := {}           ## fighter index -> [upgrade ids] awaiting a choice
-var upgrade_applier: Callable    ## (fighter, upgrade_id) -> void; campaign installs the real one
+var upgrade_applier: Callable    ## (fighter, upgrade_id) -> void; default: apply_supplement
+var taken := {}                  ## fighter index -> {supplement id: times taken}
+var _patches := {}               ## fighter index -> creature patches taken so far, in order
 var player_count := 0
 
 
@@ -56,7 +58,7 @@ func setup(match_sim) -> void:
 	stage = "break"
 	stage_time = 0.0
 	if not upgrade_applier.is_valid():
-		upgrade_applier = _basic_apply
+		upgrade_applier = apply_supplement
 
 
 func tick_fight(dt: float) -> void:
@@ -195,7 +197,10 @@ func _wave_cleared() -> void:
 
 
 func _offer_picks() -> void:
-	var pool := Content.ids("supplements")
+	# MODES.md §2.4: picks are OTC / Prescription supplements (never side effects or rarer tiers)
+	var pool := Content.ids("supplements").filter(func(sid):
+		var u := Content.get_entry("supplements", str(sid))
+		return str(u.get("type", "")) == "supplement" and str(u.get("rarity", "")) in ["otc", "prescription"])
 	if pool.is_empty():
 		return
 	var rng := RandomNumberGenerator.new()
@@ -203,9 +208,13 @@ func _offer_picks() -> void:
 	for f: Fighter in sim.fighters:
 		if f.team != 0 or f.despawned:
 			continue
+		# three different supplements this fighter can still stack
+		var open := pool.filter(func(sid): return _can_take(f, str(sid)))
 		var choices := []
-		for i in 3:
-			choices.append(pool[rng.randi_range(0, pool.size() - 1)])
+		while choices.size() < 3 and not open.is_empty():
+			choices.append(open.pop_at(rng.randi_range(0, open.size() - 1)))
+		if choices.is_empty():
+			continue
 		pending_pick[f.index] = choices
 		# local players choose in the pick panel, remote players ("net") through a mode.pick
 		# request to the server (which also times out unanswered picks); others take the first
@@ -225,18 +234,73 @@ func choose_pick(fighter_index: int, choice: int) -> void:
 		sim.emit_event({"type": "pick_taken", "fighter": fighter_index, "upgrade": str(opts[choice])})
 
 
-## Minimal applier until the campaign's build system is installed: stat mods + hooks.
-func _basic_apply(f: Fighter, upgrade_id: String) -> void:
+func _can_take(f: Fighter, sid: String) -> bool:
+	var u := Content.get_entry("supplements", sid)
+	return not u.is_empty() and int(taken.get(f.index, {}).get(sid, 0)) < maxi(1, int(u.get("stack", 1)))
+
+
+## Applies a supplement's "apply" block (the campaign format, docs/CAMPAIGN_SYSTEMS.md#supplements)
+## to a fighter mid-run: Fighter.mods, hooks, statuses (now: picks come between waves) and creature
+## patches. Patches accumulate on the base kit and swap in the re-parsed creature (rebuilding the
+## body only when a patch changed it). Max HP / stamina / poise follow their mods and patches; a
+## raise is granted at once. Run-economy and per-fight rolls have no meaning here and are skipped.
+func apply_supplement(f: Fighter, upgrade_id: String) -> void:
 	var u := Content.get_entry("supplements", upgrade_id)
-	for k in u.get("mods", {}):
-		var v = u["mods"][k]
-		if typeof(v) == TYPE_FLOAT or typeof(v) == TYPE_INT:
-			if str(k).ends_with("_add"):
-				f.mods[k] = float(f.mods.get(k, 0.0)) + float(v)
-			else:
-				f.mods[k] = float(f.mods.get(k, 1.0)) * float(v)
-	for h in u.get("hooks", []):
-		f.hooks.add(h, "supplement:" + upgrade_id)
+	if u.is_empty():
+		push_warning("chum rush: unknown supplement '%s'" % upgrade_id)
+		return
+	var counts: Dictionary = taken.get(f.index, {})
+	counts[upgrade_id] = int(counts.get(upgrade_id, 0)) + 1
+	taken[f.index] = counts
+	var ap: Dictionary = u.get("apply", {})
+	var party := "solo" if player_count <= 1 else "coop"
+	var before := _vital_bases(f)
+	BuildApplier.add_mods(f.mods, ap.get("mods", []), 1, party)
+	var patches: Array = ap.get("patches", []).filter(func(p): return typeof(p) == TYPE_DICTIONARY and BuildApplier._when_ok(p, party))
+	if not patches.is_empty():
+		var all: Array = _patches.get(f.index, [])
+		all.append_array(patches)
+		_patches[f.index] = all
+		var base := CreatureResolver.new(Content).creature_dict(f.creature.id)
+		var d := base.duplicate(true)
+		ContentPatch.apply_all(d, all)
+		var errs := PackedStringArray()
+		var c := CreatureResolver.parse(d, errs) if not d.is_empty() else null
+		if c == null or not errs.is_empty():
+			push_warning("chum rush: %s produced an invalid %s (%s); patches skipped" % [upgrade_id, f.creature.id, "; ".join(errs)])
+			all.resize(all.size() - patches.size())
+		elif var_to_str(d.get("body", {})) != var_to_str(base.get("body", {})):
+			f.rebuild(c, f.pos(), f.facing_yaw)
+		else:
+			f.creature = c
+	for h in ap.get("hooks", []):
+		if typeof(h) == TYPE_DICTIONARY and BuildApplier._when_ok(h, party):
+			var hc: Dictionary = h.duplicate(true)
+			hc.erase("when")
+			f.hooks.add(hc, "supplement:" + upgrade_id)
+	for st in ap.get("statuses", []):
+		if typeof(st) == TYPE_DICTIONARY and BuildApplier._when_ok(st, party):
+			var sc: Dictionary = st.duplicate(true)
+			sc.erase("when")
+			f.statuses.add(sc)
+	var after := _vital_bases(f)
+	f.max_health = maxf(1.0, f.max_health + after[0] - before[0])
+	f.max_stamina = maxf(1.0, f.max_stamina + after[1] - before[1])
+	f.max_poise = maxf(1.0, f.max_poise + after[2] - before[2])
+	if not f.is_out():
+		f.health += maxf(0.0, after[0] - before[0])
+		f.stamina += maxf(0.0, after[1] - before[1])
+		f.poise += maxf(0.0, after[2] - before[2])
+	f.health = minf(f.health, f.max_health)
+	f.stamina = minf(f.stamina, f.max_stamina)
+	f.poise = minf(f.poise, f.max_poise)
+
+
+## Max HP / stamina / poise as Fighter.reset_vitals sizes them from the creature and mods.
+func _vital_bases(f: Fighter) -> Array:
+	return [f.creature.stat("health") * float(f.mods.get("max_health", 1.0)) + float(f.mods.get("max_health_add", 0.0)),
+		f.creature.stat("stamina") + float(f.mods.get("stamina_add", 0.0)),
+		f.creature.stat("poise") * float(f.mods.get("poise", 1.0)) + float(f.mods.get("poise_add", 0.0))]
 
 
 func on_depleted(f: Fighter, attacker: Fighter, hit: Dictionary) -> void:

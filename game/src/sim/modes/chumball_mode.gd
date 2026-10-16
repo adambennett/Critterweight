@@ -221,6 +221,12 @@ func check_round_over() -> void:
 	pass
 
 
+## KOs give nothing in Chumball; the ball gives everything (MODES.md). The preset wins on
+## "score", so MatchMode's default would add ko_points per KO to the same totals as goals.
+func on_elimination(_f: Fighter, _attacker: Fighter) -> void:
+	pass
+
+
 func choose_respawn(f: Fighter) -> Array:
 	var g: Dictionary = goals.get(f.team, goals[0])
 	var p: Vector3 = g["pos"] + (g["normal"] as Vector3) * 1.8
