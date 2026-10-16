@@ -42,3 +42,26 @@ func test_every_visible_setting_is_read_somewhere() -> void:
 		if not used:
 			unwired.append(key)
 	check(unwired.is_empty(), "settings nobody reads: %s" % [unwired])
+
+
+## UI-04: window settings apply tentatively, then Keep confirms them and Revert rolls them back.
+## The settings screen's 15 s countdown dialog times out to Revert (settings_screen.gd).
+func test_display_changes_confirm_or_roll_back() -> void:
+	var before := str(Settings.get_value("display.window_mode"))
+	var other := "windowed" if before != "windowed" else "borderless"
+	var prev := Settings.apply_display_tentative({"display.window_mode": other})
+	check_eq(str(Settings.get_value("display.window_mode")), other, "the change applies at once")
+	Settings.revert_display(prev)
+	check_eq(str(Settings.get_value("display.window_mode")), before, "Revert (the countdown's default) restores the old mode")
+	prev = Settings.apply_display_tentative({"display.window_mode": other})
+	var seen := []
+	var on_changed := func(k: String, _v) -> void:
+		seen.append(k)
+	Settings.changed.connect(on_changed)
+	Settings.confirm_display()
+	Settings.changed.disconnect(on_changed)
+	check_eq(str(Settings.get_value("display.window_mode")), other, "Keep confirms the new mode")
+	check(seen.has("display.window_mode"), "and announces it to the game")
+	Settings.revert_display(prev)
+	Settings.confirm_display()
+	check_eq(str(Settings.get_value("display.window_mode")), before, "the test leaves the window mode as it found it")
