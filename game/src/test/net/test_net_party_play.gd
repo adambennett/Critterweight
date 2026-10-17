@@ -508,6 +508,8 @@ func test_party_fight_replayed_when_the_hosts_match_is_lost_inprocess() -> void:
 	check_eq(pr.fights_played, 0, "nothing applied")
 	check_eq(pr.session.ctrl.phase(), "fight", "the run is still at the fight")
 	check(await _until(func() -> bool: return srv.match_id > first_match and srv.sim != null, 12.0), "the fight starts again")
-	check(await _fight_until_phase(MatchMode.Phase.FIGHT, 15.0), "the bell rings again")
+	# generous wall-clock budgets: under a loaded machine (other agents' builds) the replay and the round
+	# end took over 10 s; a wait returns as soon as its condition holds
+	check(await _fight_until_phase(MatchMode.Phase.FIGHT, 30.0), "the bell rings again")
 	(srv.sim.mode as CampaignMatchMode)._finish(true)
-	check(await _until(func() -> bool: return pr.fights_played == 1 and pr.session.ctrl.phase() == "reward", 10.0), "and is applied once")
+	check(await _until(func() -> bool: return pr.fights_played == 1 and pr.session.ctrl.phase() == "reward", 30.0), "and is applied once")
