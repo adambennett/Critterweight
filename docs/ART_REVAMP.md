@@ -79,6 +79,8 @@ The final full suite finished on 2026-10-16 at commit `12b11b42d55826b5150031e7f
 
 The successful full-suite run also prints Godot shutdown diagnostics: `ObjectDB instances leaked at exit` and `5 resources still in use at exit`. A Jolt maximum-job warning also occurs during the hub wander test. The same Jolt/shutdown diagnostics and resource count appear in the existing [2026-10-16 packaged-test evidence](evidence/verification/20261016-115413/packaged_tests.log.err). They remain visible in the new log; the runner exits 0 and reports all 684 tests passed. This art branch does not claim to resolve that existing shutdown diagnostic.
 
+After publishing the draft art PR, added the user's requested [Blender machine guide](../tools/blender/README.md). It records verified local paths/preferences, the optional MCP bridge and its repairs, batch export, coordination and transferable art/capture/benchmark lessons. Live bridge status and preferences were rechecked; this addition is documentation only.
+
 ## Requests for Claude
 
 Main's current integration notes (`docs/PROGRESS.md`) request an alternate preview build from main plus this branch for the user's side-by-side comparison before any merge. This PR remains draft; Claude owns that build/release step and the later integration suite. No release, tag or packaging work is performed by the art branch.

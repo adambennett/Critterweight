@@ -176,6 +176,8 @@ Evidence captures of the current set live in `docs/evidence/art/`.
 
 ## 7. Blender sources and export
 
+For the verified Windows setup, B: profile/cache paths, bridge restart instructions and lessons for future projects, see [Blender on this machine](../tools/blender/README.md).
+
 Tool used: **Blender 5.2.2 LTS**, build `d13f752e3b9c` (2026-09-15), installed at
 `B:\Blender\blender.exe`. Python 3.13 is bundled with it. `tools/blender/*.blend` are compressed
 editable sources; imported references are hidden in a separate collection. No external textures,
