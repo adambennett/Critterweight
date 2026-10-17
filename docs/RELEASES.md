@@ -70,10 +70,14 @@ Online play needs the same version on both ends, so alt and main builds can't pl
 picks the alt build, its branch is merged into `main` and released normally. Otherwise the alt branch
 just stays where it is.
 
+The creature-art alt builds ended this way: the user picked the new art, PR #1 was merged into `main`,
+and 0.9.10 ships it. `alt/creature-art` is retired.
+
 ## Release log
 
 | Version | Tag | Date | Notes |
 |---|---|---|---|
+| 0.9.10 (preview, playtest build) | [v0.9.10](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.10) -> fa0725f | 2026-10-17 | The new creature art: PR #1 merged (D-041), twelve Blender-modelled combat creatures, credits; suite 685/685; packaged boot to the title in 4.4 s |
 | 0.9.9-alt.1 (**alt build**, comparison) | [v0.9.9-alt.1](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.9-alt.1) -> 19d029a on `alt/creature-art` | 2026-10-17 | 0.9.9 plus the creature art revamp (PR #1) and its credits; suite 685/685 |
 | 0.9.9 (preview, playtest build) | [v0.9.9](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.9) -> eecaa39 | 2026-10-17 | Busy fights readable: steeper crowd camera, plates 5-8 at the top corners; short-soak and cross-drive test fixes; built on B:; protocol 5 |
 | 0.9.8-alt.1 (**alt build**, comparison) | [v0.9.8-alt.1](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.8-alt.1) -> 33e80fb on `alt/creature-art` | 2026-10-17 | 0.9.8 plus the creature art revamp (PR #1: twelve Blender-remodelled creatures) and its credits, for a side-by-side choice; `main` untouched |

@@ -1,6 +1,6 @@
 # Progress
 
-## Status (2026-10-17) — paused for the playtest week; the new creature art ships from 0.9.10
+## Status (2026-10-17) — paused for the playtest week at v0.9.10 (the new creature art)
 
 Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
@@ -30,7 +30,7 @@ suite. Don't edit audio files on `main` meanwhile.
 Blender (PR #1, branch `art/creature-revamp`). It changed only the models, their sources and view-side code,
 never the creature bodies, stats or moves. The user compared the alt builds (`v0.9.8-alt.1`, `v0.9.9-alt.1`)
 with the main builds and chose the new art. PR #1 is merged into `main` with D-041, the ledger updates
-(ART-01..05, ART-08, PRV-03) and an in-game credits entry, and ships from 0.9.10. The `alt/creature-art`
+(ART-01..05, ART-08, PRV-03) and an in-game credits entry, and shipped in v0.9.10. The `alt/creature-art`
 branch and the paired alt builds are retired. In fights the change is subtle: the hit volumes fix every
 shape, and the match camera mostly sees backs and tops (D-041).
 
