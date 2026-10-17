@@ -1,0 +1,215 @@
+boss_bilge: 15 bones, res 0.018 m, target 18000 tris
+  field 93x131x244 (2.97M voxels, 81 parts) 331 ms
+  surface nets 74197 verts / 148444 tris 172 ms
+  decimated to 8975 verts / 18000 tris (30 colour keys) 2239 ms
+  coloured 14225 verts (4540 crisp splits) 131 ms
+  skinned 14225 verts 89 ms
+  gore piece:
+  field 24x45x24 (0.03M voxels, 1 parts) 8 ms
+  surface nets 1082 verts / 2160 tris 25 ms
+  decimated to 152 verts / 300 tris (1 colour keys) 55 ms
+  coloured 152 verts (0 crisp splits) 0 ms
+  wrote creatures/boss_bilge.glb (953 KB, 18000 tris, 14225 verts) in 3076 ms
+boss_conduit: 9 bones, res 0.02 m, target 16000 tris
+  field 43x190x266 (2.17M voxels, 37 parts) 104 ms
+  surface nets 39686 verts / 79432 tris 124 ms
+  decimated to 7970 verts / 16000 tris (12 colour keys) 999 ms
+  coloured 14254 verts (5327 crisp splits) 104 ms
+  skinned 14254 verts 49 ms
+  gore piece:
+  field 24x45x24 (0.03M voxels, 1 parts) 2 ms
+  surface nets 1082 verts / 2160 tris 2 ms
+  decimated to 152 verts / 300 tris (1 colour keys) 24 ms
+  coloured 152 verts (0 crisp splits) 0 ms
+  wrote creatures/boss_conduit.glb (942 KB, 16000 tris, 14254 verts) in 1418 ms
+boss_snappington: 16 bones, res 0.015 m, target 18000 tris
+  field 194x120x256 (5.96M voxels, 87 parts) 782 ms
+  surface nets 126263 verts / 252912 tris 555 ms
+  decimated to 8807 verts / 18000 tris (31 colour keys) 6367 ms
+  coloured 17403 verts (7337 crisp splits) 192 ms
+  skinned 17403 verts 89 ms
+  gore piece:
+  field 79x43x13 (0.04M voxels, 3 parts) 4 ms
+  surface nets 4336 verts / 8676 tris 16 ms
+  decimated to 248 verts / 500 tris (3 colour keys) 138 ms
+  coloured 310 verts (48 crisp splits) 1 ms
+  wrote creatures/boss_snappington.glb (1148 KB, 18000 tris, 17403 verts) in 8170 ms
+f_dozer: 13 bones, res 0.012 m, target 14000 tris
+  field 98x116x212 (2.41M voxels, 46 parts) 227 ms
+  surface nets 61861 verts / 123728 tris 203 ms
+  decimated to 6997 verts / 14000 tris (28 colour keys) 3061 ms
+  coloured 11454 verts (3739 crisp splits) 94 ms
+  skinned 11454 verts 54 ms
+  gore piece:
+  field 29x51x29 (0.04M voxels, 1 parts) 1 ms
+  surface nets 1530 verts / 3056 tris 5 ms
+  decimated to 152 verts / 300 tris (1 colour keys) 18 ms
+  coloured 152 verts (0 crisp splits) 0 ms
+  wrote creatures/f_dozer.glb (767 KB, 14000 tris, 11454 verts) in 3672 ms
+f_dredge: 14 bones, res 0.012 m, target 14000 tris
+  field 188x106x172 (3.43M voxels, 89 parts) 321 ms
+  surface nets 69421 verts / 138896 tris 123 ms
+  decimated to 6973 verts / 14000 tris (24 colour keys) 2970 ms
+  coloured 11936 verts (4201 crisp splits) 107 ms
+  skinned 11936 verts 33 ms
+  gore piece:
+  field 24x42x24 (0.02M voxels, 1 parts) 1 ms
+  surface nets 874 verts / 1744 tris 14 ms
+  decimated to 152 verts / 300 tris (1 colour keys) 39 ms
+  coloured 152 verts (0 crisp splits) 0 ms
+  wrote creatures/f_dredge.glb (795 KB, 14000 tris, 11936 verts) in 3614 ms
+f_gusto: 12 bones, res 0.0095 m, target 12000 tris
+  field 270x228x133 (8.19M voxels, 71 parts) 156 ms
+  surface nets 53323 verts / 106680 tris 318 ms
+  decimated to 5983 verts / 12000 tris (32 colour keys) 1923 ms
+  coloured 9627 verts (3018 crisp splits) 64 ms
+  skinned 9627 verts 31 ms
+  gore piece:
+  field 49x29x61 (0.09M voxels, 3 parts) 9 ms
+  surface nets 3140 verts / 6276 tris 53 ms
+  decimated to 182 verts / 360 tris (3 colour keys) 71 ms
+  coloured 256 verts (66 crisp splits) 1 ms
+  wrote creatures/f_gusto.glb (652 KB, 12000 tris, 9627 verts) in 2637 ms
+f_jitters: 6 bones, res 0.008 m, target 10000 tris
+  field 199x130x108 (2.79M voxels, 28 parts) 213 ms
+  surface nets 49618 verts / 99240 tris 153 ms
+  decimated to 4998 verts / 10000 tris (20 colour keys) 2502 ms
+  coloured 7998 verts (2630 crisp splits) 26 ms
+  skinned 7998 verts 9 ms
+  gore piece:
+  field 55x45x55 (0.14M voxels, 2 parts) 15 ms
+  surface nets 6778 verts / 13552 tris 14 ms
+  decimated to 202 verts / 400 tris (2 colour keys) 153 ms
+  coloured 259 verts (51 crisp splits) 0 ms
+  wrote creatures/f_jitters.glb (545 KB, 10000 tris, 7998 verts) in 3094 ms
+f_slurry: 7 bones, res 0.012 m, target 13000 tris
+  field 49x170x204 (1.70M voxels, 66 parts) 99 ms
+  surface nets 34711 verts / 69432 tris 143 ms
+  decimated to 6495 verts / 13000 tris (19 colour keys) 1270 ms
+  coloured 10307 verts (3223 crisp splits) 98 ms
+  skinned 10307 verts 43 ms
+  gore piece:
+  field 24x44x24 (0.03M voxels, 1 parts) 2 ms
+  surface nets 730 verts / 1456 tris 2 ms
+  decimated to 152 verts / 300 tris (1 colour keys) 7 ms
+  coloured 152 verts (0 crisp splits) 0 ms
+  wrote creatures/f_slurry.glb (693 KB, 13000 tris, 10307 verts) in 1673 ms
+f_stoke: 12 bones, res 0.01 m, target 12000 tris
+  field 120x181x105 (2.28M voxels, 71 parts) 227 ms
+  surface nets 52892 verts / 105804 tris 119 ms
+  decimated to 5990 verts / 12000 tris (45 colour keys) 2438 ms
+  coloured 10237 verts (3582 crisp splits) 155 ms
+  skinned 10237 verts 75 ms
+  gore piece:
+  field 26x41x26 (0.03M voxels, 1 parts) 7 ms
+  surface nets 832 verts / 1660 tris 7 ms
+  decimated to 152 verts / 300 tris (1 colour keys) 22 ms
+  coloured 152 verts (0 crisp splits) 0 ms
+  wrote creatures/f_stoke.glb (684 KB, 12000 tris, 10237 verts) in 3082 ms
+npc_blister: 3 bones, res 0.008 m, target 1500 tris
+  field 122x98x85 (1.02M voxels, 16 parts) 160 ms
+  surface nets 25908 verts / 51812 tris 75 ms
+  decimated to 752 verts / 1500 tris (9 colour keys) 1078 ms
+  coloured 1045 verts (239 crisp splits) 4 ms
+  skinned 1045 verts 1 ms
+  gore piece:
+  field 33x36x54 (0.06M voxels, 1 parts) 3 ms
+  surface nets 2874 verts / 5744 tris 4 ms
+  decimated to 102 verts / 200 tris (1 colour keys) 46 ms
+  coloured 102 verts (0 crisp splits) 0 ms
+  wrote creatures/npc_blister.glb (79 KB, 1500 tris, 1045 verts) in 1375 ms
+npc_kid_lamprey: 13 bones, res 0.009 m, target 9000 tris
+  field 90x177x114 (1.82M voxels, 65 parts) 131 ms
+  surface nets 43558 verts / 87184 tris 92 ms
+  decimated to 4466 verts / 9000 tris (21 colour keys) 1460 ms
+  coloured 7658 verts (2685 crisp splits) 67 ms
+  skinned 7658 verts 23 ms
+  gore piece:
+  field 24x37x24 (0.02M voxels, 1 parts) 1 ms
+  surface nets 562 verts / 1120 tris 1 ms
+  decimated to 152 verts / 300 tris (1 colour keys) 4 ms
+  coloured 152 verts (0 crisp splits) 0 ms
+  wrote creatures/npc_kid_lamprey.glb (515 KB, 9000 tris, 7658 verts) in 1783 ms
+npc_scrapling: 8 bones, res 0.009 m, target 1900 tris
+  field 80x117x62 (0.58M voxels, 26 parts) 32 ms
+  surface nets 21207 verts / 42428 tris 31 ms
+  decimated to 943 verts / 1900 tris (21 colour keys) 713 ms
+  coloured 1819 verts (700 crisp splits) 8 ms
+  skinned 1819 verts 13 ms
+  gore piece:
+  field 80x23x80 (0.15M voxels, 2 parts) 13 ms
+  surface nets 8922 verts / 17840 tris 13 ms
+  decimated to 152 verts / 300 tris (2 colour keys) 342 ms
+  coloured 190 verts (35 crisp splits) 1 ms
+  wrote creatures/npc_scrapling.glb (131 KB, 1900 tris, 1819 verts) in 1168 ms
+crowd_fan_a: 1 bones, res 0.014 m, target 520 tris
+  field 92x122x53 (0.59M voxels, 12 parts) 53 ms
+  surface nets 18378 verts / 36752 tris 28 ms
+  decimated to 262 verts / 520 tris (9 colour keys) 649 ms
+  coloured 411 verts (121 crisp splits) 1 ms
+  skinned 411 verts 1 ms
+  wrote crowd/fan_a.glb (29 KB, 520 tris, 411 verts) in 733 ms
+crowd_fan_b: 1 bones, res 0.014 m, target 520 tris
+  field 66x129x46 (0.39M voxels, 14 parts) 37 ms
+  surface nets 14574 verts / 29144 tris 23 ms
+  decimated to 262 verts / 520 tris (8 colour keys) 961 ms
+  coloured 431 verts (131 crisp splits) 2 ms
+  skinned 431 verts 1 ms
+  wrote crowd/fan_b.glb (31 KB, 520 tris, 431 verts) in 1038 ms
+hub_barnaby_bellows: 1 bones, res 0.01 m, target 9000 tris
+  field 239x191x122 (5.57M voxels, 31 parts) 377 ms
+  surface nets 46474 verts / 92984 tris 349 ms
+  decimated to 4482 verts / 9000 tris (20 colour keys) 2120 ms
+  coloured 8657 verts (3102 crisp splits) 69 ms
+  skinned 8657 verts 33 ms
+  wrote hub/barnaby_bellows.glb (564 KB, 9000 tris, 8657 verts) in 2959 ms
+hub_doc_sutura: 1 bones, res 0.009 m, target 9000 tris
+  field 134x166x140 (3.11M voxels, 76 parts) 253 ms
+  surface nets 48573 verts / 97296 tris 186 ms
+  decimated to 4425 verts / 9000 tris (16 colour keys) 2136 ms
+  coloured 6416 verts (1683 crisp splits) 65 ms
+  skinned 6416 verts 9 ms
+  wrote hub/doc_sutura.glb (432 KB, 9000 tris, 6416 verts) in 2654 ms
+hub_granny_haymaker: 1 bones, res 0.009 m, target 7000 tris
+  field 113x160x127 (2.30M voxels, 39 parts) 137 ms
+  surface nets 41597 verts / 83192 tris 132 ms
+  decimated to 3501 verts / 7000 tris (27 colour keys) 1685 ms
+  coloured 6068 verts (2140 crisp splits) 28 ms
+  skinned 6068 verts 11 ms
+  wrote hub/granny_haymaker.glb (400 KB, 7000 tris, 6068 verts) in 2000 ms
+hub_kid_lamprey: 1 bones, res 0.009 m, target 8000 tris
+  field 106x204x101 (2.18M voxels, 43 parts) 140 ms
+  surface nets 48423 verts / 96884 tris 94 ms
+  decimated to 3981 verts / 8000 tris (15 colour keys) 1858 ms
+  coloured 6275 verts (1907 crisp splits) 38 ms
+  skinned 6275 verts 12 ms
+  wrote hub/kid_lamprey.glb (417 KB, 8000 tris, 6275 verts) in 2146 ms
+hub_ludlow: 1 bones, res 0.011 m, target 9000 tris
+  field 161x176x101 (2.86M voxels, 41 parts) 279 ms
+  surface nets 67184 verts / 134364 tris 126 ms
+  decimated to 4502 verts / 9000 tris (19 colour keys) 2814 ms
+  coloured 6404 verts (1644 crisp splits) 40 ms
+  skinned 6404 verts 21 ms
+  wrote hub/ludlow.glb (431 KB, 9000 tris, 6404 verts) in 3285 ms
+hub_needles: 1 bones, res 0.009 m, target 8000 tris
+  field 104x176x107 (1.96M voxels, 65 parts) 125 ms
+  surface nets 48000 verts / 96028 tris 92 ms
+  decimated to 3987 verts / 8000 tris (20 colour keys) 1996 ms
+  coloured 5987 verts (1706 crisp splits) 42 ms
+  skinned 5987 verts 12 ms
+  wrote hub/needles.glb (401 KB, 8000 tris, 5987 verts) in 2271 ms
+hub_snappington_desk: 1 bones, res 0.012 m, target 12000 tris
+  field 182x115x249 (5.21M voxels, 94 parts) 664 ms
+  surface nets 144460 verts / 289304 tris 264 ms
+  decimated to 5808 verts / 12000 tris (38 colour keys) 9875 ms
+  coloured 11738 verts (4999 crisp splits) 140 ms
+  skinned 11738 verts 26 ms
+  wrote hub/snappington_desk.glb (763 KB, 12000 tris, 11738 verts) in 10987 ms
+hub_teddy_two_tooth: 1 bones, res 0.008 m, target 7000 tris
+  field 96x148x119 (1.69M voxels, 37 parts) 92 ms
+  surface nets 38180 verts / 76376 tris 76 ms
+  decimated to 3492 verts / 7000 tris (20 colour keys) 1403 ms
+  coloured 5151 verts (1443 crisp splits) 34 ms
+  skinned 5151 verts 7 ms
+  wrote hub/teddy_two_tooth.glb (346 KB, 7000 tris, 5151 verts) in 1615 ms
+forged 22 model(s), 0 failure(s); stats: ..\captures\baseline-stats.json

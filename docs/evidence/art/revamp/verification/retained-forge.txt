@@ -1,0 +1,83 @@
+preserved boss_bilge: rebuild with tools/blender/rebuild.ps1
+preserved boss_conduit: rebuild with tools/blender/rebuild.ps1
+preserved boss_snappington: rebuild with tools/blender/rebuild.ps1
+preserved f_dozer: rebuild with tools/blender/rebuild.ps1
+preserved f_dredge: rebuild with tools/blender/rebuild.ps1
+preserved f_gusto: rebuild with tools/blender/rebuild.ps1
+preserved f_jitters: rebuild with tools/blender/rebuild.ps1
+preserved f_slurry: rebuild with tools/blender/rebuild.ps1
+preserved f_stoke: rebuild with tools/blender/rebuild.ps1
+preserved npc_blister: rebuild with tools/blender/rebuild.ps1
+preserved npc_kid_lamprey: rebuild with tools/blender/rebuild.ps1
+preserved npc_scrapling: rebuild with tools/blender/rebuild.ps1
+crowd_fan_a: 1 bones, res 0.014 m, target 520 tris
+  field 92x122x53 (0.59M voxels, 12 parts) 37 ms
+  surface nets 18378 verts / 36752 tris 51 ms
+  decimated to 262 verts / 520 tris (9 colour keys) 365 ms
+  coloured 411 verts (121 crisp splits) 2 ms
+  skinned 411 verts 2 ms
+  wrote crowd/fan_a.glb (29 KB, 520 tris, 411 verts) in 467 ms
+crowd_fan_b: 1 bones, res 0.014 m, target 520 tris
+  field 66x129x46 (0.39M voxels, 14 parts) 24 ms
+  surface nets 14574 verts / 29144 tris 35 ms
+  decimated to 262 verts / 520 tris (8 colour keys) 265 ms
+  coloured 431 verts (131 crisp splits) 1 ms
+  skinned 431 verts 2 ms
+  wrote crowd/fan_b.glb (31 KB, 520 tris, 431 verts) in 330 ms
+hub_barnaby_bellows: 1 bones, res 0.01 m, target 9000 tris
+  field 239x191x122 (5.57M voxels, 31 parts) 108 ms
+  surface nets 46474 verts / 92984 tris 184 ms
+  decimated to 4482 verts / 9000 tris (20 colour keys) 1074 ms
+  coloured 8657 verts (3102 crisp splits) 38 ms
+  skinned 8657 verts 13 ms
+  wrote hub/barnaby_bellows.glb (564 KB, 9000 tris, 8657 verts) in 1426 ms
+hub_doc_sutura: 1 bones, res 0.009 m, target 9000 tris
+  field 134x166x140 (3.11M voxels, 76 parts) 131 ms
+  surface nets 48573 verts / 97296 tris 178 ms
+  decimated to 4425 verts / 9000 tris (16 colour keys) 1000 ms
+  coloured 6416 verts (1683 crisp splits) 40 ms
+  skinned 6416 verts 17 ms
+  wrote hub/doc_sutura.glb (432 KB, 9000 tris, 6416 verts) in 1374 ms
+hub_granny_haymaker: 1 bones, res 0.009 m, target 7000 tris
+  field 113x160x127 (2.30M voxels, 39 parts) 94 ms
+  surface nets 41597 verts / 83192 tris 130 ms
+  decimated to 3501 verts / 7000 tris (27 colour keys) 728 ms
+  coloured 6068 verts (2140 crisp splits) 19 ms
+  skinned 6068 verts 7 ms
+  wrote hub/granny_haymaker.glb (400 KB, 7000 tris, 6068 verts) in 983 ms
+hub_kid_lamprey: 1 bones, res 0.009 m, target 8000 tris
+  field 106x204x101 (2.18M voxels, 43 parts) 125 ms
+  surface nets 48423 verts / 96884 tris 79 ms
+  decimated to 3981 verts / 8000 tris (15 colour keys) 898 ms
+  coloured 6275 verts (1907 crisp splits) 29 ms
+  skinned 6275 verts 14 ms
+  wrote hub/kid_lamprey.glb (417 KB, 8000 tris, 6275 verts) in 1149 ms
+hub_ludlow: 1 bones, res 0.011 m, target 9000 tris
+  field 161x176x101 (2.86M voxels, 41 parts) 178 ms
+  surface nets 67184 verts / 134364 tris 106 ms
+  decimated to 4502 verts / 9000 tris (19 colour keys) 1520 ms
+  coloured 6404 verts (1644 crisp splits) 29 ms
+  skinned 6404 verts 13 ms
+  wrote hub/ludlow.glb (431 KB, 9000 tris, 6404 verts) in 1848 ms
+hub_needles: 1 bones, res 0.009 m, target 8000 tris
+  field 104x176x107 (1.96M voxels, 65 parts) 110 ms
+  surface nets 48000 verts / 96028 tris 75 ms
+  decimated to 3987 verts / 8000 tris (20 colour keys) 911 ms
+  coloured 5987 verts (1706 crisp splits) 29 ms
+  skinned 5987 verts 8 ms
+  wrote hub/needles.glb (401 KB, 8000 tris, 5987 verts) in 1138 ms
+hub_snappington_desk: 1 bones, res 0.012 m, target 12000 tris
+  field 182x115x249 (5.21M voxels, 94 parts) 477 ms
+  surface nets 144460 verts / 289304 tris 178 ms
+  decimated to 5808 verts / 12000 tris (38 colour keys) 4322 ms
+  coloured 11738 verts (4999 crisp splits) 99 ms
+  skinned 11738 verts 25 ms
+  wrote hub/snappington_desk.glb (763 KB, 12000 tris, 11738 verts) in 5107 ms
+hub_teddy_two_tooth: 1 bones, res 0.008 m, target 7000 tris
+  field 96x148x119 (1.69M voxels, 37 parts) 73 ms
+  surface nets 38180 verts / 76376 tris 64 ms
+  decimated to 3492 verts / 7000 tris (20 colour keys) 736 ms
+  coloured 5151 verts (1443 crisp splits) 20 ms
+  skinned 5151 verts 6 ms
+  wrote hub/teddy_two_tooth.glb (346 KB, 7000 tris, 5151 verts) in 901 ms
+forged 10 model(s), 0 failure(s); stats: ..\captures\retained-forge-stats.json

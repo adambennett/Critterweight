@@ -1,0 +1,156 @@
+{
+  "models": [
+    {
+      "id": "f_stoke",
+      "beforeTriangles": 12300,
+      "afterTriangles": 11876,
+      "beforeBytes": 700272,
+      "afterBytes": 484908,
+      "sourceBytes": 820798,
+      "maxWeights": 2,
+      "outsideP95cm": 3.545,
+      "outsideMaxCm": 4.976,
+      "sha256": "6de45966f1bc89b2ae9d801493cf991e719e0a755e329ce4d9891c793842b0b2"
+    },
+    {
+      "id": "f_jitters",
+      "beforeTriangles": 10400,
+      "afterTriangles": 9196,
+      "beforeBytes": 558080,
+      "afterBytes": 340012,
+      "sourceBytes": 618327,
+      "maxWeights": 2,
+      "outsideP95cm": 2.306,
+      "outsideMaxCm": 4.85,
+      "sha256": "3d43a61cc5d89c6e8d37f4c679fcbd811f9bdf1b5dfd9bf42e3d30e5659ea8c8"
+    },
+    {
+      "id": "f_dredge",
+      "beforeTriangles": 14300,
+      "afterTriangles": 11512,
+      "beforeBytes": 813692,
+      "afterBytes": 425908,
+      "sourceBytes": 903860,
+      "maxWeights": 2,
+      "outsideP95cm": 2.763,
+      "outsideMaxCm": 4.356,
+      "sha256": "549ef28119bd564b8aba31054cf0c1c5b5932b2dd2cdd212b77c9fc26d8289a6"
+    },
+    {
+      "id": "f_slurry",
+      "beforeTriangles": 13300,
+      "afterTriangles": 7732,
+      "beforeBytes": 709852,
+      "afterBytes": 286860,
+      "sourceBytes": 780047,
+      "maxWeights": 2,
+      "outsideP95cm": 1.605,
+      "outsideMaxCm": 5.312,
+      "sha256": "ec8dcfbc2a5de00b012ea35f43bdf080866ad5624858b3866009ee9f7d35640e"
+    },
+    {
+      "id": "f_gusto",
+      "beforeTriangles": 12360,
+      "afterTriangles": 10036,
+      "beforeBytes": 667756,
+      "afterBytes": 372596,
+      "sourceBytes": 756082,
+      "maxWeights": 2,
+      "outsideP95cm": 2.639,
+      "outsideMaxCm": 5.911,
+      "sha256": "829f564f68fe97af66dbc5922551426791f326fa01c289f0c81d91bb724ccb3a"
+    },
+    {
+      "id": "f_dozer",
+      "beforeTriangles": 14300,
+      "afterTriangles": 11624,
+      "beforeBytes": 785836,
+      "afterBytes": 454440,
+      "sourceBytes": 885773,
+      "maxWeights": 2,
+      "outsideP95cm": 2.69,
+      "outsideMaxCm": 4.517,
+      "sha256": "357de8b27ba485170b6f6336a65f0f6ace79553a2b59644d133e40f7d634c478"
+    },
+    {
+      "id": "boss_bilge",
+      "beforeTriangles": 18300,
+      "afterTriangles": 20400,
+      "beforeBytes": 976068,
+      "afterBytes": 746412,
+      "sourceBytes": 1119104,
+      "maxWeights": 2,
+      "outsideP95cm": 2.196,
+      "outsideMaxCm": 4.783,
+      "sha256": "a979f40d6a4d949b4a5e61fedd59de5f94840bb13facdba16dd591614a75fa61"
+    },
+    {
+      "id": "boss_conduit",
+      "beforeTriangles": 16300,
+      "afterTriangles": 12368,
+      "beforeBytes": 964528,
+      "afterBytes": 510140,
+      "sourceBytes": 955006,
+      "maxWeights": 2,
+      "outsideP95cm": 2.22,
+      "outsideMaxCm": 4.2,
+      "sha256": "a92b177837efb70e65d85eb805714665ad71d60a6283eee919d8458717d06ef0"
+    },
+    {
+      "id": "boss_snappington",
+      "beforeTriangles": 18500,
+      "afterTriangles": 22460,
+      "beforeBytes": 1175040,
+      "afterBytes": 816624,
+      "sourceBytes": 1207958,
+      "maxWeights": 2,
+      "outsideP95cm": 3.835,
+      "outsideMaxCm": 5.36,
+      "sha256": "48274a3e67a8baa33fcb8fbcc07a7c09f59d5788dd4ae6541653c14723132e66"
+    },
+    {
+      "id": "npc_scrapling",
+      "beforeTriangles": 2200,
+      "afterTriangles": 1760,
+      "beforeBytes": 134480,
+      "afterBytes": 110020,
+      "sourceBytes": 246972,
+      "maxWeights": 2,
+      "outsideP95cm": 2.572,
+      "outsideMaxCm": 4.531,
+      "sha256": "46590c9cac387b1fd81b616b2fd4df6d7da2b21831b76ef50dd9194ef6e7015a"
+    },
+    {
+      "id": "npc_blister",
+      "beforeTriangles": 1700,
+      "afterTriangles": 1772,
+      "beforeBytes": 80432,
+      "afterBytes": 69464,
+      "sourceBytes": 202993,
+      "maxWeights": 2,
+      "outsideP95cm": 1.764,
+      "outsideMaxCm": 2.423,
+      "sha256": "0e46d657a6bc604bd79dcb0f8fd7f1df336a5fa76f9eed99b539161d24c94ce1"
+    },
+    {
+      "id": "npc_kid_lamprey",
+      "beforeTriangles": 9300,
+      "afterTriangles": 1988,
+      "beforeBytes": 526856,
+      "afterBytes": 89884,
+      "sourceBytes": 608165,
+      "maxWeights": 2,
+      "outsideP95cm": 2.885,
+      "outsideMaxCm": 4.525,
+      "sha256": "0671700d65f0aa3b40019bd4515dad4803a97ae5f1d777a70bf2f46a4b966754"
+    }
+  ],
+  "totals": {
+    "beforeTriangles": 143260,
+    "afterTriangles": 122724,
+    "beforeBytes": 8092892,
+    "afterBytes": 4707268,
+    "sourceBytes": 9105085
+  },
+  "textures": 0
+}

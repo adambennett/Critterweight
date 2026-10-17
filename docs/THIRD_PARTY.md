@@ -58,3 +58,29 @@ build).
   ever used, re-check that its component list matches what ships.
 * **Credits names.** `credits.json` credits the project lead by the name on the repository's commits; confirm before
   release.
+
+
+## Creature revamp provenance (2026-10-16)
+
+The art branch adds original editable Blender geometry under `tools/blender` and GLBs under
+`game/assets/models/creatures`. `tools/blender/adopted.json` records source ownership; the original forge
+continues to own the remaining models. This supersedes the all-forge inventory above only for adopted
+models. No third-party meshes, textures, HDRIs, asset-library items or generated 3D services were used.
+
+The **thirteen concept sheets for twelve creatures** in `docs/evidence/art/concepts/*-turnaround-v*.jpg` were generated with
+Codex's built-in OpenAI `image_gen` on 2026-10-16. The underlying model identifier was not exposed.
+Every exact prompt, output file, original PNG hash, date, tool/model disclosure and processing note is
+in [`evidence/art/concepts/prompts.json`](evidence/art/concepts/prompts.json), with usage and terms described
+in [ART_PIPELINE.md, section 8](ART_PIPELINE.md#8-generated-concept-provenance). Source PNGs are retained on B:;
+committed copies are JPEG quality 86. These are design references only; no generated raster texture ships.
+Applicable terms: https://openai.com/policies/terms-of-use/ and, where applicable to the account,
+https://openai.com/policies/services-agreement/ (checked 2026-10-16). Output rights follow the applicable
+agreement and law; output may not be unique. Designs and meshes were made for Critterweight under the
+project lead's direction, without franchise or third-party character references.
+
+Build-only tools: Blender **5.2.2 LTS** (Blender Foundation/contributors, GNU GPL; https://www.blender.org/about/license/)
+and optional **mcp-for-blender 2.1.9** (Siddharth Ahuja/contributors, MIT;
+https://github.com/ahujasid/mcp-for-blender, commit `7a0373ec9199183cb460068c4f96aed9c579fb4f`).
+The bridge and its dependencies are local tools, not shipped or embedded in committed `.blend` files.
+The bridge's optional asset/AI services and telemetry are disabled. Native MCP status reports add-on 1.8 / protocol 13. A local, non-shipping configuration stub supplies disabled telemetry because that optional module is absent from the source archive; no service credentials are present. Blender's own Python API is used by the original
+model/export helpers. No additional Blender extensions or asset libraries were used.

@@ -1,0 +1,410 @@
+[
+ {
+  "id": "crowd_fan_a",
+  "out": "crowd/fan_a.glb",
+  "bytes": 30124,
+  "vertices": 411,
+  "triangles": 520,
+  "materials": [
+   "eye",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.615,
+    0.045,
+    -0.345
+   ],
+   "max": [
+    0.625,
+    1.705,
+    0.345
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 411
+   }
+  ],
+  "resolution": 0.014,
+  "grid": [
+   92,
+   122,
+   53
+  ],
+  "ms": 467,
+  "definition": "tools/forge/defs/crowd/fan_a.js"
+ },
+ {
+  "id": "crowd_fan_b",
+  "out": "crowd/fan_b.glb",
+  "bytes": 31700,
+  "vertices": 431,
+  "triangles": 520,
+  "materials": [
+   "can",
+   "eye",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.435,
+    0.065,
+    -0.285
+   ],
+   "max": [
+    0.435,
+    1.825,
+    0.315
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 431
+   }
+  ],
+  "resolution": 0.014,
+  "grid": [
+   66,
+   129,
+   46
+  ],
+  "ms": 330,
+  "definition": "tools/forge/defs/crowd/fan_b.js"
+ },
+ {
+  "id": "hub_barnaby_bellows",
+  "out": "hub/barnaby_bellows.glb",
+  "bytes": 577356,
+  "vertices": 8657,
+  "triangles": 9000,
+  "materials": [
+   "beak",
+   "cloth",
+   "eye",
+   "metal",
+   "sequin",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -1.18,
+    -0.04,
+    -0.355
+   ],
+   "max": [
+    1.18,
+    1.837,
+    0.835
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 8657
+   }
+  ],
+  "resolution": 0.01,
+  "grid": [
+   239,
+   191,
+   122
+  ],
+  "ms": 1426,
+  "definition": "tools/forge/defs/hub/barnaby_bellows.js"
+ },
+ {
+  "id": "hub_doc_sutura",
+  "out": "hub/doc_sutura.glb",
+  "bytes": 442104,
+  "vertices": 6416,
+  "triangles": 9000,
+  "materials": [
+   "cloth",
+   "eye",
+   "metal",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.623,
+    -0.02,
+    -0.61
+   ],
+   "max": [
+    0.549,
+    1.443,
+    0.619
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 6416
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   134,
+   166,
+   140
+  ],
+  "ms": 1374,
+  "definition": "tools/forge/defs/hub/doc_sutura.js"
+ },
+ {
+  "id": "hub_granny_haymaker",
+  "out": "hub/granny_haymaker.glb",
+  "bytes": 409624,
+  "vertices": 6068,
+  "triangles": 7000,
+  "materials": [
+   "cloth",
+   "eye",
+   "fur",
+   "gold",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.492,
+    -0.088,
+    -0.588
+   ],
+   "max": [
+    0.492,
+    1.318,
+    0.522
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 6068
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   113,
+   160,
+   127
+  ],
+  "ms": 983,
+  "definition": "tools/forge/defs/hub/granny_haymaker.js"
+ },
+ {
+  "id": "hub_kid_lamprey",
+  "out": "hub/kid_lamprey.glb",
+  "bytes": 427276,
+  "vertices": 6275,
+  "triangles": 8000,
+  "materials": [
+   "cloth",
+   "eye",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.463,
+    -0.083,
+    -0.613
+   ],
+   "max": [
+    0.463,
+    1.722,
+    0.265
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 6275
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   106,
+   204,
+   101
+  ],
+  "ms": 1149,
+  "definition": "tools/forge/defs/hub/kid_lamprey.js"
+ },
+ {
+  "id": "hub_ludlow",
+  "out": "hub/ludlow.glb",
+  "bytes": 441748,
+  "vertices": 6404,
+  "triangles": 9000,
+  "materials": [
+   "cloth",
+   "eye",
+   "metal",
+   "skin",
+   "wood"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.8,
+    -0.098,
+    -0.468
+   ],
+   "max": [
+    0.938,
+    1.797,
+    0.606
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 6404
+   }
+  ],
+  "resolution": 0.011,
+  "grid": [
+   161,
+   176,
+   101
+  ],
+  "ms": 1848,
+  "definition": "tools/forge/defs/hub/ludlow.js"
+ },
+ {
+  "id": "hub_needles",
+  "out": "hub/needles.glb",
+  "bytes": 411112,
+  "vertices": 5987,
+  "triangles": 8000,
+  "materials": [
+   "can",
+   "cloth",
+   "eye",
+   "fur",
+   "gold",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.453,
+    -0.063,
+    -0.49
+   ],
+   "max": [
+    0.453,
+    1.494,
+    0.443
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 5987
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   104,
+   176,
+   107
+  ],
+  "ms": 1138,
+  "definition": "tools/forge/defs/hub/needles.js"
+ },
+ {
+  "id": "hub_snappington_desk",
+  "out": "hub/snappington_desk.glb",
+  "bytes": 781368,
+  "vertices": 11738,
+  "triangles": 12000,
+  "materials": [
+   "cloth",
+   "eye",
+   "gold",
+   "horn",
+   "lens",
+   "metal",
+   "shell",
+   "skin",
+   "wood"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -1.073,
+    -0.052,
+    -2.018
+   ],
+   "max": [
+    1.073,
+    1.286,
+    0.93
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 11738
+   }
+  ],
+  "resolution": 0.012,
+  "grid": [
+   182,
+   115,
+   249
+  ],
+  "ms": 5107,
+  "definition": "tools/forge/defs/hub/snappington_desk.js"
+ },
+ {
+  "id": "hub_teddy_two_tooth",
+  "out": "hub/teddy_two_tooth.glb",
+  "bytes": 354612,
+  "vertices": 5151,
+  "triangles": 7000,
+  "materials": [
+   "cloth",
+   "eye",
+   "fur",
+   "skin",
+   "visor"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.41,
+    -0.05,
+    -0.465
+   ],
+   "max": [
+    0.33,
+    1.106,
+    0.46
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 5151
+   }
+  ],
+  "resolution": 0.008,
+  "grid": [
+   96,
+   148,
+   119
+  ],
+  "ms": 901,
+  "definition": "tools/forge/defs/hub/teddy_two_tooth.js"
+ }
+]

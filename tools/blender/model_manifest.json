@@ -1,0 +1,112 @@
+[
+  {
+    "id": "boss_bilge",
+    "creature": "game/content/core/bosses/boss_bilge.json",
+    "out": "creatures/boss_bilge.glb"
+  },
+  {
+    "id": "boss_conduit",
+    "creature": "game/content/core/bosses/boss_conduit.json",
+    "out": "creatures/boss_conduit.glb"
+  },
+  {
+    "id": "boss_snappington",
+    "creature": "game/content/core/bosses/boss_snappington.json",
+    "out": "creatures/boss_snappington.glb"
+  },
+  {
+    "id": "f_dozer",
+    "creature": "game/content/core/creatures/f_dozer.json",
+    "out": "creatures/f_dozer.glb"
+  },
+  {
+    "id": "f_dredge",
+    "creature": "game/content/core/creatures/f_dredge.json",
+    "out": "creatures/f_dredge.glb"
+  },
+  {
+    "id": "f_gusto",
+    "creature": "game/content/core/creatures/f_gusto.json",
+    "out": "creatures/f_gusto.glb"
+  },
+  {
+    "id": "f_jitters",
+    "creature": "game/content/core/creatures/f_jitters.json",
+    "out": "creatures/f_jitters.glb"
+  },
+  {
+    "id": "f_slurry",
+    "creature": "game/content/core/creatures/f_slurry.json",
+    "out": "creatures/f_slurry.glb"
+  },
+  {
+    "id": "f_stoke",
+    "creature": "game/content/core/creatures/f_stoke.json",
+    "out": "creatures/f_stoke.glb"
+  },
+  {
+    "id": "npc_blister",
+    "creature": "game/content/core/minions/npc_blister.json",
+    "out": "creatures/npc_blister.glb"
+  },
+  {
+    "id": "npc_kid_lamprey",
+    "creature": "game/content/core/creatures/npc_kid_lamprey.json",
+    "out": "creatures/npc_kid_lamprey.glb"
+  },
+  {
+    "id": "npc_scrapling",
+    "creature": "game/content/core/minions/npc_scrapling.json",
+    "out": "creatures/npc_scrapling.glb"
+  },
+  {
+    "id": "crowd_fan_a",
+    "creature": null,
+    "out": "crowd/fan_a.glb"
+  },
+  {
+    "id": "crowd_fan_b",
+    "creature": null,
+    "out": "crowd/fan_b.glb"
+  },
+  {
+    "id": "hub_barnaby_bellows",
+    "creature": null,
+    "out": "hub/barnaby_bellows.glb"
+  },
+  {
+    "id": "hub_doc_sutura",
+    "creature": null,
+    "out": "hub/doc_sutura.glb"
+  },
+  {
+    "id": "hub_granny_haymaker",
+    "creature": null,
+    "out": "hub/granny_haymaker.glb"
+  },
+  {
+    "id": "hub_kid_lamprey",
+    "creature": null,
+    "out": "hub/kid_lamprey.glb"
+  },
+  {
+    "id": "hub_ludlow",
+    "creature": null,
+    "out": "hub/ludlow.glb"
+  },
+  {
+    "id": "hub_needles",
+    "creature": null,
+    "out": "hub/needles.glb"
+  },
+  {
+    "id": "hub_snappington_desk",
+    "creature": null,
+    "out": "hub/snappington_desk.glb"
+  },
+  {
+    "id": "hub_teddy_two_tooth",
+    "creature": null,
+    "out": "hub/teddy_two_tooth.glb"
+  }
+]

@@ -1,0 +1,119 @@
+{
+  "method": "ABBA order under one shared default-TEMP lock; two 30-second runs per model set and preset, 5-second warmup, eight fighters, seed 7. Means of run fps and run p95 values; not a pooled percentile.",
+  "machine": "Intel i7-7700K / RTX 4070 Ti SUPER / Windows / Godot 4.5.1 Forward+",
+  "hardwareLimit": "Deck preset on desktop; no Steam Deck hardware claim.",
+  "runs": [
+    {
+      "file": "before-1-deck.json",
+      "fps": 169.004563123204,
+      "frameP95ms": 8.985,
+      "slowFramePercent": 0.19723865877712,
+      "hits": 72,
+      "alive": 8
+    },
+    {
+      "file": "before-2-deck.json",
+      "fps": 178.635226866738,
+      "frameP95ms": 10.409,
+      "slowFramePercent": 1.71673819742489,
+      "hits": 72,
+      "alive": 8
+    },
+    {
+      "file": "after-1-deck.json",
+      "fps": 179.372197309417,
+      "frameP95ms": 9.235,
+      "slowFramePercent": 0.650436721798922,
+      "hits": 72,
+      "alive": 8
+    },
+    {
+      "file": "after-2-deck.json",
+      "fps": 200.601805416249,
+      "frameP95ms": 8.146,
+      "slowFramePercent": 0.431965442764579,
+      "hits": 72,
+      "alive": 8
+    },
+    {
+      "file": "before-1-high.json",
+      "fps": 143.740117866897,
+      "frameP95ms": 12.338,
+      "slowFramePercent": 2.78293135435993,
+      "hits": 66,
+      "alive": 8
+    },
+    {
+      "file": "before-2-high.json",
+      "fps": 216.262975778547,
+      "frameP95ms": 8.417,
+      "slowFramePercent": 0.585606410849129,
+      "hits": 24,
+      "alive": 8
+    },
+    {
+      "file": "after-1-high.json",
+      "fps": 180.701120346946,
+      "frameP95ms": 8.515,
+      "slowFramePercent": 0.276701715550636,
+      "hits": 72,
+      "alive": 8
+    },
+    {
+      "file": "after-2-high.json",
+      "fps": 238.208670795617,
+      "frameP95ms": 7.837,
+      "slowFramePercent": 0.20987827060305,
+      "hits": 2,
+      "alive": 8
+    }
+  ],
+  "presets": [
+    {
+      "preset": "deck",
+      "before": {
+        "meanRunFps": 173.819894994971,
+        "meanRunP95ms": 9.697,
+        "slowFramePercent": 0.9780419982740435,
+        "meanDrawCalls": 557.8475000000001,
+        "meanPrimitives": 725401.7505000001,
+        "meanVideoMemoryMB": 137.41845703125
+      },
+      "after": {
+        "meanRunFps": 189.98700136283298,
+        "meanRunP95ms": 8.6905,
+        "slowFramePercent": 0.5350877192982456,
+        "meanDrawCalls": 523.4935,
+        "meanPrimitives": 532905.3385,
+        "meanVideoMemoryMB": 135.44807434082
+      },
+      "fpsChangePercent": 9.301067848608312,
+      "p95ChangePercent": -10.379498814066201,
+      "meanFpsNoRegression": true,
+      "meanP95NoRegression": true
+    },
+    {
+      "preset": "high",
+      "before": {
+        "meanRunFps": 180.001546822722,
+        "meanRunP95ms": 10.3775,
+        "slowFramePercent": 1.4628275159707433,
+        "meanDrawCalls": 925.4155,
+        "meanPrimitives": 1165105.341,
+        "meanVideoMemoryMB": 323.760887145996
+      },
+      "after": {
+        "meanRunFps": 209.4548955712815,
+        "meanRunP95ms": 8.176,
+        "slowFramePercent": 0.23870146403564607,
+        "meanDrawCalls": 854.333,
+        "meanPrimitives": 733323.709,
+        "meanVideoMemoryMB": 319.05945587158203
+      },
+      "fpsChangePercent": 16.36283091365165,
+      "p95ChangePercent": -21.21416526138279,
+      "meanFpsNoRegression": true,
+      "meanP95NoRegression": true
+    }
+  ]
+}
