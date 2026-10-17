@@ -145,6 +145,19 @@ Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the camp
    - range 1.05-1.4 m with aggression 0: Slurry 3-9, Dozer 6-6, Stoke 8-4, Gusto 5-7, but Jitters 1-11 (was 4-8);
    - range 1.15-1.5 m: Slurry 1-11, Jitters 3-9, Dozer 9-3.
    Next: per-opponent spacing, or Dredge's kit reach, measured on 36-bout pairings.
+   **24-bout baseline (2026-10-16, pro tier, after D-034):** Dredge has the slowest jab in the roster: 0.16 s,
+   against Dozer 0.14, Slurry 0.13, Stoke 0.12, Gusto 0.09 and Jitters 0.06. His records:
+   - Slurry 1-23;
+   - Dozer 12-12;
+   - Jitters 6-18;
+   - Stoke 14-10;
+   - Gusto 9-15.
+   That is 35 % overall.
+
+   **Tried and reverted:** a jab at Dozer's speed. The hit window moved to 0.14-0.22, the windup keys about
+   0.02 s earlier, and the lunge went from 2.0 to 2.4 m/s. Results: Slurry 0-24, Dozer 9-15, Jitters 6-18,
+   so jab speed is not the lever. Look at Dredge's AI next (he holds 1.25-1.6 m, inside Slurry's lunge) or at
+   his kit reach.
 
    Per-move breakdowns of the other extreme pairings (4 Contender bouts each, different seeds):
    - **Jitters vs Stoke 4-0.** Stoke's jab lands 7 times against Jitters, against 19 times on Gusto. Jitters
