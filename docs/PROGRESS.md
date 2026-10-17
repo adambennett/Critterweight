@@ -1,6 +1,8 @@
 # Progress
 
-## Status (2026-10-17) — paused for the playtest week at v0.9.10 (the new creature art)
+## Status (2026-10-17) — paused for the playtest week at v0.9.11 (combat feel)
+
+**Combat feel (0.9.11, D-035).** Hits now pause the match, punch the camera, jolt the struck body and stay lit on the health bar; walls and crowd figures between the camera and the fighters fade or shrink away. Mashed attacks still miss often (15-41 % land against the regular bot); attack magnetism is a separate, measured change for later.
 
 Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under

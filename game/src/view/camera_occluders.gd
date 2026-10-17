@@ -14,10 +14,40 @@ const MIN_HEIGHT := 0.6       ## shorter meshes never cover a fighter
 const MIN_TOP := 1.0          ## nor do meshes that end below the fighters' chests
 const INTERVAL_US := 33000    ## re-test at most ~30 times a second (fades are eased anyway)
 
+const CROWD_CLEAR := 0.9      ## crowd figures this close to a line of sight shrink out of the way
+const CROWD_NEAR := 7.0       ## only figures this close to the camera are tested
+const CROWD_CLOSE := 3.0      ## figures this close to the camera always shrink away
+
 ## [{node, aabb (local), r (bounding radius), base (own transparency), t, moving, inv, c}]
 var _items: Array = []
 var _last_us := 0
 var _blocking := 0
+var _crowd: MultiMeshInstance3D = null
+var _crowd_base: Array[Transform3D] = []
+var _crowd_world := PackedVector3Array()    ## each figure's chest, world space
+var _crowd_scale := {}                      ## instance -> current scale (missing = 1)
+
+
+## The arena's crowd (one MultiMesh): figures standing in a line of sight shrink away and grow
+## back once it is clear, so a wide shot from the stands is never filled by a spectator.
+func set_crowd(mmi: MultiMeshInstance3D) -> void:
+	_crowd = mmi
+	_crowd_base.clear()
+	_crowd_world.clear()
+	_crowd_scale.clear()
+	if mmi == null or mmi.multimesh == null:
+		return
+	# the placements ArenaSetDressing.crowd() recorded; else what the renderer reports
+	var known: Array = mmi.get_meta("instance_transforms", [])
+	for i in mmi.multimesh.instance_count:
+		var xf: Transform3D = known[i] if i < known.size() else mmi.multimesh.get_instance_transform(i)
+		_crowd_base.append(xf)
+		_crowd_world.append(mmi.global_transform * (xf.origin + Vector3.UP * 0.8))
+
+
+## Crowd figures shrunk (or shrinking) after the last update.
+func crowd_hidden() -> int:
+	return _crowd_scale.size()
 
 
 ## Every GeometryInstance3D under `root` that could block the view. Meshes under `moving`
@@ -87,6 +117,38 @@ func update(cam: Vector3, points: Array, force := false) -> void:
 			gi.transparency = maxf(float(it["base"]), t)
 		if t > 0.0:
 			_blocking += 1
+	if _crowd != null and is_instance_valid(_crowd) and _crowd.visible:
+		_update_crowd(cam, points, step * 1.5)
+
+
+func _update_crowd(cam: Vector3, points: Array, step: float) -> void:
+	var mm := _crowd.multimesh
+	for i in _crowd_world.size():
+		var w := _crowd_world[i]
+		var duck := false
+		var d2 := w.distance_squared_to(cam)
+		if d2 < CROWD_CLOSE * CROWD_CLOSE:
+			duck = true                  # right under the lens: a giant blob filling the shot
+		elif d2 < CROWD_NEAR * CROWD_NEAR:
+			for p: Vector3 in points:
+				if _near_segment(w, cam, p, CROWD_CLEAR):
+					duck = true
+					break
+		var cur := float(_crowd_scale.get(i, 1.0))
+		var want := 0.0 if duck else 1.0
+		if cur == want:
+			continue
+		var s := move_toward(cur, want, step)
+		if s >= 1.0:
+			_crowd_scale.erase(i)
+		else:
+			_crowd_scale[i] = s
+		_set_figure_scale(mm, i, s)
+
+
+func _set_figure_scale(mm: MultiMesh, i: int, s: float) -> void:
+	var b := _crowd_base[i]
+	mm.set_instance_transform(i, Transform3D(b.basis.scaled(Vector3.ONE * maxf(s, 0.001)), b.origin))
 
 
 ## What a wall must never hide: the camera's look point, and the followed fighter and its target
@@ -108,6 +170,10 @@ func clear() -> void:
 			gi.transparency = float(it["base"])
 		it["t"] = 0.0
 	_blocking = 0
+	if _crowd != null and is_instance_valid(_crowd) and _crowd.multimesh != null:
+		for i: int in _crowd_scale.keys():
+			_set_figure_scale(_crowd.multimesh, i, 1.0)
+	_crowd_scale.clear()
 
 
 static func _near_segment(c: Vector3, a: Vector3, b: Vector3, r: float) -> bool:

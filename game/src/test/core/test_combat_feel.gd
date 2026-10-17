@@ -97,6 +97,31 @@ func test_a_wall_between_the_camera_and_the_fight_fades() -> void:
 	root.queue_free()
 
 
+func test_crowd_figures_in_the_line_of_sight_shrink_away() -> void:
+	var root := Node3D.new()
+	add_child(root)
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = BoxMesh.new()
+	mm.instance_count = 2
+	var xfs: Array[Transform3D] = [Transform3D(Basis.IDENTITY, Vector3(0, 0, 6)),   # right in front of the camera
+		Transform3D(Basis.IDENTITY, Vector3(5, 0, 6))]                               # off to the side
+	for i in 2:
+		mm.set_instance_transform(i, xfs[i])
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	mmi.set_meta("instance_transforms", xfs)     # as ArenaSetDressing.crowd() records them
+	root.add_child(mmi)
+	var occ := CameraOccluders.new()
+	occ.collect(root)
+	occ.set_crowd(mmi)
+	occ.update(Vector3(0, 1.5, 8), [Vector3(0, 1, 0)], true)
+	check(occ.crowd_hidden() == 1, "only the spectator in front of the camera ducks (%d)" % occ.crowd_hidden())
+	occ.update(Vector3(0, 6, 8), [Vector3(0, 1, 0)], true)
+	check(occ.crowd_hidden() == 0, "and stands back up once the view is clear (%d)" % occ.crowd_hidden())
+	root.queue_free()
+
+
 func test_a_pit_wall_fades_in_a_real_arena() -> void:
 	var a := Content.arena("arena_crusher")
 	var av := ArenaView.new()

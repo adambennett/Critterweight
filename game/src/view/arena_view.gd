@@ -516,6 +516,7 @@ func fade_occluders(cam: Vector3, points: Array) -> void:
 	if occluders == null:
 		occluders = CameraOccluders.new()
 		occluders.collect(self, _layout_root, arena.extent().get_center() if arena else Vector2.ZERO)
+		occluders.set_crowd(_crowd)
 	occluders.update(cam, points)
 
 

@@ -263,3 +263,21 @@ The owner compared the alt builds (0.9.8-alt.1, 0.9.9-alt.1) with the main build
 2026-10-17. It ships from 0.9.10. The hit volumes fix every shape, and the match camera mostly sees backs
 and tops, so in fights the change is subtle: faces, cleaner surfaces and back details. A later art pass
 meant to show in fights should target backs, tops and colour blocking. Details: docs/ART_REVAMP.md.
+
+
+## D-035 Hits are felt, and walls never hide the fight
+
+The owner found fights clunky (2026-10-17): mashing seemed to do nothing. A masher against the regular bot
+(2 x 45 s per fighter) was within 2 m 73-81 % of the time, but only 15-41 % of its attacks landed, and a
+landed hit averaged 2.5-5.3 damage with feedback too small to see: about 2 cm of camera shake, a health
+trail that drained at once and no hit pause. Walls and scenery could also stand between the camera and
+the fighters. All changes are view-side (HitFeel, CameraOccluders):
+- offline matches pause for 50-120 ms on a hit given or taken by a local player (longer on counters) and
+  0.2 s on every KO; never online, and the speed returns to what it was;
+- a local player's hits zoom-punch and clearly shake the camera (scaled by the camera-shake setting), with
+  bigger sparks, a stronger flash, a jolt of the struck body and stronger rumble;
+- a hit's chunk stays lit on the health bar for 0.6 s before it drains;
+- meshes between the camera and the fighters fade to 78 % transparency, and crowd figures in the line of
+  sight or right under the lens shrink away.
+The simulation, balance and bots are unchanged. The miss rate stays as it is: attack magnetism for players
+would be a separate, measured change (the owner's call, 2026-10-17). Tests: test_combat_feel.

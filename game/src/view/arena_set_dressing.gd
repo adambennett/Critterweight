@@ -47,14 +47,19 @@ static func crowd(parent: Node3D, placements: Array, rim: Color, seed := 1234, d
 	mm.instance_count = placements.size()
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed
+	var xfs: Array[Transform3D] = []
 	for i in placements.size():
 		var p: Array = placements[i]
 		var s: float = float(p[2]) * rng.randf_range(0.85, 1.1)
-		mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, float(p[1])).scaled(Vector3(s, s, s)), p[0]))
+		xfs.append(Transform3D(Basis(Vector3.UP, float(p[1])).scaled(Vector3(s, s, s)), p[0]))
+		mm.set_instance_transform(i, xfs[i])
 		var c: Color = PERSON_PALETTE[rng.randi() % PERSON_PALETTE.size()]
 		mm.set_instance_color(i, c.darkened(rng.randf_range(dim - 0.1, dim + 0.12)))
 	var mi := MultiMeshInstance3D.new()
 	mi.multimesh = mm
+	# kept beside the MultiMesh: CameraOccluders shrinks the figures in a line of sight (and a
+	# headless renderer does not hand instance transforms back)
+	mi.set_meta("instance_transforms", xfs)
 	var cm := ShaderMaterial.new()
 	cm.shader = load("res://src/view/shaders/crowd.gdshader")
 	cm.set_shader_parameter("rim", rim)
