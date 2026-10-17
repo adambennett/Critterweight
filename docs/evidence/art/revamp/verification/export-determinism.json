@@ -1,0 +1,156 @@
+[
+  {
+    "id": "boss_bilge",
+    "source": "Blender",
+    "before": "A979F40D6A4D949B4A5E61FEDD59DE5F94840BB13FACDBA16DD591614A75FA61",
+    "after": "A979F40D6A4D949B4A5E61FEDD59DE5F94840BB13FACDBA16DD591614A75FA61",
+    "byteIdentical": true
+  },
+  {
+    "id": "boss_conduit",
+    "source": "Blender",
+    "before": "A92B177837EFB70E65D85EB805714665AD71D60A6283EEE919D8458717D06EF0",
+    "after": "A92B177837EFB70E65D85EB805714665AD71D60A6283EEE919D8458717D06EF0",
+    "byteIdentical": true
+  },
+  {
+    "id": "boss_snappington",
+    "source": "Blender",
+    "before": "48274A3E67A8BAA33FCB8FBCC07A7C09F59D5788DD4AE6541653C14723132E66",
+    "after": "48274A3E67A8BAA33FCB8FBCC07A7C09F59D5788DD4AE6541653C14723132E66",
+    "byteIdentical": true
+  },
+  {
+    "id": "f_dozer",
+    "source": "Blender",
+    "before": "357DE8B27BA485170B6F6336A65F0F6ACE79553A2B59644D133E40F7D634C478",
+    "after": "357DE8B27BA485170B6F6336A65F0F6ACE79553A2B59644D133E40F7D634C478",
+    "byteIdentical": true
+  },
+  {
+    "id": "f_dredge",
+    "source": "Blender",
+    "before": "549EF28119BD564B8ABA31054CF0C1C5B5932B2DD2CDD212B77C9FC26D8289A6",
+    "after": "549EF28119BD564B8ABA31054CF0C1C5B5932B2DD2CDD212B77C9FC26D8289A6",
+    "byteIdentical": true
+  },
+  {
+    "id": "f_gusto",
+    "source": "Blender",
+    "before": "829F564F68FE97AF66DBC5922551426791F326FA01C289F0C81D91BB724CCB3A",
+    "after": "829F564F68FE97AF66DBC5922551426791F326FA01C289F0C81D91BB724CCB3A",
+    "byteIdentical": true
+  },
+  {
+    "id": "f_jitters",
+    "source": "Blender",
+    "before": "3D43A61CC5D89C6E8D37F4C679FCBD811F9BDF1B5DFD9BF42E3D30E5659EA8C8",
+    "after": "3D43A61CC5D89C6E8D37F4C679FCBD811F9BDF1B5DFD9BF42E3D30E5659EA8C8",
+    "byteIdentical": true
+  },
+  {
+    "id": "f_slurry",
+    "source": "Blender",
+    "before": "EC8DCFBC2A5DE00B012EA35F43BDF080866AD5624858B3866009EE9F7D35640E",
+    "after": "EC8DCFBC2A5DE00B012EA35F43BDF080866AD5624858B3866009EE9F7D35640E",
+    "byteIdentical": true
+  },
+  {
+    "id": "f_stoke",
+    "source": "Blender",
+    "before": "6DE45966F1BC89B2AE9D801493CF991E719E0A755E329CE4D9891C793842B0B2",
+    "after": "6DE45966F1BC89B2AE9D801493CF991E719E0A755E329CE4D9891C793842B0B2",
+    "byteIdentical": true
+  },
+  {
+    "id": "npc_blister",
+    "source": "Blender",
+    "before": "0E46D657A6BC604BD79DCB0F8FD7F1DF336A5FA76F9EED99B539161D24C94CE1",
+    "after": "0E46D657A6BC604BD79DCB0F8FD7F1DF336A5FA76F9EED99B539161D24C94CE1",
+    "byteIdentical": true
+  },
+  {
+    "id": "npc_kid_lamprey",
+    "source": "Blender",
+    "before": "0671700D65F0AA3B40019BD4515DAD4803A97AE5F1D777A70BF2F46A4B966754",
+    "after": "0671700D65F0AA3B40019BD4515DAD4803A97AE5F1D777A70BF2F46A4B966754",
+    "byteIdentical": true
+  },
+  {
+    "id": "npc_scrapling",
+    "source": "Blender",
+    "before": "46590C9CAC387B1FD81B616B2FD4DF6D7DA2B21831B76EF50DD9194EF6E7015A",
+    "after": "46590C9CAC387B1FD81B616B2FD4DF6D7DA2B21831B76EF50DD9194EF6E7015A",
+    "byteIdentical": true
+  },
+  {
+    "id": "crowd_fan_a",
+    "source": "retained forge",
+    "before": "9A70FB62569A18752583A3CED9622B3668EEF4C4A89A3FE07E5F581065DE63CC",
+    "after": "9A70FB62569A18752583A3CED9622B3668EEF4C4A89A3FE07E5F581065DE63CC",
+    "byteIdentical": true
+  },
+  {
+    "id": "crowd_fan_b",
+    "source": "retained forge",
+    "before": "25396F69533C0432431C02C7D8D7818777B35C05ED00BCE2911605930207E044",
+    "after": "25396F69533C0432431C02C7D8D7818777B35C05ED00BCE2911605930207E044",
+    "byteIdentical": true
+  },
+  {
+    "id": "hub_barnaby_bellows",
+    "source": "retained forge",
+    "before": "E596541C9481E2F1C0EAF1F99AFCB0D297537307F1C64BC014FF8D8DB59B237E",
+    "after": "E596541C9481E2F1C0EAF1F99AFCB0D297537307F1C64BC014FF8D8DB59B237E",
+    "byteIdentical": true
+  },
+  {
+    "id": "hub_doc_sutura",
+    "source": "retained forge",
+    "before": "A85BC2359441C62C3C5E99B95D6DA17A42A44C880EC58DABCA0239870D69AD84",
+    "after": "A85BC2359441C62C3C5E99B95D6DA17A42A44C880EC58DABCA0239870D69AD84",
+    "byteIdentical": true
+  },
+  {
+    "id": "hub_granny_haymaker",
+    "source": "retained forge",
+    "before": "E50253AB145707E97BBC550FC1349216D1744CB5484954A23C56B4DCF08547F5",
+    "after": "E50253AB145707E97BBC550FC1349216D1744CB5484954A23C56B4DCF08547F5",
+    "byteIdentical": true
+  },
+  {
+    "id": "hub_kid_lamprey",
+    "source": "retained forge",
+    "before": "04A0E56F1C063043D2B58E2A1549112C8458703FF7EEC903A6B3E64D82547D4A",
+    "after": "04A0E56F1C063043D2B58E2A1549112C8458703FF7EEC903A6B3E64D82547D4A",
+    "byteIdentical": true
+  },
+  {
+    "id": "hub_ludlow",
+    "source": "retained forge",
+    "before": "13A7D28EF726B77832145823E40597278D0B4EFDF37718D6EFB74E771A2B4C7C",
+    "after": "13A7D28EF726B77832145823E40597278D0B4EFDF37718D6EFB74E771A2B4C7C",
+    "byteIdentical": true
+  },
+  {
+    "id": "hub_needles",
+    "source": "retained forge",
+    "before": "6CE7B17A4A45AE7D920AA9994D1C3F9907FC637BAAA765CF95D7E326B41E178E",
+    "after": "6CE7B17A4A45AE7D920AA9994D1C3F9907FC637BAAA765CF95D7E326B41E178E",
+    "byteIdentical": true
+  },
+  {
+    "id": "hub_snappington_desk",
+    "source": "retained forge",
+    "before": "C27C3DB9C3CC99231F7BBEAD4897532E3969D55EF9173C0685E9C14009FB574C",
+    "after": "C27C3DB9C3CC99231F7BBEAD4897532E3969D55EF9173C0685E9C14009FB574C",
+    "byteIdentical": true
+  },
+  {
+    "id": "hub_teddy_two_tooth",
+    "source": "retained forge",
+    "before": "F2203F5BF7EA2BA2510835D0F5784A67A4F9E39238FAFBB465F39CBBA967DB8D",
+    "after": "F2203F5BF7EA2BA2510835D0F5784A67A4F9E39238FAFBB465F39CBBA967DB8D",
+    "byteIdentical": true
+  }
+]

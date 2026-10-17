@@ -1,0 +1,5 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-16 21:34:48 [INFO] paths: user data root: B:/Critterweight-art/tmp/motion
+2026-10-16 21:34:48 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
+Capture profile: pause_on_focus_loss=false

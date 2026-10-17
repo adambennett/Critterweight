@@ -72,7 +72,7 @@ function addMesh(json, bin, mesh, name, materialIndex) {
 
 function writeGlb(outPath, model) {
   const json = {
-    asset: { version: '2.0', generator: 'critterweight-forge 1.0 (tools/forge) - original procedural art' },
+    asset: { version: '2.0', generator: model.generator || 'critterweight-forge 1.0 (tools/forge) - original procedural art' },
     scene: 0, scenes: [{ name: model.name, nodes: [0] }],
     nodes: [], meshes: [], skins: [], materials: [], accessors: [], bufferViews: [], buffers: [],
   };

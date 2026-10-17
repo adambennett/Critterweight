@@ -6,6 +6,7 @@
 //   node tools/forge/forge.js                 rebuild everything into game/assets/models
 //   node tools/forge/forge.js f_stoke boss_bilge   only these definition ids
 //   options: --out <dir>  --res <m>  --tris <n>  --quiet  --list  --stats <json>
+//   Blender-owned ids are rebuilt from tools/blender. --legacy --out <scratch> rebuilds their old definitions.
 //
 // Definitions are .js modules (module.exports = {...}) or .json files; see docs/ART_PIPELINE.md.
 
@@ -15,6 +16,8 @@ const { forgeDefinition } = require('./lib/pipeline');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const defsDir = path.join(__dirname, 'defs');
+const adoptedPath = path.join(repoRoot, 'tools/blender/adopted.json');
+const blenderIds = new Set(fs.existsSync(adoptedPath) ? JSON.parse(fs.readFileSync(adoptedPath, 'utf8').replace(/^\uFEFF/, '')) : []);
 
 function listDefs(dir, out) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -40,16 +43,22 @@ function main(argv) {
     if (a === '--out') opts.out = path.resolve(args[++i]);
     else if (a === '--res') opts.res = parseFloat(args[++i]);
     else if (a === '--tris') opts.targetTris = parseInt(args[++i], 10);
+    else if (a === '--legacy') opts.legacy = true;
     else if (a === '--quiet') opts.quiet = true;
     else if (a === '--list') opts.list = true;
     else if (a === '--stats') opts.stats = path.resolve(args[++i]);
     else if (a.startsWith('--')) throw new Error('unknown option ' + a);
     else opts.ids.push(a);
   }
+  if (opts.legacy) {
+    const shipped = path.join(repoRoot, 'game/assets/models');
+    const relative = path.relative(shipped, opts.out);
+    if (!relative || (!relative.startsWith('..') && !path.isAbsolute(relative))) throw new Error('--legacy requires --out outside game/assets/models');
+  }
   const files = listDefs(defsDir, []).sort();
   const defs = files.map((f) => ({ file: f, def: loadDef(f) }));
   if (opts.list) {
-    for (const d of defs) console.log(`${d.def.id.padEnd(20)} ${path.relative(repoRoot, d.file)} -> ${d.def.out || 'creatures/' + d.def.id + '.glb'}`);
+    for (const d of defs) console.log(`${d.def.id.padEnd(20)} ${path.relative(repoRoot, d.file)} -> ${d.def.out || 'creatures/' + d.def.id + '.glb'}${blenderIds.has(d.def.id) ? ' [Blender source]' : ''}`);
     return 0;
   }
   const selected = opts.ids.length ? defs.filter((d) => opts.ids.includes(d.def.id)) : defs;
@@ -57,10 +66,14 @@ function main(argv) {
     const known = new Set(defs.map((d) => d.def.id));
     for (const id of opts.ids) if (!known.has(id)) throw new Error('unknown definition id ' + id);
   }
+  if (!opts.legacy && opts.ids.some(id => blenderIds.has(id))) {
+    throw new Error('Blender source owns the requested model. Run tools/blender/rebuild.ps1 -Ids <id>; use --legacy --out <scratch> only for historical comparisons.');
+  }
   const log = opts.quiet ? () => {} : (m) => console.log(m);
   const all = [];
   let failures = 0;
   for (const { file, def } of selected) {
+    if (!opts.legacy && blenderIds.has(def.id)) { log(`preserved ${def.id}: rebuild with tools/blender/rebuild.ps1`); continue; }
     try {
       const stats = forgeDefinition(def, { repoRoot, outDir: opts.out, res: opts.res, targetTris: opts.targetTris, log });
       stats.definition = path.relative(repoRoot, file).replace(/\\/g, '/');
