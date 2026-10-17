@@ -8,6 +8,9 @@ extends Node
 ##   -- --bench sim    [--n 8] [--duration 60]: headless authoritative simulation cost per tick
 ##        (dedicated-server capacity), no rendering
 ##   -- --bench soak   [--matches 20]: back-to-back headless matches; memory/object trend
+##   -- --bench client_soak [--matches 16] [--match-seconds 40] [--speed 4]: presented matches
+##        back to back (rendering, HUD, VFX, audio, arenas) left the way the app leaves them;
+##        memory, objects, nodes, orphan nodes and video memory after each (run windowed)
 ##   -- --bench roster [--bouts 4] [--tier pro] [--round 60]: bot round robin between the
 ##        playable fighters (win rates, hits/min, damage per hit) for balance and size checks
 ##
@@ -33,12 +36,14 @@ func run(scene: String, a: PackedStringArray) -> void:
 			await _sim_cost(int(_arg("--n", "8")))
 		"soak":
 			await _soak(int(_arg("--matches", "20")))
+		"client_soak":
+			await _client_soak(int(_arg("--matches", "16")), float(_arg("--match-seconds", "40")))
 		"roster":
 			await _roster(int(_arg("--bouts", "4")), _arg("--tier", "pro"), float(_arg("--round", "60")))
 		"tiers":
 			await _tiers(int(_arg("--bouts", "12")), float(_arg("--round", "60")))
 		_:
-			print("unknown bench '%s' (busy, duel, sim, soak, roster, tiers)" % scene)
+			print("unknown bench '%s' (busy, duel, sim, soak, client_soak, roster, tiers)" % scene)
 			get_tree().quit(2)
 			return
 	_finish()
@@ -182,6 +187,45 @@ func _sim_cost(n: int) -> void:
 			sections[k] = snappedf(float(sim.prof[k]) / nt / 1000.0, 0.001)
 	report["section_ms_per_tick"] = sections
 	sv.queue_free()
+
+
+## Client soak (VER-05): presented matches back to back through App.start_match, as a player sees
+## them (rendering, HUD, VFX, audio, camera, arena dressing), rotating arenas and duel/FFA rules,
+## each left the way the app leaves a match. A leak shows as a steady climb in the per-match series;
+## the slope is taken over the second half, after caches and pools have warmed up.
+func _client_soak(matches: int, seconds: float) -> void:
+	var arenas := ["the_gullet", "arena_crusher", "arena_drydock", "arena_rooftop"]
+	var series := {"memory_mb": [], "objects": [], "nodes": [], "orphan_nodes": [], "video_mb": []}
+	var speed := float(_arg("--speed", "4"))
+	var t0 := Time.get_ticks_msec()
+	for m in matches:
+		var n := 2 if m % 2 == 0 else 4
+		SimSpeed.set_scale(speed)
+		var scene := App.start_match({"arena": arenas[m % arenas.size()], "rules": "duel" if n == 2 else "free_for_all_lives",
+			"seed": 100 + m, "fighters": _fighters(n)})
+		await get_tree().create_timer(seconds / speed, true, false, true).timeout
+		if is_instance_valid(scene):
+			App.set_scene(null)
+		App.goto("main_menu", {})
+		for i in 8:
+			await get_tree().process_frame
+		series["memory_mb"].append(snappedf(Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0, 0.01))
+		series["objects"].append(int(Performance.get_monitor(Performance.OBJECT_COUNT)))
+		series["nodes"].append(int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)))
+		series["orphan_nodes"].append(int(Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT)))
+		series["video_mb"].append(snappedf(Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0, 0.01))
+		print("client soak %d/%d: %s" % [m + 1, matches, JSON.stringify(series.keys().map(func(k): return "%s=%s" % [k, series[k][-1]]))])
+	SimSpeed.set_scale(1.0)
+	report["matches"] = matches
+	report["match_seconds"] = seconds
+	report["speed"] = speed
+	report["series"] = series
+	var half := matches / 2
+	for k in series:
+		var arr: Array = series[k]
+		report["%s_growth_first_to_last" % k] = float(arr[-1]) - float(arr[0])
+		report["%s_per_match_second_half" % k] = (float(arr[-1]) - float(arr[half])) / maxf(1.0, float(arr.size() - 1 - half))
+	report["wall_seconds"] = (Time.get_ticks_msec() - t0) / 1000.0
 
 
 func _soak(matches: int) -> void:

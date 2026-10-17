@@ -16,6 +16,10 @@
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File tools/build/release.ps1 -Version 0.9.0 -Bump -Prerelease -NotesFile notes.md
   powershell -ExecutionPolicy Bypass -File tools/build/release.ps1 -Version 0.9.0 -DryRun
+.EXAMPLE
+  # an alt build (side-by-side comparison, e.g. a pull request the user wants to try before merging):
+  # from a local alt/<name> branch = main + the branch under review, never from main
+  powershell -ExecutionPolicy Bypass -File tools/build/release.ps1 -Version 0.9.7-alt.1 -Bump -Alt -NotesFile notes.md
 #>
 param(
 	[Parameter(Mandatory = $true)][string]$Version,
@@ -23,6 +27,7 @@ param(
 	[switch]$Prerelease,
 	[string]$NotesFile = "",
 	[switch]$DryRun,
+	[switch]$Alt,
 	[string]$Repo = "adambennett/PokeMMA",
 	[string]$Godot = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe",
 	[string]$Gh = "C:\Program Files\GitHub CLI\gh.exe"
@@ -36,6 +41,11 @@ function Fail($m) { Write-Host "release: $m" -ForegroundColor Red; exit 1 }
 
 if ($Version -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$') { Fail "version '$Version' is not X.Y.Z or X.Y.Z-label.N" }
 $tag = "v$Version"
+if ($Alt) {
+	# a comparison build: X.Y.Z-alt.N from an alt/ branch, always a pre-release, main untouched
+	if ($Version -notmatch '-alt\.\d+$') { Fail "an alt release needs an X.Y.Z-alt.N version (got '$Version')" }
+	$Prerelease = $true
+}
 $proj = Join-Path $root "game\project.godot"
 
 if ($Bump) {
@@ -64,7 +74,9 @@ if ($Bump) {
 Step "Checking the repository"
 if ((git status --porcelain).Length -gt 0) { Fail "working tree not clean" }
 $branch = (git rev-parse --abbrev-ref HEAD).Trim()
-if ($branch -ne "main") { Fail "releases are cut from main (on '$branch')" }
+if ($Alt) {
+	if (-not $branch.StartsWith("alt/")) { Fail "alt releases are cut from an alt/ branch (on '$branch')" }
+} elseif ($branch -ne "main") { Fail "releases are cut from main (on '$branch')" }
 $have = [regex]::Match((Get-Content $proj -Raw), 'config/version="([^"]*)"').Groups[1].Value
 if ($have -ne $Version) { Fail "project.godot says '$have', not '$Version' (use -Bump)" }
 $head = (git rev-parse HEAD).Trim()
@@ -115,10 +127,11 @@ $assets | ForEach-Object { Write-Host ("   {0}  {1:N0} MB" -f (Split-Path $_ -Le
 if ($DryRun) { Step "Dry run: not pushing the tag or creating the release"; exit 0 }
 
 Step "Publishing $tag"
-git push -q origin main
+git push -q origin $branch
 git push -q origin $tag
 if ($LASTEXITCODE -ne 0) { Fail "pushing the tag failed" }
-$args2 = @("release", "create", $tag) + $assets + @("-R", $Repo, "--title", "Critterweight $Version", "--verify-tag")
+$title = if ($Alt) { "Critterweight $Version (alt build, for comparison)" } else { "Critterweight $Version" }
+$args2 = @("release", "create", $tag) + $assets + @("-R", $Repo, "--title", $title, "--verify-tag")
 if ($NotesFile -ne "") { $args2 += @("--notes-file", $NotesFile) } else { $args2 += @("--notes", "Critterweight $Version ($head)") }
 if ($Prerelease) { $args2 += "--prerelease" }
 & $Gh @args2

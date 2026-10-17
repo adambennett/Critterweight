@@ -807,3 +807,14 @@ Also LOOPBACK on one PC.
 * The Online and Lobby screens are tested headless with injected controller events and LOOPBACK
   sessions (one process, and a host in a second process); not tested with a second machine or a
   real controller on a real network.
+
+## Reference: Project Reclaimer (inspected 2026-10-16)
+
+The brief asks for Project Reclaimer's hosting and playlist documentation to be inspected for ideas. Its
+local dedicated-hosting notes were read only: no live server was touched and nothing was copied. Their
+ideas are already part of this design:
+- weighted playlists with display names (the playlists section);
+- content verified by hash before play (the content handshake);
+- the admin console on loopback only (TCP admin on 127.0.0.1 with a token);
+- a machine-readable status file (the dedicated server's `status.json`);
+- direct connect as the fallback when discovery fails.

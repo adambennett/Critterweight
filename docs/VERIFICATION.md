@@ -1,6 +1,6 @@
 # Verification report
 
-**Current build: preview 0.9.6 (tag `v0.9.6` → `68673c1`), 2026-10-16.** This is a preview, not the
+**Current build: preview 0.9.7 (tag `v0.9.7` → `9e9d93c`), 2026-10-16.** This is a preview, not the
 release candidate. The release-candidate run, the whole-brief audit (VER-07) and the open items in
 `docs/PROGRESS.md` are still to do. This report records what has been verified so far, how, on which
 build, and where the evidence is. It leaves out what has not been verified. Requirement-level states live
@@ -16,6 +16,7 @@ dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`
 
 | Version | Commit | Source suite before release | Packaged checks |
 |---|---|---|---|
+| 0.9.7 | 9e9d93c | 684 / 684 passed (2026-10-16) | release smoke: script check, packaged boot to the title |
 | 0.9.6 | 68673c1 | 682 / 682 passed (2026-10-16) | release smoke: script check, packaged boot to the title in 4.5 s |
 | 0.9.5 | d699dfa | 679 / 679 passed | release smoke, boot 4.4 s |
 | 0.9.4 | f908db2 | full suite green | release smoke |
@@ -76,7 +77,12 @@ Deck.
 (`docs/PROGRESS.md`). The working screenshots were not committed; the committed before/after evidence is
 the sweep in `presets-20261016`.
 
-**6. Audio:** the windowed showcase (`audio_showcase.gd -- --quick`) plays the whole chain with real output
+**6. Client soak:** 2026-10-16, `docs/evidence/verification/client-soak-20261016/` (`--bench client_soak`). 48 presented
+matches back to back, about 32 minutes of fighting at 4x, each left the way the app leaves it. Memory
+levels off at 326 MB after the first loads (+0.003 MB per match afterwards), nodes stay at 976, orphan
+nodes at 0, and video memory is flat: no leak.
+
+**7. Audio:** the windowed showcase (`audio_showcase.gd -- --quick`) plays the whole chain with real output
 and exits 0 when everything played (docs/AUDIO.md §7).
 
 ## Changes since the last full packaged verification
@@ -100,7 +106,23 @@ verification will be repeated for the release candidate.
 - **Two PCs or the internet:** online play has only run over loopback on one PC.
 - **Steam Deck and Linux runtime:** the Linux game and server packages are built and pass the
   portability checks, but they have not been run on Linux or a Deck. No Linux environment is available
-  here.
+  here. The exact remaining checks:
+  - **Ubuntu 24.04 LTS x86-64, game package:**
+    - boot to the title with a fresh profile;
+    - the tutorial;
+    - a duel and an 8-fighter match with a controller;
+    - sound on the default device;
+    - settings saved and reloaded;
+    - join a Windows host's lobby and play a match.
+  - **Ubuntu 24.04, server package:** start with the example config; a Windows client joins; TCP admin
+    works; graceful shutdown.
+  - **Steam Deck (SteamOS 3), native Linux build:**
+    - the Deck preset at 1280x800 holds 60 fps in the busy 8-fighter scene;
+    - controller navigation and glyphs in every menu;
+    - text readable at 1280x800;
+    - suspend and resume mid-match;
+    - a campaign fight;
+    - Proton only as a fallback.
 - **Physical controller:** controller paths are verified with injected input events only (ARN-03, UI-02).
 - **Player judgement:** readability, feel and balance have not been playtested by the user. Bot-measured
   balance is in docs/BOTS.md and PROGRESS.md: some matchups are lopsided, and the Journeyman bot loses

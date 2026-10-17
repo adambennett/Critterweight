@@ -48,10 +48,33 @@ creates the annotated tag, builds all four packages (`package.ps1 -Archive`), sm
 game (script check + boot to the title screen), writes `SHA256SUMS.txt`, pushes the tag and creates the
 GitHub release with the assets (`gh`). `-DryRun` does everything except pushing and publishing.
 
+### Alt builds (side-by-side comparisons)
+
+An alt build lets the user try a branch under review next to the main build, without merging it. It is a
+pre-release such as `v0.9.7-alt.1`, built from a local `alt/<name>` branch. For example, the creature-art
+pull request: the user asked to compare it before deciding.
+
+```powershell
+git switch -c alt/creature-art main
+git merge --no-ff origin/art/creature-revamp      # the branch under review
+powershell -ExecutionPolicy Bypass -File tools/dev/run_suite.ps1   # green, as for any release
+powershell -ExecutionPolicy Bypass -File tools/build/release.ps1 -Version 0.9.7-alt.1 -Bump -Alt -NotesFile notes.md
+```
+
+`-Alt` behaves differently from a normal release:
+- It needs an `X.Y.Z-alt.N` version and an `alt/` branch.
+- It always publishes a pre-release, titled as an alt build.
+- It pushes the alt branch and its tag, and leaves `main` untouched.
+
+Online play needs the same version on both ends, so alt and main builds can't play each other. If the user
+picks the alt build, its branch is merged into `main` and released normally. Otherwise the alt branch
+just stays where it is.
+
 ## Release log
 
 | Version | Tag | Date | Notes |
 |---|---|---|---|
+| 0.9.7 (preview, playtest build) | [v0.9.7](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.7) -> 9e9d93c | 2026-10-16 | Bookie's Table camera presets (Broadcast / Director / Free); its control bar no longer hides the fighter plates; client soak (48 matches, no leak); missing-mod save resume and display Keep/Revert tested; ledger audit; protocol 5 |
 | 0.9.6 (preview, playtest build) | [v0.9.6](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.6) -> 68673c1 | 2026-10-16 | Review fixes: Chum Rush supplement picks apply (OTC/Prescription offers), Chumball KOs no longer score, Rooftop railings along the short edges (were fencing the floor), bots steer round props (Swarm Night stall), flaky resume test fixed; protocol 5 |
 | 0.9.5 (preview, playtest build) | [v0.9.5](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.5) -> d699dfa | 2026-10-16 | Slurry's Head Butt starts at 0.13 s with a shorter lunge (D-034): Dozer vs Slurry 6-6 (was 3-9), Slurry vs Stoke 7-5 (was 9-3); Fight Camp full-run test on seed 1003; protocol 5 |
 | 0.9.4 (preview, playtest build) | [v0.9.4](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.4) -> f908db2 | 2026-10-16 | UI polish pass: the Fight Card and Bookie setup on the shared menu kit, compact reward/rest cards, tidier run summary, readable route map, cleaner Ledger; 3-4 player co-op tests; protocol 5 |

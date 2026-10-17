@@ -1,6 +1,6 @@
 # Progress
 
-## Status (2026-10-16) — paused for the playtest week at v0.9.6
+## Status (2026-10-16) — paused for the playtest week at v0.9.7
 
 Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
@@ -25,6 +25,10 @@ It works in its own clone at B:\Critterweight-art, on the branch `art/creature-r
 pull request. It changes only the forge definitions, the generated models, view-side code and the art docs,
 never the creature bodies, stats or moves. Decision number **D-041** is reserved for its art decision.
 Merge it after the user approves and a full suite passes.
+**The user's instruction (2026-10-16): don't merge the art pull request straight away.** First publish a separate
+"alt" pre-release built from `main` plus that branch, so the user can compare the two builds side by side.
+For example, a local `alt/creature-art` branch tagged `v<next>-alt.1`. Note that `release.ps1` releases
+from `main` only, so it will need a branch option. Merge into `main` only if the user picks the new art.
 
 ## Integrated on `main` (all merged, full suite green before each release)
 
@@ -141,6 +145,26 @@ Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the camp
    - range 1.05-1.4 m with aggression 0: Slurry 3-9, Dozer 6-6, Stoke 8-4, Gusto 5-7, but Jitters 1-11 (was 4-8);
    - range 1.15-1.5 m: Slurry 1-11, Jitters 3-9, Dozer 9-3.
    Next: per-opponent spacing, or Dredge's kit reach, measured on 36-bout pairings.
+   **24-bout baseline (2026-10-16, pro tier, after D-034):** Dredge has the slowest jab in the roster: 0.16 s,
+   against Dozer 0.14, Slurry 0.13, Stoke 0.12, Gusto 0.09 and Jitters 0.06. His records:
+   - Slurry 1-23;
+   - Dozer 12-12;
+   - Jitters 6-18;
+   - Stoke 14-10;
+   - Gusto 9-15.
+   That is 35 % overall.
+
+   **Tried and reverted:** a jab at Dozer's speed. The hit window moved to 0.14-0.22, the windup keys about
+   0.02 s earlier, and the lunge went from 2.0 to 2.4 m/s. Results: Slurry 0-24, Dozer 9-15, Jitters 6-18,
+   so jab speed is not the lever.
+
+   **Also tried and reverted:** an `outspace` kit hint, in which Dredge's bot holds at the target's jab reach
+   plus 0.15 m (capped at 2.4 m) and answers what comes in. Results: Slurry 1-23, Dozer 14-10, Jitters 3-21.
+   Neither spacing nor jab speed fixes it.
+
+   **Next:** a per-move breakdown of Dredge's losses to Slurry with the diag tool: what lands on him, whether
+   he blocks the jab stream, and how Slurry's L2/L3 and puddles score. Then a kit-level answer, for example
+   armour or a counter on Dredge's guard, measured on 36-bout pairings.
 
    Per-move breakdowns of the other extreme pairings (4 Contender bouts each, different seeds):
    - **Jitters vs Stoke 4-0.** Stoke's jab lands 7 times against Jitters, against 19 times on Gusto. Jitters
