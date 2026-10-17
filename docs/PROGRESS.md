@@ -1,6 +1,6 @@
 # Progress
 
-## Status (2026-10-16) — paused for the playtest week at v0.9.6
+## Status (2026-10-16) — paused for the playtest week at v0.9.7
 
 Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under

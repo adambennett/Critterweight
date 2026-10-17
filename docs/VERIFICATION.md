@@ -1,6 +1,6 @@
 # Verification report
 
-**Current build: preview 0.9.6 (tag `v0.9.6` → `68673c1`), 2026-10-16.** This is a preview, not the
+**Current build: preview 0.9.7 (tag `v0.9.7` → `9e9d93c`), 2026-10-16.** This is a preview, not the
 release candidate. The release-candidate run, the whole-brief audit (VER-07) and the open items in
 `docs/PROGRESS.md` are still to do. This report records what has been verified so far, how, on which
 build, and where the evidence is. It leaves out what has not been verified. Requirement-level states live
@@ -16,6 +16,7 @@ dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`
 
 | Version | Commit | Source suite before release | Packaged checks |
 |---|---|---|---|
+| 0.9.7 | 9e9d93c | 684 / 684 passed (2026-10-16) | release smoke: script check, packaged boot to the title |
 | 0.9.6 | 68673c1 | 682 / 682 passed (2026-10-16) | release smoke: script check, packaged boot to the title in 4.5 s |
 | 0.9.5 | d699dfa | 679 / 679 passed | release smoke, boot 4.4 s |
 | 0.9.4 | f908db2 | full suite green | release smoke |
