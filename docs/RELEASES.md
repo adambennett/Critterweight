@@ -74,6 +74,7 @@ just stays where it is.
 
 | Version | Tag | Date | Notes |
 |---|---|---|---|
+| 0.9.9 (preview, playtest build) | [v0.9.9](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.9) -> eecaa39 | 2026-10-17 | Busy fights readable: steeper crowd camera, plates 5-8 at the top corners; short-soak and cross-drive test fixes; built on B:; protocol 5 |
 | 0.9.8-alt.1 (**alt build**, comparison) | [v0.9.8-alt.1](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.8-alt.1) -> 33e80fb on `alt/creature-art` | 2026-10-17 | 0.9.8 plus the creature art revamp (PR #1: twelve Blender-remodelled creatures) and its credits, for a side-by-side choice; `main` untouched |
 | 0.9.8 (preview, playtest build) | [v0.9.8](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.8) -> 57613cc | 2026-10-16 | Cross-platform hashes (Canon): the Linux dedicated server now hosts Windows players (first Linux run, Debian 12 container); saves and party tickets agree across platforms; Docker notes; `--arena-hash`; built on B: (C: nearly full); protocol 5 |
 | 0.9.7 (preview, playtest build) | [v0.9.7](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.7) -> 9e9d93c | 2026-10-16 | Bookie's Table camera presets (Broadcast / Director / Free); its control bar no longer hides the fighter plates; client soak (48 matches, no leak); missing-mod save resume and display Keep/Revert tested; ledger audit; protocol 5 |

@@ -1,6 +1,6 @@
 # Progress
 
-## Status (2026-10-16) — paused for the playtest week at v0.9.8 (plus the alt-art comparison build)
+## Status (2026-10-17) — paused for the playtest week at v0.9.9 (plus the alt-art comparison builds)
 
 Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
