@@ -194,7 +194,10 @@ func test_recording_again_adds_new_episodes() -> void:
 	var ds_root := rel_from(cwd, dir.path_join("datasets"))
 	var run1 := rel_from(cwd, dir.path_join("rec1"))
 	var run2 := rel_from(cwd, dir.path_join("rec2"))
-	check(exported or run1.begins_with("..") or not OS.get_name() in ["Windows", "Linux"], "the run folder is relative (%s)" % run1)
+	# a test data root on another Windows drive than the project (e.g. -UserRoot B:\... with the repo on C:)
+	# cannot be reached by a relative path either: those paths stay absolute, like an export's
+	var other_drive := cwd.length() >= 2 and cwd[1] == ":" and dir.length() >= 2 and dir[1] == ":" and cwd.substr(0, 1).to_upper() != dir.substr(0, 1).to_upper()
+	check(exported or other_drive or run1.begins_with("..") or not OS.get_name() in ["Windows", "Linux"], "the run folder is relative (%s)" % run1)
 	DirAccess.make_dir_recursive_absolute(dir.path_join("rec1"))
 	DirAccess.make_dir_recursive_absolute(dir.path_join("rec2"))
 	_record_job(run1, ds_root, 4)

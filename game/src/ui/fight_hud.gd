@@ -73,9 +73,26 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 		if n == 2:
 			cards[sim.fighters[1].index] = _make_card(sim.fighters[1], n, _top, true)
 	else:
+		# 5-8 fighters: the second row of plates moves to the top corners, split around the timer, so the
+		# plates cover half as much of the floor (two bottom rows hid fighters at 1280x800)
+		var top_n := maxi(0, n - 4)
+		var left := HBoxContainer.new()
+		var right := HBoxContainer.new()
+		for box in [left, right]:
+			box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			box.add_theme_constant_override("separation", 18)
+		if top_n > 0:
+			_top.add_child(left)
 		_top.add_child(mid)
-		for f in sim.fighters:
-			cards[f.index] = _make_card(f, n, _bottom, false)
+		if top_n > 0:
+			_top.add_child(right)
+		for i in sim.fighters.size():
+			var f: Fighter = sim.fighters[i]
+			if i < 4:
+				cards[f.index] = _make_card(f, n, _bottom, false)
+			else:
+				var to_left := (i - 4) < ceili(top_n / 2.0)
+				cards[f.index] = _make_card(f, n, left if to_left else right, not to_left)
 	mid.add_child(_timer)
 	mid.add_child(_mode_label)
 	_center = _label("", 110, _font_heavy)

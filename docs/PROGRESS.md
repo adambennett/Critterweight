@@ -31,6 +31,23 @@ It works in its own clone at B:\Critterweight-art, on the branch `art/creature-r
 pull request. It changes only the forge definitions, the generated models, view-side code and the art docs,
 never the creature bodies, stats or moves. Decision number **D-041** is reserved for its art decision.
 Merge it after the user approves and a full suite passes.
+**Status (2026-10-17): the alt build is out**, as `v0.9.8-alt.1` on `alt/creature-art` = main 0.9.8 + PR #1 + an
+in-game credits entry. Its suite passed (one short-soak flake, cleared by a 6-minute soak and a hardened check).
+**Waiting on the user's choice.** If they pick the new art:
+1. Merge PR #1 into `main`.
+2. Apply the PR's proposed D-041 and ledger updates (ART-01..05, ART-08, PRV-03) from `docs/ART_REVAMP.md`.
+3. Cherry-pick the credits entry.
+
+Follow-up for both art sets (the PR asked for it): in busy Deck-view scenes, the cage's foreground posts and the
+bottom HUD can hide fighters.
+- **Camera, done 2026-10-17 (after 0.9.8).** With 5+ fighters it takes a steeper, more top-down angle (height
+  factor 0.3 → 0.46), so the near rail drops to the bottom edge. Before/after 1280x800 captures are in
+  B:\Critterweight-occlusion.
+- **HUD, done 2026-10-17.** With 5-8 fighters, fighters 1-4 keep the bottom row, and fighters 5-8 move to the
+  top corners, split around the timer. Text sizes are unchanged. At 1280x800 the floor is now clear, and the
+  busy-scene capture shows all eight fighters (B:\Critterweight-occlusionusy8_deck_hud.png).
+  test_ui_navigation is green.
+
 **The user's instruction (2026-10-16): don't merge the art pull request straight away.** First publish a separate
 "alt" pre-release built from `main` plus that branch, so the user can compare the two builds side by side.
 For example, a local `alt/creature-art` branch tagged `v<next>-alt.1`. Note that `release.ps1` releases
