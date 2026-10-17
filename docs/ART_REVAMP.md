@@ -1,6 +1,6 @@
 # Creature art revamp
 
-Status: ready for Claude's draft-PR review and alternate preview build on `art/creature-revamp`. Gameplay data is unchanged. This document records the plan, adoption decisions, evidence and proposed updates for Claude; it does not change the release or requirements ledgers.
+Status: **adopted 2026-10-17.** The user compared the alt builds (0.9.8-alt.1, 0.9.9-alt.1) with the main builds and chose this art. PR #1 is merged into `main` and ships from 0.9.10, with D-041 and the requirement updates below applied to `docs/DECISIONS.md` and `docs/REQUIREMENTS.md`. The requests below are handled: the cage and HUD occlusion was fixed in 0.9.9 (`docs/PROGRESS.md`), and the in-game credits (`game/assets/ui/credits.json`) match `docs/CREDITS.md`. Gameplay data is unchanged. The text below is the art branch's original record.
 
 ## Plan and scope
 

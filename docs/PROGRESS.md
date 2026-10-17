@@ -1,6 +1,6 @@
 # Progress
 
-## Status (2026-10-17) — paused for the playtest week at v0.9.9 (plus the alt-art comparison builds)
+## Status (2026-10-17) — paused for the playtest week; the new creature art ships from 0.9.10
 
 Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
@@ -26,32 +26,23 @@ branch `audio/ableton-revamp`, and ends in a draft pull request. It changes only
 request is merged into `main` only after the user approves it by listening, followed by a green full
 suite. Don't edit audio files on `main` meanwhile.
 
-**Creature art revamp in parallel (from 2026-10-16).** A second Astra agent redesigns the creature models.
-It works in its own clone at B:\Critterweight-art, on the branch `art/creature-revamp`, and ends in a draft
-pull request. It changes only the forge definitions, the generated models, view-side code and the art docs,
-never the creature bodies, stats or moves. Decision number **D-041** is reserved for its art decision.
-Merge it after the user approves and a full suite passes.
-**Status (2026-10-17): the alt build is out**, as `v0.9.8-alt.1` on `alt/creature-art` = main 0.9.8 + PR #1 + an
-in-game credits entry. Its suite passed (one short-soak flake, cleared by a 6-minute soak and a hardened check).
-**Waiting on the user's choice.** If they pick the new art:
-1. Merge PR #1 into `main`.
-2. Apply the PR's proposed D-041 and ledger updates (ART-01..05, ART-08, PRV-03) from `docs/ART_REVAMP.md`.
-3. Cherry-pick the credits entry.
+**Creature art revamp: adopted (2026-10-17).** A second Astra agent rebuilt the twelve combat creatures in
+Blender (PR #1, branch `art/creature-revamp`). It changed only the models, their sources and view-side code,
+never the creature bodies, stats or moves. The user compared the alt builds (`v0.9.8-alt.1`, `v0.9.9-alt.1`)
+with the main builds and chose the new art. PR #1 is merged into `main` with D-041, the ledger updates
+(ART-01..05, ART-08, PRV-03) and an in-game credits entry, and ships from 0.9.10. The `alt/creature-art`
+branch and the paired alt builds are retired. In fights the change is subtle: the hit volumes fix every
+shape, and the match camera mostly sees backs and tops (D-041).
 
-Follow-up for both art sets (the PR asked for it): in busy Deck-view scenes, the cage's foreground posts and the
-bottom HUD can hide fighters.
+Follow-up from the art PR: in busy Deck-view scenes, the cage's foreground posts and the bottom HUD could hide
+fighters.
 - **Camera, done 2026-10-17 (after 0.9.8).** With 5+ fighters it takes a steeper, more top-down angle (height
   factor 0.3 → 0.46), so the near rail drops to the bottom edge. Before/after 1280x800 captures are in
   B:\Critterweight-occlusion.
 - **HUD, done 2026-10-17.** With 5-8 fighters, fighters 1-4 keep the bottom row, and fighters 5-8 move to the
   top corners, split around the timer. Text sizes are unchanged. At 1280x800 the floor is now clear, and the
-  busy-scene capture shows all eight fighters (B:\Critterweight-occlusionusy8_deck_hud.png).
+  busy-scene capture shows all eight fighters (B:\Critterweight-occlusion\busy8_deck_hud.png).
   test_ui_navigation is green.
-
-**The user's instruction (2026-10-16): don't merge the art pull request straight away.** First publish a separate
-"alt" pre-release built from `main` plus that branch, so the user can compare the two builds side by side.
-For example, a local `alt/creature-art` branch tagged `v<next>-alt.1`. Note that `release.ps1` releases
-from `main` only, so it will need a branch option. Merge into `main` only if the user picks the new art.
 
 ## Integrated on `main` (all merged, full suite green before each release)
 

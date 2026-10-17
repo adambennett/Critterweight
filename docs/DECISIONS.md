@@ -244,3 +244,22 @@ Round robin at 12 bouts:
 - Dozer vs Slurry 6-6 (was 3-9);
 - Slurry vs Stoke 7-5 (was 9-3);
 - Dredge vs Slurry still 0-12, a separate cause in Dredge's play, still open.
+
+
+## D-041 The twelve combat creatures are modelled in Blender
+
+(D-035 to D-039 are free for later decisions; D-040 is reserved for the audio revamp.)
+
+For the twelve models listed in `tools/blender/adopted.json` (six fighters, three bosses, three minions),
+original editable Blender sources supplement D-012's deterministic SDF forge:
+- the compressed `.blend` masters, the concept provenance and a deterministic scripted GLB export are committed;
+- the segment skeleton, collision registration, vertex colour and glow, team tint and the unskinned KO piece
+  are preserved;
+- the forge stays for the ten retained hub and crowd models and for historical comparison, and ordinary forge
+  builds must not overwrite Blender-owned outputs;
+- no third-party character geometry and no gameplay-data changes.
+
+The owner compared the alt builds (0.9.8-alt.1, 0.9.9-alt.1) with the main builds and chose this art on
+2026-10-17. It ships from 0.9.10. The hit volumes fix every shape, and the match camera mostly sees backs
+and tops, so in fights the change is subtle: faces, cleaner surfaces and back details. A later art pass
+meant to show in fights should target backs, tops and colour blocking. Details: docs/ART_REVAMP.md.
