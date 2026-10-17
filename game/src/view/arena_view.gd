@@ -60,6 +60,7 @@ var _bag_chains: Array = []
 var _debris: Array = []
 var _shown_markers: Array = ["wave_gate"]
 var _quality := {}
+var occluders: CameraOccluders = null     ## collected on the first fade_occluders()
 
 
 func build(a: ArenaDef) -> void:
@@ -485,6 +486,9 @@ func _build_layout() -> void:
 ## Editor: rebuild only props and markers for a changed layout (static set is kept).
 func rebuild_layout(a: ArenaDef) -> void:
 	arena = a
+	if occluders:
+		occluders.clear()
+		occluders = null        # collected again with the new props on the next fade
 	for c in _layout_root.get_children():
 		_layout_root.remove_child(c)
 		c.queue_free()
@@ -502,6 +506,17 @@ func show_markers(names: Array) -> void:
 func set_editor_mode(on: bool) -> void:
 	editor_mode = on
 	_auto_bind = not on
+
+
+## Fight scenes, every frame: fades the meshes that stand between the camera and `points`
+## (CameraOccluders: pit walls, tall props, posts, set dressing outside the cage).
+func fade_occluders(cam: Vector3, points: Array) -> void:
+	if editor_mode:
+		return
+	if occluders == null:
+		occluders = CameraOccluders.new()
+		occluders.collect(self, _layout_root, arena.extent().get_center() if arena else Vector2.ZERO)
+	occluders.update(cam, points)
 
 
 ## Editor: hides set dressing that sits entirely above head height (trusses, light banks, hooks,

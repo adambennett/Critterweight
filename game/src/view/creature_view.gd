@@ -37,6 +37,11 @@ var _glow_materials: Array[ShaderMaterial] = []
 var _gore_mesh: Mesh = null
 var _bruises: Array = []                  ## [{seg, local: Vector3, s: float}]
 var _flash := 0.0
+const JOLT_TIME := 0.2           ## seconds a struck body shakes (real time)
+const JOLT_AMP := 0.05           ## metres at full strength
+var _jolt_dir := Vector3.ZERO
+var _jolt_amp := 0.0
+var _jolt_t0 := 0
 var juice_amount := 0.0
 var status_color := Color(0, 0, 0, 0)
 var gore_level := 2                       ## 0 off, 1 reduced, 2 full
@@ -335,8 +340,28 @@ func snap_transforms(xf: Array[Transform3D]) -> void:
 		_curr[i] = xf[i]
 
 
+## A landed hit's jolt: the struck body shakes along `dir` (flattened) for JOLT_TIME real
+## seconds, so it keeps shaking through a hit pause. View-only, like the flash.
+func jolt(dir: Vector3, amount := 1.0) -> void:
+	var d := Vector3(dir.x, 0.0, dir.z)
+	_jolt_dir = d.normalized() if d.length() > 0.01 else Vector3.RIGHT
+	_jolt_amp = clampf(amount, 0.0, 1.0) * JOLT_AMP
+	_jolt_t0 = Time.get_ticks_usec()
+
+
+func _jolt_offset() -> Vector3:
+	if _jolt_amp <= 0.0:
+		return Vector3.ZERO
+	var t := float(Time.get_ticks_usec() - _jolt_t0) / 1e6
+	if t >= JOLT_TIME:
+		_jolt_amp = 0.0
+		return Vector3.ZERO
+	return _jolt_dir * _jolt_amp * (1.0 - t / JOLT_TIME) * sin(t * TAU * 28.0)
+
+
 func render(alpha: float) -> void:
 	var n := _curr.size()
+	var off := _jolt_offset()
 	if _skeleton:
 		# Desired GLOBAL pose of every segment bone = the segment's interpolated world transform
 		# (the skeleton sits at the world origin). Converted to parent-relative poses parents-first,
@@ -349,7 +374,7 @@ func render(alpha: float) -> void:
 			if si >= 0 and si < n:
 				var a := _prev[si]
 				var b := _curr[si]
-				global = Transform3D(Basis(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha)), a.origin.lerp(b.origin, alpha))
+				global = Transform3D(Basis(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha)), a.origin.lerp(b.origin, alpha) + off)
 			else:
 				global = parent_global * _skeleton.get_bone_rest(bi)
 			_bone_global[bi] = global
@@ -362,7 +387,7 @@ func render(alpha: float) -> void:
 		for i in n:
 			var a := _prev[i]
 			var b := _curr[i]
-			var t := Transform3D(Basis(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha)), a.origin.lerp(b.origin, alpha))
+			var t := Transform3D(Basis(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha)), a.origin.lerp(b.origin, alpha) + off)
 			if i < _seg_nodes.size():
 				_seg_nodes[i].global_transform = t
 			_seg_global[i] = t

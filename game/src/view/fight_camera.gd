@@ -17,7 +17,9 @@ var dist := 7.0
 var height := 3.2
 var center := Vector3.ZERO
 var shake_scale := 1.0
+var base_fov := 50.0
 var _trauma := 0.0
+var _punch := 0.0          ## zoom punch of a landed hit (HitFeel.punch), eased back out
 var _rng := RandomNumberGenerator.new()
 var arena_radius := 5.0
 var free_pos := Vector3(0, 4, 9)
@@ -26,7 +28,7 @@ var free_pitch := -0.3
 
 
 func _ready() -> void:
-	fov = 50.0
+	fov = base_fov
 	near = 0.05
 	far = 200.0
 	current = true
@@ -34,6 +36,12 @@ func _ready() -> void:
 
 func add_trauma(t: float) -> void:
 	_trauma = clampf(_trauma + t, 0.0, 1.0)
+
+
+## A short zoom-in (up to 6 degrees) that eases back over about a quarter second. Scaled by the
+## camera shake setting like the shake itself; it holds while a hit pause freezes the game.
+func punch(amount: float) -> void:
+	_punch = clampf(maxf(_punch, amount), 0.0, 1.0)
 
 
 func snap() -> void:
@@ -45,6 +53,8 @@ func _process(dt: float) -> void:
 
 
 func _update(dt: float, instant: bool) -> void:
+	_punch = maxf(0.0, _punch - dt * 4.0)
+	fov = base_fov - _punch * _punch * 6.0 * shake_scale
 	if mode == Mode.FREE:
 		_free_cam(dt)
 		return

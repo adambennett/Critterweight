@@ -216,6 +216,7 @@ func _process(dt: float) -> void:
 		cv.render(1.0)
 	for p in _sample["props"]:
 		arena_view.set_prop_transform(int(p["index"]), Transform3D(Basis(p["rot"] as Quaternion), p["pos"]))
+	arena_view.fade_occluders(camera.global_position, CameraOccluders.points_for(camera, _camera_focus()))
 	vfx.sync_entities(_sample["entities"])
 	mirror.update(_sample, dt)
 	if mode_view:
@@ -506,19 +507,26 @@ func _on_event(ev: Dictionary) -> void:
 			var v: CreatureView = views[ti]
 			var el := str(ev.get("element", ""))
 			var col := Elements.color(el) if el != "" else Color(1.0, 0.9, 0.55)
-			if bool(ev.get("blocked", false)):
+			var blocked := bool(ev.get("blocked", false))
+			# online there is no hit pause (the server's clock never stops); the rest matches MatchScene
+			var mine := ti == my_index or fi == my_index
+			if blocked:
 				vfx.emit("spark", p, n, Color(0.6, 0.85, 1.0), 0.6)
+				v.jolt(n, 0.3)
 			else:
-				v.flash(clampf(dmg / 14.0, 0.25, 1.0))
+				v.flash(HitFeel.flash(dmg))
+				v.jolt(n, HitFeel.flash(dmg) * (1.0 if mine else 0.6))
 				v.add_bruise(_seg_near(ti, p), p, clampf(dmg / 16.0, 0.15, 1.0))
-				vfx.emit("spark", p, n, col, clampf(dmg / 10.0, 0.4, 1.5))
-				if dmg >= 10.0:
+				vfx.emit("spark", p, n, col, HitFeel.spark_scale(dmg, mine))
+				if dmg >= (6.0 if mine else 10.0):
 					vfx.ring(p, 0.8, Color(1, 1, 1, 0.8), 0.25, false)
-			camera.add_trauma(clampf(dmg / 40.0, 0.05, 0.45))
+			camera.add_trauma(HitFeel.trauma(dmg, mine))
+			camera.punch(HitFeel.punch(dmg, blocked, mine))
 			if bool(ev.get("counter", false)):
 				vfx.word(p + Vector3.UP * 0.3, "COUNTER!", Color(1.0, 0.75, 0.2))
-			if ti == my_index or fi == my_index:
-				Controls.rumble(clampf(dmg / 20.0, 0.1, 0.6), clampf(dmg / 30.0, 0.0, 0.8), 0.12)
+			if mine:
+				var r := HitFeel.rumble(dmg, blocked)
+				Controls.rumble(r[0], r[1], r[2])
 			if bool(Settings.get_value("gameplay.damage_numbers")) and dmg >= 0.5:
 				vfx.word(p + Vector3.UP * 0.25, "%d" % roundi(dmg), Color(0.75, 0.85, 1.0) if bool(ev.get("blocked", false)) else Color(1.0, 0.95, 0.8), 40)
 		"parry":

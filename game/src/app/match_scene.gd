@@ -26,6 +26,9 @@ var director: SpectatorDirector = null   ## auto-director when spectating (cfg.s
 var _goals_by_me := 0
 var _debug: CombatDebugDraw = null
 var _bench_hint: Label = null   ## campaign tag-team fights: what a benched partner can do
+var _pause_until_us := 0        ## hit pause end (Time ticks), 0 = none
+var _pause_base := 1.0          ## the time scale a hit pause returns to
+var _pause_token := 0           ## the latest hit pause (only its timer ends the pause)
 
 
 ## config: {arena: ArenaDef, rules: {}, seed: int, mode: MatchMode, fighters: [{creature, team, kind:"player"|"bot", difficulty, name}]}
@@ -137,6 +140,7 @@ func _default_music() -> String:
 
 
 func _exit_tree() -> void:
+	_end_hit_pause()
 	if hud and Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.disconnect(hud.subtitle)
 	# A rematch starts the new scene before this one is freed: only reset the playback speed when no
@@ -253,6 +257,7 @@ func _process(delta: float) -> void:
 	var props: Array = sim.arena_nodes.get("props", [])
 	for i in props.size():
 		arena_view.set_prop_transform(i, (props[i] as Node3D).global_transform)
+	arena_view.fade_occluders(camera.global_position, CameraOccluders.points_for(camera, _camera_focus()))
 	vfx.sync_entities(sim.effects.entities)
 
 
@@ -288,20 +293,28 @@ func _on_event(ev: Dictionary) -> void:
 			var v: CreatureView = views[ti]
 			var el := str(ev.get("element", ""))
 			var col := Elements.color(el) if el != "" else Color(1.0, 0.9, 0.55)
-			if bool(ev["blocked"]):
+			var blocked := bool(ev["blocked"])
+			var counter := bool(ev.get("counter", false))
+			# a local player's hits (given or taken) get the strong feedback (HitFeel)
+			var involved := _is_local(ti) or _is_local(int(ev["fighter"]))
+			if blocked:
 				vfx.emit("spark", p, n, Color(0.6, 0.85, 1.0), 0.6)
+				v.jolt(n, 0.3)
 			else:
-				v.flash(clampf(dmg / 14.0, 0.25, 1.0))
+				v.flash(HitFeel.flash(dmg))
+				v.jolt(n, HitFeel.flash(dmg) * (1.0 if involved else 0.6))
 				v.add_bruise(_seg_near(ti, p), p, clampf(dmg / 16.0, 0.15, 1.0))
-				vfx.emit("spark", p, n, col, clampf(dmg / 10.0, 0.4, 1.5))
-				if dmg >= 10.0:
+				vfx.emit("spark", p, n, col, HitFeel.spark_scale(dmg, involved))
+				if dmg >= (6.0 if involved else 10.0):
 					vfx.ring(p, 0.8, Color(1, 1, 1, 0.8), 0.25, false)
-			camera.add_trauma(clampf(dmg / 40.0, 0.05, 0.45))
-			if bool(ev.get("counter", false)):
+			camera.add_trauma(HitFeel.trauma(dmg, involved))
+			camera.punch(HitFeel.punch(dmg, blocked, involved))
+			hit_pause(HitFeel.hit_pause(dmg, blocked, counter, involved))
+			if counter:
 				vfx.word(p + Vector3.UP * 0.3, "COUNTER!", Color(1.0, 0.75, 0.2))
-			var involved := ti == player_index or int(ev["fighter"]) == player_index
-			if involved:
-				Controls.rumble(clampf(dmg / 20.0, 0.1, 0.6), clampf(dmg / 30.0, 0.0, 0.8), 0.12)
+			if ti == player_index or int(ev["fighter"]) == player_index:
+				var r := HitFeel.rumble(dmg, blocked)
+				Controls.rumble(r[0], r[1], r[2])
 			if bool(Settings.get_value("gameplay.damage_numbers")) and dmg >= 0.5:
 				vfx.word(p + Vector3.UP * 0.25, "%d" % roundi(dmg), Color(0.75, 0.85, 1.0) if bool(ev["blocked"]) else Color(1.0, 0.95, 0.8), 40)
 		"parry":
@@ -320,6 +333,8 @@ func _on_event(ev: Dictionary) -> void:
 				(views[ki] as CreatureView).detach_piece(Vector3(away.x, 0, away.z))
 			hud.callout("K.O.!", 2.0, Color(1.0, 0.35, 0.3))
 			camera.add_trauma(0.5)
+			camera.punch(0.8)
+			hit_pause(HitFeel.ko_pause())
 			vfx.stars(_head_of.bind(ki), 2.6)
 		"guard_break":
 			vfx.word(sim.fighters[int(ev["fighter"])].head_pos() + Vector3.UP * 0.3, "GUARD BREAK!", Color(1.0, 0.5, 0.2))
@@ -409,6 +424,40 @@ func _on_event(ev: Dictionary) -> void:
 
 func _is_local_player() -> bool:
 	return player_index < sim.fighters.size() and sim.fighters[player_index].controller_kind == "player"
+
+
+func _is_local(i: int) -> bool:
+	return i >= 0 and i < sim.fighters.size() and sim.fighters[i].controller_kind == "player"
+
+
+## Hit pause (HitFeel): the whole local match nearly stops for `sec` real seconds, then returns to
+## the speed it had (accessibility or spectator speed included). A later hit extends a running
+## pause instead of stacking. Never online: a listen host's clock is everyone's clock.
+func hit_pause(sec: float) -> void:
+	if sec <= 0.0 or bool(config.get("online", false)) or not is_inside_tree():
+		return
+	var end := Time.get_ticks_usec() + int(sec * 1e6)
+	if _pause_until_us == 0:
+		_pause_base = Engine.time_scale
+	if end > _pause_until_us:
+		_pause_until_us = end
+		_pause_token += 1
+		# real-time and pause-proof: a pause menu opened mid-freeze must not run at 4 % speed. The
+		# latest hit's timer ends the pause (a timer may fire a hair early by the wall clock).
+		get_tree().create_timer(sec, true, false, true).timeout.connect(_end_hit_pause.bind(_pause_token))
+	Engine.time_scale = _pause_base * HitFeel.PAUSE_SCALE
+
+
+func hit_paused() -> bool:
+	return _pause_until_us != 0
+
+
+## `token`: the hit whose timer fired (an older one is ignored); -1 ends any pause now.
+func _end_hit_pause(token := -1) -> void:
+	if _pause_until_us == 0 or (token >= 0 and token != _pause_token):
+		return
+	_pause_until_us = 0
+	Engine.time_scale = _pause_base
 
 
 func _team_label(team: int) -> String:

@@ -6,6 +6,9 @@ extends Control
 
 var sim: MatchSim
 var player_index := 0
+const TRAIL_HOLD := 0.6          ## seconds a hit's chunk stays lit on the health bar
+const TRAIL_DRAIN := 0.5         ## then it drains this much of the bar per second
+
 var cards := {}                  ## fighter index -> Dictionary of nodes
 var _center: Label
 var _sub: Label
@@ -250,6 +253,19 @@ func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dic
 		"cd1": cd1, "cd2": cd2, "status": status, "lives": lives, "trail_v": 1.0, "big": big}
 
 
+## Damage trail behind the health bar: the chunk a hit took stays lit for TRAIL_HOLD seconds
+## after the latest hit (so a landed hit reads at a glance), then drains at TRAIL_DRAIN per
+## second. Returns [trail, hold left]. A heal snaps the trail to the new health.
+static func trail_step(trail: float, hold: float, frac: float, prev: float, dt: float) -> Array:
+	if frac < prev - 0.0001:
+		hold = TRAIL_HOLD
+	if trail <= frac:
+		return [frac, 0.0]
+	if hold > 0.0:
+		return [trail, hold - dt]
+	return [maxf(frac, trail - dt * TRAIL_DRAIN), 0.0]
+
+
 ## The first local player's fighter (the profile owner), -1 when none fights.
 func _owner_index() -> int:
 	for f in sim.fighters:
@@ -267,7 +283,10 @@ func _process(dt: float) -> void:
 		var c: Dictionary = cards[f.index]
 		var frac := f.health_frac()
 		(c["hp"] as ProgressBar).value = frac
-		c["trail_v"] = maxf(frac, float(c["trail_v"]) - dt * 0.35) if float(c["trail_v"]) > frac else frac
+		var tr := trail_step(float(c["trail_v"]), float(c.get("trail_hold", 0.0)), frac, float(c.get("hp_prev", frac)), dt)
+		c["trail_v"] = tr[0]
+		c["trail_hold"] = tr[1]
+		c["hp_prev"] = frac
 		(c["trail"] as ProgressBar).value = c["trail_v"]
 		var resting := bool(f.flags.get("resting", false)) and f.health > 0.0
 		(c["hp_text"] as Label).text = ("%d  RESTING" % ceili(f.health)) if resting else ("%d" % ceili(f.health) if not f.is_out() else ("KO" if f.state == Fighter.State.KO else "DOWN"))
