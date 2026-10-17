@@ -84,7 +84,10 @@ func _update(dt: float, instant: bool) -> void:
 		want_dist = 5.5
 	var kd := 1.0 if instant else MathX.damp_factor(0.35, dt)
 	dist = lerpf(dist, want_dist, kd)
-	height = lerpf(height, 1.8 + dist * 0.3, kd)
+	# a crowd (5+ fighters) gets a steeper, more top-down angle: from the low duel angle the near cage rail
+	# and posts cut across the fighters in front, and the plate rows cover the bottom of the screen
+	var crowd := clampf((float(pts.size()) - 3.0) / 4.0, 0.0, 1.0) if mode == Mode.FIGHT else 0.0
+	height = lerpf(height, 1.8 + dist * (0.3 + 0.16 * crowd), kd)
 	center = center.lerp(c, 1.0 if instant else MathX.damp_factor(0.12, dt))
 	var cam_yaw := yaw + manual_yaw
 	var offset := Vector3(sin(cam_yaw), 0.0, cos(cam_yaw)) * dist + Vector3.UP * height

@@ -40,6 +40,13 @@ in-game credits entry. Its suite passed (one short-soak flake, cleared by a 6-mi
 
 Follow-up for both art sets (the PR asked for it): in busy Deck-view scenes, the cage's foreground posts and the
 bottom HUD can hide fighters.
+- **Camera, done 2026-10-17 (after 0.9.8).** With 5+ fighters it takes a steeper, more top-down angle (height
+  factor 0.3 → 0.46), so the near rail drops to the bottom edge. Before/after 1280x800 captures are in
+  B:\Critterweight-occlusion.
+- **Next: the HUD.** With 5-8 fighters, two rows of four plates (340 design units each, 24-26 px text) cover
+  the bottom third at 1280x800. Plan: move the second row to the top corners, two left and two right of the
+  timer, rather than shrinking text below the layout audit's minimum. Verify with captures at 1280x800 and
+  1920x1080, then run test_ui_navigation (layout/readability).
 
 **The user's instruction (2026-10-16): don't merge the art pull request straight away.** First publish a separate
 "alt" pre-release built from `main` plus that branch, so the user can compare the two builds side by side.
