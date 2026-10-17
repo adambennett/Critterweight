@@ -55,7 +55,17 @@ static func canonical(v):
 
 
 static func checksum(data) -> String:
+	return Canon.sha256(canonical(data))
+
+
+## The pre-0.9.8 checksum, over raw JSON text, whose float formatting differs between Windows and Linux
+## (Canon). Still accepted when verifying files and tickets written by older builds.
+static func checksum_legacy(data) -> String:
 	return JSON.stringify(canonical(data), "", true, true).sha256_text()
+
+
+static func checksum_matches(data, expected: String) -> bool:
+	return checksum(data) == expected or checksum_legacy(data) == expected
 
 
 ## Data exactly as it will read back: Godot's JSON text round trip is not exact for every double
@@ -184,7 +194,7 @@ func _parse_envelope(text: String, kind: String) -> Dictionary:
 	res["header_ok"] = true
 	var v = env.get("version", 0)
 	res["version"] = int(v) if typeof(v) == TYPE_FLOAT or typeof(v) == TYPE_INT else 0
-	if not env.has("data") or checksum(env["data"]) != str(env.get("checksum", "")):
+	if not env.has("data") or not checksum_matches(env["data"], str(env.get("checksum", ""))):
 		res["error"] = "checksum mismatch (file damaged or edited)"
 		return res
 	res["ok"] = true

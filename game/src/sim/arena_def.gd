@@ -769,6 +769,12 @@ func _base_def_json() -> Dictionary:
 ## Canonical sha256 of the layout as serialized by to_dict() (used by packages and multiplayer
 ## to check that two peers run the same arena). Keys are sorted, integral floats normalized.
 func content_hash() -> String:
+	return Canon.sha256(canonical(to_dict()))
+
+
+## The pre-0.9.8 hash, over raw JSON text, whose float formatting differs between Windows and Linux
+## (Canon). Accepted when importing arena packages made by older builds.
+func content_hash_legacy() -> String:
 	return JSON.stringify(canonical(to_dict()), "", true, true).sha256_text()
 
 

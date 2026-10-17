@@ -31,6 +31,8 @@ func _ready() -> void:
 		mode = "tutorial"
 	elif args.has("--check"):
 		mode = "check"
+	elif args.has("--arena-hash"):
+		mode = "arena_hash"
 	elif args.has("--server"):
 		mode = "server"
 	elif args.has("--net-client"):
@@ -96,6 +98,8 @@ func _start(mode: String) -> void:
 			Tutorial.start(int(arg_value("--tutorial", "0")), arg_value("--creature", ""))
 		"check":
 			_check_scripts()
+		"arena_hash":
+			_arena_hash()
 		"server":
 			# Dedicated server (owned by src/net): headless, no UI.
 			Net.call("start_dedicated_from_cli", args)
@@ -214,6 +218,25 @@ func _do_capture(path: String, k: int, count: int) -> void:
 
 
 ## --check: loads every script under res://src (with autoloads present) and reports failures.
+## Support and cross-platform check: prints an arena's content hash (what peers compare before a
+## match) and, with --out, writes the canonical data it is computed from, so two builds can be diffed.
+func _arena_hash() -> void:
+	var aid := arg_value("--arena-hash", "the_gullet")
+	var a = Content.arena(aid)
+	if a == null:
+		print("ARENA_HASH %s unknown" % aid)
+		get_tree().quit(2)
+		return
+	var canon = ArenaDef.canonical(a.to_dict())
+	print("ARENA_HASH %s %s" % [aid, a.content_hash()])
+	var out := arg_value("--out", "")
+	if out != "":
+		var f := FileAccess.open(out, FileAccess.WRITE)
+		if f:
+			f.store_string(JSON.stringify(canon, "\t", true, true))
+	get_tree().quit(0)
+
+
 func _check_scripts() -> void:
 	var files := _collect_scripts("res://src")
 	var failures := 0

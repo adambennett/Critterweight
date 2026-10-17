@@ -82,7 +82,12 @@ matches back to back, about 32 minutes of fighting at 4x, each left the way the 
 levels off at 326 MB after the first loads (+0.003 MB per match afterwards), nodes stay at 976, orphan
 nodes at 0, and video memory is flat: no leak.
 
-**7. Audio:** the windowed showcase (`audio_showcase.gd -- --quick`) plays the whole chain with real output
+**7. Linux server in a container:** 2026-10-16, `docs/evidence/verification/linux-container-20261016/`. The packaged
+Linux server ran in Debian 12 (Docker on WSL2) and hosted a full duel for two packaged Windows clients.
+It found a cross-platform bug: JSON float text differs between Windows and Linux, so arena and save
+hashes differed. Fixed with `Canon`.
+
+**8. Audio:** the windowed showcase (`audio_showcase.gd -- --quick`) plays the whole chain with real output
 and exits 0 when everything played (docs/AUDIO.md §7).
 
 ## Changes since the last full packaged verification
@@ -106,7 +111,7 @@ verification will be repeated for the release candidate.
 - **Two PCs or the internet:** online play has only run over loopback on one PC.
 - **Steam Deck and Linux runtime:** the Linux game and server packages are built and pass the
   portability checks, but they have not been run on Linux or a Deck. No Linux environment is available
-  here. The exact remaining checks:
+  here (except the server package, which ran in a Debian 12 container, see step 7). The exact remaining checks:
   - **Ubuntu 24.04 LTS x86-64, game package:**
     - boot to the title with a fresh profile;
     - the tutorial;

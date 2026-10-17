@@ -91,3 +91,29 @@ func test_settings_coercion_and_presets() -> void:
 	Settings.set_value("graphics.ao", 2, false, false)
 	check_eq(str(Settings.get_value("graphics.preset")), "custom", "manual change marks preset custom")
 	Settings.set_value("graphics.preset", "high", false, false)
+
+
+## Cross-platform regression (2026-10-16): Godot's JSON.stringify writes fractional doubles with 17
+## significant digits on Windows and 18 on Linux, so checksums and arena hashes over JSON text differed
+## between platforms (a Linux dedicated server refused Windows players' arena). Canon hashes exact bits;
+## files written with the old checksum still verify.
+func test_checksums_do_not_depend_on_float_text() -> void:
+	var form = Canon.form({"hp": 1.6, "xs": [0.2, 3.0, -5.85], "n": 4})
+	var text := JSON.stringify(form, "", true, true)
+	check_eq(text, "{\"hp\":\"f:%s\",\"n\":4,\"xs\":[\"f:%s\",3,\"f:%s\"]}" % [var_to_bytes(1.6).hex_encode(),
+		var_to_bytes(0.2).hex_encode(), var_to_bytes(-5.85).hex_encode()], "only ints, strings and structure are hashed")
+	check(not text.contains("1.6") and not text.contains("5.85"), "no float is written as text")
+	# an arena's hash goes through the same form
+	var a = Content.arena("the_gullet")
+	check_eq(a.content_hash(), Canon.sha256(ArenaDef.canonical(a.to_dict())), "the arena hash is platform-independent")
+	# a file written by an older build, with the legacy checksum, still loads
+	var p := dir.path_join("legacy.json")
+	Saves.write_json(p, "test", 1, {"hp": 1.6, "clout": 10})
+	var env: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(p))
+	env["checksum"] = Saves.checksum_legacy(env["data"])
+	var f := FileAccess.open(p, FileAccess.WRITE)
+	f.store_string(JSON.stringify(env, "\t"))
+	f.close()
+	DirAccess.remove_absolute(p + ".bak")
+	var r := Saves.read_json(p, "test", 1)
+	check(bool(r["ok"]), "a legacy checksum still verifies: %s" % r.get("error", ""))

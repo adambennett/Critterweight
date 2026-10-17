@@ -6,6 +6,12 @@ Work is **paused at a playable preview**, not at the finished release candidate.
 published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
 "Remaining for the release candidate" must be done before a completion audit can pass.
 
+**Cross-platform hash bug (fixed 2026-10-16, after v0.9.7).** The first Linux run found it: the packaged Linux
+server ran in a Debian 12 container (Docker on WSL2) with Windows clients. Godot's JSON writes doubles with
+17 digits on Windows and 18 on Linux, so arena content hashes and save/ticket checksums differed between the
+platforms. A Linux server refused every Windows player's arena. Now `Canon` hashes exact float bits, and
+old hashes are still accepted (docs/evidence/verification/linux-container-20261016).
+
 **Fixed in v0.9.6 (2026-10-16).** Astra reviewed the code and found two bugs:
 - Chum Rush supplement picks did nothing: the mode read a format no supplement uses. The mode now applies
   the campaign format, and offers only OTC and Prescription supplements, never side effects.

@@ -230,7 +230,7 @@ static func make_ticket(state: Dictionary, host: String) -> Dictionary:
 
 
 static func ticket_valid(t: Dictionary) -> bool:
-	return t.has("state") and typeof(t["state"]) == TYPE_DICTIONARY and Saves.checksum(t["state"]) == str(t.get("checksum", ""))
+	return t.has("state") and typeof(t["state"]) == TYPE_DICTIONARY and Saves.checksum_matches(t["state"], str(t.get("checksum", "")))
 
 
 func save_ticket(profile_id: String, ticket: Dictionary) -> Error:

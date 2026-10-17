@@ -1,0 +1,16 @@
+﻿Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+2026-10-17 02:12:01 [INFO] paths: user data root: /srv/verify/root
+2026-10-17 02:12:01 [INFO] app: Critterweight 0.9.7+b3fa368.dirty (Linux x86_64, Godot 4.5.1-stable (official))
+2026-10-17 02:12:01 [INFO] server: content: core 1.0.0; gameplay hash 24f6c2591b89
+2026-10-17 02:12:01 [INFO] playlist: no saved playlist state (first run)
+2026-10-17 02:12:01 [INFO] net: dedicated server 'Linux Container Server' listening on UDP *:7777 (protocol 5, game 0.9.7, content 24f6c2591b89)
+2026-10-17 02:12:01 [INFO] server: ready: 'Linux Container Server' on UDP 7777, 4 players max, playlist 'Verification duel' (1 valid entries)
+2026-10-17 02:12:02 [INFO] net: player 2 'Alice' joined from 172.17.0.1
+2026-10-17 02:12:02 [INFO] net: player 3 'Bob' joined from 172.17.0.1
+2026-10-17 02:12:05 [INFO] net: playlist pick: duel (no votes: highest weight)
+2026-10-17 02:12:05 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-17 02:12:53 [INFO] stats: phase=match players=2 spect=0 match=1 fighters=2 sim_ms(1s avg/max)=0.71/1.16 phys_frame_max_ms=2.05 out=15.1KB/s in=9.3KB/s mem=0.0MB objects=1929 nodes=107 orphans=0
+2026-10-17 02:13:07 [INFO] net: match 1 finished: winner team 0
+2026-10-17 02:13:08 [INFO] net: player 2 'Alice' removed (left)
+2026-10-17 02:13:08 [INFO] net: player 3 'Bob' removed (left)
+2026-10-17 02:13:10 [INFO] net: server idle (no players)

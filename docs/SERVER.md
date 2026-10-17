@@ -318,3 +318,20 @@ the last second (logic + Jolt step).
 | Clients: "Incompatible build" | Different game version or network protocol; update both sides |
 | Playlist entries "skipped" in the log | Entry references content that is not installed; fix or remove it |
 | Lobby says "Waiting for players" | No entry can start with this many humans (bots disallowed); lower `min_players` or allow bots |
+
+## Running in Docker (Linux server package)
+
+The Linux server package runs in an ordinary glibc-based container. It was tested in Debian 12, with
+Windows clients playing a full duel through the mapped UDP port
+(docs/evidence/verification/linux-container-20261016).
+
+```sh
+docker run -d --init --name critterweight -p 7777:7777/udp   -v /opt/critterweight-server:/srv -w /srv --entrypoint /srv/CritterweightServer.x86_64 debian:12   --headless -- --server --config /srv/server.cfg --user-root /srv/data
+```
+
+- Use `--init`. Without it the server is PID 1, which ignores SIGTERM, and `docker stop` has to kill it
+  after its timeout. With `--init` it stops at once (exit 143).
+- Neither way shuts down gracefully. For that, use the TCP admin `shutdown` (bind the admin port inside the
+  container, never publish it) or the console.
+- Keep `--user-root` on the mounted volume so playlist state and logs survive the container.
+

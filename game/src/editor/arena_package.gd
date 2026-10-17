@@ -270,14 +270,15 @@ static func import_package(zip_path: String, install_dir := "", dry_run := false
 		if str(ae.get("id", "")) != a.id:
 			res["errors"].append("%s: id does not match the manifest" % file)
 			continue
-		if a.content_hash() != str(ae.get("content_hash", "")):
+		var want_hash := str(ae.get("content_hash", ""))
+		if a.content_hash() != want_hash and a.content_hash_legacy() != want_hash:
 			res["errors"].append("%s: content hash mismatch" % file)
 			continue
 		var v := ArenaValidator.validate(a)
 		for ve in v["errors"]:
 			res["warnings"].append("%s: %s" % [a.display_name, ve["message"]])
 		res["arenas"].append(d)
-		entries_for_hash.append({"id": a.id, "content_hash": a.content_hash()})
+		entries_for_hash.append({"id": a.id, "content_hash": want_hash})
 	zr.close()
 	if not (res["errors"] as Array).is_empty():
 		res["arenas"] = []
