@@ -74,6 +74,7 @@ just stays where it is.
 
 | Version | Tag | Date | Notes |
 |---|---|---|---|
+| 0.9.8 (preview, playtest build) | [v0.9.8](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.8) -> 57613cc | 2026-10-16 | Cross-platform hashes (Canon): the Linux dedicated server now hosts Windows players (first Linux run, Debian 12 container); saves and party tickets agree across platforms; Docker notes; `--arena-hash`; built on B: (C: nearly full); protocol 5 |
 | 0.9.7 (preview, playtest build) | [v0.9.7](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.7) -> 9e9d93c | 2026-10-16 | Bookie's Table camera presets (Broadcast / Director / Free); its control bar no longer hides the fighter plates; client soak (48 matches, no leak); missing-mod save resume and display Keep/Revert tested; ledger audit; protocol 5 |
 | 0.9.6 (preview, playtest build) | [v0.9.6](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.6) -> 68673c1 | 2026-10-16 | Review fixes: Chum Rush supplement picks apply (OTC/Prescription offers), Chumball KOs no longer score, Rooftop railings along the short edges (were fencing the floor), bots steer round props (Swarm Night stall), flaky resume test fixed; protocol 5 |
 | 0.9.5 (preview, playtest build) | [v0.9.5](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.5) -> d699dfa | 2026-10-16 | Slurry's Head Butt starts at 0.13 s with a shorter lunge (D-034): Dozer vs Slurry 6-6 (was 3-9), Slurry vs Stoke 7-5 (was 9-3); Fight Camp full-run test on seed 1003; protocol 5 |
