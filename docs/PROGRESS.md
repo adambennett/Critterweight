@@ -156,8 +156,15 @@ Possible follow-ups: the AI Lab shows internal ids ("Dozer (f_dozer)"); the camp
 
    **Tried and reverted:** a jab at Dozer's speed. The hit window moved to 0.14-0.22, the windup keys about
    0.02 s earlier, and the lunge went from 2.0 to 2.4 m/s. Results: Slurry 0-24, Dozer 9-15, Jitters 6-18,
-   so jab speed is not the lever. Look at Dredge's AI next (he holds 1.25-1.6 m, inside Slurry's lunge) or at
-   his kit reach.
+   so jab speed is not the lever.
+
+   **Also tried and reverted:** an `outspace` kit hint, in which Dredge's bot holds at the target's jab reach
+   plus 0.15 m (capped at 2.4 m) and answers what comes in. Results: Slurry 1-23, Dozer 14-10, Jitters 3-21.
+   Neither spacing nor jab speed fixes it.
+
+   **Next:** a per-move breakdown of Dredge's losses to Slurry with the diag tool: what lands on him, whether
+   he blocks the jab stream, and how Slurry's L2/L3 and puddles score. Then a kit-level answer, for example
+   armour or a counter on Dredge's guard, measured on 36-bout pairings.
 
    Per-move breakdowns of the other extreme pairings (4 Contender bouts each, different seeds):
    - **Jitters vs Stoke 4-0.** Stoke's jab lands 7 times against Jitters, against 19 times on Gusto. Jitters
