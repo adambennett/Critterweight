@@ -789,8 +789,8 @@ Also LOOPBACK on one PC.
   (`Net.rejoin()`), a restarted game cannot.
 * No in-game mod download: players install missing mods themselves (the join error names
   them); rules presets travel in full and player-made arenas as checked layout packages (§13).
-* Server CPU with 8 fighters is 52-68 % of one core (target < 35 %); the cost is the simulation,
-  not networking (§15).
+* Server CPU with 8 fighters is about 30 % of one core, inside the < 35 % target. It was 52-68 % before the server
+  paced its own frames and used one worker thread (D-030, D-031); the cost is the simulation, not networking (§15).
 * Event types added after the event codec's id table was fixed (arena hazards and props, bosses, ring-out return,
   campaign events; `test_net_parity` lists them) travel with their type name instead of a 1-byte
   id: they work, the event packets are just a little larger. Giving them ids is a protocol bump.

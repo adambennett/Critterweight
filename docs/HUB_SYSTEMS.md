@@ -326,8 +326,8 @@ Sizzle, the profile screen's frame, the can shelf, Rooftop night vs full neon, P
 
 ## 14. Known gaps
 
-- Cosmetics are local and view-only: on your screen your own fighter wears them; other players'
-  cosmetics are not sent in online matches (no field for them in the networked match config yet).
+- Cosmetics are view-only: they never change the simulation. In online matches each player's cosmetics travel with
+  them in the match config, and every client shows them (test_net_loopback `test_cosmetics_travel_with_players_inprocess`).
 - Frames wrap the name card where the active profile's card is shown: the fight HUD, the results
   table and the profile screen. There is no separate lobby name card to frame.
 - Attachments are fitted automatically to each body (§16); a kit can pin any of them with

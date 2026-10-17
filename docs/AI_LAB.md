@@ -14,8 +14,9 @@ held-out episodes), but strength grows with training time. Short runs learn habi
 
 ## 1. Workflow in the game
 
-Open the **AI Lab** screen (main menu → AI Lab; App screen `lab`). Three sample policies ship
-with the game (`content/core/policies/`):
+Open the **AI Lab** screen (main menu → AI Lab; App screen `lab`). Nine sample policies ship with the game
+(`content/core/policies/`): an ES drill policy for each of the six fighters (`f_<id>_es_drill`), plus three for the
+development biped:
 
 - *Drill Hitter (ES)*
 - *Regular Clone (BC)*

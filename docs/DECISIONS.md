@@ -15,7 +15,7 @@ Compared (2026-10-14): Unreal 5, Unity 6, Godot 4, custom Rust (Bevy + Rapier), 
   audio mixing, import and editor tooling would all be rebuilt. Higher delivery risk. Not chosen.
 - Electron/three.js: explicitly discouraged by the brief.
 - GDScript over C#: no .NET runtime in exports, simpler modding story, measured performance is adequate
-  (see D-004). Hot paths stay in engine-native code (Jolt, rendering).
+  (the frame and server benches in docs/VERIFICATION.md). Hot paths stay in engine-native code (Jolt, rendering).
 - Mobile/macOS feasibility: Godot exports to macOS/Android/iOS exist; nothing in our architecture blocks them,
   but they are not built or claimed for this delivery.
 
@@ -38,6 +38,10 @@ in probes (`--probe stand/jab/spar`). Headless multi-world stepping measured at 
   speed/cleanliness, body part, guard/parry, counters, combo scaling, elements. Physics resolves the bodies
   colliding; the game adds knockback/stagger impulses and muscle-tone drops for readable reactions.
 - Cosmetic physics (debris, gore pieces, particles) never feeds back into the simulation.
+
+## D-004 to D-008 (not used)
+These numbers were reserved during the bootstrap and never written. Their measurements live in docs/DESIGN.md
+(targets and budgets) and docs/VERIFICATION.md.
 
 ## D-009 Joint drive convention (measured)
 Godot 4.5.1 + Jolt: a Generic6DOFJoint3D angular spring settles where the relative rotation (B in A's joint frame)
