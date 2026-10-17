@@ -62,6 +62,10 @@ These are means of the two run fps/p95 values, not a pooled p95. The paired aggr
 
 All runs use the same busy-scene implementation, seed 7, eight fighters, five-second warmup and thirty-second measurement on an i7-7700K / RTX 4070 Ti SUPER. These are desktop Deck-preset and High-preset results, not Steam Deck hardware measurements.
 
-Content audit 5/5, content targets 7/7 and hub cosmetics 6/6 passed before and after (18 targeted checks). All 378 scripts compile. The merged-main full suite is pending. Logs, commands and JSON results live in [verification](verification/). Tests are run only through `tools/dev/run_suite.ps1` at BelowNormal with the B: test root; the final unfiltered suite preserves default TEMP and shares the machine-wide lock.
+Content audit 5/5, content targets 7/7 and hub cosmetics 6/6 passed before and after (18 targeted checks). All 378 scripts compile. The same targeted checks pass after merging `origin/main` (`48139c7`) at `12b11b42d55826b5150031e7f5dc3b1cb251305d`; the unfiltered full suite passed at that commit: **684/684, zero failures, 0 skipped** (42.4 minutes). Subsequent changes are final documentation/evidence only. [Full output](verification/art-full-suite.txt) and [run metadata](verification/art-full-suite-run.json). Logs, commands and JSON results live in [verification](verification/). Tests are run only through `tools/dev/run_suite.ps1` at BelowNormal with the B: test root; the final unfiltered suite preserves default TEMP and shares the machine-wide lock.
 
 Reproduction commands and source/provenance details: [ART_PIPELINE.md](../../../ART_PIPELINE.md). Concepts and exact generation prompts: [concepts](../concepts/).
+
+The full run exits 0 but prints a Jolt maximum-job warning and ObjectDB/5-resources-in-use shutdown diagnostics. The same diagnostics and count are present in the earlier [packaged-test baseline](../../verification/20261016-115413/packaged_tests.log.err); they are preserved in the full-suite output above.
+
+The committed full-suite text removes trailing whitespace only. The original runner log remains at `B:\Critterweight-art\captures\art-full-suite.log`.

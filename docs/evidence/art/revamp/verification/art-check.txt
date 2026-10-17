@@ -1,6 +1,6 @@
 Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
 
-2026-10-16 21:09:16 [INFO] paths: user data root: B:/Critterweight-art/test_root
-2026-10-16 21:09:16 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
-2026-10-16 21:09:16 [INFO] app: Critterweight 0.9.6-dev (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-16 21:39:50 [INFO] paths: user data root: B:/Critterweight-art/test_root
+2026-10-16 21:39:50 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
+2026-10-16 21:39:50 [INFO] app: Critterweight 0.9.7-dev (Windows x86_64, Godot 4.5.1-stable (official))
 checked 378 scripts, 0 failures

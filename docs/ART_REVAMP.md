@@ -1,6 +1,6 @@
 # Creature art revamp
 
-Status: final verification in progress on `art/creature-revamp`. Gameplay data is unchanged. This document records the plan, adoption decisions, evidence and proposed updates for Claude; it does not change the release or requirements ledgers.
+Status: ready for Claude's draft-PR review and alternate preview build on `art/creature-revamp`. Gameplay data is unchanged. This document records the plan, adoption decisions, evidence and proposed updates for Claude; it does not change the release or requirements ledgers.
 
 ## Plan and scope
 
@@ -46,7 +46,7 @@ The runtime change is limited to omitting the inflated outline pass on `detail_`
 - Concepts: [thirteen sheets for twelve creatures](evidence/art/concepts/) with [exact prompts/provenance](evidence/art/concepts/prompts.json). The second Kid Lamprey sheet corrects the turnaround views. Original PNGs remain in `B:\Critterweight-art\concepts`.
 - Before captures were regenerated after correcting the preview framing/Hype setup: five category walls, all 22 individual models, duels and eight-fighter scenes at 1920×1080 and 1280×800, plus twelve silhouettes. Sandbox shots use 20 seconds so they show combat rather than the introduction. The new models were restored and imported automatically afterward.
 - Final [before/after gallery, five cast walls, collision/effect fixtures, live motion sheets and 48 px silhouettes](evidence/art/revamp/README.md) are complete and visually reviewed. The six fighter body plans remain distinct; Slurry and Conduit share a serpent plan and rely on scale/colour details. No obvious skin drift was found in the sampled combat poses. Blister was recaptured at 8–11 seconds, with focus-loss pausing disabled only in its isolated capture profile. Performance results are below.
-- Full suite after merging `origin/main`: **pending**. Release packaging, merging and shipping remain Claude's work after user approval.
+- Merged `origin/main` at `48139c7` without conflict; tested merge commit is `12b11b42d55826b5150031e7f5dc3b1cb251305d`. Import, 378-script compilation and the 18 targeted tests pass again. The unfiltered full suite completed with **684/684 passed, zero failures and 0 skipped** in 42.4 minutes, using default TEMP and the isolated B: root. [Full output](evidence/art/revamp/verification/art-full-suite.txt) and [run metadata](evidence/art/revamp/verification/art-full-suite-run.json) record the check. Subsequent commits contain final documentation/evidence only. Release packaging, merging and shipping remain Claude's work after user approval.
 
 Baseline busy benchmark: i7-7700K / RTX 4070 Ti SUPER, Godot 4.5.1 Forward+, eight fighters, seed 7, five-second warmup and thirty-second measurement. Deck preset at 1280×800: **215.936 fps**, frame p95 **7.362 ms**. High at 1920×1080: **186.047 fps**, p95 **7.914 ms**. These are desktop measurements with those presets, not Steam Deck hardware results.
 
@@ -75,7 +75,13 @@ C: free space initially measured 1,725,509,632 bytes. It later dipped to roughly
 
 An early capture helper inherited a redirected B: TEMP, so some earlier art jobs did not share the default-TEMP suite lock. On discovery, heavy work stopped. The wrappers now resolve the user-level default TEMP independently and acquire the real lock before Blender, imports, captures and benches. Final full-suite execution preserves the default TEMP unchanged. No other agent's files or processes were modified.
 
+The final full suite finished on 2026-10-16 at commit `12b11b42d55826b5150031e7f5dc3b1cb251305d`: `tests: 684 run, 0 failed, 684 passed, 0 skipped in 2542.2 s`. C: free space measured 1,820,606,464 bytes before and 3,294,261,248 bytes after. All source/asset work was complete before this run; only final evidence and documentation were changed afterward.
+
+The successful full-suite run also prints Godot shutdown diagnostics: `ObjectDB instances leaked at exit` and `5 resources still in use at exit`. A Jolt maximum-job warning also occurs during the hub wander test. The same Jolt/shutdown diagnostics and resource count appear in the existing [2026-10-16 packaged-test evidence](evidence/verification/20261016-115413/packaged_tests.log.err). They remain visible in the new log; the runner exits 0 and reports all 684 tests passed. This art branch does not claim to resolve that existing shutdown diagnostic.
+
 ## Requests for Claude
+
+Main's current integration notes (`docs/PROGRESS.md`) request an alternate preview build from main plus this branch for the user's side-by-side comparison before any merge. This PR remains draft; Claude owns that build/release step and the later integration suite. No release, tag or packaging work is performed by the art branch.
 
 No body JSON change is requested. The locked proportions support the adopted cleanup; broader concept wings/crests and oversized props were reduced to the existing reach instead of changing gameplay.
 
@@ -99,4 +105,4 @@ For the twelve models listed in `tools/blender/adopted.json`, supplement D-012's
 
 ### Proposed progress/release text
 
-Draft, pending final verification: replaces twelve combat-creature visual models with cleaner faces, fitted shapes and readable signature details; adds editable Blender sources and reproducible export. Preserves every gameplay body and kit, the common shader effects, team tint and cosmetic attachments. Ten optional hub/crowd models retain their original art. See the final evidence and test/benchmark results before promoting this draft into the release ledger.
+Draft for user visual approval; merged-main validation passes all 684 tests: replaces twelve combat-creature visual models with cleaner faces, fitted shapes and readable signature details; adds editable Blender sources and reproducible export. Preserves every gameplay body and kit, the common shader effects, team tint and cosmetic attachments. Ten optional hub/crowd models retain their original art. Claude should first provide the separate alternate preview requested on main, then wait for the user's art choice before integration and release-ledger updates.

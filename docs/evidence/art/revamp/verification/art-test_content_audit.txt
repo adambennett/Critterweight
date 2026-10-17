@@ -1,13 +1,13 @@
 Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
 
-2026-10-16 21:02:42 [INFO] paths: user data root: B:/Critterweight-art/test_root
-2026-10-16 21:02:42 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
-2026-10-16 21:02:42 [INFO] app: Critterweight 0.9.6-dev (Windows x86_64, Godot 4.5.1-stable (official))
-ok    res://src/test/core/test_content_audit.gd::test_arenas_have_safe_spawns_inside_bounds (13 ms)
-ok    res://src/test/core/test_content_audit.gd::test_bundled_example_mods_validate (17 ms)
-2026-10-16 21:02:44 [INFO] mods: loaded 0 mod(s): (none)
-2026-10-16 21:02:45 [INFO] mods: loaded 0 mod(s): (none)
-ok    res://src/test/core/test_content_audit.gd::test_core_package_loads_without_errors (502 ms)
-ok    res://src/test/core/test_content_audit.gd::test_every_creature_parses_and_assets_exist (34 ms)
+2026-10-16 21:40:09 [INFO] paths: user data root: B:/Critterweight-art/test_root
+2026-10-16 21:40:09 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
+2026-10-16 21:40:09 [INFO] app: Critterweight 0.9.7-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/core/test_content_audit.gd::test_arenas_have_safe_spawns_inside_bounds (32 ms)
+ok    res://src/test/core/test_content_audit.gd::test_bundled_example_mods_validate (24 ms)
+2026-10-16 21:40:12 [INFO] mods: loaded 0 mod(s): (none)
+2026-10-16 21:40:12 [INFO] mods: loaded 0 mod(s): (none)
+ok    res://src/test/core/test_content_audit.gd::test_core_package_loads_without_errors (621 ms)
+ok    res://src/test/core/test_content_audit.gd::test_every_creature_parses_and_assets_exist (31 ms)
 ok    res://src/test/core/test_content_audit.gd::test_tutorial_achievements_and_presets_complete (0 ms)
-tests: 5 run, 0 failed, 5 passed, 0 skipped in 8.7 s
+tests: 5 run, 0 failed, 5 passed, 0 skipped in 9.3 s
