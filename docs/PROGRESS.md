@@ -43,10 +43,10 @@ bottom HUD can hide fighters.
 - **Camera, done 2026-10-17 (after 0.9.8).** With 5+ fighters it takes a steeper, more top-down angle (height
   factor 0.3 → 0.46), so the near rail drops to the bottom edge. Before/after 1280x800 captures are in
   B:\Critterweight-occlusion.
-- **Next: the HUD.** With 5-8 fighters, two rows of four plates (340 design units each, 24-26 px text) cover
-  the bottom third at 1280x800. Plan: move the second row to the top corners, two left and two right of the
-  timer, rather than shrinking text below the layout audit's minimum. Verify with captures at 1280x800 and
-  1920x1080, then run test_ui_navigation (layout/readability).
+- **HUD, done 2026-10-17.** With 5-8 fighters, fighters 1-4 keep the bottom row, and fighters 5-8 move to the
+  top corners, split around the timer. Text sizes are unchanged. At 1280x800 the floor is now clear, and the
+  busy-scene capture shows all eight fighters (B:\Critterweight-occlusionusy8_deck_hud.png).
+  test_ui_navigation is green.
 
 **The user's instruction (2026-10-16): don't merge the art pull request straight away.** First publish a separate
 "alt" pre-release built from `main` plus that branch, so the user can compare the two builds side by side.
