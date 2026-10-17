@@ -17,6 +17,11 @@ A cohesive cartoony 3D style for a physical, readable, slightly grubby combat sp
 | Scale cues | Each fighter carries one human-scale object (Stoke's wraps, Dredge's chain, Dozer's headlamp, Slurry's pipe collars, Jitters' battery cap, Gusto's shin tape) so size reads against the cage. |
 | NPC/minion | Scraplings are deliberately low-detail (6 colors, flat shading tier) so a crowd of 16 stays readable. |
 
+The creature revamp keeps these silhouettes inside the existing collision bodies. Expressive eyes,
+clean colour boundaries and fitted plates replace swollen junctions; concepts do not authorize larger
+heads, fists or wings than their hit volumes. Fine facial details share the toon effects but omit the
+inflated outline pass, so outlines describe the silhouette instead of obscuring the face.
+
 ## 3. Palettes
 
 ### 3.1 Global
@@ -62,6 +67,10 @@ Rule: no two fighters share a primary hue family; Stoke (orange-red) and Dredge 
 | Cloth (wraps, tape, Kid's hoodie) | flat | 0.9 | Stitch decals |
 | Emissive accents | element color | — | Intensity drives from Hype (0.3 at 0 Hype → 1.0 at 100) on each fighter's "Hype feature" (crest smoke, barnacle glow, coil, headlamp, drip rate, feather sheen) |
 | Floors | desaturated, low-frequency gradients | 0.7 | Decal layer for stains, logos, hazard footprints |
+
+Revamp implementation: vertex colours provide all albedo and glow masks. Jitters uses an opaque painted
+jelly window and a fitted luminous coil; there is no transparency sorting or refraction cost. The existing
+shared creature shader retains its toon ramp, rim, Hype, JUICE, flash, status and bruise effects.
 
 Lighting: one key, one fill (sky), one rim per arena; **soft shadows** (PCF 3×3 at the Deck preset, 5×5 at high); SSAO at 0.6 intensity (scalable to off); HDR with a filmic tonemap and a slight warm lift. The look must survive the lowest preset: everything that matters is albedo + silhouette, not lighting.
 
@@ -145,10 +154,10 @@ Readability: hit flashes are white (not element color) so a hit always reads the
 
 | Item | Target |
 |---|---|
-| Fighter mesh | 6–12k triangles, one 2048 atlas (albedo/roughness/metal/emissive packed), segments skinned to the ragdoll bones with ≤ 2 influences at joints |
-| Minion mesh | ≤ 2k triangles, 512 atlas |
-| Boss mesh | ≤ 25k, 2× 2048 |
+| Fighter mesh | 6–12k triangles including the KO piece; at most one 1024² atlas if needed, VRAM-compressed on import (revamp uses none); exact body-segment bones, ≤ 4 influences per vertex (revamp uses at most 2) |
+| Minion mesh | ≤ 2k triangles including the KO piece; revamp uses vertex colours, no texture |
+| Boss mesh | ≤ 25k triangles including the KO piece; revamp uses vertex colours, no texture |
 | Arena | ≤ 150k triangles total scene, props ≤ 3k each, crowd as billboarded silhouettes (3 rows, 2 anim frames) |
-| Source masters | glTF export from the DCC with embedded materials; rigs and effector-path reference poses kept as named animations in the same file (`pose_stance`, `pose_guard`, `atk_l1_*`) |
+| Source masters | Compressed editable `.blend` plus reproducible GLB exporter for adopted models; original forge definitions for retained models. Import the original GLB to preserve exact segment pivots. Fighter motion comes from the existing simulation and move/pose data; no keyframed fighter animations are exported. |
 | Icons | SVG masters, exported at 64/128/256 |
 | Style check | Every new asset is screenshot against the "style wall" (one fighter, one Scrapling, The Gullet, the HUD) under the Deck preset before approval |

@@ -77,14 +77,15 @@ func _palette(key: String, fallback: Color) -> Color:
 	return fallback
 
 
-func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := false) -> ShaderMaterial:
+func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := false, outlined := true) -> ShaderMaterial:
 	var m := Materials.creature_material()
 	m.set_shader_parameter("tint", color)
 	m.set_shader_parameter("roughness_v", float(creature.art.get("roughness", 0.65)) if roughness < 0.0 else roughness)
 	m.set_shader_parameter("metallic_v", metallic)
 	m.set_shader_parameter("vertex_glow", 1.0 if glow else 0.0)
 	m.set_shader_parameter("time_offset", randf() * 10.0)
-	m.next_pass = Materials.outline_material(float(creature.art.get("outline", 0.012)))
+	if outlined:
+		m.next_pass = Materials.outline_material(float(creature.art.get("outline", 0.012)))
 	_materials.append(m)
 	if glow:
 		_glow_materials.append(m)
@@ -147,14 +148,17 @@ func _try_load_model(path: String) -> bool:
 			var metal := 0.0
 			var glow := false
 			var tint := Color.WHITE
+			var outlined := true
 			if src is BaseMaterial3D:
 				var bm := src as BaseMaterial3D
 				rough = bm.roughness
 				metal = bm.metallic
 				glow = bm.emission_enabled
+				# Surface details keep all creature effects, without an inflated inner outline.
+				outlined = not bm.resource_name.begins_with("detail_")
 				if bm.resource_name == "team":
 					tint = team_color
-			mi.set_surface_override_material(si, _make_material(tint, rough, metal, glow))
+			mi.set_surface_override_material(si, _make_material(tint, rough, metal, glow, outlined))
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	return true
 

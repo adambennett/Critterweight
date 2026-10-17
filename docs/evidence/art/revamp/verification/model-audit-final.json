@@ -1,0 +1,634 @@
+[
+  {
+    "id": "boss_bilge",
+    "bodyTriangles": 20284,
+    "goreTriangles": 116,
+    "triangles": 20400,
+    "budget": 25000,
+    "vertices": 10308,
+    "bytes": 746412,
+    "maxWeights": 2,
+    "materials": [
+      "skin",
+      "metal",
+      "detail_skin",
+      "detail_metal",
+      "detail_eye",
+      "team"
+    ],
+    "glowVertices": 296,
+    "outsideCollision": {
+      "maxM": 0.047826187776009055,
+      "p95M": 0.02195569140986453,
+      "verticesOver5cm": 0,
+      "maxByDominantBone": {
+        "pelvis": 0,
+        "chest": 0,
+        "neck1": 0.08522633797817825,
+        "head": 0.047826187776009055,
+        "shin_bl": 0.017424433015280627,
+        "shin_br": 0.017424433015280627,
+        "shin_fl": 0.01742456050905486,
+        "shin_fr": 0.01742456050905486,
+        "tail": 0,
+        "chain": 0.000003721663512833151,
+        "thigh_bl": 0,
+        "thigh_br": 0,
+        "thigh_fl": 0.008722542940697686,
+        "thigh_fr": 0,
+        "neck2": 2.6499508309907327e-8
+      },
+      "furthestVertices": []
+    },
+    "sha256": "a979f40d6a4d949b4a5e61fedd59de5f94840bb13facdba16dd591614a75fa61",
+    "errors": []
+  },
+  {
+    "id": "boss_conduit",
+    "bodyTriangles": 12252,
+    "goreTriangles": 116,
+    "triangles": 12368,
+    "budget": 25000,
+    "vertices": 7186,
+    "bytes": 510140,
+    "maxWeights": 2,
+    "materials": [
+      "skin",
+      "metal",
+      "detail_skin",
+      "detail_metal",
+      "detail_eye",
+      "team"
+    ],
+    "glowVertices": 1910,
+    "outsideCollision": {
+      "maxM": 0.04200000206882065,
+      "p95M": 0.022204931528623517,
+      "verticesOver5cm": 0,
+      "maxByDominantBone": {
+        "body7": 0.013000026755126154,
+        "body6": 0.013000121116638147,
+        "body5": 0.013000113116058476,
+        "body4": 0.019674398073559862,
+        "body3": 0.013000050184822809,
+        "body2": 0.013000091568708017,
+        "body1": 0.013000095538465345,
+        "head": 0.04200000206882065,
+        "plug": 0
+      },
+      "furthestVertices": []
+    },
+    "sha256": "a92b177837efb70e65d85eb805714665ad71d60a6283eee919d8458717d06ef0",
+    "errors": []
+  },
+  {
+    "id": "boss_snappington",
+    "bodyTriangles": 21852,
+    "goreTriangles": 608,
+    "triangles": 22460,
+    "budget": 25000,
+    "vertices": 11352,
+    "bytes": 816624,
+    "maxWeights": 2,
+    "materials": [
+      "skin",
+      "detail_skin",
+      "detail_metal",
+      "detail_eye",
+      "metal",
+      "team"
+    ],
+    "glowVertices": 1536,
+    "outsideCollision": {
+      "maxM": 0.05359848129745953,
+      "p95M": 0.038345691411863614,
+      "verticesOver5cm": 23,
+      "maxByDominantBone": {
+        "head": 0.05359848129745953,
+        "shell": 0.028000062508993562,
+        "claw_r": 0.030000057745280473,
+        "uclaw_l": 0.010797087322848065,
+        "claw_l": 0.045166227550747395,
+        "lleg_bl": 7.775858917868916e-8,
+        "lleg_br": 7.775858917868916e-8,
+        "lleg_fl": 7.775858917868916e-8,
+        "lleg_fr": 7.775858917868916e-8,
+        "uclaw_r": 0,
+        "uleg_bl": 0,
+        "uleg_br": 0,
+        "uleg_fl": 0,
+        "uleg_fr": 0,
+        "neck": 0,
+        "tail": 0
+      },
+      "furthestVertices": [
+        {
+          "bone": "head",
+          "position": [
+            -0.13179250061511993,
+            1.3807145357131958,
+            1.8701921701431274
+          ],
+          "outside": 0.05359848129745953
+        },
+        {
+          "bone": "head",
+          "position": [
+            0.13179250061511993,
+            1.3807145357131958,
+            1.8701921701431274
+          ],
+          "outside": 0.05359848129745953
+        },
+        {
+          "bone": "head",
+          "position": [
+            -0.1287177950143814,
+            1.3897489309310913,
+            1.8630738258361816
+          ],
+          "outside": 0.053409190805524975
+        },
+        {
+          "bone": "head",
+          "position": [
+            0.1287177950143814,
+            1.3897489309310913,
+            1.8630738258361816
+          ],
+          "outside": 0.053409190805524975
+        },
+        {
+          "bone": "head",
+          "position": [
+            -0.16782499849796295,
+            1.3048244714736938,
+            1.8957334756851196
+          ],
+          "outside": 0.05273594325221265
+        },
+        {
+          "bone": "head",
+          "position": [
+            -0.159653902053833,
+            1.31789231300354,
+            1.8948575258255005
+          ],
+          "outside": 0.052492260256908674
+        },
+        {
+          "bone": "head",
+          "position": [
+            -0.1523302048444748,
+            1.312425971031189,
+            1.9023334980010986
+          ],
+          "outside": 0.05202101740058018
+        },
+        {
+          "bone": "head",
+          "position": [
+            -0.1788640022277832,
+            1.3197999000549316,
+            1.877074122428894
+          ],
+          "outside": 0.05186050962271482
+        }
+      ]
+    },
+    "sha256": "48274a3e67a8baa33fcb8fbcc07a7c09f59d5788dd4ae6541653c14723132e66",
+    "errors": []
+  },
+  {
+    "id": "f_dozer",
+    "bodyTriangles": 11532,
+    "goreTriangles": 92,
+    "triangles": 11624,
+    "budget": 12000,
+    "vertices": 6320,
+    "bytes": 454440,
+    "maxWeights": 2,
+    "materials": [
+      "skin",
+      "detail_skin",
+      "detail_metal",
+      "detail_eye",
+      "metal",
+      "team"
+    ],
+    "glowVertices": 218,
+    "outsideCollision": {
+      "maxM": 0.045168223356744974,
+      "p95M": 0.02689746927779388,
+      "verticesOver5cm": 0,
+      "maxByDominantBone": {
+        "shin_bl": 0.009886101428263808,
+        "shin_br": 0.009886101428263808,
+        "shin_fl": 0.007000000476837187,
+        "shin_fr": 0.007000000476837187,
+        "head": 0.045168223356744974,
+        "pelvis": 3.741324028361248e-8,
+        "chest": 0.018120643188372365,
+        "thigh_bl": 0,
+        "thigh_br": 0,
+        "thigh_fl": 0.008119804594239013,
+        "thigh_fr": 0,
+        "tail": 0,
+        "neck": 0
+      },
+      "furthestVertices": []
+    },
+    "sha256": "357de8b27ba485170b6f6336a65f0f6ace79553a2b59644d133e40f7d634c478",
+    "errors": []
+  },
+  {
+    "id": "f_dredge",
+    "bodyTriangles": 11420,
+    "goreTriangles": 92,
+    "triangles": 11512,
+    "budget": 12000,
+    "vertices": 5854,
+    "bytes": 425908,
+    "maxWeights": 2,
+    "materials": [
+      "skin",
+      "metal",
+      "detail_metal",
+      "detail_skin",
+      "detail_eye",
+      "team"
+    ],
+    "glowVertices": 456,
+    "outsideCollision": {
+      "maxM": 0.04355730052839679,
+      "p95M": 0.027634945330194338,
+      "verticesOver5cm": 0,
+      "maxByDominantBone": {
+        "shell": 0.04355730052839679,
+        "uclaw_l": 0.006617542076561525,
+        "uclaw_r": 0,
+        "claw_l": 0.020308435119684387,
+        "claw_r": 0.03748738976119559,
+        "lleg_bl": 0.008453351441307884,
+        "lleg_br": 0.008453351441307884,
+        "lleg_fl": 0.008453351441307884,
+        "lleg_fr": 0.008453351441307884,
+        "head": 0.028097275956782936,
+        "uleg_bl": 0,
+        "uleg_br": 0,
+        "uleg_fl": 0,
+        "uleg_fr": 0
+      },
+      "furthestVertices": []
+    },
+    "sha256": "549ef28119bd564b8aba31054cf0c1c5b5932b2dd2cdd212b77c9fc26d8289a6",
+    "errors": []
+  },
+  {
+    "id": "f_gusto",
+    "bodyTriangles": 9868,
+    "goreTriangles": 168,
+    "triangles": 10036,
+    "budget": 12000,
+    "vertices": 5138,
+    "bytes": 372596,
+    "maxWeights": 2,
+    "materials": [
+      "skin",
+      "detail_skin",
+      "detail_eye",
+      "detail_cloth",
+      "team"
+    ],
+    "glowVertices": 36,
+    "outsideCollision": {
+      "maxM": 0.05911123514665953,
+      "p95M": 0.026394612148237823,
+      "verticesOver5cm": 27,
+      "maxByDominantBone": {
+        "shin_l": 0.018072499368939968,
+        "shin_r": 0.018072499368939968,
+        "head": 0.05145361288784009,
+        "uwing_l": 0.04393486578532019,
+        "lwing_l": 0.05911123514665953,
+        "uwing_r": 0.04393486578532019,
+        "lwing_r": 0.05911123514665953,
+        "thigh_l": 0,
+        "thigh_r": 0,
+        "neck": 0,
+        "tail": 0.016138616423679725,
+        "torso": 0
+      },
+      "furthestVertices": [
+        {
+          "bone": "lwing_l",
+          "position": [
+            1.1314353942871094,
+            1.1101312637329102,
+            -0.13071340322494507
+          ],
+          "outside": 0.05911123514665953
+        },
+        {
+          "bone": "lwing_r",
+          "position": [
+            -1.1314353942871094,
+            1.1101312637329102,
+            -0.13071340322494507
+          ],
+          "outside": 0.05911123514665953
+        },
+        {
+          "bone": "lwing_l",
+          "position": [
+            1.13196861743927,
+            1.1106444597244263,
+            -0.1315733939409256
+          ],
+          "outside": 0.059043088223777004
+        },
+        {
+          "bone": "lwing_r",
+          "position": [
+            -1.13196861743927,
+            1.1106444597244263,
+            -0.1315733939409256
+          ],
+          "outside": 0.059043088223777004
+        },
+        {
+          "bone": "lwing_l",
+          "position": [
+            1.1318572759628296,
+            1.1100651025772095,
+            -0.12966230511665344
+          ],
+          "outside": 0.059003312332740504
+        },
+        {
+          "bone": "lwing_r",
+          "position": [
+            -1.1318572759628296,
+            1.1100651025772095,
+            -0.12966230511665344
+          ],
+          "outside": 0.059003312332740504
+        },
+        {
+          "bone": "lwing_l",
+          "position": [
+            1.1333140134811401,
+            1.1114673614501953,
+            -0.13201169669628143
+          ],
+          "outside": 0.05882671123939538
+        },
+        {
+          "bone": "lwing_r",
+          "position": [
+            -1.1333140134811401,
+            1.1114673614501953,
+            -0.13201169669628143
+          ],
+          "outside": 0.05882671123939538
+        }
+      ]
+    },
+    "sha256": "829f564f68fe97af66dbc5922551426791f326fa01c289f0c81d91bb724ccb3a",
+    "errors": []
+  },
+  {
+    "id": "f_jitters",
+    "bodyTriangles": 9056,
+    "goreTriangles": 140,
+    "triangles": 9196,
+    "budget": 12000,
+    "vertices": 4677,
+    "bytes": 340012,
+    "maxWeights": 2,
+    "materials": [
+      "metal",
+      "detail_skin",
+      "detail_metal",
+      "detail_eye",
+      "skin",
+      "team"
+    ],
+    "glowVertices": 874,
+    "outsideCollision": {
+      "maxM": 0.04850216574662991,
+      "p95M": 0.023058791880826324,
+      "verticesOver5cm": 0,
+      "maxByDominantBone": {
+        "antenna_l": 0.010332263093523898,
+        "antenna_r": 0.010332263093523898,
+        "body": 0.04850216574662991,
+        "coil": 0,
+        "arm_l": 0.018597045473374846,
+        "arm_r": 0.018597045473374846
+      },
+      "furthestVertices": []
+    },
+    "sha256": "3d43a61cc5d89c6e8d37f4c679fcbd811f9bdf1b5dfd9bf42e3d30e5659ea8c8",
+    "errors": []
+  },
+  {
+    "id": "f_slurry",
+    "bodyTriangles": 7640,
+    "goreTriangles": 92,
+    "triangles": 7732,
+    "budget": 12000,
+    "vertices": 3928,
+    "bytes": 286860,
+    "maxWeights": 2,
+    "materials": [
+      "metal",
+      "skin",
+      "detail_metal",
+      "detail_skin",
+      "detail_eye",
+      "team"
+    ],
+    "glowVertices": 180,
+    "outsideCollision": {
+      "maxM": 0.05311731059916616,
+      "p95M": 0.01605388691228002,
+      "verticesOver5cm": 1,
+      "maxByDominantBone": {
+        "body1": 0.05311731059916616,
+        "body2": 0.047820149797434236,
+        "body3": 0.024502546122980307,
+        "body6": 0,
+        "body5": 0.004584541792070768,
+        "body4": 0.006395030609385177,
+        "head": 0.04948743789060972
+      },
+      "furthestVertices": [
+        {
+          "bone": "body1",
+          "position": [
+            0,
+            1.1699999570846558,
+            -0.03999999910593033
+          ],
+          "outside": 0.05311731059916616
+        }
+      ]
+    },
+    "sha256": "ec8dcfbc2a5de00b012ea35f43bdf080866ad5624858b3866009ee9f7d35640e",
+    "errors": []
+  },
+  {
+    "id": "f_stoke",
+    "bodyTriangles": 11784,
+    "goreTriangles": 92,
+    "triangles": 11876,
+    "budget": 12000,
+    "vertices": 6792,
+    "bytes": 484908,
+    "maxWeights": 2,
+    "materials": [
+      "skin",
+      "metal",
+      "detail_skin",
+      "detail_eye",
+      "detail_cloth",
+      "detail_metal",
+      "team",
+      "cloth"
+    ],
+    "glowVertices": 180,
+    "outsideCollision": {
+      "maxM": 0.04975847570893116,
+      "p95M": 0.035453992199423245,
+      "verticesOver5cm": 0,
+      "maxByDominantBone": {
+        "pelvis": 0.004821900991357403,
+        "chest": 0.04975847570893116,
+        "head": 0.05418134565947122,
+        "farm_l": 0.009288780801349275,
+        "farm_r": 0.009288780801349275,
+        "shin_l": 0.004999997019767749,
+        "shin_r": 0.004999997019767749,
+        "tail": 0.034307280395919834,
+        "uarm_l": 0,
+        "uarm_r": 0,
+        "thigh_l": 0,
+        "thigh_r": 0
+      },
+      "furthestVertices": []
+    },
+    "sha256": "6de45966f1bc89b2ae9d801493cf991e719e0a755e329ce4d9891c793842b0b2",
+    "errors": []
+  },
+  {
+    "id": "npc_blister",
+    "bodyTriangles": 1672,
+    "goreTriangles": 100,
+    "triangles": 1772,
+    "budget": 2000,
+    "vertices": 924,
+    "bytes": 69464,
+    "maxWeights": 2,
+    "materials": [
+      "detail_eye",
+      "detail_skin",
+      "skin",
+      "team"
+    ],
+    "glowVertices": 48,
+    "outsideCollision": {
+      "maxM": 0.024232349076045434,
+      "p95M": 0.017637042897054533,
+      "verticesOver5cm": 0,
+      "maxByDominantBone": {
+        "core": 0.024232349076045434,
+        "nub_l": 0.0015545036360707087,
+        "nub_r": 0
+      },
+      "furthestVertices": []
+    },
+    "sha256": "0e46d657a6bc604bd79dcb0f8fd7f1df336a5fa76f9eed99b539161d24c94ce1",
+    "errors": []
+  },
+  {
+    "id": "npc_kid_lamprey",
+    "bodyTriangles": 1984,
+    "goreTriangles": 4,
+    "triangles": 1988,
+    "budget": 2000,
+    "vertices": 1192,
+    "bytes": 89884,
+    "maxWeights": 2,
+    "materials": [
+      "cloth",
+      "detail_eye",
+      "detail_cloth",
+      "detail_skin",
+      "skin",
+      "team",
+      "eye"
+    ],
+    "glowVertices": 32,
+    "outsideCollision": {
+      "maxM": 0.045251057428106006,
+      "p95M": 0.028845411924708075,
+      "verticesOver5cm": 0,
+      "maxByDominantBone": {
+        "farm_l": 0,
+        "farm_r": 0,
+        "shin_l": 1.9992005642494174e-9,
+        "shin_r": 1.9992005642494174e-9,
+        "thigh_l": 0,
+        "thigh_r": 0,
+        "uarm_l": 0,
+        "uarm_r": 0,
+        "head": 0.1050000240217965,
+        "chest": 0.03072220673416129,
+        "tail1": 0,
+        "tail2": 0,
+        "pelvis": 0
+      },
+      "furthestVertices": []
+    },
+    "sha256": "0671700d65f0aa3b40019bd4515dad4803a97ae5f1d777a70bf2f46a4b966754",
+    "errors": []
+  },
+  {
+    "id": "npc_scrapling",
+    "bodyTriangles": 1652,
+    "goreTriangles": 108,
+    "triangles": 1760,
+    "budget": 2000,
+    "vertices": 1632,
+    "bytes": 110020,
+    "maxWeights": 2,
+    "materials": [
+      "metal",
+      "detail_skin",
+      "detail_eye",
+      "detail_metal",
+      "skin",
+      "team"
+    ],
+    "glowVertices": 86,
+    "outsideCollision": {
+      "maxM": 0.04530789060211653,
+      "p95M": 0.025716623980231154,
+      "verticesOver5cm": 0,
+      "maxByDominantBone": {
+        "arm_l": 0.020000001192092904,
+        "head": 0.04530789060211653,
+        "arm_r": 0,
+        "shin_l": 3.18288948504402e-10,
+        "shin_r": 3.18288948504402e-10,
+        "thigh_l": 0,
+        "thigh_r": 0,
+        "torso": 0.006999994516372676
+      },
+      "furthestVertices": []
+    },
+    "sha256": "46590c9cac387b1fd81b616b2fd4df6d7da2b21831b76ef50dd9194ef6e7015a",
+    "errors": []
+  }
+]

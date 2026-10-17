@@ -1,0 +1,212 @@
+[
+  {
+    "id": "f_stoke",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Service model identifier not exposed by the built-in tool; do not infer.",
+    "prompt": "Use case: stylized-concept. Asset type: original Critterweight creature turnaround for a Godot physics cartoon brawler. Create a polished character model sheet on warm off-white paper, three equal large full-body views: FRONT, SIDE, THREE-QUARTER, plus a small head-expression study and 5 palette swatches. Consistent hand-designed 3D cartoon house style: sculpted clean flowing surfaces, clear big colour blocks, deliberate rounded edges, appealing expressive eyes, readable silhouette, modest surface detail, satin materials, soft studio shadows. No franchise references, no brands, no logos, no noisy spots, no realistic pores, no bulky inflated shoulders, no random extra accessories. The same character and proportions in every view. Neutral standing/rest posture. These are visual refinements over locked collision bodies; obey the specified proportions. Labels only character name and view names. Landscape composition. Character: STOKE, the Boiler Newt, an impatient but lovable pressure boxer. Burnt orange #D9532B amphibian biped with a round cast-iron boiler belly plate #3A3A42 hugging the torso, a small arched furnace hatch with three glowing ember-orange #FF7A1A vents, cream #EDE6D6 bandage wraps on compact fists, short newt tail, short swept-back iron stovepipe crest. Wide expressive yellow eyes under thick lowered brows, broad newt muzzle with asymmetric self-confident grin and two tiny teeth. Main body is a barrel, separated naturally from slender capsule arms, knees and shins; sculpted shoulders with negative space under arms. Crucial fixed dimensions: total body height 1.53 m (crest reaches 1.67), belly radius .31 m centered at y1.0, head diameter .34 m centered y1.36, shoulders x ±.38 y1.15, arms hang beside body ending compact .24 m diameter wrapped fists at y.50. Pelvis y.62, feet floor. Do not enlarge head or fists beyond these ratios. Torso-to-shoulder transition sleek; no spherical shoulder pads. Keep orange the dominant colour, boiler as a fitted front inset, thin neutral team-tape on upper arms. Charm from the face and confident stance, not bulk.",
+    "output": "f_stoke-turnaround-v1.jpg",
+    "originalPNG_SHA256": "93fca6da05f6fccca69bc7bb5d85e270de67629a3b5a64ff910381cb254c801e",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "f_jitters",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Service model identifier not exposed by the built-in tool; do not infer.",
+    "prompt": "Use case: stylized-concept. Asset type: original Critterweight creature turnaround for a Godot physics cartoon brawler. Create a polished character model sheet on warm off-white paper, three equal large full-body views: FRONT, SIDE, THREE-QUARTER, plus a small head-expression study and 5 palette swatches. Consistent hand-designed 3D cartoon house style: sculpted clean flowing surfaces, clear big colour blocks, deliberate rounded edges, appealing expressive eyes, readable silhouette, modest surface detail, satin materials, soft studio shadows. No franchise references, no brands, no logos, no noisy spots, no realistic pores, no bulky inflated shoulders, no random extra accessories. The same character and proportions in every view. Neutral standing/rest posture. These are visual refinements over locked collision bodies; obey the specified proportions. Labels only character name and view names. Landscape composition. Character: JITTERS, the Battery Jelly, a permanently over-caffeinated nervous ball with ears. Small rounded translucent-looking cyan-white #BDEFFF jelly body, lavender #B59CE0 short rubbery arms at the sides, two thin dark antenna stems with pale yellow #F7E04A bulbs, small dark-steel #3C4650 battery cap. A tidy yellow #FFF27A glowing coil motif visible through a soft pearly belly window. Nervous expressive oval eyes with large dark pupils, tiny crooked mouth, raised uneven brows, cute cheek pinches. Main body diameter about .72 m, center y.42; total bulbs height .97 m, two stubby lateral arms only, NO legs or feet. Show gelatin impression through a clean pale perimeter and simple internal coil shapes, not photoreal refraction. Keep hand tips registered to short lateral capsules. Ball silhouette with thin antenna negative space. One slim neutral team-tint band near the lower belly. Restrained glossy highlights, smooth clean contour, no lumpy eyes or huge hands.",
+    "output": "f_jitters-turnaround-v1.jpg",
+    "originalPNG_SHA256": "e98afac8c125ee069f7d12dd4f02c09792c00460082f8839060303eb7793a3e4",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "f_dredge",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Service model identifier not exposed by the built-in tool; do not infer.",
+    "prompt": "Use case: stylized-concept. Asset type: original Critterweight creature turnaround for a Godot physics cartoon brawler. Create a polished character model sheet on warm off-white paper, three equal large full-body views: FRONT, SIDE, THREE-QUARTER, plus a small head-expression study and 5 palette swatches. Consistent hand-designed 3D cartoon house style: sculpted clean flowing surfaces, clear big colour blocks, deliberate rounded edges, appealing expressive eyes, readable silhouette, modest surface detail, satin materials, soft studio shadows. No franchise references, no brands, no logos, no noisy spots, no realistic pores, no bulky inflated shoulders, no random extra accessories. The same character and proportions in every view. Neutral standing/rest posture. These are visual refinements over locked collision bodies; obey the specified proportions. Labels only character name and view names. Landscape composition. Character: DREDGE, the Dock Crab, a weary salty old dockworker. Rust-red #8C3B2B low broad chitin shell with cream #E8D9B8 underside and pale grey #B9B3A6 sparse barnacles. Four visible slender articulated walking legs, two claw arms thrust forward. Right crusher claw on viewer LEFT in front view is much larger than left cutter, dark charcoal claw tips #2E2A28, simple steel mooring chain #7A7F85 around crusher. Two short eyestalks with half-lidded pale #DDF3FF eyes, heavy expressive brow lids, resigned crooked mouth between claws. Clear anvil silhouette, shell horizontal wide flattened oval, NOT tall round balloon. Exact dimensions: body shell approx 1.16m wide, overall feet width about2m; total eyestalk height1.11m, shell centered y.55. Preserve claw tip position and forward reach approx1.15m from root; palms should be flattened sculpted pincers, not fleshy fists. Claws have clean readable split mouths with small ivory cutting ridges. Keep only a few designed barnacle clusters with subtle brine-blue #2E9BE0 glow. Slim neutral team stripe on shell rim. Smooth stylized chitin, no random chipped noise.",
+    "output": "f_dredge-turnaround-v1.jpg",
+    "originalPNG_SHA256": "17b66b60070981e5dc42cd2b6f3403801673d0017ee0ba6a47d0815ff72d0a62",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "f_slurry",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Service model identifier not exposed by the built-in tool; do not infer.",
+    "prompt": "Use case: stylized-concept. Asset type: original Critterweight creature turnaround for a Godot physics cartoon brawler. Create a polished character model sheet on warm off-white paper, three equal large full-body views: FRONT, SIDE, THREE-QUARTER, plus a small head-expression study and 5 palette swatches. Consistent hand-designed 3D cartoon house style: sculpted clean flowing surfaces, clear big colour blocks, deliberate rounded edges, appealing expressive eyes, readable silhouette, modest surface detail, satin materials, soft studio shadows. No franchise references, no brands, no logos, no noisy spots, no realistic pores, no bulky inflated shoulders, no random extra accessories. The same character and proportions in every view. Neutral standing/rest posture. These are visual refinements over locked collision bodies; obey the specified proportions. Labels only character name and view names. Landscape composition. Character: SLURRY, the Drain Wyrm, a smug patient oily moray serpent. Upright question-mark/S-curve body with seven connected body volumes, rounded broad moray head, NO limbs. Oil-black #2A2F2E skin, clean yellow-green #C7E66B belly ribbon, brass #B08A3E pipe collars on three body segments, small crisp green #8BD426 fin crest, expressive magenta #E04FB0 eyes under mischievously lowered lids. A long sideways smirk and two small ivory fangs, short forked tongue optional in expression study only. Exact body proportions: reared head about y1.42, head and crest top1.9m; thickest lower neck diameter .38m, tapering tail lies along floor behind to1.46m from root. Avoid fat cylindrical neck and lumpy segmented sausages; use flowing tapered curve while retaining the underlying generous snake radius. Collars must hug body closely, no giant toruses. Belly segmented with sparse clean transverse marks. One neutral team stripe on a lower body collar. Fin and drips are small cosmetic accents near body silhouette, no huge unsupported sail.",
+    "output": "f_slurry-turnaround-v1.jpg",
+    "originalPNG_SHA256": "9606baa7b5f58f42ffcbb2e690da2cae7b3949785ea89c8a05514958fa4105fd",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "f_gusto",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Service model identifier not exposed by the built-in tool; do not infer.",
+    "prompt": "Use case: stylized-concept. Asset type: original Critterweight creature turnaround for a Godot physics cartoon brawler. Create a polished character model sheet on warm off-white paper, three equal large full-body views: FRONT, SIDE, THREE-QUARTER, plus a small head-expression study and 5 palette swatches. Consistent hand-designed 3D cartoon house style: sculpted clean flowing surfaces, clear big colour blocks, deliberate rounded edges, appealing expressive eyes, readable silhouette, modest surface detail, satin materials, soft studio shadows. No franchise references, no brands, no logos, no noisy spots, no realistic pores, no bulky inflated shoulders, no random extra accessories. The same character and proportions in every view. Neutral standing/rest posture. These are visual refinements over locked collision bodies; obey the specified proportions. Labels only character name and view names. Landscape composition. Character: GUSTO, the Showboat Tern, a lanky flamboyant seabird boxer with a confident smirk. Clean warm-white #F2F2EC feathers, grey-blue #7FA4B8 wings, dark #2B2B2B wing tips and sunglasses-shaped eye markings, orange #FF8A3D beak and long thin bird legs, bleached swept pompadour crest with one teal #35C1C9 streak, cream shin tape. Two articulated wings extended sideways in neutral T rest pose with clean overlapping feather blades integrated along existing wing edges, no extra arms. Small white torso atop long taped legs with three-toed feet; narrow neck supports bird head and short forward wedge beak. Total crest height1.9m, torso center1.05m, head1.6m, wings from shoulder y1.34 outward to about1.16m from central axis. Preserve silhouette T-with-hairdo, head diameter about .28m, beak reaches .31m forward. Do not enlarge head or give huge fan wings. Face has readable off-white sclera inside black markings, dark pupils and lifted confident brow. Feather edges sharp but sculpted, wing mass thin; clean tapered feather groups rather than rectangular wing planks. Neutral team tape on neck, distinctive but restrained.",
+    "output": "f_gusto-turnaround-v1.jpg",
+    "originalPNG_SHA256": "7a437ac7e4f07ecec15fdde507137f41adfa7b73effc9c29a926c7d01db128e3",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "f_dozer",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Service model identifier not exposed by the built-in tool; do not infer.",
+    "prompt": "Use case: stylized-concept. Asset type: original Critterweight creature turnaround for a Godot physics cartoon brawler. Create a polished character model sheet on warm off-white paper, three equal large full-body views: FRONT, SIDE, THREE-QUARTER, plus a small head-expression study and 5 palette swatches. Consistent hand-designed 3D cartoon house style: sculpted clean flowing surfaces, clear big colour blocks, deliberate rounded edges, appealing expressive eyes, readable silhouette, modest surface detail, satin materials, soft studio shadows. No franchise references, no brands, no logos, no noisy spots, no realistic pores, no bulky inflated shoulders, no random extra accessories. The same character and proportions in every view. Neutral standing/rest posture. These are visual refinements over locked collision bodies; obey the specified proportions. Labels only character name and view names. Landscape composition. Character: DOZER, the Shovelsnout, a cheerful slightly dopey quarry hog quadruped. Low long wedge silhouette, slate-grey #6E6A66 hide, ochre #C7A160 cracked-stone shoulder plates, brushed-steel #9FA6AD broad shovel-blade snout, one short horn above snout, small bright yellow #FFE066 headlamp on fitted dark strap, simple triangular floppy hog ears. Big kind dark eyes with cream sclera, happy asymmetric mouth, two small lower tusks near snout corners only. Exact dimensions: four sturdy but clearly separated legs under long body, shoulder height1.2m, body length2.2m overall; chest pivot y.78 z.30, front and rear feet ground; snout front about1.26m ahead of root. Maintain modest head and wide steel snout collision shape, no enormous cartoon head or massive balloon shoulders. Two broad fitted ochre plates with clean incised cracks, not many scattered bumps. Sculpt a smooth sloping back and belly with slender leg negative spaces, black cloven hooves, tiny curled tail. Lamp is a clear focal bright dot. One neutral team band around flank. Crisp forms, friendly face, no stone noise.",
+    "output": "f_dozer-turnaround-v1.jpg",
+    "originalPNG_SHA256": "6944d01847c0f33f45c120962aeebdf4f309486b5e2619dc9199c955cb0d43c2",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "boss_bilge",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Model identifier not exposed by tool",
+    "prompt": "Use case: stylized-concept. Original Critterweight boss creature model sheet, landscape warm off-white background, FRONT SIDE THREE-QUARTER full-body views plus one head expression and palette. One consistent polished 3D cartoon house style: clean sculpted forms, broad crisp colour blocks, appealing eyes, satin materials, rounded industrial details, no surface noise. No franchise imitation, brands or logos. Character BILGE, the Cannery Hound, a huge sweet-eyed goofy dock dog with a long flexible neck, barrel body, four clearly separated sturdy legs, small tail, floppy short ears, wide canine muzzle and two small teeth. Original brown-grey #5A4E45 hide, cream chin and chest patch, rust-red #8C3B2B chunky chain collar with one red #E03A2B light, tiny lime #8BD426 drool accent. Personality is a very good boy with a bad record: gentle worried brow, big warm dark pupils, lopsided panting smile. Physically locked proportions: shoulder/body top about2.04 metres; body from z-1.6 to+1.3, barrel width1.24m, legs ground to y1.1; long neck goes forward from z.95 to1.70 at y1.6; modest head diameter.6m centered y1.78 z1.90, muzzle reaches z2.52, so head must NOT become huge compared with body. Four paws under body, chain pendant hangs from collar to y.75. Keep belly silhouette generous but fitted; reduce lumpy overlapping masses and overstuffed cheeks. Collar fits tightly. Distinct clean muzzle, ears and facial expressions matter. No armour suit, no spikes. Same anatomy across all views. Labels only BILGE and view names.",
+    "output": "boss_bilge-turnaround-v1.jpg",
+    "originalPNG_SHA256": "60b74845db8c10d99ddc75a43005b621960da5dbd8fd5967f83304e2fc9f7ed7",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "boss_conduit",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Model identifier not exposed by tool",
+    "prompt": "Use case: stylized-concept. Original Critterweight boss model sheet, landscape warm ivory paper, three clear matched views FRONT SIDE THREE-QUARTER, plus face detail and palette swatches. Polished original 3D cartoon brawler house style: clean sculpted geometry, rounded deliberate edges, large crisp colour blocks, expressive eyes, satin materials, no grit noise, no franchise influence, no brands or logos. CONDUIT, the Live Wire: a tall curious electrical serpent, insulation-black #1E1E24 skin with bold yellow #F7E04A hazard bands, fitted copper #B87333 head crest, thin cyan-white #CFF4FF luminous seams. One continuous slender S silhouette, small wide moray-like muzzle with two electrical-looking ivory teeth, wary clever eyes and raised brows; it is current rather than angry. Long grounded tail ends in an original chunky rectangular two-prong electrical plug. No arms or legs. Locked proportions: nine body bones, reared head center y3.05m and radius .26m, muzzle reaches z.94m; body diameter .52m at base tapering .40m at upper neck. Tail extends3.85m behind root. The head is modest relative to the long neck; do not inflate it or add thick armour segments. Smooth transitions through the body, each yellow stripe simple and readable, copper crest tightly fitted and swept back. Small plug prongs, no loose wires far from body. Showcase a calm alert expression and neat seam design. Same anatomy in every view. Labels only CONDUIT and view names.",
+    "output": "boss_conduit-turnaround-v1.jpg",
+    "originalPNG_SHA256": "ff9220125eadfe633d754e36109c1a9bec90039af1171401408d9c11c932890b",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "boss_snappington",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Model identifier not exposed by tool",
+    "prompt": "Use case: stylized-concept. Original Critterweight boss character sheet on warm ivory background, three full-body matched FRONT SIDE THREE-QUARTER views plus head expression detail and palette swatches. Polished clean 3D cartoon brawler style, appealing deliberate sculpted forms, expressive eyes, broad crisp colour blocks, rounded edges, no tiny surface noise, no franchise resemblance, no real brands or logos. COMMISSIONER SNAPPINGTON, Her Honor: an ancient imperious snapping-turtle commissioner with a low broad domed moss-green #4F6B3A shell, thin gold #C9A227 rim, olive #8A8C5A skin. Four sturdy articulated crab-like walking legs and two forward claw arms, asymmetric slightly bigger right gavel claw, long extending turtle neck and compact beaked head. Small gold reading glasses perched over sharp skeptical half-lidded eyes, wrinkled cheek folds, stubborn little beak smirk, tiny gavel on a chain. Character looks like a strict elderly judge who secretly loves a brawl. Locked dimensions: shell about2.30m wide,2.0m long, top y1.40m; head diameter.48m center y1.20 z1.68, beak reaches2.15m forward, neck connects to shell at z1.05. Keep head small but expressive and limbs within their lean articulated capsules; no giant shoulders, no balloon hands. Shell scutes have clean broad seam lines, faint luminous seams for Hype, not spiky fantasy armour. Four feet planted, tail short. Original turtle anatomy with stylized claw hands; no clothing costume, no desk in this fighting model. The tiny gavel is a clearly readable signature. Keep same anatomy in each view. Labels only SNAPPINGTON and view labels.",
+    "output": "boss_snappington-turnaround-v1.jpg",
+    "originalPNG_SHA256": "0ce1f9652542ba55d5348babe38ef9b784cd68868e18e071f5646b95e0313547",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "npc_blister",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Model identifier not exposed by tool",
+    "prompt": "Use case: stylized-concept. Original Critterweight small minion turnaround, landscape warm ivory background, FRONT SIDE THREE-QUARTER full-body views and a face close-up with palette. BLISTER: a charming unstable sludge sac, an upright egg shape with ONLY two little upper side nubs, NO legs, NO hands, NO feet. Lime green #8BD426 body, deeper olive green #4F7F1A sparse veins, pale yellow-green #C7E66B face/belly patch. Body dimensions exactly .52m wide and .66m tall, capsule-like egg center y.35m. Two tiny tapered nubs branch upward and outward from x±.25 y.50 to x±.36 y.60, diameter .10m. Nervous mischievous oval eyes and a tiny crooked toothless smile. Design must read at 48 pixels and fit a 2000-triangle mesh: three big softly sculpted volumes, two bold face shapes, three or four simple vein arcs only, clean crisp colour blocks, no hundreds of bumps or pores. Polished original 3D cartoon toy-like shading, soft satin skin, appealing slightly asymmetric expression. No franchise resemblance, no brands, no logos, no realistic disgusting detail. Same anatomy across all three views; do not add limbs. Labels only BLISTER and view names.",
+    "output": "npc_blister-turnaround-v1.jpg",
+    "originalPNG_SHA256": "89d730ac595bf511ea42257c563c90abf4cf9c4c015cd1f3492d0bac53727935",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "npc_kid_lamprey",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Model identifier not exposed by tool",
+    "prompt": "Use case: stylized-concept. Original Critterweight tutorial sparring creature model sheet, landscape warm ivory paper. FRONT SIDE THREE-QUARTER full-body views plus face close-up and colour swatches. KID LAMPREY, the Gutter Rookie: an original small biped lamprey in a dark slate-blue #3F4A5C hoodie with hood always up, grey-teal #6E8B8E skin, modest red #C23A2B accents. A circular sucker mouth with a ring of a few blunt cream #F2EFE4 teeth WHERE A HUMAN FACE WOULD BE; two small inset expressive fish eyes can sit above the mouth within the hood opening. Cocky posture, insecure eager expression, thin arms with small clenched hands, two short legs in simple sneakers, short tapering eel tail hanging behind. Absolutely no human face, no conventional nose/mouth, no franchise features, no brands or logos. Fixed body proportions: total hood height1.41m, hood/head diameter .32m centered y1.25; chest width .34m at y.88, shoulders±.24 at y1.0, compact fists center y.50 radius .085, pelvis y.55, feet floor. Keep hoodie fitted, no giant sleeves or overstuffed hood. This is a 2000-triangle clean cartoon mesh: crisp simple cloth shapes, a single hood rim and pocket, no seams everywhere or noisy fabric textures. Polished sculpted original 3D cartoon brawler house style, broad colour blocks, expressive readable face, charming asymmetry. Same anatomy across views. Labels only KID LAMPREY and view names.",
+    "output": "npc_kid_lamprey-turnaround-v1.jpg",
+    "originalPNG_SHA256": "cc67e0347b9145b2c5aec8fdce762b732aae5e4457878225fc0b1e18f11785d1",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "npc_scrapling",
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Model identifier not exposed by tool",
+    "prompt": "Use case: stylized-concept. Original Critterweight minion turnaround, FRONT SIDE THREE-QUARTER and a face close-up, warm off-white landscape sheet. A polished charming 3D cartoon brawler minion designed for a 2000-triangle mesh: large crisp colour blocks, smooth clean chunky surfaces, very sparse detail, expressive face, no realistic scratches, no franchise resemblance, brands or logos. SCRAPLING: a small original junk gremlin, upright thin-limbed biped with a squat dented tin-grey #A7A9A0 box torso, rust-red #8C3B2B joints, round little head with one big yellow #FFD23F goggle eye, one crooked tooth and a defiant half-smile. Left arm carries a plain round bin-lid shield, right arm a narrow bent metal pipe upright. Tiny practical scrap boots. Do not use a ready-made robot or recognisable franchise shape. Locked dimensions: total height .97m, torso .30m wide x .28m high centered y.52, head diameter .22m at y.78, thin arm radii .04m, shield diameter .34m held forward in creature LEFT hand (viewer right in front view), pipe reaches y.95. Keep weapons exactly at hands, no giant fists. A few clear sheet-metal folds, no tiny bolts all over. Charming asymmetry and a bold single goggle carry the character. Two thin legs, two arms, no extra appendages. Same anatomy across views. Labels SCRAPLING and view labels only.",
+    "output": "npc_scrapling-turnaround-v1.jpg",
+    "originalPNG_SHA256": "701a6b1b11dfe80e4e336eb05bb40f67ffdd4fbcedf25f8e2366a7bdc8029ab2",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Concept reference only; original editable 3D geometry authored separately against the locked body. No generated texture ships.",
+    "processing": "Original PNG retained on B:; evidence copy JPEG quality 86, original dimensions."
+  },
+  {
+    "id": "npc_kid_lamprey",
+    "revision": 2,
+    "date": "2026-10-16",
+    "tool": "Codex built-in image_gen",
+    "model": "Model identifier not exposed by tool",
+    "prompt": "Edit this original Critterweight KID LAMPREY concept sheet into a precise three-view design reference. Keep the same original lamprey hoodie character, slate-blue hoodie, grey-teal skin, red accents, circular sucker mouth with blunt cream teeth, small expressive fish eyes above it, sneakers and short eel tail. Warm ivory paper and consistent polished sculpted cartoon style. Show exactly THREE equal full-body views: a TRUE STRAIGHT FRONT view with both shoulders and feet symmetric, a TRUE SIDE PROFILE facing right, and a FRONT THREE-QUARTER view. No back views. Label the views FRONT, SIDE, THREE-QUARTER, plus title KID LAMPREY and small palette swatches. Neutral rest pose, arms hanging loosely, feet on one common baseline. Reduce the oversized concept head to the locked body's proportion: hood/head about .36m wide and .36m high, head center y1.25m, total height1.43m; chest width .34m, shoulders x+/-.24m at y1.0m, small fists centered y.50m radius .085m. Keep a fitted hoodie with a clear hood rim and collar joining head to chest, not a floating helmet. Simple clean masses suitable for a 2000-triangle minion; no fabric noise or microscopic details. No brands, logos, third-party characters or franchise styling. Preserve the appealing eager, slightly cocky expression. This corrects the missing true-front view in the reference.",
+    "reference": "npc_kid_lamprey-turnaround-v1.png",
+    "output": "npc_kid_lamprey-turnaround-v2.jpg",
+    "terms": [
+      "https://openai.com/policies/terms-of-use/",
+      "https://openai.com/policies/services-agreement/"
+    ],
+    "terms_checked": "2026-10-16",
+    "use": "Corrected front, side and three-quarter concept reference; geometry remains constrained to the immutable body.",
+    "processing": "PNG retained on B:, JPEG evidence at quality 86.",
+    "originalPNG_SHA256": "8b6ce57bf276e4ff259f562af6df26da54d2cdef0fe83f5843fc0e60cc2dcf4e"
+  }
+]

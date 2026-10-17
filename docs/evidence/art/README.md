@@ -1,5 +1,7 @@
 # Art evidence (forged models, 2026-10-15)
 
+The later Blender adoption is documented in [revamp/README.md](revamp/README.md), with paired captures, motion/effect fixtures, 48 px silhouettes, audits and test results. The files below preserve the original forge evidence.
+
 Real rendered frames (Godot 4.5.1, Forward+, downscaled from 3840×2160 to 1280 wide). Produced with
 `game/src/view/model_preview.gd` (walls, close-ups, gore) and `--sandbox --autoplay --capture`
 (matches). Rebuild the models with `node tools/forge/forge.js`; see docs/ART_PIPELINE.md.

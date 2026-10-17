@@ -1,0 +1,314 @@
+﻿[
+    {
+        "id":  "f_stoke",
+        "phase":  "before",
+        "source":  "captures/before/f_stoke.png",
+        "sha256":  "EBE7B1F454A09C20D2865B98CA5258FE7AE1DC06B104CF45DE308476A07C6209",
+        "crop":  [
+                     745,
+                     164,
+                     427,
+                     671
+                 ],
+        "output":  "f_stoke-comparison.jpg"
+    },
+    {
+        "id":  "f_stoke",
+        "phase":  "after",
+        "source":  "captures/after/f_stoke.png",
+        "sha256":  "780B133341A760F63C2196FA86D34C917DD683A1F58B17F6EBAC6C2738F0C78F",
+        "crop":  [
+                     745,
+                     164,
+                     427,
+                     671
+                 ],
+        "output":  "f_stoke-comparison.jpg"
+    },
+    {
+        "id":  "f_jitters",
+        "phase":  "before",
+        "source":  "captures/before/f_jitters.png",
+        "sha256":  "30F0EC4091BBE30458DDD80E90050D0ABFD3A04A8A5B71D173AB73BDBB91CD72",
+        "crop":  [
+                     622,
+                     271,
+                     695,
+                     493
+                 ],
+        "output":  "f_jitters-comparison.jpg"
+    },
+    {
+        "id":  "f_jitters",
+        "phase":  "after",
+        "source":  "captures/after/f_jitters.png",
+        "sha256":  "35B55C0C24F9D11826FC5F15632F4B732E901382BEA0979545D0027D00DDD704",
+        "crop":  [
+                     622,
+                     271,
+                     695,
+                     493
+                 ],
+        "output":  "f_jitters-comparison.jpg"
+    },
+    {
+        "id":  "f_dredge",
+        "phase":  "before",
+        "source":  "captures/before/f_dredge.png",
+        "sha256":  "53C218A8F88000AA4C7F46CFE5DE694EAEC3F7619BD7691DC5BCC487509E8AAF",
+        "crop":  [
+                     466,
+                     221,
+                     1015,
+                     639
+                 ],
+        "output":  "f_dredge-comparison.jpg"
+    },
+    {
+        "id":  "f_dredge",
+        "phase":  "after",
+        "source":  "captures/after/f_dredge.png",
+        "sha256":  "3E0196E41EEC92067773A051150B1E08FD338CDE7A21B7ACF6485945F500BED6",
+        "crop":  [
+                     466,
+                     221,
+                     1015,
+                     639
+                 ],
+        "output":  "f_dredge-comparison.jpg"
+    },
+    {
+        "id":  "f_slurry",
+        "phase":  "before",
+        "source":  "captures/before/f_slurry.png",
+        "sha256":  "E17433C069E0A97196C4AEE3995F206C487D9718635BEF5CBC47C5CC263710C3",
+        "crop":  [
+                     746,
+                     168,
+                     359,
+                     630
+                 ],
+        "output":  "f_slurry-comparison.jpg"
+    },
+    {
+        "id":  "f_slurry",
+        "phase":  "after",
+        "source":  "captures/after/f_slurry.png",
+        "sha256":  "26BFF305F86F31D5A6F40F77D4F31C79033916F52947EE0137768EDEBDA63550",
+        "crop":  [
+                     746,
+                     168,
+                     359,
+                     630
+                 ],
+        "output":  "f_slurry-comparison.jpg"
+    },
+    {
+        "id":  "f_gusto",
+        "phase":  "before",
+        "source":  "captures/before/f_gusto.png",
+        "sha256":  "945A34425F9F916CBFABC79986839F698C309EF5D965710AB583D8BCB4D1F38C",
+        "crop":  [
+                     537,
+                     147,
+                     744,
+                     704
+                 ],
+        "output":  "f_gusto-comparison.jpg"
+    },
+    {
+        "id":  "f_gusto",
+        "phase":  "after",
+        "source":  "captures/after/f_gusto.png",
+        "sha256":  "04881EDEE27EB6EDB2A7BC9A0E7D932D20C10CAE2E10582BD6A795EBED0AD2FA",
+        "crop":  [
+                     537,
+                     147,
+                     744,
+                     704
+                 ],
+        "output":  "f_gusto-comparison.jpg"
+    },
+    {
+        "id":  "f_dozer",
+        "phase":  "before",
+        "source":  "captures/before/f_dozer.png",
+        "sha256":  "1AB4D0C4751F45E0F98182679D7BF842316CAF7DB5E6B18D9972ACB5F2918B64",
+        "crop":  [
+                     705,
+                     214,
+                     683,
+                     631
+                 ],
+        "output":  "f_dozer-comparison.jpg"
+    },
+    {
+        "id":  "f_dozer",
+        "phase":  "after",
+        "source":  "captures/after/f_dozer.png",
+        "sha256":  "ED258C58537735C9ACE77923B42D068ADEFE6C5D00DAECB152D2AEF0A4F2CA7E",
+        "crop":  [
+                     705,
+                     214,
+                     683,
+                     631
+                 ],
+        "output":  "f_dozer-comparison.jpg"
+    },
+    {
+        "id":  "boss_bilge",
+        "phase":  "before",
+        "source":  "captures/before/boss_bilge.png",
+        "sha256":  "D4441EC970F8FEDE793DCEC05F8159D62CEB3820D7A8AE6425115CA109AEA5D8",
+        "crop":  [
+                     694,
+                     71,
+                     795,
+                     836
+                 ],
+        "output":  "boss_bilge-comparison.jpg"
+    },
+    {
+        "id":  "boss_bilge",
+        "phase":  "after",
+        "source":  "captures/after/boss_bilge.png",
+        "sha256":  "B36010F2CA8BEF3DEE591DC61FB999A622878C6FFF17E275951FF9B1DD4E8289",
+        "crop":  [
+                     694,
+                     71,
+                     795,
+                     836
+                 ],
+        "output":  "boss_bilge-comparison.jpg"
+    },
+    {
+        "id":  "boss_conduit",
+        "phase":  "before",
+        "source":  "captures/before/boss_conduit.png",
+        "sha256":  "C2866F6DD8A20DB688A2CB8074EACB18C2F76F071C02EC065C5652C584A86551",
+        "crop":  [
+                     686,
+                     104,
+                     421,
+                     744
+                 ],
+        "output":  "boss_conduit-comparison.jpg"
+    },
+    {
+        "id":  "boss_conduit",
+        "phase":  "after",
+        "source":  "captures/after/boss_conduit.png",
+        "sha256":  "FA28519F1BA8F3715311EE3A8B6DF7C03E2803A08FE68E7A2FC82F5CEEA9DB41",
+        "crop":  [
+                     686,
+                     104,
+                     421,
+                     744
+                 ],
+        "output":  "boss_conduit-comparison.jpg"
+    },
+    {
+        "id":  "boss_snappington",
+        "phase":  "before",
+        "source":  "captures/before/boss_snappington.png",
+        "sha256":  "1E33EF372BF6D24AF09FDF136D5499B78CF8E548A6D61660BD2227CB2BA19863",
+        "crop":  [
+                     412,
+                     69,
+                     1407,
+                     851
+                 ],
+        "output":  "boss_snappington-comparison.jpg"
+    },
+    {
+        "id":  "boss_snappington",
+        "phase":  "after",
+        "source":  "captures/after/boss_snappington.png",
+        "sha256":  "38B3FA968FDFDE155F93FDA08B164B5F2AE96F855A2B2484F2003A9F379DE134",
+        "crop":  [
+                     412,
+                     69,
+                     1407,
+                     851
+                 ],
+        "output":  "boss_snappington-comparison.jpg"
+    },
+    {
+        "id":  "npc_scrapling",
+        "phase":  "before",
+        "source":  "captures/before/npc_scrapling.png",
+        "sha256":  "A1C75F57409C522E75C14FD6AEE4D773CA5ADBAEF7308BF82920CB2AD9B244DE",
+        "crop":  [
+                     753,
+                     273,
+                     416,
+                     520
+                 ],
+        "output":  "npc_scrapling-comparison.jpg"
+    },
+    {
+        "id":  "npc_scrapling",
+        "phase":  "after",
+        "source":  "captures/after/npc_scrapling.png",
+        "sha256":  "8AC6DF08482D6E9C7E0FA7EF2D0C485437C715487B7C7991048BC2EBC5785FAF",
+        "crop":  [
+                     753,
+                     273,
+                     416,
+                     520
+                 ],
+        "output":  "npc_scrapling-comparison.jpg"
+    },
+    {
+        "id":  "npc_blister",
+        "phase":  "before",
+        "source":  "captures/before/npc_blister.png",
+        "sha256":  "5A5951A4A2FA17F25CDEF81DC4D5FC945F43B928F42A9CAC17856428ED15C636",
+        "crop":  [
+                     738,
+                     398,
+                     420,
+                     378
+                 ],
+        "output":  "npc_blister-comparison.jpg"
+    },
+    {
+        "id":  "npc_blister",
+        "phase":  "after",
+        "source":  "captures/after/npc_blister.png",
+        "sha256":  "8B483C0BCEB9AD92DD8E4406392B6B1A00B1177BC31358F162B75E54265E9B37",
+        "crop":  [
+                     738,
+                     398,
+                     420,
+                     378
+                 ],
+        "output":  "npc_blister-comparison.jpg"
+    },
+    {
+        "id":  "npc_kid_lamprey",
+        "phase":  "before",
+        "source":  "captures/before/npc_kid_lamprey.png",
+        "sha256":  "2C818D60CEA0EDF0C9B6795A467E4604AE58CB1C0A5784B248B34FF53BCC55BC",
+        "crop":  [
+                     801,
+                     204,
+                     326,
+                     622
+                 ],
+        "output":  "npc_kid_lamprey-comparison.jpg"
+    },
+    {
+        "id":  "npc_kid_lamprey",
+        "phase":  "after",
+        "source":  "captures/after/npc_kid_lamprey.png",
+        "sha256":  "F1DD0CEA6A42C359BB4C6176924BB8387AE0C1ABB92E57FD0866A6F23ABE247A",
+        "crop":  [
+                     801,
+                     204,
+                     326,
+                     622
+                 ],
+        "output":  "npc_kid_lamprey-comparison.jpg"
+    }
+]

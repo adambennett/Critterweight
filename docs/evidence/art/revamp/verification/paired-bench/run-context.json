@@ -1,0 +1,58 @@
+[
+  {
+    "run": "before-1-deck",
+    "started": "2026-10-16T21:24:56.3098348-04:00",
+    "elapsedSeconds": 43.8220998,
+    "survivingOtherProcessesCPUSeconds": 103.0,
+    "note": "CPU context omits processes that started or exited during the run; no process names recorded."
+  },
+  {
+    "run": "before-1-high",
+    "started": "2026-10-16T21:25:40.1935567-04:00",
+    "elapsedSeconds": 42.8620951,
+    "survivingOtherProcessesCPUSeconds": 60.0,
+    "note": "CPU context omits processes that started or exited during the run; no process names recorded."
+  },
+  {
+    "run": "after-1-deck",
+    "started": "2026-10-16T21:26:35.4016510-04:00",
+    "elapsedSeconds": 42.4542265,
+    "survivingOtherProcessesCPUSeconds": 67.0,
+    "note": "CPU context omits processes that started or exited during the run; no process names recorded."
+  },
+  {
+    "run": "after-1-high",
+    "started": "2026-10-16T21:27:17.8928010-04:00",
+    "elapsedSeconds": 43.3149428,
+    "survivingOtherProcessesCPUSeconds": 48.0,
+    "note": "CPU context omits processes that started or exited during the run; no process names recorded."
+  },
+  {
+    "run": "after-2-deck",
+    "started": "2026-10-16T21:28:11.5757481-04:00",
+    "elapsedSeconds": 42.0628055,
+    "survivingOtherProcessesCPUSeconds": 33.0,
+    "note": "CPU context omits processes that started or exited during the run; no process names recorded."
+  },
+  {
+    "run": "after-2-high",
+    "started": "2026-10-16T21:28:53.6675304-04:00",
+    "elapsedSeconds": 42.7998734,
+    "survivingOtherProcessesCPUSeconds": 74.0,
+    "note": "CPU context omits processes that started or exited during the run; no process names recorded."
+  },
+  {
+    "run": "before-2-deck",
+    "started": "2026-10-16T21:29:48.2944100-04:00",
+    "elapsedSeconds": 42.8540317,
+    "survivingOtherProcessesCPUSeconds": 49.0,
+    "note": "CPU context omits processes that started or exited during the run; no process names recorded."
+  },
+  {
+    "run": "before-2-high",
+    "started": "2026-10-16T21:30:31.1751095-04:00",
+    "elapsedSeconds": 42.4032892,
+    "survivingOtherProcessesCPUSeconds": 95.0,
+    "note": "CPU context omits processes that started or exited during the run; no process names recorded."
+  }
+]

@@ -1,0 +1,1368 @@
+[
+ {
+  "id": "boss_bilge",
+  "out": "creatures/boss_bilge.glb",
+  "bytes": 976068,
+  "vertices": 14225,
+  "triangles": 18000,
+  "materials": [
+   "drool",
+   "eye",
+   "glow",
+   "metal",
+   "pad",
+   "skin"
+  ],
+  "gore_triangles": 300,
+  "bounds": {
+   "min": [
+    -0.805,
+    -0.065,
+    -1.785
+   ],
+   "max": [
+    0.805,
+    2.235,
+    2.54
+   ]
+  },
+  "bones": [
+   {
+    "id": "chest",
+    "dominant_vertices": 3311
+   },
+   {
+    "id": "pelvis",
+    "dominant_vertices": 1864
+   },
+   {
+    "id": "neck1",
+    "dominant_vertices": 1190
+   },
+   {
+    "id": "neck2",
+    "dominant_vertices": 513
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 2964
+   },
+   {
+    "id": "chain",
+    "dominant_vertices": 284
+   },
+   {
+    "id": "thigh_fl",
+    "dominant_vertices": 356
+   },
+   {
+    "id": "shin_fl",
+    "dominant_vertices": 582
+   },
+   {
+    "id": "thigh_fr",
+    "dominant_vertices": 344
+   },
+   {
+    "id": "shin_fr",
+    "dominant_vertices": 724
+   },
+   {
+    "id": "thigh_bl",
+    "dominant_vertices": 518
+   },
+   {
+    "id": "shin_bl",
+    "dominant_vertices": 573
+   },
+   {
+    "id": "thigh_br",
+    "dominant_vertices": 369
+   },
+   {
+    "id": "shin_br",
+    "dominant_vertices": 571
+   },
+   {
+    "id": "tail",
+    "dominant_vertices": 62
+   }
+  ],
+  "resolution": 0.018,
+  "grid": [
+   93,
+   131,
+   244
+  ],
+  "ms": 3076,
+  "definition": "tools/forge/defs/creatures/boss_bilge.js"
+ },
+ {
+  "id": "boss_conduit",
+  "out": "creatures/boss_conduit.glb",
+  "bytes": 964528,
+  "vertices": 14254,
+  "triangles": 16000,
+  "materials": [
+   "copper",
+   "eye",
+   "glow",
+   "plug",
+   "skin"
+  ],
+  "gore_triangles": 300,
+  "bounds": {
+   "min": [
+    -0.4,
+    -0.11,
+    -4.1
+   ],
+   "max": [
+    0.4,
+    3.626,
+    1.15
+   ]
+  },
+  "bones": [
+   {
+    "id": "body4",
+    "dominant_vertices": 3285
+   },
+   {
+    "id": "body3",
+    "dominant_vertices": 1268
+   },
+   {
+    "id": "body2",
+    "dominant_vertices": 1071
+   },
+   {
+    "id": "body1",
+    "dominant_vertices": 981
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 2679
+   },
+   {
+    "id": "body5",
+    "dominant_vertices": 1514
+   },
+   {
+    "id": "body6",
+    "dominant_vertices": 1345
+   },
+   {
+    "id": "body7",
+    "dominant_vertices": 1380
+   },
+   {
+    "id": "plug",
+    "dominant_vertices": 731
+   }
+  ],
+  "resolution": 0.02,
+  "grid": [
+   43,
+   190,
+   266
+  ],
+  "ms": 1418,
+  "definition": "tools/forge/defs/creatures/boss_conduit.js"
+ },
+ {
+  "id": "boss_snappington",
+  "out": "creatures/boss_snappington.glb",
+  "bytes": 1175040,
+  "vertices": 17403,
+  "triangles": 18000,
+  "materials": [
+   "eye",
+   "gold",
+   "horn",
+   "lens",
+   "metal",
+   "shell",
+   "skin",
+   "wood"
+  ],
+  "gore_triangles": 500,
+  "bounds": {
+   "min": [
+    -1.427,
+    -0.068,
+    -1.488
+   ],
+   "max": [
+    1.427,
+    1.688,
+    2.308
+   ]
+  },
+  "bones": [
+   {
+    "id": "shell",
+    "dominant_vertices": 10335
+   },
+   {
+    "id": "neck",
+    "dominant_vertices": 830
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 1362
+   },
+   {
+    "id": "uclaw_l",
+    "dominant_vertices": 302
+   },
+   {
+    "id": "claw_l",
+    "dominant_vertices": 593
+   },
+   {
+    "id": "uclaw_r",
+    "dominant_vertices": 373
+   },
+   {
+    "id": "claw_r",
+    "dominant_vertices": 1221
+   },
+   {
+    "id": "uleg_fl",
+    "dominant_vertices": 237
+   },
+   {
+    "id": "lleg_fl",
+    "dominant_vertices": 346
+   },
+   {
+    "id": "uleg_bl",
+    "dominant_vertices": 228
+   },
+   {
+    "id": "lleg_bl",
+    "dominant_vertices": 322
+   },
+   {
+    "id": "uleg_fr",
+    "dominant_vertices": 254
+   },
+   {
+    "id": "lleg_fr",
+    "dominant_vertices": 341
+   },
+   {
+    "id": "uleg_br",
+    "dominant_vertices": 231
+   },
+   {
+    "id": "lleg_br",
+    "dominant_vertices": 333
+   },
+   {
+    "id": "tail",
+    "dominant_vertices": 95
+   }
+  ],
+  "resolution": 0.015,
+  "grid": [
+   194,
+   120,
+   256
+  ],
+  "ms": 8170,
+  "definition": "tools/forge/defs/creatures/boss_snappington.js"
+ },
+ {
+  "id": "crowd_fan_a",
+  "out": "crowd/fan_a.glb",
+  "bytes": 30124,
+  "vertices": 411,
+  "triangles": 520,
+  "materials": [
+   "eye",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.615,
+    0.045,
+    -0.345
+   ],
+   "max": [
+    0.625,
+    1.705,
+    0.345
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 411
+   }
+  ],
+  "resolution": 0.014,
+  "grid": [
+   92,
+   122,
+   53
+  ],
+  "ms": 733,
+  "definition": "tools/forge/defs/crowd/fan_a.js"
+ },
+ {
+  "id": "crowd_fan_b",
+  "out": "crowd/fan_b.glb",
+  "bytes": 31700,
+  "vertices": 431,
+  "triangles": 520,
+  "materials": [
+   "can",
+   "eye",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.435,
+    0.065,
+    -0.285
+   ],
+   "max": [
+    0.435,
+    1.825,
+    0.315
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 431
+   }
+  ],
+  "resolution": 0.014,
+  "grid": [
+   66,
+   129,
+   46
+  ],
+  "ms": 1038,
+  "definition": "tools/forge/defs/crowd/fan_b.js"
+ },
+ {
+  "id": "f_dozer",
+  "out": "creatures/f_dozer.glb",
+  "bytes": 785836,
+  "vertices": 11454,
+  "triangles": 14000,
+  "materials": [
+   "clay",
+   "eye",
+   "glow",
+   "hoof",
+   "skin",
+   "steel",
+   "team"
+  ],
+  "gore_triangles": 300,
+  "bounds": {
+   "min": [
+    -0.568,
+    -0.03,
+    -1.11
+   ],
+   "max": [
+    0.568,
+    1.32,
+    1.395
+   ]
+  },
+  "bones": [
+   {
+    "id": "chest",
+    "dominant_vertices": 5011
+   },
+   {
+    "id": "pelvis",
+    "dominant_vertices": 1306
+   },
+   {
+    "id": "neck",
+    "dominant_vertices": 426
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 2293
+   },
+   {
+    "id": "thigh_fl",
+    "dominant_vertices": 272
+   },
+   {
+    "id": "shin_fl",
+    "dominant_vertices": 312
+   },
+   {
+    "id": "thigh_fr",
+    "dominant_vertices": 268
+   },
+   {
+    "id": "shin_fr",
+    "dominant_vertices": 301
+   },
+   {
+    "id": "thigh_bl",
+    "dominant_vertices": 276
+   },
+   {
+    "id": "shin_bl",
+    "dominant_vertices": 302
+   },
+   {
+    "id": "thigh_br",
+    "dominant_vertices": 258
+   },
+   {
+    "id": "shin_br",
+    "dominant_vertices": 301
+   },
+   {
+    "id": "tail",
+    "dominant_vertices": 128
+   }
+  ],
+  "resolution": 0.012,
+  "grid": [
+   98,
+   116,
+   212
+  ],
+  "ms": 3672,
+  "definition": "tools/forge/defs/creatures/f_dozer.js"
+ },
+ {
+  "id": "f_dredge",
+  "out": "creatures/f_dredge.glb",
+  "bytes": 813692,
+  "vertices": 11936,
+  "triangles": 14000,
+  "materials": [
+   "eye",
+   "metal",
+   "skin",
+   "team"
+  ],
+  "gore_triangles": 300,
+  "bounds": {
+   "min": [
+    -1.11,
+    -0.08,
+    -0.67
+   ],
+   "max": [
+    1.11,
+    1.152,
+    1.35
+   ]
+  },
+  "bones": [
+   {
+    "id": "shell",
+    "dominant_vertices": 5710
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 395
+   },
+   {
+    "id": "uclaw_l",
+    "dominant_vertices": 283
+   },
+   {
+    "id": "claw_l",
+    "dominant_vertices": 657
+   },
+   {
+    "id": "uclaw_r",
+    "dominant_vertices": 932
+   },
+   {
+    "id": "claw_r",
+    "dominant_vertices": 1959
+   },
+   {
+    "id": "uleg_fl",
+    "dominant_vertices": 307
+   },
+   {
+    "id": "lleg_fl",
+    "dominant_vertices": 195
+   },
+   {
+    "id": "uleg_bl",
+    "dominant_vertices": 292
+   },
+   {
+    "id": "lleg_bl",
+    "dominant_vertices": 189
+   },
+   {
+    "id": "uleg_fr",
+    "dominant_vertices": 323
+   },
+   {
+    "id": "lleg_fr",
+    "dominant_vertices": 195
+   },
+   {
+    "id": "uleg_br",
+    "dominant_vertices": 310
+   },
+   {
+    "id": "lleg_br",
+    "dominant_vertices": 189
+   }
+  ],
+  "resolution": 0.012,
+  "grid": [
+   188,
+   106,
+   172
+  ],
+  "ms": 3614,
+  "definition": "tools/forge/defs/creatures/f_dredge.js"
+ },
+ {
+  "id": "f_gusto",
+  "out": "creatures/f_gusto.glb",
+  "bytes": 667756,
+  "vertices": 9627,
+  "triangles": 12000,
+  "materials": [
+   "beak",
+   "cloth",
+   "eye",
+   "skin",
+   "team"
+  ],
+  "gore_triangles": 360,
+  "bounds": {
+   "min": [
+    -1.264,
+    -0.039,
+    -0.582
+   ],
+   "max": [
+    1.264,
+    2.095,
+    0.644
+   ]
+  },
+  "bones": [
+   {
+    "id": "torso",
+    "dominant_vertices": 679
+   },
+   {
+    "id": "neck",
+    "dominant_vertices": 340
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 1600
+   },
+   {
+    "id": "uwing_l",
+    "dominant_vertices": 870
+   },
+   {
+    "id": "lwing_l",
+    "dominant_vertices": 875
+   },
+   {
+    "id": "uwing_r",
+    "dominant_vertices": 866
+   },
+   {
+    "id": "lwing_r",
+    "dominant_vertices": 856
+   },
+   {
+    "id": "thigh_l",
+    "dominant_vertices": 506
+   },
+   {
+    "id": "shin_l",
+    "dominant_vertices": 1030
+   },
+   {
+    "id": "thigh_r",
+    "dominant_vertices": 518
+   },
+   {
+    "id": "shin_r",
+    "dominant_vertices": 1042
+   },
+   {
+    "id": "tail",
+    "dominant_vertices": 445
+   }
+  ],
+  "resolution": 0.0095,
+  "grid": [
+   270,
+   228,
+   133
+  ],
+  "ms": 2637,
+  "definition": "tools/forge/defs/creatures/f_gusto.js"
+ },
+ {
+  "id": "f_jitters",
+  "out": "creatures/f_jitters.glb",
+  "bytes": 558080,
+  "vertices": 7998,
+  "triangles": 10000,
+  "materials": [
+   "eye",
+   "glow",
+   "metal",
+   "rubber",
+   "skin",
+   "team"
+  ],
+  "gore_triangles": 400,
+  "bounds": {
+   "min": [
+    -0.783,
+    -0.01,
+    -0.42
+   ],
+   "max": [
+    0.783,
+    1.005,
+    0.42
+   ]
+  },
+  "bones": [
+   {
+    "id": "body",
+    "dominant_vertices": 6143
+   },
+   {
+    "id": "coil",
+    "dominant_vertices": 0
+   },
+   {
+    "id": "arm_l",
+    "dominant_vertices": 661
+   },
+   {
+    "id": "arm_r",
+    "dominant_vertices": 697
+   },
+   {
+    "id": "antenna_l",
+    "dominant_vertices": 254
+   },
+   {
+    "id": "antenna_r",
+    "dominant_vertices": 243
+   }
+  ],
+  "resolution": 0.008,
+  "grid": [
+   199,
+   130,
+   108
+  ],
+  "ms": 3094,
+  "definition": "tools/forge/defs/creatures/f_jitters.js"
+ },
+ {
+  "id": "f_slurry",
+  "out": "creatures/f_slurry.glb",
+  "bytes": 709852,
+  "vertices": 10307,
+  "triangles": 13000,
+  "materials": [
+   "brass",
+   "eye",
+   "fin",
+   "glow",
+   "skin",
+   "team"
+  ],
+  "gore_triangles": 300,
+  "bounds": {
+   "min": [
+    -0.27,
+    -0.09,
+    -1.68
+   ],
+   "max": [
+    0.27,
+    1.905,
+    0.73
+   ]
+  },
+  "bones": [
+   {
+    "id": "body3",
+    "dominant_vertices": 2130
+   },
+   {
+    "id": "body2",
+    "dominant_vertices": 2034
+   },
+   {
+    "id": "body1",
+    "dominant_vertices": 1360
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 2131
+   },
+   {
+    "id": "body4",
+    "dominant_vertices": 799
+   },
+   {
+    "id": "body5",
+    "dominant_vertices": 1250
+   },
+   {
+    "id": "body6",
+    "dominant_vertices": 603
+   }
+  ],
+  "resolution": 0.012,
+  "grid": [
+   49,
+   170,
+   204
+  ],
+  "ms": 1673,
+  "definition": "tools/forge/defs/creatures/f_slurry.js"
+ },
+ {
+  "id": "f_stoke",
+  "out": "creatures/f_stoke.glb",
+  "bytes": 700272,
+  "vertices": 10237,
+  "triangles": 12000,
+  "materials": [
+   "cloth",
+   "ember",
+   "eye",
+   "iron",
+   "skin",
+   "team"
+  ],
+  "gore_triangles": 300,
+  "bounds": {
+   "min": [
+    -0.585,
+    -0.055,
+    -0.57
+   ],
+   "max": [
+    0.585,
+    1.717,
+    0.445
+   ]
+  },
+  "bones": [
+   {
+    "id": "pelvis",
+    "dominant_vertices": 758
+   },
+   {
+    "id": "chest",
+    "dominant_vertices": 2437
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 1563
+   },
+   {
+    "id": "uarm_l",
+    "dominant_vertices": 697
+   },
+   {
+    "id": "farm_l",
+    "dominant_vertices": 1271
+   },
+   {
+    "id": "uarm_r",
+    "dominant_vertices": 709
+   },
+   {
+    "id": "farm_r",
+    "dominant_vertices": 1247
+   },
+   {
+    "id": "thigh_l",
+    "dominant_vertices": 343
+   },
+   {
+    "id": "shin_l",
+    "dominant_vertices": 392
+   },
+   {
+    "id": "thigh_r",
+    "dominant_vertices": 279
+   },
+   {
+    "id": "shin_r",
+    "dominant_vertices": 396
+   },
+   {
+    "id": "tail",
+    "dominant_vertices": 145
+   }
+  ],
+  "resolution": 0.01,
+  "grid": [
+   120,
+   181,
+   105
+  ],
+  "ms": 3082,
+  "definition": "tools/forge/defs/creatures/f_stoke.js"
+ },
+ {
+  "id": "hub_barnaby_bellows",
+  "out": "hub/barnaby_bellows.glb",
+  "bytes": 577356,
+  "vertices": 8657,
+  "triangles": 9000,
+  "materials": [
+   "beak",
+   "cloth",
+   "eye",
+   "metal",
+   "sequin",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -1.18,
+    -0.04,
+    -0.355
+   ],
+   "max": [
+    1.18,
+    1.837,
+    0.835
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 8657
+   }
+  ],
+  "resolution": 0.01,
+  "grid": [
+   239,
+   191,
+   122
+  ],
+  "ms": 2959,
+  "definition": "tools/forge/defs/hub/barnaby_bellows.js"
+ },
+ {
+  "id": "hub_doc_sutura",
+  "out": "hub/doc_sutura.glb",
+  "bytes": 442104,
+  "vertices": 6416,
+  "triangles": 9000,
+  "materials": [
+   "cloth",
+   "eye",
+   "metal",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.623,
+    -0.02,
+    -0.61
+   ],
+   "max": [
+    0.549,
+    1.443,
+    0.619
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 6416
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   134,
+   166,
+   140
+  ],
+  "ms": 2654,
+  "definition": "tools/forge/defs/hub/doc_sutura.js"
+ },
+ {
+  "id": "hub_granny_haymaker",
+  "out": "hub/granny_haymaker.glb",
+  "bytes": 409624,
+  "vertices": 6068,
+  "triangles": 7000,
+  "materials": [
+   "cloth",
+   "eye",
+   "fur",
+   "gold",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.492,
+    -0.088,
+    -0.588
+   ],
+   "max": [
+    0.492,
+    1.318,
+    0.522
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 6068
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   113,
+   160,
+   127
+  ],
+  "ms": 2000,
+  "definition": "tools/forge/defs/hub/granny_haymaker.js"
+ },
+ {
+  "id": "hub_kid_lamprey",
+  "out": "hub/kid_lamprey.glb",
+  "bytes": 427276,
+  "vertices": 6275,
+  "triangles": 8000,
+  "materials": [
+   "cloth",
+   "eye",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.463,
+    -0.083,
+    -0.613
+   ],
+   "max": [
+    0.463,
+    1.722,
+    0.265
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 6275
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   106,
+   204,
+   101
+  ],
+  "ms": 2146,
+  "definition": "tools/forge/defs/hub/kid_lamprey.js"
+ },
+ {
+  "id": "hub_ludlow",
+  "out": "hub/ludlow.glb",
+  "bytes": 441748,
+  "vertices": 6404,
+  "triangles": 9000,
+  "materials": [
+   "cloth",
+   "eye",
+   "metal",
+   "skin",
+   "wood"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.8,
+    -0.098,
+    -0.468
+   ],
+   "max": [
+    0.938,
+    1.797,
+    0.606
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 6404
+   }
+  ],
+  "resolution": 0.011,
+  "grid": [
+   161,
+   176,
+   101
+  ],
+  "ms": 3285,
+  "definition": "tools/forge/defs/hub/ludlow.js"
+ },
+ {
+  "id": "hub_needles",
+  "out": "hub/needles.glb",
+  "bytes": 411112,
+  "vertices": 5987,
+  "triangles": 8000,
+  "materials": [
+   "can",
+   "cloth",
+   "eye",
+   "fur",
+   "gold",
+   "skin"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.453,
+    -0.063,
+    -0.49
+   ],
+   "max": [
+    0.453,
+    1.494,
+    0.443
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 5987
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   104,
+   176,
+   107
+  ],
+  "ms": 2271,
+  "definition": "tools/forge/defs/hub/needles.js"
+ },
+ {
+  "id": "hub_snappington_desk",
+  "out": "hub/snappington_desk.glb",
+  "bytes": 781368,
+  "vertices": 11738,
+  "triangles": 12000,
+  "materials": [
+   "cloth",
+   "eye",
+   "gold",
+   "horn",
+   "lens",
+   "metal",
+   "shell",
+   "skin",
+   "wood"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -1.073,
+    -0.052,
+    -2.018
+   ],
+   "max": [
+    1.073,
+    1.286,
+    0.93
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 11738
+   }
+  ],
+  "resolution": 0.012,
+  "grid": [
+   182,
+   115,
+   249
+  ],
+  "ms": 10987,
+  "definition": "tools/forge/defs/hub/snappington_desk.js"
+ },
+ {
+  "id": "hub_teddy_two_tooth",
+  "out": "hub/teddy_two_tooth.glb",
+  "bytes": 354612,
+  "vertices": 5151,
+  "triangles": 7000,
+  "materials": [
+   "cloth",
+   "eye",
+   "fur",
+   "skin",
+   "visor"
+  ],
+  "gore_triangles": 0,
+  "bounds": {
+   "min": [
+    -0.41,
+    -0.05,
+    -0.465
+   ],
+   "max": [
+    0.33,
+    1.106,
+    0.46
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "dominant_vertices": 5151
+   }
+  ],
+  "resolution": 0.008,
+  "grid": [
+   96,
+   148,
+   119
+  ],
+  "ms": 1615,
+  "definition": "tools/forge/defs/hub/teddy_two_tooth.js"
+ },
+ {
+  "id": "npc_blister",
+  "out": "creatures/npc_blister.glb",
+  "bytes": 80432,
+  "vertices": 1045,
+  "triangles": 1500,
+  "materials": [
+   "eye",
+   "skin"
+  ],
+  "gore_triangles": 200,
+  "bounds": {
+   "min": [
+    -0.475,
+    -0.04,
+    -0.33
+   ],
+   "max": [
+    0.475,
+    0.72,
+    0.32
+   ]
+  },
+  "bones": [
+   {
+    "id": "core",
+    "dominant_vertices": 919
+   },
+   {
+    "id": "nub_l",
+    "dominant_vertices": 59
+   },
+   {
+    "id": "nub_r",
+    "dominant_vertices": 67
+   }
+  ],
+  "resolution": 0.008,
+  "grid": [
+   122,
+   98,
+   85
+  ],
+  "ms": 1375,
+  "definition": "tools/forge/defs/creatures/npc_blister.js"
+ },
+ {
+  "id": "npc_kid_lamprey",
+  "out": "creatures/npc_kid_lamprey.glb",
+  "bytes": 526856,
+  "vertices": 7658,
+  "triangles": 9000,
+  "materials": [
+   "cloth",
+   "eye",
+   "skin",
+   "team"
+  ],
+  "gore_triangles": 300,
+  "bounds": {
+   "min": [
+    -0.391,
+    -0.03,
+    -0.742
+   ],
+   "max": [
+    0.391,
+    1.532,
+    0.253
+   ]
+  },
+  "bones": [
+   {
+    "id": "pelvis",
+    "dominant_vertices": 496
+   },
+   {
+    "id": "chest",
+    "dominant_vertices": 1992
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 1718
+   },
+   {
+    "id": "uarm_l",
+    "dominant_vertices": 260
+   },
+   {
+    "id": "farm_l",
+    "dominant_vertices": 675
+   },
+   {
+    "id": "uarm_r",
+    "dominant_vertices": 291
+   },
+   {
+    "id": "farm_r",
+    "dominant_vertices": 630
+   },
+   {
+    "id": "thigh_l",
+    "dominant_vertices": 0
+   },
+   {
+    "id": "shin_l",
+    "dominant_vertices": 314
+   },
+   {
+    "id": "thigh_r",
+    "dominant_vertices": 0
+   },
+   {
+    "id": "shin_r",
+    "dominant_vertices": 315
+   },
+   {
+    "id": "tail1",
+    "dominant_vertices": 508
+   },
+   {
+    "id": "tail2",
+    "dominant_vertices": 459
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   90,
+   177,
+   114
+  ],
+  "ms": 1783,
+  "definition": "tools/forge/defs/creatures/npc_kid_lamprey.js"
+ },
+ {
+  "id": "npc_scrapling",
+  "out": "creatures/npc_scrapling.glb",
+  "bytes": 134480,
+  "vertices": 1819,
+  "triangles": 1900,
+  "materials": [
+   "glow",
+   "rust",
+   "skin"
+  ],
+  "gore_triangles": 300,
+  "bounds": {
+   "min": [
+    -0.358,
+    -0.026,
+    -0.21
+   ],
+   "max": [
+    0.33,
+    0.998,
+    0.313
+   ]
+  },
+  "bones": [
+   {
+    "id": "torso",
+    "dominant_vertices": 743
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 309
+   },
+   {
+    "id": "arm_l",
+    "dominant_vertices": 368
+   },
+   {
+    "id": "arm_r",
+    "dominant_vertices": 194
+   },
+   {
+    "id": "thigh_l",
+    "dominant_vertices": 37
+   },
+   {
+    "id": "shin_l",
+    "dominant_vertices": 65
+   },
+   {
+    "id": "thigh_r",
+    "dominant_vertices": 42
+   },
+   {
+    "id": "shin_r",
+    "dominant_vertices": 61
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   80,
+   117,
+   62
+  ],
+  "ms": 1168,
+  "definition": "tools/forge/defs/creatures/npc_scrapling.js"
+ }
+]
