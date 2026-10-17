@@ -24,6 +24,14 @@
 			]
 		},
 		{
+			"heading": "Creature art (Blender revamp)",
+			"lines": [
+				"Creature models and concept direction assisted by OpenAI Codex (Astra), under the project lead's direction.",
+				"Made in Blender (Blender Foundation and contributors); concept references from OpenAI image generation.",
+				"Optional Blender MCP bridge by Siddharth Ahuja and contributors (MIT). No third-party character, texture or material asset ships."
+			]
+		},
+		{
 			"heading": "Engine and middleware",
 			"lines": [
 				"Godot Engine 4.5.1 — godotengine.org — MIT License",
