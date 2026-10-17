@@ -2,7 +2,7 @@
   "id": "rust_bucket",
   "name": "Rust Bucket Arenas",
   "version": "1.0.0",
-  "game_version": "0.9.7",
+  "game_version": "0.9.8",
   "api": 1,
   "author": "Critterweight examples",
   "description": "Arena example: The Drain, a square pit with a shock plate in the middle, crates and barrels to throw people into, and spawn/mode markers so it works for duels, free-for-alls, Chumball and Spotlight Hog.",
