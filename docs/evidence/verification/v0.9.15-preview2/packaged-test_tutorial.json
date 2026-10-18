@@ -1,0 +1,118 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_content_audit.gd::test_tutorial_achievements_and_presets_complete"
+		},
+		{
+			"errors": [],
+			"ms": 92,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_ability_connects"
+		},
+		{
+			"errors": [],
+			"ms": 398,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_dodge_drill_heavy_is_a_real_threat"
+		},
+		{
+			"errors": [],
+			"ms": 412,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_dodge_then_dash_attack"
+		},
+		{
+			"errors": [],
+			"ms": 1149,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_exercises_adapt_to_missing_slots"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_exercises_load_with_live_prompts"
+		},
+		{
+			"errors": [],
+			"ms": 1294,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_finisher_then_juice"
+		},
+		{
+			"errors": [],
+			"ms": 417,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_footwork"
+		},
+		{
+			"errors": [],
+			"ms": 2895,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_freestyle_round_can_be_won"
+		},
+		{
+			"errors": [],
+			"ms": 79,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_grab_and_throw_through_guard"
+		},
+		{
+			"errors": [],
+			"ms": 305,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_guard_string"
+		},
+		{
+			"errors": [],
+			"ms": 188,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_heavy_then_charged"
+		},
+		{
+			"errors": [],
+			"ms": 133,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_light_string"
+		},
+		{
+			"errors": [],
+			"ms": 456,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_parries"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_partner_fits_every_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 1367,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_retry_skip_and_progress_saved"
+		},
+		{
+			"errors": [],
+			"ms": 279,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_rushed_string_gets_rhythm_advice"
+		},
+		{
+			"errors": [],
+			"ms": 8140,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_tutorial_partner_behaviours"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 18 run, 0 failed, 18 passed, 0 skipped in 21.3 s",
+	"time": "2026-10-18T17:29:33",
+	"total": 18,
+	"version": "0.9.15"
+}

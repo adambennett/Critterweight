@@ -8,11 +8,13 @@ Kendall and Coach Buck cost 3,230.2 credits total; 269.8 remain. Nine recorded-s
 The full source suite completed with 730 passes, one expected headless skip and two test-fixture
 failures. The editor fixture is isolated correctly and the four-player campaign seed/route is
 corrected with preflight assertions; focused reruns all pass, including 93 UI tests (one headless skip) and both party-voting tests.
-The Windows export and packaged checks follow.
+Windows preview 2 from clean commit a527f2d is built and packaged checks pass. The executable
+is B:/Critterweight/release-work/v0.9.15-preview2/Critterweight-0.9.15-preview.exe.
 No graphical launch or publication is authorized. All answers are saved in
 releases/v0.9.15-follow-up-notes.md and were posted in chat. The owner additionally requested
 an editor-only rooftop canvas with independent width/depth and four open edges; implement it
-only after this batch and its local package verification are complete, then rebuild the preview.
+next, now that the previous batch and its local package verification are complete, then rebuild
+the preview. The earlier batch answers are in the saved follow-up notes and the chat.
 
 ## Status (2026-10-18) — v0.9.15 local preview ready
 

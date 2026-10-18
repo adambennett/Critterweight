@@ -1,0 +1,70 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 4475,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_boards_freeze_the_hubs_clocks"
+		},
+		{
+			"errors": [],
+			"ms": 597,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_campaign_menu_from_the_desk_goes_back_to_the_hub"
+		},
+		{
+			"errors": [],
+			"ms": 154,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_dev_stand_ins_apply_to_one_sign_up_only"
+		},
+		{
+			"errors": [],
+			"ms": 527,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_lessons_return_by_a_route_not_a_stored_lambda"
+		},
+		{
+			"errors": [],
+			"ms": 1193,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_match_audio_survives_every_hub_scene_swap"
+		},
+		{
+			"errors": [],
+			"ms": 120,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_pet_none_hides_the_blister"
+		},
+		{
+			"errors": [],
+			"ms": 794,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_restart_fight_restarts_the_spar_and_walks_back_in"
+		},
+		{
+			"errors": [],
+			"ms": 366,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_rooftop_practice_walks_back_onto_the_roof"
+		},
+		{
+			"errors": [],
+			"ms": 525,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_switching_fighters_calls_off_the_challenge"
+		},
+		{
+			"errors": [],
+			"ms": 195,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_the_hub_is_not_an_online_match"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 10 run, 0 failed, 10 passed, 0 skipped in 12.5 s",
+	"time": "2026-10-18T17:29:08",
+	"total": 10,
+	"version": "0.9.15"
+}

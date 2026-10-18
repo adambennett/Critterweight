@@ -1,0 +1,108 @@
+{
+  "product": "Critterweight",
+  "version": "0.9.15",
+  "git_revision": "a527f2d",
+  "working_tree_dirty": false,
+  "built_at": "2026-10-18T17:27:34",
+  "godot": "4.5.1.stable.official.f62fdbde1",
+  "targets": [
+    {
+      "target": "Windows Desktop",
+      "folder": "Critterweight-windows-x64",
+      "binary": "Critterweight.exe",
+      "files": [
+        {
+          "path": "AI_LAB.md",
+          "bytes": 35841,
+          "sha256": "c82516f32a9f43474a2f3b4f4f9d58d30f9c740762d8e6031a22912f54b2cdef"
+        },
+        {
+          "path": "CREDITS.md",
+          "bytes": 3483,
+          "sha256": "92cce9ac8b7d99413a5eddd61a2212e13136d0b231555fccd74a75806864e93c"
+        },
+        {
+          "path": "Critterweight.exe",
+          "bytes": 241886992,
+          "sha256": "b359fdc81057449360208355783e6432791cf4c60207dc22da618b52f155727c"
+        },
+        {
+          "path": "MODDING.md",
+          "bytes": 20649,
+          "sha256": "9e8c939f51fdace3b59bf3d39113748733af261209b4605fa5b5b0f2da82a69e"
+        },
+        {
+          "path": "OFL-Barlow.txt",
+          "bytes": 4377,
+          "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f"
+        },
+        {
+          "path": "OFL-Bungee.txt",
+          "bytes": 4380,
+          "sha256": "ff43f39d2143afa2ef0a7009629d25f62de23f0614ecdaea6dd07f6c58c5d2b1"
+        },
+        {
+          "path": "PLAYER_GUIDE.md",
+          "bytes": 12967,
+          "sha256": "408267733e0776f4265974bdaa5fc3c50a480958253abe0dc87a24b952fd3051"
+        },
+        {
+          "path": "README.md",
+          "bytes": 5593,
+          "sha256": "a8dc66e4cf55a459e98349f8f6da5090bf0f98492b5f1231b5a81773a28ef30a"
+        },
+        {
+          "path": "THIRD_PARTY.md",
+          "bytes": 15262,
+          "sha256": "ebd7b7be88eb412af6567dbbe2e088ef8770579411fba34708eaf5c52980416c"
+        },
+        {
+          "path": "example-mod-sources/pack_mod.py",
+          "bytes": 3167,
+          "sha256": "c3ac003e1b3aa8ea611a5dc2c7db3ed5f96564a1a55d78aee1775ef41b2b052d"
+        },
+        {
+          "path": "example-mod-sources/moon_rules/manifest.json",
+          "bytes": 514,
+          "sha256": "9b38c933e081875d984e13f24d0ce73a44af4c0459cda351b79ec9428f1f88d6"
+        },
+        {
+          "path": "example-mod-sources/moon_rules/playlists/moon_night.json",
+          "bytes": 409,
+          "sha256": "0385787189f3e8c8e3b521155d253b0c1506d74e96ad7446adaf5bc1c532c833"
+        },
+        {
+          "path": "example-mod-sources/moon_rules/rules/juice_frenzy.json",
+          "bytes": 421,
+          "sha256": "f053506270d1a107142cdcad0f6da27bc5b6d6bcdf6a6494fde6cc5b38e12fad"
+        },
+        {
+          "path": "example-mod-sources/moon_rules/rules/moon_brawl.json",
+          "bytes": 607,
+          "sha256": "78f33df81ca33feadc7451ca5afd8c5a9854c63f24eaf4b9335796d220f13fd9"
+        },
+        {
+          "path": "example-mod-sources/rust_bucket/manifest.json",
+          "bytes": 475,
+          "sha256": "e0d1d2b771c677cf5983ad7a1e277ad5eb9e5828d42abadb4716b4211dc57283"
+        },
+        {
+          "path": "example-mod-sources/rust_bucket/arenas/the_drain.json",
+          "bytes": 906,
+          "sha256": "cb70a269e3a4eeff8dd5415bbd5ce3276335b4864e993d9fde1de1f3e420d6b9"
+        },
+        {
+          "path": "example-mod-sources/stoke_variants/manifest.json",
+          "bytes": 515,
+          "sha256": "9fa45db3b10145bb27b194f244654c8b39a3eb5407ace3ac3a7c03dda9860adb"
+        },
+        {
+          "path": "example-mod-sources/stoke_variants/creatures/overheated_stoke.json",
+          "bytes": 700,
+          "sha256": "de11e545ddc1e5f20ec351df773bee38c906f29bb048eccf54a9ab2de8908887"
+        }
+      ]
+    }
+  ],
+  "tag": ""
+}

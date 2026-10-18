@@ -1,4 +1,4 @@
-# v0.9.15 preview 2 — verification in progress
+# v0.9.15 preview 2 — verified local build
 
 The owner resumed work on 2026-10-18 and authorized the full Breeze dialogue batch up to
 3,500 credits, with Coach Buck for coaching. PAUSE_CHECKPOINT.md is a historical checkpoint;
@@ -37,11 +37,19 @@ warning; there are no script/parse errors in the completed successful checks.
 
 ## Delivery target and boundaries
 
-Intended executable: B:/Critterweight/release-work/v0.9.15-preview2/Critterweight-0.9.15-preview.exe.
-It is not built yet. The older preview directory contains only the earlier monitor/tick fixes.
-Build with tools/build/package.ps1, Windows Desktop only, into preview2/package; do not use
-release.ps1. Verify the packaged exe headlessly with explicit arguments. Record the actual
-manifest, SHA-256 and test results here before handing it over.
+Executable: B:/Critterweight/release-work/v0.9.15-preview2/Critterweight-0.9.15-preview.exe.
+Windows export from clean source commit a527f2d, version 0.9.15, 241,886,992 bytes.
+SHA-256: b359fdc81057449360208355783e6432791cf4c60207dc22da618b52f155727c.
+BUILD_MANIFEST.json records every package file. The delivery copy matches the packaged exe.
+
+Packaged headless checks: 402 scripts, zero failures; recorded speech 9/9; preview regressions
+13/13; settings 6 passed plus one expected source-scan skip; hub flow 10/10; tutorials 18/18.
+The tutorial/hub combination retains the same shutdown-only resource warning as source runs.
+No script/parse errors or test failures. All packaged checks used isolated B: user roots and
+CreateNoWindow. No graphical launch, tag, push or release publication occurred.
+
+This completes the previous playtest-fix and dialogue batch. The subsequent rooftop canvas
+request is a separate follow-on change and will produce a newer local preview.
 
 No new graphical Windows-runtime claim is made. Physical controller feel, real multi-monitor
 placement, visual composition and listening taste require the owner's playtest. Code-capable

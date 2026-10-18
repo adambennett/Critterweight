@@ -205,16 +205,16 @@ B is added after the Windows export succeeds. No new W claims: the owner request
 
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
-| P15-01 | Editor Share switches canvas/menu ownership; every panel and popup supports controller navigation | I T | test_preview_0915::test_editor_popup_keeps_controller_focus_and_share_toggles_all_controls; existing editor UI suite |
-| P15-02 | Unique default arena names; overwrite confirmation; confirmed Compendium edit/recoverable delete | I T | test_preview_0915 editor_unique_default_and_overwrite_confirmation, compendium_custom_arena_actions_require_confirmation |
-| P15-03 | New rules has hotkey cancellation without a redundant tile; offline patch-note archive | I T | test_preview_0915 rules chooser and patch archive regression; all 17 published releases through 0.9.14 |
-| P15-04 | Pannable campaign route chart with new icons, pulsing stops, focus reveal; no act-intro popup or modal click-through | I T | test_preview_0915 map regression; test_campaign_ui full controller traversal |
-| P15-05 | Every core event has distinct illustration; outcomes retain art; campaign decision screens show live run stats | I T | test_preview_0915 all 29 event/outcome layouts; docs/evidence/art/events/prompts.json |
-| P15-06 | Bookie abandon targets the latest run after loss/redeal and leaves the player able to exit | I T | test_preview_0915 Bookie regression; test_campaign_ui table setup/stop |
-| P15-07 | Top-only fighter health cards; separate subtitle band; live input-glyph cooldowns | I T | test_preview_0915 eight-fighter HUD and cooldown coverage; physical presentation awaits owner |
-| P15-08 | Default-off controller spectator free-camera Invert Y; crate-toss boundary feedback uses actual legality | I T | test_preview_0915 crate/invert regression; hub/core suites |
-| P15-09 | Persisted context playlists, ordered/shuffle/repeat; main-menu ambience silence; original crowd restored | I T | test_preview_0915 jukebox selection/persistence/menu-silence regressions; audio inventory |
-| P15-10 | Shared segmented fighter stats and live glyphs; controller information scroll; compact team columns | I T | test_preview_0915 fighter-info scrolling and team layout/slot identity at 1280x800 and 1920x1080 |
-| P15-11 | Offline Devon/Kendall/Coach Buck dialogue, current-name subtitles, recorded name/number fallbacks, safe interruption and no runtime API | I T | docs/audio/breeze/plan.json and generation-ledger.jsonl; 764 clips generated and verified; test_recorded_speech covers playback, full authored corpus, custom names and aliases |
+| P15-01 | Editor Share switches canvas/menu ownership; every panel and popup supports controller navigation | I B T | test_preview_0915::test_editor_popup_keeps_controller_focus_and_share_toggles_all_controls; existing editor UI suite |
+| P15-02 | Unique default arena names; overwrite confirmation; confirmed Compendium edit/recoverable delete | I B T | test_preview_0915 editor_unique_default_and_overwrite_confirmation, compendium_custom_arena_actions_require_confirmation |
+| P15-03 | New rules has hotkey cancellation without a redundant tile; offline patch-note archive | I B T | test_preview_0915 rules chooser and patch archive regression; all 17 published releases through 0.9.14 |
+| P15-04 | Pannable campaign route chart with new icons, pulsing stops, focus reveal; no act-intro popup or modal click-through | I B T | test_preview_0915 map regression; test_campaign_ui full controller traversal |
+| P15-05 | Every core event has distinct illustration; outcomes retain art; campaign decision screens show live run stats | I B T | test_preview_0915 all 29 event/outcome layouts; docs/evidence/art/events/prompts.json |
+| P15-06 | Bookie abandon targets the latest run after loss/redeal and leaves the player able to exit | I B T | test_preview_0915 Bookie regression; test_campaign_ui table setup/stop |
+| P15-07 | Top-only fighter health cards; separate subtitle band; live input-glyph cooldowns | I B T | test_preview_0915 eight-fighter HUD and cooldown coverage; physical presentation awaits owner |
+| P15-08 | Default-off controller spectator free-camera Invert Y; crate-toss boundary feedback uses actual legality | I B T | test_preview_0915 crate/invert regression; hub/core suites |
+| P15-09 | Persisted context playlists, ordered/shuffle/repeat; main-menu ambience silence; original crowd restored | I B T | test_preview_0915 jukebox selection/persistence/menu-silence regressions; audio inventory |
+| P15-10 | Shared segmented fighter stats and live glyphs; controller information scroll; compact team columns | I B T | test_preview_0915 fighter-info scrolling and team layout/slot identity at 1280x800 and 1920x1080 |
+| P15-11 | Offline Devon/Kendall/Coach Buck dialogue, current-name subtitles, recorded name/number fallbacks, safe interruption and no runtime API | I B T | docs/audio/breeze/plan.json and generation-ledger.jsonl; 764 clips generated and verified; test_recorded_speech covers playback, full authored corpus, custom names and aliases |
 
 Scope and owner review checklist: docs/releases/v0.9.15-preview2.md. Prior monitor/single-tick regressions remain applicable.
