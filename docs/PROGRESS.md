@@ -1,23 +1,14 @@
 # Progress
 
-## Status (2026-10-17) — v0.9.13 audio and fighter selection
+## Status (2026-10-18) — v0.9.15 local preview ready
 
-The owner asked for free-to-use audio replacements installed in the game and Random in every fighter
-picker. v0.9.13 adds 126 selected CC BY 4.0 / CC0 audio files with in-game attribution, hashes and bank
-references, and resolves Random to a concrete fighter before a run or fight starts. All downloads and
-the release working clone are on B:. The owner will judge the sound choices by playing this build. See
-[release notes](releases/v0.9.13.md) and the [verification record](evidence/verification/v0.9.13/README.md).
+The local v0.9.15 preview fixes monitor persistence: numeric enum settings now survive the integer-to-float JSON round trip, and the saved display is reapplied after the startup window has been placed. Menu focus now plays a single soft CC0 tick_001.ogg cue at -14 dB with fixed pitch. The Windows executable is at B:/Critterweight/release-work/v0.9.15-preview/Critterweight-0.9.15-preview.exe. Source and packaged headless checks are green; native multi-monitor behavior and the final sound choice await the owner's review. The preview is local and untagged. Evidence is in [the v0.9.15 preview record](evidence/verification/v0.9.15-preview/README.md).
 
-The preceding [v0.9.12 playtest fixes](releases/v0.9.12.md) remain in this build, including campaign
-progression, controller navigation, Compendium, visible autobattler fights, free spectating, Cannery
-activities, settings and the ambience buzz repair. The larger release-candidate backlog below remains
-separate from this preview release.
+v0.9.14 remains the latest published release. The v0.9.13 audio replacements and Random fighter selection, along with v0.9.12 playtest fixes, remain in this branch. The wider release-candidate backlog below remains separate from this preview.
 
 **Combat feel (0.9.11, D-035).** Hits now pause the match, punch the camera, jolt the struck body and stay lit on the health bar; walls and crowd figures between the camera and the fighters fade or shrink away. Mashed attacks still miss often (15-41 % land against the regular bot); attack magnetism is a separate, measured change for later.
 
-Work is **paused at a playable preview**, not at the finished release candidate. The latest build is
-published as a GitHub pre-release (see `docs/RELEASES.md`). The goal stays open: the items under
-"Remaining for the release candidate" must be done before a completion audit can pass.
+Work is **paused at a playable preview**, not at the finished release candidate. v0.9.14 remains the latest published build (see `docs/RELEASES.md`); v0.9.15 is a local preview awaiting owner verification. The goal stays open: the items under `Remaining for the release candidate` must be done before a completion audit can pass.
 
 **Cross-platform hash bug (fixed 2026-10-16, after v0.9.7).** The first Linux run found it: the packaged Linux
 server ran in a Debian 12 container (Docker on WSL2) with Windows clients. Godot's JSON writes doubles with

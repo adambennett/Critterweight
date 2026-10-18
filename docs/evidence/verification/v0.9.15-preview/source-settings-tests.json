@@ -1,0 +1,28 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_display_changes_confirm_or_roll_back"
+		},
+		{
+			"errors": [],
+			"ms": 131,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_every_visible_setting_is_read_somewhere"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_selected_monitor_persists_across_settings_reload"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 3 run, 0 failed, 3 passed, 0 skipped in 7.1 s",
+	"time": "2026-10-18T12:04:26",
+	"total": 3,
+	"version": "0.9.15"
+}

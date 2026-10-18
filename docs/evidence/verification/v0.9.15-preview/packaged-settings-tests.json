@@ -1,0 +1,29 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_display_changes_confirm_or_roll_back"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"skipped": "scans GDScript source; exported builds ship compiled scripts (runs in the source suite)",
+			"test": "res://src/test/ui/test_settings_wired.gd::test_every_visible_setting_is_read_somewhere"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_selected_monitor_persists_across_settings_reload"
+		}
+	],
+	"skipped": 1,
+	"summary": "tests: 3 run, 0 failed, 2 passed, 1 skipped in 2.8 s",
+	"time": "2026-10-18T12:13:09",
+	"total": 3,
+	"version": "0.9.15"
+}
