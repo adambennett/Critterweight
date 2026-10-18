@@ -1,0 +1,6 @@
+434523899794c2881a547518752b1364187c87ee9e2ddd3d759bc300207365b1  Critterweight-0.9.13-windows-x64.exe
+9cd43363ed833f8a966a43c716f690b42a959d215854dd14a8359d34ed9d2b41  Critterweight-0.9.13-windows-x64.zip
+fef68ac72ae0d5a15b96078187bc12fdf7314ee5ea8ad9d3770aaf1d9003c1f5  Critterweight-0.9.13-server-windows-x64.zip
+b33e33c867356fe299b9de45b4515bcdce6d75f1c1ef599b8e32cf6eeb61f8c1  Critterweight-0.9.13-linux-x86_64.tar.gz
+d1b306ca34f442ca809786f99d520c16bc74b62e5e0fb525a62b75851d8570c9  Critterweight-0.9.13-server-linux-x86_64.tar.gz
+a6812103603a382bca404edf174eade65f68ad3e3ad06253f9c46297b84129d1  BUILD_MANIFEST.json

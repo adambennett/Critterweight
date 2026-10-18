@@ -1,0 +1,67 @@
+{
+  "tag": "v0.9.13",
+  "url": "https://github.com/adambennett/PokeMMA/releases/tag/v0.9.13",
+  "prerelease": true,
+  "commit": "cdacbcf864850191562a14a0b31e4e885539a566",
+  "manifest_dirty": false,
+  "asset_count": 7,
+  "all_uploaded_hashes_match": true,
+  "assets": [
+    {
+      "name": "BUILD_MANIFEST.json",
+      "bytes": 22719,
+      "github_bytes": 22719,
+      "sha256": "a6812103603a382bca404edf174eade65f68ad3e3ad06253f9c46297b84129d1",
+      "github_sha256": "a6812103603a382bca404edf174eade65f68ad3e3ad06253f9c46297b84129d1",
+      "matches": true
+    },
+    {
+      "name": "Critterweight-0.9.13-linux-x86_64.tar.gz",
+      "bytes": 88626917,
+      "github_bytes": 88626917,
+      "sha256": "b33e33c867356fe299b9de45b4515bcdce6d75f1c1ef599b8e32cf6eeb61f8c1",
+      "github_sha256": "b33e33c867356fe299b9de45b4515bcdce6d75f1c1ef599b8e32cf6eeb61f8c1",
+      "matches": true
+    },
+    {
+      "name": "Critterweight-0.9.13-server-linux-x86_64.tar.gz",
+      "bytes": 34317021,
+      "github_bytes": 34317021,
+      "sha256": "d1b306ca34f442ca809786f99d520c16bc74b62e5e0fb525a62b75851d8570c9",
+      "github_sha256": "d1b306ca34f442ca809786f99d520c16bc74b62e5e0fb525a62b75851d8570c9",
+      "matches": true
+    },
+    {
+      "name": "Critterweight-0.9.13-server-windows-x64.zip",
+      "bytes": 41841870,
+      "github_bytes": 41841870,
+      "sha256": "fef68ac72ae0d5a15b96078187bc12fdf7314ee5ea8ad9d3770aaf1d9003c1f5",
+      "github_sha256": "fef68ac72ae0d5a15b96078187bc12fdf7314ee5ea8ad9d3770aaf1d9003c1f5",
+      "matches": true
+    },
+    {
+      "name": "Critterweight-0.9.13-windows-x64.exe",
+      "bytes": 165005464,
+      "github_bytes": 165005464,
+      "sha256": "434523899794c2881a547518752b1364187c87ee9e2ddd3d759bc300207365b1",
+      "github_sha256": "434523899794c2881a547518752b1364187c87ee9e2ddd3d759bc300207365b1",
+      "matches": true
+    },
+    {
+      "name": "Critterweight-0.9.13-windows-x64.zip",
+      "bytes": 96093219,
+      "github_bytes": 96093219,
+      "sha256": "9cd43363ed833f8a966a43c716f690b42a959d215854dd14a8359d34ed9d2b41",
+      "github_sha256": "9cd43363ed833f8a966a43c716f690b42a959d215854dd14a8359d34ed9d2b41",
+      "matches": true
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 629,
+      "github_bytes": 629,
+      "sha256": "050e710f880b024ef44cae57fcb613e4a85351194abcc4fc88eccb96e63e0223",
+      "github_sha256": "050e710f880b024ef44cae57fcb613e4a85351194abcc4fc88eccb96e63e0223",
+      "matches": true
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
 
-2026-10-17 23:12:44 [INFO] paths: user data root: B:/Critterweight/packaged-audio-userdata-v0.9.13-final
-2026-10-17 23:12:44 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
-2026-10-17 23:12:44 [INFO] app: Critterweight 0.9.13+842b405.dirty (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-17 23:21:38 [INFO] paths: user data root: B:/Critterweight/packaged-audio-tagged-userdata-v0.9.13
+2026-10-17 23:21:38 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
+2026-10-17 23:21:38 [INFO] app: Critterweight 0.9.13 (cdacbcf) (Windows x86_64, Godot 4.5.1-stable (official))
 ok    res://src/test/audio/test_audio_bank.gd::test_bank_loads_and_every_id_resolves (308 ms)
 ok    res://src/test/audio/test_audio_bank.gd::test_every_creature_has_a_voice_in_the_bank (1 ms)
 ok    res://src/test/audio/test_audio_bank.gd::test_frequent_sounds_have_variations (0 ms)

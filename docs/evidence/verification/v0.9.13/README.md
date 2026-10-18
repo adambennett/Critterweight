@@ -9,7 +9,7 @@
 - Audio bank tests after the export-aware assertion change: **10/10 passed in source**. The Windows PCK run tested the same 10 cases: **8 passed, 0 failed, 2 source-file-only checks skipped**. All selected replacement streams load from the exported PCK. [Source result](source-audio-tests.json), [packaged result](packaged-audio-tests.json).
 - Godot script check: **394 scripts, 0 failures**. [Log](script-check.log).
 - Audio reproducibility check: all **638 generated renders match** the committed files. [Log](generated-audio-reproducibility.log).
-- All four Windows/Linux game and dedicated-server targets exported and archived during the B: preflight. The release script repeats packaging and runs the tagged Windows boot and rendered playtest checks before publishing.
+- Clean tagged release build: all four Windows/Linux game and dedicated-server targets exported and archived on B:. The manifest records **v0.9.13 / `cdacbcf` / clean tree**. The release script reports **394 scripts checked, 0 failures**. [Tagged build manifest](tagged-build-manifest.json), [package script check](packaged-script-check.log).
 
 The source suite ran before a test-only adjustment made the replacement-asset check understand Godot's PCK imports. Production code did not change afterward. The adjusted test was rerun in source and in the packaged Windows game as recorded above.
 
@@ -27,4 +27,7 @@ The successful full source run recorded one Jolt job-pool capacity warning in a 
 
 ## Tagged release
 
-Release tag, commit, clean packaged manifest, packaged boot, rendered regression and uploaded asset digests are recorded here after the release script completes.
+- GitHub prerelease **[`v0.9.13`](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.13)** points to clean commit **`cdacbcf864850191562a14a0b31e4e885539a566`**. The manifest records `working_tree_dirty: false` and four packaged targets.
+- The released Windows build checked **394 scripts**, reached the title in **4533 ms**, and passed **20/20 rendered regressions** with no skips in **15.3 seconds**. [Boot report](packaged-boot.json), [test results](packaged-rendered-tests.json), [runtime log](packaged-rendered-tests.log).
+- Audio bank tests on the exact released Windows executable: **10 run, 8 passed, 0 failed, 2 source-only checks skipped**. All selected replacement streams load from the PCK. [Results](packaged-audio-tests.json), [runtime log](packaged-audio-tests.log).
+- GitHub reports **seven uploaded assets**. The recorded sizes and SHA-256 digests match every local release file. [Asset verification](release-assets.json), [published checksums](release-SHA256SUMS.txt).
