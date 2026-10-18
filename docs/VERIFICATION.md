@@ -17,7 +17,7 @@ dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`
 
 | Version | Commit | Source suite before release | Packaged checks |
 |---|---|---|---|
-| 0.9.12 | tag `v0.9.12` | 711 run: 710 passed, 0 failed, 1 graphical-only skip; full-suite shutdown warning documented in the linked report | Windows preflight: 391 scripts, 20/20 rendered playtest regressions, no shutdown warnings; clean tagged exports repeat these gates before publication |
+| 0.9.12 | `0e8b20f` (`v0.9.12`) | 711 run: 710 passed, 0 failed, 1 graphical-only skip; full-suite warnings documented in the linked report | Tagged Windows build: 391 scripts, title in 4.5 s, 20/20 rendered regressions, no shutdown warnings; all four targets built and seven uploaded asset digests verified |
 | 0.9.9 | eecaa39 | 684 / 685 (the one failure was the cross-drive lab-test check, fixed and re-run green) | release smoke: script check, packaged boot to the title |
 | 0.9.8 | 57613cc | 685 / 685 passed (2026-10-16) | release smoke: script check, packaged boot to the title |
 | 0.9.7 | 9e9d93c | 684 / 684 passed (2026-10-16) | release smoke: script check, packaged boot to the title |

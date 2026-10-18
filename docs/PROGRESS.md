@@ -6,8 +6,10 @@ The owner requested fixes for the v0.9.11 playtest and a new v0.9.12 preview. Ca
 controller navigation/scrolling, menu/editor layout, visible autobattler fights, free spectating,
 Compendium, profile naming, Cannery challenges, settings and the ambience buzz are addressed. See
 [release notes](releases/v0.9.12.md) and the [issue-by-issue verification record](evidence/verification/v0.9.12/README.md).
+Published [v0.9.12](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.12) from `0e8b20f`.
 The source suite passed 710 tests with one graphical-only skip and no failures; all 20 playtest regressions
-passed in the exported Windows preflight. The report records the full-suite-only shutdown warning and
+passed in the tagged Windows executable, which boots in 4.5 seconds. All seven uploaded asset hashes match.
+The report records the full-suite-only warnings and
 the remaining physical-controller, subjective-audio and Linux gameplay validation limits.
 The larger release-candidate backlog below remains separate from this patch release.
 

@@ -1,0 +1,130 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 2008,
+			"ok": true,
+			"test": "res://src/test/campaign/test_playtest_campaign.gd::test_bookie_default_setup_reaches_a_visible_live_fight"
+		},
+		{
+			"errors": [],
+			"ms": 340,
+			"ok": true,
+			"test": "res://src/test/campaign/test_playtest_campaign.gd::test_campaign_flow_survives_its_map_and_resumes_reward"
+		},
+		{
+			"errors": [],
+			"ms": 185,
+			"ok": true,
+			"test": "res://src/test/campaign/test_playtest_campaign.gd::test_campaign_lobby_back_pops_without_recursing"
+		},
+		{
+			"errors": [],
+			"ms": 250,
+			"ok": true,
+			"test": "res://src/test/campaign/test_playtest_campaign.gd::test_suspended_run_is_reachable_from_bookie_with_dpad"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_playtest_input.gd::test_legacy_you_name_is_a_rookie_until_renamed"
+		},
+		{
+			"errors": [],
+			"ms": 2007,
+			"ok": true,
+			"test": "res://src/test/core/test_playtest_input.gd::test_right_bumper_starts_ability_two_for_every_roster_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 284,
+			"ok": true,
+			"test": "res://src/test/core/test_playtest_input.gd::test_small_team_hud_leaves_no_orphan_containers"
+		},
+		{
+			"errors": [],
+			"ms": 289,
+			"ok": true,
+			"test": "res://src/test/core/test_playtest_input.gd::test_spectator_has_follow_locked_and_free_flight"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/hub/test_playtest_hub.gd::test_called_crate_shots_reward_variety_and_reset_the_dock"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/hub/test_playtest_hub.gd::test_camera_controls_match_every_frame_of_a_room_turn"
+		},
+		{
+			"errors": [],
+			"ms": 252,
+			"ok": true,
+			"test": "res://src/test/hub/test_playtest_hub.gd::test_cannon_difficulties_speed_and_tracking"
+		},
+		{
+			"errors": [],
+			"ms": 301,
+			"ok": true,
+			"test": "res://src/test/hub/test_playtest_hub.gd::test_crate_pickup_cannot_reach_through_main_floor_wall"
+		},
+		{
+			"errors": [],
+			"ms": 1775,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_cannery_boards_fit_and_lessons_reveal_the_final_button"
+		},
+		{
+			"errors": [],
+			"ms": 1091,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_compendium_roster_models_and_all_sections"
+		},
+		{
+			"errors": [],
+			"ms": 362,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_dialog_options_fit_and_are_reachable"
+		},
+		{
+			"errors": [],
+			"ms": 746,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_dropdown_keeps_music_and_rapid_ambience_switches_settle"
+		},
+		{
+			"errors": [],
+			"ms": 1313,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_editor_lock_and_device_layout"
+		},
+		{
+			"errors": [],
+			"ms": 603,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_main_menu_has_no_scroll_and_keeps_submenu"
+		},
+		{
+			"errors": [],
+			"ms": 558,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_resolution_dropdown_and_fps_toggle"
+		},
+		{
+			"errors": [],
+			"ms": 269,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_last_button_and_text_panel_scrolls"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 20 run, 0 failed, 20 passed, 0 skipped in 15.7 s",
+	"time": "2026-10-17T21:19:09",
+	"total": 20,
+	"version": "0.9.12"
+}

@@ -1,0 +1,59 @@
+{
+  "release_url": "https://github.com/adambennett/PokeMMA/releases/tag/v0.9.12",
+  "tag": "v0.9.12",
+  "published_at": "2026-10-18T01:19:34Z",
+  "prerelease": true,
+  "verified_at": "2026-10-18T01:20:46.1774536Z",
+  "verification": "Every uploaded asset size and GitHub SHA-256 digest matches the local release file",
+  "assets": [
+    {
+      "name": "BUILD_MANIFEST.json",
+      "bytes": 22715,
+      "sha256": "0a00d1878e207f13fe3de45093dc19303790c6733b0b3440b0ea9ece422cbe37",
+      "github_digest": "sha256:0a00d1878e207f13fe3de45093dc19303790c6733b0b3440b0ea9ece422cbe37",
+      "url": "https://github.com/adambennett/PokeMMA/releases/download/v0.9.12/BUILD_MANIFEST.json"
+    },
+    {
+      "name": "Critterweight-0.9.12-linux-x86_64.tar.gz",
+      "bytes": 59501698,
+      "sha256": "8b19da78c352e32d450cb49417eef4aef1af600f2a5dde6014c687f32bf978ef",
+      "github_digest": "sha256:8b19da78c352e32d450cb49417eef4aef1af600f2a5dde6014c687f32bf978ef",
+      "url": "https://github.com/adambennett/PokeMMA/releases/download/v0.9.12/Critterweight-0.9.12-linux-x86_64.tar.gz"
+    },
+    {
+      "name": "Critterweight-0.9.12-server-linux-x86_64.tar.gz",
+      "bytes": 34304808,
+      "sha256": "1ede7f651023ef3bab4d11f4283b16c5833e0dab6b411151aa7551af72bc9c51",
+      "github_digest": "sha256:1ede7f651023ef3bab4d11f4283b16c5833e0dab6b411151aa7551af72bc9c51",
+      "url": "https://github.com/adambennett/PokeMMA/releases/download/v0.9.12/Critterweight-0.9.12-server-linux-x86_64.tar.gz"
+    },
+    {
+      "name": "Critterweight-0.9.12-server-windows-x64.zip",
+      "bytes": 41829592,
+      "sha256": "a83b4d998f625a20f76831761f3ec6a120558263fe633f65aa1509f8c671848d",
+      "github_digest": "sha256:a83b4d998f625a20f76831761f3ec6a120558263fe633f65aa1509f8c671848d",
+      "url": "https://github.com/adambennett/PokeMMA/releases/download/v0.9.12/Critterweight-0.9.12-server-windows-x64.zip"
+    },
+    {
+      "name": "Critterweight-0.9.12-windows-x64.exe",
+      "bytes": 133665464,
+      "sha256": "653653a84e07238972b4f0febdb9b04b11b0b8906c1de8d0baa3c1c476da8e10",
+      "github_digest": "sha256:653653a84e07238972b4f0febdb9b04b11b0b8906c1de8d0baa3c1c476da8e10",
+      "url": "https://github.com/adambennett/PokeMMA/releases/download/v0.9.12/Critterweight-0.9.12-windows-x64.exe"
+    },
+    {
+      "name": "Critterweight-0.9.12-windows-x64.zip",
+      "bytes": 66946970,
+      "sha256": "63fe4bc923e000d3cd605cc899a0da426c69f733f84393c16e9d2fa5ff094236",
+      "github_digest": "sha256:63fe4bc923e000d3cd605cc899a0da426c69f733f84393c16e9d2fa5ff094236",
+      "url": "https://github.com/adambennett/PokeMMA/releases/download/v0.9.12/Critterweight-0.9.12-windows-x64.zip"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 629,
+      "sha256": "3ef0a444144773e00841cded0597ba6d5da3ff72a7cca9d8fc6a477ada54bb2b",
+      "github_digest": "sha256:3ef0a444144773e00841cded0597ba6d5da3ff72a7cca9d8fc6a477ada54bb2b",
+      "url": "https://github.com/adambennett/PokeMMA/releases/download/v0.9.12/SHA256SUMS.txt"
+    }
+  ]
+}
