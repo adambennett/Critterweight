@@ -591,31 +591,31 @@ assets/audio/replacements/interface/scroll_001.ogg
   21633 bytes | SHA-256 320c6aafb2c7a503eae508dc443b72d7f7c0a317bfd16813157ed400cd04cf16
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_move.files[0]
+  Bank: (not directly referenced)
 
 assets/audio/replacements/interface/scroll_002.ogg
   24628 bytes | SHA-256 6fbcda22bc45349c66f1ba4b56d6c211b12264e83667de4b9af1e4ffcef74be5
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_move.files[1]
+  Bank: (not directly referenced)
 
 assets/audio/replacements/interface/scroll_003.ogg
   29488 bytes | SHA-256 c2fecaa6e37c73d7141d0bd303d1c2231428d97c19ce83d50236a56804818643
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_move.files[2]
+  Bank: (not directly referenced)
 
 assets/audio/replacements/interface/scroll_004.ogg
   20348 bytes | SHA-256 431398a3c12ba3aa30ead97f3e2f9b05eb00978facf04b31bda138ab77a2f54c
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_move.files[3]
+  Bank: (not directly referenced)
 
 assets/audio/replacements/interface/scroll_005.ogg
   20448 bytes | SHA-256 e39d059462225efa31f758fb2e01871cc96781972b5062873a24a55c88174e02
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_move.files[4]
+  Bank: (not directly referenced)
 
 assets/audio/replacements/interface/select_001.ogg
   5468 bytes | SHA-256 aec0c31ea934a35936ae0d2ab8fac8123c93aa5647f935853a58dbaf90278b7a
@@ -651,19 +651,19 @@ assets/audio/replacements/interface/tick_001.ogg
   4497 bytes | SHA-256 9d057b918024c787bbe6c00beed13a7ef72a3fa0c259add3cef36582792f4230
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_slider.files[0]
+  Bank: bank.sfx.ui_move.files[0]; bank.sfx.ui_slider.files[0]
 
 assets/audio/replacements/interface/tick_002.ogg
   4514 bytes | SHA-256 869442f54214be902ec7437f79e400dc91c1bfd90d18a6dd2d5b7e41ffbf457b
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_slider.files[1]
+  Bank: bank.sfx.ui_move.files[1]; bank.sfx.ui_slider.files[1]
 
 assets/audio/replacements/interface/tick_004.ogg
   5031 bytes | SHA-256 0253d5f7d8d2afbbc370eac2a4539bb844239f0c98343e516d376b137c06d27c
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_slider.files[2]
+  Bank: bank.sfx.ui_move.files[2]; bank.sfx.ui_slider.files[2]
 
 assets/audio/replacements/interface/toggle_001.ogg
   7369 bytes | SHA-256 ca1d2dde5f0b286abac4f070e23edab8f30927c8a533665cdf2ac6492a415e49

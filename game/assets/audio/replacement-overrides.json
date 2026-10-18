@@ -418,13 +418,11 @@
     },
     "ui_move": {
       "files": [
-        "res://assets/audio/replacements/interface/scroll_001.ogg",
-        "res://assets/audio/replacements/interface/scroll_002.ogg",
-        "res://assets/audio/replacements/interface/scroll_003.ogg",
-        "res://assets/audio/replacements/interface/scroll_004.ogg",
-        "res://assets/audio/replacements/interface/scroll_005.ogg"
+        "res://assets/audio/replacements/interface/tick_001.ogg",
+        "res://assets/audio/replacements/interface/tick_002.ogg",
+        "res://assets/audio/replacements/interface/tick_004.ogg"
       ],
-      "gain": -10
+      "gain": -14
     },
     "ui_accept": {
       "files": [

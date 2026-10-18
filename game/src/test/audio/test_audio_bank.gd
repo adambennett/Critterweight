@@ -237,3 +237,19 @@ func test_every_creature_has_a_voice_in_the_bank() -> void:
 				if not Audio.has_sfx("voice_%s_%s" % [voice, t]):
 					missing.append("%s -> voice_%s_%s" % [id, voice, t])
 	check(missing.is_empty(), "creature voices missing from the bank: %s" % [missing])
+
+func test_menu_focus_uses_soft_interface_ticks() -> void:
+	var entry: Dictionary = Audio._sfx_entries.get("ui_move", {})
+	var expected := [
+		"res://assets/audio/replacements/interface/tick_001.ogg",
+		"res://assets/audio/replacements/interface/tick_002.ogg",
+		"res://assets/audio/replacements/interface/tick_004.ogg",
+	]
+	var files: Array = entry.get("files", [])
+	check(files == expected, "menu focus uses brief interface ticks instead of scroll effects")
+	check(float(entry.get("gain", 0.0)) <= -14.0, "menu focus cue is mixed quietly")
+	for path in files:
+		var stream := Audio._stream(str(path))
+		check(stream != null, "menu focus cue loads: %s" % path)
+		if stream != null:
+			check(stream.get_length() <= 0.12, "menu focus cue stays brief: %s" % path)

@@ -965,41 +965,31 @@
       "sha256": "320c6aafb2c7a503eae508dc443b72d7f7c0a317bfd16813157ed400cd04cf16",
       "source_id": "kenney-interface",
       "license": "Creative Commons Zero (CC0 1.0)",
-      "bank_references": [
-        "bank.sfx.ui_move.files[0]"
-      ]
+      "bank_references": []
     },
     "assets/audio/replacements/interface/scroll_002.ogg": {
       "sha256": "6fbcda22bc45349c66f1ba4b56d6c211b12264e83667de4b9af1e4ffcef74be5",
       "source_id": "kenney-interface",
       "license": "Creative Commons Zero (CC0 1.0)",
-      "bank_references": [
-        "bank.sfx.ui_move.files[1]"
-      ]
+      "bank_references": []
     },
     "assets/audio/replacements/interface/scroll_003.ogg": {
       "sha256": "c2fecaa6e37c73d7141d0bd303d1c2231428d97c19ce83d50236a56804818643",
       "source_id": "kenney-interface",
       "license": "Creative Commons Zero (CC0 1.0)",
-      "bank_references": [
-        "bank.sfx.ui_move.files[2]"
-      ]
+      "bank_references": []
     },
     "assets/audio/replacements/interface/scroll_004.ogg": {
       "sha256": "431398a3c12ba3aa30ead97f3e2f9b05eb00978facf04b31bda138ab77a2f54c",
       "source_id": "kenney-interface",
       "license": "Creative Commons Zero (CC0 1.0)",
-      "bank_references": [
-        "bank.sfx.ui_move.files[3]"
-      ]
+      "bank_references": []
     },
     "assets/audio/replacements/interface/scroll_005.ogg": {
       "sha256": "e39d059462225efa31f758fb2e01871cc96781972b5062873a24a55c88174e02",
       "source_id": "kenney-interface",
       "license": "Creative Commons Zero (CC0 1.0)",
-      "bank_references": [
-        "bank.sfx.ui_move.files[4]"
-      ]
+      "bank_references": []
     },
     "assets/audio/replacements/interface/select_001.ogg": {
       "sha256": "aec0c31ea934a35936ae0d2ab8fac8123c93aa5647f935853a58dbaf90278b7a",
@@ -1046,6 +1036,7 @@
       "source_id": "kenney-interface",
       "license": "Creative Commons Zero (CC0 1.0)",
       "bank_references": [
+        "bank.sfx.ui_move.files[0]",
         "bank.sfx.ui_slider.files[0]"
       ]
     },
@@ -1054,6 +1045,7 @@
       "source_id": "kenney-interface",
       "license": "Creative Commons Zero (CC0 1.0)",
       "bank_references": [
+        "bank.sfx.ui_move.files[1]",
         "bank.sfx.ui_slider.files[1]"
       ]
     },
@@ -1062,6 +1054,7 @@
       "source_id": "kenney-interface",
       "license": "Creative Commons Zero (CC0 1.0)",
       "bank_references": [
+        "bank.sfx.ui_move.files[2]",
         "bank.sfx.ui_slider.files[2]"
       ]
     },
@@ -2673,9 +2666,7 @@
       "title": "Interface Sounds",
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://kenney.nl/assets/interface-sounds",
-      "bank_references": [
-        "bank.sfx.ui_move.files[0]"
-      ]
+      "bank_references": []
     },
     {
       "file": "assets/audio/replacements/interface/scroll_002.ogg",
@@ -2687,9 +2678,7 @@
       "title": "Interface Sounds",
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://kenney.nl/assets/interface-sounds",
-      "bank_references": [
-        "bank.sfx.ui_move.files[1]"
-      ]
+      "bank_references": []
     },
     {
       "file": "assets/audio/replacements/interface/scroll_003.ogg",
@@ -2701,9 +2690,7 @@
       "title": "Interface Sounds",
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://kenney.nl/assets/interface-sounds",
-      "bank_references": [
-        "bank.sfx.ui_move.files[2]"
-      ]
+      "bank_references": []
     },
     {
       "file": "assets/audio/replacements/interface/scroll_004.ogg",
@@ -2715,9 +2702,7 @@
       "title": "Interface Sounds",
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://kenney.nl/assets/interface-sounds",
-      "bank_references": [
-        "bank.sfx.ui_move.files[3]"
-      ]
+      "bank_references": []
     },
     {
       "file": "assets/audio/replacements/interface/scroll_005.ogg",
@@ -2729,9 +2714,7 @@
       "title": "Interface Sounds",
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://kenney.nl/assets/interface-sounds",
-      "bank_references": [
-        "bank.sfx.ui_move.files[4]"
-      ]
+      "bank_references": []
     },
     {
       "file": "assets/audio/replacements/interface/select_001.ogg",
@@ -2814,6 +2797,7 @@
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://kenney.nl/assets/interface-sounds",
       "bank_references": [
+        "bank.sfx.ui_move.files[0]",
         "bank.sfx.ui_slider.files[0]"
       ]
     },
@@ -2828,6 +2812,7 @@
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://kenney.nl/assets/interface-sounds",
       "bank_references": [
+        "bank.sfx.ui_move.files[1]",
         "bank.sfx.ui_slider.files[1]"
       ]
     },
@@ -2842,6 +2827,7 @@
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://kenney.nl/assets/interface-sounds",
       "bank_references": [
+        "bank.sfx.ui_move.files[2]",
         "bank.sfx.ui_slider.files[2]"
       ]
     },
