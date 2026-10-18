@@ -217,6 +217,6 @@ B is added after the Windows export succeeds. No new W claims: the owner request
 | P15-10 | Shared segmented fighter stats and live glyphs; controller information scroll; compact team columns | I B T | test_preview_0915 fighter-info scrolling and team layout/slot identity at 1280x800 and 1920x1080 |
 | P15-11 | Offline Devon/Kendall/Coach Buck dialogue, current-name subtitles, recorded name/number fallbacks, safe interruption and no runtime API | I B T | docs/audio/breeze/plan.json and generation-ledger.jsonl; 764 clips generated and verified; test_recorded_speech covers playback, full authored corpus, custom names and aliases |
 
-| P15-12 | Editor-only blank rooftop canvas; independent 12-64m dimensions, four ledges, standard props, save/package/play support and large-stage camera | I T | test_arena_canvas: nine integration, geometry, controller, simulation, audio and policy tests; Windows export pending |
+| P15-12 | Editor-only blank rooftop canvas; independent 12-64m dimensions, four ledges, standard props, save/package/play support and large-stage camera | I B T | test_arena_canvas: nine integration, geometry, controller, simulation, audio and policy tests; source and packaged arena suites 61/61; preview 3 Windows export verified |
 
 Scope and owner review checklist: docs/releases/v0.9.15-preview3.md. Prior monitor/single-tick regressions remain applicable.

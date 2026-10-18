@@ -29,7 +29,15 @@ four-resource warning; no new runtime error is present in the successful verific
 
 ## Build
 
-Windows local preview export and packaged verification pending. No graphical launch, tag,
-push or publication. Physical controller feel, real monitor placement, visual composition and
-voice/music taste remain for the owner's playtest. All work and test user roots are on B:;
-Godot jobs run sequentially at BelowNormal priority.
+Windows preview 3 is built from clean source commit 9d8f44e, version 0.9.15.
+Executable: B:/Critterweight/release-work/v0.9.15-preview3/Critterweight-0.9.15-preview.exe
+Size: 241908256 bytes. SHA-256: d23ff71d570702d48b3eae2bcd2eb29ee9b712df4293505bbc409883f314247e.
+The delivery copy matches the package executable; BUILD_MANIFEST.json records its provenance.
+
+Packaged headless checks: 403 scripts compile, zero failures; arena 61/61, recorded speech
+9/9, preview regressions 13/13, settings 6 passed plus one expected source-only skip.
+Total: 89 passed, zero failed, one skipped. No script/parse errors in these packaged runs.
+
+No graphical launch, tag, push or publication. Physical controller feel, real monitor
+placement, visual composition and voice/music taste remain for the owner's playtest.
+All work and test user roots are on B:; Godot jobs ran sequentially at BelowNormal priority.

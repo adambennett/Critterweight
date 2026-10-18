@@ -1,6 +1,6 @@
 # Verification report
 
-**Local v0.9.15 preview 3, 2026-10-18.** [Canvas verification](evidence/verification/v0.9.15-preview3/README.md) records the completed source checks; local Windows export is next. It includes every completed preview 2 change and all 764 voice clips. No graphical launch or publication is authorized.
+**Local v0.9.15 preview 3, 2026-10-18.** [The current report](evidence/verification/v0.9.15-preview3/README.md) records the completed rooftop canvas, clean Windows export from 9d8f44e and packaged verification: 403 scripts, 89 tests passed, zero failed, one source-only skip. It includes every preview 2 change and all 764 voice clips/names. No graphical launch or publication; owner playtesting is next.
 
 **Local v0.9.15 preview 2, 2026-10-18.** [The current report](evidence/verification/v0.9.15-preview2/README.md) records the full suite, corrected fixture reruns, 764 recorded voice clips and clean Windows export from a527f2d. Packaged headless checks pass; physical controller, monitor, visuals and listening remain for the owner. The rooftop canvas is a follow-on request. No .15 release has been published.
 

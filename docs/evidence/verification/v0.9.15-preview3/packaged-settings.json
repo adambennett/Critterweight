@@ -1,0 +1,53 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_settings_coercion_and_presets"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence_safety.gd::test_settings_from_a_newer_version_are_left_untouched"
+		},
+		{
+			"errors": [],
+			"ms": 342,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_network_settings_apply_live"
+		},
+		{
+			"errors": [],
+			"ms": 21,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_display_changes_confirm_or_roll_back"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"skipped": "scans GDScript source; exported builds ship compiled scripts (runs in the source suite)",
+			"test": "res://src/test/ui/test_settings_wired.gd::test_every_visible_setting_is_read_somewhere"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_selected_monitor_persists_across_settings_reload"
+		},
+		{
+			"errors": [],
+			"ms": 596,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_menu_settings_round_trip"
+		}
+	],
+	"skipped": 1,
+	"summary": "tests: 7 run, 0 failed, 6 passed, 1 skipped in 4.5 s",
+	"time": "2026-10-18T17:49:09",
+	"total": 7,
+	"version": "0.9.15"
+}
