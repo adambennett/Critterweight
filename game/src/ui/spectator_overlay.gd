@@ -1,7 +1,7 @@
 class_name SpectatorOverlay
 extends Control
 ## AI-vs-AI spectating controls drawn over the fight HUD: a "SPECTATING" banner plus prompts.
-## Y / R toggles the camera between the auto director and the free camera (FightCamera FREE: stick
+## Y / R cycles the camera through follow, locked and free (FightCamera FREE: stick
 ## or WASD moves, the Guard/Dodge bindings lower/raise, camera-nudge turns); X / Delete hides or
 ## shows the HUD; LB/RB (Q/E) lock the director on a fighter (past either end = auto again);
 ## D-pad up/down (arrow keys) change the playback speed 0.25x-2x (offline only);
@@ -9,7 +9,8 @@ extends Control
 
 var scene: MatchScene
 var _mode_label: Label
-var _bar: PromptBar
+var _bar: FlowPromptBar
+var _free_help: Control
 
 
 func setup(s: MatchScene) -> void:
@@ -28,7 +29,6 @@ func setup(s: MatchScene) -> void:
 	# top of the screen: the fighter cards own the bottom edge in 3+ fighter matches
 	var row := UiTheme.hbox(UiTheme.GAP_M)
 	col.add_child(row)
-	col.add_child(UiTheme.spacer())
 	var chip := UiTheme.panel("PanelChip")
 	var chip_row := UiTheme.hbox(10)
 	chip_row.add_child(UiIcons.rect("spectate", 30, UiTheme.RIM))
@@ -38,7 +38,8 @@ func setup(s: MatchScene) -> void:
 	_mode_label = UiTheme.label("", "Caption")
 	row.add_child(_mode_label)
 	row.add_child(UiTheme.spacer())
-	_bar = PromptBar.new()
+	_bar = FlowPromptBar.new()
+	_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_bar.set_prompts([
 		{"actions": ["ui_tab_prev", "ui_tab_next"], "text": "Focus", "call": func() -> void: cycle_focus(1)},
 		{"actions": ["ui_up", "ui_down"], "text": "Speed", "call": func() -> void: change_speed(1)},
@@ -47,6 +48,11 @@ func setup(s: MatchScene) -> void:
 		{"actions": ["pause"], "text": "Pause", "call": func() -> void: MatchFlow.open_pause()},
 	])
 	row.add_child(_bar)
+	_free_help = UiTheme.panel("PanelSolid", 12)
+	_free_help.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_free_help.add_child(UiTheme.label("FREE CAMERA · WASD / left stick: move · Right drag / right stick: look · Space / A: rise · Shift / LT: descend", "Body", true))
+	col.add_child(_free_help)
+	col.add_child(UiTheme.spacer())
 	_update_label()
 
 
@@ -55,11 +61,12 @@ func toggle_camera() -> void:
 		return
 	if scene.camera.mode == FightCamera.Mode.FREE:
 		scene.camera.mode = FightCamera.Mode.SPECTATE
+		if scene.director:
+			scene.director.locked = -1
+	elif scene.director and scene.director.locked < 0:
+		scene.director.cycle_lock(1)
 	else:
-		scene.camera.free_pos = scene.camera.global_position
-		scene.camera.free_yaw = scene.camera.global_rotation.y
-		scene.camera.free_pitch = clampf(scene.camera.global_rotation.x, -1.2, 0.2)
-		scene.camera.mode = FightCamera.Mode.FREE
+		scene.camera.enter_free()
 	Audio.sfx("ui_accept")
 	_update_label()
 
@@ -101,8 +108,10 @@ func change_speed(step: int) -> void:
 func _update_label() -> void:
 	if scene == null or scene.camera == null:
 		return
-	var cam := "Free camera" if scene.camera.mode == FightCamera.Mode.FREE else (scene.director.label() if scene.director else "Director camera")
+	var cam := "FREE" if scene.camera.mode == FightCamera.Mode.FREE else ("LOCKED · " + scene.director.label() if scene.director and scene.director.locked >= 0 else "FOLLOW · Auto director")
 	_mode_label.text = "%s   ·   %sx" % [cam, str(snappedf(Engine.time_scale, 0.01))]
+	if _free_help:
+		_free_help.visible = scene.camera.mode == FightCamera.Mode.FREE
 
 
 func _process(_dt: float) -> void:
@@ -124,6 +133,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_tab_next") or event.is_action_pressed("ui_tab_prev"):
 		get_viewport().set_input_as_handled()
 		cycle_focus(1 if event.is_action_pressed("ui_tab_next") else -1)
-	elif event.is_action_pressed("ui_up") or event.is_action_pressed("ui_down"):
+	elif not (event is InputEventJoypadMotion) and (event.is_action_pressed("ui_up") or event.is_action_pressed("ui_down")):
 		get_viewport().set_input_as_handled()
 		change_speed(1 if event.is_action_pressed("ui_up") else -1)

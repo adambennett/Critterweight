@@ -481,7 +481,10 @@ func _interact(f: Fighter) -> void:
 		"transition":
 			begin_transition(f, eid)
 		"activity":
-			start_activity(str(d["activity"]), str(d.get("bag", "")))
+			if str(d["activity"]) == "drill":
+				emit_hub({"type": "hub_interact", "kind": "drill", "fighter": f.index})
+			else:
+				start_activity(str(d["activity"]), str(d.get("bag", "")))
 		"object":
 			emit_hub({"type": "hub_interact", "kind": "object", "id": eid, "fighter": f.index})
 		"secret":
@@ -559,7 +562,7 @@ func teleport(f: Fighter, pos: Vector3, yaw: float) -> void:
 # Activities
 # =====================================================================================
 
-func start_activity(kind: String, bag := "") -> bool:
+func start_activity(kind: String, bag := "", difficulty := "standard") -> bool:
 	if bags.running() or drill.running() or crates.running():
 		return false
 	match kind:
@@ -570,7 +573,7 @@ func start_activity(kind: String, bag := "") -> bool:
 			if f and not HubLayout.DRILL_SQUARE.has_point(Vector2(f.pos().x, f.pos().z)):
 				# step into the square first: the cannon waits for you there
 				teleport_soft(f, Vector3(HubLayout.DRILL_SQUARE.get_center().x, 0.0, HubLayout.DRILL_SQUARE.get_center().y))
-			drill.start()
+			drill.start(difficulty)
 		"crates":
 			crates.start()
 		_:
@@ -724,7 +727,7 @@ func _nearest_carryable(f: Fighter) -> Dictionary:
 		if _is_carried(c):
 			continue
 		var d := Vector2(c.global_position.x - at.x, c.global_position.z - at.z).length()
-		if d < bd and absf(c.global_position.y - f.ground_pos().y) < 1.6:
+		if d < bd and absf(c.global_position.y - f.ground_pos().y) < 1.6 and carryable_visible(f, c):
 			bd = d
 			best = {"kind": "crate", "index": i}
 	for item_id in world["items"]:
@@ -734,10 +737,16 @@ func _nearest_carryable(f: Fighter) -> Dictionary:
 		if _is_carried(b):
 			continue
 		var d2 := Vector2(b.global_position.x - at.x, b.global_position.z - at.z).length()
-		if d2 < bd and absf(b.global_position.y - f.ground_pos().y) < 1.8:
+		if d2 < bd and absf(b.global_position.y - f.ground_pos().y) < 1.8 and carryable_visible(f, b):
 			bd = d2
 			best = {"kind": "item", "id": item_id}
 	return best
+
+
+func carryable_visible(f: Fighter, body: RigidBody3D) -> bool:
+	var from := f.ground_pos() + Vector3.UP * 0.8
+	var query := PhysicsRayQueryParameters3D.create(from, body.global_position, Rig.LAYER_WORLD)
+	return body.get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func _is_carried(b: RigidBody3D) -> bool:

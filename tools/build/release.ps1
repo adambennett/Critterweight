@@ -11,7 +11,8 @@
   repacks the example mods and commits "Release <version>"; (2) checks the tree is clean, on main,
   pushed, and that project.godot matches -Version; (3) creates the annotated tag (refuses a tag that
   points elsewhere); (4) runs tools/build/package.ps1 -Archive (all four targets); (5) smoke-tests the
-  packaged game (script check + boot to the title screen); (6) writes SHA256SUMS.txt; (7) pushes the
+  packaged game (script check + boot to the title screen, plus rendered regressions with -TestFilter);
+  (6) writes SHA256SUMS.txt; (7) pushes the
   tag and creates the GitHub release with the Windows exe, the zips/tarballs and the manifest.
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File tools/build/release.ps1 -Version 0.9.0 -Bump -Prerelease -NotesFile notes.md
@@ -26,6 +27,7 @@ param(
 	[switch]$Bump,
 	[switch]$Prerelease,
 	[string]$NotesFile = "",
+	[string]$TestFilter = "",
 	[switch]$DryRun,
 	[switch]$Alt,
 	[string]$Repo = "adambennett/PokeMMA",
@@ -96,16 +98,30 @@ $exe = Join-Path $dist "Critterweight-windows-x64\Critterweight.exe"
 if (-not (Test-Path $exe)) { Fail "no Windows executable in dist" }
 
 Step "Smoke-testing the packaged game"
-$smoke = Join-Path $env:TEMP "critterweight-release-$Version"
-if (Test-Path $smoke) { Remove-Item -Recurse -Force $smoke }
+$tempRoot = [System.IO.Path]::GetFullPath($env:TEMP)
+$smoke = [System.IO.Path]::GetFullPath((Join-Path $tempRoot "critterweight-release-$Version"))
+if (-not $smoke.StartsWith($tempRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) { Fail "smoke directory escapes temporary root: $smoke" }
+if (Test-Path -LiteralPath $smoke) { Remove-Item -LiteralPath $smoke -Recurse -Force }
 New-Item -ItemType Directory -Force $smoke | Out-Null
-$p = Start-Process -FilePath $exe -ArgumentList @("--headless", "--", "--user-root", $smoke, "--check") -PassThru -Wait -NoNewWindow -RedirectStandardOutput (Join-Path $smoke "check.log") -RedirectStandardError (Join-Path $smoke "check.err")
+$p = Start-Process -FilePath $exe -ArgumentList @("--headless", "--log-file", ('"{0}"' -f (Join-Path $smoke "check-engine.log")), "--", "--user-root", ('"{0}"' -f $smoke), "--check") -PassThru -Wait -WindowStyle Hidden -RedirectStandardOutput (Join-Path $smoke "check.log") -RedirectStandardError (Join-Path $smoke "check.err")
 if ($p.ExitCode -ne 0) { Fail "packaged script check failed (exit $($p.ExitCode))" }
 $boot = Join-Path $smoke "boot.json"
-$p = Start-Process -FilePath $exe -ArgumentList @("--", "--user-root", $smoke, "--windowed", "--size", "1280x720", "--boot-report", $boot) -PassThru -Wait
+$p = Start-Process -FilePath $exe -ArgumentList @("--log-file", ('"{0}"' -f (Join-Path $smoke "boot-engine.log")), "--", "--user-root", ('"{0}"' -f $smoke), "--windowed", "--size", "1280x720", "--boot-report", ('"{0}"' -f $boot)) -PassThru -Wait
 if ($p.ExitCode -ne 0 -or -not (Test-Path $boot)) { Fail "packaged game did not boot to a menu (exit $($p.ExitCode))" }
 $br = Get-Content $boot | ConvertFrom-Json
 Write-Host ("   booted to '{0}' in {1} ms" -f $br.screen, $br.ms_since_start)
+
+if ($TestFilter -ne "") {
+	Step "Running packaged regressions: $TestFilter"
+	$testResult = Join-Path $smoke "test_results.json"
+	$testLog = Join-Path $smoke "test-engine.log"
+	$p = Start-Process -FilePath $exe -ArgumentList @("--log-file", ('"{0}"' -f $testLog), "--", "--user-root", ('"{0}"' -f $smoke), "--windowed", "--size", "1280x720", "--test", $TestFilter, "--test-out", ('"{0}"' -f $testResult)) -PassThru -Wait -RedirectStandardOutput (Join-Path $smoke "test.log") -RedirectStandardError (Join-Path $smoke "test.err")
+	if ($p.ExitCode -ne 0 -or -not (Test-Path $testResult)) { Fail "packaged regressions failed (exit $($p.ExitCode))" }
+	$tr = Get-Content $testResult -Raw | ConvertFrom-Json
+	if ($tr.total -le 0 -or $tr.failed -ne 0 -or $tr.skipped -ne 0) { Fail "packaged regressions did not all run: $($tr.summary)" }
+	if (Select-String -Path $testLog -Pattern 'SCRIPT ERROR:|Parse Error:|ERROR:') { Fail "packaged regressions logged an engine/script error; see $testLog" }
+	Write-Host ("   {0}" -f $tr.summary)
+}
 
 Step "Collecting assets"
 $assets = @()
@@ -114,10 +130,9 @@ Copy-Item $exe $namedExe -Force
 $assets += $namedExe
 foreach ($a in @("Critterweight-windows-x64.zip", "Critterweight-server-windows-x64.zip", "Critterweight-linux-x86_64.tar.gz", "Critterweight-server-linux-x86_64.tar.gz", "BUILD_MANIFEST.json")) {
 	$f = Join-Path $dist $a
-	if (Test-Path $f) {
-		$renamed = Join-Path $dist ($a -replace '^Critterweight-', "Critterweight-$Version-")
-		if ($a -ne "BUILD_MANIFEST.json") { Copy-Item $f $renamed -Force; $assets += $renamed } else { $assets += $f }
-	}
+	if (-not (Test-Path $f)) { Fail "missing required release asset: $f" }
+	$renamed = Join-Path $dist ($a -replace '^Critterweight-', "Critterweight-$Version-")
+	if ($a -ne "BUILD_MANIFEST.json") { Copy-Item $f $renamed -Force; $assets += $renamed } else { $assets += $f }
 }
 $sums = Join-Path $dist "SHA256SUMS.txt"
 ($assets | ForEach-Object { "{0}  {1}" -f (Get-FileHash -Algorithm SHA256 $_).Hash.ToLower(), (Split-Path $_ -Leaf) }) | Set-Content -Encoding ascii $sums
@@ -128,6 +143,7 @@ if ($DryRun) { Step "Dry run: not pushing the tag or creating the release"; exit
 
 Step "Publishing $tag"
 git push -q origin $branch
+if ($LASTEXITCODE -ne 0) { Fail "pushing the branch failed" }
 git push -q origin $tag
 if ($LASTEXITCODE -ne 0) { Fail "pushing the tag failed" }
 $title = if ($Alt) { "Critterweight $Version (alt build, for comparison)" } else { "Critterweight $Version" }

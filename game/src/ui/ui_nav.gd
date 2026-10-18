@@ -37,6 +37,7 @@ var _repeat_t := 0.0
 var _repeats := 0
 var _last_input_ms := -100000
 var _capture := {}
+var fps_label: Label
 
 
 ## Returns the installed instance, creating it under /root/App when needed.
@@ -103,6 +104,19 @@ func _ready() -> void:
 	Controls.joy_connection.connect(_on_joy_connection)
 	Settings.changed.connect(_on_setting_changed)
 	get_window().focus_exited.connect(_on_window_focus_lost)
+	get_viewport().gui_focus_changed.connect(_on_focus_changed)
+	var layer := CanvasLayer.new()
+	layer.layer = 100
+	add_child(layer)
+	fps_label = UiTheme.label("", "CaptionStrong")
+	fps_label.name = "FPS"
+	fps_label.position = Vector2(16, 8)
+	fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fps_label.add_theme_color_override("font_color", Color.WHITE)
+	fps_label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	fps_label.add_theme_constant_override("shadow_offset_x", 2)
+	fps_label.add_theme_constant_override("shadow_offset_y", 2)
+	layer.add_child(fps_label)
 
 
 static func _register_actions() -> void:
@@ -130,7 +144,8 @@ static func _register_actions() -> void:
 
 
 func _menu_active() -> bool:
-	return get_viewport().gui_get_focus_owner() != null
+	var f := get_viewport().gui_get_focus_owner()
+	return f != null and not bool(f.get_meta("owns_sticks", false))
 
 
 func _input(event: InputEvent) -> void:
@@ -236,6 +251,10 @@ static func emit_nav(action: String) -> void:
 
 
 func _process(dt: float) -> void:
+	if fps_label != null:
+		fps_label.visible = bool(Settings.get_value("diag.show_fps"))
+		if fps_label.visible:
+			fps_label.text = "%d FPS" % Engine.get_frames_per_second()
 	if not _capture.is_empty():
 		if Time.get_ticks_msec() >= int(_capture["until"]):
 			_finish_capture(null)
@@ -250,6 +269,67 @@ func _process(dt: float) -> void:
 				_repeat_t = REPEAT_RATE_FAST if _repeats > 8 else REPEAT_RATE
 				emit_nav(_held_action)
 	_guard_focus()
+	if App.top_screen() != null:
+		var ry := 0.0
+		for device in Input.get_connected_joypads():
+			var value := Input.get_joy_axis(device, JOY_AXIS_RIGHT_Y)
+			if absf(value) > absf(ry):
+				ry = value
+		if absf(ry) > 0.25:
+			scroll_focused(ry * 1400.0 * dt)
+
+
+## One right-stick path for lists, information panels, and rich text (including
+## embedded text scrollbars). It never scrolls a covered screen or an editor canvas.
+func scroll_focused(amount: float) -> void:
+	var f := get_viewport().gui_get_focus_owner()
+	if f == null or bool(f.get_meta("owns_sticks", false)):
+		return
+	var bar := scroll_bar_for(f)
+	if bar != null:
+		bar.value += amount
+
+
+static func scroll_bar_for(f: Control) -> Range:
+	if f is ScrollText:
+		return (f as ScrollText).scroll.get_v_scroll_bar()
+	if f is RichTextLabel and (f as RichTextLabel).scroll_active:
+		return (f as RichTextLabel).get_v_scroll_bar()
+	if f is ItemList:
+		return (f as ItemList).get_v_scroll_bar()
+	var n: Node = f
+	while n != null:
+		if n is ScrollContainer:
+			return (n as ScrollContainer).get_v_scroll_bar()
+		n = n.get_parent()
+	# A focusable information panel owns a scroll region below it.
+	for child in f.find_children("*", "ScrollContainer", true, false):
+		if (child as Control).is_visible_in_tree():
+			return (child as ScrollContainer).get_v_scroll_bar()
+	return null
+
+
+func _on_focus_changed(f: Control) -> void:
+	reveal_focus.call_deferred(f)
+
+
+static func reveal_focus(f: Control) -> void:
+	if not is_instance_valid(f) or not f.is_inside_tree() or not f.has_focus():
+		return
+	var n := f.get_parent()
+	while n != null:
+		if n is ScrollContainer:
+			var sc := n as ScrollContainer
+			sc.ensure_control_visible(f)
+			# Godot only reveals the unscaled rectangle. Reserve room for the
+			# gold focus ring and scale tween, including the final row's padding.
+			var top := f.global_position.y - sc.global_position.y - 16.0
+			var bottom := f.global_position.y + f.size.y - sc.global_position.y + 16.0
+			if bottom > sc.size.y:
+				sc.scroll_vertical += ceili(bottom - sc.size.y)
+			elif top < 0.0:
+				sc.scroll_vertical += floori(top)
+		n = n.get_parent()
 
 
 ## Focus guardian (UI-02): the top screen always owns a visible focused control when it has any.

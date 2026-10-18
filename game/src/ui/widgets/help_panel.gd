@@ -19,9 +19,15 @@ func _init(scope_: Node = null, eyebrow_ := "") -> void:
 	eyebrow = eyebrow_
 	theme_type_variation = "PanelHelp"
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	focus_mode = Control.FOCUS_ALL
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	add_child(scroll)
 	var v := UiTheme.vbox(UiTheme.GAP_S)
-	add_child(v)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(v)
 	_eyebrow = UiTheme.label(eyebrow_.to_upper(), "Eyebrow")
 	_eyebrow.visible = eyebrow_ != ""
 	v.add_child(_eyebrow)

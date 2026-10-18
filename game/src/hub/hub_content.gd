@@ -67,7 +67,7 @@ static func run_context(state: HubState, fighter_name := "") -> Dictionary:
 	var act := int(lr.get("act", 1))
 	var fid := str(lr.get("fighter", ""))
 	var fname := str(Content.get_entry("creatures", fid).get("name", fid.trim_prefix("f_").capitalize())) if fid != "" else fighter_name
-	return {"player": str(state.profile.get("name", "Rookie")), "fighter": fname if fname != "" else "your fighter",
+	return {"player": Profiles.player_name(state.profile), "fighter": fname if fname != "" else "your fighter",
 		"boss": str(BOSS_OF_ACT.get(act, "the card")), "act": act, "kos": int(lr.get("kos", 0)), "dose": int(lr.get("dose", 0)),
 		"clout": state.clout(), "secrets": state.secrets_found()}
 

@@ -75,6 +75,8 @@ var _crowd_players: Array = []        ## 3 loop players
 var _ambience: AudioStreamPlayer
 var _ambience_next: AudioStreamPlayer
 var _ambience_id := ""
+var _ambience_fade: Tween
+var _ambience_fade_in: Tween
 var _arena_id := ""
 
 # match context
@@ -1024,8 +1026,15 @@ func ambience(id: String, fade := 1.5) -> void:
 	if id == _ambience_id:
 		return
 	_ambience_id = id
-	var tw := create_tween()
-	tw.tween_property(_ambience, "volume_db", -80.0, fade)
+	# Rapid room changes must not leave older fades writing to a reused player.
+	if _ambience_fade:
+		_ambience_fade.kill()
+	if _ambience_fade_in:
+		_ambience_fade_in.kill()
+	_ambience_next.stop()
+	_ambience_fade = create_tween()
+	_ambience_fade.tween_property(_ambience, "volume_db", -80.0, fade)
+	_ambience_fade.tween_callback(_ambience.stop)
 	var e: Dictionary = _sfx_entries.get(id, {})
 	var files: Array = e.get("files", [])
 	if id == "" or files.is_empty():
@@ -1041,8 +1050,8 @@ func ambience(id: String, fade := 1.5) -> void:
 	_ambience.stream = s
 	_ambience.volume_db = -80.0
 	_ambience.play()
-	var tw2 := create_tween()
-	tw2.tween_property(_ambience, "volume_db", float(e.get("gain", 0.0)), fade)
+	_ambience_fade_in = create_tween()
+	_ambience_fade_in.tween_property(_ambience, "volume_db", float(e.get("gain", 0.0)), fade)
 
 
 ## Arena: ambience + crowd reverb character. `base` is the arena's base (gullet/drydock/crusher/

@@ -11,6 +11,12 @@ extends RefCounted
 ## the "Soaked" profile frame.
 
 const BUCKET_R := 0.28
+const DIFFICULTIES := {
+	"standard": {"name": "Warm-up", "interval": 1.0, "flight": 1.0, "lead": 0.6, "spread": 1.0, "tracking": 0.0},
+	"advanced": {"name": "Pressure", "interval": 0.65, "flight": 0.85, "lead": 0.9, "spread": 0.5, "tracking": 0.0},
+	"expert": {"name": "Homing hell", "interval": 0.42, "flight": 0.78, "lead": 1.0, "spread": 0.25, "tracking": 3.0},
+}
+var difficulty := "standard"
 
 var _mode_ref: WeakRef = null
 ## The owning HubMode, held weakly: the mode owns this object, so a strong back-reference would be a
@@ -43,7 +49,8 @@ func running() -> bool:
 	return phase == "countdown" or phase == "running"
 
 
-func start() -> void:
+func start(level := "standard") -> void:
+	difficulty = level if DIFFICULTIES.has(level) else "standard"
 	phase = "countdown"
 	t = 0.0
 	drill_hp = int(cfg.get("drill_hp", 30))
@@ -69,11 +76,11 @@ func progress() -> float:
 
 
 func _interval() -> float:
-	return lerpf(float(cfg.get("interval_start", 1.7)), float(cfg.get("interval_end", 0.55)), progress())
+	return lerpf(float(cfg.get("interval_start", 1.7)), float(cfg.get("interval_end", 0.55)), progress()) * float(DIFFICULTIES[difficulty]["interval"])
 
 
 func _flight() -> float:
-	return lerpf(float(cfg.get("flight_start", 1.25)), float(cfg.get("flight_end", 0.7)), progress())
+	return lerpf(float(cfg.get("flight_start", 1.25)), float(cfg.get("flight_end", 0.7)), progress()) * float(DIFFICULTIES[difficulty]["flight"])
 
 
 func tick(dt: float) -> void:
@@ -109,9 +116,9 @@ func _fire(f: Fighter) -> void:
 	var muzzle := HubLayout.CANNON_POS + Vector3(-0.7, 1.2, 0.0)
 	var fl := _flight()
 	# aim where the fighter will be, with a little spread (seeded by the sim RNG)
-	var lead := f.rig.com_velocity() * fl * 0.6
+	var lead := f.rig.com_velocity() * fl * float(DIFFICULTIES[difficulty]["lead"])
 	lead.y = 0.0
-	var spread := float(cfg.get("spread", 0.7)) * (0.5 + 0.5 * progress())
+	var spread := float(cfg.get("spread", 0.7)) * (0.5 + 0.5 * progress()) * float(DIFFICULTIES[difficulty]["spread"])
 	var target := f.pos() + lead + Vector3(mode.sim.rng.randf_range(-spread, spread), 0.0, mode.sim.rng.randf_range(-spread, spread))
 	target.y = 1.0
 	var sq := HubLayout.DRILL_SQUARE.grow(0.3)
@@ -130,6 +137,13 @@ func _update_buckets(dt: float, f: Fighter) -> void:
 	var g: float = mode.sim.gravity
 	for b in buckets.duplicate():
 		var vel: Vector3 = b["vel"]
+		# Expert buckets steer early, then commit for the last 0.25 s so a timed dodge can beat them.
+		var remaining := float(b["flight"]) - float(b["age"])
+		if f and remaining > 0.25 and not bool(b["resolved"]):
+			var tracking := float(DIFFICULTIES[difficulty]["tracking"])
+			var wanted := (f.pos() - (b["pos"] as Vector3)) / remaining
+			vel.x = lerpf(vel.x, wanted.x, minf(1.0, tracking * dt))
+			vel.z = lerpf(vel.z, wanted.z, minf(1.0, tracking * dt))
 		vel.y -= g * dt
 		var p: Vector3 = b["pos"] + vel * dt
 		b["vel"] = vel
@@ -206,6 +220,6 @@ func finish(reason: String) -> void:
 	if best_streak >= int(cfg.get("frame_streak", 50)):
 		if mode.state.unlock_cosmetic(str(cfg.get("frame", "hub_frame_soaked"))):
 			frame = str(cfg.get("frame", "hub_frame_soaked"))
-	result = {"streak": best_streak, "fired": fired, "hits": hits_taken, "parries": parries, "drill_hp": drill_hp, "reason": reason,
+	result = {"difficulty": difficulty, "streak": best_streak, "fired": fired, "hits": hits_taken, "parries": parries, "drill_hp": drill_hp, "reason": reason,
 		"tier": int(rew["tier"]), "new_tier": int(rew["tier"]) > int(rew["previous"]), "clout": int(rew["clout"]), "frame": frame}
 	mode.emit_hub({"type": "hub_activity", "activity": "drill", "phase": "end", "result": result})

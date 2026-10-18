@@ -21,7 +21,11 @@ $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $game = Join-Path $root "game"
 if ($OutDir -eq "") { $OutDir = Join-Path $root "dist" }
+$OutDir = [System.IO.Path]::GetFullPath($OutDir)
 New-Item -ItemType Directory -Force $OutDir | Out-Null
+$buildLogs = Join-Path $OutDir "build-logs"
+New-Item -ItemType Directory -Force $buildLogs | Out-Null
+try { (Get-Process -Id $PID).PriorityClass = 'BelowNormal' } catch {}
 
 $layout = @{
 	"Windows Desktop" = @{ dir = "Critterweight-windows-x64"; file = "Critterweight.exe"; kind = "game"; os = "windows" }
@@ -33,15 +37,16 @@ $layout = @{
 function Step($msg) { Write-Host "==> $msg" -ForegroundColor Cyan }
 
 Step "Importing assets"
-& $Godot --headless --path $game --import 2>&1 | Out-Null
+& $Godot --headless --path $game --log-file (Join-Path $buildLogs "import.log") --import 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0) { throw "Asset import failed ($LASTEXITCODE)" }
 
 Step "Checking scripts"
-& $Godot --headless --path $game -- --check
+& $Godot --headless --path $game --log-file (Join-Path $buildLogs "check.log") -- --user-root (Join-Path $buildLogs "check-user") --check
 if ($LASTEXITCODE -ne 0) { throw "Script check failed ($LASTEXITCODE scripts)" }
 
 if ($RunTests) {
 	Step "Running automated tests"
-	& $Godot --headless --path $game -- --test
+	& powershell -ExecutionPolicy Bypass -File (Join-Path $root "tools/dev/run_suite.ps1") -Godot $Godot
 	if ($LASTEXITCODE -ne 0) { throw "$LASTEXITCODE test(s) failed" }
 }
 
@@ -58,12 +63,15 @@ $manifest = [ordered]@{ product = "Critterweight"; version = $version; git_revis
 
 foreach ($t in $Targets) {
 	$l = $layout[$t]
-	$dest = Join-Path $OutDir $l.dir
-	if (Test-Path $dest) { Remove-Item -Recurse -Force $dest }
+	if ($null -eq $l) { throw "Unknown export target '$t'" }
+	$dest = [System.IO.Path]::GetFullPath((Join-Path $OutDir $l.dir))
+	if (-not $dest.StartsWith($OutDir.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) { throw "Export directory escapes output root: $dest" }
+	if (Test-Path -LiteralPath $dest) { Remove-Item -LiteralPath $dest -Recurse -Force }
 	New-Item -ItemType Directory -Force $dest | Out-Null
 	$exe = Join-Path $dest $l.file
 	Step "Exporting $t -> $exe"
-	& $Godot --headless --path $game --export-release $t $exe 2>&1 | Where-Object { $_ -match "ERROR|error|WARNING" } | ForEach-Object { Write-Host "   $_" }
+	& $Godot --headless --path $game --log-file (Join-Path $buildLogs ($l.dir + ".log")) --export-release $t $exe 2>&1 | Where-Object { $_ -match "ERROR|error|WARNING" } | ForEach-Object { Write-Host "   $_" }
+	if ($LASTEXITCODE -ne 0) { throw "Export of '$t' failed ($LASTEXITCODE)" }
 	if (-not (Test-Path $exe)) { throw "Export of '$t' produced no binary" }
 	# documentation and licences shipped with every package
 	foreach ($doc in @("README.md", "docs/THIRD_PARTY.md", "docs/CREDITS.md")) {

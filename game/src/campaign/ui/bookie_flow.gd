@@ -9,10 +9,10 @@ extends CampaignFlow
 ## Every presented fight re-applies the table's speed (SimSpeed: k x physics ticks at the fixed
 ## 1/120 s step): a finished MatchScene resets Engine.time_scale on its way out.
 
-const OVERLAY_BAR_H := 86              ## the Bookie's control bar over a presented fight (BookieScreen)
+const OVERLAY_BAR_H := 132             ## title/hints plus wrapping controls, clear of fighter plates
 
 var table: BookieTable
-var watching := true             ## fights presented (true) or fast-forwarded headless (false)
+var watching := true             ## live view (true) or the same fight hidden at 8x (false)
 var log_lines: Array = []        ## newest first: what happened at the table (for the live view)
 var _scene: MatchScene = null
 var _fight_done := false
@@ -53,6 +53,9 @@ func _on_fight_started(info: Dictionary) -> void:
 
 
 func _on_changed(what: String) -> void:
+	if what == "speed" and is_instance_valid(_scene):
+		SimSpeed.set_scale(table.speed if watching else maxf(8.0, table.speed))
+		return
 	if what == "camera":
 		apply_camera(table.camera)
 		return
@@ -76,11 +79,9 @@ func _on_changed(what: String) -> void:
 			note("Knocked out.")
 
 
-## The table's fight runner: a presented match (App.start_match) while watching, otherwise the
-## headless fast-forward runner. Pause freezes the match (sim + its physics space).
+## Watching and skipping share one match, so returning to the live view is immediate.
+## Pause freezes the match (sim + its physics space).
 func run_fight(t: BookieTable, config: Dictionary) -> Dictionary:
-	if not watching:
-		return await HeadlessFightRunner.run(t, config, 420.0, t._is_paused, t.is_stopping)
 	_fight_done = false
 	_fight_result = {}
 	MatchFlow.last_config = {}     # no "Restart fight" into an unrelated earlier match
@@ -91,10 +92,13 @@ func run_fight(t: BookieTable, config: Dictionary) -> Dictionary:
 	apply_camera(t.camera)
 	if is_instance_valid(_scene) and _scene.hud:
 		_scene.hud.set_bottom_inset(OVERLAY_BAR_H)
-	App.push("bookie", {"overlay": true})
+	show_fight_view()
 	var space := _scene.get_world_3d().space if _scene.get_world_3d() else RID()
 	var frozen := false
 	while not _fight_done:
+		# Watching and skipping share this exact simulation. Switching back to watching mid-bout
+		# never restarts a fight or waits for the next encounter.
+		# Apply speed only on explicit changes, never undo the combat camera's hit pause.
 		var hold := t.paused
 		if hold != frozen:
 			if space.is_valid():
@@ -111,6 +115,21 @@ func run_fight(t: BookieTable, config: Dictionary) -> Dictionary:
 	return _fight_result
 
 
+func set_watching(value: bool) -> void:
+	watching = value
+	if is_instance_valid(_scene):
+		show_fight_view()
+
+
+func show_fight_view() -> void:
+	App.goto("bookie", {"overlay": watching})
+	if is_instance_valid(_scene):
+		_scene.visible = watching
+		if _scene.hud:
+			_scene.hud.visible = watching
+	SimSpeed.set_scale(table.speed if watching else maxf(8.0, table.speed))
+
+
 ## Points the presented fight's camera at the table's preset (AI-04 "speed/camera"): the standard
 ## broadcast framing, the spectators' auto-director (cuts between the fighters and the action), or
 ## the free camera (stick / WASD moves it, as when spectating).
@@ -125,10 +144,7 @@ func apply_camera(preset: String) -> void:
 			cam.mode = FightCamera.Mode.SPECTATE
 		"free":
 			if cam.mode != FightCamera.Mode.FREE:
-				cam.free_pos = cam.global_position
-				cam.free_yaw = cam.global_rotation.y
-				cam.free_pitch = clampf(cam.global_rotation.x, -1.2, 0.2)
-			cam.mode = FightCamera.Mode.FREE
+				cam.enter_free()
 		_:
 			cam.mode = FightCamera.Mode.FIGHT
 

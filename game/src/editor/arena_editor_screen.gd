@@ -68,7 +68,9 @@ var _issues_box: VBoxContainer
 var _status: Label
 var _hints: Label
 var _issues_expanded := false
-var _prompts: PromptBar
+var _prompts: FlowPromptBar
+var _palette_panel: Control
+var _details_panel: Control
 var _hint_key := ""
 var _undo_btn: Button
 var _redo_btn: Button
@@ -298,9 +300,7 @@ func _build_ui() -> void:
 	_status = UiTheme.label("", "BodyStrong", true)
 	_status.custom_minimum_size = Vector2(0, 40)
 	bb.add_child(_status)
-	_prompts = PromptBar.new()
-	_prompts.alignment = BoxContainer.ALIGNMENT_BEGIN
-	_prompts.add_theme_constant_override("separation", 28)
+	_prompts = FlowPromptBar.new()
 	bb.add_child(_prompts)
 	_hints = UiTheme.label("", "Caption", true)
 	bb.add_child(_hints)
@@ -310,8 +310,9 @@ func _build_ui() -> void:
 func _build_top_bar(parent: Control) -> void:
 	var bar := PanelContainer.new()
 	parent.add_child(bar)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", UiTheme.GAP_XS)
+	var row := HFlowContainer.new()
+	row.add_theme_constant_override("h_separation", UiTheme.GAP_XS)
+	row.add_theme_constant_override("v_separation", UiTheme.GAP_XS)
 	bar.add_child(row)
 	_undo_btn = _button("Undo", _undo, "Ctrl+Z")
 	_redo_btn = _button("Redo", _redo, "Ctrl+Y")
@@ -319,9 +320,9 @@ func _build_top_bar(parent: Control) -> void:
 	row.add_child(_redo_btn)
 	row.add_child(_button("Save", _save, "Ctrl+S"))
 	row.add_child(_button("Load", _open_load_dialog))
-	var sp := Control.new()
-	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(sp)
+	row.add_child(_button("Palette", func(): _toggle_panel(_palette_panel), "Show / hide palette"))
+	row.add_child(_button("Details", func(): _toggle_panel(_details_panel), "Show / hide details"))
+	row.add_child(_button("Edit map", func(): vp.grab_focus(), "Lock controls to the map (View toggles panels)"))
 	row.add_child(_button("Help", _open_help, "H / F1"))
 	row.add_child(_button("Menu", _open_menu, "Start / Esc"))
 	row.add_child(_button("Test Play", _open_test_dialog, "F5", "PrimaryButton"))
@@ -329,6 +330,7 @@ func _build_top_bar(parent: Control) -> void:
 
 func _build_palette_panel() -> void:
 	var panel := PanelContainer.new()
+	_palette_panel = panel
 	panel.custom_minimum_size = Vector2(420, 0)
 	_root_box.add_child(panel)
 	var v := VBoxContainer.new()
@@ -389,6 +391,7 @@ func _build_palette_panel() -> void:
 
 func _build_right_panel() -> void:
 	var panel := PanelContainer.new()
+	_details_panel = panel
 	panel.custom_minimum_size = Vector2(500, 0)
 	_root_box.add_child(panel)
 	_right_scroll = ScrollContainer.new()
@@ -679,7 +682,7 @@ func _refresh_hints() -> void:
 	if _hints == null or _prompts == null:
 		return
 	var pad := Controls.last_device == "gamepad"
-	var key := "%s|%d|%s|%s|%s" % [armed, selected, carrying, pad, _overlay != null]
+	var key := "%s|%d|%s|%s|%s|%s" % [armed, selected, carrying, pad, _overlay != null, _canvas_active()]
 	if key == _hint_key:
 		return
 	_hint_key = key
@@ -704,9 +707,10 @@ func _refresh_hints() -> void:
 		ps.append({"actions": ["pause"], "text": "Menu", "call": _open_menu})
 	_prompts.set_prompts(ps)
 	if pad:
-		_hints.text = "Left stick: cursor  ·  Right stick: orbit  ·  LT / RT: zoom  ·  D-pad: nudge / pick item  ·  View: side panels"
+		_hints.text = "MAP LOCKED · View: switch to panels" if _canvas_active() else "PANELS · View / B: lock controls to map"
+		_hints.text += "\nLeft stick: cursor · Right stick: orbit · Triggers: zoom\nD-pad: nudge / choose item · Help: all controls"
 	else:
-		_hints.text = "Drag to move (Alt: no snap)  ·  Right-drag: orbit  ·  Middle-drag: pan  ·  Wheel: zoom  ·  Ctrl+Z / Ctrl+Y  ·  Ctrl+D duplicate  ·  Ctrl+S save  ·  F5 test  ·  H help"
+		_hints.text = "Drag: move · Right-drag: orbit · Middle-drag: pan · Wheel: zoom\nCtrl+S: save · Ctrl+Z: undo · F5: test · H: all controls"
 
 
 func _status_msg(text: String, col := COL_TEXT, seconds := 4.0) -> void:
@@ -1346,16 +1350,16 @@ func _test_play(format: String) -> void:
 	match format:
 		"ffa":
 			for i in 4:
-				fighters.append({"creature": creature, "team": i, "kind": "player" if i == 0 else "bot", "difficulty": "regular", "name": "You" if i == 0 else "Bot %d" % i})
+				fighters.append({"creature": creature, "team": i, "kind": "player" if i == 0 else "bot", "difficulty": "regular", "name": Profiles.player_name() if i == 0 else "Bot %d" % i})
 			rules["round_time"] = 120
 		"teams":
 			for i2 in 4:
-				fighters.append({"creature": creature, "team": i2 % 2, "kind": "player" if i2 == 0 else "bot", "difficulty": "regular", "name": "You" if i2 == 0 else "Bot %d" % i2})
+				fighters.append({"creature": creature, "team": i2 % 2, "kind": "player" if i2 == 0 else "bot", "difficulty": "regular", "name": Profiles.player_name() if i2 == 0 else "Bot %d" % i2})
 		"watch":
 			for i3 in 4:
 				fighters.append({"creature": creature, "team": i3, "kind": "bot", "difficulty": "pro", "name": "Bot %d" % (i3 + 1)})
 		_:
-			fighters = [{"creature": creature, "team": 0, "kind": "player", "name": "You"}, {"creature": creature, "team": 1, "kind": "bot", "difficulty": "regular", "name": "Sparring Bot"}]
+			fighters = [{"creature": creature, "team": 0, "kind": "player", "name": Profiles.player_name()}, {"creature": creature, "team": 1, "kind": "bot", "difficulty": "regular", "name": "Sparring Bot"}]
 	_save_session()
 	var cfg := {"arena": a, "rules": rules, "seed": randi() % 100000, "fighters": fighters, "context": "arena_test"}
 	var scene := App.start_match(cfg, func(_res): ArenaTestPlay.return_to_editor())
@@ -1566,7 +1570,10 @@ func on_back() -> bool:
 func _input(ev: InputEvent) -> void:
 	if App.top_screen() != self or not is_visible_in_tree():
 		return
-	if ev is InputEventJoypadButton:
+	if ev is InputEventJoypadMotion and _canvas_active() and _overlay == null:
+		# Polling owns the sticks; never let Godot's GUI navigation move focus off the map.
+		get_viewport().set_input_as_handled()
+	elif ev is InputEventJoypadButton:
 		_on_joy_button(ev as InputEventJoypadButton)
 	elif ev is InputEventKey and (ev as InputEventKey).pressed and not (ev as InputEventKey).echo:
 		_on_key(ev as InputEventKey)
@@ -1660,12 +1667,22 @@ func _primary_at_cursor() -> void:
 
 
 func _focus_panels() -> void:
+	_hint_key = ""
+	if not _details_panel.visible and not _palette_panel.visible:
+		_palette_panel.show()
 	for c in _inspector.find_children("*", "Control", true, false) + _layout_box.find_children("*", "Control", true, false):
 		var ctl := c as Control
 		if ctl.focus_mode != Control.FOCUS_NONE and ctl.is_visible_in_tree():
 			ctl.grab_focus()
 			return
 	_palette.grab_focus()
+
+
+func _toggle_panel(panel: Control) -> void:
+	panel.visible = not panel.visible
+	if not panel.visible:
+		vp.grab_focus()
+	_hint_key = ""
 
 
 func _on_key(k: InputEventKey) -> void:

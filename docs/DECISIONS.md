@@ -281,3 +281,25 @@ the fighters. All changes are view-side (HitFeel, CameraOccluders):
   sight or right under the lens shrink away.
 The simulation, balance and bots are unchanged. The miss rate stays as it is: attack magnetism for players
 would be a separate, measured change (the owner's call, 2026-10-17). Tests: test_combat_feel.
+
+## D-042 v0.9.12 playtest fixes and field guide
+
+The owner requested a patch release covering campaign progression, controller and mouse navigation,
+watchable autobattler fights, free spectating, explanatory content, deeper Cannery activities, settings
+and unpleasant ambience (2026-10-17). CampaignFlow now lives as long as its presented match. Bookie
+Watch/Skip shares one simulation, so returning to the live fight never starts it over. Map/model camera
+focus owns its sticks explicitly; ordinary focused text and lists share right-stick scrolling.
+
+The main menu retains its visual design with eight grouped entries. Compendium combines live content
+values and actual models with authored explanations of abilities, elemental reactions and game rules.
+Rookie is the legacy/default player address; the existing profile rename feature supplies custom names.
+The Chum Cannon adds three difficulties, and Crate Toss rewards varying distances through called targets
+and consecutive successes. Existing reward milestones remain shared, preventing difficulty-switch farming.
+
+The audio change is a targeted removal of sustained generated hum/buzz and a crossfade repair, explicitly
+authorized by this playtest request. It does not adopt the separate Ableton branch or new stock assets.
+The complete generated-file inventory and license-linked shortlist are in docs/audio. Stock music would
+need a listening decision and compatible loop/stem treatment before integration. DLSS is unavailable in
+the current stock renderer; FSR's existing NVIDIA support is explained in the setting instead.
+
+Issue-by-issue evidence and verification limits: docs/evidence/verification/v0.9.12/README.md.

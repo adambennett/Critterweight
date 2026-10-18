@@ -73,5 +73,5 @@ static func build_sim(parent: Node, state: HubState, fighter_id: String, spot :=
 		c = Content.creature(pick_fighter(state))
 	var mode := HubMode.new(state, spot)
 	sim.setup({"arena": HubArenaDef.make(), "rules": RULES.duplicate(true), "seed": seed_value, "mode": mode,
-		"fighters": [{"creature": c, "team": 0, "source": source, "name": str(state.profile.get("name", "Rookie")), "kind": "player"}]})
+		"fighters": [{"creature": c, "team": 0, "source": source, "name": Profiles.player_name(state.profile), "kind": "player"}]})
 	return sim

@@ -231,6 +231,7 @@ static func wait_for_party(screen: Control, msg: Label) -> void:
 
 static func scroll(child: Control) -> ScrollContainer:
 	var s := ScrollContainer.new()
+	s.focus_mode = Control.FOCUS_ALL
 	s.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	s.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	s.follow_focus = true
@@ -283,7 +284,8 @@ static func fighter_name(cat: CampaignCatalog, fid: String) -> String:
 ## Leaves the campaign screens for the game's menu (whichever the shell provides).
 static func leave_campaign() -> void:
 	if App.stack.size() > 1:
-		App.back()
+		# Called from on_back(): do not dispatch back into the same handler again.
+		App.pop()
 		return
 	for s in ["main_menu", "title"]:
 		if App.has_screen(s):

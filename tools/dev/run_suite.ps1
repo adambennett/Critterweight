@@ -49,7 +49,7 @@ if ($Filter -eq "" -and (Test-Path $UserRoot)) { Remove-Item -LiteralPath $UserR
 New-Item -ItemType Directory -Force $UserRoot | Out-Null
 $code = 1
 try {
-	$a = @("--headless", "--path", $GamePath, "--fixed-fps", "120", "--", "--user-root", $UserRoot, "--test")
+	$a = @("--headless", "--path", $GamePath, "--log-file", (Join-Path $UserRoot 'engine.log'), "--fixed-fps", "120", "--", "--user-root", $UserRoot, "--test")
 	if ($Filter -ne "") { $a += $Filter }
 	if ($Log -ne "") { & $Godot @a *> $Log } else { & $Godot @a }
 	$code = $LASTEXITCODE

@@ -13,7 +13,7 @@ const ROLLBACK_SECONDS := 15.0
 ## Display strings for enum values (key-specific formatting is in value_label()).
 const VALUE_LABELS := {
 	"windowed": "Windowed", "borderless": "Borderless window", "fullscreen": "Fullscreen", "native": "Native",
-	"off": "Off", "on": "On", "adaptive": "Adaptive", "bilinear": "Bilinear", "fsr1": "AMD FSR 1.0", "fsr2": "AMD FSR 2.2",
+	"off": "Off", "on": "On", "adaptive": "Adaptive", "bilinear": "Bilinear", "fsr1": "FSR 1.0 (cross-vendor)", "fsr2": "FSR 2.2 (cross-vendor)",
 	"deck": "Steam Deck", "low": "Low", "medium": "Medium", "high": "High", "ultra": "Ultra", "custom": "Custom",
 	"fxaa": "FXAA", "msaa2": "MSAA 2x", "msaa4": "MSAA 4x", "taa": "TAA",
 	"auto": "Automatic", "xbox": "Xbox", "playstation": "PlayStation", "keyboard": "Keyboard & mouse",
@@ -135,10 +135,16 @@ static func make(key: String) -> UiRow:
 			var lbls: Array[String] = []
 			for o in opts:
 				lbls.append(value_label(key, o))
-			var orow := OptionRow.new(label)
-			orow.setup(opts, lbls, v)
-			orow.value_changed.connect(func(nv) -> void: _commit(key, nv, orow))
-			row = orow
+			if key == "display.resolution":
+				var dropdown := DropdownRow.new(label)
+				dropdown.setup(opts, lbls, v)
+				dropdown.value_changed.connect(func(nv) -> void: _commit(key, nv, dropdown))
+				row = dropdown
+			else:
+				var orow := OptionRow.new(label)
+				orow.setup(opts, lbls, v)
+				orow.value_changed.connect(func(nv) -> void: _commit(key, nv, orow))
+				row = orow
 		"int", "float":
 			var mn := float(s.get("min", 0.0))
 			var mx := float(s.get("max", 1.0))
@@ -247,6 +253,8 @@ static func refresh_row(row: UiRow, v) -> void:
 		return
 	if row is ToggleRow:
 		(row as ToggleRow).set_value(bool(v))
+	elif row is DropdownRow:
+		(row as DropdownRow).set_value(v)
 	elif row is OptionRow:
 		(row as OptionRow).set_value(v)
 	elif row is SliderRow:
@@ -257,6 +265,8 @@ static func refresh_row(row: UiRow, v) -> void:
 
 ## Human summary of the current value (tests, help panel).
 static func value_text(row: UiRow) -> String:
+	if row is DropdownRow:
+		return (row as DropdownRow).value_text()
 	if row is ToggleRow:
 		return (row as ToggleRow).value_text()
 	if row is OptionRow:

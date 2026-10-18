@@ -213,8 +213,9 @@ func id() -> String:
 	return str(current.get("id", ""))
 
 
-func player_name() -> String:
-	return str(current.get("name", "Rookie"))
+func player_name(profile: Dictionary = {}) -> String:
+	var value := str((current if profile.is_empty() else profile).get("name", "Rookie")).strip_edges()
+	return "Rookie" if value == "" or value == "You" else value
 
 
 ## Records a finished match for statistics/records. `context`: versus | campaign | tutorial | lab...

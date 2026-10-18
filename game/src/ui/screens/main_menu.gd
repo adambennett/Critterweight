@@ -16,6 +16,8 @@ const ENTRIES := [
 				"desc": "No clock, endless respawns. Work on your timing against a standing dummy or a bot."},
 			{"id": "spectate", "label": "Spectate", "icon": "spectate", "screen": "spectate", "params": {},
 				"desc": "Book a fight between bots, pick their skill tiers and watch from the director's chair."},
+			{"id": "tutorial", "label": "Tutorial", "icon": "tutorial", "screen": "tutorial_menu", "params": {},
+				"desc": "Granny Haymaker's corner: ten short lessons from footwork to the JUICE."},
 		]},
 	{"id": "campaign", "label": "Campaign", "icon": "campaign", "desc": "Run a seeded fight card from the Undercard to the Title Card.",
 		"children": [
@@ -28,25 +30,25 @@ const ENTRIES := [
 		]},
 	{"id": "online", "label": "Online", "icon": "online", "screen": "online", "params": {},
 		"desc": "Host or join matches and co-op runs over the internet or your local network."},
-	{"id": "tutorial", "label": "Tutorial", "icon": "tutorial", "screen": "tutorial_menu", "params": {},
-		"desc": "Granny Haymaker's corner: ten short lessons from footwork to the JUICE."},
 	{"id": "create", "label": "Create", "icon": "create", "desc": "Write your own rules and build your own cages.",
 		"children": [
 			{"id": "rules_editor", "label": "Rules Editor", "icon": "rules", "screen": "rules_editor", "params": {},
 				"desc": "Rounds, timers, health, damage, respawns, hazards and mode options — saved as shareable presets."},
 			{"id": "arena_editor", "label": "Arena Editor", "icon": "arena", "screen": "arena_editor", "params": {},
 				"desc": "Place props, hazards and spawns, test-play the layout and share it."},
+			{"id": "lab", "label": "AI Lab", "icon": "lab", "screen": "lab", "params": {},
+				"desc": "Train bots on your own machine and pit them against the house fighters."},
+			{"id": "mods", "label": "Mods", "icon": "mods", "screen": "mods", "params": {},
+				"desc": "Enable, disable and arrange content packages and mod sets."},
 		]},
-	{"id": "lab", "label": "AI Lab", "icon": "lab", "screen": "lab", "params": {},
-		"desc": "Train bots on your own machine and pit them against the house fighters."},
-	{"id": "mods", "label": "Mods", "icon": "mods", "screen": "mods", "params": {},
-		"desc": "Enable, disable and arrange content packages and mod sets."},
+	{"id": "compendium", "label": "Compendium", "icon": "info", "screen": "compendium", "params": {},
+		"desc": "Meet every fighter, inspect their models and abilities, and learn the arenas, elements and rules."},
 	{"id": "profile", "label": "Profile", "icon": "profile", "screen": "profile", "params": {},
 		"desc": "Switch, create or rename profiles and check your record."},
-	{"id": "settings", "label": "Settings", "icon": "settings", "screen": "settings", "params": {},
-		"desc": "Display, graphics, audio, controls, accessibility, gameplay, network and diagnostics."},
-	{"id": "credits", "label": "Credits", "icon": "credits", "screen": "credits", "params": {},
-		"desc": "Who made this, and the licences of everything we built it with."},
+	{"id": "settings", "label": "Settings", "icon": "settings", "desc": "Settings, controls and credits.", "children": [
+		{"id": "settings", "label": "Settings", "icon": "settings", "screen": "settings", "desc": "Display, sound, controls and accessibility."},
+		{"id": "controls", "label": "Controls", "icon": "info", "screen": "controls", "desc": "Every keyboard and controller action."},
+		{"id": "credits", "label": "Credits", "icon": "credits", "screen": "credits", "desc": "Who made this, and the licences of everything we built it with."}]},
 	{"id": "quit", "label": "Quit", "icon": "quit", "action": "quit", "desc": "Hang up the gloves for tonight."},
 ]
 
@@ -109,7 +111,7 @@ func _build() -> void:
 	var sub := UiTheme.label("THE CRITTERWEIGHT CIRCUIT  ·  GULLET BAY", "Eyebrow")
 	left.add_child(sub)
 	left.add_child(UiTheme.spacer(false, 18))
-	var list := FocusScroll.new(4)
+	var list := UiTheme.vbox(4)
 	list.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	left.add_child(list)
 	var hidden: Array[String] = []
@@ -121,7 +123,8 @@ func _build() -> void:
 		b.route = str(d["id"])
 		b.help_title = str(d["label"])
 		b.help_text = str(d.get("desc", ""))
-		b.custom_minimum_size = Vector2(560, 0)
+		b.custom_minimum_size = Vector2(560, 62)
+		b.add_theme_font_size_override("font_size", UiTheme.size("h3"))
 		b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		var idx := _items.size()
 		b.pressed.connect(_activate.bind(idx))
@@ -132,7 +135,7 @@ func _build() -> void:
 				if ev.is_action_pressed("ui_right", false, true):
 					b.accept_event()
 					_open_sub(idx))
-		list.content.add_child(b)
+		list.add_child(b)
 		_items.append(b)
 		_item_defs.append(d)
 	if not _reported_hidden and not hidden.is_empty():
@@ -220,8 +223,8 @@ func default_focus() -> Control:
 func _on_item_focus(idx: int) -> void:
 	var d := _item_defs[idx]
 	_show_poster(d)
-	if _open_index >= 0 and _open_index != idx:
-		_close_sub(false)
+	# A clicked category stays open while the pointer crosses the poster or another
+	# row. Only activating another entry or Back changes it.
 
 
 func _show_poster(d: Dictionary) -> void:

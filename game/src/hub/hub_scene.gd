@@ -170,7 +170,7 @@ func switch_fighter(id: String) -> void:
 	mode.drop_carried(f)
 	f.rebuild(c, at, yaw)
 	f.reset_vitals()
-	f.display_name = str(state.profile.get("name", "Rookie"))
+	f.display_name = Profiles.player_name(state.profile)
 	state.set_loadout_fighter(id)
 	_make_creature_view()
 	view.upgrades.refresh()
@@ -404,6 +404,8 @@ func _enter_room(s: String) -> void:
 
 func _on_interact(ev: Dictionary) -> void:
 	match str(ev["kind"]):
+		"drill":
+			open_board("drill")
 		"npc":
 			open_board("talk", {"npc": str(ev["npc"])})
 		"station":

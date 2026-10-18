@@ -52,7 +52,14 @@ func test_every_interactable_fires() -> void:
 	# activities start their activity
 	for act in [["bag_heavy", "bag"], ["crate_pile", "crates"], ["chum_cannon", "drill"]]:
 		await _stand_at(str(act[0]))
+		var start_seq := last_seq()
 		mode.request_interact(player())
+		if act[1] == "drill":
+			await run_until(func(): return not events_of("hub_interact", start_seq).is_empty(), 0.5)
+			var choices := events_of("hub_interact", start_seq)
+			check(not choices.is_empty() and choices[0].get("kind") == "drill", "cannon opens its difficulty choice before firing")
+			check_eq(mode.activity_running(), "", "cannon waits for a difficulty selection")
+			mode.start_activity("drill", "", "standard")
 		await run_until(func(): return mode.activity_running() != "", 0.5)
 		check_eq(mode.activity_running(), str(act[1]), "%s starts the %s activity" % [act[0], act[1]])
 		mode.cancel_activity()

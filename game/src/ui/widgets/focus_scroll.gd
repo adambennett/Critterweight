@@ -21,7 +21,7 @@ func _init(gap := 10) -> void:
 	_pad.add_theme_constant_override("margin_left", 22)
 	_pad.add_theme_constant_override("margin_right", 26)
 	_pad.add_theme_constant_override("margin_top", 10)
-	_pad.add_theme_constant_override("margin_bottom", 14)
+	_pad.add_theme_constant_override("margin_bottom", 24)
 	add_child(_pad)
 	content = UiTheme.vbox(gap)
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL

@@ -58,6 +58,8 @@ func on_enter(p: Dictionary) -> void:
 			_build_lessons()
 		"shop":
 			_build_shop()
+		"drill":
+			_build_drill()
 		"rest":
 			_build_rest()
 		_:
@@ -145,7 +147,9 @@ func frame(eyebrow: String, title: String, width := 1020.0, with_help := true, a
 	if with_help:
 		help = HelpPanel.new(list, "Details")
 		help.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		help.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		# A scrollable details panel needs allocated height: shrink-to-content
+		# would collapse its ScrollContainer to an empty strip.
+		help.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		# long rows must not squeeze the details into a one-word column (it would grow off screen)
 		help.custom_minimum_size = Vector2(340, 0)
 		body_row.add_child(help)
@@ -276,6 +280,7 @@ func _start_lesson(i: int) -> void:
 
 func _build_shop() -> void:
 	frame("Needles' price board", "Tonight's menu", 1000.0)
+	text_line("CATALOG PREVIEW · Visit a Shop node on your campaign map to buy items and services with Scrip. Nothing is sold in the Cannery.", "BodyStrong")
 	var sv := services()
 	var items := sv.shop_preview()
 	if items.is_empty():
@@ -286,9 +291,25 @@ func _build_shop() -> void:
 		var b := button("%s   ·   %d Scrip" % [str(d["name"]), int(d["price"])], func() -> void: pass, str(d["name"]),
 			"%s. %s" % [str(rarity_names.get(str(d["rarity"]), d["rarity"])), str(d.get("desc", ""))])
 		b.sfx_accept = "ui_denied"
-	section("Services on the card")
-	text_line("Rub-down 35 · Antidote 30 · Reroll stock 25 · Sell for half. Shops open between fights on the run; prices are Scrip, not Clout.", "Caption")
+	section("Campaign shop services")
+	text_line("Each campaign stall offers one service, alongside its stock. Rub-down (35 Scrip) removes side effects now. Antidote (30) gives a consumable to clear them later. Restock (25) rerolls that stall once. You can also sell supplements for half price.", "Caption")
 	set_status("Preview only: Needles sells on the fight card, not in the Cannery.")
+
+
+func _build_drill() -> void:
+	frame("Ludlow's cannon", "Pick your pressure", 1000.0)
+	text_line("45 seconds. Dodge, block or parry buckets. Parrying earns +5 streak. Leave the square to stop. Clout milestones are shared across difficulties.", "Caption")
+	var descriptions := ["The original drill. Slow lobs with forgiving spread.", "More shots, shorter flight times and stronger movement prediction.", "Rapid fire with homing buckets. They stop steering just before impact: time your dodge!"]
+	var i := 0
+	for id: String in HubChumDrill.DIFFICULTIES:
+		var level := id
+		button(str(HubChumDrill.DIFFICULTIES[id]["name"]), func():
+			var m := hub_mode()
+			close()
+			if m:
+				m.start_activity("drill", "", level), str(HubChumDrill.DIFFICULTIES[id]["name"]), descriptions[i])
+		i += 1
+	focus_first()
 
 
 func _build_rest() -> void:

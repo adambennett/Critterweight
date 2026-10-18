@@ -5,6 +5,11 @@ repository (D-013). No third-party samples, no paid tools, no TTS. This document
 subsystem's contract: the pipeline, how to rebuild, the source formats, the runtime API, the
 integration table for the lead, the tests, and the provenance statement.
 
+For the v0.9.12 playtest request, [docs/audio/REPLACEMENT_GUIDE.md](audio/REPLACEMENT_GUIDE.md) links the
+complete 638-file generated inventory and a researched stock-audio shortlist. Eight ambience loops have
+had sustained hum/buzz removed, and rapid room crossfades now cancel superseded fades. No stock assets or
+unapproved Ableton branch audio are included in that patch.
+
 Spec: `docs/design/AUDIO_DIRECTION.md` (tracks, SFX list, mixing), `docs/design/ANNOUNCER_AND_TUTORIAL.md`
 (voices, lines), `docs/design/ROSTER.md` (per-fighter sound palettes).
 

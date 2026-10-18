@@ -26,6 +26,7 @@ const SCREENS := {
 	"mods": "res://src/mods/ui/mods_screen.gd",
 	"profile": "res://src/ui/screens/profile_screen.gd",
 	"credits": "res://src/ui/screens/credits_screen.gd",
+	"compendium": "res://src/ui/screens/compendium_screen.gd",
 	"pause": "res://src/ui/screens/pause_menu.gd",
 	"results": "res://src/ui/screens/results_screen.gd",
 	"dialog": "res://src/ui/screens/dialog.gd",

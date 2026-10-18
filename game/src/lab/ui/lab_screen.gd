@@ -1109,7 +1109,7 @@ func _fight() -> void:
 		return
 	var me := _player_creature.get_item_text(_player_creature.selected) if _player_creature.selected >= 0 else p.creature
 	App.start_match({"arena": "the_gullet", "rules": "duel", "fighters": [
-		{"creature": me, "team": 0, "kind": "player", "name": "You"},
+		{"creature": me, "team": 0, "kind": "player", "name": Profiles.player_name()},
 		{"creature": p.creature, "team": 1, "kind": "policy", "policy_id": p.id, "name": p.name}]}, _back_to_lab)
 
 

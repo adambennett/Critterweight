@@ -40,6 +40,11 @@ func _init() -> void:
 	stretch = true
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	focus_mode = Control.FOCUS_ALL
+	set_meta("owns_sticks", true)
+	focus_neighbor_left = NodePath(".")
+	focus_neighbor_right = NodePath(".")
+	focus_neighbor_top = NodePath(".")
+	focus_neighbor_bottom = NodePath(".")
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 

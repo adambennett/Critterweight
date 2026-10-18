@@ -151,7 +151,7 @@ func _shared_texts(shared: Dictionary) -> Array:
 	var name_ := "The party" if who == "party" else who
 	for p in ctrl.players():
 		if str(p.get("id", "")) == who:
-			name_ = "You" if who == flow.me else str(p.get("name", who))
+			name_ = Profiles.player_name() if who == flow.me else str(p.get("name", who))
 	var out: Array = []
 	var texts: Array = shared.get("texts", [])
 	out.append_array(texts if not texts.is_empty() else ["Nothing happens."])

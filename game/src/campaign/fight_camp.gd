@@ -106,7 +106,7 @@ static func run_config(profile: Dictionary, choices: Dictionary) -> Dictionary:
 		"mode": str(choices.get("mode", "campaign")), "seed": int(choices.get("seed", 0)), "seeded": int(choices.get("seed", 0)) != 0,
 		"coop_format": str(choices.get("coop_format", "simultaneous")), "created_at": int(Time.get_unix_time_from_system()),
 		"custom": not (choices.get("custom_reasons", []) as Array).is_empty(), "custom_reasons": choices.get("custom_reasons", []),
-		"players": [{"id": "p0", "name": str(profile.get("name", "Player")), "profile_id": str(profile.get("id", "")),
+		"players": [{"id": "p0", "name": Profiles.player_name(profile), "profile_id": str(profile.get("id", "")),
 			"fighter": str(choices.get("fighter", "")), "meta": meta_levels(profile) if variant == "fight_camp" else {}}]}
 	return cfg
 

@@ -4,6 +4,11 @@ Creative specifications live in `docs/design/` (GAME_PITCH, ROSTER, ELEMENTS, EN
 CAMPAIGN, HUB, MODES, ANNOUNCER_AND_TUTORIAL, ART_DIRECTION, AUDIO_DIRECTION). This file records how the engine
 realises them and the committed numeric targets.
 
+The v0.9.12 playtest changes are recorded in D-042 and docs/releases/v0.9.12.md: grouped main navigation,
+Compendium, exclusive editor/free-camera input, live Bookie Watch/Skip, Chum Cannon difficulties and
+Crate Toss called targets. The campaign simulation and saved-decision format are retained; its presented
+flow now has explicit ownership until the result is committed.
+
 ## 1. Platform targets and budgets (committed early, see DEL-09)
 | Item | Target |
 |---|---|

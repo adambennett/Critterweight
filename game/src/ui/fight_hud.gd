@@ -84,11 +84,11 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 		for box in [left, right]:
 			box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			box.add_theme_constant_override("separation", 18)
-		if top_n > 0:
-			_top.add_child(left)
+		left.visible = top_n > 0
+		right.visible = top_n > 0
+		_top.add_child(left)
 		_top.add_child(mid)
-		if top_n > 0:
-			_top.add_child(right)
+		_top.add_child(right)
 		for i in sim.fighters.size():
 			var f: Fighter = sim.fighters[i]
 			if i < 4:
@@ -235,8 +235,8 @@ func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dic
 	hp_stack.add_child(hp_text)
 	var st := _bar(w * 0.7, 10, Color(0.35, 0.85, 0.55))
 	box.add_child(st)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	var row := HFlowContainer.new()
+	row.add_theme_constant_override("h_separation", 12)
 	box.add_child(row)
 	var hype := _bar(w * (0.45 if big else 0.32), 14, Color(1.0, 0.62, 0.15))
 	hype.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -295,8 +295,9 @@ func _process(dt: float) -> void:
 		var juiced := f.time < f.juiced_until
 		var ready_txt := ("JUICE READY [%s]" % Controls.prompt_for("juice")) if bool(c.get("big", true)) else "JUICE!"
 		(c["hype_l"] as Label).text = "JUICED!" if juiced else (ready_txt if f.hype >= 100.0 else "HYPE")
-		(c["cd1"] as Label).text = _cd_text(f, "ability1", "A1")
-		(c["cd2"] as Label).text = _cd_text(f, "ability2", "A2")
+		var own := f.index == player_index and f.controller_kind == "player"
+		(c["cd1"] as Label).text = _cd_text(f, "ability1", Controls.prompt_for("ability1") if own else "A1")
+		(c["cd2"] as Label).text = _cd_text(f, "ability2", Controls.prompt_for("ability2") if own else "A2")
 		var st_txt := []
 		for s in f.statuses.summary():
 			var nm := str(s["element"]) if str(s["element"]) != "" else str(s["name"])
@@ -347,6 +348,8 @@ func _apply_highlight(which: String) -> void:
 func _cd_text(f: Fighter, slot: String, short: String) -> String:
 	if not f.creature.abilities.has(slot):
 		return ""
+	if f.index == player_index and f.controller_kind == "player":
+		short += " " + (f.creature.abilities[slot] as MoveDef).display_name
 	var left := float(f.cooldown_left.get(slot, 0.0))
 	return "%s %.0f" % [short, ceilf(left)] if left > 0.0 else "%s ready" % short
 

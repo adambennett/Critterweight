@@ -43,7 +43,7 @@ func on_enter(p: Dictionary) -> void:
 		if bool((b as Dictionary).get("danger", false)):
 			danger = true
 	_panel.theme_type_variation = "PanelDialogDanger" if danger else "PanelDialog"
-	_panel.custom_minimum_size = Vector2(860, 0)
+	_panel.custom_minimum_size = Vector2(1040 if buttons.size() > 3 else 860, 0)
 	center.add_child(_panel)
 	var col := UiTheme.vbox(UiTheme.GAP_M)
 	_panel.add_child(col)
@@ -68,14 +68,19 @@ func on_enter(p: Dictionary) -> void:
 		col.add_child(_bar)
 	_update_body()
 	col.add_child(UiTheme.spacer(false, 6))
-	var row := UiTheme.hbox(UiTheme.GAP_M)
-	row.alignment = BoxContainer.ALIGNMENT_END
+	# Choice lists use a bounded grid; a horizontal button row grows off screen.
+	var row := GridContainer.new()
+	row.columns = mini(3, buttons.size())
+	row.add_theme_constant_override("h_separation", UiTheme.GAP_S)
+	row.add_theme_constant_override("v_separation", UiTheme.GAP_S)
 	col.add_child(row)
 	for i in buttons.size():
 		var bd: Dictionary = buttons[i]
 		var id := str(bd.get("id", str(i)))
 		var b := UiButton.new(str(bd.get("label", id)), "DangerButton" if bool(bd.get("danger", false)) else ("PrimaryButton" if bool(bd.get("primary", false)) else ""))
 		b.custom_minimum_size = Vector2(220, 64)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		b.alignment = HORIZONTAL_ALIGNMENT_CENTER
 		b.route = id
 		b.pressed.connect(_choose.bind(id))
@@ -93,8 +98,8 @@ func on_enter(p: Dictionary) -> void:
 		var b := _buttons[i]
 		b.focus_neighbor_left = b.get_path_to(_buttons[posmod(i - 1, _buttons.size())])
 		b.focus_neighbor_right = b.get_path_to(_buttons[posmod(i + 1, _buttons.size())])
-		b.focus_neighbor_top = b.get_path_to(b)
-		b.focus_neighbor_bottom = b.get_path_to(b)
+		b.focus_neighbor_top = b.get_path_to(_buttons[maxi(0, i - row.columns)] if i >= row.columns else b)
+		b.focus_neighbor_bottom = b.get_path_to(_buttons[mini(i + row.columns, _buttons.size() - 1)] if i + row.columns < _buttons.size() else b)
 	var prompts := PromptBar.new()
 	prompts.set_prompts([{"actions": ["ui_accept"], "text": "Choose"},
 		{"actions": ["ui_cancel"], "text": _label_for(_cancel_id), "call": func() -> void: _choose(_cancel_id)}])

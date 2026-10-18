@@ -89,7 +89,7 @@ static func config(me: String, player_name: String, choices: Dictionary) -> Dict
 static func launch(scene: Node, choices: Dictionary) -> MatchScene:
 	var me: String = scene.call("player").creature.id
 	var st: HubState = scene.get("state")
-	var cfg := config(me, str(st.profile.get("name", "Rookie")), choices)
+	var cfg := config(me, Profiles.player_name(st.profile), choices)
 	Profiles.save()
 	var spar: Dictionary = cfg["hub_spar"]
 	# through MatchFlow: the pause menu's "Restart fight" restarts THIS spar (not whatever match was

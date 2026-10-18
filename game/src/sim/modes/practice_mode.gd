@@ -98,7 +98,11 @@ func hud_state() -> Dictionary:
 
 class PracticeDummy:
 	extends InputSource
-	var mode
+	# The mode owns this source. A strong back-reference would retain both after leaving practice.
+	var _mode_ref: WeakRef
+	var mode:
+		get:
+			return _mode_ref.get_ref()
 	var _t := 0.0
 	var _bot: BotBrain = null
 	var _replay_i := 0
@@ -106,7 +110,7 @@ class PracticeDummy:
 	var _countering := 0.0
 
 	func _init(m) -> void:
-		mode = m
+		_mode_ref = weakref(m)
 
 	func reset(tier: String) -> void:
 		_bot = BotBrain.new(tier, 4242) if mode.behavior == "bot" else null

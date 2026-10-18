@@ -39,8 +39,6 @@ function loopOf(sr, parts, dur, xf = 1.0) { return K.seamless(K.mix(sr, parts).s
 
 module.exports = [
   def('amb_gullet', AMB, (rng, sr) => loopOf(sr, [
-    { buf: K.buzz(sr, rng, { dur: DUR, f: 50, harmonics: 2, am: 0.05, amRate: 0.5, lp: 400, q: 1, jitter: 0.002, gain: 0.35 }), gain: -6 },
-    { buf: K.buzz(sr, rng, { dur: DUR, f: 120, harmonics: 1, am: 0.3, amRate: 100, lp: 3000, q: 0.8, wave: 'saw', jitter: 0.001, gain: 0.08 }), gain: -18 },
     { buf: far(K.wind(sr, rng, { dur: DUR, base: 900, wander: 0.6, q: 1.5, gusts: 0.5, rate: 0.2, gain: 0.5 }), sr, 0.7), gain: -4 },
     ...sparse(sr, rng, DUR, () => far(K.rattle(sr, rng, { dur: 0.5, f: 110, density: 30, gain: 0.6 }), sr, 0.8), 3, -14),
   ], DUR)),
@@ -51,7 +49,6 @@ module.exports = [
     ...sparse(sr, rng, DUR, () => far(K.fmHit(sr, { f: 220, ratio: 2.76, index: 1, dur: 0.9, idxDecay: 0.3 }), sr, 0.8), 2, -18),
   ], DUR)),
   def('amb_crusher', AMB, (rng, sr) => loopOf(sr, [
-    { buf: K.buzz(sr, rng, { dur: DUR, f: 100, harmonics: 3, am: 0.4, amRate: 120, lp: 2500, q: 1.2, wave: 'saw', jitter: 0.003, gain: 0.12 }), gain: -12 },
     { buf: K.wind(sr, rng, { dur: DUR, base: 300, wander: 0.8, q: 0.7, gusts: 0.5, rate: 0.2, gain: 0.5 }), gain: -8 },
     ...sparse(sr, rng, DUR, () => far(K.fmHit(sr, { f: rng.range(150, 320), ratio: 2.76, index: 1.4, dur: 1.4, idxDecay: 0.3 }), sr, 0.8), 3, -16),
     ...sparse(sr, rng, DUR, () => K.crackle(sr, rng, { dur: 0.4, density: 400, tone: 4000, decayMs: 2, gain: 0.4 }), 3, -20),
@@ -59,18 +56,15 @@ module.exports = [
   ], DUR)),
   def('amb_rooftop', AMB, (rng, sr) => loopOf(sr, [
     { buf: K.wind(sr, rng, { dur: DUR, base: 520, wander: 1.5, q: 0.9, gusts: 0.8, rate: 0.3, gain: 0.8 }), gain: -3 },
-    { buf: K.buzz(sr, rng, { dur: DUR, f: 120, harmonics: 1, am: 0.6, amRate: 30, lp: 3500, q: 0.8, wave: 'saw', jitter: 0.004, gain: 0.07 }), gain: -18 },
     { buf: far(K.noise(sr, DUR, rng, { color: 'brown', filt: [{ type: 'lp', f: 500 }], gain: 0.5 }), sr, 0.5), gain: -14 },
     ...sparse(sr, rng, DUR, () => pigeon(sr, rng), 3, -16),
   ], DUR)),
   def('amb_hub_main', AMB, (rng, sr) => loopOf(sr, [
-    { buf: K.buzz(sr, rng, { dur: DUR, f: 60, harmonics: 2, am: 0.05, amRate: 0.3, lp: 500, q: 1, jitter: 0.002, gain: 0.3 }), gain: -8 },
     { buf: K.wind(sr, rng, { dur: DUR, base: 700, wander: 0.4, q: 1.5, gusts: 0.3, rate: 0.15, gain: 0.35 }), gain: -10 },
     ...sparse(sr, rng, DUR, () => far(K.thump(sr, { f0: 140, f1: 70, sweep: 0.03, dur: 0.25, drive: 1.8 }), sr, 0.7), 4, -12),
     ...sparse(sr, rng, DUR, () => far(K.rattle(sr, rng, { dur: 0.6, f: 130, density: 25, gain: 0.6 }), sr, 0.8), 2, -18),
   ], DUR)),
   def('amb_hub_juice_bar', AMB, (rng, sr) => loopOf(sr, [
-    { buf: K.buzz(sr, rng, { dur: DUR, f: 55, harmonics: 3, am: 0.1, amRate: 0.8, lp: 700, q: 1.2, jitter: 0.002, gain: 0.3 }), gain: -8 },
     ...sparse(sr, rng, DUR, () => K.fmHit(sr, { f: rng.range(2000, 3200), ratio: 2.0, index: 0.9, dur: 0.35, idxDecay: 0.3 }), 4, -18),
     ...sparse(sr, rng, DUR, () => K.crackle(sr, rng, { dur: 0.5, density: 600, tone: 5000, decayMs: 1.5, gain: 0.5 }), 2, -20),
   ], DUR)),
@@ -82,7 +76,6 @@ module.exports = [
   ], DUR)),
   def('amb_hub_office', AMB, (rng, sr) => {
     const parts = [
-      { buf: K.buzz(sr, rng, { dur: DUR, f: 120, harmonics: 1, am: 0.5, amRate: 100, lp: 2500, q: 0.8, wave: 'saw', jitter: 0.001, gain: 0.07 }), gain: -16 },
       { buf: K.wind(sr, rng, { dur: DUR, base: 600, wander: 0.3, q: 1.5, gusts: 0.2, rate: 0.1, gain: 0.3 }), gain: -14 },
     ];
     for (let t = 0; t < DUR; t += 1) parts.push({ buf: K.burst(sr, rng, { dur: 0.015, filt: [{ type: 'bp', f: 2600, q: 4 }], curve: 2.5, gain: 1.2 }), gain: -14, at: t + 0.1 });
@@ -90,7 +83,6 @@ module.exports = [
   }),
   def('amb_hub_boiler', AMB, (rng, sr) => loopOf(sr, [
     { buf: K.noise(sr, DUR, rng, { color: 'brown', filt: [{ type: 'lp', f: 250 }], gain: 0.8 }), gain: -6 },
-    { buf: K.buzz(sr, rng, { dur: DUR, f: 45, harmonics: 2, am: 0.2, amRate: 1.2, lp: 300, q: 1, jitter: 0.004, gain: 0.3 }), gain: -8 },
     ...sparse(sr, rng, DUR, () => K.drip(sr, rng, { f: rng.range(900, 1900), dur: 0.15 }), 6, -14),
     ...sparse(sr, rng, DUR, () => far(K.fmHit(sr, { f: rng.range(200, 400), ratio: 2.76, index: 1.2, dur: 0.8, idxDecay: 0.3 }), sr, 0.9), 2, -14),
   ], DUR)),
@@ -101,7 +93,6 @@ module.exports = [
   ], DUR)),
   def('amb_hub_booth', AMB, (rng, sr) => loopOf(sr, [
     { buf: far(K.wind(sr, rng, { dur: DUR, base: 900, wander: 0.6, q: 1.5, gusts: 0.5, rate: 0.2, gain: 0.5 }), sr, 0.8), gain: -6 },
-    { buf: K.buzz(sr, rng, { dur: DUR, f: 60, harmonics: 2, am: 0.05, amRate: 0.3, lp: 400, q: 1, jitter: 0.002, gain: 0.2 }), gain: -12 },
   ], DUR)),
   def('amb_menu', AMB, (rng, sr) => loopOf(sr, [
     { buf: K.wind(sr, rng, { dur: DUR, base: 350, wander: 1.0, q: 0.8, gusts: 0.5, rate: 0.2, gain: 0.5 }), gain: -8 },

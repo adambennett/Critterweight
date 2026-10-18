@@ -26,6 +26,15 @@ Menus: left stick / D-pad move, A select, B back, LB/RB switch tabs, Y and X are
 screen uses them. The mouse can click everything. Hold/toggle guard, dead zones, sensitivity, inversion,
 vibration and the button-prompt style are in Settings › Controls.
 
+Use the **right stick** to scroll a focused text panel or list. The main menu uses eight groups without
+a scrollbar. Tutorial is under Fight; AI Lab and Mods are under Create; Controls and Credits are under
+Settings. Profile lets you rename Rookie; dialogue uses that name.
+
+**Compendium** explains each fighter's stats, abilities and cooldowns beside a rotatable 3D model. It also
+covers elemental statuses (including Brine/Soaked), reactions, arenas, objects and mode rules. Ability 2
+(RB/E) often sets up a defense or movement effect: Stoke buffs attacks, Dredge counters, Gusto hovers,
+Dozer raises a dust cloud, Slurry dives, and Jitters places a spring pad.
+
 ## 2. Fighting basics
 
 - **Your body is real.** Hits land where a fist, claw, beak or tail actually touches, and harder when it is
@@ -51,18 +60,35 @@ vibration and the button-prompt style are in Settings › Controls.
 |---|---|
 | Fight › Quick Fight / Versus | You against bots (up to 8 fighters, teams, any rules preset and arena) |
 | Fight › Practice | A dummy that stands, guards, parries, counters, replays your recording, or fights; hit telemetry |
-| Fight › Spectate | Bots only; auto-director camera, LB/RB follow a fighter, D-pad speed, Y free camera, X hide HUD |
-| Tutorial | Ten short exercises with Granny Haymaker; retry, skip or replay any of them |
+| Fight › Spectate | Bots only; Y cycles Follow / Locked / Free, LB/RB chooses a fighter, D-pad speed, X hides HUD |
+| Fight › Tutorial | Ten short exercises with Granny Haymaker; retry, skip or replay any of them |
 | Bonus modes (rules presets) | **Spotlight Hog** (hold the moving light), **Chumball** (knock the ball into the goal), **Absolute Unit** (KO the giant to become the giant), **Chum Rush** (co-op waves), **Tag Team** |
 | Campaign | **Off the Street** (fresh runs, no permanent power) and **Fight Camp** (persistent upgrades, The Cannery hub), plus **The Bookie's Table** (watch AI fight your build); The Dosage difficulty ladder 1–10; co-op with friends |
 | Online | Host a game, join by address or LAN, or connect to a dedicated server with playlists |
 | Create › Rules | Make, test-play, save, share and import your own rules presets |
 | Create › Arena | Build arenas from props, hazards and spawns; test-play and share them |
-| AI Lab | Train your own fighter AI on your PC, evaluate it, then fight or watch it |
-| Mods | Turn mods on/off, keep mod sets, import/share packages (data-only, they never run code) |
+| Create › AI Lab | Train your own fighter AI on your PC, evaluate it, then fight or watch it |
+| Create › Mods | Turn mods on/off, keep mod sets, import/share packages (data-only, they never run code) |
+| Compendium | Fighter models and abilities, elements, arenas, rules and field guide |
 
 Records: custom rules and mods are allowed everywhere single-player; results played with them are marked
 "custom" and kept separate from standard records. Online, everyone needs the same gameplay mods as the host.
+
+Free camera: LS/WASD moves, RS/right-drag looks, A/Space rises and LT/Shift descends. At the Bookie's Table,
+View/Tab switches between flying and its control bar. Watch fights shows actual combat at 1–4x; Skip ahead
+hides that same fight and advances it at 8x. You can return to watching immediately.
+
+In the Cannery, the Chum Cannon offers Warm-up, Pressure and Homing hell. Crate Toss rotates a called
+target between the three rings: matching it adds 25 points plus a streak bonus, so vary throw strength.
+Crates reset when the activity ends. Needles' hub board is a catalog preview; purchases and the listed
+services happen at **Shop nodes on the campaign map**, using Scrip. Clout is for permanent hub upgrades.
+
+The Arena Editor's **View** button switches map/panel focus. Palette and Details can be minimized to give
+the map more room. When map focus is locked, sticks and editing buttons stay inside the canvas.
+
+Display settings use a resolution dropdown followed by one Keep/Revert confirmation. FSR works on NVIDIA,
+AMD and Intel hardware; DLSS is not available in this renderer. Diagnostics › Show FPS adds a counter over
+both menus and gameplay.
 
 ## 4. Playing online
 

@@ -310,7 +310,11 @@ func launch_fight() -> void:
 	# the pause menu's "Restart fight" replays MatchFlow.last_config; a campaign fight must not
 	# restart into an unrelated earlier match (quitting keeps the run at this fight instead)
 	MatchFlow.last_config = {}
-	App.start_match(built["config"], _on_match_finished)
+	var scene := App.start_match(built["config"], _on_match_finished)
+	# Callables do not retain RefCounted targets. The map screen is freed when the
+	# fight starts, so the fight must own its flow until the next decision screen does.
+	if scene != null:
+		scene.set_meta("campaign_flow", self)
 
 
 ## Right before a presented fight: re-check what makes a run custom (the game speed may have

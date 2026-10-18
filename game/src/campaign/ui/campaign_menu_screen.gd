@@ -25,6 +25,7 @@ var _help: HelpPanel
 var _status: Label
 var _start: Button
 var _runs_box: VBoxContainer
+var _right_buttons: Array[Control] = []
 
 
 func on_enter(p: Dictionary) -> void:
@@ -73,6 +74,7 @@ func _build() -> void:
 	runs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	right.add_child(runs)
 	var rs := ScrollContainer.new()
+	rs.follow_focus = true
 	rs.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	rs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	runs.add_child(rs)
@@ -88,6 +90,9 @@ func _build() -> void:
 		"The Bookie's Table", "Teddy Two-Tooth deals a card and the AI fights it: watch, bet on your build, or take over the decisions."))
 	right.add_child(_button("CANNERY LEDGER (Fight Camp upgrades)", "", func(): App.push("camp_ledger", {"station": ""}), "",
 		"Cannery Ledger", "Spend Clout on Fight Camp upgrades. They apply only in Fight Camp runs."))
+	for child in right.get_children():
+		if child is Button:
+			_right_buttons.append(child)
 	# the prompt bar's Back covers the main menu; from the Cannery a button says where Back goes
 	if return_to_hub:
 		right.add_child(_button("BACK TO THE CANNERY", "", _leave, "back"))
@@ -178,6 +183,7 @@ func _build_rows(focus_key := "") -> void:
 	_start.disabled = fighter == ""
 	c.add_child(_start)
 	_scroll.wrap_focus.call_deferred()
+	_link_columns.call_deferred()
 	_focus_key.call_deferred(focus_key if focus_key != "" else "start")
 
 
@@ -267,6 +273,7 @@ func _update_status() -> void:
 
 func _refresh_runs() -> void:
 	for c in _runs_box.get_children():
+		_runs_box.remove_child(c)
 		c.queue_free()
 	var runs := RunStore.new().list(Profiles.id() if Profiles.id() != "" else "default", catalog)
 	if runs.is_empty():
@@ -293,6 +300,25 @@ func _refresh_runs() -> void:
 		hb.add_child(_button("ABANDON", "DangerButton", _abandon.bind(str(r["slot"])), "close"))
 		col.add_child(hb)
 		_runs_box.add_child(box)
+	_link_columns.call_deferred()
+
+
+func _link_columns() -> void:
+	var run_buttons: Array[Control] = []
+	for child in _runs_box.find_children("*", "Button", true, false):
+		if not (child as Button).disabled:
+			run_buttons.append(child)
+	var right := run_buttons + _right_buttons
+	if right.is_empty():
+		return
+	CampaignUI.chain_focus(right)
+	var left := _scroll.focusables()
+	for button in right:
+		button.focus_neighbor_left = button.get_path_to(_start)
+	for row in left:
+		# Left/right on option rows still adjusts their value. Start and the
+		# text row provide an explicit bridge to the suspended run controls.
+		row.focus_neighbor_right = row.get_path_to(right[0])
 
 
 func _resume(slot: String) -> void:

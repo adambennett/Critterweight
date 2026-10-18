@@ -17,7 +17,7 @@ const SCHEMA := [
 	{"key": "display.vsync", "cat": "display", "t": "enum", "def": "on", "opts": ["off", "on", "adaptive"], "label": "VSync", "help": "Synchronize frames to the display to prevent tearing."},
 	{"key": "display.frame_limit", "cat": "display", "t": "enum", "def": 0, "opts": [0, 30, 60, 90, 120, 144, 165, 240], "label": "Frame limit", "help": "Maximum frames per second (0 = unlimited)."},
 	{"key": "display.render_scale", "cat": "display", "t": "float", "def": 1.0, "min": 0.5, "max": 1.0, "step": 0.05, "label": "Render scale", "help": "3D resolution relative to the window. Lower is faster; the HUD stays sharp."},
-	{"key": "display.upscaler", "cat": "display", "t": "enum", "def": "fsr1", "opts": ["bilinear", "fsr1", "fsr2"], "label": "Upscaler", "help": "How a reduced render scale is upscaled."},
+	{"key": "display.upscaler", "cat": "display", "t": "enum", "def": "fsr1", "opts": ["bilinear", "fsr1", "fsr2"], "label": "Upscaler", "help": "FSR works on NVIDIA, AMD and Intel GPUs. FSR 2.2 provides temporal anti-aliasing; use a render scale below 100% to upscale. NVIDIA DLSS is not supported by this game's renderer."},
 	{"key": "display.ui_scale", "cat": "display", "t": "float", "def": 1.0, "min": 0.75, "max": 1.5, "step": 0.05, "label": "UI scale", "help": "Size of menus and HUD."},
 	{"key": "display.brightness", "cat": "display", "t": "float", "def": 1.0, "min": 0.6, "max": 1.4, "step": 0.05, "label": "Brightness", "help": "Overall scene brightness."},
 	{"key": "graphics.preset", "cat": "graphics", "t": "enum", "def": "high", "opts": ["deck", "low", "medium", "high", "ultra", "custom"], "label": "Quality preset", "help": "Sets the options below. Deck targets 1280x800 at 60 fps."},
@@ -372,7 +372,22 @@ func quality() -> Dictionary:
 		"brightness": float(values["display.brightness"]), "crowd": int(values["graphics.crowd"])}
 
 
-func _on_focus(focused: bool) -> void:
-	if bool(values.get("audio.mute_in_background", true)):
-		var idx := AudioServer.get_bus_index("Master")
-		AudioServer.set_bus_mute(idx, not focused or float(values["audio.master"]) <= 0.0)
+func _on_focus(_focused: bool) -> void:
+	# Embedded dropdowns temporarily take Window focus without leaving the app.
+	# Wait until focus transfer finishes and query native application windows.
+	_apply_focus_audio.call_deferred()
+
+
+func application_focused() -> bool:
+	if DisplayServer.get_name() == "headless":
+		return true
+	for wid in DisplayServer.get_window_list():
+		if DisplayServer.window_is_focused(wid):
+			return true
+	return false
+
+
+func _apply_focus_audio() -> void:
+	var idx := AudioServer.get_bus_index("Master")
+	var background := bool(values.get("audio.mute_in_background", true)) and not application_focused()
+	AudioServer.set_bus_mute(idx, background or float(values["audio.master"]) <= 0.0)

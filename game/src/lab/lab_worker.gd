@@ -260,9 +260,13 @@ func _note(msg: String) -> void:
 
 static func spawn_args(job_path: String, run_dir_path: String, user_args: Array) -> PackedStringArray:
 	var a := PackedStringArray()
+	var worker_rank := 0
+	var rank_index := user_args.find("--lab-rank")
+	if rank_index >= 0 and rank_index + 1 < user_args.size():
+		worker_rank = int(user_args[rank_index + 1])
 	if not OS.has_feature("template"):
 		a.append_array(["--path", ProjectSettings.globalize_path("res://")])
-	a.append_array(["--headless", "--fixed-fps", "120", "--", "--lab-worker", job_path, "--lab-out", run_dir_path])
+	a.append_array(["--headless", "--log-file", run_dir_path.path_join("engine_r%d.log" % worker_rank), "--fixed-fps", "120", "--", "--lab-worker", job_path, "--lab-out", run_dir_path])
 	for x in user_args:
 		a.append(str(x))
 	return a

@@ -18,12 +18,10 @@ var _trauma := 0.0
 var _rng := RandomNumberGenerator.new()
 var _zoom := 1.0
 var _ease_to := INF            ## preferred yaw of the space just entered (eased in once; the stick cancels it)
-var _input_yaw := 0.0
 ## While a board is open your fighter is framed beside it: x = sideways, y = toward the camera, in
 ## fractions of the camera distance (HubScene sets it from the board's alignment).
 var frame_shift := Vector2.ZERO
 var _shift := Vector2.ZERO
-var _hold_input := false       ## the camera turns itself into a new space while you walk: keep your heading
 var pitch_lock := 0.0          ## QA captures (--hub-pitch <deg>): one fixed pitch in every space
 
 
@@ -55,8 +53,6 @@ func snap() -> void:
 	_focus = target
 	_pitch = pitch_deg
 	_dist = distance
-	_input_yaw = yaw
-	_hold_input = false
 	_place(0.0)
 
 
@@ -66,7 +62,6 @@ func _process(dt: float) -> void:
 		yaw = wrapf(yaw + axis * dt * 2.0, -PI, PI)
 		if absf(axis) > 0.01:
 			_ease_to = INF
-			_hold_input = false
 	if _ease_to != INF:
 		yaw = lerp_angle(yaw, _ease_to, MathX.damp_factor(0.35, dt))
 		if absf(wrapf(_ease_to - yaw, -PI, PI)) < 0.01:
@@ -95,14 +90,8 @@ func _place(dt: float) -> void:
 
 
 ## Ground-plane basis that turns the movement stick into a world direction. While the camera eases
-## itself into a new space's view (the Loading Dock looks west) and you keep walking, the old basis
-## is held until you let go of the stick, so you keep going where you were going.
+## itself into a new space's view (the Loading Dock looks west), controls follow the displayed yaw.
 func input_basis() -> Basis:
-	var walking := Controls.move_vector().length() > 0.2
-	if _ease_to != INF and walking:
-		_hold_input = true
-	elif not walking:
-		_hold_input = false
-	if not _hold_input:
-		_input_yaw = yaw
-	return Basis(Vector3.UP, _input_yaw)
+	# Use the frame the player is actually seeing, including during room turns.
+	# Holding the old yaw until stick release made the controls feel reversed.
+	return Basis(Vector3.UP, atan2(global_basis.z.x, global_basis.z.z))

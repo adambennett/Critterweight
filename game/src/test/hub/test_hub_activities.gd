@@ -220,7 +220,7 @@ func test_crate_toss_foul_and_jitters_hint() -> void:
 		ct.on_throw(i, Vector3(HubLayout.CRATE_LANE_X, 0.8, HubLayout.CRATE_LINE_Z + 0.2))
 		ct.on_land(i, Vector3(HubLayout.CRATE_LANE_X, 0.3, HubLayout.CRATE_LINE_Z - 5.0), false)
 	ct.tick(0.1)
-	check_eq(ct.points, 100, "ten crates in the 5 m ring = 100")
+	check_eq(ct.points, 175, "ten middle-ring throws: 100 base plus three called-ring bonuses")
 	check(bool(state.flag("pier_hint")), "100 with Jitters earns Ludlow's pier hint")
 	check_eq(state.clout(), 85, "and all three tiers (10 + 25 + 50)")
 

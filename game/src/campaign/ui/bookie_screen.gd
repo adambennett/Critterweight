@@ -33,6 +33,8 @@ var _intro_played := false
 var _live_box: Control
 var _msg: Label
 var _dirty := false
+var _camera_controls := false     ## View / Tab switches between flying and the control bar
+var _camera_focus: Control
 
 
 static func get_table() -> BookieTable:
@@ -98,8 +100,10 @@ func _process(_dt: float) -> void:
 
 func _build() -> void:
 	for c in get_children():
+		remove_child(c)
 		c.queue_free()
 	_focusables.clear()
+	_camera_focus = null
 	if overlay:
 		_build_overlay()
 	elif table == null:
@@ -112,6 +116,9 @@ func _refresh() -> void:
 	var f: Control = get_viewport().gui_get_focus_owner() if get_viewport() else null
 	var focus_text := (f as Button).text if f is Button else ""
 	_build()
+	if _camera_focus != null:
+		_camera_focus.call_deferred("grab_focus")
+		return
 	if focus_text != "":
 		for c in _focusables:
 			if c is Button and (c as Button).text == focus_text and not (c as Button).disabled:
@@ -197,8 +204,8 @@ func _build_setup() -> void:
 	_option(c, "tier", "Teddy's dice", ts, tier, "How well the AI fights for you: from the Punching Bag up to the Hall-of-Famer.", _set_tier)
 	_option(c, "decisions", "Decisions", [["Teddy decides", "teddy"], ["I decide", "me"]], "me" if attended else "teddy",
 		"Teddy decides: the table runs unattended and he makes every pick between fights. 'I decide' opens the normal campaign screens for you.", _set_decisions)
-	_option(c, "fights", "Fights", [["Watch them", "watch"], ["Fast-forward", "ff"]], "watch" if watch else "ff",
-		"Watch each bout, or fast-forward to the results.", _set_watch)
+	_option(c, "fights", "Fights", [["Watch live", "watch"], ["Skip ahead (8x)", "ff"]], "watch" if watch else "ff",
+		"Watch the actual AI fight with 1x–4x playback, or skip ahead at 8x. You can switch back to the same live fight at any time.", _set_watch)
 	_option(c, "keep", "When a run ends", [["Deal another card", "yes"], ["Stop", "no"]], "yes" if keep_going else "no",
 		"Keep the table running card after card, or stop after one.", _set_keep)
 	c.add_child(UiTheme.spacer(false, 2))
@@ -427,7 +434,7 @@ func _controls() -> Control:
 			var go := CampaignUI.button("MAKE YOUR CALL", _open_decision, 24, CampaignUI.GOOD)
 			row.add_child(go)
 			_focusables.append(go)
-		var wt := CampaignUI.button("FAST-FORWARD FIGHTS" if (bflow and bflow.watching) else "WATCH FIGHTS", _toggle_watch, 22)
+		var wt := CampaignUI.button("SKIP AHEAD (8x)" if (bflow and bflow.watching) else "WATCH FIGHTS", _toggle_watch, 22)
 		row.add_child(wt)
 		_focusables.append(wt)
 		var st := CampaignUI.button("STOP THE TABLE", _confirm_stop, 22, CampaignUI.DANGER)
@@ -459,6 +466,7 @@ func _set_speed(k: float) -> void:
 
 func _cycle_camera() -> void:
 	var i := BookieTable.CAMERAS.find(table.camera)
+	_camera_controls = false
 	table.set_camera(str(BookieTable.CAMERAS[(i + 1) % BookieTable.CAMERAS.size()]))
 	_refresh()
 
@@ -473,7 +481,9 @@ func _toggle_take_over() -> void:
 
 func _toggle_watch() -> void:
 	if bflow:
-		bflow.watching = not bflow.watching
+		bflow.set_watching(not bflow.watching)
+		if table.in_fight:
+			return
 	_refresh()
 
 
@@ -532,6 +542,16 @@ func _leave() -> void:
 
 func _build_overlay() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var flying := table != null and table.camera == "free" and not _camera_controls
+	set_meta("free_camera_input", flying)
+	if flying:
+		_camera_focus = Control.new()
+		_camera_focus.focus_mode = Control.FOCUS_ALL
+		_camera_focus.set_meta("owns_sticks", true)
+		_camera_focus.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_camera_focus)
+		for direction in ["left", "right", "top", "bottom"]:
+			_camera_focus.set("focus_neighbor_" + direction, NodePath("."))
 	var anchor := MarginContainer.new()
 	anchor.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	anchor.offset_top = -BookieFlow.OVERLAY_BAR_H
@@ -539,14 +559,22 @@ func _build_overlay() -> void:
 	add_child(anchor)
 	var bar := CampaignUI.panel(Color(CampaignUI.BG, 0.88))
 	anchor.add_child(bar)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	bar.add_child(row)
+	var contents := VBoxContainer.new()
+	bar.add_child(contents)
 	var name_s := str(table.current_fight.get("name", "")) if table else ""
 	var title_l := CampaignUI.label("THE BOOKIE'S TABLE · %s%s" % [name_s, " · PAUSED" if table and table.paused else ""], 22, CampaignUI.ACCENT, "900")
 	title_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_l.autowrap_mode = TextServer.AUTOWRAP_OFF
-	row.add_child(title_l)
+	title_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if table and table.camera == "free":
+		title_l.text += " · View / Tab: %s" % ("controls" if flying else "fly camera")
+		if flying:
+			title_l.text += " · LS / WASD: fly · RS / right-drag: look · A / Space: rise · LT / Shift: descend"
+	contents.add_child(title_l)
+	var row := HFlowContainer.new()
+	row.focus_behavior_recursive = Control.FOCUS_BEHAVIOR_DISABLED if flying else Control.FOCUS_BEHAVIOR_INHERITED
+	row.add_theme_constant_override("h_separation", 10)
+	row.add_theme_constant_override("v_separation", 8)
+	contents.add_child(row)
 	if table == null:
 		return
 	var pz := CampaignUI.button("RESUME" if table.paused else "PAUSE", _toggle_pause, 20)
@@ -561,6 +589,14 @@ func _build_overlay() -> void:
 	cm.tooltip_text = "Broadcast framing, the director's cuts between the fighters, or a free camera (stick / WASD moves it)."
 	row.add_child(cm)
 	_focusables.append(cm)
+	if table.camera == "free":
+		var fly := CampaignUI.button("CONTROLS" if flying else "FLY CAMERA", _toggle_camera_controls, 20)
+		row.add_child(fly)
+		_focusables.append(fly)
+	var skip := CampaignUI.button("SKIP AHEAD", _toggle_watch, 20)
+	skip.tooltip_text = "Hide the fight and advance at 8x. WATCH FIGHTS returns to this same bout."
+	row.add_child(skip)
+	_focusables.append(skip)
 	var tk := CampaignUI.button("HAND BACK" if not table.unattended else "TAKE OVER", _toggle_take_over, 20)
 	tk.tooltip_text = "Take over the decisions from the next decision point (the AI keeps fighting)."
 	row.add_child(tk)
@@ -584,4 +620,28 @@ func on_back() -> bool:
 
 
 func default_focus() -> Control:
+	if _camera_focus != null:
+		return _camera_focus
 	return CampaignUI.first_enabled(_focusables)
+
+
+func _toggle_camera_controls() -> void:
+	_camera_controls = not _camera_controls
+	_refresh()
+	var target := default_focus()
+	if target:
+		target.call_deferred("grab_focus")
+
+
+func _input(event: InputEvent) -> void:
+	if not is_top() or not overlay or table == null or table.camera != "free":
+		return
+	var toggle: bool = (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_BACK) \
+		or (event is InputEventKey and event.pressed and not event.echo and (event.keycode == KEY_TAB or event.physical_keycode == KEY_TAB))
+	if toggle:
+		_toggle_camera_controls()
+		get_viewport().set_input_as_handled()
+	elif not _camera_controls and (event is InputEventJoypadMotion or event.is_action("ui_accept") \
+		or event.is_action("ui_left") or event.is_action("ui_right") or event.is_action("ui_up") or event.is_action("ui_down")):
+		# Polling still sees the sticks/buttons; UI navigation must not see camera movement.
+		get_viewport().set_input_as_handled()

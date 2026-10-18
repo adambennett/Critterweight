@@ -222,7 +222,7 @@ func update_hud(dt: float, mode: HubMode, state: HubState) -> void:
 				flash_go()
 		"drill":
 			var d := mode.drill
-			_act_title.text = "CHUM CANNON DRILL"
+			_act_title.text = "CHUM CANNON · " + str(HubChumDrill.DIFFICULTIES[d.difficulty]["name"]).to_upper()
 			_act_time.text = "%.1f" % d.time_left()
 			_act_score.text = "STREAK %d" % d.streak
 			_act_extra.text = "Drill HP %d   ·   best %d" % [d.drill_hp, d.best_streak]
@@ -235,7 +235,7 @@ func update_hud(dt: float, mode: HubMode, state: HubState) -> void:
 			_act_title.text = "CRATE TOSS"
 			_act_time.text = "%d CRATES LEFT" % ct.crates_left()
 			_act_score.text = "%d PTS" % ct.points
-			_act_extra.text = "30 · 60 · 100 for Clout"
+			_act_extra.text = ct.target_text()
 	if act == "" and _count.visible and _count.text != "GO!":
 		_count.visible = false
 	# banner / subtitle timers

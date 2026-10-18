@@ -22,6 +22,14 @@ var throws: Array = []         ## [{crate, dist, ring, points, foul}]
 var cfg := {}
 var result := {}
 var _pending := {}             ## crate index -> true (thrown this session, not landed yet)
+var _used := {}
+var combo := 0
+
+func called_ring() -> int:
+	return thrown % HubLayout.CRATE_RINGS.size()
+
+func target_text() -> String:
+	return "AIM: %d m · called ring +25 · streak %d" % [int(HubLayout.CRATE_RINGS[called_ring()]["dist"]), combo]
 
 
 func _init(m) -> void:
@@ -41,6 +49,8 @@ func start() -> void:
 	landed = 0
 	throws.clear()
 	_pending.clear()
+	_used.clear()
+	combo = 0
 	result = {}
 	mode.reset_crates()
 	mode.emit_hub({"type": "hub_activity", "activity": "crates", "phase": "start", "crates": crates_total()})
@@ -71,11 +81,13 @@ func tick(dt: float) -> void:
 
 ## A crate left the fighter's hands (HubMode calls this for every crate throw during a session).
 func on_throw(crate_index: int, from: Vector3) -> void:
-	if phase != "running" or thrown >= crates_total():
+	if phase != "running" or thrown >= crates_total() or _used.has(crate_index):
 		return
+	var target := called_ring()
+	_used[crate_index] = true
 	thrown += 1
 	var foul := from.z < HubLayout.CRATE_LINE_Z - 0.35
-	_pending[crate_index] = {"foul": foul, "from": from}
+	_pending[crate_index] = {"foul": foul, "from": from, "target": target}
 	if foul:
 		mode.emit_hub({"type": "hub_score", "activity": "crates", "points": 0, "pos": from + Vector3.UP, "label": "FOUL: THROW FROM BEHIND THE LINE"})
 
@@ -97,11 +109,17 @@ func on_land(crate_index: int, pos: Vector3, in_water: bool) -> void:
 			if Vector2(pos.x, pos.z).distance_to(c) <= float(rd["r"]) + HubWorld.CRATE_SIZE * 0.35:
 				ring = i
 				pts = int(rd["points"])
+	var called := ring >= 0 and ring == int(info["target"])
+	combo = combo + 1 if called else 0
+	if called:
+		pts += 25 + mini(combo - 1, 4) * 5
 	points += pts
 	var from: Vector3 = info["from"]
 	var dist := Vector2(pos.x - from.x, pos.z - from.z).length()
 	throws.append({"crate": crate_index, "dist": snappedf(dist, 0.01), "ring": ring, "points": pts, "foul": bool(info["foul"]), "water": in_water})
 	var label := "SPLASH" if in_water else ("%d m RING" % int(HubLayout.CRATE_RINGS[ring]["dist"]) if ring >= 0 else "MISS")
+	if called:
+		label += " · CALLED SHOT x%d" % combo
 	mode.emit_hub({"type": "hub_score", "activity": "crates", "points": pts, "pos": pos + Vector3.UP * 0.6, "label": label, "total": points})
 
 
@@ -109,6 +127,8 @@ func cancel() -> void:
 	if running():
 		phase = "done"
 		result = {"points": points, "cancelled": true}
+		_pending.clear()
+		mode.reset_crates()
 		mode.emit_hub({"type": "hub_activity", "activity": "crates", "phase": "cancel"})
 
 
@@ -124,4 +144,6 @@ func finish(reason: String) -> void:
 		mode.state.set_flag("pier_hint", true)
 	result = {"points": points, "thrown": thrown, "throws": throws.duplicate(true), "reason": reason, "tier": int(rew["tier"]),
 		"new_tier": int(rew["tier"]) > int(rew["previous"]), "clout": int(rew["clout"]), "jitters_hint": jitters_hint}
+	_pending.clear()
+	mode.reset_crates()
 	mode.emit_hub({"type": "hub_activity", "activity": "crates", "phase": "end", "result": result})

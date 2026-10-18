@@ -120,16 +120,42 @@ func _update(dt: float, instant: bool) -> void:
 
 
 func _free_cam(dt: float) -> void:
+	var top := App.top_screen()
+	if top != null and not bool(top.get_meta("free_camera_input", false)):
+		return
 	var mv := Controls.move_vector()
 	free_yaw -= Controls.camera_axis() * dt * 1.8
+	var ry := 0.0
+	for dev in Input.get_connected_joypads():
+		var value := Input.get_joy_axis(dev, JOY_AXIS_RIGHT_Y)
+		if absf(value) > absf(ry):
+			ry = value
+	if absf(ry) > 0.2:
+		free_pitch = clampf(free_pitch - ry * dt * 1.6, -1.45, 1.45)
 	var basis_y := Basis(Vector3.UP, free_yaw)
 	free_pos += basis_y * Vector3(mv.x, 0, -mv.y) * dt * 6.0
 	if Input.is_action_pressed("guard"):
 		free_pos.y -= dt * 3.0
 	if Input.is_action_pressed("dodge"):
 		free_pos.y += dt * 3.0
-	free_pos.y = clampf(free_pos.y, 0.5, 14.0)
+	free_pos.y = clampf(free_pos.y, 0.3, 30.0)
 	global_transform = Transform3D(basis_y * Basis(Vector3.RIGHT, free_pitch), free_pos)
+
+
+func enter_free() -> void:
+	free_pos = global_position
+	free_yaw = global_rotation.y
+	free_pitch = clampf(global_rotation.x, -1.45, 1.45)
+	mode = Mode.FREE
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	var top := App.top_screen()
+	if mode != Mode.FREE or (top != null and not bool(top.get_meta("free_camera_input", false))):
+		return
+	if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		free_yaw -= event.relative.x * 0.004
+		free_pitch = clampf(free_pitch - event.relative.y * 0.004, -1.45, 1.45)
 
 
 ## Ground-plane basis used to convert the movement stick into a world direction.

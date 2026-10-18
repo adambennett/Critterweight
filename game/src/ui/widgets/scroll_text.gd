@@ -45,16 +45,6 @@ func _notification(what: int) -> void:
 		add_theme_stylebox_override("panel", UiTheme.style("scroll_text"))
 
 
-func _process(dt: float) -> void:
-	if not has_focus():
-		return
-	var ry := 0.0
-	for d in Input.get_connected_joypads():
-		ry += Input.get_joy_axis(d, JOY_AXIS_RIGHT_Y)
-	if absf(ry) > 0.25:
-		scroll.scroll_vertical += int(ry * 1400.0 * dt)
-
-
 func scroll_by(amount: float) -> void:
 	scroll.scroll_vertical = int(clampf(scroll.scroll_vertical + amount, 0.0, maxf(0.0, rich.size.y - scroll.size.y)))
 

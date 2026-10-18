@@ -47,6 +47,8 @@ powershell -ExecutionPolicy Bypass -File tools/build/release.ps1 -Version 0.9.4 
 creates the annotated tag, builds all four packages (`package.ps1 -Archive`), smoke-tests the packaged
 game (script check + boot to the title screen), writes `SHA256SUMS.txt`, pushes the tag and creates the
 GitHub release with the assets (`gh`). `-DryRun` does everything except pushing and publishing.
+Use `-TestFilter test_playtest` to require the rendered playtest regressions to pass in the exported
+Windows game before publication. Every required game/server archive must exist; missing assets abort the release.
 
 ### Alt builds (side-by-side comparisons)
 
@@ -77,6 +79,7 @@ and 0.9.10 ships it. `alt/creature-art` is retired.
 
 | Version | Tag | Date | Notes |
 |---|---|---|---|
+| 0.9.12 (preview, playtest fixes) | [v0.9.12](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.12) | 2026-10-17 | Campaign progression/resume, controller scrolling/focus, Compendium, visible Bookie fights/free camera, Cannery activities, editor/settings and ambience fixes (D-042); source suite 710 passed / 1 graphical-only skip / 0 failed; Windows preflight 20/20 rendered regressions; [verification and limits](evidence/verification/v0.9.12/README.md) |
 | 0.9.11 (preview, playtest build) | [v0.9.11](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.11) -> 1024039 | 2026-10-17 | Combat feel (D-035): hit pause, camera punch, body jolt, lingering health chunk; walls and crowd between camera and fighters fade or shrink; suite 691/691 |
 | 0.9.10 (preview, playtest build) | [v0.9.10](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.10) -> fa0725f | 2026-10-17 | The new creature art: PR #1 merged (D-041), twelve Blender-modelled combat creatures, credits; suite 685/685; packaged boot to the title in 4.4 s |
 | 0.9.9-alt.1 (**alt build**, comparison) | [v0.9.9-alt.1](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.9-alt.1) -> 19d029a on `alt/creature-art` | 2026-10-17 | 0.9.9 plus the creature art revamp (PR #1) and its credits; suite 685/685 |

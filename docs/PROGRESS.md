@@ -1,6 +1,15 @@
 # Progress
 
-## Status (2026-10-17) — paused for the playtest week at v0.9.11 (combat feel)
+## Status (2026-10-17) — v0.9.12 playtest fixes
+
+The owner requested fixes for the v0.9.11 playtest and a new v0.9.12 preview. Campaign flow ownership,
+controller navigation/scrolling, menu/editor layout, visible autobattler fights, free spectating,
+Compendium, profile naming, Cannery challenges, settings and the ambience buzz are addressed. See
+[release notes](releases/v0.9.12.md) and the [issue-by-issue verification record](evidence/verification/v0.9.12/README.md).
+The source suite passed 710 tests with one graphical-only skip and no failures; all 20 playtest regressions
+passed in the exported Windows preflight. The report records the full-suite-only shutdown warning and
+the remaining physical-controller, subjective-audio and Linux gameplay validation limits.
+The larger release-candidate backlog below remains separate from this patch release.
 
 **Combat feel (0.9.11, D-035).** Hits now pause the match, punch the camera, jolt the struck body and stay lit on the health bar; walls and crowd figures between the camera and the fighters fade or shrink away. Mashed attacks still miss often (15-41 % land against the regular bot); attack magnetism is a separate, measured change for later.
 
@@ -26,7 +35,9 @@ branch `audio/ableton-revamp`, and ends in a draft pull request. It changes only
 (`game/assets/audio`, `tools/audio`, `game/src/audio`, the audio tests and docs). Decision number
 **D-040** is reserved for its audio decision, which supersedes D-013 for the replaced assets. The pull
 request is merged into `main` only after the user approves it by listening, followed by a green full
-suite. Don't edit audio files on `main` meanwhile.
+suite. The v0.9.12 request explicitly authorizes the targeted buzz/crossfade repair on `main` and
+stock-audio research. That repair does not merge or overwrite the isolated Ableton experiment. Its
+broader adoption still requires the owner's listening decision. See [the audio inventory and shortlist](audio/REPLACEMENT_GUIDE.md).
 
 **Creature art revamp: adopted (2026-10-17).** A second Astra agent rebuilt the twelve combat creatures in
 Blender (PR #1, branch `art/creature-revamp`). It changed only the models, their sources and view-side code,

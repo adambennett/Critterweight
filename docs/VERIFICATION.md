@@ -1,6 +1,7 @@
 # Verification report
 
-**Current build: preview 0.9.9 (tag `v0.9.9` → `eecaa39`), 2026-10-17.** This is a preview, not the
+**Preview 0.9.12, 2026-10-17.** The [v0.9.12 playtest report](evidence/verification/v0.9.12/README.md)
+records the 24 reported issues, new regression tests and native Windows captures. This is a preview, not the
 release candidate. The release-candidate run, the whole-brief audit (VER-07) and the open items in
 `docs/PROGRESS.md` are still to do. This report records what has been verified so far, how, on which
 build, and where the evidence is. It leaves out what has not been verified. Requirement-level states live
@@ -16,6 +17,7 @@ dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`
 
 | Version | Commit | Source suite before release | Packaged checks |
 |---|---|---|---|
+| 0.9.12 | tag `v0.9.12` | 711 run: 710 passed, 0 failed, 1 graphical-only skip; full-suite shutdown warning documented in the linked report | Windows preflight: 391 scripts, 20/20 rendered playtest regressions, no shutdown warnings; clean tagged exports repeat these gates before publication |
 | 0.9.9 | eecaa39 | 684 / 685 (the one failure was the cross-drive lab-test check, fixed and re-run green) | release smoke: script check, packaged boot to the title |
 | 0.9.8 | 57613cc | 685 / 685 passed (2026-10-16) | release smoke: script check, packaged boot to the title |
 | 0.9.7 | 9e9d93c | 684 / 684 passed (2026-10-16) | release smoke: script check, packaged boot to the title |
@@ -42,7 +44,9 @@ below-normal priority, one full run at a time on the machine. It covers:
 About 38 minutes. A release needs a green run of the exact commit.
 
 **2. Release smoke:** `tools/build/release.ps1`. On the packaged game it runs a script check and a boot to
-the title screen before anything is published.
+the title screen before anything is published. `-TestFilter` additionally runs matching tests with the
+native Windows renderer and requires a nonempty result with no failures, skips or engine/script errors.
+The v0.9.12 release uses `-TestFilter test_playtest` for the 20 playtest regressions.
 
 **3. Full packaged verification:** `tools/verify/run_verification.ps1`, on the packages `release.ps1`
 built. Its steps:

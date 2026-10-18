@@ -5353,9 +5353,9 @@
    "channels": 1,
    "bytes": 308744,
    "peak_db": -1,
-   "rms_db": -10.49,
-   "sha256": "a06aad3d85abb35cf062fa75ee1d1fe733476b330d083624b847e2a43e7e6ebd",
-   "lufs": -13.83,
+   "rms_db": -15.2,
+   "sha256": "c9d392b147d1d7ae5f91e66fb28d9b009ea5594bf836264f47d5a689bd591af5",
+   "lufs": -15.57,
    "loop": {
     "begin": 0,
     "end": 154350
@@ -5381,9 +5381,9 @@
    "channels": 1,
    "bytes": 308744,
    "peak_db": -1,
-   "rms_db": -17.98,
-   "sha256": "adac402cf13c531a325b3b06c88234019da6ed57b56a14c8034c87254a390021",
-   "lufs": -18.2,
+   "rms_db": -16.38,
+   "sha256": "41f44f6a9c3292d8529082a47dc362d5c228cafaa3291e9b7295dc2b91be8ce4",
+   "lufs": -14.07,
    "loop": {
     "begin": 0,
     "end": 154350
@@ -5395,9 +5395,9 @@
    "channels": 1,
    "bytes": 308744,
    "peak_db": -1,
-   "rms_db": -15.57,
-   "sha256": "0e84702efe93cfd4c91d51062a4f5a8209c7fb740c6bf8de93d8ffdbf5ba802b",
-   "lufs": -16.36,
+   "rms_db": -16.05,
+   "sha256": "8543afebc6008f52df2a5945cd55fdae5aebcd663868dd745eaeeb1ce5e142ef",
+   "lufs": -16.84,
    "loop": {
     "begin": 0,
     "end": 154350
@@ -5409,26 +5409,26 @@
    "channels": 1,
    "bytes": 308744,
    "peak_db": -1,
-   "rms_db": -8.46,
-   "sha256": "d2afc525e4cb3dbe55d238770f0f397099a25e97b0928be7b726017cddec8764",
-   "lufs": -12.24,
+   "rms_db": -18.71,
+   "sha256": "03ed11c8494577be6fdbb0c327a5d118db42a6f4ed99623569995d2fc057cd0a",
+   "lufs": -19.06,
    "loop": {
     "begin": 0,
     "end": 154350
    }
   },
   "ambience/amb_hub_juice_bar.wav": {
-   "seconds": 7,
+   "seconds": 6.057,
    "sr": 22050,
    "channels": 1,
-   "bytes": 308744,
+   "bytes": 267162,
    "peak_db": -1,
-   "rms_db": -8.57,
-   "sha256": "ce27a302ea8a8d331ceff3f6e230bd4496b96fa3efd3e55d9a5939e1ca0cc85a",
-   "lufs": -11.98,
+   "rms_db": -18.3,
+   "sha256": "c98d82339dfd720cfc2f8d283c974b062f5fa08b7063b8af7ce39e6110429b21",
+   "lufs": -11.1,
    "loop": {
     "begin": 0,
-    "end": 154350
+    "end": 133559
    }
   },
   "ambience/amb_hub_dock.wav": {
@@ -5451,9 +5451,9 @@
    "channels": 1,
    "bytes": 308744,
    "peak_db": -1,
-   "rms_db": -20.17,
-   "sha256": "33acf7d0706f79e5460563bc1c37247029389e4cd51241948ce50ee83e46d94a",
-   "lufs": -20.44,
+   "rms_db": -21.17,
+   "sha256": "b099d01cdb5ebad03f30eecd7fa7c7a343f8babb1347e5ac92fdae373f1da024",
+   "lufs": -21.1,
    "loop": {
     "begin": 0,
     "end": 154350
@@ -5465,9 +5465,9 @@
    "channels": 1,
    "bytes": 308744,
    "peak_db": -1,
-   "rms_db": -13.99,
-   "sha256": "86b79aaadc19f4b793d29ea0dca82ada0015a340bb47d86d9fd8e92937da258a",
-   "lufs": -20.28,
+   "rms_db": -14.14,
+   "sha256": "a0103a9742b91e287880c8f775a22227236325e5a9b85855bde4ba88024ace47",
+   "lufs": -22.44,
    "loop": {
     "begin": 0,
     "end": 154350
@@ -5493,9 +5493,9 @@
    "channels": 1,
    "bytes": 308744,
    "peak_db": -1,
-   "rms_db": -13.94,
-   "sha256": "5ae105719351444ac512346aa4bfb046f3603d7b7e24dc32de27a884edf49f95",
-   "lufs": -15.27,
+   "rms_db": -14.86,
+   "sha256": "c887fd510c28b1210991c1c1a8fd15e27a5de687e124c3be103793149ed6b685",
+   "lufs": -15.33,
    "loop": {
     "begin": 0,
     "end": 154350
@@ -6233,6 +6233,103 @@
    }
   }
  },
+ "voices": {
+  "barnaby": {
+   "speaker": "barnaby",
+   "f0": 150,
+   "rate": 11,
+   "pouch": 460,
+   "honk": 1.9,
+   "brightness": 1,
+   "nasal": 0.15,
+   "jitter": 0.025,
+   "growl": 0.12,
+   "grainMs": [
+    70,
+    105
+   ],
+   "consMs": 32,
+   "contour": "auction",
+   "capsGain": 1.4,
+   "capsPitch": 1.3,
+   "fanfare": true,
+   "breath": 0.08,
+   "sr": 22050,
+   "grains": {
+    "v_a_0": "res://assets/audio/announcer/barnaby/v_a_0.wav",
+    "v_a_1": "res://assets/audio/announcer/barnaby/v_a_1.wav",
+    "v_e_0": "res://assets/audio/announcer/barnaby/v_e_0.wav",
+    "v_e_1": "res://assets/audio/announcer/barnaby/v_e_1.wav",
+    "v_i_0": "res://assets/audio/announcer/barnaby/v_i_0.wav",
+    "v_i_1": "res://assets/audio/announcer/barnaby/v_i_1.wav",
+    "v_o_0": "res://assets/audio/announcer/barnaby/v_o_0.wav",
+    "v_o_1": "res://assets/audio/announcer/barnaby/v_o_1.wav",
+    "v_u_0": "res://assets/audio/announcer/barnaby/v_u_0.wav",
+    "v_u_1": "res://assets/audio/announcer/barnaby/v_u_1.wav",
+    "c_plosive_0": "res://assets/audio/announcer/barnaby/c_plosive_0.wav",
+    "c_plosive_1": "res://assets/audio/announcer/barnaby/c_plosive_1.wav",
+    "c_sibilant_0": "res://assets/audio/announcer/barnaby/c_sibilant_0.wav",
+    "c_sibilant_1": "res://assets/audio/announcer/barnaby/c_sibilant_1.wav",
+    "c_sh_0": "res://assets/audio/announcer/barnaby/c_sh_0.wav",
+    "c_sh_1": "res://assets/audio/announcer/barnaby/c_sh_1.wav",
+    "c_fric_0": "res://assets/audio/announcer/barnaby/c_fric_0.wav",
+    "c_fric_1": "res://assets/audio/announcer/barnaby/c_fric_1.wav",
+    "c_nasal_0": "res://assets/audio/announcer/barnaby/c_nasal_0.wav",
+    "c_nasal_1": "res://assets/audio/announcer/barnaby/c_nasal_1.wav",
+    "c_liquid_0": "res://assets/audio/announcer/barnaby/c_liquid_0.wav",
+    "c_liquid_1": "res://assets/audio/announcer/barnaby/c_liquid_1.wav",
+    "fanfare": "res://assets/audio/announcer/barnaby/fanfare.wav"
+   }
+  },
+  "granny": {
+   "speaker": "granny",
+   "f0": 128,
+   "rate": 7,
+   "pouch": 260,
+   "honk": 1.1,
+   "brightness": 0.75,
+   "nasal": 0.45,
+   "jitter": 0.045,
+   "growl": 0,
+   "grainMs": [
+    100,
+    135
+   ],
+   "consMs": 40,
+   "contour": "flat",
+   "capsGain": 1,
+   "capsPitch": 1.08,
+   "fanfare": false,
+   "breath": 0.14,
+   "creak": 0.3,
+   "sr": 22050,
+   "grains": {
+    "v_a_0": "res://assets/audio/announcer/granny/v_a_0.wav",
+    "v_a_1": "res://assets/audio/announcer/granny/v_a_1.wav",
+    "v_e_0": "res://assets/audio/announcer/granny/v_e_0.wav",
+    "v_e_1": "res://assets/audio/announcer/granny/v_e_1.wav",
+    "v_i_0": "res://assets/audio/announcer/granny/v_i_0.wav",
+    "v_i_1": "res://assets/audio/announcer/granny/v_i_1.wav",
+    "v_o_0": "res://assets/audio/announcer/granny/v_o_0.wav",
+    "v_o_1": "res://assets/audio/announcer/granny/v_o_1.wav",
+    "v_u_0": "res://assets/audio/announcer/granny/v_u_0.wav",
+    "v_u_1": "res://assets/audio/announcer/granny/v_u_1.wav",
+    "c_plosive_0": "res://assets/audio/announcer/granny/c_plosive_0.wav",
+    "c_plosive_1": "res://assets/audio/announcer/granny/c_plosive_1.wav",
+    "c_sibilant_0": "res://assets/audio/announcer/granny/c_sibilant_0.wav",
+    "c_sibilant_1": "res://assets/audio/announcer/granny/c_sibilant_1.wav",
+    "c_sh_0": "res://assets/audio/announcer/granny/c_sh_0.wav",
+    "c_sh_1": "res://assets/audio/announcer/granny/c_sh_1.wav",
+    "c_fric_0": "res://assets/audio/announcer/granny/c_fric_0.wav",
+    "c_fric_1": "res://assets/audio/announcer/granny/c_fric_1.wav",
+    "c_nasal_0": "res://assets/audio/announcer/granny/c_nasal_0.wav",
+    "c_nasal_1": "res://assets/audio/announcer/granny/c_nasal_1.wav",
+    "c_liquid_0": "res://assets/audio/announcer/granny/c_liquid_0.wav",
+    "c_liquid_1": "res://assets/audio/announcer/granny/c_liquid_1.wav",
+    "eh": "res://assets/audio/announcer/granny/eh.wav"
+   }
+  }
+ },
  "music": {
   "fight_night_poster": {
    "file": "res://assets/audio/music/fight_night_poster.wav",
@@ -6652,102 +6749,5 @@
    "stinger": false
   }
  },
- "voices": {
-  "barnaby": {
-   "speaker": "barnaby",
-   "f0": 150,
-   "rate": 11,
-   "pouch": 460,
-   "honk": 1.9,
-   "brightness": 1,
-   "nasal": 0.15,
-   "jitter": 0.025,
-   "growl": 0.12,
-   "grainMs": [
-    70,
-    105
-   ],
-   "consMs": 32,
-   "contour": "auction",
-   "capsGain": 1.4,
-   "capsPitch": 1.3,
-   "fanfare": true,
-   "breath": 0.08,
-   "sr": 22050,
-   "grains": {
-    "v_a_0": "res://assets/audio/announcer/barnaby/v_a_0.wav",
-    "v_a_1": "res://assets/audio/announcer/barnaby/v_a_1.wav",
-    "v_e_0": "res://assets/audio/announcer/barnaby/v_e_0.wav",
-    "v_e_1": "res://assets/audio/announcer/barnaby/v_e_1.wav",
-    "v_i_0": "res://assets/audio/announcer/barnaby/v_i_0.wav",
-    "v_i_1": "res://assets/audio/announcer/barnaby/v_i_1.wav",
-    "v_o_0": "res://assets/audio/announcer/barnaby/v_o_0.wav",
-    "v_o_1": "res://assets/audio/announcer/barnaby/v_o_1.wav",
-    "v_u_0": "res://assets/audio/announcer/barnaby/v_u_0.wav",
-    "v_u_1": "res://assets/audio/announcer/barnaby/v_u_1.wav",
-    "c_plosive_0": "res://assets/audio/announcer/barnaby/c_plosive_0.wav",
-    "c_plosive_1": "res://assets/audio/announcer/barnaby/c_plosive_1.wav",
-    "c_sibilant_0": "res://assets/audio/announcer/barnaby/c_sibilant_0.wav",
-    "c_sibilant_1": "res://assets/audio/announcer/barnaby/c_sibilant_1.wav",
-    "c_sh_0": "res://assets/audio/announcer/barnaby/c_sh_0.wav",
-    "c_sh_1": "res://assets/audio/announcer/barnaby/c_sh_1.wav",
-    "c_fric_0": "res://assets/audio/announcer/barnaby/c_fric_0.wav",
-    "c_fric_1": "res://assets/audio/announcer/barnaby/c_fric_1.wav",
-    "c_nasal_0": "res://assets/audio/announcer/barnaby/c_nasal_0.wav",
-    "c_nasal_1": "res://assets/audio/announcer/barnaby/c_nasal_1.wav",
-    "c_liquid_0": "res://assets/audio/announcer/barnaby/c_liquid_0.wav",
-    "c_liquid_1": "res://assets/audio/announcer/barnaby/c_liquid_1.wav",
-    "fanfare": "res://assets/audio/announcer/barnaby/fanfare.wav"
-   }
-  },
-  "granny": {
-   "speaker": "granny",
-   "f0": 128,
-   "rate": 7,
-   "pouch": 260,
-   "honk": 1.1,
-   "brightness": 0.75,
-   "nasal": 0.45,
-   "jitter": 0.045,
-   "growl": 0,
-   "grainMs": [
-    100,
-    135
-   ],
-   "consMs": 40,
-   "contour": "flat",
-   "capsGain": 1,
-   "capsPitch": 1.08,
-   "fanfare": false,
-   "breath": 0.14,
-   "creak": 0.3,
-   "sr": 22050,
-   "grains": {
-    "v_a_0": "res://assets/audio/announcer/granny/v_a_0.wav",
-    "v_a_1": "res://assets/audio/announcer/granny/v_a_1.wav",
-    "v_e_0": "res://assets/audio/announcer/granny/v_e_0.wav",
-    "v_e_1": "res://assets/audio/announcer/granny/v_e_1.wav",
-    "v_i_0": "res://assets/audio/announcer/granny/v_i_0.wav",
-    "v_i_1": "res://assets/audio/announcer/granny/v_i_1.wav",
-    "v_o_0": "res://assets/audio/announcer/granny/v_o_0.wav",
-    "v_o_1": "res://assets/audio/announcer/granny/v_o_1.wav",
-    "v_u_0": "res://assets/audio/announcer/granny/v_u_0.wav",
-    "v_u_1": "res://assets/audio/announcer/granny/v_u_1.wav",
-    "c_plosive_0": "res://assets/audio/announcer/granny/c_plosive_0.wav",
-    "c_plosive_1": "res://assets/audio/announcer/granny/c_plosive_1.wav",
-    "c_sibilant_0": "res://assets/audio/announcer/granny/c_sibilant_0.wav",
-    "c_sibilant_1": "res://assets/audio/announcer/granny/c_sibilant_1.wav",
-    "c_sh_0": "res://assets/audio/announcer/granny/c_sh_0.wav",
-    "c_sh_1": "res://assets/audio/announcer/granny/c_sh_1.wav",
-    "c_fric_0": "res://assets/audio/announcer/granny/c_fric_0.wav",
-    "c_fric_1": "res://assets/audio/announcer/granny/c_fric_1.wav",
-    "c_nasal_0": "res://assets/audio/announcer/granny/c_nasal_0.wav",
-    "c_nasal_1": "res://assets/audio/announcer/granny/c_nasal_1.wav",
-    "c_liquid_0": "res://assets/audio/announcer/granny/c_liquid_0.wav",
-    "c_liquid_1": "res://assets/audio/announcer/granny/c_liquid_1.wav",
-    "eh": "res://assets/audio/announcer/granny/eh.wav"
-   }
-  }
- },
- "bytes": 135125208
+ "bytes": 135083626
 }

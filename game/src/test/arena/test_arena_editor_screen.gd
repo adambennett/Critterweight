@@ -191,6 +191,7 @@ func test_layout_fits_and_text_is_readable() -> void:
 		var px_per_du := get_viewport().get_final_transform().get_scale().y
 		var tag := "%dx%d" % [res.x, res.y]
 		var bars: Array = scr.find_children("*", "PromptBar", true, false)
+		bars.append_array(scr.find_children("*", "FlowPromptBar", true, false))
 		check(bars.size() >= 1, "%s: the editor has a prompt bar" % tag)
 		for b in bars:
 			var r := (b as Control).get_global_rect()
