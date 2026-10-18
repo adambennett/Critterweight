@@ -117,12 +117,8 @@ func test_menu_starts_a_run_and_shows_the_map() -> void:
 	await wait_frames(2)
 	check_eq(top().screen_name, "run_map", "START RUN opens the run map")
 	await wait_frames(2)
-	# act intro modal first; Back closes it
-	check(CampaignUI.has_modal(top()), "act intro card shown at the start of Act 1")
-	App.back()
-	await wait_frames(2)
-	check(not CampaignUI.has_modal(top()), "Back closes the modal")
-	check_eq(top().screen_name, "run_map", "and stays on the map")
+	check(not CampaignUI.has_modal(top()), "new run starts on the map without an act-intro popup")
+	check_eq(top().screen_name, "run_map", "new run is ready for an intentional route choice")
 
 
 func test_controller_walks_the_map_and_screens_to_the_summary() -> void:

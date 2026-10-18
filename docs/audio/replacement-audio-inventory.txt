@@ -9,13 +9,13 @@ assets/audio/replacements/crowd/crowd-applause.wav
   6905324 bytes | SHA-256 0d3bfde5a050f3c5e6685bd7f1efc7ab1d289fbad65c88c1ce9b4691228c69c9
   Applause in a Large Hall or Church — eXpl0it3r | Creative Commons Zero (CC0 1.0)
   Source: https://opengameart.org/content/applause-in-a-large-hall-or-church
-  Bank: bank.sfx.crowd_cheer.files[0]
+  Bank: (not directly referenced)
 
 assets/audio/replacements/crowd/crowd-shouting.ogg
   335526 bytes | SHA-256 a2c23a64c127c77717cbe4abb21f138bac9d9aa6cb3cc89d62bab5d0d96dd7ca
   Crowd Shouting/Speaking Ambience — StarNinjas | Creative Commons Zero (CC0 1.0)
   Source: https://opengameart.org/content/crowd-shoutingspeaking-ambience
-  Bank: bank.sfx.crowd_murmur.files[0]
+  Bank: (not directly referenced)
 
 assets/audio/replacements/footsteps/footstep_carpet_000.ogg
   6353 bytes | SHA-256 b9524658b52a99a20590f8feefc103088637fd13ea8ec35811aee785e1f2f330

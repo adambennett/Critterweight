@@ -15,6 +15,7 @@ var _buttons: Array = []
 var _msg: Label
 var _title := ""
 var _showing := false
+var _event_id := ""
 
 
 func on_enter(p: Dictionary) -> void:
@@ -32,10 +33,12 @@ func _build() -> void:
 	ctrl = flow.ctrl
 	_showing = false
 	for c in get_children():
+		remove_child(c)
 		c.queue_free()
 	_buttons.clear()
 	var view := ctrl.event_view(flow.me)
 	var shared := flow.party_event()
+	_event_id = str(view.get("id", ctrl.session().get("event", {}).get("id", "")))
 	if view.is_empty() or (flow.is_party() and str(view.get("chosen", "")) != "" and not shared.is_empty()):
 		if not shared.is_empty() and str(shared.get("node", "")) == str(ctrl.state.get("position", "")):
 			# a party run: the event at this node was decided (maybe by someone else) - its outcome
@@ -46,11 +49,12 @@ func _build() -> void:
 			if flow.current_screen() != "event":
 				flow.show_current.call_deferred()
 			return
+	_event_id = str(view.get("id", ""))
 	_title = str(view.get("title", "Event"))
 	if str(view.get("chosen", "")) != "":
 		_show_result(ctrl.last_texts if not ctrl.last_texts.is_empty() else view.get("result", []))
 		return
-	var v := CampaignUI.scaffold(self, _title.to_upper(), "")
+	var v := _event_layout()
 	var body := CampaignUI.panel()
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var bv := VBoxContainer.new()
@@ -161,10 +165,11 @@ func _shared_texts(shared: Dictionary) -> Array:
 
 func _show_result(texts: Array) -> void:
 	for c in get_children():
+		remove_child(c)
 		c.queue_free()
 	_buttons.clear()
 	_showing = true
-	var v := CampaignUI.scaffold(self, _title.to_upper(), "")
+	var v := _event_layout()
 	var body := CampaignUI.panel()
 	var bv := VBoxContainer.new()
 	bv.add_theme_constant_override("separation", 10)
@@ -200,3 +205,34 @@ func on_back() -> bool:
 
 func default_focus() -> Control:
 	return CampaignUI.first_enabled(_buttons)
+
+
+func _event_layout() -> VBoxContainer:
+	var frame := CampaignUI.scaffold(self, "", "")
+	var art_path := "res://assets/art/events/" + _event_id + ".png"
+	if ResourceLoader.exists(art_path):
+		var art := TextureRect.new()
+		art.name = "EventArtwork"
+		art.texture = load(art_path)
+		art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(art)
+		move_child(art, frame.get_parent().get_index())
+	var columns := HBoxContainer.new()
+	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	frame.add_child(columns)
+	var left := Control.new()
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.size_flags_stretch_ratio = 0.85
+	left.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	columns.add_child(left)
+	var panel := CampaignUI.panel(Color(0.07, 0.08, 0.11, 0.94))
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	columns.add_child(panel)
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 14)
+	panel.add_child(content)
+	content.add_child(CampaignUI.label(_title.to_upper(), 44, CampaignUI.ACCENT, "900"))
+	return content

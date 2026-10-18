@@ -89,7 +89,7 @@ Codex's built-in OpenAI `image_gen` on 2026-10-16. The underlying model identifi
 Every exact prompt, output file, original PNG hash, date, tool/model disclosure and processing note is
 in [`evidence/art/concepts/prompts.json`](evidence/art/concepts/prompts.json), with usage and terms described
 in [ART_PIPELINE.md, section 8](ART_PIPELINE.md#8-generated-concept-provenance). Source PNGs are retained on B:;
-committed copies are JPEG quality 86. These are design references only; no generated raster texture ships.
+committed copies are JPEG quality 86. These creature sheets are design references only and are not shipped as model textures. The separate v0.9.15 event artwork is documented below.
 Applicable terms: https://openai.com/policies/terms-of-use/ and, where applicable to the account,
 https://openai.com/policies/services-agreement/ (checked 2026-10-16). Output rights follow the applicable
 agreement and law; output may not be unique. Designs and meshes were made for Critterweight under the
@@ -101,3 +101,37 @@ https://github.com/ahujasid/mcp-for-blender, commit `7a0373ec9199183cb460068c4f9
 The bridge and its dependencies are local tools, not shipped or embedded in committed `.blend` files.
 The bridge's optional asset/AI services and telemetry are disabled. Native MCP status reports add-on 1.8 / protocol 13. A local, non-shipping configuration stub supplies disabled telemetry because that optional module is absent from the source archive; no service credentials are present. Blender's own Python API is used by the original
 model/export helpers. No additional Blender extensions or asset libraries were used.
+
+
+## v0.9.15 event illustrations
+
+All 29 campaign-event illustrations in `game/assets/art/events/` are original project assets generated
+with Codex's built-in OpenAI image_gen tool on 2026-10-18. One image was generated per event; the tool
+did not expose its underlying model identifier. Exact prompts, file sizes and SHA-256 hashes are in
+`docs/evidence/art/events/prompts.json`. The original 1536x1024 PNGs are the shipped masters.
+No third-party reference artwork was supplied to the generator. The owner's Slay the Spire screenshot
+informed the functional arrangement of the UI, not the subject or artwork of these original scenes.
+The OpenAI account's applicable service terms govern generated outputs (the terms references in the
+concept-art section above apply); no claim of exclusive copyright or guaranteed uniqueness is made.
+
+v0.9.15 restores the original synthesized crowd_murmur and crowd_cheer bank entries. The downloaded
+CC0 crowd recordings remain in the asset inventory but are no longer wired to those entries.
+
+The new campaign route icons and Compendium trash icon are original hand-authored SVG sources.
+
+
+## v0.9.15 recorded dialogue (2026-10-18)
+
+Original Critterweight script rendered through BreezeBlue's hosted `breeze-tts-2` model using
+Devon (`voc_g53htd8kmjsj`), Kendall (`voc_j66xnnsxfeet`), and Coach Buck (`voc_b36c5rxpfuzb`).
+The owner selected these voices, confirmed their existing subscription, and authorized up to
+3,500 credits. See `docs/audio/breeze/plan.json`, `generation-ledger.jsonl`, and the final budget
+record for exact text, instructions, voice/model IDs, timestamps, raw/processed SHA-256 hashes
+and spending. Raw masters stay on B:; normalized mono PCM WAVs ship in `assets/audio/speech/`.
+Processing trims excessive silence, adds short edge fades and adjusts level without pitch changes.
+
+Terms checked 2026-10-18: https://breezeblue.ai/legal/terms (effective 2026-09-10), section 5.
+Outputs generated while a paid subscription is active may be used commercially, including
+public-library voices; permission survives subscription cancellation. The output-rights grant
+does not cover the voice models or provider technology. These are commercially usable generated
+outputs, not public-domain or CC0 assets. No voice model, API key or provider SDK ships.

@@ -45,10 +45,11 @@ const ENTRIES := [
 		"desc": "Meet every fighter, inspect their models and abilities, and learn the arenas, elements and rules."},
 	{"id": "profile", "label": "Profile", "icon": "profile", "screen": "profile", "params": {},
 		"desc": "Switch, create or rename profiles and check your record."},
-	{"id": "settings", "label": "Settings", "icon": "settings", "desc": "Settings, controls and credits.", "children": [
+	{"id": "settings", "label": "Settings", "icon": "settings", "desc": "Settings, controls, credits and patch notes.", "children": [
 		{"id": "settings", "label": "Settings", "icon": "settings", "screen": "settings", "desc": "Display, sound, controls and accessibility."},
 		{"id": "controls", "label": "Controls", "icon": "info", "screen": "controls", "desc": "Every keyboard and controller action."},
-		{"id": "credits", "label": "Credits", "icon": "credits", "screen": "credits", "desc": "Who made this, and the licences of everything we built it with."}]},
+		{"id": "credits", "label": "Credits", "icon": "credits", "screen": "credits", "desc": "Who made this, and the licences of everything we built it with."},
+		{"id": "patch_notes", "label": "Patch Notes", "icon": "info", "screen": "patch_notes", "desc": "Read every published release note, available offline."}]},
 	{"id": "quit", "label": "Quit", "icon": "quit", "action": "quit", "desc": "Hang up the gloves for tonight."},
 ]
 

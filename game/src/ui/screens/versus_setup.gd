@@ -1,8 +1,7 @@
 class_name VersusSetup
 extends Screen
 ## Local match setup for Versus, Practice and Spectate (spectate_setup.gd sets the mode).
-## One vertical list (predictable controller focus): match rows (rules preset, arena), then a group
-## per fighter (fighter pick, controller kind, team, bot skill tier, remove), then Add / Start. A
+## Match rows followed by compact fighter cards grouped into team columns, then Add / Start. A
 ## "fight card" poster on the right summarises the line-up and shows validation errors.
 ## Up to 8 fighters. Bot skill tiers come from BotTiers (the single tier -> BotBrain mapping).
 ## params: {mode: versus|practice|spectate, setup: Dictionary (restore), fighters: int (initial count)}
@@ -41,13 +40,13 @@ func on_enter(p: Dictionary) -> void:
 	body.add_child(cols)
 	var left := UiTheme.panel("PanelSolid", 18.0)
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	left.size_flags_stretch_ratio = 1.6
+	left.size_flags_stretch_ratio = 2.6
 	cols.add_child(left)
 	_scroll = FocusScroll.new(8)
 	left.add_child(_scroll)
 	var right := UiTheme.vbox(UiTheme.GAP_M)
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right.custom_minimum_size = Vector2(520, 0)
+	right.custom_minimum_size = Vector2(390, 0)
 	cols.add_child(right)
 	var poster := UiTheme.panel("PanelPoster")
 	poster.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -62,7 +61,7 @@ func on_enter(p: Dictionary) -> void:
 	ps.add_child(_poster)
 	_help = HelpPanel.new(_scroll)
 	_help.size_flags_vertical = Control.SIZE_SHRINK_END
-	_help.custom_minimum_size = Vector2(0, 190)
+	_help.custom_minimum_size = Vector2(0, 140)
 	right.add_child(_help)
 	_bar = f["prompts"]
 	_bar.set_prompts([{"actions": ["ui_accept"], "text": "Select"}, {"actions": ["ui_left", "ui_right"], "text": "Change"},
@@ -215,8 +214,32 @@ func _rebuild(focus_key := "") -> void:
 		lr.value_changed.connect(func(v) -> void: setup["look"] = str(v))
 		c.add_child(lr)
 	var sl := slots()
+	_pick_rows.resize(sl.size())
+	var columns := GridContainer.new()
+	columns.name = "TeamColumns"
+	columns.columns = 2
+	columns.add_theme_constant_override("h_separation", 18)
+	columns.add_theme_constant_override("v_separation", 18)
+	c.add_child(columns)
+	var groups: Array[VBoxContainer] = []
+	for t in (2 if is_ffa() else team_count()):
+		var group := UiTheme.vbox(8)
+		group.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		group.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		columns.add_child(group)
+		groups.append(group)
+		var heading := UiTheme.label("CORNER %d" % (t + 1) if is_ffa() else "TEAM %s" % UiTheme.team_letter(t), "Eyebrow")
+		if not is_ffa():
+			heading.add_theme_color_override("font_color", TeamColors.color(t).lightened(0.25))
+		group.add_child(heading)
 	for i in sl.size():
-		_add_slot_rows(c, i)
+		var group_index := i % 2 if is_ffa() else int(sl[i]["team"]) % team_count()
+		var card := UiTheme.panel("PanelSolid", 10.0)
+		groups[group_index].add_child(card)
+		var rows := UiTheme.vbox(4)
+		card.add_child(rows)
+		_add_slot_rows(rows, i)
+		_compact_controls(rows)
 	c.add_child(UiTheme.spacer(false, 6))
 	if sl.size() < MAX_FIGHTERS:
 		_add = UiButton.new("Add a bot" if mode != "practice" else "Add a sparring partner", "", "plus")
@@ -232,10 +255,15 @@ func _rebuild(focus_key := "") -> void:
 	_start.set_meta("focus_key", "start")
 	_start.pressed.connect(_try_start)
 	c.add_child(_start)
-	_scroll.wrap_focus.call_deferred()
+	_wire_setup_focus.call_deferred()
 	_update_poster()
 	if focus_key != "":
 		_focus_key.call_deferred(focus_key)
+
+
+## Explicit vertical traversal reaches both team columns; left/right still edits a row.
+func _wire_setup_focus() -> void:
+	CampaignUI.chain_focus(_scroll.focusables(), true)
 
 
 func _focus_key(key: String) -> void:
@@ -250,10 +278,10 @@ func _slot_title(i: int) -> String:
 	var s: Dictionary = slots()[i]
 	match str(s["kind"]):
 		"player":
-			return "FIGHTER %d  ·  YOU (%s)" % [i + 1, Profiles.player_name().to_upper()]
+			return "%d  ·  %s" % [i + 1, Profiles.player_name().to_upper()]
 		"dummy":
-			return "FIGHTER %d  ·  TRAINING DUMMY" % (i + 1)
-	return "FIGHTER %d  ·  BOT" % (i + 1)
+			return "%d  ·  DUMMY" % (i + 1)
+	return "%d  ·  BOT" % (i + 1)
 
 
 func _add_slot_rows(c: VBoxContainer, i: int) -> void:
@@ -264,12 +292,12 @@ func _add_slot_rows(c: VBoxContainer, i: int) -> void:
 	head.add_child(UiTheme.label(_slot_title(i), "Eyebrow"))
 	c.add_child(head)
 	var pr := PickRow.new("Fighter")
-	pr.set_choice(_creature_name(str(s["creature"])), _creature_sub(str(s["creature"])), _creature_icon(str(s["creature"])))
+	pr.set_choice(_creature_name(str(s["creature"])), "", _creature_icon(str(s["creature"])))
 	pr.set_help("Fighter %d" % (i + 1), "Choose who fights in this corner. Opens the character select.")
 	pr.set_meta("focus_key", "pick%d" % i)
 	pr.activated.connect(_pick_creature.bind(i))
 	c.add_child(pr)
-	_pick_rows.append(pr)
+	_pick_rows[i] = pr
 	if i > 0 and mode == "practice":
 		var kr := OptionRow.new("Controlled by")
 		kr.setup(["dummy", "bot"], ["Training dummy", "Bot"], s["kind"])
@@ -318,7 +346,7 @@ func _pick_creature(i: int) -> void:
 		"allow_random": true, "on_pick": func(id: String) -> void:
 			s["creature"] = id
 			if i < _pick_rows.size():
-				_pick_rows[i].set_choice(_creature_name(id), _creature_sub(id), _creature_icon(id))
+				_pick_rows[i].set_choice(_creature_name(id), "", _creature_icon(id))
 			_update_poster()})
 
 
@@ -473,3 +501,23 @@ func _unhandled_input(event: InputEvent) -> void:
 		_try_start()
 		return
 	super(event)
+
+
+## Compact variants retain the existing row visuals and live binding behavior.
+func _compact_controls(node: Node) -> void:
+	if node is Label:
+		(node as Label).add_theme_font_size_override("font_size", 28)
+	if node is UiRow:
+		var row := node as UiRow
+		row.custom_minimum_size.y = 54
+		row.focus_scale = 1.0
+		row._row.add_theme_constant_override("separation", 8)
+		row._value_box.add_theme_constant_override("separation", 4)
+		row._value_box.size_flags_stretch_ratio = 2.0
+		if row is OptionRow:
+			(row as OptionRow)._value_label.get_parent().custom_minimum_size.x = 140
+	if node is UiButton:
+		(node as UiButton).custom_minimum_size.y = 46
+		(node as UiButton).add_theme_font_size_override("font_size", 28)
+	for child in node.get_children():
+		_compact_controls(child)

@@ -30,6 +30,7 @@ func on_enter(p: Dictionary) -> void:
 	_remaining = _countdown
 	_timeout_choice = str(p.get("timeout_choice", ""))
 	var kind := str(p.get("kind", "info"))
+	_cancel_id = str(p.get("cancel_id", ""))
 	var buttons: Array = p.get("buttons", [])
 	if buttons.is_empty():
 		buttons = [{"label": "OK", "id": "ok"}]
@@ -114,7 +115,7 @@ func on_enter(p: Dictionary) -> void:
 
 func _label_for(id: String) -> String:
 	var i := _ids.find(id)
-	return _buttons[i].text if i >= 0 else "Back"
+	return _buttons[i].text if i >= 0 else "Cancel"
 
 
 func default_focus() -> Control:

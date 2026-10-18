@@ -10,6 +10,8 @@ signal match_ended(result: Dictionary)
 const SCREENS := {
 	"title": "res://src/ui/screens/title_screen.gd",
 	"main_menu": "res://src/ui/screens/main_menu.gd",
+	"jukebox": "res://src/ui/screens/jukebox_screen.gd",
+	"patch_notes": "res://src/ui/screens/patch_notes_screen.gd",
 	"settings": "res://src/ui/screens/settings_screen.gd",
 	"versus_setup": "res://src/ui/screens/versus_setup.gd",
 	"character_select": "res://src/ui/screens/character_select.gd",

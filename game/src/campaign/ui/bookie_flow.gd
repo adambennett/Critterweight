@@ -53,6 +53,8 @@ func _on_fight_started(info: Dictionary) -> void:
 
 
 func _on_changed(what: String) -> void:
+	if what == "new_card":
+		ctrl = table.ctrl
 	if what == "speed" and is_instance_valid(_scene):
 		SimSpeed.set_scale(table.speed if watching else maxf(8.0, table.speed))
 		return
@@ -208,6 +210,9 @@ func suspend() -> void:
 
 
 func abandon() -> void:
+	ctrl = table.ctrl
+	table.keep_going = false
+	table.paused = false
 	ctrl.abandon()
 	return_to_table()
 

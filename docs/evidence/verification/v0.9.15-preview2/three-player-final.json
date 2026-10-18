@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 116350,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_campaign.gd::test_party_run_three_players_majority_route"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 126.7 s",
+	"time": "2026-10-18T17:23:57",
+	"total": 1,
+	"version": "0.9.15"
+}

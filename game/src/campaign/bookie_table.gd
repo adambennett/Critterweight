@@ -60,6 +60,9 @@ func _new_card(seed_value: int) -> void:
 
 ## Deals a fresh card with the same settings (e.g. after a run ended and the loop stopped).
 func deal(seed_value := 0) -> void:
+	paused = false
+	waiting_for_player = false
+	_decided = false
 	_new_card(seed_value)
 
 

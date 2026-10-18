@@ -285,12 +285,19 @@ func scroll_focused(amount: float) -> void:
 	var f := get_viewport().gui_get_focus_owner()
 	if f == null or bool(f.get_meta("owns_sticks", false)):
 		return
+	var top := App.top_screen()
+	if top != null and top.has_method("right_stick_scroll_target"):
+		var target: Control = top.call("right_stick_scroll_target")
+		if is_instance_valid(target):
+			f = target
 	var bar := scroll_bar_for(f)
 	if bar != null:
 		bar.value += amount
 
 
 static func scroll_bar_for(f: Control) -> Range:
+	if f is ScrollContainer:
+		return (f as ScrollContainer).get_v_scroll_bar()
 	if f is ScrollText:
 		return (f as ScrollText).scroll.get_v_scroll_bar()
 	if f is RichTextLabel and (f as RichTextLabel).scroll_active:

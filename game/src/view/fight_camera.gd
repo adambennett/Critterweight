@@ -131,7 +131,7 @@ func _free_cam(dt: float) -> void:
 		if absf(value) > absf(ry):
 			ry = value
 	if absf(ry) > 0.2:
-		free_pitch = clampf(free_pitch - ry * dt * 1.6, -1.45, 1.45)
+		free_pitch = clampf(free_pitch - ry * (-1.0 if bool(Settings.get_value("input.invert_free_camera_y")) else 1.0) * dt * 1.6, -1.45, 1.45)
 	var basis_y := Basis(Vector3.UP, free_yaw)
 	free_pos += basis_y * Vector3(mv.x, 0, -mv.y) * dt * 6.0
 	if Input.is_action_pressed("guard"):

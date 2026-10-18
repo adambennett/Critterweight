@@ -193,7 +193,7 @@ const ITEMS := {
 
 ## Crate Toss lane (Loading Dock): crates spawn at the pile, rings are painted ahead (north).
 const CRATE_PILE := Vector3(-7.2, 0, -9.6)
-const CRATE_LINE_Z := -9.6
+const CRATE_LINE_Z := -10.15
 const CRATE_LANE_X := -4.0
 const CRATE_RINGS := [{"dist": 3.0, "r": 0.9, "points": 5}, {"dist": 5.0, "r": 0.9, "points": 10}, {"dist": 8.0, "r": 0.8, "points": 20}]
 const WATER_EDGE_Z := -18.6

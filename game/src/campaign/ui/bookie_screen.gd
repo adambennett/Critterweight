@@ -93,7 +93,7 @@ func _on_table_event_run(_s: Dictionary) -> void:
 
 
 func _process(_dt: float) -> void:
-	if _dirty and is_inside_tree():
+	if _dirty and is_inside_tree() and not CampaignUI.has_modal(self):
 		_dirty = false
 		_refresh()
 

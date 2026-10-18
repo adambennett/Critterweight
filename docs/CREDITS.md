@@ -12,6 +12,10 @@ Developed with AI-assisted tooling (Anthropic Claude) under the project lead's d
 writing, UI, icons and models are original to this project. Music and selected sound effects are third-party recordings
 under the free licences listed below; the remaining generated audio comes from tools/audio.
 
+## Campaign event art
+
+29 event illustrations generated with OpenAI image_gen under the project lead's direction. Exact prompts and asset provenance: docs/evidence/art/events/prompts.json.
+
 ## Reference project
 Cage Rules, by Jeremy — its code, ideas and project-owned assets were authorised for reuse. This game reuses only the
 Barlow typefaces that came through Cage Rules (their own SIL OFL 1.1 licence applies); everything else was made for
@@ -26,6 +30,8 @@ this project.
 - Bungee — David Jonathan Ross — SIL Open Font License 1.1
 
 ## Audio and sound
+
+- Dialogue generated with BreezeBlue TTS 2 using the owner-selected Devon, Kendall and Coach Buck library voices. Original Critterweight writing; commercial-use generated outputs under an active paid subscription. See docs/audio/breeze/ for exact takes and provenance.
 
 - Funkorama, Backbay Lounge, Furious Freak and Volatile Reaction — Kevin MacLeod (incompetech.com), CC BY 4.0. Required attribution: “Music: Funkorama, Backbay Lounge, Furious Freak, Volatile Reaction by Kevin MacLeod (incompetech.com). Licensed under CC BY 4.0.” Source and licence links appear in the in-game Notices.
 - Selected clips from Kenney Impact Sounds, Interface Sounds, RPG Audio and Music Jingles — CC0 1.0; credit is optional and included here for provenance.

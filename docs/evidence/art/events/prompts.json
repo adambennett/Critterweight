@@ -1,0 +1,213 @@
+{
+  "date": "2026-10-18",
+  "tool": "Built-in image_gen",
+  "mode": "generate; one call per event",
+  "model": "Not exposed by tool",
+  "terms": "OpenAI service terms applicable to the user's account; generated assets, no third-party reference art supplied",
+  "transparent_background": false,
+  "assets": [
+    {
+      "id": "evt_needles_sample",
+      "file": "game/assets/art/events/evt_needles_sample.png",
+      "prompt": "Use case: illustration-story. Create one finished 1536x1024 landscape event illustration for Critterweight, a darkly funny cartoon creature cage-fighting game set in a grimy seaside cannery. Event: Free Sample. A nervous porcupine supplement vendor named Needles, wearing an oversized white lab coat, leans from the side door of a battered van offering a glowing lime-green sample bottle in one paw. His quills silhouette against a warm lamp, dubious cans and jars in the van, wet dock planks and distant chain-link cage lights. Original stylized editorial game painting: chunky angular shapes, expressive animal anatomy, ink contour accents, subtly textured brushwork, sophisticated deep charcoal and teal shadows, muted rust and brass, sharp lime accent. Focal subject on LEFT HALF; right half fades into dark uncluttered harbor mist for a separate options panel. Show an atmospheric full scene, no border, no UI, no text or lettering, no watermark. Playful unease, not horror. Clear silhouette at small size.",
+      "sha256": "315ff8915a491f00918e0498ba2eb9edbea4256c492f61231cc93c3644bab748",
+      "bytes": 2431553
+    },
+    {
+      "id": "evt_weigh_in",
+      "file": "game/assets/art/events/evt_weigh_in.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: The Weigh-In. An officious small crab clerk in a shirt and tie examines an absurd broken industrial weighing scale. A bulky shovel-snouted boar fighter with taped paws stands on its bent platform, spring and dial comically crooked. Shipping-container weigh-in booth, buckets and towels.",
+      "sha256": "a8ff44e0fc09ab23585b1fcf02259327f04e6314363dddd49741f1ed24168ad6",
+      "bytes": 2482669
+    },
+    {
+      "id": "evt_sponsor_read",
+      "file": "game/assets/art/events/evt_sponsor_read.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Sponsor Read. An impatient ferret television producer with headphones pushes a cue card and a neon lime supplement can toward an embarrassed bulky boar fighter in boxing wraps, under harsh broadcast lamps beside a seaside cage. Cue card blank, no writing.",
+      "sha256": "d821e0578bd8e9e5a17c6184a28857a1a9851e561781d591cb9fca32d0b4891d",
+      "bytes": 2749896
+    },
+    {
+      "id": "evt_dock_dice",
+      "file": "game/assets/art/events/evt_dock_dice.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Dock Dice. A burly crab dockworker and wiry rat longshoreman gambling with bone dice and brass tokens on an overturned wooden fish crate beside wet pilings. Suspicious delighted faces, low hanging amber work lamp.",
+      "sha256": "9d01df4111f843a27480a7a1becee8d216e3955fe85f35e67e743f2fdcf2a19d",
+      "bytes": 2686888
+    },
+    {
+      "id": "evt_lost_dog",
+      "file": "game/assets/art/events/evt_lost_dog.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Lost Dog. A huge woeful sludge-soaked harbor hound named Bilge, tethered loosely to a bollard, gazes hungrily at a small tin of fish offered by a gloved paw. Massive droopy jowls, seaweed, sad puppy eyes, moody wet dock.",
+      "sha256": "442fdf0f9eaf9921e42fc8d1e52209e07e5e7691005792dd057df711de78d58f",
+      "bytes": 2857688
+    },
+    {
+      "id": "evt_commission_hearing",
+      "file": "game/assets/art/events/evt_commission_hearing.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Commission Hearing. A small severe tortoise clerk behind a towering oak desk piled with paperwork points a rubber stamp at a nervous wrapped-fist boar fighter. A brass scale, filing cabinets, absurd bureaucratic hearing in cannery back office.",
+      "sha256": "b4d081a7a762aeb15cd818ef0690c67757e9267cc8e405281527f9980ae67d28",
+      "bytes": 2576138
+    },
+    {
+      "id": "evt_cut_woman",
+      "file": "game/assets/art/events/evt_cut_woman.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Cut-Woman. Doc Sutura, a wise octopus veterinarian in an apron, uses eight busy tentacles to wrap a crab fighter's injured claw with bandages while handling scissors, gauze, icepack and a tiny lamp in a shabby dockside clinic. Funny caring demeanor, no gore.",
+      "sha256": "1c0dd7c2deab7c586c2263037924634876f1334773bbb0cacbf91e317b68f9ce",
+      "bytes": 2626621
+    },
+    {
+      "id": "evt_vending_machine",
+      "file": "game/assets/art/events/evt_vending_machine.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Vending Machine. A battered retro green vending machine with cracked glass, glowing strange supplement bottles trapped behind a bent spiral, a crab claw pondering the coin slot. Dark abandoned cannery corridor, lime glow and amber lamp.",
+      "sha256": "6731881bc8402929d4afbea8b13e591e2170fcc2521cf8270e069c255634e795",
+      "bytes": 2439301
+    },
+    {
+      "id": "evt_the_bookie",
+      "file": "game/assets/art/events/evt_the_bookie.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: The Bookie. Teddy, small sly rat wearing green visor and suspenders, sits on left atop a giant betting ledger at a tiny boiler-room desk. Stacks of scrip, pencil, brass pipes, mischievous welcoming expression.",
+      "sha256": "0d2038f57119a174aaae27aecfc7b6b0032c6253e34a02ff3b2cde7ce81e3eed",
+      "bytes": 2670594
+    },
+    {
+      "id": "evt_press_conference",
+      "file": "game/assets/art/events/evt_press_conference.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Press Conference. A sweaty boar cage fighter behind a cluster of mismatched microphones, blinding camera flash, smug ferret corporate producer holds cue cards beside him. Industrial press room, comically awkward moment.",
+      "sha256": "6ae52cda882ec15de59f67eaa523f09312f0214b0d5c4858943243771d27b3ac",
+      "bytes": 2469029
+    },
+    {
+      "id": "evt_scrap_crane",
+      "file": "game/assets/art/events/evt_scrap_crane.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Scrap Crane. An old walrus janitor named Ludlow, grey whiskers, worn ring-crew jacket and mop, points up at a battered supply crate hanging from a crane over a pit on the left. Foggy rusted gantry.",
+      "sha256": "72bfb422c1fc31793bfba4dcc3cc44e2c0d4c245f56c13483fc758b18b76dd4a",
+      "bytes": 2637815
+    },
+    {
+      "id": "evt_kid_lamprey_spar",
+      "file": "game/assets/art/events/evt_kid_lamprey_spar.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Sparring Offer. Kid Lamprey, a slender eel-like lamprey boxer in a charcoal hoodie, hood raised around a circular toothy mouth, offers a wrapped fist bump by an empty training cage. Playful challenge, no gore.",
+      "sha256": "ad87fe57d94b0dea0f6842f244ac96d81ed12e603ad256c32eb979a005e80009",
+      "bytes": 2756849
+    },
+    {
+      "id": "evt_juice_crate",
+      "file": "game/assets/art/events/evt_juice_crate.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: A Crate of JUICE. A cracked unmarked wooden crate full of cold sweating lime-glowing beverage cans sits in the left foreground under a swinging dock lamp, one can open with fizz. Tempting contraband, long shadows, no lettering.",
+      "sha256": "d3ee47cac098a4502676a67df72584c9f15e583d8279c7bc0fae2c0a523e6432",
+      "bytes": 2470670
+    },
+    {
+      "id": "evt_crowd_favor",
+      "file": "game/assets/art/events/evt_crowd_favor.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Crowd Favorite. Roaring cheerful cage-fight crowd of crabs, boars, gulls and rat dockworkers fill the left half, waving mitts and hand-painted signs bearing simple lightning, wave and flame shapes only. Festive paper lanterns and cage fence.",
+      "sha256": "4b9ca74eaaf24caa1c6800405a1bb70ee09ce9c78251e877be7a9b1d5aa34aa4",
+      "bytes": 2822385
+    },
+    {
+      "id": "evt_blister_nest",
+      "file": "game/assets/art/events/evt_blister_nest.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Blister Nest. A floor drain teems with tiny round swamp-green blister creatures with big eyes, tiny limbs and wobbling toxic bubbles, guarding a shiny brass prize in the left foreground. Gross but endearing, no gore.",
+      "sha256": "b613b17de1d0c099725287d872832ebb831402480ebf0b358934cbad8daf1c04",
+      "bytes": 2644081
+    },
+    {
+      "id": "evt_weight_class",
+      "file": "game/assets/art/events/evt_weight_class.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Wrong Weight Class. Tiny stern seabird clerk with spectacles holds an oversized tournament bracket clipboard up to an enormous sheepish boar fighter, scale in foreground. Comical size difference, industrial weigh-in room. Abstract unreadable chart lines only.",
+      "sha256": "c77aa4548447e21c2400e6572e1c3cc7b9ea9f5302c0d51e4c4865799934d725",
+      "bytes": 2511170
+    },
+    {
+      "id": "evt_ref_bribe",
+      "file": "game/assets/art/events/evt_ref_bribe.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: A Word With the Ref. Tired old goat referee in black-and-cream striped shirt discreetly counts scrip notes beside a cage gate, whistle hanging from neck, one eyebrow lifted. Ambiguous conspiratorial mood, warm side light.",
+      "sha256": "699151e4dd33dc94a0d55cf43013064fc0e74e4a63f299f9c7fe5f4e571816bc",
+      "bytes": 2533820
+    },
+    {
+      "id": "evt_ice_bath",
+      "file": "game/assets/art/events/evt_ice_bath.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Ice Bath. Doc Sutura the octopus veterinarian proudly presents a battered metal dumpster overflowing with sparkling ice cubes. A shivering crab fighter hesitates beside it, towel on shell. Steam pipes and cold blue glints.",
+      "sha256": "f71073832bd4c4dc57132ac12ffb54ddffc47d93d553b3d8eb3df37d8ef80a30",
+      "bytes": 3023173
+    },
+    {
+      "id": "evt_wall_of_fame",
+      "file": "game/assets/art/events/evt_wall_of_fame.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Wall of Fame. A walrus janitor in ring-crew jacket holding an old camera stands by a wall of framed portraits of absurd animal fighting champions; one prominent empty gilt frame waiting for the next champion. Left-focused warm gallery, no lettering.",
+      "sha256": "ba753abdd4954eec8157680ab52c3669e4e21bb0262a90f41831b9878c203b7c",
+      "bytes": 2767811
+    },
+    {
+      "id": "evt_rooftop_pigeons",
+      "file": "game/assets/art/events/evt_rooftop_pigeons.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Pigeons. A vast flock of comically suspicious pigeons crowds the left roof of a fish cannery, one small pigeon proudly grips a single green banknote. Moonlight, copper vent pipes, dark harbor beyond.",
+      "sha256": "c96b8be6a520320761a68b2af8a59d3b7c3964e61596311d5b9b20c17478fce9",
+      "bytes": 2624574
+    },
+    {
+      "id": "evt_glandco_audit",
+      "file": "game/assets/art/events/evt_glandco_audit.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Glandco Audit. Two officious stoat inspectors in matching lime-trimmed dark windbreakers examine a tiny supplement bottle with magnifying glass and clipboard in the left of an industrial hallway. A boar fighter looks guilty. No readable labels.",
+      "sha256": "77727d2d0c8e27570e197a628c68c13379d4e09baf80642a007342fee76d4c01",
+      "bytes": 2687418
+    },
+    {
+      "id": "evt_rest_stop",
+      "file": "game/assets/art/events/evt_rest_stop.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Highway Rest Stop. A battered empty bench and broken vending machine under a small shelter beside a coastal highway, a tired boar fighter seated quietly with towel around neck. Rare peaceful moment, dawn harbor haze.",
+      "sha256": "3dd30f39b5f57e0cd79ea0a70626fc33284a02f7116b43ca745eaec0ca88d50d",
+      "bytes": 2589402
+    },
+    {
+      "id": "evt_the_belt",
+      "file": "game/assets/art/events/evt_the_belt.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: The Belt. A beautifully battered replica wrestling championship belt with huge ornate brass animal-claw medallion rests in a dusty pawnshop window on the left. Tiny warm lamps, old boxing gloves, rain streaks, no lettering.",
+      "sha256": "b4cf01cb2568da8fdc95a48f8f0b957f723e59821409e697ef5179601e35041f",
+      "bytes": 2673117
+    },
+    {
+      "id": "evt_boiler_inspector",
+      "file": "game/assets/art/events/evt_boiler_inspector.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Boiler Inspector. Stoke, stout orange newt fighter whose round belly resembles a riveted boiler with a glowing furnace window, watches a city-inspector mouse cautiously tap his belly with a wrench. Steam wisps, dark machine room, silly expression.",
+      "sha256": "6857ed81d54fe0465269f3ce605c6bda5b5772537b6f12c6dd5e97a547c8db71",
+      "bytes": 2474655
+    },
+    {
+      "id": "evt_molting",
+      "file": "game/assets/art/events/evt_molting.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Molting Day. Dredge, chunky dock crab fighter, awkwardly steps out of his old cracked empty shell like ill-fitting armor beside a fish crate. Fresh softer teal shell beneath, wraps on claws, bashful determined expression. Non-gory cartoon.",
+      "sha256": "a9e36581e833137b316221158f2f6568659e3f0a89cbbce9079989ac095ff952",
+      "bytes": 2425012
+    },
+    {
+      "id": "evt_fan_club",
+      "file": "game/assets/art/events/evt_fan_club.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Fan Club. Gusto, a proud round tern fighter with swept crest, meets six smaller starry-eyed terns with matching crests, all requesting one treasured feather. Dockside cage entrance, warm lanterns, affectionate comedy.",
+      "sha256": "f55419a049726325e82dca58375ce23df906b520bcf39005329f6d7edb45ebcc",
+      "bytes": 2555606
+    },
+    {
+      "id": "evt_headlamp",
+      "file": "game/assets/art/events/evt_headlamp.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Dead Battery. Dozer, burly boar with broad shovel-like snout and small mining helmet with dark headlamp, ruefully looks at a spent battery in his gloved hoof beside a freshly dented brick wall. Funny dazed expression, no injury gore.",
+      "sha256": "2ca75a6e15ddb6439359fa95eea30b5356bdcc04c1fe2b8753b73fba37aff3aa",
+      "bytes": 2807987
+    },
+    {
+      "id": "evt_drain_backup",
+      "file": "game/assets/art/events/evt_drain_backup.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Drain Backup. Slurry, an expressive green sludge eel/hagfish fighter with whiskered mouth, peers into a blocked drain overflowing with bubbling green slime in the left foreground. Old cannery tiles, pipes, tiny rubber duck.",
+      "sha256": "b0f987cb4298b9bc4a79fb8db923358d629695b8b0800546f707aedaa0dcaf6b",
+      "bytes": 2685345
+    },
+    {
+      "id": "evt_static_storm",
+      "file": "game/assets/art/events/evt_static_storm.png",
+      "prompt": "Use case: illustration-story. One finished landscape 1536x1024 event illustration for Critterweight, darkly funny cartoon animal cage fighting at a grimy seaside cannery. Match a cohesive painted storybook-noir style: chunky angular silhouettes, expressive creature anatomy, dark ink accents, textured brushwork, charcoal/teal shadows, brass and rusty orange lighting, restrained lime-green accents. Focal subjects left half; right half recedes to a dark low-detail environment for a separate options panel. No UI, no border, no words, no lettering or watermark. Event: Storm Warning. Jitters, small translucent electric jellyfish fighter with tiny battery pack and glowing bulb-like nodes, hovers by the left dock railing, tentacles crackling with harmless blue sparks. Thunderstorm over dark bay, anxious curious expression.",
+      "sha256": "845bb5fe7959e6c0f0252903c0e0ffcc3e8952f01b0f7324d3e61ac5273902c3",
+      "bytes": 2667628
+    }
+  ]
+}

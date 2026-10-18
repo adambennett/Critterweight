@@ -22,6 +22,8 @@ var sign_letters := {}               ## roof sign letter -> MeshInstance3D
 var fluorescents: Array[MeshInstance3D] = []
 var cage_banner: Node3D
 var elevator_sign: Label3D
+var throw_line: MeshInstance3D
+var throw_line_label: Label3D
 
 
 func build(view: HubView) -> void:
@@ -512,7 +514,23 @@ func _booth() -> void:
 func _dock() -> void:
 	var k := v.kit("loading_dock")
 	# crate toss: throw line, rings at 3 / 5 / 8 m, distance stencils
-	k.box(Vector3(HubLayout.CRATE_LANE_X, 0.012, HubLayout.CRATE_LINE_Z), Vector3(4.2, 0.02, 0.12), CANVAS, HubMeshKit.PAINT, false)
+	throw_line = MeshInstance3D.new()
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(4.2, 0.025, 0.18)
+	throw_line.mesh = mesh
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = CANVAS
+	throw_line.material_override = mat
+	throw_line.position = Vector3(HubLayout.CRATE_LANE_X, 0.028, HubLayout.CRATE_LINE_Z)
+	v.add_child(throw_line)
+	throw_line_label = Label3D.new()
+	throw_line_label.font = load(F_COND)
+	throw_line_label.font_size = 42
+	throw_line_label.pixel_size = 0.007
+	throw_line_label.rotation_degrees.x = -90
+	throw_line_label.position = Vector3(HubLayout.CRATE_LANE_X, 0.05, HubLayout.CRATE_LINE_Z + 0.75)
+	v.add_child(throw_line_label)
 	label("THROW LINE", Vector3(HubLayout.CRATE_LANE_X, 0.03, HubLayout.CRATE_LINE_Z + 0.35), 0.0, 40, CANVAS, F_COND, true)
 	for rd in HubLayout.CRATE_RINGS:
 		var cz := HubLayout.CRATE_LINE_Z - float(rd["dist"])
@@ -699,3 +717,12 @@ func _surroundings() -> void:
 	for i in 8:
 		var h := 12.0 + float((i * 37) % 11)
 		k.box(Vector3(-50.0 + i * 13.0, h * 0.5 - 1.0, -75.0), Vector3(10.0, h, 6.0), Color("#2b2f3a").lightened(0.04 * (i % 3)))
+
+
+func update_throw_line(active: bool, legal: bool) -> void:
+	if not is_instance_valid(throw_line):
+		return
+	var color := (Color("#66e18d") if legal else Color("#ff655a")) if active else CANVAS
+	(throw_line.material_override as StandardMaterial3D).albedo_color = color
+	throw_line_label.text = ("READY" if legal else "STEP BACK") if active else ""
+	throw_line_label.modulate = color

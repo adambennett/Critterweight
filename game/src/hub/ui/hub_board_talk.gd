@@ -20,6 +20,8 @@ static func build(b: HubBoard, p: Dictionary) -> void:
 	b.extra["line"] = UiTheme.label(HubContent.fill(line, HubContent.run_context(st)), "H3", true)
 	(b.extra["line"] as Label).custom_minimum_size = Vector2(1300, 0)
 	b.list.content.add_child(b.extra["line"])
+	Audio.stop_announcer() # An explicit conversation replaces an incidental bark.
+	Audio.say(str(d.get("speaker", npc)), HubContent.fill(line, HubContent.run_context(st)), 45)
 	_options(b, npc, d)
 	b.prompts.set_prompts([{"actions": ["ui_accept"], "text": "Choose"}, {"actions": ["ui_cancel"], "text": "Bye", "call": b.close}])
 
@@ -27,6 +29,7 @@ static func build(b: HubBoard, p: Dictionary) -> void:
 static func say(b: HubBoard, text: String) -> void:
 	(b.extra["line"] as Label).text = text
 	var npc := str(b.extra.get("npc", ""))
+	Audio.stop_announcer() # A newly selected response must not be dropped behind the greeting.
 	Audio.say(str(HubContent.npc(npc).get("speaker", npc)), text, 45)
 
 

@@ -526,19 +526,6 @@
       ],
       "gain": -8
     },
-    "crowd_murmur": {
-      "files": [
-        "res://assets/audio/replacements/crowd/crowd-shouting.ogg"
-      ],
-      "gain": -26,
-      "loop": true
-    },
-    "crowd_cheer": {
-      "files": [
-        "res://assets/audio/replacements/crowd/crowd-applause.wav"
-      ],
-      "gain": -5
-    },
     "amb_drydock": {
       "files": [
         "res://assets/audio/replacements/water/waterflow.mp3"

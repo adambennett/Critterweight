@@ -1,5 +1,19 @@
 # Progress
 
+## Status (2026-10-18) — preview 2 final verification and local export
+
+All requested playtest changes and Breeze speech are implemented in the isolated B: checkout.
+764 clips cover 497 dialogue entries, the selected player names and worm/werm aliases. Devon,
+Kendall and Coach Buck cost 3,230.2 credits total; 269.8 remain. Nine recorded-speech tests pass.
+The full source suite completed with 730 passes, one expected headless skip and two test-fixture
+failures. The editor fixture is isolated correctly and the four-player campaign seed/route is
+corrected with preflight assertions; focused reruns all pass, including 93 UI tests (one headless skip) and both party-voting tests.
+The Windows export and packaged checks follow.
+No graphical launch or publication is authorized. All answers are saved in
+releases/v0.9.15-follow-up-notes.md and were posted in chat. The owner additionally requested
+an editor-only rooftop canvas with independent width/depth and four open edges; implement it
+only after this batch and its local package verification are complete, then rebuild the preview.
+
 ## Status (2026-10-18) — v0.9.15 local preview ready
 
 The local v0.9.15 preview fixes monitor persistence: numeric enum settings now survive the integer-to-float JSON round trip, and the saved display is reapplied after the startup window has been placed. Menu focus now plays a single soft CC0 tick_001.ogg cue at -14 dB with fixed pitch. The Windows executable is at B:/Critterweight/release-work/v0.9.15-preview/Critterweight-0.9.15-preview.exe. Source and packaged headless checks are green; native multi-monitor behavior and the final sound choice await the owner's review. The preview is local and untagged. Evidence is in [the v0.9.15 preview record](evidence/verification/v0.9.15-preview/README.md).

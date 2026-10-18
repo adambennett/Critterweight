@@ -57,12 +57,18 @@ var _music_sting: AudioStreamPlayer
 var _music_pending_jump := -1.0        ## seconds position to seek to on the next bar line
 var _music_pending_stop := false
 var _music_pitch := 1.0
+var _jukebox_context := ""
+var _jukebox_default := ""
+var _jukebox_opts := {}
 var _music_duck := 0.0
 
 # announcer
 var _lines := {}                      ## id -> line dict
 var _lines_by_trigger := {}           ## trigger -> Array of ids
 var _babble: Babble
+var _speech := preload("res://src/audio/speech_library.gd").new()
+var _speech_player: AudioStreamPlayer
+var _speech_clips: Array = []
 var _ann_current := {}                ## {id, priority, until, speaker}
 var _ann_pending := {}                ## one queued line
 var _ann_used := {}                   ## ids used in this match
@@ -111,6 +117,10 @@ func _ready() -> void:
 		_babble.finished.connect(_on_babble_finished)
 		for sp in bank.get("voices", {}):
 			_babble.add_voice(str(sp), bank["voices"][sp])
+		_speech_player = _make_2d("Dialogue")
+		_speech_player.name = "RecordedSpeech"
+		_speech_player.volume_db = -2.0
+		_speech_player.finished.connect(_advance_speech)
 		_music_sting = AudioStreamPlayer.new()
 		_music_sting.bus = "Music"
 		_music_sting.name = "Sting"
@@ -126,6 +136,10 @@ func _read_settings() -> void:
 
 
 func _on_setting_changed(key: String, _v) -> void:
+	if key == "audio.jukebox" and _jukebox_context != "":
+		var options := _jukebox_opts.duplicate()
+		options["restart"] = true
+		music(_jukebox_default, 0.5, options)
 	if key == "gameplay.announcer" or key == "access.subtitles":
 		_read_settings()
 
@@ -513,6 +527,13 @@ func is_music_playing() -> bool:
 ## Plays a track from the bank with a crossfade. opts: {layers: {id: bool}, seed: int,
 ## intensity: float, section: String (start section), pitch: float, diegetic: bool}
 func music(track: String, fade := 1.0, opts := {}) -> void:
+	if track != "" and not bool(opts.get("jukebox_resolved", false)):
+		var context := str(opts.get("context", Jukebox.context_for(track)))
+		var current := music_track() if context == _jukebox_context else ""
+		_jukebox_context = context
+		_jukebox_default = track
+		_jukebox_opts = opts.duplicate()
+		track = Jukebox.choose(context, track, current)
 	if not enabled or not bank_loaded:
 		return
 	var entries: Dictionary = bank.get("music", {})
@@ -522,7 +543,7 @@ func music(track: String, fade := 1.0, opts := {}) -> void:
 	if not entries.has(track):
 		_warn_missing("music:" + track)
 		return
-	if _music_cur >= 0 and str(_music_slots[_music_cur]["track"]) == track and is_music_playing():
+	if _music_cur >= 0 and str(_music_slots[_music_cur]["track"]) == track and is_music_playing() and not bool(opts.get("restart", false)):
 		_apply_music_opts(_music_slots[_music_cur], opts)
 		return
 	var entry: Dictionary = entries[track]
@@ -543,6 +564,15 @@ func music(track: String, fade := 1.0, opts := {}) -> void:
 	var pitch := float(opts.get("pitch", 1.0))
 	var base := AudioStreamPlayer.new()
 	base.stream = base_stream
+	if _jukebox_context != "" and str(Jukebox.config(_jukebox_context)["mode"]) != "game":
+		base.stream = base_stream.duplicate()
+		if base.stream is AudioStreamWAV:
+			(base.stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_DISABLED
+		elif base.stream is AudioStreamOggVorbis:
+			(base.stream as AudioStreamOggVorbis).loop = false
+		elif base.stream is AudioStreamMP3:
+			(base.stream as AudioStreamMP3).loop = false
+		base.finished.connect(_playlist_finished.bind(track))
 	base.bus = slot["bus"]
 	base.pitch_scale = pitch
 	base.name = "Music_" + track
@@ -832,7 +862,16 @@ func say(speaker: String, text: String, priority := 50, vars := {}, mood := "") 
 	return _say_line("say:%d" % hash(text), speaker, text, priority, vars, mood, "say")
 
 
+## Recorded duration for world bubbles and scripted dialogue pacing; zero for unrecorded text.
+func speech_seconds(speaker: String, text: String, vars := {}) -> float:
+	var merged := _ann_vars.duplicate()
+	merged.merge(vars, true)
+	var recording := _speech.resolve("", speaker, text, _substitute(text, vars), merged, _match)
+	return float(recording.get("seconds", 0.0))
+
+
 func stop_announcer() -> void:
+	_stop_speech()
 	_ann_current = {}
 	_ann_pending = {}
 	if _babble:
@@ -856,7 +895,7 @@ func _say_line(id: String, speaker: String, text: String, priority: int, vars: D
 		if now - float(_ann_last_trigger_time.get(trigger, -100.0)) < 8.0:
 			return false
 		_ann_last_trigger_time[trigger] = now
-	var entry := {"id": id, "speaker": speaker, "text": _substitute(text, vars), "priority": priority, "mood": mood, "vars": vars}
+	var entry := {"id": id, "speaker": speaker, "text": _substitute(text, vars), "priority": priority, "mood": mood, "vars": vars, "source": text}
 	if not _ann_current.is_empty():
 		if priority >= PRIORITY_INTERRUPT and priority >= int(_ann_current["priority"]):
 			_start_line(entry)
@@ -873,9 +912,18 @@ func _say_line(id: String, speaker: String, text: String, priority: int, vars: D
 func _start_line(entry: Dictionary) -> void:
 	var text: String = entry["text"]
 	var speaker: String = entry["speaker"]
-	var seconds := 0.0
+	_stop_speech()
+	if _babble:
+		_babble.stop()
+	var merged := _ann_vars.duplicate()
+	merged.merge(entry["vars"], true)
+	var recording := _speech.resolve(str(entry["id"]), speaker, str(entry.get("source", text)), text, merged, _match)
+	var seconds := float(recording.get("seconds", 0.0))
 	var reduced := announcer_mode == "reduced"
-	if enabled and _babble and _babble.has_voice(speaker):
+	if enabled and not recording.is_empty():
+		_speech_clips = recording["clips"].duplicate()
+		_play_speech_clip()
+	elif enabled and _babble and _babble.has_voice(speaker):
 		var names: Array = []
 		for k in ["p", "o"]:
 			var v = entry["vars"].get(k, _ann_vars.get(k, ""))
@@ -886,13 +934,36 @@ func _start_line(entry: Dictionary) -> void:
 		seconds = _babble.speak(str(entry["id"]), speaker, text, _ann_seed + hash(str(entry["id"])), reduced and speaker == "barnaby", names, str(entry["mood"]))
 	if seconds <= 0.0:
 		seconds = clampf(float(text.length()) * 0.055, 1.2, 4.0)
-	_ann_current = {"id": entry["id"], "priority": entry["priority"], "until": _now() + seconds + 0.15, "speaker": speaker}
+	_ann_current = {"id": entry["id"], "priority": entry["priority"], "until": _now() + seconds + 0.15, "speaker": speaker, "recorded": not recording.is_empty()}
 	_ann_used[entry["id"]] = true
 	if subtitles_on:
 		subtitle.emit(speaker, text, seconds + 0.6)
 	line_started.emit(str(entry["id"]))
 	_music_lead_mute(true)
 	_duck_target["Crowd"] = -3.0
+
+
+func _stop_speech() -> void:
+	_speech_clips.clear()
+	if _speech_player:
+		_speech_player.stop()
+		_speech_player.stream = null
+
+
+func _play_speech_clip() -> void:
+	if _speech_player == null or _speech_clips.is_empty():
+		return
+	var path := str(_speech_clips.pop_front())
+	_speech_player.stream = _stream(path)
+	_speech_player.pitch_scale = 1.0
+	_speech_player.play()
+
+
+func _advance_speech() -> void:
+	if _speech_clips.is_empty():
+		_finish_line()
+	else:
+		_play_speech_clip()
 
 
 func _on_babble_finished(_id: String) -> void:
@@ -903,6 +974,7 @@ func _finish_line() -> void:
 	if _ann_current.is_empty():
 		return
 	var id := str(_ann_current["id"])
+	_stop_speech()
 	_ann_current = {}
 	line_finished.emit(id)
 	if not _ann_pending.is_empty():
@@ -1747,8 +1819,9 @@ func _process(dt: float) -> void:
 				v["fade"] = 0.0
 		elif v["handle"] > 0 and not _playing(v):
 			v["handle"] = 0
-	# announcer timeout safety (babble finished signal is the normal path)
-	if not _ann_current.is_empty() and now >= float(_ann_current["until"]) + 0.5:
+	# A playing recording owns completion: frame delays between phrase clips must not cut it off.
+	var speech_playing := _speech_player != null and _speech_player.playing
+	if not speech_playing and not _ann_current.is_empty() and now >= float(_ann_current["until"]) + 0.5:
 		_finish_line()
 	# ducking: impacts duck movement/zones/creatures briefly; dialogue ducks crowd
 	var impact_duck := now < _impact_duck_until
@@ -1765,3 +1838,31 @@ func _process(dt: float) -> void:
 			var idx := AudioServer.get_bus_index(b)
 			if idx >= 0 and str(b) != "Radio":
 				AudioServer.set_bus_volume_db(idx, _bus_base_db(str(b)) + cur_d)
+
+
+func _playlist_finished(track: String) -> void:
+	if track != music_track() or _jukebox_context == "":
+		return
+	var next := Jukebox.choose(_jukebox_context, _jukebox_default, track, true)
+	var options := _jukebox_opts.duplicate()
+	options["jukebox_resolved"] = true
+	options["restart"] = true
+	music(next, 0.6, options)
+
+
+## Menus have music and UI cues only. End both sides of any in-progress ambience fade.
+func silence_environment() -> void:
+	crowd_stop(0.0)
+	# A previous end_match may already have removed its fading players from the live list.
+	# Stop those too, along with any finishing crowd reaction in the SFX pool.
+	for child in get_children():
+		if child is AudioStreamPlayer and child.bus == "Crowd":
+			child.stop()
+	if _ambience_fade:
+		_ambience_fade.kill()
+	if _ambience_fade_in:
+		_ambience_fade_in.kill()
+	for player in [_ambience, _ambience_next]:
+		if is_instance_valid(player):
+			player.stop()
+	_ambience_id = ""

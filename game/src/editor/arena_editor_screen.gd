@@ -53,6 +53,8 @@ var _status_until := 0.0
 var _joy_prev := {}
 var _ui_lock := false
 var _leaving := false
+var _panel_focus: Control
+var _toolbar: Control
 # UI
 var _root_box: HBoxContainer
 var _name_edit: LineEdit
@@ -98,7 +100,7 @@ func on_enter(p: Dictionary) -> void:
 	elif not _session.is_empty():
 		_restore_session()
 	else:
-		_bind(ArenaEditModel.new_from_base("gullet"), "")
+		_bind(_fresh_layout("gullet"), "")
 	set_process(true)
 	set_process_input(true)
 
@@ -115,6 +117,8 @@ func _on_device_changed(_kind: String) -> void:
 
 
 func default_focus() -> Control:
+	if is_instance_valid(_overlay):
+		return Screen.first_focusable(_overlay)
 	return vp
 
 
@@ -314,6 +318,7 @@ func _build_top_bar(parent: Control) -> void:
 	row.add_theme_constant_override("h_separation", UiTheme.GAP_XS)
 	row.add_theme_constant_override("v_separation", UiTheme.GAP_XS)
 	bar.add_child(row)
+	_toolbar = row
 	_undo_btn = _button("Undo", _undo, "Ctrl+Z")
 	_redo_btn = _button("Redo", _redo, "Ctrl+Y")
 	row.add_child(_undo_btn)
@@ -370,14 +375,15 @@ func _build_palette_panel() -> void:
 	v.add_child(tabs)
 	for i in TABS.size():
 		var tb := _button(str(ArenaCatalog.TAB_LABELS[TABS[i]]), _set_tab.bind(i), "LB / RB  ·  Q / E  ·  [ / ]", "TabButton")
-		tb.focus_mode = Control.FOCUS_NONE     # tabs switch with LB/RB (Q/E); not focus stops
+		tb.focus_mode = Control.FOCUS_ALL
 		tabs.add_child(tb)
 		_tab_buttons.append(tb)
 	_palette = ItemList.new()
 	_palette.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_palette.custom_minimum_size = Vector2(0, 260)
 	_palette.item_selected.connect(_on_palette_selected)
-	_palette.item_activated.connect(func(i): _on_palette_selected(i); vp.grab_focus())
+	_palette.item_activated.connect(_on_palette_selected)
+	_palette.gui_input.connect(_palette_navigation)
 	v.add_child(_palette)
 	_palette_desc = UiTheme.label("", "Caption", true)
 	_palette_desc.custom_minimum_size = Vector2(0, 120)
@@ -687,6 +693,12 @@ func _refresh_hints() -> void:
 		return
 	_hint_key = key
 	var ps: Array = []
+	if pad and not _canvas_active() and _overlay == null:
+		_prompts.set_prompts([
+			{"actions": ["ui_accept"], "text": "Select"},
+			{"actions": ["ui_cancel"], "text": "Menu", "call": _open_menu}])
+		_hints.text = "MENUS · View / Share: switch to map\nStick / D-pad: navigate · Left / Right: change panel · Right stick: scroll"
+		return
 	if carrying:
 		ps.append({"actions": ["ui_accept"], "text": "Drop"})
 		ps.append({"actions": ["ui_cancel"], "text": "Cancel"})
@@ -707,7 +719,7 @@ func _refresh_hints() -> void:
 		ps.append({"actions": ["pause"], "text": "Menu", "call": _open_menu})
 	_prompts.set_prompts(ps)
 	if pad:
-		_hints.text = "MAP LOCKED · View: switch to panels" if _canvas_active() else "PANELS · View / B: lock controls to map"
+		_hints.text = "MAP LOCKED · View: switch to panels" if _canvas_active() else "MENUS · View / Share: switch to map"
 		_hints.text += "\nLeft stick: cursor · Right stick: orbit · Triggers: zoom\nD-pad: nudge / choose item · Help: all controls"
 	else:
 		_hints.text = "Drag: move · Right-drag: orbit · Middle-drag: pan · Wheel: zoom\nCtrl+S: save · Ctrl+Z: undo · F5: test · H: all controls"
@@ -743,6 +755,7 @@ func _process(dt: float) -> void:
 	if _status and _status.text != "" and Time.get_ticks_msec() / 1000.0 > _status_until:
 		_status.text = ""
 	_refresh_hints()
+	_wire_panel_focus()
 	if _overlay == null and _canvas_active():
 		_poll_sticks(dt)
 	_update_ghost()
@@ -1189,7 +1202,7 @@ func _on_base_selected(i: int) -> void:
 	var b := str(_base_opt.get_item_metadata(i))
 	if b == model.base:
 		return
-	var fresh := ArenaEditModel.new_from_base(b)
+	var fresh := _fresh_layout(b)
 	stack.execute(ArenaEditCommands.SetState.new(model.snapshot(), fresh.snapshot(), "Change base"))
 	selected = -1
 	vp.reset_camera()
@@ -1266,8 +1279,20 @@ func _after_history() -> void:
 # Files, packages, test play
 # =====================================================================================
 
-func _save() -> void:
+func _save(leave_after := false) -> void:
 	_commit_name()
+	var target := ArenaLibrary.path_for("user:" + ArenaEditModel.slug_id(model.name))
+	if FileAccess.file_exists(target):
+		var v := _make_overlay("OVERWRITE ARENA?", 760)
+		v.add_child(_label("Replace the saved arena '%s'?" % model.name))
+		v.add_child(_menu_button("Overwrite", func(): _close_overlay(); _save_confirmed(leave_after), "DangerButton"))
+		v.add_child(_menu_button("Keep editing", _close_overlay))
+		_focus_first(v)
+		return
+	_save_confirmed(leave_after)
+
+
+func _save_confirmed(leave_after := false) -> void:
 	var want := "user:" + ArenaEditModel.slug_id(model.name)
 	if model.id != want:
 		model.id = want
@@ -1275,6 +1300,9 @@ func _save() -> void:
 	if bool(r["ok"]):
 		path = str(r["path"])
 		stack.mark_clean()
+		if leave_after:
+			_leave()
+			return
 		var errs: int = (validation.get("errors", []) as Array).size()
 		_status_msg("Saved %s%s" % [path, "" if errs == 0 else "  (%d validation errors remain)" % errs], COL_OK if errs == 0 else COL_WARN, 6.0)
 	else:
@@ -1295,7 +1323,7 @@ func _open_content(id: String, undoable := true) -> void:
 	var d := Content.get_entry("arenas", id).duplicate(true)
 	if d.is_empty():
 		_status_msg("Unknown layout %s" % id, COL_DANGER)
-		_bind(ArenaEditModel.new_from_base("gullet"), "")
+		_bind(_fresh_layout("gullet"), "")
 		return
 	d.erase("_package")
 	d.erase("_file")
@@ -1390,6 +1418,7 @@ func _make_overlay(title: String, width := 620) -> VBoxContainer:
 	panel.add_child(v)
 	v.add_child(UiTheme.label(title, "H2"))
 	_overlay = dim
+	_root_box.focus_behavior_recursive = Control.FOCUS_BEHAVIOR_DISABLED
 	_hint_key = ""
 	return v
 
@@ -1407,13 +1436,24 @@ func _close_overlay() -> void:
 	_overlay = null
 	_hint_key = ""
 	if is_inside_tree():
-		vp.grab_focus.call_deferred()
+		_root_box.focus_behavior_recursive = Control.FOCUS_BEHAVIOR_INHERITED
+		_restore_editor_focus.call_deferred()
+
+
+func _restore_editor_focus() -> void:
+	if not is_inside_tree() or App.top_screen() != self or _overlay != null:
+		return
+	if is_instance_valid(_panel_focus) and _panel_focus.is_visible_in_tree():
+		_panel_focus.grab_focus()
+	else:
+		vp.grab_focus()
 
 
 func _focus_first(v: Control) -> void:
 	for c in v.find_children("*", "BaseButton", true, false):
 		if (c as Control).visible and not (c as BaseButton).disabled:
 			(c as Control).grab_focus.call_deferred()
+			CampaignUI.chain_focus(v.find_children("*", "BaseButton", true, false), true)
 			return
 
 
@@ -1442,7 +1482,7 @@ func _open_new_dialog() -> void:
 
 func _new_layout_on(b: String) -> void:
 	_close_overlay()
-	var fresh := ArenaEditModel.new_from_base(b)
+	var fresh := _fresh_layout(b)
 	stack.execute(ArenaEditCommands.SetState.new(model.snapshot(), fresh.snapshot(), "New layout"))
 	path = ""
 	vp.reset_camera()
@@ -1511,7 +1551,7 @@ func _open_help() -> void:
 	v.add_child(_label("MOUSE / KEYBOARD", COL_GOLD))
 	v.add_child(_label("Left click: place the armed item / select / drag (hold Alt for free placement)\nRight click: cancel · right drag: orbit · middle drag: pan · wheel: zoom\nR / Shift+R rotate 15° · Del delete · Ctrl+D duplicate · arrows nudge\nCtrl+Z undo · Ctrl+Y (or Ctrl+Shift+Z) redo · Ctrl+S save · F5 test play\n[ and ] palette tab · 1–9 palette item · T marker team · G grid snap · Esc cancel/menu", COL_TEXT, 18))
 	v.add_child(_label("CONTROLLER", COL_GOLD))
-	v.add_child(_label("Left stick: cursor · Right stick: orbit (up/down = tilt) · LT / RT: zoom\nA: place / select (A again on the selection carries it, A drops it)\nB: back / cancel · X: delete · Y: rotate 15° · LB / RB: palette tab\nD-pad: nudge the selection, or browse palette items when nothing is selected\nView: jump to the side panels (B returns) · Menu: editor menu · L3: grid snap · R3: reset camera", COL_TEXT, 18))
+	v.add_child(_label("Left stick: cursor · Right stick: orbit (up/down = tilt) · LT / RT: zoom\nA: place / select (A again on the selection carries it, A drops it)\nB: back / cancel · X: delete · Y: rotate 15° · LB / RB: palette tab\nD-pad: nudge the selection, or browse palette items when nothing is selected\nView / Share: toggle canvas or menu controls · Menu: editor menu\nIn menus: sticks / D-pad move focus, A selects, B opens or closes the editor menu.\nIn canvas: L3 toggles grid snap, R3 resets the camera.", COL_TEXT, 18))
 	v.add_child(_menu_button("Close", _close_overlay))
 	_focus_first(v)
 
@@ -1528,7 +1568,7 @@ func _exit() -> void:
 	if stack.is_dirty():
 		var v := _make_overlay("UNSAVED CHANGES", 760)
 		v.add_child(_label("Leave the editor without saving?", COL_TEXT))
-		v.add_child(_menu_button("Save and exit", func(): _save(); _leave()))
+		v.add_child(_menu_button("Save and exit", func(): _save(true)))
 		v.add_child(_menu_button("Discard and exit", _leave, "DangerButton"))
 		v.add_child(_menu_button("Keep editing", _close_overlay))
 		_focus_first(v)
@@ -1559,7 +1599,7 @@ func on_back() -> bool:
 		_close_overlay()
 		return true
 	if not _canvas_active():
-		vp.grab_focus()
+		_open_menu()
 		return true
 	if _cancel():
 		return true
@@ -1599,12 +1639,13 @@ func _on_joy_button(jb: InputEventJoypadButton) -> void:
 		if canvas:
 			_focus_panels()
 		else:
+			_panel_focus = get_viewport().gui_get_focus_owner()
 			vp.grab_focus()
 		return
 	if not canvas:
 		if jb.button_index == JOY_BUTTON_B and _overlay == null:
 			get_viewport().set_input_as_handled()
-			vp.grab_focus()
+			_open_menu()
 		return
 	get_viewport().set_input_as_handled()
 	match jb.button_index:
@@ -1666,22 +1707,62 @@ func _primary_at_cursor() -> void:
 	_select(int(hit["uid"]))
 
 
+func _panel_controls(root: Node) -> Array:
+	var out: Array = []
+	for c in root.find_children("*", "Control", true, false):
+		if c.focus_mode == Control.FOCUS_ALL and c.is_visible_in_tree() and not c.is_queued_for_deletion() and not (c is BaseButton and c.disabled):
+			out.append(c)
+	return out
+
+
+func _wire_panel_focus() -> void:
+	if _overlay != null:
+		return
+	var groups := [_panel_controls(_palette_panel), _panel_controls(_toolbar), _panel_controls(_details_panel)]
+	for group in groups:
+		CampaignUI.chain_focus(group, true)
+	for i in groups.size():
+		var group: Array = groups[i]
+		var left: Array = groups[posmod(i - 1, groups.size())]
+		var right: Array = groups[(i + 1) % groups.size()]
+		for c: Control in group:
+			if not left.is_empty():
+				c.focus_neighbor_left = c.get_path_to(left[0])
+			if not right.is_empty():
+				c.focus_neighbor_right = c.get_path_to(right[0])
+	for direction in ["left", "right", "top", "bottom"]:
+		vp.set("focus_neighbor_" + direction, vp.get_path_to(vp))
+
+
+func _palette_navigation(event: InputEvent) -> void:
+	var selected_items := _palette.get_selected_items()
+	var item := int(selected_items[0]) if not selected_items.is_empty() else -1
+	if event.is_action_pressed("ui_up") and item <= 0:
+		_palette.accept_event()
+		_palette.get_node(_palette.focus_neighbor_top).grab_focus()
+	elif event.is_action_pressed("ui_down") and item >= _palette.item_count - 1:
+		_palette.accept_event()
+		_palette.get_node(_palette.focus_neighbor_bottom).grab_focus()
+
+
 func _focus_panels() -> void:
 	_hint_key = ""
-	if not _details_panel.visible and not _palette_panel.visible:
-		_palette_panel.show()
-	for c in _inspector.find_children("*", "Control", true, false) + _layout_box.find_children("*", "Control", true, false):
-		var ctl := c as Control
-		if ctl.focus_mode != Control.FOCUS_NONE and ctl.is_visible_in_tree():
-			ctl.grab_focus()
-			return
-	_palette.grab_focus()
+	_end_drag()
+	carrying = false
+	_wire_panel_focus()
+	if is_instance_valid(_panel_focus) and _panel_focus.is_visible_in_tree():
+		_panel_focus.grab_focus()
+	else:
+		var controls := _panel_controls(_toolbar)
+		if not controls.is_empty():
+			controls[0].grab_focus()
 
 
 func _toggle_panel(panel: Control) -> void:
+	var canvas := _canvas_active()
 	panel.visible = not panel.visible
-	if not panel.visible:
-		vp.grab_focus()
+	if not panel.visible and not canvas:
+		_focus_panels()
 	_hint_key = ""
 
 
@@ -1799,3 +1880,10 @@ func _debug_state() -> void:
 	cursor = Vector3(1.6, 0, 0.4)
 	vp.set_cursor(cursor, true)
 	_status_msg("Placed Steam vent.")
+
+
+func _fresh_layout(base_id: String, variant_id := "") -> ArenaEditModel:
+	var fresh := ArenaEditModel.new_from_base(base_id, variant_id)
+	fresh.name = ArenaLibrary.unused_name(fresh.name)
+	fresh.id = "user:" + ArenaEditModel.slug_id(fresh.name)
+	return fresh

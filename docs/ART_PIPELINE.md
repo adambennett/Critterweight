@@ -278,4 +278,18 @@ The user authorized brief staging in the built-in tool's C: output folder, follo
 each image to B:. Each staged file was only a few MB. No image API keys, paid calls, new accounts or third-party
 character references were used. Sheets establish expression, colour blocks and shape language; generated
 view consistency and proportions were reviewed against the immutable body, not treated as engineering drawings.
-The game ships original editable mesh geometry and vertex colours, not generated image textures.
+The creature models ship as original editable mesh geometry and vertex colours; their concept sheets are not model textures. The separate v0.9.15 event illustrations described below do ship as raster artwork.
+
+
+## 9. Campaign event illustrations (v0.9.15 preview)
+
+The 29 core event backgrounds live in `game/assets/art/events/evt_*.png`. Each is a separate
+1536x1024 illustration generated with the built-in image_gen tool on 2026-10-18. The model ID
+was not exposed. Exact prompts and final PNG hashes/sizes are in
+`docs/evidence/art/events/prompts.json`; the PNGs are the retained masters. The event screen
+loads the event's stable ID, keeps the illustration behind the status strip and choices, and
+retains it for the outcome. The artwork has its focal subject on the left and subdued space on
+the right for the options. No external reference artwork was supplied to generation.
+
+The route_*.svg map glyphs and trash.svg are original editable vector sources authored directly
+for this preview. They do not replace the older UI icon set outside the campaign chart.

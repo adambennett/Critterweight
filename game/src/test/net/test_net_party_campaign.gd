@@ -74,20 +74,36 @@ func test_party_run_three_players_majority_route() -> void:
 ## Captain - the host in Act 1 - breaks the tie for his pick.
 func test_party_run_four_players_captain_breaks_tie() -> void:
 	await _vote_party("party_four", [["Ann", "f_jitters", false], ["Ben", "f_dredge", true], ["Cal", "f_gusto", true]],
-		"the Captain's tie-break")
+		"the Captain's tie-break", 543, "a1r1l2,a1r2l3,a1r3l2,a1r4l3")
 
 
 ## A party run with the host (Stoke) and `members` ([name, fighter, wants_a_fight_at_row_2]) on seed
-## 193 (Dock Rats | Sponsor Read, a personal event | the shop | Hot Pipes); the host forfeits fight 2
+## 193 for three players; four use 543 (Dock Rats | Commission Hearing | shop | fight). The host forfeits fight 2
 ## to end it. The host's route takes the event at row 2, so `why` says what must carry his pick.
-func _vote_party(label: String, members: Array, why: String) -> void:
+func _vote_party(label: String, members: Array, why: String, seed_value := 193, route := "a1r1l0,a1r2l1,a1r3l1,a1r4l3") -> void:
 	u = U.new(self, label)
 	var port: int = u.base_port
-	var route := "a1r1l0,a1r2l1,a1r3l1,a1r4l3"
-	var fight_route := "a1r1l0,fight,a1r3l1,a1r4l3"
+	var route_nodes := route.split(",")
+	var alternate := route_nodes.duplicate()
+	alternate[1] = "fight"
+	var fight_route := ",".join(alternate)
+	if members.size() == 3:
+		# Roster-dependent event eligibility changes the content shuffle. Seed 193's four-player
+		# opening is Timed Scrap; use a verified Dock Rats route so this remains a voting test.
+		var players := [{"fighter": "f_stoke"}]
+		for member in members:
+			players.append({"fighter": member[1]})
+		var fixture := RunState.create(CampaignFlow.make_catalog(false), {"seed": seed_value, "players": players, "variant": "off_the_street", "difficulty": "sparring"})
+		var nodes: Dictionary = fixture["acts"][0]["nodes"]
+		check_eq(nodes[route_nodes[0]]["encounter"], "enc_a1_dock_rats", "voting fixture starts with the intended untimed minion fight")
+		check_eq(nodes[route_nodes[1]]["event"], "evt_commission_hearing", "voting fixture reaches its personal event")
+		for i in range(1, route_nodes.size()):
+			check(nodes[route_nodes[i - 1]]["edges"].has(route_nodes[i]), "fixture route is connected")
+		if not _failures.is_empty():
+			return
 	var budget := U.SERVER_READY_S + 360.0
 	var host: int = u.spawn("host", _host_args(port, "Hosty", ["--creature", "f_stoke", "--party-new", "off_the_street:simultaneous",
-		"--party-seed", "193", "--party-difficulty", "sparring", "--party-route", route, "--party-pick", "first", "--party-shop", "leave",
+		"--party-seed", str(seed_value), "--party-difficulty", "sparring", "--party-route", route, "--party-pick", "first", "--party-shop", "leave",
 		"--party-event-wait", "4", "--party-forfeit-fight", "2", "--party-forfeit-after", "8", "--quit-after", str(budget + 60.0)]))
 	check(host > 0, "host process spawned")
 	var r0: Dictionary = await u.wait_json(u.result_path("Hosty"), func(d: Dictionary) -> bool: return bool(d.get("connected", false)), U.SERVER_READY_S)
@@ -122,14 +138,14 @@ func _vote_party(label: String, members: Array, why: String) -> void:
 	var st: Dictionary = ph.get("state", {})
 	check(int(st.get("fights_won", 0)) >= 1, "the party won its first fight (%s)" % str(st))
 	var path: Array = st.get("path", [])
-	check(path.size() >= 2 and str(path[1]) == "a1r2l1", "%s took the host's stop at row 2: %s" % [why, str(path)])
+	check(path.size() >= 2 and str(path[1]) == route_nodes[1], "%s took the host's stop at row 2: %s" % [why, str(path)])
 	for k in members.size():
 		if not bool(members[k][2]):
 			continue
 		var votes: Array = (results[k].get("decisions", []) as Array).filter(func(d: Dictionary) -> bool:
-			return str(d.get("kind", "")) == "vote" and str(d.get("position", "")) == "a1r1l0")
+			return str(d.get("kind", "")) == "vote" and str(d.get("position", "")) == route_nodes[0])
 		var row2 := str(votes[0].get("detail", "")) if not votes.is_empty() else ""
-		check(row2 != "" and not row2.begins_with("a1r2l1"), "%s voted for another stop at row 2: %s" % [members[k][0], row2])
+		check(row2 != "" and not row2.begins_with(route_nodes[1]), "%s voted for another stop at row 2: %s" % [members[k][0], row2])
 	check(bool(st.get("over", false)), "the run ended (%s)" % str(st.get("phase", "")))
 	for p in [ph] + results:
 		var who := str(p.get("role", "?")) + " " + str(p.get("seat", ""))

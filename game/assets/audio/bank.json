@@ -4480,10 +4480,10 @@
   },
   "crowd_murmur": {
    "files": [
-    "res://assets/audio/replacements/crowd/crowd-shouting.ogg"
+    "res://assets/audio/crowd/crowd_murmur.wav"
    ],
    "bus": "Crowd",
-   "gain": -26,
+   "gain": -8,
    "pitch": [
     0.98,
     1.02
@@ -4615,10 +4615,12 @@
   },
   "crowd_cheer": {
    "files": [
-    "res://assets/audio/replacements/crowd/crowd-applause.wav"
+    "res://assets/audio/crowd/crowd_cheer_0.wav",
+    "res://assets/audio/crowd/crowd_cheer_1.wav",
+    "res://assets/audio/crowd/crowd_cheer_2.wav"
    ],
    "bus": "Crowd",
-   "gain": -5,
+   "gain": 0,
    "pitch": [
     0.98,
     1.02

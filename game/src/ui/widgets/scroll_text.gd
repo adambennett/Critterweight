@@ -33,7 +33,14 @@ func _init() -> void:
 	scroll.add_child(rich)
 
 
+func set_plain(text: String) -> void:
+	rich.bbcode_enabled = false
+	rich.text = text
+	scroll.scroll_vertical = 0
+
+
 func set_bbcode(text: String) -> void:
+	rich.bbcode_enabled = true
 	rich.text = text
 	scroll.scroll_vertical = 0
 

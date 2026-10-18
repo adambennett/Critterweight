@@ -14,6 +14,7 @@ var _sweep_targets: Array[Vector3] = []
 
 
 static func ensure() -> void:
+	Audio.silence_environment()
 	if DisplayServer.get_name() == "headless":
 		return
 	var s = App.current_scene

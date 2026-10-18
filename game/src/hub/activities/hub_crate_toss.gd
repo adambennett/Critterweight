@@ -86,7 +86,7 @@ func on_throw(crate_index: int, from: Vector3) -> void:
 	var target := called_ring()
 	_used[crate_index] = true
 	thrown += 1
-	var foul := from.z < HubLayout.CRATE_LINE_Z - 0.35
+	var foul := not legal_launch(from)
 	_pending[crate_index] = {"foul": foul, "from": from, "target": target}
 	if foul:
 		mode.emit_hub({"type": "hub_score", "activity": "crates", "points": 0, "pos": from + Vector3.UP, "label": "FOUL: THROW FROM BEHIND THE LINE"})
@@ -147,3 +147,14 @@ func finish(reason: String) -> void:
 	_pending.clear()
 	mode.reset_crates()
 	mode.emit_hub({"type": "hub_activity", "activity": "crates", "phase": "end", "result": result})
+
+
+static func legal_launch(from: Vector3) -> bool:
+	return from.z >= HubLayout.CRATE_LINE_Z - 0.35
+
+
+static func player_behind_line(f: Fighter) -> bool:
+	var direction := f.input.move if f.input.move.length() > 0.3 else f.forward()
+	direction.y = 0.0
+	direction = direction.normalized() if direction.length_squared() > 0.000001 else f.forward()
+	return legal_launch(f.pos() + direction * 0.55 + Vector3.UP * 0.75)

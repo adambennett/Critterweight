@@ -190,8 +190,7 @@ func _ask_new() -> void:
 	var buttons := []
 	for m in RulesValidator.EDITABLE_MODES:
 		buttons.append({"label": str(VALUE_LABELS.get(m, m)), "id": m})
-	buttons.append({"label": "Cancel", "id": "cancel", "cancel": true})
-	App.dialog("New rules", "Pick a mode to start from. You can change everything afterwards.", buttons, _on_new_choice)
+	App.push("dialog", {"title": "New rules", "body": "Pick a mode to start from. You can change everything afterwards.", "buttons": buttons, "cancel_id": "cancel", "callback": _on_new_choice})
 
 
 func _on_new_choice(choice: String) -> void:

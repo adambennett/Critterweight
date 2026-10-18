@@ -20,7 +20,11 @@ func after_each() -> void:
 func _measure(name_: String, rules: String, fighters: int, seconds: float) -> Dictionary:
 	u = U.new(self, "measure_" + name_)
 	var port: int = u.base_port
-	var entry := {"id": name_, "rules": rules, "arena": "the_gullet", "weight": 1, "rules_override": {"rounds": 1, "round_time": 300}}
+	# Measure active-fight traffic for the entire window. A normal duel can KO in under
+	# twenty seconds, leaving the final status sample in the lobby with zero fighters.
+	# Keep the same fighters, simulation and network limits, but prevent an early KO.
+	var entry := {"id": name_, "rules": rules, "arena": "the_gullet", "weight": 1,
+		"rules_override": {"rounds": 1, "round_time": 300, "health_mult": 4.0, "damage_mult": 0.25}}
 	if fighters > 2:
 		entry["min_players"] = fighters
 	var pl: String = u.playlist("m.json", [entry], {"voting": {"enabled": false, "candidates": 1}})

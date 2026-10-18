@@ -36,7 +36,7 @@ func _build() -> void:
 		if str(part).strip_edges() != "":
 			parts.append(str(part))
 	var v := CampaignUI.scaffold(self, heading, "  ·  ".join(parts))
-	(v.get_child(0) as Label).add_theme_color_override("font_color", CampaignUI.ACCENT if victory else CampaignUI.DANGER)
+	(v.get_node("Heading") as Label).add_theme_color_override("font_color", CampaignUI.ACCENT if victory else CampaignUI.DANGER)
 	var cols := HBoxContainer.new()
 	cols.add_theme_constant_override("separation", 22)
 	v.add_child(cols)

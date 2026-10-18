@@ -2,7 +2,7 @@
 
 Audio uses the repository synthesis pipeline for its editable score, SFX, creature and announcer sources, with selected free third-party recordings overlaid for v0.9.13. The audio bank remains reproducible: tools/audio/build.js writes the generated source bank, then merges game/assets/audio/replacement-overrides.json. Imported files stay in game/assets/audio/replacements/ and are protected from the generated-audio cleaner.
 
-The v0.9.12 playtest removed eight sustained tonal ambience beds and fixed rapid-room crossfades. v0.9.13 adds selected CC BY 4.0 and CC0 music, combat, UI, movement, crowd and dock-water clips. The four Kevin MacLeod songs require in-game attribution. Replacement filenames, source pages, licences, hashes and bank references are in docs/audio/replacement-audio-inventory.txt; the original generated inventory remains separate. Named creature calls and custom announcer/coach lines remain generated.
+The v0.9.12 playtest removed eight sustained tonal ambience beds and fixed rapid-room crossfades. v0.9.13 adds selected CC BY 4.0 and CC0 music, combat, UI, movement, crowd and dock-water clips. The four Kevin MacLeod songs require in-game attribution. Replacement filenames, source pages, licences, hashes and bank references are in docs/audio/replacement-audio-inventory.txt; the original generated inventory remains separate. Named creature calls retain the original synthesis. The v0.9.15 preview adds offline Breeze speech for announcers, coaching and Cannery dialogue; see audio/breeze/README.md.
 
 Spec: `docs/design/AUDIO_DIRECTION.md` (tracks, SFX list, mixing), `docs/design/ANNOUNCER_AND_TUTORIAL.md`
 (voices, lines), `docs/design/ROSTER.md` (per-fighter sound palettes).
@@ -269,13 +269,25 @@ the showcase; UI-05's bus/device/mute settings were already wired by Settings an
   yet; the lines and triggers exist (see §6) for the lead/mode owners to call.
 - Boss phase-2 vocal distortion is a runtime effect to add on the Creatures bus when bosses land (the
   palettes exist: bilge, conduit, snappington).
-- Hub NPC lines other than Granny's documented ones are subtitles-only until the hub owner adds their JSON
-  (any speaker without a grain bank gets subtitles with an estimated duration).
+- Authored hub NPC dialogue uses the recorded speech catalog in v0.9.15. New/modded text without a recording retains the existing babble/subtitle fallback.
 
 ## 9. Provenance
 
-All music, sound effects, creature voices, crowd, ambience and the announcer/coach babble voices are original
-works synthesized by the tools in `tools/audio/` (written for this project, Node.js standard library only,
-no npm packages) from the scores, definitions and line files in this repository, rendered on 2026-10-15. No
-samples, loops, soundfonts, recordings, TTS voices or third-party audio libraries were used; nothing was
-copied from Cage Rules or any other project. Fonts and other non-audio assets are inventoried elsewhere.
+The original 2026-10-15 source bank was synthesized by tools/audio from this project's scores,
+SFX definitions and babble grains. v0.9.13 overlaid the free licensed recordings listed in
+THIRD_PARTY.md. v0.9.15 restores the original crowd entries and adds offline BreezeBlue TTS 2
+recordings using the owner's selected Devon, Kendall and Coach Buck library voices. The
+active paid subscription permits commercial use of those outputs under Breeze's terms;
+these recordings are not CC0. Exact text, voice/model IDs, delivery directions, timestamps,
+raw/processed hashes and credit accounting are retained in audio/breeze/.
+
+## 10. Recorded speech (v0.9.15 preview)
+
+SpeechLibrary resolves authored line IDs or speaker/text templates to local WAV clips.
+Subtitles retain custom player names and current bindings. Speech uses recorded roster names,
+Rookie, Player 1-8, numbers, and device-independent action names. Short reusable clips fill
+variable names/numbers without multiplying every sentence into hundreds of variants. The
+existing priority/interrupt/queue rules apply; interruption stops both recording and babble,
+and subtitle duration follows the actual recording. The game has no Breeze key or network
+requirement. Unknown mod text falls back safely instead of playing an unrelated recording.
+The legacy audio cleaner explicitly preserves assets/audio/speech/.

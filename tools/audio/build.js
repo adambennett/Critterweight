@@ -351,7 +351,7 @@ function main() {
   }
   // stale files
   if (flag('--clean')) {
-    const walk = (dir) => { for (const f of fs.readdirSync(dir)) { const p = path.join(dir, f); if (fs.statSync(p).isDirectory()) walk(p); else if (f.endsWith('.wav')) { const rel = path.relative(OUT, p).replace(/\\/g, '/'); if (!rel.startsWith('replacements/') && !produced.has(rel)) { fs.unlinkSync(p); if (fs.existsSync(p + '.import')) fs.unlinkSync(p + '.import'); log(`  removed stale ${rel}`); } } } };
+    const walk = (dir) => { for (const f of fs.readdirSync(dir)) { const p = path.join(dir, f); if (fs.statSync(p).isDirectory()) walk(p); else if (f.endsWith('.wav')) { const rel = path.relative(OUT, p).replace(/\\/g, '/'); if (!rel.startsWith('replacements/') && !rel.startsWith('speech/') && !produced.has(rel)) { fs.unlinkSync(p); if (fs.existsSync(p + '.import')) fs.unlinkSync(p + '.import'); log(`  removed stale ${rel}`); } } } };
     if (fs.existsSync(OUT)) walk(OUT);
   }
   fs.mkdirSync(OUT, { recursive: true });

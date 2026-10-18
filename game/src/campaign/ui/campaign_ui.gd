@@ -201,7 +201,13 @@ static func scaffold(screen: Control, heading: String, sub := "") -> VBoxContain
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 14)
 	m.add_child(v)
-	v.add_child(title(heading))
+	var run_flow = screen.get("flow")
+	if run_flow is CampaignFlow and run_flow.ctrl != null and not run_flow.ctrl.state.is_empty():
+		v.add_child(run_status(run_flow))
+	if heading != "":
+		var heading_label := title(heading)
+		heading_label.name = "Heading"
+		v.add_child(heading_label)
 	if sub != "":
 		v.add_child(label(sub, 22, MUTED))
 	# online party runs: who is deciding what, the Captain, the vote (CoopFlow keeps it current)
@@ -212,6 +218,39 @@ static func scaffold(screen: Control, heading: String, sub := "") -> VBoxContain
 		v.add_child(strip)
 		screen.set_meta("party_strip", strip)
 	return v
+
+
+## Persistent information used to weigh choices: current health, money and carried build.
+static func run_status(flow: CampaignFlow) -> Control:
+	var ctrl := flow.ctrl
+	var player := ctrl.player(flow.me)
+	var bar := panel(Color("#24282e"))
+	bar.name = "RunStatus"
+	var columns := VBoxContainer.new()
+	columns.add_theme_constant_override("separation", 5)
+	bar.add_child(columns)
+	var row := HFlowContainer.new()
+	row.add_theme_constant_override("h_separation", 28)
+	columns.add_child(row)
+	row.add_child(inline_label(fighter_name(ctrl.catalog, str(player.get("fighter", ""))).to_upper(), 26, ACCENT, "900"))
+	var hp := ceili(float(player.get("hp", 0)))
+	row.add_child(inline_label("HP %d / %d" % [hp, ceili(ctrl.max_hp(player))], 25, GOOD if hp > ctrl.max_hp(player) * 0.5 else DANGER, "700"))
+	row.add_child(inline_label("SCRIP %d" % int(player.get("scrip", 0)), 25, ACCENT))
+	row.add_child(inline_label("HYPE %d" % int(player.get("hype_carry", 0)), 25))
+	row.add_child(inline_label("ACT %d" % int(ctrl.state.get("act", 1)), 25, MUTED))
+	var build: PackedStringArray = []
+	for item in player.get("supplements", []):
+		build.append(ctrl.catalog.item_name(str(item["id"])))
+	for item in player.get("techniques", []):
+		build.append(ctrl.catalog.item_name(str(item)))
+	for item in player.get("side_effects", []):
+		build.append("! " + ctrl.catalog.item_name(str(item)))
+	var inventory := label("BUILD  " + (" · ".join(build) if not build.is_empty() else "No supplements yet"), 18, MUTED)
+	inventory.max_lines_visible = 2
+	inventory.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	inventory.tooltip_text = "\n".join(build)
+	columns.add_child(inventory)
+	return bar
 
 
 ## Party runs: after a decision was sent to the party's host, the screen waits for the host's
@@ -327,8 +366,14 @@ class Modal:
 	var callback: Callable
 	var closing := false
 	var _buttons: Array = []
+	var _covered: Array = []
 
 	func build(heading: String, body: String, buttons: Array) -> void:
+		for sibling in get_parent().get_children():
+			if sibling != self and sibling is Control:
+				_covered.append([sibling, sibling.focus_behavior_recursive, sibling.mouse_behavior_recursive])
+				sibling.focus_behavior_recursive = Control.FOCUS_BEHAVIOR_DISABLED
+				sibling.mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_DISABLED
 		set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		var dim := ColorRect.new()
@@ -369,10 +414,25 @@ class Modal:
 			bt.focus_previous = bt.focus_neighbor_left
 		(_buttons[0] as Button).call_deferred("grab_focus")
 
+	func _uncover() -> void:
+		for entry in _covered:
+			if is_instance_valid(entry[0]):
+				entry[0].focus_behavior_recursive = entry[1]
+				entry[0].mouse_behavior_recursive = entry[2]
+		_covered.clear()
+
+	func _process(_dt: float) -> void:
+		if closing or not is_inside_tree() or App.top_screen() != get_parent():
+			return
+		var focus := get_viewport().gui_get_focus_owner()
+		if focus == null or not is_ancestor_of(focus):
+			(_buttons[0] as Control).grab_focus()
+
 	func _choose(id: String) -> void:
 		if closing:
 			return
 		closing = true
+		_uncover()
 		queue_free()
 		if callback.is_valid():
 			callback.call(id)
@@ -381,6 +441,7 @@ class Modal:
 		if closing:
 			return
 		closing = true
+		_uncover()
 		queue_free()
 		if notify and callback.is_valid():
 			callback.call("")
@@ -427,39 +488,7 @@ class NodeIcon:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	func _draw() -> void:
-		var c := size * 0.5
-		var r := minf(size.x, size.y) * 0.42
-		var col: Color = CampaignUI.NODE_COLORS.get(kind, Color.WHITE)
-		draw_circle(c, r + 3.0, Color(0, 0, 0, 0.55))
-		draw_circle(c, r, col.darkened(0.55) if not lit else col.darkened(0.2))
-		draw_arc(c, r, 0, TAU, 32, col, 3.0, true)
-		match kind:
-			"fight":
-				draw_line(c + Vector2(-r * 0.5, -r * 0.5), c + Vector2(r * 0.5, r * 0.5), col, 4.0, true)
-				draw_line(c + Vector2(r * 0.5, -r * 0.5), c + Vector2(-r * 0.5, r * 0.5), col, 4.0, true)
-			"elite":
-				var pts := PackedVector2Array()
-				for i in 10:
-					var a := -PI / 2.0 + TAU * i / 10.0
-					var rr := r * (0.6 if i % 2 == 0 else 0.28)
-					pts.append(c + Vector2(cos(a), sin(a)) * rr)
-				draw_colored_polygon(pts, col)
-			"event":
-				draw_rect(Rect2(c - Vector2(r * 0.55, r * 0.4), Vector2(r * 1.1, r * 0.65)), col, false, 3.0)
-				draw_line(c + Vector2(-r * 0.2, r * 0.25), c + Vector2(-r * 0.45, r * 0.6), col, 3.0)
-			"shop":
-				draw_rect(Rect2(c - Vector2(r * 0.3, r * 0.55), Vector2(r * 0.6, r * 1.1)), col, false, 3.0)
-				draw_line(c + Vector2(-r * 0.3, -r * 0.25), c + Vector2(r * 0.3, -r * 0.25), col, 2.0)
-			"rest":
-				draw_line(c + Vector2(0, -r * 0.55), c + Vector2(0, r * 0.55), col, 5.0)
-				draw_line(c + Vector2(-r * 0.55, 0), c + Vector2(r * 0.55, 0), col, 5.0)
-			"treasure":
-				draw_rect(Rect2(c - Vector2(r * 0.55, r * 0.4), Vector2(r * 1.1, r * 0.8)), col, false, 3.0)
-				draw_line(c + Vector2(-r * 0.55, -r * 0.05), c + Vector2(r * 0.55, -r * 0.05), col, 2.0)
-			"boss":
-				draw_rect(Rect2(c - Vector2(r * 0.7, r * 0.22), Vector2(r * 1.4, r * 0.44)), col, false, 3.0)
-				draw_circle(c, r * 0.22, col)
-			_:
-				var f := CampaignUI.font("900")
-				if f:
-					draw_string(f, c + Vector2(-r * 0.32, r * 0.42), "?", HORIZONTAL_ALIGNMENT_CENTER, -1, int(r * 1.3), col)
+		var texture := UiIcons.tex("route_" + kind)
+		if texture:
+			var col: Color = CampaignUI.NODE_COLORS.get(kind, Color.WHITE)
+			draw_texture_rect(texture, Rect2(Vector2.ZERO, size), false, col if lit else col.darkened(0.35))

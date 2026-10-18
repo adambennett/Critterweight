@@ -10,6 +10,8 @@ var heading: Label
 var rows: Array = []
 var selected := 0
 var section := 0
+var fighter_info: FighterInfo
+var entry_buttons: Array[Control] = []
 
 func on_enter(_p: Dictionary) -> void:
 	MenuBackdrop.ensure()
@@ -42,6 +44,8 @@ func on_enter(_p: Dictionary) -> void:
 	information.add_child(heading)
 	details = ScrollText.new()
 	information.add_child(details)
+	fighter_info = FighterInfo.new()
+	information.add_child(fighter_info)
 	(frame["prompts"] as PromptBar).set_prompts([
 		{"actions": ["ui_tab_prev", "ui_tab_next"], "text": "Sections"},
 		{"actions": ["ui_left", "ui_right"], "text": "Panels"},
@@ -63,7 +67,11 @@ func _select_section(index: int) -> void:
 	tabs.select(index, false)
 	rows = CompendiumData.entries(SECTIONS[index])
 	list.clear()
+	entry_buttons.clear()
 	preview_panel.visible = index == 0
+	heading.visible = index != 0
+	fighter_info.visible = index == 0
+	details.visible = index != 0
 	for i in rows.size():
 		var b := UiButton.new(str(rows[i]["name"]))
 		b.custom_minimum_size.x = 300
@@ -72,7 +80,25 @@ func _select_section(index: int) -> void:
 		b.pressed.connect(func():
 			_select_entry(i)
 			(preview if preview_panel.visible else details).grab_focus())
-		list.content.add_child(b)
+		entry_buttons.append(b)
+		if section == 2 and Content.origin_of("arenas", str(rows[i]["id"])) == "user":
+			var row := UiTheme.hbox(6)
+			b.custom_minimum_size.x = 220
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			row.add_child(b)
+			for action in ["edit", "trash"]:
+				var control := UiButton.new("", "", action)
+				control.tooltip_text = ("Edit " if action == "edit" else "Delete ") + str(rows[i]["name"])
+				control.show_chevron = false
+				control.focus_scale = 1.0
+				control.custom_minimum_size = Vector2(56, 56)
+				control.add_theme_constant_override("icon_max_width", 28)
+				control.focus_entered.connect(_select_entry.bind(i))
+				control.pressed.connect(_arena_action.bind(i, action))
+				row.add_child(control)
+			list.content.add_child(row)
+		else:
+			list.content.add_child(b)
 	if not rows.is_empty():
 		_select_entry(0)
 		list.focusables()[0].grab_focus.call_deferred()
@@ -83,6 +109,8 @@ func _select_entry(index: int) -> void:
 	var entry: Dictionary = rows[index]
 	heading.text = str(entry["name"]).to_upper()
 	details.set_bbcode(str(entry["text"]))
+	if section == 0:
+		fighter_info.show_fighter(str(entry["id"]))
 	if preview_panel.visible and preview.creature_id != str(entry["id"]):
 		preview.show_fighter(Content.creature(str(entry["id"])))
 	_link_focus.call_deferred()
@@ -91,11 +119,13 @@ func _link_focus() -> void:
 	var buttons := list.focusables()
 	if buttons.is_empty():
 		return
-	var left: Control = buttons[clampi(selected, 0, buttons.size() - 1)]
+	var left: Control = entry_buttons[clampi(selected, 0, entry_buttons.size() - 1)]
 	for button: Control in buttons:
-		button.focus_neighbor_right = button.get_path_to(preview if preview_panel.visible else details)
+		if button.get_parent() == list.content:
+			button.focus_neighbor_right = button.get_path_to(preview if preview_panel.visible else details)
 	preview.focus_neighbor_left = preview.get_path_to(left)
-	preview.focus_neighbor_right = preview.get_path_to(details)
+	preview.focus_neighbor_right = preview.get_path_to(fighter_info)
+	fighter_info.focus_neighbor_left = fighter_info.get_path_to(preview)
 	details.focus_neighbor_left = details.get_path_to(preview if preview_panel.visible else left)
 	list.wrap_focus()
 
@@ -115,3 +145,20 @@ func _unhandled_input(event: InputEvent) -> void:
 func on_back() -> bool:
 	App.pop() if App.stack.size() > 1 else App.goto("main_menu")
 	return true
+
+
+func _arena_action(index: int, action: String) -> void:
+	var entry: Dictionary = rows[index]
+	var path := ArenaLibrary.path_for(str(entry["id"]))
+	var heading := "Edit this arena?" if action == "edit" else "Delete this arena?"
+	var body := "Open '%s' in the arena editor?" % entry["name"] if action == "edit" else "Remove '%s' from your custom arenas? A recoverable copy stays in arenas/.removed." % entry["name"]
+	App.dialog(heading, body, [{"id": "yes", "label": "Edit arena" if action == "edit" else "Delete arena", "danger": action == "trash"}, {"id": "no", "label": "Keep browsing", "cancel": true}],
+		func(choice: String):
+			if choice != "yes":
+				return
+			if action == "edit":
+				App.push("arena_editor", {"path": path})
+			elif ArenaLibrary.delete_layout(path):
+				_select_section(2)
+			else:
+				UiNav.toast("Could not remove this arena.", "error"))

@@ -26,6 +26,8 @@ var _margin: MarginContainer
 var _hints: Control                ## the controls-hint strip (bottom-anchored in duels)
 var _hints_bottom := false
 var _bottom: GridContainer
+var _ability_prompts := {}
+var _bottom_inset := 0.0
 
 
 func setup(match_sim: MatchSim, player_idx: int) -> void:
@@ -53,16 +55,6 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(spacer)
-	var bottom_row := HBoxContainer.new()
-	bottom_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bottom_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	col.add_child(bottom_row)
-	_bottom = GridContainer.new()
-	_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bottom.columns = mini(maxi(n, 1), 4)
-	_bottom.add_theme_constant_override("h_separation", 18)
-	_bottom.add_theme_constant_override("v_separation", 10)
-	bottom_row.add_child(_bottom)
 	var mid := VBoxContainer.new()
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mid.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -76,26 +68,18 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 		if n == 2:
 			cards[sim.fighters[1].index] = _make_card(sim.fighters[1], n, _top, true)
 	else:
-		# 5-8 fighters: the second row of plates moves to the top corners, split around the timer, so the
-		# plates cover half as much of the floor (two bottom rows hid fighters at 1280x800)
-		var top_n := maxi(0, n - 4)
-		var left := HBoxContainer.new()
-		var right := HBoxContainer.new()
-		for box in [left, right]:
-			box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			box.add_theme_constant_override("separation", 18)
-		left.visible = top_n > 0
-		right.visible = top_n > 0
-		_top.add_child(left)
 		_top.add_child(mid)
-		_top.add_child(right)
-		for i in sim.fighters.size():
-			var f: Fighter = sim.fighters[i]
-			if i < 4:
-				cards[f.index] = _make_card(f, n, _bottom, false)
-			else:
-				var to_left := (i - 4) < ceili(top_n / 2.0)
-				cards[f.index] = _make_card(f, n, left if to_left else right, not to_left)
+		_bottom = GridContainer.new()
+		_bottom.name = "TopRoster"
+		_bottom.columns = mini(n, 4)
+		_bottom.add_theme_constant_override("h_separation", 18)
+		_bottom.add_theme_constant_override("v_separation", 8)
+		_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_bottom.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		col.add_child(_bottom)
+		col.move_child(_bottom, 1)
+		for f in sim.fighters:
+			cards[f.index] = _make_card(f, n, _bottom, false)
 	mid.add_child(_timer)
 	mid.add_child(_mode_label)
 	_center = _label("", 110, _font_heavy)
@@ -113,9 +97,9 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 	_sub.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	_sub.offset_left = -700
 	_sub.offset_right = 700
-	# keep subtitles clear of the fighter cards (one or two rows at the bottom)
-	_sub.offset_top = -150 if n <= 2 else (-250 if n <= 4 else -390)
-	_sub.offset_bottom = _sub.offset_top + 64
+	# Keep subtitles between the top fighter cards and the bottom control prompts.
+	_sub.offset_top = -180
+	_sub.offset_bottom = -88
 	_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_sub.add_theme_constant_override("outline_size", 10)
@@ -125,45 +109,51 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 
 
 ## Settings › Gameplay › Control hints: the core actions with the live bindings (players only).
-func _add_control_hints(n: int) -> void:
-	if not bool(Settings.get_value("gameplay.tutorial_prompts")):
+func _add_control_hints(_n: int) -> void:
+	if player_index < 0 or player_index >= sim.fighters.size() or sim.fighters[player_index].controller_kind != "player":
 		return
-	if player_index >= sim.fighters.size() or sim.fighters[player_index].controller_kind != "player":
-		return
-	var bar := PromptBar.new()
+	var bar := HFlowContainer.new()
 	bar.theme = UiTheme.get_theme()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bar.set_prompts([{"actions": ["light"], "text": "Light"}, {"actions": ["heavy"], "text": "Heavy"},
-		{"actions": ["guard"], "text": "Guard"}, {"actions": ["dodge"], "text": "Dodge"}, {"actions": ["grab"], "text": "Grab"},
-		{"actions": ["ability1"], "text": "Trick 1"}, {"actions": ["ability2"], "text": "Trick 2"}, {"actions": ["juice"], "text": "JUICE"}])
-	# a dark strip behind the hints keeps them readable over the bright mat
+	bar.add_theme_constant_override("h_separation", 20)
+	bar.alignment = FlowContainer.ALIGNMENT_CENTER
+	if bool(Settings.get_value("gameplay.tutorial_prompts")):
+		for item in [["light", "Light"], ["heavy", "Heavy"], ["guard", "Guard"], ["dodge", "Dodge"], ["grab", "Grab"]]:
+			var prompt := ButtonPrompt.new([item[0]], item[1], 36)
+			prompt.clickable = false
+			bar.add_child(prompt)
+	var fighter: Fighter = sim.fighters[player_index]
+	for slot in ["ability1", "ability2", "juice"]:
+		if slot != "juice" and not fighter.creature.abilities.has(slot):
+			continue
+		var prompt := CombatPrompt.new([slot], "JUICE" if slot == "juice" else ("Trick 1" if slot == "ability1" else "Trick 2"), 40)
+		bar.add_child(prompt)
+		_ability_prompts[slot] = prompt
 	var strip := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.05, 0.03, 0.08, 0.62)
+	sb.bg_color = Color(0.05, 0.03, 0.08, 0.75)
 	sb.set_corner_radius_all(10)
 	sb.set_content_margin_all(8)
 	strip.add_theme_stylebox_override("panel", sb)
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	strip.add_child(bar)
-	bar.alignment = BoxContainer.ALIGNMENT_CENTER
-	if n <= 2:
-		strip.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-		strip.offset_top = -78
-		strip.offset_bottom = -16
-	else:
-		strip.set_anchors_preset(Control.PRESET_CENTER_TOP)
-		strip.offset_top = 140
-		strip.offset_bottom = 202
-	strip.offset_left = -720
-	strip.offset_right = 720
+	strip.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	strip.offset_top = -78
+	strip.offset_bottom = -16
+	strip.offset_left = -850
+	strip.offset_right = 850
 	add_child(strip)
 	_hints = strip
-	_hints_bottom = n <= 2
+	_hints_bottom = true
 
 
-## Lifts the bottom of the HUD by `px` (the fighter plates, and the hint strip in duels), so a control
+## Lifts subtitles and the control-hint strip by `px`, so a control
 ## bar laid over the match (The Bookie's Table) never hides them.
 func set_bottom_inset(px: float) -> void:
+	_bottom_inset = px
+	if _sub:
+		_sub.offset_top = -180.0 - px
+		_sub.offset_bottom = -88.0 - px
 	if _margin:
 		_margin.add_theme_constant_override("margin_bottom", 28 + int(px))
 	if _hints and _hints_bottom:
@@ -243,14 +233,12 @@ func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dic
 	row.add_child(hype)
 	var hype_l := _label("HYPE", 24, _font)
 	row.add_child(hype_l)
-	var cd1 := _label("", 24, _font)
-	row.add_child(cd1)
-	var cd2 := _label("", 24, _font)
-	row.add_child(cd2)
 	var status := _label("", 23, _font)
+	status.max_lines_visible = 2
+	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(status)
-	return {"box": box, "hp": hp, "trail": trail, "hp_text": hp_text, "st": st, "hype": hype, "hype_l": hype_l,
-		"cd1": cd1, "cd2": cd2, "status": status, "lives": lives, "trail_v": 1.0, "big": big}
+	return {"box": box, "name": name_l, "hp": hp, "trail": trail, "hp_text": hp_text, "st": st, "hype": hype, "hype_l": hype_l,
+		"status": status, "lives": lives, "trail_v": 1.0, "big": big}
 
 
 ## Damage trail behind the health bar: the chunk a hit took stays lit for TRAIL_HOLD seconds
@@ -278,9 +266,13 @@ func _process(dt: float) -> void:
 	if sim == null:
 		return
 	for f in sim.fighters:
-		if not cards.has(f.index) or f.despawned:
+		if not cards.has(f.index):
 			continue
 		var c: Dictionary = cards[f.index]
+		(c["box"] as Control).visible = not f.despawned
+		if f.despawned:
+			continue
+		(c["name"] as Label).text = f.display_name.to_upper()
 		var frac := f.health_frac()
 		(c["hp"] as ProgressBar).value = frac
 		var tr := trail_step(float(c["trail_v"]), float(c.get("trail_hold", 0.0)), frac, float(c.get("hp_prev", frac)), dt)
@@ -293,11 +285,20 @@ func _process(dt: float) -> void:
 		(c["st"] as ProgressBar).value = f.stamina / f.max_stamina
 		(c["hype"] as ProgressBar).value = f.hype / 100.0
 		var juiced := f.time < f.juiced_until
-		var ready_txt := ("JUICE READY [%s]" % Controls.prompt_for("juice")) if bool(c.get("big", true)) else "JUICE!"
-		(c["hype_l"] as Label).text = "JUICED!" if juiced else (ready_txt if f.hype >= 100.0 else "HYPE")
-		var own := f.index == player_index and f.controller_kind == "player"
-		(c["cd1"] as Label).text = _cd_text(f, "ability1", Controls.prompt_for("ability1") if own else "A1")
-		(c["cd2"] as Label).text = _cd_text(f, "ability2", Controls.prompt_for("ability2") if own else "A2")
+		(c["hype_l"] as Label).text = "JUICED!" if juiced else "HYPE"
+		if f.index == player_index and f.controller_kind == "player":
+			for slot in _ability_prompts:
+				var left := float(f.cooldown_left.get(slot, 0.0))
+				var full := 1.0
+				if f.creature.abilities.has(slot):
+					full = maxf(0.01, float(f.creature.cooldowns.get(slot, 1.0)))
+				var available := int(f.charges_left.get(slot, 1)) > 0
+				if available:
+					left = 0.0 # A second charge stays usable while the spent charge recharges.
+				if slot == "juice":
+					available = f.hype >= 100.0 or juiced
+					left = 0.0
+				(_ability_prompts[slot] as CombatPrompt).set_cooldown(left, full, available)
 		var st_txt := []
 		for s in f.statuses.summary():
 			var nm := str(s["element"]) if str(s["element"]) != "" else str(s["name"])
@@ -333,8 +334,10 @@ func _apply_highlight(which: String) -> void:
 	var c: Dictionary = cards[player_index]
 	var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() / 1000.0 * 7.0)
 	var on := Color(1.0 + 0.6 * pulse, 1.0 + 0.6 * pulse, 1.0 + 0.2 * pulse)
-	for key in ["st", "hype", "cd1", "hype_l"]:
+	for key in ["st", "hype", "hype_l"]:
 		(c[key] as CanvasItem).modulate = Color.WHITE
+	for prompt: CanvasItem in _ability_prompts.values():
+		prompt.modulate = Color.WHITE
 	match which:
 		"stamina":
 			(c["st"] as CanvasItem).modulate = on
@@ -342,16 +345,10 @@ func _apply_highlight(which: String) -> void:
 			(c["hype"] as CanvasItem).modulate = on
 			(c["hype_l"] as CanvasItem).modulate = on
 		"cooldown":
-			(c["cd1"] as CanvasItem).modulate = on
+			if _ability_prompts.has("ability1"):
+				(_ability_prompts["ability1"] as CanvasItem).modulate = on
 
 
-func _cd_text(f: Fighter, slot: String, short: String) -> String:
-	if not f.creature.abilities.has(slot):
-		return ""
-	if f.index == player_index and f.controller_kind == "player":
-		short += " " + (f.creature.abilities[slot] as MoveDef).display_name
-	var left := float(f.cooldown_left.get(slot, 0.0))
-	return "%s %.0f" % [short, ceilf(left)] if left > 0.0 else "%s ready" % short
 
 
 func callout(text: String, seconds := 1.4, color := Color(1, 0.92, 0.7)) -> void:

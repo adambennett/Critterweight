@@ -94,7 +94,7 @@ func start(p: Dictionary) -> void:
 	_apply_settings()
 	Audio.attach_match(sim, 0, {"context": "hub", "arena": "hub_cannery"})
 	Audio.crowd_stop(0.1)
-	Audio.music("cannery_radio", 1.5, {"diegetic": true})
+	Audio.music("cannery_radio", 1.5, {"diegetic": true, "context": "hub"})
 	_enter_room(mode.current_space)
 	if not Audio.subtitle.is_connected(_on_subtitle):
 		Audio.subtitle.connect(_on_subtitle)
@@ -244,6 +244,7 @@ func _process(dt: float) -> void:
 		shift = {"right": Vector2(0.4, 0.0), "bottom": Vector2(0.0, 0.34)}.get(board.align, Vector2.ZERO)
 	camera.frame_shift = shift
 	view.update(dt, camera, player().pos())
+	view.dressing.update_throw_line(mode.crates.running(), HubCrateToss.player_behind_line(player()))
 	hud.update_hud(dt, mode, state)
 	_update_fade(dt)
 	_barks()
@@ -397,9 +398,9 @@ func _enter_room(s: String) -> void:
 	Audio.set_room(room)
 	# the Loading Dock's sound system plays the Walkout track once bought (HUB.md §6)
 	if s == "loading_dock" and state.upgrade_level("meta_walkout") > 0 and radio_on:
-		Audio.music("title_night", 1.2, {"diegetic": true})
+		Audio.music("title_night", 1.2, {"diegetic": true, "context": "hub"})
 	elif radio_on and Audio.music_track() != "cannery_radio":
-		Audio.music("cannery_radio", 1.2, {"diegetic": true})
+		Audio.music("cannery_radio", 1.2, {"diegetic": true, "context": "hub"})
 
 
 func _on_interact(ev: Dictionary) -> void:
@@ -450,7 +451,7 @@ func _object(id: String) -> void:
 		"radio":
 			radio_on = not radio_on
 			if radio_on:
-				Audio.music("cannery_radio", 0.6, {"diegetic": true})
+				Audio.music("cannery_radio", 0.6, {"diegetic": true, "context": "hub"})
 				npc_say("needles", HubContent.keyed_line("needles", "radio"))
 			else:
 				Audio.stop_music(0.6)
@@ -592,14 +593,15 @@ func _on_state_changed(kind: String, data: Dictionary) -> void:
 				FighterCosmetics.dress(creature_view, state.profile)
 
 
-## An NPC speaks: a bubble over their head plus their voice (babble for speakers with a grain bank).
+## An NPC speaks: a bubble over their head paced to the recorded voice.
 func npc_say(npc: String, text: String, seconds := 4.0) -> void:
 	if text == "":
 		return
 	var v := view.npc(npc)
+	var d := HubContent.npc(npc)
+	seconds = maxf(seconds, Audio.speech_seconds(str(d.get("speaker", npc)), text) + 0.6)
 	if v:
 		v.say(text, seconds)
-	var d := HubContent.npc(npc)
 	_suppress_sub = v != null and v.global_position.distance_to(player().pos()) < 14.0
 	Audio.say(str(d.get("speaker", npc)), text, 40)
 	_suppress_sub = false

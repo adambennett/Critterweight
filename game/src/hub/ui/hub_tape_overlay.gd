@@ -72,9 +72,10 @@ void fragment() {
 func _process(dt: float) -> void:
 	_t += dt
 	if _t >= _next_line and _line < LINES.size():
-		Audio.say("barnaby", str(LINES[_line]), 75)
+		var text := str(LINES[_line])
+		Audio.say("barnaby", text, 90)
 		_line += 1
-		_next_line = _t + 5.5
+		_next_line = _t + maxf(5.5, Audio.speech_seconds("barnaby", text) + 0.3)
 
 
 func _unhandled_input(event: InputEvent) -> void:

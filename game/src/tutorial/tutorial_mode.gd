@@ -161,6 +161,8 @@ func _say(kind: String, raw: String) -> void:
 	var line := Tutorial.fill(raw, player().creature)
 	coach = {"kind": kind, "text": line}
 	sim.emit_event({"type": "tutorial_line", "kind": kind, "text": line, "index": index})
+	if kind != "hint":
+		Audio.stop_announcer() # Advancing a lesson replaces instructions for the previous state.
 	Audio.say("granny", line, 80 if kind != "hint" else 60)
 
 

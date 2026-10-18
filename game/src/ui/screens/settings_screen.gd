@@ -151,6 +151,10 @@ func _build_tab() -> void:
 		_list.content.add_child(row)
 		_rows.append(row)
 	match cat:
+		"audio":
+			var jukebox := UiButton.new("Jukebox", "", "settings")
+			jukebox.pressed.connect(func(): App.push("jukebox"))
+			_list.content.add_child(jukebox)
 		"input":
 			_build_input_extras()
 		"gameplay":

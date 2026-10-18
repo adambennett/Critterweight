@@ -225,3 +225,13 @@ static func playable_arenas(in_dir := "") -> Array:
 		if sid != "" and not seen.has(sid) and not seen.has(content_id(sid)):
 			out.append({"id": sid, "name": s["name"], "base": s["base"], "source": "user"})
 	return out
+
+
+## Compare filenames too: punctuation and case can collapse to the same slug.
+static func unused_name(base_name: String, in_dir := "") -> String:
+	var candidate := base_name
+	var suffix := 0
+	while FileAccess.file_exists(path_for(candidate, in_dir)):
+		suffix += 1
+		candidate = "%s %d" % [base_name, suffix]
+	return candidate

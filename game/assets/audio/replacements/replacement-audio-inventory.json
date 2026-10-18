@@ -84,17 +84,13 @@
       "sha256": "0d3bfde5a050f3c5e6685bd7f1efc7ab1d289fbad65c88c1ce9b4691228c69c9",
       "source_id": "oga-applause",
       "license": "Creative Commons Zero (CC0 1.0)",
-      "bank_references": [
-        "bank.sfx.crowd_cheer.files[0]"
-      ]
+      "bank_references": []
     },
     "assets/audio/replacements/crowd/crowd-shouting.ogg": {
       "sha256": "a2c23a64c127c77717cbe4abb21f138bac9d9aa6cb3cc89d62bab5d0d96dd7ca",
       "source_id": "oga-crowd",
       "license": "Creative Commons Zero (CC0 1.0)",
-      "bank_references": [
-        "bank.sfx.crowd_murmur.files[0]"
-      ]
+      "bank_references": []
     },
     "assets/audio/replacements/footsteps/footstep_carpet_000.ogg": {
       "sha256": "b9524658b52a99a20590f8feefc103088637fd13ea8ec35811aee785e1f2f330",
@@ -1201,9 +1197,7 @@
       "title": "Applause in a Large Hall or Church",
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://opengameart.org/content/applause-in-a-large-hall-or-church",
-      "bank_references": [
-        "bank.sfx.crowd_cheer.files[0]"
-      ]
+      "bank_references": []
     },
     {
       "file": "assets/audio/replacements/crowd/crowd-shouting.ogg",
@@ -1215,9 +1209,7 @@
       "title": "Crowd Shouting/Speaking Ambience",
       "license": "Creative Commons Zero (CC0 1.0)",
       "source": "https://opengameart.org/content/crowd-shoutingspeaking-ambience",
-      "bank_references": [
-        "bank.sfx.crowd_murmur.files[0]"
-      ]
+      "bank_references": []
     },
     {
       "file": "assets/audio/replacements/footsteps/footstep_carpet_000.ogg",

@@ -277,13 +277,13 @@ game/assets/audio/crowd/crowd_chant.wav
   bank.sfx.crowd_chant.files[0]
 game/assets/audio/crowd/crowd_cheer_0.wav
   2.934s | 22050 Hz | 1 channel(s)
-  Referenced indirectly by its voice grain bank
+  bank.sfx.crowd_cheer.files[0]
 game/assets/audio/crowd/crowd_cheer_1.wav
   2.827s | 22050 Hz | 1 channel(s)
-  Referenced indirectly by its voice grain bank
+  bank.sfx.crowd_cheer.files[1]
 game/assets/audio/crowd/crowd_cheer_2.wav
   2.847s | 22050 Hz | 1 channel(s)
-  Referenced indirectly by its voice grain bank
+  bank.sfx.crowd_cheer.files[2]
 game/assets/audio/crowd/crowd_excited.wav
   7.2s | 22050 Hz | 1 channel(s)
   bank.sfx.crowd_excited.files[0]
@@ -301,7 +301,7 @@ game/assets/audio/crowd/crowd_laugh_1.wav
   bank.sfx.crowd_laugh.files[1]
 game/assets/audio/crowd/crowd_murmur.wav
   7.2s | 22050 Hz | 1 channel(s)
-  Referenced indirectly by its voice grain bank
+  bank.sfx.crowd_murmur.files[0]
 game/assets/audio/crowd/crowd_ooh_0.wav
   1.54s | 22050 Hz | 1 channel(s)
   bank.sfx.crowd_ooh.files[0]

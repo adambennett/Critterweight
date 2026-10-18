@@ -32,6 +32,13 @@
 			]
 		},
 		{
+			"heading": "Campaign event art",
+			"lines": [
+				"29 original event illustrations generated with OpenAI image_gen under the project lead's direction.",
+				"Art prompts and provenance are recorded in docs/evidence/art/events/prompts.json."
+			]
+		},
+		{
 			"heading": "Engine and middleware",
 			"lines": [
 				"Godot Engine 4.5.1 — godotengine.org — MIT License",
@@ -51,7 +58,8 @@
 			"lines": [
 				"Funkorama, Backbay Lounge, Furious Freak and Volatile Reaction — Kevin MacLeod (incompetech.com) — CC BY 4.0.",
 				"Kenney Impact Sounds, Interface Sounds, RPG Audio and Music Jingles — CC0 1.0.",
-				"OpenGameArt: Waterflow Sound by TyberiusGames; crowd ambience by StarNinjas; applause by eXpl0it3r — CC0 1.0."
+				"OpenGameArt: Waterflow Sound by TyberiusGames; crowd ambience by StarNinjas; applause by eXpl0it3r — CC0 1.0.",
+				"Dialogue: BreezeBlue TTS 2, using Devon, Kendall and Coach Buck library voices selected by the project lead. Original game writing; paid-plan commercial-use outputs."
 			]
 		},
 		{
@@ -104,6 +112,12 @@
 			"license": "Creative Commons Zero (CC0 1.0)",
 			"source": "https://opengameart.org/content/applause-in-a-large-hall-or-church",
 			"text": "Applause in a Large Hall or Church by eXpl0it3r, OpenGameArt. CC0 1.0. License deed: https://creativecommons.org/publicdomain/zero/1.0/. Supplied WAV used without editing."
+		},
+		{
+			"title": "BreezeBlue generated dialogue",
+			"license": "Commercial-use generated outputs under an active paid subscription",
+			"source": "https://breezeblue.ai/legal/terms",
+			"text": "Original Critterweight dialogue generated on 2026-10-18 with BreezeBlue TTS 2 and library voices Devon, Kendall and Coach Buck. BreezeBlue Terms of Service, effective September 10, 2026, section 5: paid-subscription outputs may be used commercially; that permission survives cancellation. The outputs are not CC0 and this does not grant rights in Breeze models or voices. Generation text, voice IDs, instructions, hashes and budget evidence are retained in docs/audio/breeze/."
 		}
 	]
 }

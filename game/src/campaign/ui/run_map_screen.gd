@@ -1,5 +1,5 @@
 extends Screen
-## The fight card map: the current act's rows left-to-right (row 1 -> boss), edges between
+## The fight card chart: climb from the first row to the boss, with curved routes between
 ## nodes, node types as icon + text (unrevealed rows show ???), the current position and the
 ## reachable next nodes as focusable buttons. Controller: up/down cycles the reachable nodes,
 ## left/right jumps between the map and the side panel, A/Enter enters, B/Esc offers to suspend.
@@ -12,6 +12,7 @@ extends Screen
 var flow: CampaignFlow
 var ctrl: RunController
 var _map_view: Control
+var _map_scroll: ScrollContainer
 var _node_buttons := {}          ## node id -> Button
 var _reachable: Array = []       ## Buttons of reachable nodes (focus order)
 var _side_buttons: Array = []
@@ -27,8 +28,7 @@ func on_enter(p: Dictionary) -> void:
 	_build()
 	if str(p.get("fight_error", "")) != "" and ctrl.phase() == "fight":
 		_show_fight_error(str(p["fight_error"]))
-	else:
-		_maybe_act_intro()
+
 
 
 func _show_fight_error(errors: String) -> void:
@@ -72,13 +72,19 @@ func _build() -> void:
 	map_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	map_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	cols.add_child(map_panel)
+	_map_scroll = ScrollContainer.new()
+	_map_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	_map_scroll.follow_focus = true
+	_map_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	map_panel.add_child(_map_scroll)
 	_map_view = MapView.new()
 	_map_view.screen = self
-	map_panel.add_child(_map_view)
+	_map_scroll.add_child(_map_view)
 	_place_nodes()
 	cols.add_child(_side_panel())
-	var foot := HBoxContainer.new()
-	foot.add_theme_constant_override("separation", 18)
+	var foot := HFlowContainer.new()
+	foot.add_theme_constant_override("h_separation", 18)
+	foot.add_theme_constant_override("v_separation", 4)
 	for t in ["fight", "elite", "event", "shop", "rest", "mystery", "treasure", "boss"]:
 		var hb := HBoxContainer.new()
 		var ic := CampaignUI.NodeIcon.new(t)
@@ -88,6 +94,7 @@ func _build() -> void:
 		hb.add_child(CampaignUI.inline_label(str(CampaignUI.NODE_NAMES[t]) if t != "mystery" else "? MYSTERY", 18, CampaignUI.MUTED))
 		foot.add_child(hb)
 	v.add_child(foot)
+	v.add_child(CampaignUI.label("Drag the chart / mouse wheel / right stick to explore · Select a pulsing stop to continue", 18, CampaignUI.MUTED))
 	_msg = CampaignUI.label("\n".join(flow.notices) if not flow.notices.is_empty() else "", 20, CampaignUI.DANGER)
 	flow.notices.clear()
 	v.add_child(_msg)
@@ -133,99 +140,91 @@ func refresh_party() -> void:
 	var votes: Dictionary = vv.get("votes", {})
 	for id in _node_buttons:
 		var b: Button = _node_buttons[id]
-		if not is_instance_valid(b) or not b.has_meta("base_text"):
+		if not is_instance_valid(b):
 			continue
 		var n := 0
 		for voter in votes:
 			if str(votes[voter]) == str(id):
 				n += 1
-		var t := str(b.get_meta("base_text"))
+		var t := _stop_name(str(id))
 		if not vv.is_empty() and not b.disabled:
 			t += "\nVOTES %d%s" % [n, "  (yours)" if str(votes.get(flow.me, "")) == str(id) else ""]
-		b.text = t
+		b.tooltip_text = t
 	if flow.notices.is_empty():
 		_msg.text = _party_status()
 
 
-func _node_style(bg: Color, border: Color, width: int) -> StyleBoxFlat:
-	var sb := CampaignUI.style(bg, border, width)
-	sb.content_margin_left = 54
-	sb.content_margin_right = 8
-	return sb
-
-
 func _place_nodes() -> void:
-	var m := RunState.current_map(ctrl.state)
-	var avail := ctrl.available_nodes() if ctrl.phase() == "map" else []
-	var pos := str(ctrl.state.get("position", ""))
+	var map := RunState.current_map(ctrl.state)
+	var available := ctrl.available_nodes() if ctrl.phase() == "map" else []
+	var position := str(ctrl.state.get("position", ""))
 	var path: Array = ctrl.state.get("path", [])
-	var rows: Array = m.get("rows", [])
-	for r in rows.size():
-		for id in rows[r]:
-			var n: Dictionary = m["nodes"][id]
-			var t := ctrl.visible_type(str(id))
-			var on := avail.has(id)
-			var here := str(id) == pos
+	var rows: Array = map.get("rows", [])
+	_map_view.custom_minimum_size = Vector2(860, maxf(700, rows.size() * 170 + 80))
+	for row in rows.size():
+		for id in rows[row]:
+			var node: Dictionary = map["nodes"][id]
+			var kind := ctrl.visible_type(str(id))
+			var available_now := available.has(id)
+			var here := str(id) == position
 			var done := path.has(id)
-			var b := Button.new()
-			b.focus_mode = Control.FOCUS_ALL if on else Control.FOCUS_NONE
-			b.disabled = not on
-			b.custom_minimum_size = Vector2(168, 76)
-			b.size = b.custom_minimum_size
-			var txt := str(CampaignUI.NODE_NAMES.get(t, t)) if t != "mystery" else "? MYSTERY"
-			var lbl := ctrl.node_label(str(id))
-			if lbl != "":
-				txt += "\n" + lbl
-			if here:
-				txt += "\nYOU ARE HERE"
-			elif done:
-				txt += "\ncleared"
-			elif on and flow.is_party():
-				b.set_meta("base_text", txt)     # refresh_party adds the votes line
-			elif on:
-				txt += "\nreachable"
-			b.text = txt
-			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-			b.clip_text = true
-			b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-			b.add_theme_font_size_override("font_size", 19)
-			var fnt := CampaignUI.font("700")
-			if fnt:
-				b.add_theme_font_override("font", fnt)
-			var col: Color = CampaignUI.NODE_COLORS.get(t, Color.WHITE)
-			b.add_theme_stylebox_override("normal", _node_style(CampaignUI.PANEL_HI, col, 3))
-			b.add_theme_stylebox_override("hover", _node_style(col.darkened(0.15), Color.WHITE, 3))
-			b.add_theme_stylebox_override("focus", _node_style(col, Color.WHITE, 5))
-			b.add_theme_stylebox_override("pressed", _node_style(col.darkened(0.3), Color.WHITE, 5))
-			var dis_bg := CampaignUI.PANEL_HI.darkened(0.25) if (done or here) else CampaignUI.PANEL.darkened(0.2)
-			var dis_border := CampaignUI.ACCENT if here else (col.darkened(0.35) if done else col.darkened(0.65))
-			b.add_theme_stylebox_override("disabled", _node_style(dis_bg, dis_border, 4 if here else 1))
-			b.add_theme_color_override("font_color", CampaignUI.INK)
-			b.add_theme_color_override("font_disabled_color", CampaignUI.INK if (here or done) else CampaignUI.MUTED.darkened(0.2))
-			b.add_theme_color_override("font_focus_color", CampaignUI.BG)
-			b.add_theme_color_override("font_hover_color", CampaignUI.BG)
-			b.add_theme_color_override("font_pressed_color", CampaignUI.BG)
-			var icon := CampaignUI.NodeIcon.new(t)
-			icon.lit = on or here or done
-			icon.anchor_top = 0.5
-			icon.anchor_bottom = 0.5
-			icon.offset_top = -22
-			icon.offset_bottom = 22
-			icon.offset_left = 8
-			icon.offset_right = 52
-			b.add_child(icon)
-			b.set_meta("row", r)
-			b.set_meta("x", float(n.get("x", 0.5)))
-			if on:
-				b.pressed.connect(_enter.bind(str(id)))
-				b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-				_reachable.append(b)
-			b.tooltip_text = txt.replace("\n", " · ")
-			_map_view.add_child(b)
-			_node_buttons[str(id)] = b
-	_reachable.sort_custom(func(a, c): return float(a.get_meta("x", 0.0)) < float(c.get_meta("x", 0.0)))
+			var button := Button.new()
+			button.name = "Stop_" + str(id).replace(":", "_")
+			button.disabled = not available_now
+			button.focus_mode = Control.FOCUS_ALL if available_now else Control.FOCUS_NONE
+			button.size = Vector2(100, 108)
+			button.custom_minimum_size = button.size
+			button.pivot_offset = button.size * 0.5
+			var color: Color = CampaignUI.NODE_COLORS.get(kind, Color.WHITE)
+			for state in ["normal", "hover", "pressed", "disabled"]:
+				button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+			button.add_theme_stylebox_override("focus", CampaignUI.style(Color(color, 0.16), color, 2, 16))
+			var icon := CampaignUI.NodeIcon.new(kind)
+			icon.position = Vector2(14, 0)
+			icon.size = Vector2(72, 72)
+			icon.lit = available_now or here or done
+			button.add_child(icon)
+			var caption := CampaignUI.label(str(CampaignUI.NODE_NAMES.get(kind, kind)), 18, color if available_now or here else CampaignUI.MUTED, "900")
+			caption.position = Vector2(0, 75)
+			caption.size = Vector2(100, 28)
+			caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			button.add_child(caption)
+			if here or done:
+				var mark := CampaignUI.label("HERE" if here else "CLEARED", 14, CampaignUI.ACCENT if here else CampaignUI.MUTED, "700")
+				mark.position = Vector2(0, -23)
+				mark.size.x = 100
+				mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				button.add_child(mark)
+			button.set_meta("row", row)
+			button.set_meta("x", float(node.get("x", 0.5)))
+			button.tooltip_text = "%s%s" % [CampaignUI.NODE_NAMES.get(kind, kind), " · " + ctrl.node_label(str(id)) if ctrl.node_label(str(id)) != "" else ""]
+			if available_now:
+				button.pressed.connect(_enter.bind(str(id)))
+				button.focus_entered.connect(_reveal_node.bind(button))
+				button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+				_reachable.append(button)
+			_map_view.add_child(button)
+			_node_buttons[str(id)] = button
+	_reachable.sort_custom(func(a, b): return float(a.get_meta("x")) < float(b.get_meta("x")))
 	if not _reachable.is_empty():
 		_first = _reachable[0]
+
+
+func _reveal_node(button: Control) -> void:
+	_map_scroll.ensure_control_visible.call_deferred(button)
+
+
+func right_stick_scroll_target() -> Control:
+	var focus := get_viewport().gui_get_focus_owner()
+	return _map_scroll if focus != null and _map_view.is_ancestor_of(focus) else null
+
+
+func _process(_dt: float) -> void:
+	for button: Control in _reachable:
+		var pulse := 1.0 if UiTheme.reduce_motion() else 1.0 + 0.045 * sin(Time.get_ticks_msec() / 650.0)
+		button.scale = Vector2.ONE * pulse
 
 
 func _wire_focus() -> void:
@@ -349,19 +348,6 @@ func _use(cid: String) -> void:
 		_build()
 
 
-func _maybe_act_intro() -> void:
-	var act := int(ctrl.state.get("act", 1))
-	if str(ctrl.state.get("position", "")) != "" or flow.intro_seen.has(act):
-		return
-	flow.intro_seen[act] = true
-	var act_def: Dictionary = ctrl.catalog.acts.get(act, {})
-	var boss_enc: Dictionary = ctrl.catalog.encounters.get(str(act_def.get("boss", "")), {})
-	var body := str(act_def.get("blurb", ""))
-	if not boss_enc.is_empty():
-		body += "\n\nTonight's headliner: %s." % str(boss_enc.get("name", "")).replace("Boss: ", "")
-	CampaignUI.confirm(self, "ACT %d — %s" % [act, str(act_def.get("name", "")).to_upper()], body, [{"label": "LET'S GO", "id": "ok"}], _after_modal)
-
-
 func _after_modal(_id: String) -> void:
 	var f := default_focus()
 	if f:
@@ -419,56 +405,55 @@ func default_focus() -> Control:
 class MapView:
 	extends Control
 	var screen
+	var dragging := false
 
 	func _init() -> void:
 		size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		size_flags_vertical = Control.SIZE_EXPAND_FILL
-		custom_minimum_size = Vector2(900, 520)
+		mouse_filter = Control.MOUSE_FILTER_STOP
 		resized.connect(_layout)
 
 	func _ready() -> void:
 		_layout.call_deferred()
 
-	func _rows() -> int:
-		return (RunState.current_map(screen.ctrl.state).get("rows", []) as Array).size()
-
-	func _cell(row: int, x: float, rows: int) -> Vector2:
-		var w := size.x - 180.0
-		var h := size.y - 100.0
-		return Vector2(10.0 + w * (float(row) / maxf(1.0, float(rows - 1))), 10.0 + h * x)
-
 	func _layout() -> void:
-		var rows := _rows()
-		for c in get_children():
-			if c is Button:
-				var b: Button = c
-				b.position = _cell(int(b.get_meta("row", 0)), float(b.get_meta("x", 0.5)), rows)
+		var rows: Array = RunState.current_map(screen.ctrl.state).get("rows", [])
+		for child in get_children():
+			if child is Button:
+				var row := int(child.get_meta("row", 0))
+				var lane := float(child.get_meta("x", 0.5))
+				child.position = Vector2(60 + lane * (size.x - 220), 45 + (rows.size() - 1 - row) * 170)
 		queue_redraw()
+		if screen._first:
+			screen._reveal_node.call_deferred(screen._first)
+
+	func _gui_input(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE]:
+			dragging = event.pressed
+			accept_event()
+		elif event is InputEventMouseMotion and dragging:
+			screen._map_scroll.scroll_vertical -= int(event.relative.y)
+			screen._map_scroll.scroll_horizontal -= int(event.relative.x)
+			accept_event()
 
 	func _draw() -> void:
-		var m := RunState.current_map(screen.ctrl.state)
+		var map := RunState.current_map(screen.ctrl.state)
 		var path: Array = screen.ctrl.state.get("path", [])
-		var pos := str(screen.ctrl.state.get("position", ""))
-		var avail: Array = screen.ctrl.available_nodes()
-		var buttons: Dictionary = screen._node_buttons
-		for id in m.get("nodes", {}):
-			var ba: Control = buttons.get(str(id))
-			if ba == null:
+		var position := str(screen.ctrl.state.get("position", ""))
+		var available: Array = screen.ctrl.available_nodes()
+		for id in map.get("nodes", {}):
+			var source: Control = screen._node_buttons.get(str(id))
+			if source == null:
 				continue
-			var a := ba.position + Vector2(ba.size.x, ba.size.y * 0.5)
-			for e in m["nodes"][id].get("edges", []):
-				var bb: Control = buttons.get(str(e))
-				if bb == null:
+			for edge in map["nodes"][id].get("edges", []):
+				var destination: Control = screen._node_buttons.get(str(edge))
+				if destination == null:
 					continue
-				var b := bb.position + Vector2(0.0, bb.size.y * 0.5)
-				var walked := path.has(id) and path.has(e)
-				var next := str(id) == pos and avail.has(e)
-				var col := CampaignUI.ACCENT if walked else (Color(1, 1, 1, 0.75) if next else Color(1, 1, 1, 0.16))
-				draw_line(a, b, col, 5.0 if walked else (3.0 if next else 2.0), true)
-		if pos == "":
-			# act start: draw stubs into the first row so the entry choice reads as a route
-			for e2 in avail:
-				var bs: Control = buttons.get(str(e2))
-				if bs:
-					var tip := bs.position + Vector2(0.0, bs.size.y * 0.5)
-					draw_line(tip - Vector2(28, 0), tip, Color(1, 1, 1, 0.75), 3.0, true)
+				var a := source.position + Vector2(50, 0)
+				var b := destination.position + Vector2(50, 72)
+				var walked := path.has(id) and path.has(edge)
+				var next := str(id) == position and available.has(edge)
+				var color := CampaignUI.ACCENT if walked else (Color("#d1c9ac") if next else Color("#49464d"))
+				var curve := Curve2D.new()
+				curve.add_point(a, Vector2.ZERO, Vector2(0, -48))
+				curve.add_point(b, Vector2(0, 48), Vector2.ZERO)
+				draw_polyline(curve.get_baked_points(), color, 3.0 if walked or next else 2.0, true)

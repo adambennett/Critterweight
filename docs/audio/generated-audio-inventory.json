@@ -1119,7 +1119,9 @@
       "channels": 1,
       "bytes": 129418,
       "sha256": "fd7e037e537405d165ddec7d805ddf9d328ae24ec53a8036429747c640a34adf",
-      "bank_references": [],
+      "bank_references": [
+        "bank.sfx.crowd_cheer.files[0]"
+      ],
       "generated_by": "tools/audio/build.js"
     },
     {
@@ -1130,7 +1132,9 @@
       "channels": 1,
       "bytes": 124730,
       "sha256": "a67ef7ba024f9eeb32f460dc0dbf2f015ae4a76565ca3ba45f7dcbbba33fc7af",
-      "bank_references": [],
+      "bank_references": [
+        "bank.sfx.crowd_cheer.files[1]"
+      ],
       "generated_by": "tools/audio/build.js"
     },
     {
@@ -1141,7 +1145,9 @@
       "channels": 1,
       "bytes": 125600,
       "sha256": "cc2890de32ceb702543e64dc773e1e45459ca29e1596a023fdb57d8ad450b939",
-      "bank_references": [],
+      "bank_references": [
+        "bank.sfx.crowd_cheer.files[2]"
+      ],
       "generated_by": "tools/audio/build.js"
     },
     {
@@ -1217,7 +1223,9 @@
       "channels": 1,
       "bytes": 317564,
       "sha256": "56e5b9e313d91f93092dffa16e9888252a74486e3dbd026ae53c369033008b87",
-      "bank_references": [],
+      "bank_references": [
+        "bank.sfx.crowd_murmur.files[0]"
+      ],
       "generated_by": "tools/audio/build.js"
     },
     {

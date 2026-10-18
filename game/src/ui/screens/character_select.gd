@@ -8,11 +8,6 @@ extends Screen
 ## Creature JSON fields used for presentation (all optional): name, title (epithet), element,
 ## stats {health, walk_speed, stamina, poise, power}, blurb (playstyle), tags, abilities.*.name, juice.name.
 
-## Ranges for stat bars (ROSTER.md weight-class table spans these).
-const STAT_RANGES := {"health": [60.0, 150.0], "walk_speed": [2.2, 4.6], "stamina": [80.0, 115.0], "poise": [30.0, 100.0], "power": [0.7, 1.3]}
-const STAT_LABELS := {"health": "Health", "walk_speed": "Speed", "stamina": "Stamina", "poise": "Poise", "power": "Power"}
-const CLASSES := [[65.0, "Pipsqueak"], [110.0, "Scrapper"], [145.0, "Lunker"], [9999.0, "Absolute Unit"]]
-
 var mode := "quick"
 var _cards: Array[CreatureCard] = []
 var _grid: GridContainer
@@ -20,6 +15,7 @@ var _scroll: FocusScroll
 var _detail: VBoxContainer
 var _on_pick: Callable
 var _current := ""
+var _fighter_info: FighterInfo
 
 
 func on_enter(p: Dictionary) -> void:
@@ -55,13 +51,9 @@ func on_enter(p: Dictionary) -> void:
 	poster.custom_minimum_size = Vector2(600, 0)
 	cols.add_child(poster)
 	# the tale of the tape scrolls inside the poster so long kits never push the footer off screen
-	var ds := ScrollContainer.new()
-	ds.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	ds.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	poster.add_child(ds)
-	_detail = UiTheme.vbox(UiTheme.GAP_S)
-	_detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ds.add_child(_detail)
+	_fighter_info = FighterInfo.new()
+	poster.add_child(_fighter_info)
+	_detail = _fighter_info.content
 	if ids.is_empty():
 		_detail.add_child(UiTheme.label("No playable fighters were found in the loaded content.", "Danger", true))
 	play_intro()
@@ -89,74 +81,15 @@ func cards() -> Array[CreatureCard]:
 
 
 static func weight_class(d: Dictionary) -> String:
-	var body = d.get("body", {})
-	var mass := 0.0
-	if typeof(body) == TYPE_DICTIONARY:
-		for s in (body as Dictionary).get("segments", []):
-			mass += float((s as Dictionary).get("mass", 0.0))
-	if mass <= 0.0:
-		return ""
-	for c in CLASSES:
-		if mass <= float(c[0]):
-			return "%s · %d kg" % [str(c[1]), roundi(mass)]
-	return ""
+	return FighterInfo.weight_class(d)
 
 
 func _show_detail(id: String) -> void:
-	for ch in _detail.get_children():
-		ch.queue_free()
-	if id == "random":
-		_detail.add_child(UiTheme.label("THE FIGHTER IS", "Eyebrow"))
-		_detail.add_child(UiTheme.label("RANDOM", "H1"))
-		_detail.add_child(UiTheme.label("Anyone on the roster could step through the door. You'll find out at the bell.", "Body", true))
-		return
-	var d := Content.get_entry("creatures", id)
-	var defs := CreatureDef.new()
-	_detail.add_child(UiTheme.label("TALE OF THE TAPE", "Eyebrow"))
-	_detail.add_child(UiTheme.label(str(d.get("name", id)).to_upper(), "H1"))
-	var title := str(d.get("title", ""))
-	if title != "":
-		var t := UiTheme.label(title, "H3")
-		t.add_theme_color_override("font_color", UiTheme.WARM)
-		_detail.add_child(t)
-	var el := str(d.get("element", ""))
-	_detail.add_child(UiIcons.element_badge(el, 46, true))
-	var wc := weight_class(d)
-	if wc != "":
-		var wl := UiTheme.label(wc.to_upper(), "Eyebrow")
-		wl.add_theme_color_override("font_color", UiTheme.MUTED)
-		_detail.add_child(wl)
-	_detail.add_child(UiTheme.spacer(false, 6))
-	var st: Dictionary = d.get("stats", {})
-	for k in ["health", "walk_speed", "stamina", "poise", "power"]:
-		var v := float(st.get(k, defs.stats.get(k, 1.0)))
-		var rg: Array = STAT_RANGES[k]
-		var frac := (v - float(rg[0])) / (float(rg[1]) - float(rg[0]))
-		var txt := ("%.1f m/s" % v) if k == "walk_speed" else (("%d%%" % roundi(v * 100.0)) if k == "power" else "%d" % roundi(v))
-		_detail.add_child(StatBar.new(str(STAT_LABELS[k]), frac, txt, UiTheme.element_color(el) if el != "" else UiTheme.GOLD))
-	_detail.add_child(UiTheme.spacer(false, 6))
-	var blurb := str(d.get("blurb", d.get("playstyle", d.get("description", ""))))
-	if blurb == "":
-		var tags: Array = d.get("tags", [])
-		blurb = "Engine test fighter: a plain biped used to tune the physics and the combat." if tags.has("dev") else "No scouting report on this one yet."
-	_detail.add_child(UiTheme.label("PLAYSTYLE", "Eyebrow"))
-	_detail.add_child(UiTheme.label(blurb, "Body", true))
-	var kit := _kit_text(d)
-	if kit != "":
-		_detail.add_child(UiTheme.label("KIT", "Eyebrow"))
-		_detail.add_child(UiTheme.label(kit, "Caption", true))
+	_fighter_info.show_fighter(id)
 
 
-func _kit_text(d: Dictionary) -> String:
-	var parts: PackedStringArray = PackedStringArray()
-	var ab: Dictionary = d.get("abilities", {})
-	for slot in ["ability1", "ability2"]:
-		if ab.has(slot) and typeof(ab[slot]) == TYPE_DICTIONARY:
-			parts.append("%s: %s" % ["LB" if slot == "ability1" else "RB", str((ab[slot] as Dictionary).get("name", slot))])
-	var j = d.get("juice", {})
-	if typeof(j) == TYPE_DICTIONARY and (j as Dictionary).has("name"):
-		parts.append("JUICE: %s" % str((j as Dictionary)["name"]))
-	return "   ·   ".join(parts)
+func right_stick_scroll_target() -> Control:
+	return _fighter_info
 
 
 func _choose(id: String) -> void:
