@@ -4,7 +4,7 @@
 
 ## Checks
 
-- Godot 4.5.1 script check: **394 scripts, 0 failures**. The package was built from the clean `v0.9.14` tag; the [build manifest](tagged-build-manifest.json) records all four targets and `working_tree_dirty: false`.
+- Godot 4.5.1 script check: **394 scripts, 0 failures**. [Packaged check log](packaged-script-check.log). The package was built from the clean `v0.9.14` tag; the [build manifest](tagged-build-manifest.json) records all four targets and `working_tree_dirty: false`.
 - Source audio suite on v0.9.14: **20 run, 20 passed, 0 failed, 0 skipped**. This includes `test_menu_focus_uses_soft_interface_ticks`, which checks the three exact bank clips, the -14 dB ceiling, stream loading and short duration. [Results](source-audio-tests.json) · [runtime log](source-audio-tests.log).
 - Packaged Windows audio suite: **20 run, 18 passed, 0 failed, 2 source-only checks skipped**. The new menu tick test passed against the exported PCK. The skipped checks scan source files that are not shipped in exports. [Results](packaged-audio-tests.json) · [runtime log](packaged-audio-tests.log).
 - Packaged Windows game booted to the title in **5684 ms** and its rendered regression suite passed **20/20**, with no skips. [Boot report](packaged-boot.json) · [test results](packaged-rendered-tests.json) · [runtime log](packaged-rendered-tests.log).

@@ -1,0 +1,48 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-18 11:38:18 [INFO] paths: user data root: B:/Critterweight/release-work/v0.9.14-temp/packaged-audio-confirmed
+2026-10-18 11:38:19 [INFO] audio: bank loaded: 312 sfx ids, 8 music tracks, 2 voices
+2026-10-18 11:38:19 [INFO] app: Critterweight 0.9.14 (95c857a) (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/audio/test_audio_announcer.gd::test_all_lines_have_ids_subtitles_and_triggers (3 ms)
+2026-10-18 11:38:19 [WARN] audio: unknown sound id 'line:no_such_line'
+ok    res://src/test/audio/test_audio_announcer.gd::test_announce_emits_subtitle_and_substitutes_names (2 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_babble_plan (2 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_priority_interrupt_and_queue_rules (0 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_sim_event_mapping (1 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_trigger_picks_most_specific_line_and_rotates (1 ms)
+ok    res://src/test/audio/test_audio_babble.gd::test_babble_speaks_a_line_headless (1386 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_bank_loads_and_every_id_resolves (572 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_every_creature_has_a_voice_in_the_bank (0 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_frequent_sounds_have_variations (1 ms)
+skip  res://src/test/audio/test_audio_bank.gd::test_literal_ids_in_code_exist (scans GDScript source; exported builds ship compiled scripts (runs in the source suite))
+skip  res://src/test/audio/test_audio_bank.gd::test_manifest_matches_files_on_disk (exported builds ship imported samples, not the source .wav files)
+ok    res://src/test/audio/test_audio_bank.gd::test_menu_focus_uses_soft_interface_ticks (0 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_music_tracks_loops_and_layers (0 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_no_file_peaks_above_minus_one_dbfs (9 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_replacement_assets_are_present_and_hashed (15 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_required_ids_present (0 ms)
+ok    res://src/test/audio/test_audio_bank.gd::test_size_budget (6 ms)
+ok    res://src/test/core/test_content_targets.gd::test_audio_and_lab_targets (1 ms)
+2026-10-18 11:38:22 [INFO] hub: sim build ms: 10
+2026-10-18 11:38:23 [INFO] hub: view build ms: structure 8 dressing 39 commit 4 water+npcs 21 props+upgrades 24 ambient 8; batch verts 35082
+2026-10-18 11:38:23 [INFO] match: start hub_spar on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/bot
+2026-10-18 11:38:23 [INFO] hub: sim build ms: 4
+2026-10-18 11:38:23 [INFO] hub: view build ms: structure 7 dressing 27 commit 3 water+npcs 17 props+upgrades 16 ambient 7; batch verts 35082
+2026-10-18 11:38:23 [INFO] match: start tape_1973 on the_gullet: boss_snappington/t0/bot, f_dozer/t1/bot
+2026-10-18 11:38:23 [INFO] hub: sim build ms: 4
+2026-10-18 11:38:23 [INFO] hub: view build ms: structure 8 dressing 30 commit 2 water+npcs 15 props+upgrades 21 ambient 8; batch verts 35082
+2026-10-18 11:38:23 [INFO] match: start tutorial on practice_cage: f_stoke/t0/player, npc_kid_lamprey/t1/scripted
+2026-10-18 11:38:23 [INFO] hub: sim build ms: 4
+2026-10-18 11:38:23 [INFO] hub: view build ms: structure 8 dressing 28 commit 3 water+npcs 15 props+upgrades 17 ambient 8; batch verts 35082
+2026-10-18 11:38:24 [INFO] hub: sim build ms: 4
+2026-10-18 11:38:24 [INFO] hub: view build ms: structure 6 dressing 22 commit 4 water+npcs 6 props+upgrades 16 ambient 7; batch verts 35082
+2026-10-18 11:38:24 [INFO] match: start hub_spar on arena_rooftop: f_stoke/t0/player, npc_kid_lamprey/t1/bot
+2026-10-18 11:38:24 [INFO] hub: sim build ms: 4
+2026-10-18 11:38:24 [INFO] hub: view build ms: structure 8 dressing 32 commit 4 water+npcs 17 props+upgrades 21 ambient 8; batch verts 35082
+2026-10-18 11:38:24 [INFO] match: start hub_spar on practice_cage: f_stoke/t0/player, f_dredge/t1/bot
+ok    res://src/test/hub/test_hub_flow.gd::test_match_audio_survives_every_hub_scene_swap (1657 ms)
+tests: 20 run, 0 failed, 18 passed, 2 skipped in 7.6 s
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+   at: cleanup (core/object/object.cpp:2514)
+ERROR: 4 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:795)
