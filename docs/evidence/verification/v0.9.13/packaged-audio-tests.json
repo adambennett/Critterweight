@@ -1,0 +1,72 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 308,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_bank_loads_and_every_id_resolves"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_every_creature_has_a_voice_in_the_bank"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_frequent_sounds_have_variations"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"skipped": "scans GDScript source; exported builds ship compiled scripts (runs in the source suite)",
+			"test": "res://src/test/audio/test_audio_bank.gd::test_literal_ids_in_code_exist"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"skipped": "exported builds ship imported samples, not the source .wav files",
+			"test": "res://src/test/audio/test_audio_bank.gd::test_manifest_matches_files_on_disk"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_music_tracks_loops_and_layers"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_no_file_peaks_above_minus_one_dbfs"
+		},
+		{
+			"errors": [],
+			"ms": 8,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_replacement_assets_are_present_and_hashed"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_required_ids_present"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_size_budget"
+		}
+	],
+	"skipped": 2,
+	"summary": "tests: 10 run, 0 failed, 8 passed, 2 skipped in 3.0 s",
+	"time": "2026-10-17T23:12:47",
+	"total": 10,
+	"version": "0.9.13"
+}

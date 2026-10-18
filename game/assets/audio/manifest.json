@@ -6233,6 +6233,280 @@
    }
   }
  },
+ "music": {
+  "fight_night_poster": {
+   "file": "res://assets/audio/replacements/music/Funkorama.mp3",
+   "title": "Funkorama",
+   "bpm": 101,
+   "beats_per_bar": 4,
+   "bars": 84,
+   "seconds": 201,
+   "bar_seconds": 2.376238,
+   "sections": [
+    {
+     "id": "intro",
+     "start_bar": 1,
+     "bars": 4
+    },
+    {
+     "id": "A",
+     "start_bar": 5,
+     "bars": 40
+    },
+    {
+     "id": "B",
+     "start_bar": 45,
+     "bars": 40
+    }
+   ],
+   "gain": -9,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "menu"
+   ],
+   "stinger": false,
+   "replacement": true
+  },
+  "cannery_radio": {
+   "file": "res://assets/audio/replacements/music/Backbay-Lounge.mp3",
+   "title": "Backbay Lounge",
+   "bpm": 120,
+   "beats_per_bar": 4,
+   "bars": 134,
+   "seconds": 267,
+   "bar_seconds": 2,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 44
+    },
+    {
+     "id": "B",
+     "start_bar": 45,
+     "bars": 45
+    },
+    {
+     "id": "C",
+     "start_bar": 90,
+     "bars": 45
+    }
+   ],
+   "gain": -15,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "hub",
+    "diegetic"
+   ],
+   "stinger": false,
+   "replacement": true
+  },
+  "combat_a": {
+   "file": "res://assets/audio/replacements/music/Furious-Freak.mp3",
+   "title": "Furious Freak",
+   "bpm": 160,
+   "beats_per_bar": 4,
+   "bars": 124,
+   "seconds": 187,
+   "bar_seconds": 1.5,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 31
+    },
+    {
+     "id": "B",
+     "start_bar": 32,
+     "bars": 31
+    },
+    {
+     "id": "C",
+     "start_bar": 63,
+     "bars": 62
+    }
+   ],
+   "gain": -8,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "combat"
+   ],
+   "stinger": false,
+   "replacement": true
+  },
+  "combat_b": {
+   "file": "res://assets/audio/replacements/music/Furious-Freak.mp3",
+   "title": "Furious Freak",
+   "bpm": 160,
+   "beats_per_bar": 4,
+   "bars": 124,
+   "seconds": 187,
+   "bar_seconds": 1.5,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 31
+    },
+    {
+     "id": "B",
+     "start_bar": 32,
+     "bars": 31
+    },
+    {
+     "id": "C",
+     "start_bar": 63,
+     "bars": 62
+    }
+   ],
+   "gain": -8,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "combat"
+   ],
+   "stinger": false,
+   "replacement": true
+  },
+  "boss": {
+   "file": "res://assets/audio/replacements/music/Volatile-Reaction.mp3",
+   "title": "Volatile Reaction",
+   "bpm": 155,
+   "beats_per_bar": 7,
+   "bars": 60,
+   "seconds": 165,
+   "bar_seconds": 2.709677,
+   "sections": [
+    {
+     "id": "intro",
+     "start_bar": 1,
+     "bars": 6
+    },
+    {
+     "id": "A",
+     "start_bar": 7,
+     "bars": 24
+    },
+    {
+     "id": "B",
+     "start_bar": 31,
+     "bars": 30
+    }
+   ],
+   "gain": -10,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "boss"
+   ],
+   "stinger": false,
+   "replacement": true
+  },
+  "victory": {
+   "file": "res://assets/audio/replacements/jingles/jingles_PIZZI03.ogg",
+   "title": "Victory Jingle",
+   "bpm": 120,
+   "beats_per_bar": 4,
+   "bars": 4,
+   "seconds": 2,
+   "bar_seconds": 2,
+   "sections": [
+    {
+     "id": "fanfare",
+     "start_bar": 1,
+     "bars": 4
+    }
+   ],
+   "gain": -7,
+   "loop": null,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "sting",
+    "win"
+   ],
+   "stinger": true,
+   "replacement": true
+  },
+  "defeat": {
+   "file": "res://assets/audio/replacements/jingles/jingles_HIT02.ogg",
+   "title": "Defeat Jingle",
+   "bpm": 120,
+   "beats_per_bar": 4,
+   "bars": 4,
+   "seconds": 2,
+   "bar_seconds": 2,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 4
+    }
+   ],
+   "gain": -8,
+   "loop": null,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "sting",
+    "loss"
+   ],
+   "stinger": true,
+   "replacement": true
+  },
+  "title_night": {
+   "file": "res://assets/audio/replacements/music/Funkorama.mp3",
+   "title": "Funkorama",
+   "bpm": 101,
+   "beats_per_bar": 4,
+   "bars": 84,
+   "seconds": 201,
+   "bar_seconds": 2.376238,
+   "sections": [
+    {
+     "id": "intro",
+     "start_bar": 1,
+     "bars": 4
+    },
+    {
+     "id": "A",
+     "start_bar": 5,
+     "bars": 40
+    },
+    {
+     "id": "B",
+     "start_bar": 45,
+     "bars": 40
+    }
+   ],
+   "gain": -9,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "layers": [],
+   "tags": [
+    "title",
+    "menu_bonus"
+   ],
+   "stinger": false,
+   "replacement": true
+  }
+ },
  "voices": {
   "barnaby": {
    "speaker": "barnaby",
@@ -6328,425 +6602,6 @@
     "c_liquid_1": "res://assets/audio/announcer/granny/c_liquid_1.wav",
     "eh": "res://assets/audio/announcer/granny/eh.wav"
    }
-  }
- },
- "music": {
-  "fight_night_poster": {
-   "file": "res://assets/audio/music/fight_night_poster.wav",
-   "title": "Fight Night Poster",
-   "bpm": 104,
-   "beats_per_bar": 4,
-   "bars": 56,
-   "seconds": 129.231,
-   "bar_seconds": 2.307692,
-   "sections": [
-    {
-     "id": "intro",
-     "start_bar": 1,
-     "bars": 4
-    },
-    {
-     "id": "A",
-     "start_bar": 5,
-     "bars": 16
-    },
-    {
-     "id": "B",
-     "start_bar": 21,
-     "bars": 16
-    },
-    {
-     "id": "A2",
-     "start_bar": 37,
-     "bars": 16
-    },
-    {
-     "id": "tag",
-     "start_bar": 53,
-     "bars": 4
-    }
-   ],
-   "gain": -6,
-   "loop": {
-    "begin": 407077,
-    "end": 5699077,
-    "start_bar": 5,
-    "end_bar": 56
-   },
-   "stereo": true,
-   "sr": 44100,
-   "layers": [],
-   "tags": [
-    "menu"
-   ],
-   "stinger": false
-  },
-  "cannery_radio": {
-   "file": "res://assets/audio/music/cannery_radio.wav",
-   "title": "Cannery Radio",
-   "bpm": 92,
-   "beats_per_bar": 4,
-   "bars": 56,
-   "seconds": 146.087,
-   "bar_seconds": 2.608696,
-   "sections": [
-    {
-     "id": "A",
-     "start_bar": 1,
-     "bars": 16
-    },
-    {
-     "id": "B",
-     "start_bar": 17,
-     "bars": 16
-    },
-    {
-     "id": "A2",
-     "start_bar": 33,
-     "bars": 16
-    },
-    {
-     "id": "C",
-     "start_bar": 49,
-     "bars": 8
-    }
-   ],
-   "gain": -12,
-   "loop": {
-    "begin": 0,
-    "end": 3221217,
-    "start_bar": 1,
-    "end_bar": 56
-   },
-   "stereo": false,
-   "sr": 22050,
-   "layers": [],
-   "tags": [
-    "hub",
-    "diegetic"
-   ],
-   "stinger": false
-  },
-  "combat_a": {
-   "file": "res://assets/audio/music/combat_a.wav",
-   "title": "Undercard Scrap",
-   "bpm": 128,
-   "beats_per_bar": 4,
-   "bars": 56,
-   "seconds": 105,
-   "bar_seconds": 1.875,
-   "sections": [
-    {
-     "id": "A",
-     "start_bar": 1,
-     "bars": 16
-    },
-    {
-     "id": "B",
-     "start_bar": 17,
-     "bars": 16
-    },
-    {
-     "id": "A2",
-     "start_bar": 33,
-     "bars": 16
-    },
-    {
-     "id": "C",
-     "start_bar": 49,
-     "bars": 8
-    }
-   ],
-   "gain": -8,
-   "loop": {
-    "begin": 0,
-    "end": 4630500,
-    "start_bar": 1,
-    "end_bar": 56
-   },
-   "stereo": true,
-   "sr": 44100,
-   "layers": [
-    {
-     "id": "lead",
-     "file": "res://assets/audio/music/combat_a_lead.wav",
-     "default_db": -80,
-     "loop_bars": 56,
-     "kind": "intensity",
-     "seconds": 105,
-     "sr": 22050
-    },
-    {
-     "id": "perc2",
-     "file": "res://assets/audio/music/combat_a_perc2.wav",
-     "default_db": -80,
-     "loop_bars": 4,
-     "kind": "variant",
-     "seconds": 7.5,
-     "sr": 44100
-    },
-    {
-     "id": "perc3",
-     "file": "res://assets/audio/music/combat_a_perc3.wav",
-     "default_db": -80,
-     "loop_bars": 4,
-     "kind": "variant",
-     "seconds": 7.5,
-     "sr": 44100
-    }
-   ],
-   "tags": [
-    "combat"
-   ],
-   "stinger": false
-  },
-  "combat_b": {
-   "file": "res://assets/audio/music/combat_b.wav",
-   "title": "Main Card Heat",
-   "bpm": 128,
-   "beats_per_bar": 4,
-   "bars": 56,
-   "seconds": 105,
-   "bar_seconds": 1.875,
-   "sections": [
-    {
-     "id": "A",
-     "start_bar": 1,
-     "bars": 16
-    },
-    {
-     "id": "B",
-     "start_bar": 17,
-     "bars": 16
-    },
-    {
-     "id": "A2",
-     "start_bar": 33,
-     "bars": 16
-    },
-    {
-     "id": "D",
-     "start_bar": 49,
-     "bars": 8
-    }
-   ],
-   "gain": -8,
-   "loop": {
-    "begin": 0,
-    "end": 4630500,
-    "start_bar": 1,
-    "end_bar": 56
-   },
-   "stereo": true,
-   "sr": 44100,
-   "layers": [
-    {
-     "id": "arp",
-     "file": "res://assets/audio/music/combat_b_arp.wav",
-     "default_db": 0,
-     "loop_bars": 56,
-     "kind": "lead",
-     "seconds": 105,
-     "sr": 22050
-    },
-    {
-     "id": "perc2",
-     "file": "res://assets/audio/music/combat_b_perc2.wav",
-     "default_db": -80,
-     "loop_bars": 4,
-     "kind": "variant",
-     "seconds": 7.5,
-     "sr": 44100
-    },
-    {
-     "id": "perc3",
-     "file": "res://assets/audio/music/combat_b_perc3.wav",
-     "default_db": -80,
-     "loop_bars": 4,
-     "kind": "variant",
-     "seconds": 7.5,
-     "sr": 44100
-    }
-   ],
-   "tags": [
-    "combat"
-   ],
-   "stinger": false
-  },
-  "boss": {
-   "file": "res://assets/audio/music/boss.wav",
-   "title": "Her Honor",
-   "bpm": 132,
-   "beats_per_bar": 4,
-   "bars": 40,
-   "seconds": 72.727,
-   "bar_seconds": 1.818182,
-   "sections": [
-    {
-     "id": "intro",
-     "start_bar": 1,
-     "bars": 8
-    },
-    {
-     "id": "A",
-     "start_bar": 9,
-     "bars": 16
-    },
-    {
-     "id": "B",
-     "start_bar": 25,
-     "bars": 16
-    }
-   ],
-   "gain": -8,
-   "loop": {
-    "begin": 641455,
-    "end": 3207273,
-    "start_bar": 9,
-    "end_bar": 40
-   },
-   "stereo": true,
-   "sr": 44100,
-   "layers": [
-    {
-     "id": "p2",
-     "file": "res://assets/audio/music/boss_p2.wav",
-     "default_db": -80,
-     "loop_bars": 40,
-     "kind": "phase",
-     "seconds": 72.727,
-     "sr": 22050
-    },
-    {
-     "id": "bilge",
-     "file": "res://assets/audio/music/boss_bilge.wav",
-     "default_db": -80,
-     "loop_bars": 2,
-     "kind": "boss",
-     "seconds": 3.636,
-     "sr": 44100
-    },
-    {
-     "id": "conduit",
-     "file": "res://assets/audio/music/boss_conduit.wav",
-     "default_db": -80,
-     "loop_bars": 2,
-     "kind": "boss",
-     "seconds": 3.636,
-     "sr": 44100
-    },
-    {
-     "id": "snappington",
-     "file": "res://assets/audio/music/boss_snappington.wav",
-     "default_db": -80,
-     "loop_bars": 2,
-     "kind": "boss",
-     "seconds": 3.636,
-     "sr": 44100
-    }
-   ],
-   "tags": [
-    "boss"
-   ],
-   "stinger": false
-  },
-  "victory": {
-   "file": "res://assets/audio/music/victory.wav",
-   "title": "Belt Up",
-   "bpm": 120,
-   "beats_per_bar": 4,
-   "bars": 6,
-   "seconds": 15.5,
-   "bar_seconds": 2,
-   "sections": [
-    {
-     "id": "fanfare",
-     "start_bar": 1,
-     "bars": 4
-    },
-    {
-     "id": "tag",
-     "start_bar": 5,
-     "bars": 2
-    }
-   ],
-   "gain": -6,
-   "loop": null,
-   "stereo": true,
-   "sr": 44100,
-   "layers": [],
-   "tags": [
-    "sting",
-    "win"
-   ],
-   "stinger": true
-  },
-  "defeat": {
-   "file": "res://assets/audio/music/defeat.wav",
-   "title": "Cut Man",
-   "bpm": 70,
-   "beats_per_bar": 4,
-   "bars": 4,
-   "seconds": 17.714,
-   "bar_seconds": 3.428571,
-   "sections": [
-    {
-     "id": "A",
-     "start_bar": 1,
-     "bars": 4
-    }
-   ],
-   "gain": -6,
-   "loop": null,
-   "stereo": true,
-   "sr": 44100,
-   "layers": [],
-   "tags": [
-    "sting",
-    "loss"
-   ],
-   "stinger": true
-  },
-  "title_night": {
-   "file": "res://assets/audio/music/title_night.wav",
-   "title": "Title Night",
-   "bpm": 112,
-   "beats_per_bar": 4,
-   "bars": 28,
-   "seconds": 60,
-   "bar_seconds": 2.142857,
-   "sections": [
-    {
-     "id": "intro",
-     "start_bar": 1,
-     "bars": 4
-    },
-    {
-     "id": "A",
-     "start_bar": 5,
-     "bars": 16
-    },
-    {
-     "id": "B",
-     "start_bar": 21,
-     "bars": 8
-    }
-   ],
-   "gain": -6,
-   "loop": {
-    "begin": 378000,
-    "end": 2646000,
-    "start_bar": 5,
-    "end_bar": 28
-   },
-   "stereo": true,
-   "sr": 44100,
-   "layers": [],
-   "tags": [
-    "title",
-    "menu_bonus"
-   ],
-   "stinger": false
   }
  },
  "bytes": 135083626

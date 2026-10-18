@@ -29,15 +29,14 @@
  "sfx": {
   "hit_light": {
    "files": [
-    "res://assets/audio/impacts/hit_light_0.wav",
-    "res://assets/audio/impacts/hit_light_1.wav",
-    "res://assets/audio/impacts/hit_light_2.wav",
-    "res://assets/audio/impacts/hit_light_3.wav",
-    "res://assets/audio/impacts/hit_light_4.wav",
-    "res://assets/audio/impacts/hit_light_5.wav"
+    "res://assets/audio/replacements/impact/impactPunch_medium_000.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_medium_001.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_medium_002.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_medium_003.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_medium_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": 0,
+   "gain": -2,
    "pitch": [
     0.96,
     1.04
@@ -50,15 +49,14 @@
   },
   "hit_heavy": {
    "files": [
-    "res://assets/audio/impacts/hit_heavy_0.wav",
-    "res://assets/audio/impacts/hit_heavy_1.wav",
-    "res://assets/audio/impacts/hit_heavy_2.wav",
-    "res://assets/audio/impacts/hit_heavy_3.wav",
-    "res://assets/audio/impacts/hit_heavy_4.wav",
-    "res://assets/audio/impacts/hit_heavy_5.wav"
+    "res://assets/audio/replacements/impact/impactPunch_heavy_000.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_001.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_002.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_003.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": 0,
+   "gain": -2,
    "pitch": [
     0.96,
     1.04
@@ -71,13 +69,14 @@
   },
   "hit_layer_chitin": {
    "files": [
-    "res://assets/audio/impacts/hit_layer_chitin_0.wav",
-    "res://assets/audio/impacts/hit_layer_chitin_1.wav",
-    "res://assets/audio/impacts/hit_layer_chitin_2.wav",
-    "res://assets/audio/impacts/hit_layer_chitin_3.wav"
+    "res://assets/audio/replacements/impact/impactPlate_medium_000.ogg",
+    "res://assets/audio/replacements/impact/impactPlate_medium_001.ogg",
+    "res://assets/audio/replacements/impact/impactPlate_medium_002.ogg",
+    "res://assets/audio/replacements/impact/impactPlate_medium_003.ogg",
+    "res://assets/audio/replacements/impact/impactPlate_medium_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": -3,
+   "gain": -2,
    "pitch": [
     0.96,
     1.04
@@ -90,13 +89,14 @@
   },
   "hit_layer_jelly": {
    "files": [
-    "res://assets/audio/impacts/hit_layer_jelly_0.wav",
-    "res://assets/audio/impacts/hit_layer_jelly_1.wav",
-    "res://assets/audio/impacts/hit_layer_jelly_2.wav",
-    "res://assets/audio/impacts/hit_layer_jelly_3.wav"
+    "res://assets/audio/replacements/impact/impactGeneric_light_000.ogg",
+    "res://assets/audio/replacements/impact/impactGeneric_light_001.ogg",
+    "res://assets/audio/replacements/impact/impactGeneric_light_002.ogg",
+    "res://assets/audio/replacements/impact/impactGeneric_light_003.ogg",
+    "res://assets/audio/replacements/impact/impactGeneric_light_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": -3,
+   "gain": -5,
    "pitch": [
     0.96,
     1.04
@@ -109,13 +109,14 @@
   },
   "hit_guard": {
    "files": [
-    "res://assets/audio/impacts/hit_guard_0.wav",
-    "res://assets/audio/impacts/hit_guard_1.wav",
-    "res://assets/audio/impacts/hit_guard_2.wav",
-    "res://assets/audio/impacts/hit_guard_3.wav"
+    "res://assets/audio/replacements/impact/impactPlate_light_000.ogg",
+    "res://assets/audio/replacements/impact/impactPlate_light_001.ogg",
+    "res://assets/audio/replacements/impact/impactPlate_light_002.ogg",
+    "res://assets/audio/replacements/impact/impactPlate_light_003.ogg",
+    "res://assets/audio/replacements/impact/impactPlate_light_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": 0,
+   "gain": -2,
    "pitch": [
     0.96,
     1.04
@@ -128,12 +129,14 @@
   },
   "parry": {
    "files": [
-    "res://assets/audio/impacts/parry_0.wav",
-    "res://assets/audio/impacts/parry_1.wav",
-    "res://assets/audio/impacts/parry_2.wav"
+    "res://assets/audio/replacements/impact/impactBell_heavy_000.ogg",
+    "res://assets/audio/replacements/impact/impactBell_heavy_001.ogg",
+    "res://assets/audio/replacements/impact/impactBell_heavy_002.ogg",
+    "res://assets/audio/replacements/impact/impactBell_heavy_003.ogg",
+    "res://assets/audio/replacements/impact/impactBell_heavy_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": 0,
+   "gain": -2,
    "pitch": [
     0.96,
     1.04
@@ -146,13 +149,14 @@
   },
   "wall_splat_fence": {
    "files": [
-    "res://assets/audio/impacts/wall_splat_fence_0.wav",
-    "res://assets/audio/impacts/wall_splat_fence_1.wav",
-    "res://assets/audio/impacts/wall_splat_fence_2.wav",
-    "res://assets/audio/impacts/wall_splat_fence_3.wav"
+    "res://assets/audio/replacements/impact/impactMetal_medium_000.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_medium_001.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_medium_002.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_medium_003.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_medium_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": 0,
+   "gain": -2,
    "pitch": [
     0.96,
     1.04
@@ -165,13 +169,14 @@
   },
   "wall_splat_concrete": {
    "files": [
-    "res://assets/audio/impacts/wall_splat_concrete_0.wav",
-    "res://assets/audio/impacts/wall_splat_concrete_1.wav",
-    "res://assets/audio/impacts/wall_splat_concrete_2.wav",
-    "res://assets/audio/impacts/wall_splat_concrete_3.wav"
+    "res://assets/audio/replacements/impact/impactPunch_heavy_000.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_001.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_002.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_003.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": 0,
+   "gain": -2,
    "pitch": [
     0.96,
     1.04
@@ -184,13 +189,14 @@
   },
   "wall_splat_steel": {
    "files": [
-    "res://assets/audio/impacts/wall_splat_steel_0.wav",
-    "res://assets/audio/impacts/wall_splat_steel_1.wav",
-    "res://assets/audio/impacts/wall_splat_steel_2.wav",
-    "res://assets/audio/impacts/wall_splat_steel_3.wav"
+    "res://assets/audio/replacements/impact/impactMetal_heavy_000.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_heavy_001.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_heavy_002.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_heavy_003.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_heavy_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": 0,
+   "gain": -2,
    "pitch": [
     0.96,
     1.04
@@ -203,13 +209,14 @@
   },
   "wall_splat_railing": {
    "files": [
-    "res://assets/audio/impacts/wall_splat_railing_0.wav",
-    "res://assets/audio/impacts/wall_splat_railing_1.wav",
-    "res://assets/audio/impacts/wall_splat_railing_2.wav",
-    "res://assets/audio/impacts/wall_splat_railing_3.wav"
+    "res://assets/audio/replacements/impact/impactMetal_light_000.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_light_001.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_light_002.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_light_003.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_light_004.ogg"
    ],
    "bus": "Impacts",
-   "gain": 0,
+   "gain": -2,
    "pitch": [
     0.96,
     1.04
@@ -780,15 +787,17 @@
   },
   "step_biped_canvas": {
    "files": [
-    "res://assets/audio/footsteps/step_biped_canvas_0.wav",
-    "res://assets/audio/footsteps/step_biped_canvas_1.wav",
-    "res://assets/audio/footsteps/step_biped_canvas_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_carpet_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.94,
+    1.06
    ],
    "cooldown": 0,
    "priority": 30,
@@ -798,15 +807,17 @@
   },
   "step_crab_canvas": {
    "files": [
-    "res://assets/audio/footsteps/step_crab_canvas_0.wav",
-    "res://assets/audio/footsteps/step_crab_canvas_1.wav",
-    "res://assets/audio/footsteps/step_crab_canvas_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_carpet_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.82,
+    0.96
    ],
    "cooldown": 0,
    "priority": 30,
@@ -816,15 +827,17 @@
   },
   "step_avian_canvas": {
    "files": [
-    "res://assets/audio/footsteps/step_avian_canvas_0.wav",
-    "res://assets/audio/footsteps/step_avian_canvas_1.wav",
-    "res://assets/audio/footsteps/step_avian_canvas_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_carpet_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    1.05,
+    1.17
    ],
    "cooldown": 0,
    "priority": 30,
@@ -834,15 +847,17 @@
   },
   "step_quadruped_canvas": {
    "files": [
-    "res://assets/audio/footsteps/step_quadruped_canvas_0.wav",
-    "res://assets/audio/footsteps/step_quadruped_canvas_1.wav",
-    "res://assets/audio/footsteps/step_quadruped_canvas_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_carpet_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_carpet_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.84,
+    0.98
    ],
    "cooldown": 0,
    "priority": 30,
@@ -868,12 +883,14 @@
   },
   "hop_land_canvas": {
    "files": [
-    "res://assets/audio/footsteps/hop_land_canvas_0.wav",
-    "res://assets/audio/footsteps/hop_land_canvas_1.wav",
-    "res://assets/audio/footsteps/hop_land_canvas_2.wav"
+    "res://assets/audio/replacements/impact/impactPunch_medium_000.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_medium_001.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_medium_002.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_medium_003.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_medium_004.ogg"
    ],
    "bus": "Movement",
-   "gain": -6,
+   "gain": -2,
    "pitch": [
     0.93,
     1.07
@@ -886,15 +903,17 @@
   },
   "step_biped_concrete": {
    "files": [
-    "res://assets/audio/footsteps/step_biped_concrete_0.wav",
-    "res://assets/audio/footsteps/step_biped_concrete_1.wav",
-    "res://assets/audio/footsteps/step_biped_concrete_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.94,
+    1.06
    ],
    "cooldown": 0,
    "priority": 30,
@@ -904,15 +923,17 @@
   },
   "step_crab_concrete": {
    "files": [
-    "res://assets/audio/footsteps/step_crab_concrete_0.wav",
-    "res://assets/audio/footsteps/step_crab_concrete_1.wav",
-    "res://assets/audio/footsteps/step_crab_concrete_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.82,
+    0.96
    ],
    "cooldown": 0,
    "priority": 30,
@@ -922,15 +943,17 @@
   },
   "step_avian_concrete": {
    "files": [
-    "res://assets/audio/footsteps/step_avian_concrete_0.wav",
-    "res://assets/audio/footsteps/step_avian_concrete_1.wav",
-    "res://assets/audio/footsteps/step_avian_concrete_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    1.05,
+    1.17
    ],
    "cooldown": 0,
    "priority": 30,
@@ -940,15 +963,17 @@
   },
   "step_quadruped_concrete": {
    "files": [
-    "res://assets/audio/footsteps/step_quadruped_concrete_0.wav",
-    "res://assets/audio/footsteps/step_quadruped_concrete_1.wav",
-    "res://assets/audio/footsteps/step_quadruped_concrete_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.84,
+    0.98
    ],
    "cooldown": 0,
    "priority": 30,
@@ -974,12 +999,14 @@
   },
   "hop_land_concrete": {
    "files": [
-    "res://assets/audio/footsteps/hop_land_concrete_0.wav",
-    "res://assets/audio/footsteps/hop_land_concrete_1.wav",
-    "res://assets/audio/footsteps/hop_land_concrete_2.wav"
+    "res://assets/audio/replacements/impact/impactPunch_heavy_000.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_001.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_002.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_003.ogg",
+    "res://assets/audio/replacements/impact/impactPunch_heavy_004.ogg"
    ],
    "bus": "Movement",
-   "gain": -6,
+   "gain": -2,
    "pitch": [
     0.93,
     1.07
@@ -992,15 +1019,17 @@
   },
   "step_biped_steel": {
    "files": [
-    "res://assets/audio/footsteps/step_biped_steel_0.wav",
-    "res://assets/audio/footsteps/step_biped_steel_1.wav",
-    "res://assets/audio/footsteps/step_biped_steel_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.94,
+    1.06
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1010,15 +1039,17 @@
   },
   "step_crab_steel": {
    "files": [
-    "res://assets/audio/footsteps/step_crab_steel_0.wav",
-    "res://assets/audio/footsteps/step_crab_steel_1.wav",
-    "res://assets/audio/footsteps/step_crab_steel_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.82,
+    0.96
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1028,15 +1059,17 @@
   },
   "step_avian_steel": {
    "files": [
-    "res://assets/audio/footsteps/step_avian_steel_0.wav",
-    "res://assets/audio/footsteps/step_avian_steel_1.wav",
-    "res://assets/audio/footsteps/step_avian_steel_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    1.05,
+    1.17
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1046,15 +1079,17 @@
   },
   "step_quadruped_steel": {
    "files": [
-    "res://assets/audio/footsteps/step_quadruped_steel_0.wav",
-    "res://assets/audio/footsteps/step_quadruped_steel_1.wav",
-    "res://assets/audio/footsteps/step_quadruped_steel_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.84,
+    0.98
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1080,12 +1115,14 @@
   },
   "hop_land_steel": {
    "files": [
-    "res://assets/audio/footsteps/hop_land_steel_0.wav",
-    "res://assets/audio/footsteps/hop_land_steel_1.wav",
-    "res://assets/audio/footsteps/hop_land_steel_2.wav"
+    "res://assets/audio/replacements/impact/impactMetal_medium_000.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_medium_001.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_medium_002.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_medium_003.ogg",
+    "res://assets/audio/replacements/impact/impactMetal_medium_004.ogg"
    ],
    "bus": "Movement",
-   "gain": -6,
+   "gain": -2,
    "pitch": [
     0.93,
     1.07
@@ -1098,15 +1135,17 @@
   },
   "step_biped_plank": {
    "files": [
-    "res://assets/audio/footsteps/step_biped_plank_0.wav",
-    "res://assets/audio/footsteps/step_biped_plank_1.wav",
-    "res://assets/audio/footsteps/step_biped_plank_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_wood_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.94,
+    1.06
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1116,15 +1155,17 @@
   },
   "step_crab_plank": {
    "files": [
-    "res://assets/audio/footsteps/step_crab_plank_0.wav",
-    "res://assets/audio/footsteps/step_crab_plank_1.wav",
-    "res://assets/audio/footsteps/step_crab_plank_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_wood_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.82,
+    0.96
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1134,15 +1175,17 @@
   },
   "step_avian_plank": {
    "files": [
-    "res://assets/audio/footsteps/step_avian_plank_0.wav",
-    "res://assets/audio/footsteps/step_avian_plank_1.wav",
-    "res://assets/audio/footsteps/step_avian_plank_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_wood_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    1.05,
+    1.17
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1152,15 +1195,17 @@
   },
   "step_quadruped_plank": {
    "files": [
-    "res://assets/audio/footsteps/step_quadruped_plank_0.wav",
-    "res://assets/audio/footsteps/step_quadruped_plank_1.wav",
-    "res://assets/audio/footsteps/step_quadruped_plank_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_wood_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_wood_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.84,
+    0.98
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1186,12 +1231,14 @@
   },
   "hop_land_plank": {
    "files": [
-    "res://assets/audio/footsteps/hop_land_plank_0.wav",
-    "res://assets/audio/footsteps/hop_land_plank_1.wav",
-    "res://assets/audio/footsteps/hop_land_plank_2.wav"
+    "res://assets/audio/replacements/impact/impactPlank_medium_000.ogg",
+    "res://assets/audio/replacements/impact/impactPlank_medium_001.ogg",
+    "res://assets/audio/replacements/impact/impactPlank_medium_002.ogg",
+    "res://assets/audio/replacements/impact/impactPlank_medium_003.ogg",
+    "res://assets/audio/replacements/impact/impactPlank_medium_004.ogg"
    ],
    "bus": "Movement",
-   "gain": -6,
+   "gain": -2,
    "pitch": [
     0.93,
     1.07
@@ -1204,15 +1251,17 @@
   },
   "step_biped_gravel": {
    "files": [
-    "res://assets/audio/footsteps/step_biped_gravel_0.wav",
-    "res://assets/audio/footsteps/step_biped_gravel_1.wav",
-    "res://assets/audio/footsteps/step_biped_gravel_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_snow_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.94,
+    1.06
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1222,15 +1271,17 @@
   },
   "step_crab_gravel": {
    "files": [
-    "res://assets/audio/footsteps/step_crab_gravel_0.wav",
-    "res://assets/audio/footsteps/step_crab_gravel_1.wav",
-    "res://assets/audio/footsteps/step_crab_gravel_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_snow_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.82,
+    0.96
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1240,15 +1291,17 @@
   },
   "step_avian_gravel": {
    "files": [
-    "res://assets/audio/footsteps/step_avian_gravel_0.wav",
-    "res://assets/audio/footsteps/step_avian_gravel_1.wav",
-    "res://assets/audio/footsteps/step_avian_gravel_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_snow_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    1.05,
+    1.17
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1258,15 +1311,17 @@
   },
   "step_quadruped_gravel": {
    "files": [
-    "res://assets/audio/footsteps/step_quadruped_gravel_0.wav",
-    "res://assets/audio/footsteps/step_quadruped_gravel_1.wav",
-    "res://assets/audio/footsteps/step_quadruped_gravel_2.wav"
+    "res://assets/audio/replacements/footsteps/footstep_snow_000.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_001.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_002.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_003.ogg",
+    "res://assets/audio/replacements/footsteps/footstep_snow_004.ogg"
    ],
    "bus": "Movement",
    "gain": -6,
    "pitch": [
-    0.93,
-    1.07
+    0.84,
+    0.98
    ],
    "cooldown": 0,
    "priority": 30,
@@ -1292,12 +1347,14 @@
   },
   "hop_land_gravel": {
    "files": [
-    "res://assets/audio/footsteps/hop_land_gravel_0.wav",
-    "res://assets/audio/footsteps/hop_land_gravel_1.wav",
-    "res://assets/audio/footsteps/hop_land_gravel_2.wav"
+    "res://assets/audio/replacements/impact/impactGeneric_light_000.ogg",
+    "res://assets/audio/replacements/impact/impactGeneric_light_001.ogg",
+    "res://assets/audio/replacements/impact/impactGeneric_light_002.ogg",
+    "res://assets/audio/replacements/impact/impactGeneric_light_003.ogg",
+    "res://assets/audio/replacements/impact/impactGeneric_light_004.ogg"
    ],
    "bus": "Movement",
-   "gain": -6,
+   "gain": -2,
    "pitch": [
     0.93,
     1.07
@@ -3992,12 +4049,14 @@
   },
   "ui_move": {
    "files": [
-    "res://assets/audio/ui/ui_move_0.wav",
-    "res://assets/audio/ui/ui_move_1.wav",
-    "res://assets/audio/ui/ui_move_2.wav"
+    "res://assets/audio/replacements/interface/scroll_001.ogg",
+    "res://assets/audio/replacements/interface/scroll_002.ogg",
+    "res://assets/audio/replacements/interface/scroll_003.ogg",
+    "res://assets/audio/replacements/interface/scroll_004.ogg",
+    "res://assets/audio/replacements/interface/scroll_005.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -10,
    "pitch": [
     0.99,
     1.01
@@ -4010,11 +4069,13 @@
   },
   "ui_accept": {
    "files": [
-    "res://assets/audio/ui/ui_accept_0.wav",
-    "res://assets/audio/ui/ui_accept_1.wav"
+    "res://assets/audio/replacements/interface/confirmation_001.ogg",
+    "res://assets/audio/replacements/interface/confirmation_002.ogg",
+    "res://assets/audio/replacements/interface/confirmation_003.ogg",
+    "res://assets/audio/replacements/interface/confirmation_004.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -6,
    "pitch": [
     0.99,
     1.01
@@ -4027,11 +4088,13 @@
   },
   "ui_back": {
    "files": [
-    "res://assets/audio/ui/ui_back_0.wav",
-    "res://assets/audio/ui/ui_back_1.wav"
+    "res://assets/audio/replacements/interface/back_001.ogg",
+    "res://assets/audio/replacements/interface/back_002.ogg",
+    "res://assets/audio/replacements/interface/back_003.ogg",
+    "res://assets/audio/replacements/interface/back_004.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -6,
    "pitch": [
     0.99,
     1.01
@@ -4044,11 +4107,17 @@
   },
   "ui_error": {
    "files": [
-    "res://assets/audio/ui/ui_error_0.wav",
-    "res://assets/audio/ui/ui_error_1.wav"
+    "res://assets/audio/replacements/interface/error_001.ogg",
+    "res://assets/audio/replacements/interface/error_002.ogg",
+    "res://assets/audio/replacements/interface/error_003.ogg",
+    "res://assets/audio/replacements/interface/error_004.ogg",
+    "res://assets/audio/replacements/interface/error_005.ogg",
+    "res://assets/audio/replacements/interface/error_006.ogg",
+    "res://assets/audio/replacements/interface/error_007.ogg",
+    "res://assets/audio/replacements/interface/error_008.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -8,
    "pitch": [
     0.99,
     1.01
@@ -4061,11 +4130,13 @@
   },
   "ui_toggle": {
    "files": [
-    "res://assets/audio/ui/ui_toggle_0.wav",
-    "res://assets/audio/ui/ui_toggle_1.wav"
+    "res://assets/audio/replacements/interface/toggle_001.ogg",
+    "res://assets/audio/replacements/interface/toggle_002.ogg",
+    "res://assets/audio/replacements/interface/toggle_003.ogg",
+    "res://assets/audio/replacements/interface/toggle_004.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -8,
    "pitch": [
     0.99,
     1.01
@@ -4078,12 +4149,12 @@
   },
   "ui_slider": {
    "files": [
-    "res://assets/audio/ui/ui_slider_0.wav",
-    "res://assets/audio/ui/ui_slider_1.wav",
-    "res://assets/audio/ui/ui_slider_2.wav"
+    "res://assets/audio/replacements/interface/tick_001.ogg",
+    "res://assets/audio/replacements/interface/tick_002.ogg",
+    "res://assets/audio/replacements/interface/tick_004.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -10,
    "pitch": [
     0.99,
     1.01
@@ -4096,11 +4167,14 @@
   },
   "ui_tab": {
    "files": [
-    "res://assets/audio/ui/ui_tab_0.wav",
-    "res://assets/audio/ui/ui_tab_1.wav"
+    "res://assets/audio/replacements/interface/select_001.ogg",
+    "res://assets/audio/replacements/interface/select_002.ogg",
+    "res://assets/audio/replacements/interface/select_003.ogg",
+    "res://assets/audio/replacements/interface/select_004.ogg",
+    "res://assets/audio/replacements/interface/select_005.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -8,
    "pitch": [
     0.99,
     1.01
@@ -4113,11 +4187,10 @@
   },
   "ui_stamp": {
    "files": [
-    "res://assets/audio/ui/ui_stamp_0.wav",
-    "res://assets/audio/ui/ui_stamp_1.wav"
+    "res://assets/audio/replacements/interface/bong_001.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -6,
    "pitch": [
     0.99,
     1.01
@@ -4130,12 +4203,11 @@
   },
   "ui_scrip": {
    "files": [
-    "res://assets/audio/ui/ui_scrip_0.wav",
-    "res://assets/audio/ui/ui_scrip_1.wav",
-    "res://assets/audio/ui/ui_scrip_2.wav"
+    "res://assets/audio/replacements/rpg/handleCoins.ogg",
+    "res://assets/audio/replacements/rpg/handleCoins2.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -8,
    "pitch": [
     0.99,
     1.01
@@ -4311,10 +4383,13 @@
   },
   "ui_open": {
    "files": [
-    "res://assets/audio/ui/ui_open.wav"
+    "res://assets/audio/replacements/interface/open_001.ogg",
+    "res://assets/audio/replacements/interface/open_002.ogg",
+    "res://assets/audio/replacements/interface/open_003.ogg",
+    "res://assets/audio/replacements/interface/open_004.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -8,
    "pitch": [
     0.99,
     1.01
@@ -4327,10 +4402,13 @@
   },
   "ui_close": {
    "files": [
-    "res://assets/audio/ui/ui_close.wav"
+    "res://assets/audio/replacements/interface/close_001.ogg",
+    "res://assets/audio/replacements/interface/close_002.ogg",
+    "res://assets/audio/replacements/interface/close_003.ogg",
+    "res://assets/audio/replacements/interface/close_004.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -8,
    "pitch": [
     0.99,
     1.01
@@ -4343,11 +4421,12 @@
   },
   "ui_card_flip": {
    "files": [
-    "res://assets/audio/ui/ui_card_flip_0.wav",
-    "res://assets/audio/ui/ui_card_flip_1.wav"
+    "res://assets/audio/replacements/rpg/bookFlip1.ogg",
+    "res://assets/audio/replacements/rpg/bookFlip2.ogg",
+    "res://assets/audio/replacements/rpg/bookFlip3.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -8,
    "pitch": [
     0.99,
     1.01
@@ -4360,10 +4439,11 @@
   },
   "ui_purchase": {
    "files": [
-    "res://assets/audio/ui/ui_purchase.wav"
+    "res://assets/audio/replacements/rpg/handleCoins.ogg",
+    "res://assets/audio/replacements/rpg/handleCoins2.ogg"
    ],
    "bus": "UI",
-   "gain": -2,
+   "gain": -8,
    "pitch": [
     0.99,
     1.01
@@ -4404,10 +4484,10 @@
   },
   "crowd_murmur": {
    "files": [
-    "res://assets/audio/crowd/crowd_murmur.wav"
+    "res://assets/audio/replacements/crowd/crowd-shouting.ogg"
    ],
    "bus": "Crowd",
-   "gain": -8,
+   "gain": -26,
    "pitch": [
     0.98,
     1.02
@@ -4539,12 +4619,10 @@
   },
   "crowd_cheer": {
    "files": [
-    "res://assets/audio/crowd/crowd_cheer_0.wav",
-    "res://assets/audio/crowd/crowd_cheer_1.wav",
-    "res://assets/audio/crowd/crowd_cheer_2.wav"
+    "res://assets/audio/replacements/crowd/crowd-applause.wav"
    ],
    "bus": "Crowd",
-   "gain": 0,
+   "gain": -5,
    "pitch": [
     0.98,
     1.02
@@ -4623,10 +4701,10 @@
   },
   "amb_drydock": {
    "files": [
-    "res://assets/audio/ambience/amb_drydock.wav"
+    "res://assets/audio/replacements/water/waterflow.mp3"
    ],
    "bus": "Ambience",
-   "gain": -8,
+   "gain": -22,
    "pitch": [
     1,
     1
@@ -4703,10 +4781,10 @@
   },
   "amb_hub_dock": {
    "files": [
-    "res://assets/audio/ambience/amb_hub_dock.wav"
+    "res://assets/audio/replacements/water/waterflow.mp3"
    ],
    "bus": "Ambience",
-   "gain": -8,
+   "gain": -22,
    "pitch": [
     1,
     1
@@ -4866,13 +4944,13 @@
  },
  "music": {
   "fight_night_poster": {
-   "file": "res://assets/audio/music/fight_night_poster.wav",
-   "title": "Fight Night Poster",
-   "bpm": 104,
+   "file": "res://assets/audio/replacements/music/Funkorama.mp3",
+   "title": "Funkorama",
+   "bpm": 101,
    "beats_per_bar": 4,
-   "bars": 56,
-   "seconds": 129.231,
-   "bar_seconds": 2.307692,
+   "bars": 84,
+   "seconds": 201,
+   "bar_seconds": 2.376238,
    "sections": [
     {
      "id": "intro",
@@ -4882,329 +4960,186 @@
     {
      "id": "A",
      "start_bar": 5,
-     "bars": 16
+     "bars": 40
     },
     {
      "id": "B",
-     "start_bar": 21,
-     "bars": 16
-    },
-    {
-     "id": "A2",
-     "start_bar": 37,
-     "bars": 16
-    },
-    {
-     "id": "tag",
-     "start_bar": 53,
-     "bars": 4
+     "start_bar": 45,
+     "bars": 40
     }
    ],
-   "gain": -6,
-   "loop": {
-    "begin": 407077,
-    "end": 5699077,
-    "start_bar": 5,
-    "end_bar": 56
-   },
+   "gain": -9,
+   "loop": true,
    "stereo": true,
    "sr": 44100,
    "layers": [],
    "tags": [
     "menu"
    ],
-   "stinger": false
+   "stinger": false,
+   "replacement": true
   },
   "cannery_radio": {
-   "file": "res://assets/audio/music/cannery_radio.wav",
-   "title": "Cannery Radio",
-   "bpm": 92,
+   "file": "res://assets/audio/replacements/music/Backbay-Lounge.mp3",
+   "title": "Backbay Lounge",
+   "bpm": 120,
    "beats_per_bar": 4,
-   "bars": 56,
-   "seconds": 146.087,
-   "bar_seconds": 2.608696,
+   "bars": 134,
+   "seconds": 267,
+   "bar_seconds": 2,
    "sections": [
     {
      "id": "A",
      "start_bar": 1,
-     "bars": 16
+     "bars": 44
     },
     {
      "id": "B",
-     "start_bar": 17,
-     "bars": 16
-    },
-    {
-     "id": "A2",
-     "start_bar": 33,
-     "bars": 16
+     "start_bar": 45,
+     "bars": 45
     },
     {
      "id": "C",
-     "start_bar": 49,
-     "bars": 8
+     "start_bar": 90,
+     "bars": 45
     }
    ],
-   "gain": -12,
-   "loop": {
-    "begin": 0,
-    "end": 3221217,
-    "start_bar": 1,
-    "end_bar": 56
-   },
-   "stereo": false,
-   "sr": 22050,
+   "gain": -15,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
    "layers": [],
    "tags": [
     "hub",
     "diegetic"
    ],
-   "stinger": false
+   "stinger": false,
+   "replacement": true
   },
   "combat_a": {
-   "file": "res://assets/audio/music/combat_a.wav",
-   "title": "Undercard Scrap",
-   "bpm": 128,
+   "file": "res://assets/audio/replacements/music/Furious-Freak.mp3",
+   "title": "Furious Freak",
+   "bpm": 160,
    "beats_per_bar": 4,
-   "bars": 56,
-   "seconds": 105,
-   "bar_seconds": 1.875,
+   "bars": 124,
+   "seconds": 187,
+   "bar_seconds": 1.5,
    "sections": [
     {
      "id": "A",
      "start_bar": 1,
-     "bars": 16
+     "bars": 31
     },
     {
      "id": "B",
-     "start_bar": 17,
-     "bars": 16
-    },
-    {
-     "id": "A2",
-     "start_bar": 33,
-     "bars": 16
+     "start_bar": 32,
+     "bars": 31
     },
     {
      "id": "C",
-     "start_bar": 49,
-     "bars": 8
+     "start_bar": 63,
+     "bars": 62
     }
    ],
    "gain": -8,
-   "loop": {
-    "begin": 0,
-    "end": 4630500,
-    "start_bar": 1,
-    "end_bar": 56
-   },
+   "loop": true,
    "stereo": true,
    "sr": 44100,
-   "layers": [
-    {
-     "id": "lead",
-     "file": "res://assets/audio/music/combat_a_lead.wav",
-     "default_db": -80,
-     "loop_bars": 56,
-     "kind": "intensity",
-     "seconds": 105,
-     "sr": 22050
-    },
-    {
-     "id": "perc2",
-     "file": "res://assets/audio/music/combat_a_perc2.wav",
-     "default_db": -80,
-     "loop_bars": 4,
-     "kind": "variant",
-     "seconds": 7.5,
-     "sr": 44100
-    },
-    {
-     "id": "perc3",
-     "file": "res://assets/audio/music/combat_a_perc3.wav",
-     "default_db": -80,
-     "loop_bars": 4,
-     "kind": "variant",
-     "seconds": 7.5,
-     "sr": 44100
-    }
-   ],
+   "layers": [],
    "tags": [
     "combat"
    ],
-   "stinger": false
+   "stinger": false,
+   "replacement": true
   },
   "combat_b": {
-   "file": "res://assets/audio/music/combat_b.wav",
-   "title": "Main Card Heat",
-   "bpm": 128,
+   "file": "res://assets/audio/replacements/music/Furious-Freak.mp3",
+   "title": "Furious Freak",
+   "bpm": 160,
    "beats_per_bar": 4,
-   "bars": 56,
-   "seconds": 105,
-   "bar_seconds": 1.875,
+   "bars": 124,
+   "seconds": 187,
+   "bar_seconds": 1.5,
    "sections": [
     {
      "id": "A",
      "start_bar": 1,
-     "bars": 16
+     "bars": 31
     },
     {
      "id": "B",
-     "start_bar": 17,
-     "bars": 16
+     "start_bar": 32,
+     "bars": 31
     },
     {
-     "id": "A2",
-     "start_bar": 33,
-     "bars": 16
-    },
-    {
-     "id": "D",
-     "start_bar": 49,
-     "bars": 8
+     "id": "C",
+     "start_bar": 63,
+     "bars": 62
     }
    ],
    "gain": -8,
-   "loop": {
-    "begin": 0,
-    "end": 4630500,
-    "start_bar": 1,
-    "end_bar": 56
-   },
+   "loop": true,
    "stereo": true,
    "sr": 44100,
-   "layers": [
-    {
-     "id": "arp",
-     "file": "res://assets/audio/music/combat_b_arp.wav",
-     "default_db": 0,
-     "loop_bars": 56,
-     "kind": "lead",
-     "seconds": 105,
-     "sr": 22050
-    },
-    {
-     "id": "perc2",
-     "file": "res://assets/audio/music/combat_b_perc2.wav",
-     "default_db": -80,
-     "loop_bars": 4,
-     "kind": "variant",
-     "seconds": 7.5,
-     "sr": 44100
-    },
-    {
-     "id": "perc3",
-     "file": "res://assets/audio/music/combat_b_perc3.wav",
-     "default_db": -80,
-     "loop_bars": 4,
-     "kind": "variant",
-     "seconds": 7.5,
-     "sr": 44100
-    }
-   ],
+   "layers": [],
    "tags": [
     "combat"
    ],
-   "stinger": false
+   "stinger": false,
+   "replacement": true
   },
   "boss": {
-   "file": "res://assets/audio/music/boss.wav",
-   "title": "Her Honor",
-   "bpm": 132,
-   "beats_per_bar": 4,
-   "bars": 40,
-   "seconds": 72.727,
-   "bar_seconds": 1.818182,
+   "file": "res://assets/audio/replacements/music/Volatile-Reaction.mp3",
+   "title": "Volatile Reaction",
+   "bpm": 155,
+   "beats_per_bar": 7,
+   "bars": 60,
+   "seconds": 165,
+   "bar_seconds": 2.709677,
    "sections": [
     {
      "id": "intro",
      "start_bar": 1,
-     "bars": 8
+     "bars": 6
     },
     {
      "id": "A",
-     "start_bar": 9,
-     "bars": 16
+     "start_bar": 7,
+     "bars": 24
     },
     {
      "id": "B",
-     "start_bar": 25,
-     "bars": 16
+     "start_bar": 31,
+     "bars": 30
     }
    ],
-   "gain": -8,
-   "loop": {
-    "begin": 641455,
-    "end": 3207273,
-    "start_bar": 9,
-    "end_bar": 40
-   },
+   "gain": -10,
+   "loop": true,
    "stereo": true,
    "sr": 44100,
-   "layers": [
-    {
-     "id": "p2",
-     "file": "res://assets/audio/music/boss_p2.wav",
-     "default_db": -80,
-     "loop_bars": 40,
-     "kind": "phase",
-     "seconds": 72.727,
-     "sr": 22050
-    },
-    {
-     "id": "bilge",
-     "file": "res://assets/audio/music/boss_bilge.wav",
-     "default_db": -80,
-     "loop_bars": 2,
-     "kind": "boss",
-     "seconds": 3.636,
-     "sr": 44100
-    },
-    {
-     "id": "conduit",
-     "file": "res://assets/audio/music/boss_conduit.wav",
-     "default_db": -80,
-     "loop_bars": 2,
-     "kind": "boss",
-     "seconds": 3.636,
-     "sr": 44100
-    },
-    {
-     "id": "snappington",
-     "file": "res://assets/audio/music/boss_snappington.wav",
-     "default_db": -80,
-     "loop_bars": 2,
-     "kind": "boss",
-     "seconds": 3.636,
-     "sr": 44100
-    }
-   ],
+   "layers": [],
    "tags": [
     "boss"
    ],
-   "stinger": false
+   "stinger": false,
+   "replacement": true
   },
   "victory": {
-   "file": "res://assets/audio/music/victory.wav",
-   "title": "Belt Up",
+   "file": "res://assets/audio/replacements/jingles/jingles_PIZZI03.ogg",
+   "title": "Victory Jingle",
    "bpm": 120,
    "beats_per_bar": 4,
-   "bars": 6,
-   "seconds": 15.5,
+   "bars": 4,
+   "seconds": 2,
    "bar_seconds": 2,
    "sections": [
     {
      "id": "fanfare",
      "start_bar": 1,
      "bars": 4
-    },
-    {
-     "id": "tag",
-     "start_bar": 5,
-     "bars": 2
     }
    ],
-   "gain": -6,
+   "gain": -7,
    "loop": null,
    "stereo": true,
    "sr": 44100,
@@ -5213,16 +5148,17 @@
     "sting",
     "win"
    ],
-   "stinger": true
+   "stinger": true,
+   "replacement": true
   },
   "defeat": {
-   "file": "res://assets/audio/music/defeat.wav",
-   "title": "Cut Man",
-   "bpm": 70,
+   "file": "res://assets/audio/replacements/jingles/jingles_HIT02.ogg",
+   "title": "Defeat Jingle",
+   "bpm": 120,
    "beats_per_bar": 4,
    "bars": 4,
-   "seconds": 17.714,
-   "bar_seconds": 3.428571,
+   "seconds": 2,
+   "bar_seconds": 2,
    "sections": [
     {
      "id": "A",
@@ -5230,7 +5166,7 @@
      "bars": 4
     }
    ],
-   "gain": -6,
+   "gain": -8,
    "loop": null,
    "stereo": true,
    "sr": 44100,
@@ -5239,16 +5175,17 @@
     "sting",
     "loss"
    ],
-   "stinger": true
+   "stinger": true,
+   "replacement": true
   },
   "title_night": {
-   "file": "res://assets/audio/music/title_night.wav",
-   "title": "Title Night",
-   "bpm": 112,
+   "file": "res://assets/audio/replacements/music/Funkorama.mp3",
+   "title": "Funkorama",
+   "bpm": 101,
    "beats_per_bar": 4,
-   "bars": 28,
-   "seconds": 60,
-   "bar_seconds": 2.142857,
+   "bars": 84,
+   "seconds": 201,
+   "bar_seconds": 2.376238,
    "sections": [
     {
      "id": "intro",
@@ -5258,21 +5195,16 @@
     {
      "id": "A",
      "start_bar": 5,
-     "bars": 16
+     "bars": 40
     },
     {
      "id": "B",
-     "start_bar": 21,
-     "bars": 8
+     "start_bar": 45,
+     "bars": 40
     }
    ],
-   "gain": -6,
-   "loop": {
-    "begin": 378000,
-    "end": 2646000,
-    "start_bar": 5,
-    "end_bar": 28
-   },
+   "gain": -9,
+   "loop": true,
    "stereo": true,
    "sr": 44100,
    "layers": [],
@@ -5280,7 +5212,8 @@
     "title",
     "menu_bonus"
    ],
-   "stinger": false
+   "stinger": false,
+   "replacement": true
   }
  },
  "voices": {

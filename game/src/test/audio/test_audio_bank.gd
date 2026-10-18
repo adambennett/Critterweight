@@ -25,7 +25,8 @@ func test_frequent_sounds_have_variations() -> void:
 		var e: Dictionary = Audio._sfx_entries.get(id, {})
 		check(not e.is_empty(), "%s exists" % id)
 		var n: int = e.get("files", []).size()
-		check(n >= 3, "%s has >= 3 variants (got %d)" % [id, n])
+		var min_variants := 1 if id == "crowd_cheer" else 3
+		check(n >= min_variants, "%s has >= %d variants (got %d)" % [id, min_variants, n])
 		var pr: Array = e.get("pitch", [1, 1])
 		check(float(pr[0]) < float(pr[1]) or id.begins_with("ui_"), "%s has a random pitch range" % id)
 
@@ -102,35 +103,42 @@ func test_music_tracks_loops_and_layers() -> void:
 	var music: Dictionary = Audio.bank.get("music", {})
 	for t in required:
 		check(music.has(t), "track %s in bank" % t)
-	if not music.has("combat_a"):
-		return
-	# tempo contract: combat A/B share 128 BPM so they can crossfade on bar lines; boss is 132
-	check_eq(int(music["combat_a"]["bpm"]), 128, "combat_a bpm")
-	check_eq(int(music["combat_b"]["bpm"]), 128, "combat_b bpm")
-	check_eq(int(music["boss"]["bpm"]), 132, "boss bpm")
+	if not music.has("combat_a"): return
+	check_eq(int(music["combat_a"]["bpm"]), 160, "replacement combat_a bpm")
+	check_eq(int(music["combat_b"]["bpm"]), 160, "replacement combat_b bpm")
+	check_eq(int(music["boss"]["bpm"]), 155, "replacement boss bpm")
 	for t in music:
 		var e: Dictionary = music[t]
 		var sections: Array = e.get("sections", [])
 		check(not sections.is_empty() and sections[0].has("start_bar") and sections[0].has("bars"), "%s sections carry start_bar/bars for music_jump" % t)
-		var s = load(str(e["file"]))
-		check(s is AudioStreamWAV, "%s stream loads" % t)
-		if not (s is AudioStreamWAV):
+		var stream := Audio._stream(str(e["file"]))
+		check(stream is AudioStreamWAV or stream is AudioStreamMP3 or stream is AudioStreamOggVorbis, "%s stream loads in a supported format" % t)
+		if stream == null: continue
+		check(stream.get_length() > 0.0, "%s has a positive duration" % t)
+		if bool(e.get("replacement", false)):
+			check((e.get("layers", []) as Array).is_empty(), "%s replacement has no mismatched generated stems" % t)
+			if e.get("loop") != null:
+				if stream is AudioStreamMP3: check((stream as AudioStreamMP3).loop, "%s MP3 loops" % t)
+				elif stream is AudioStreamOggVorbis: check((stream as AudioStreamOggVorbis).loop, "%s Ogg loops" % t)
+				elif stream is AudioStreamWAV: check((stream as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_FORWARD, "%s WAV loops" % t)
+			else:
+				check(bool(e.get("stinger", false)), "%s is a stinger when it does not loop" % t)
 			continue
-		var w: AudioStreamWAV = s
+		if not (stream is AudioStreamWAV): continue
+		var w: AudioStreamWAV = stream
 		var frames := int(round(w.get_length() * float(w.mix_rate)))
-		check_near(float(frames) / float(w.mix_rate), float(e["seconds"]), 0.002, "%s length matches the bank" % t)
+		check_near(float(frames) / float(w.mix_rate), float(e["seconds"]), 0.002, "%s generated length matches bank" % t)
 		var lp = e.get("loop")
-		if lp != null:
+		if lp is Dictionary:
 			var begin := int(lp["begin"])
-			var end := int(lp["end"])
-			check(begin >= 0 and begin < end and end <= frames, "%s loop %d-%d inside %d frames" % [t, begin, end, frames])
+			var end_frame := int(lp["end"])
+			check(begin >= 0 and begin < end_frame and end_frame <= frames, "%s loop %d-%d inside %d frames" % [t, begin, end_frame, frames])
 			check_eq(w.loop_mode, AudioStreamWAV.LOOP_FORWARD, "%s imported as forward loop" % t)
 			check_eq(w.loop_begin, begin, "%s loop_begin" % t)
-			check_eq(w.loop_end, end, "%s loop_end" % t)
-			# loop points sit exactly on bar lines
+			check_eq(w.loop_end, end_frame, "%s loop_end" % t)
 			var bs := float(e["bar_seconds"]) * float(e["sr"])
 			check_near(float(begin) / bs, round(float(begin) / bs), 0.01, "%s loop begin on a bar" % t)
-			check_near(float(end) / bs, round(float(end) / bs), 0.01, "%s loop end on a bar" % t)
+			check_near(float(end_frame) / bs, round(float(end_frame) / bs), 0.01, "%s loop end on a bar" % t)
 		else:
 			check(bool(e.get("stinger", false)), "%s has no loop so it must be a stinger" % t)
 		for L in e.get("layers", []):
@@ -138,17 +146,45 @@ func test_music_tracks_loops_and_layers() -> void:
 			check(ls is AudioStreamWAV, "%s layer %s loads" % [t, L["id"]])
 			var lb := int(L.get("loop_bars", 0))
 			check(lb > 0 and int(e["bars"]) % lb == 0, "%s layer %s (%d bars) divides the track" % [t, L["id"], lb])
-	# intensity + variant layers exist where the design asks for them
-	var ca_layers := []
-	for L2 in music["combat_a"].get("layers", []):
-		ca_layers.append(str(L2["id"]))
-	check(ca_layers.has("lead") and ca_layers.has("perc2"), "combat_a has lead + percussion variant layers (%s)" % str(ca_layers))
-	var boss_layers := []
-	for L3 in music["boss"].get("layers", []):
-		boss_layers.append(str(L3["id"]))
-	for want in ["p2", "bilge", "conduit", "snappington"]:
-		check(boss_layers.has(want), "boss has layer %s" % want)
 
+func test_replacement_assets_are_present_and_hashed() -> void:
+	const REPLACEMENTS := "res://assets/audio/replacements/replacement-audio-inventory.json"
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(REPLACEMENTS))
+	check(typeof(parsed) == TYPE_DICTIONARY, "replacement inventory is readable")
+	if typeof(parsed) != TYPE_DICTIONARY: return
+	var files: Array = parsed.get("files", [])
+	check(files.size() >= 100, "replacement inventory includes selected clips (%d)" % files.size())
+	var missing := []
+	var bad_hash := []
+	for entry in files:
+		var rel := str(entry.get("file", ""))
+		var path := "res://" + rel
+		var stream = ResourceLoader.load(path)
+		if not (stream is AudioStream):
+			missing.append(rel)
+		elif FileAccess.file_exists(path) and FileAccess.get_sha256(path) != str(entry.get("sha256", "")):
+			# Source builds can hash the downloaded file directly. Exported builds keep the
+			# imported stream in the PCK, so there is no loose source file to hash there.
+			bad_hash.append(rel)
+	check(missing.is_empty(), "replacement audio missing or unloadable: %s" % ", ".join(missing.slice(0, 10)))
+	check(bad_hash.is_empty(), "replacement audio hashes changed: %s" % ", ".join(bad_hash.slice(0, 10)))
+	var used := []
+	for value in Audio.bank:
+		_collect_replacement_paths(Audio.bank[value], used)
+	var used_unique := {}
+	for rel in used: used_unique[str(rel)] = true
+	check(used_unique.size() >= 50, "replacement files are wired into the bank (%d unique paths)" % used_unique.size())
+	for rel in used_unique:
+		check(parsed.get("paths", {}).has(str(rel)), "replacement bank path has provenance: %s" % rel)
+
+
+func _collect_replacement_paths(value, out: Array) -> void:
+	if value is String and value.begins_with("res://assets/audio/replacements/"):
+		out.append(value.trim_prefix("res://"))
+	elif value is Array:
+		for item in value: _collect_replacement_paths(item, out)
+	elif value is Dictionary:
+		for item in value.values(): _collect_replacement_paths(item, out)
 
 func test_size_budget() -> void:
 	var m := _manifest()

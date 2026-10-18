@@ -1,0 +1,762 @@
+CRITTERWEIGHT IMPORTED AUDIO REPLACEMENT INVENTORY
+
+126 files; 34.8 MiB
+All included third-party clips were obtained from the official author or asset page without payment. No clip file was edited; bank gain, playback loop, and pitch settings are game-side settings. The Kenney Voiceover Pack: Fighter and OpenGameArt Water Waves FLACs are not shipped or used because they do not suit the named creature casts or current Godot audio path.
+
+Every installed file:
+
+assets/audio/replacements/crowd/crowd-applause.wav
+  6905324 bytes | SHA-256 0d3bfde5a050f3c5e6685bd7f1efc7ab1d289fbad65c88c1ce9b4691228c69c9
+  Applause in a Large Hall or Church — eXpl0it3r | Creative Commons Zero (CC0 1.0)
+  Source: https://opengameart.org/content/applause-in-a-large-hall-or-church
+  Bank: bank.sfx.crowd_cheer.files[0]
+
+assets/audio/replacements/crowd/crowd-shouting.ogg
+  335526 bytes | SHA-256 a2c23a64c127c77717cbe4abb21f138bac9d9aa6cb3cc89d62bab5d0d96dd7ca
+  Crowd Shouting/Speaking Ambience — StarNinjas | Creative Commons Zero (CC0 1.0)
+  Source: https://opengameart.org/content/crowd-shoutingspeaking-ambience
+  Bank: bank.sfx.crowd_murmur.files[0]
+
+assets/audio/replacements/footsteps/footstep_carpet_000.ogg
+  6353 bytes | SHA-256 b9524658b52a99a20590f8feefc103088637fd13ea8ec35811aee785e1f2f330
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_canvas.files[0]; bank.sfx.step_crab_canvas.files[0]; bank.sfx.step_avian_canvas.files[0]; bank.sfx.step_quadruped_canvas.files[0]
+
+assets/audio/replacements/footsteps/footstep_carpet_001.ogg
+  6411 bytes | SHA-256 9af3c3f76705107339e72036e4053bdca3eaa50ad31c8c929f42ce8d40e5d781
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_canvas.files[1]; bank.sfx.step_crab_canvas.files[1]; bank.sfx.step_avian_canvas.files[1]; bank.sfx.step_quadruped_canvas.files[1]
+
+assets/audio/replacements/footsteps/footstep_carpet_002.ogg
+  6411 bytes | SHA-256 9af3c3f76705107339e72036e4053bdca3eaa50ad31c8c929f42ce8d40e5d781
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_canvas.files[2]; bank.sfx.step_crab_canvas.files[2]; bank.sfx.step_avian_canvas.files[2]; bank.sfx.step_quadruped_canvas.files[2]
+
+assets/audio/replacements/footsteps/footstep_carpet_003.ogg
+  6301 bytes | SHA-256 4ae7454338d57c7d102145919ae653c7d010eb542797c4f25a1c7470be3a7e4c
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_canvas.files[3]; bank.sfx.step_crab_canvas.files[3]; bank.sfx.step_avian_canvas.files[3]; bank.sfx.step_quadruped_canvas.files[3]
+
+assets/audio/replacements/footsteps/footstep_carpet_004.ogg
+  6301 bytes | SHA-256 4ae7454338d57c7d102145919ae653c7d010eb542797c4f25a1c7470be3a7e4c
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_canvas.files[4]; bank.sfx.step_crab_canvas.files[4]; bank.sfx.step_avian_canvas.files[4]; bank.sfx.step_quadruped_canvas.files[4]
+
+assets/audio/replacements/footsteps/footstep_concrete_000.ogg
+  5808 bytes | SHA-256 d7267e183067757c92c169de2a379abea592cfca6b39bb2e8feea15221ad79fe
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_concrete.files[0]; bank.sfx.step_crab_concrete.files[0]; bank.sfx.step_avian_concrete.files[0]; bank.sfx.step_quadruped_concrete.files[0]; bank.sfx.step_biped_steel.files[0]; bank.sfx.step_crab_steel.files[0]; bank.sfx.step_avian_steel.files[0]; bank.sfx.step_quadruped_steel.files[0]
+
+assets/audio/replacements/footsteps/footstep_concrete_001.ogg
+  6308 bytes | SHA-256 507a75eb19b897087855a3be3cf11a12d7fa37d143ad535eeebe0b8031c7325d
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_concrete.files[1]; bank.sfx.step_crab_concrete.files[1]; bank.sfx.step_avian_concrete.files[1]; bank.sfx.step_quadruped_concrete.files[1]; bank.sfx.step_biped_steel.files[1]; bank.sfx.step_crab_steel.files[1]; bank.sfx.step_avian_steel.files[1]; bank.sfx.step_quadruped_steel.files[1]
+
+assets/audio/replacements/footsteps/footstep_concrete_002.ogg
+  6255 bytes | SHA-256 b21fa546d74941196b25da8a20b7010abd8c05c4fcf93545d1f344e66a664e13
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_concrete.files[2]; bank.sfx.step_crab_concrete.files[2]; bank.sfx.step_avian_concrete.files[2]; bank.sfx.step_quadruped_concrete.files[2]; bank.sfx.step_biped_steel.files[2]; bank.sfx.step_crab_steel.files[2]; bank.sfx.step_avian_steel.files[2]; bank.sfx.step_quadruped_steel.files[2]
+
+assets/audio/replacements/footsteps/footstep_concrete_003.ogg
+  5805 bytes | SHA-256 8b513c2f0316324060b9174b8f28df6c2147418c506e6a53b77f18e149a5547b
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_concrete.files[3]; bank.sfx.step_crab_concrete.files[3]; bank.sfx.step_avian_concrete.files[3]; bank.sfx.step_quadruped_concrete.files[3]; bank.sfx.step_biped_steel.files[3]; bank.sfx.step_crab_steel.files[3]; bank.sfx.step_avian_steel.files[3]; bank.sfx.step_quadruped_steel.files[3]
+
+assets/audio/replacements/footsteps/footstep_concrete_004.ogg
+  5912 bytes | SHA-256 24dd8db2413e5b81ad181e1205c12a1c7801da5f85715d471b92a4b2f632e45e
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_concrete.files[4]; bank.sfx.step_crab_concrete.files[4]; bank.sfx.step_avian_concrete.files[4]; bank.sfx.step_quadruped_concrete.files[4]; bank.sfx.step_biped_steel.files[4]; bank.sfx.step_crab_steel.files[4]; bank.sfx.step_avian_steel.files[4]; bank.sfx.step_quadruped_steel.files[4]
+
+assets/audio/replacements/footsteps/footstep_snow_000.ogg
+  7880 bytes | SHA-256 c05fa4a9dc9a7aabc04996466fb589537e49af76de9998d8f9e6270ec92dcef7
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_gravel.files[0]; bank.sfx.step_crab_gravel.files[0]; bank.sfx.step_avian_gravel.files[0]; bank.sfx.step_quadruped_gravel.files[0]
+
+assets/audio/replacements/footsteps/footstep_snow_001.ogg
+  7794 bytes | SHA-256 980fb9a1c9227aed7995067b0357f373053337f2416316db8ea0438418542fb4
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_gravel.files[1]; bank.sfx.step_crab_gravel.files[1]; bank.sfx.step_avian_gravel.files[1]; bank.sfx.step_quadruped_gravel.files[1]
+
+assets/audio/replacements/footsteps/footstep_snow_002.ogg
+  7694 bytes | SHA-256 db52bafdc66304f3b999f2c29227826c65993916e630ac2ffbca17d07b263178
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_gravel.files[2]; bank.sfx.step_crab_gravel.files[2]; bank.sfx.step_avian_gravel.files[2]; bank.sfx.step_quadruped_gravel.files[2]
+
+assets/audio/replacements/footsteps/footstep_snow_003.ogg
+  7860 bytes | SHA-256 68272e3f1cabcabd02d328fd344454d7c04cb58b5a86972fcdd858f845e3d007
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_gravel.files[3]; bank.sfx.step_crab_gravel.files[3]; bank.sfx.step_avian_gravel.files[3]; bank.sfx.step_quadruped_gravel.files[3]
+
+assets/audio/replacements/footsteps/footstep_snow_004.ogg
+  7630 bytes | SHA-256 7fe9ce5f5732aaa0a50ef02bb1ac162c27f6bd85214e86aaea6e13e7a41dbc00
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_gravel.files[4]; bank.sfx.step_crab_gravel.files[4]; bank.sfx.step_avian_gravel.files[4]; bank.sfx.step_quadruped_gravel.files[4]
+
+assets/audio/replacements/footsteps/footstep_wood_000.ogg
+  5949 bytes | SHA-256 5f1c252942a220d658121bd9417448cd19649ded9fff2ff15f6e50899373ce8e
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_plank.files[0]; bank.sfx.step_crab_plank.files[0]; bank.sfx.step_avian_plank.files[0]; bank.sfx.step_quadruped_plank.files[0]
+
+assets/audio/replacements/footsteps/footstep_wood_001.ogg
+  5929 bytes | SHA-256 e4f68e1c9fd55b4dc8ca89ed2bbab6f200171bc54bdc18aa96b80d8e7336f462
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_plank.files[1]; bank.sfx.step_crab_plank.files[1]; bank.sfx.step_avian_plank.files[1]; bank.sfx.step_quadruped_plank.files[1]
+
+assets/audio/replacements/footsteps/footstep_wood_002.ogg
+  5895 bytes | SHA-256 9ff095b05cee5eec40b081defe3f0eef7232bb16d4865ce03b9f6dbab875cfdd
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_plank.files[2]; bank.sfx.step_crab_plank.files[2]; bank.sfx.step_avian_plank.files[2]; bank.sfx.step_quadruped_plank.files[2]
+
+assets/audio/replacements/footsteps/footstep_wood_003.ogg
+  6207 bytes | SHA-256 2a68a083daa9eda08fed0ea5da5280dfbe0de226196c576be02f95259dd139d9
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_plank.files[3]; bank.sfx.step_crab_plank.files[3]; bank.sfx.step_avian_plank.files[3]; bank.sfx.step_quadruped_plank.files[3]
+
+assets/audio/replacements/footsteps/footstep_wood_004.ogg
+  5799 bytes | SHA-256 b33e0854e2b3f6b6492e25c25ef8f90447a332f7c6bb25dd02edced9581d3441
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.step_biped_plank.files[4]; bank.sfx.step_crab_plank.files[4]; bank.sfx.step_avian_plank.files[4]; bank.sfx.step_quadruped_plank.files[4]
+
+assets/audio/replacements/impact/impactBell_heavy_000.ogg
+  13915 bytes | SHA-256 94b8bb5f2d43ab65e4bcc32b28562416e9bc2c51d9fd4be1e333660ee52f977f
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.parry.files[0]
+
+assets/audio/replacements/impact/impactBell_heavy_001.ogg
+  15577 bytes | SHA-256 9df61e3ae9a83dc65e5a1fd3ed19d480876f3b22b963a1b9ef6fa293592dcec4
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.parry.files[1]
+
+assets/audio/replacements/impact/impactBell_heavy_002.ogg
+  9252 bytes | SHA-256 a4171ed1a4a17fb858a38de1c59b5b42e50d8f046c525706c0e3ac8671f189f5
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.parry.files[2]
+
+assets/audio/replacements/impact/impactBell_heavy_003.ogg
+  9429 bytes | SHA-256 5572ccdeb3b62373b86fa955355b3a222c36e815f0636ba16165189a21cf2514
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.parry.files[3]
+
+assets/audio/replacements/impact/impactBell_heavy_004.ogg
+  6529 bytes | SHA-256 49fe4fafa2001bd0d312976796824571ca8429851f285997e1327d17bb34fd00
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.parry.files[4]
+
+assets/audio/replacements/impact/impactGeneric_light_000.ogg
+  5827 bytes | SHA-256 f0e982611e97512fee5f777986b67e8b435434b601f94992ec044f7e89fb5acb
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_jelly.files[0]; bank.sfx.hop_land_gravel.files[0]
+
+assets/audio/replacements/impact/impactGeneric_light_001.ogg
+  5636 bytes | SHA-256 c3cd1c073d186ae8fa35788ba94de581f1826e7427a7bb26490b2695fac18efa
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_jelly.files[1]; bank.sfx.hop_land_gravel.files[1]
+
+assets/audio/replacements/impact/impactGeneric_light_002.ogg
+  5795 bytes | SHA-256 d0bf60905b59ff630ffe01eb0edeeacd2504eaa8fb6523aeef7d2458b78264d3
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_jelly.files[2]; bank.sfx.hop_land_gravel.files[2]
+
+assets/audio/replacements/impact/impactGeneric_light_003.ogg
+  5792 bytes | SHA-256 0e8896706130f6bc88cdf1f0157aaacdbe88dce86cf0330f9136e44eb1209e81
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_jelly.files[3]; bank.sfx.hop_land_gravel.files[3]
+
+assets/audio/replacements/impact/impactGeneric_light_004.ogg
+  5747 bytes | SHA-256 f906fa3a37acc4372787b496efcedefa2856045d5ec9456a3bd6c303c0eabb41
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_jelly.files[4]; bank.sfx.hop_land_gravel.files[4]
+
+assets/audio/replacements/impact/impactMetal_heavy_000.ogg
+  6110 bytes | SHA-256 e07045693e4a2b3d165c424e3dab4c781d9ff8880a386880ac89a51315d7f831
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_steel.files[0]
+
+assets/audio/replacements/impact/impactMetal_heavy_001.ogg
+  7279 bytes | SHA-256 83554049f81f4db9209379e103c30bfa63f65c42189a03f300b045c2c82e23ae
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_steel.files[1]
+
+assets/audio/replacements/impact/impactMetal_heavy_002.ogg
+  5634 bytes | SHA-256 b914c8f1eb7c0f34bb165d7c77f4be0351f6be0660c13c53e65424e262e2c093
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_steel.files[2]
+
+assets/audio/replacements/impact/impactMetal_heavy_003.ogg
+  6209 bytes | SHA-256 b0f2ba4dabde9a87eb9c188a19d31e0c2300fd321adeba08d3b9b8aa011d7037
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_steel.files[3]
+
+assets/audio/replacements/impact/impactMetal_heavy_004.ogg
+  5788 bytes | SHA-256 6d65b463c0555dd5be16b8db6d2cbe23a94e07a4637779b8ad17d0db3e500a87
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_steel.files[4]
+
+assets/audio/replacements/impact/impactMetal_light_000.ogg
+  7651 bytes | SHA-256 33b5e6e37c6e9d54e07bf5a89b12c76e879f40c1ea83cdd82714df1d6f9fec6d
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_railing.files[0]
+
+assets/audio/replacements/impact/impactMetal_light_001.ogg
+  6967 bytes | SHA-256 fba69c467ddd85da7b1d82e259f936b876d9ba6a3d6f1b24bdd10468e46bfe08
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_railing.files[1]
+
+assets/audio/replacements/impact/impactMetal_light_002.ogg
+  6804 bytes | SHA-256 25a96f90a9a1f88a531e824e126f0519504625e5635e65a72e4f31611428db29
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_railing.files[2]
+
+assets/audio/replacements/impact/impactMetal_light_003.ogg
+  9023 bytes | SHA-256 92d5db6bfc672d9dc1b4f390b2900504f013187fa36335472554fafefa9050b1
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_railing.files[3]
+
+assets/audio/replacements/impact/impactMetal_light_004.ogg
+  6675 bytes | SHA-256 9b1c35820fba507081261f19ab5f461f69a5e2627a7d91acdb73ca3cfc997979
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_railing.files[4]
+
+assets/audio/replacements/impact/impactMetal_medium_000.ogg
+  7117 bytes | SHA-256 a96f879fec0864a8938e0c745b6996a6c5679c16a234ce31a01cc995e8401003
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_fence.files[0]; bank.sfx.hop_land_steel.files[0]
+
+assets/audio/replacements/impact/impactMetal_medium_001.ogg
+  6151 bytes | SHA-256 e8a9eaba7c4d27422e4eeb3e6c7100d5d7dc0f83e005efc98c960adcc5265337
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_fence.files[1]; bank.sfx.hop_land_steel.files[1]
+
+assets/audio/replacements/impact/impactMetal_medium_002.ogg
+  5857 bytes | SHA-256 7e89ce2ca0dbda95ea2b78d4b50791cab35c10d20e9f5ccd45dd0b00e99ff548
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_fence.files[2]; bank.sfx.hop_land_steel.files[2]
+
+assets/audio/replacements/impact/impactMetal_medium_003.ogg
+  6964 bytes | SHA-256 2a185e2e57211d02c1bdd33b872d6b6a2fe83e6c14f4e56f426a95e717acf08e
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_fence.files[3]; bank.sfx.hop_land_steel.files[3]
+
+assets/audio/replacements/impact/impactMetal_medium_004.ogg
+  5744 bytes | SHA-256 03e10f800199c7166208e41c11cf4acfac6cc265467f02357da71972bc967295
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.wall_splat_fence.files[4]; bank.sfx.hop_land_steel.files[4]
+
+assets/audio/replacements/impact/impactPlank_medium_000.ogg
+  12016 bytes | SHA-256 8403cd7a043f0391574c88c55dd205743725b5363d2407f6de145f201690b68f
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hop_land_plank.files[0]
+
+assets/audio/replacements/impact/impactPlank_medium_001.ogg
+  12082 bytes | SHA-256 d7c304319f8beac616231b62041fa8da74045b62d7155965516efb9b19303df4
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hop_land_plank.files[1]
+
+assets/audio/replacements/impact/impactPlank_medium_002.ogg
+  12313 bytes | SHA-256 f6a14da45994229676b4f29e6a35f504b5c2ec2b8166fb1a3b1aa004bc6911ef
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hop_land_plank.files[2]
+
+assets/audio/replacements/impact/impactPlank_medium_003.ogg
+  12138 bytes | SHA-256 0602a7b3eab5f53484f10fe775ee4204e7a2ba9703c886b302e012f7f6fab8de
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hop_land_plank.files[3]
+
+assets/audio/replacements/impact/impactPlank_medium_004.ogg
+  12084 bytes | SHA-256 6a51318c1c63821ea757622b57fafbf44c16c28129f6d39406a784260d87c447
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hop_land_plank.files[4]
+
+assets/audio/replacements/impact/impactPlate_light_000.ogg
+  10474 bytes | SHA-256 6e797cf8a5bfc52d7ed5eb47c227974c1cf2a674954fec5b539cea7d62c7282c
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_guard.files[0]
+
+assets/audio/replacements/impact/impactPlate_light_001.ogg
+  11730 bytes | SHA-256 947915c2eb6ac57ee08fd3a48b297fd108d69abc72076e79882c21cad0eef56e
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_guard.files[1]
+
+assets/audio/replacements/impact/impactPlate_light_002.ogg
+  9932 bytes | SHA-256 8ac5869ea434cf0d364872774efe70b2d666a4f02ba35ddfc1e051d336721be8
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_guard.files[2]
+
+assets/audio/replacements/impact/impactPlate_light_003.ogg
+  10626 bytes | SHA-256 dbfb7c1d002576696df3e9a43d6639ee3f342068398b5e7b55bc2389d20508a9
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_guard.files[3]
+
+assets/audio/replacements/impact/impactPlate_light_004.ogg
+  11928 bytes | SHA-256 9cb33b0c0cce948313f078b60769d2f8e4075472494fc8f8129aa4a23c951897
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_guard.files[4]
+
+assets/audio/replacements/impact/impactPlate_medium_000.ogg
+  10921 bytes | SHA-256 b670d30452983369771081319c268475edaaafe782bf4e8d70bd7eef09d8823c
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_chitin.files[0]
+
+assets/audio/replacements/impact/impactPlate_medium_001.ogg
+  11491 bytes | SHA-256 68ba7701b71ef620f498f3038e832157d71ac8db7ad59424545890b250ceb24e
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_chitin.files[1]
+
+assets/audio/replacements/impact/impactPlate_medium_002.ogg
+  10250 bytes | SHA-256 68762e1ed49bb59ae6602fad6ce2ebac61958478ddb2668de9106f010cd4b6b0
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_chitin.files[2]
+
+assets/audio/replacements/impact/impactPlate_medium_003.ogg
+  11616 bytes | SHA-256 964c5fcfb91e7710e2af25c2243c8b7160756b223b0984bacc9eb25bfeea057b
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_chitin.files[3]
+
+assets/audio/replacements/impact/impactPlate_medium_004.ogg
+  10803 bytes | SHA-256 f0e8164081190839caff6c2958361b22780ffba5617f77f2d4ee3a4275b318bf
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_layer_chitin.files[4]
+
+assets/audio/replacements/impact/impactPunch_heavy_000.ogg
+  11617 bytes | SHA-256 b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_heavy.files[0]; bank.sfx.wall_splat_concrete.files[0]; bank.sfx.hop_land_concrete.files[0]
+
+assets/audio/replacements/impact/impactPunch_heavy_001.ogg
+  10861 bytes | SHA-256 f92f5cb6ba4ff2766497292ffd90865654317eeca976f5652e0708dbdcdc0dd9
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_heavy.files[1]; bank.sfx.wall_splat_concrete.files[1]; bank.sfx.hop_land_concrete.files[1]
+
+assets/audio/replacements/impact/impactPunch_heavy_002.ogg
+  9025 bytes | SHA-256 7993dd4c156b9979ad69f17be5ebe31850b16039a3857f8477141be54dfee1b3
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_heavy.files[2]; bank.sfx.wall_splat_concrete.files[2]; bank.sfx.hop_land_concrete.files[2]
+
+assets/audio/replacements/impact/impactPunch_heavy_003.ogg
+  10029 bytes | SHA-256 4ab53b26f4ea575120dcc1348526c9e0db2afc6af7a442aa0489bdead2ca80b6
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_heavy.files[3]; bank.sfx.wall_splat_concrete.files[3]; bank.sfx.hop_land_concrete.files[3]
+
+assets/audio/replacements/impact/impactPunch_heavy_004.ogg
+  10452 bytes | SHA-256 f4c0c3eb8ab6517583b8218ed03f28923d1b687379aab4c1d5a6d4c10cf8e500
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_heavy.files[4]; bank.sfx.wall_splat_concrete.files[4]; bank.sfx.hop_land_concrete.files[4]
+
+assets/audio/replacements/impact/impactPunch_medium_000.ogg
+  8800 bytes | SHA-256 486988aa2d6440ffc4c62a0e8ccf3c23673ba84424bd4723378d451b7255eb5c
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_light.files[0]; bank.sfx.hop_land_canvas.files[0]
+
+assets/audio/replacements/impact/impactPunch_medium_001.ogg
+  8701 bytes | SHA-256 e71d23abcc3f10d9d6bc9615b2a431fff70b12333a5fcdd9964457564ace4349
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_light.files[1]; bank.sfx.hop_land_canvas.files[1]
+
+assets/audio/replacements/impact/impactPunch_medium_002.ogg
+  10399 bytes | SHA-256 6492f9ccbc8d24dcef607bb1b48790b7870961474561f7fe5601e1c73a3018ef
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_light.files[2]; bank.sfx.hop_land_canvas.files[2]
+
+assets/audio/replacements/impact/impactPunch_medium_003.ogg
+  9509 bytes | SHA-256 2d7c719c05999e0532f4384e1018e04cd916db715140bf16dee2dff3f820e908
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_light.files[3]; bank.sfx.hop_land_canvas.files[3]
+
+assets/audio/replacements/impact/impactPunch_medium_004.ogg
+  10032 bytes | SHA-256 4a256878a3afb994ec9a4399336687748e68c7c136872c08c9c797d8c4e2464a
+  Impact Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/impact-sounds
+  Bank: bank.sfx.hit_light.files[4]; bank.sfx.hop_land_canvas.files[4]
+
+assets/audio/replacements/interface/back_001.ogg
+  6997 bytes | SHA-256 07db973f79f6ae0f2edc34561e7592e24d0577455919fb602cb8ecc0da991dcf
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_back.files[0]
+
+assets/audio/replacements/interface/back_002.ogg
+  7029 bytes | SHA-256 61581c58194e3f19f531072edabbc344204c7e0a2887b8ededce4357bcf09195
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_back.files[1]
+
+assets/audio/replacements/interface/back_003.ogg
+  7208 bytes | SHA-256 ff5e87de1230b1a5f1fa83e5a4ba9d7eb1c07154267ac34b510a17d4caa03cef
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_back.files[2]
+
+assets/audio/replacements/interface/back_004.ogg
+  6923 bytes | SHA-256 c22e3c49f42c2a5ba6748e91283efe124f32822469c1258c3e5d7b3d7ab9361c
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_back.files[3]
+
+assets/audio/replacements/interface/bong_001.ogg
+  4848 bytes | SHA-256 d21d0f0b782445db579d11e2506b24cd1ac9d664ee33aeaf807761aa7b6fd710
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_stamp.files[0]
+
+assets/audio/replacements/interface/close_001.ogg
+  9915 bytes | SHA-256 44af8249b933e0fd35ec957a638bb1a0b01f85b53fbe9674bf77bd3ca3168ef4
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_close.files[0]
+
+assets/audio/replacements/interface/close_002.ogg
+  14752 bytes | SHA-256 bc4279d2bb2bf86592473eab6a8eab55e51b54a8619315000dbd780a83b102d8
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_close.files[1]
+
+assets/audio/replacements/interface/close_003.ogg
+  15648 bytes | SHA-256 39a1a7f3bc001766c1881841e9903c6b16f5a10b5666e0791d7f6444677d8b05
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_close.files[2]
+
+assets/audio/replacements/interface/close_004.ogg
+  16263 bytes | SHA-256 41b41e01ac75f4bc5a9c8dc3b0de744fa7f877757463692783c12a8ae4bfae6b
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_close.files[3]
+
+assets/audio/replacements/interface/confirmation_001.ogg
+  8968 bytes | SHA-256 063564703b6094d70718a3e787a55cc9141611e4ecd6b6637f8828f79b4a8c3a
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_accept.files[0]
+
+assets/audio/replacements/interface/confirmation_002.ogg
+  14169 bytes | SHA-256 33b17a9a9a2397c62b285c52c33a907fdffb476909c99e42dde603f6a7a8b12c
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_accept.files[1]
+
+assets/audio/replacements/interface/confirmation_003.ogg
+  9535 bytes | SHA-256 3091bf0be0497f825769ee0733ca7bdc3bcd59bd6c6e8f2ba8f93d580ff38022
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_accept.files[2]
+
+assets/audio/replacements/interface/confirmation_004.ogg
+  12391 bytes | SHA-256 568967a3d9f8a8f6af54ea01729c4882284308f2a27d78c07ffd7ee0d6951661
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_accept.files[3]
+
+assets/audio/replacements/interface/error_001.ogg
+  7373 bytes | SHA-256 46e67425d16339772e8d328fb36a49426c9467418686e11beeb71ff84b0f6433
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_error.files[0]
+
+assets/audio/replacements/interface/error_002.ogg
+  7369 bytes | SHA-256 76810ec365f41078fd0507101da5bb7b8730fe011dde43908329fdabd8575e79
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_error.files[1]
+
+assets/audio/replacements/interface/error_003.ogg
+  12256 bytes | SHA-256 885b28175c7b511118bcffab95675b48bbac9005cf6514656ebdad979276b3ab
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_error.files[2]
+
+assets/audio/replacements/interface/error_004.ogg
+  6393 bytes | SHA-256 0b574cea597d96507e782ae9764f88482ce49f46e931e57054bf7150047f2d69
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_error.files[3]
+
+assets/audio/replacements/interface/error_005.ogg
+  7266 bytes | SHA-256 3f75b11df5b06d68d2c25fbf0e9c9d9e7dd9250562a4007ee34856b8a309a2ae
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_error.files[4]
+
+assets/audio/replacements/interface/error_006.ogg
+  8288 bytes | SHA-256 a97513d7fd2b12b1210c423be943b4c1ab0e899b11db95855e9b74836e646ae0
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_error.files[5]
+
+assets/audio/replacements/interface/error_007.ogg
+  10225 bytes | SHA-256 f1ee4c1ac8bfe1a82eacb54b26f49e8974bab93bcf10c01800bc10dbf730f559
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_error.files[6]
+
+assets/audio/replacements/interface/error_008.ogg
+  9215 bytes | SHA-256 eba17ecb2a426bfd4a8a6acff5f8a86202b6424a77af0fd842e37809a1ab6d81
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_error.files[7]
+
+assets/audio/replacements/interface/open_001.ogg
+  9834 bytes | SHA-256 a27c6bb0df7da1e6af5dd5937593c98bc58b6e513f42fe6a3254cd6a6949c648
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_open.files[0]
+
+assets/audio/replacements/interface/open_002.ogg
+  14975 bytes | SHA-256 24ff224fe2c09c6aed1b41249825382dc74cf324b887ff279d8494912ce2beee
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_open.files[1]
+
+assets/audio/replacements/interface/open_003.ogg
+  15046 bytes | SHA-256 bcdca6b5c9c33aa15ca3fb18a1fa8d98a01b528b85be08c5a610e57c75fc022d
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_open.files[2]
+
+assets/audio/replacements/interface/open_004.ogg
+  15879 bytes | SHA-256 4e02b8287bc4d9e7bf7a889cb9e48613c8eb22a310dfb0bf29c2bfd0a1e4bea5
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_open.files[3]
+
+assets/audio/replacements/interface/scroll_001.ogg
+  21633 bytes | SHA-256 320c6aafb2c7a503eae508dc443b72d7f7c0a317bfd16813157ed400cd04cf16
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_move.files[0]
+
+assets/audio/replacements/interface/scroll_002.ogg
+  24628 bytes | SHA-256 6fbcda22bc45349c66f1ba4b56d6c211b12264e83667de4b9af1e4ffcef74be5
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_move.files[1]
+
+assets/audio/replacements/interface/scroll_003.ogg
+  29488 bytes | SHA-256 c2fecaa6e37c73d7141d0bd303d1c2231428d97c19ce83d50236a56804818643
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_move.files[2]
+
+assets/audio/replacements/interface/scroll_004.ogg
+  20348 bytes | SHA-256 431398a3c12ba3aa30ead97f3e2f9b05eb00978facf04b31bda138ab77a2f54c
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_move.files[3]
+
+assets/audio/replacements/interface/scroll_005.ogg
+  20448 bytes | SHA-256 e39d059462225efa31f758fb2e01871cc96781972b5062873a24a55c88174e02
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_move.files[4]
+
+assets/audio/replacements/interface/select_001.ogg
+  5468 bytes | SHA-256 aec0c31ea934a35936ae0d2ab8fac8123c93aa5647f935853a58dbaf90278b7a
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_tab.files[0]
+
+assets/audio/replacements/interface/select_002.ogg
+  5463 bytes | SHA-256 4cc6ac5341b9b2c86fef80c347de028e9ab9f2e037586ac7d9fa59a403a1c012
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_tab.files[1]
+
+assets/audio/replacements/interface/select_003.ogg
+  6901 bytes | SHA-256 9a612fd2f513d52a296906b41071c990f75defe56be3bee60d2d4e2423b51b8b
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_tab.files[2]
+
+assets/audio/replacements/interface/select_004.ogg
+  6909 bytes | SHA-256 eb6cb435f3f2ab14f85f46a2bdd9073ec511d0f1f8d8c890c6636045703a5fd4
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_tab.files[3]
+
+assets/audio/replacements/interface/select_005.ogg
+  6767 bytes | SHA-256 ad09146e4ea33b931b2f5dfb4051a4f1fe4a36f1a48c42c5e9269c292ae21214
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_tab.files[4]
+
+assets/audio/replacements/interface/tick_001.ogg
+  4497 bytes | SHA-256 9d057b918024c787bbe6c00beed13a7ef72a3fa0c259add3cef36582792f4230
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_slider.files[0]
+
+assets/audio/replacements/interface/tick_002.ogg
+  4514 bytes | SHA-256 869442f54214be902ec7437f79e400dc91c1bfd90d18a6dd2d5b7e41ffbf457b
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_slider.files[1]
+
+assets/audio/replacements/interface/tick_004.ogg
+  5031 bytes | SHA-256 0253d5f7d8d2afbbc370eac2a4539bb844239f0c98343e516d376b137c06d27c
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_slider.files[2]
+
+assets/audio/replacements/interface/toggle_001.ogg
+  7369 bytes | SHA-256 ca1d2dde5f0b286abac4f070e23edab8f30927c8a533665cdf2ac6492a415e49
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_toggle.files[0]
+
+assets/audio/replacements/interface/toggle_002.ogg
+  8056 bytes | SHA-256 1f564f5520cfa0764028ce245ad97599d3ece8f0ab504554c403af92ac72b900
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_toggle.files[1]
+
+assets/audio/replacements/interface/toggle_003.ogg
+  8654 bytes | SHA-256 7e69aba356d590826cce291bbd9dc6a85d7c53858b0e3712fcad30e1ad080b23
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_toggle.files[2]
+
+assets/audio/replacements/interface/toggle_004.ogg
+  6695 bytes | SHA-256 d7bf2236fc95a0fe1e3b278259392bcb062644e2d4ec5f9c96f7c09a9928262f
+  Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/interface-sounds
+  Bank: bank.sfx.ui_toggle.files[3]
+
+assets/audio/replacements/jingles/jingles_HIT02.ogg
+  11735 bytes | SHA-256 1ebd52ba108c0e749d2814c54e44bba6c39d111fa30d025fddfac70538e0e241
+  Music Jingles — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/music-jingles
+  Bank: bank.music.defeat.file
+
+assets/audio/replacements/jingles/jingles_PIZZI03.ogg
+  16981 bytes | SHA-256 88da900ec74a79fb845f2dcf2068383998833a9ee1b87a23f074924781af5700
+  Music Jingles — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/music-jingles
+  Bank: bank.music.victory.file
+
+assets/audio/replacements/music/Backbay-Lounge.mp3
+  8531962 bytes | SHA-256 9567e71a213b0026341b2c0ecd226950e7653abd235cf520fb9aee4247d74d96
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.cannery_radio.file
+
+assets/audio/replacements/music/Funkorama.mp3
+  8199078 bytes | SHA-256 6be229815d85a0b99382b944d31098b882702c04ac7ad899e44ab7f8ba89b5ad
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.fight_night_poster.file; bank.music.title_night.file
+
+assets/audio/replacements/music/Furious-Freak.mp3
+  5990768 bytes | SHA-256 81eeea1f99cb0f25b417cfa69b9268f040e46bb67a955247fe80a769ee426bd7
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.combat_a.file; bank.music.combat_b.file
+
+assets/audio/replacements/music/Volatile-Reaction.mp3
+  5293585 bytes | SHA-256 ced1148df201a6c69062a96b7ef49c49924572ca5023c2ac5a2d6c5828ecb218
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.boss.file
+
+assets/audio/replacements/rpg/bookFlip1.ogg
+  18248 bytes | SHA-256 fa81ac2fedc8c641661b87e349630a36c9800e795e0c800e029214efdbe26a7d
+  RPG Audio — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/rpg-audio
+  Bank: bank.sfx.ui_card_flip.files[0]
+
+assets/audio/replacements/rpg/bookFlip2.ogg
+  12393 bytes | SHA-256 3409042acbfaebc24c1a6327dc073e36f9250841712e96c5040da566a97df73c
+  RPG Audio — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/rpg-audio
+  Bank: bank.sfx.ui_card_flip.files[1]
+
+assets/audio/replacements/rpg/bookFlip3.ogg
+  9077 bytes | SHA-256 c85db5dceb3f1df073e960630277eaa88a5afda0477c1ddd68dad707621767be
+  RPG Audio — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/rpg-audio
+  Bank: bank.sfx.ui_card_flip.files[2]
+
+assets/audio/replacements/rpg/handleCoins.ogg
+  25394 bytes | SHA-256 8a91f969e932df709df80ee124d86a51389eed9b67f22e5e716bc2bbf60d8dab
+  RPG Audio — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/rpg-audio
+  Bank: bank.sfx.ui_scrip.files[0]; bank.sfx.ui_purchase.files[0]
+
+assets/audio/replacements/rpg/handleCoins2.ogg
+  13094 bytes | SHA-256 4b857968d64f9ac9336a10ffac6694d7547e1f01566ad6857b30bc8db3ee6c32
+  RPG Audio — Kenney | Creative Commons Zero (CC0 1.0)
+  Source: https://kenney.nl/assets/rpg-audio
+  Bank: bank.sfx.ui_scrip.files[1]; bank.sfx.ui_purchase.files[1]
+
+assets/audio/replacements/water/waterflow.mp3
+  102625 bytes | SHA-256 5a053719d5b06a8e5005dbe81b66e020f10312635a823d66883702568c971e92
+  Waterflow Sound — TyberiusGames | Creative Commons Zero (CC0 1.0)
+  Source: https://opengameart.org/content/waterflow-sound
+  Bank: bank.sfx.amb_drydock.files[0]; bank.sfx.amb_hub_dock.files[0]

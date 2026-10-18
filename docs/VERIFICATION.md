@@ -1,11 +1,6 @@
 # Verification report
 
-**Preview 0.9.12, 2026-10-17.** The [v0.9.12 playtest report](evidence/verification/v0.9.12/README.md)
-records the 24 reported issues, new regression tests and native Windows captures. This is a preview, not the
-release candidate. The release-candidate run, the whole-brief audit (VER-07) and the open items in
-`docs/PROGRESS.md` are still to do. This report records what has been verified so far, how, on which
-build, and where the evidence is. It leaves out what has not been verified. Requirement-level states live
-in `docs/REQUIREMENTS.md`.
+**Preview 0.9.13, 2026-10-17.** The [v0.9.13 report](evidence/verification/v0.9.13/README.md) records the free audio replacements, Random fighter choices, source and packaged checks, and release evidence. The preceding [v0.9.12 playtest report](evidence/verification/v0.9.12/README.md) records the menu and gameplay fixes carried forward here. This is a preview, not the release candidate. The release-candidate run, whole-brief audit (VER-07) and open items in `docs/PROGRESS.md` remain separate. This report distinguishes verified checks from what has not been verified. Requirement-level states live in `docs/REQUIREMENTS.md`.
 
 Machine for every result below: Windows 10 (19045), i7-7700K, RTX 4070 Ti Super, Godot 4.5.1 (official
 build). Networking results are **loopback** on this one PC unless stated otherwise.
@@ -17,6 +12,7 @@ dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`
 
 | Version | Commit | Source suite before release | Packaged checks |
 |---|---|---|---|
+| 0.9.13 | pending | 718 run: 717 passed, 0 failed, 1 graphical-only skip; fighter selection 24/24, AI Lab picker 8/8, source audio 10/10 | Packaged audio: 8 passed, 0 failed, 2 source-only skips; all four targets exported in B: preflight; tagged smoke and publication pending; [report](evidence/verification/v0.9.13/README.md) |
 | 0.9.12 | `0e8b20f` (`v0.9.12`) | 711 run: 710 passed, 0 failed, 1 graphical-only skip; full-suite warnings documented in the linked report | Tagged Windows build: 391 scripts, title in 4.5 s, 20/20 rendered regressions, no shutdown warnings; all four targets built and seven uploaded asset digests verified |
 | 0.9.9 | eecaa39 | 684 / 685 (the one failure was the cross-drive lab-test check, fixed and re-run green) | release smoke: script check, packaged boot to the title |
 | 0.9.8 | 57613cc | 685 / 685 passed (2026-10-16) | release smoke: script check, packaged boot to the title |

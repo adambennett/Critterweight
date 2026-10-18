@@ -9,8 +9,8 @@ Adam Bennett
 
 ## Design, engineering and art direction
 Developed with AI-assisted tooling (Anthropic Claude) under the project lead's direction. All names, characters,
-writing, UI, icons, models, music and sound are original to this project and produced by the project's own tools
-(`tools/forge` and `tools/blender` for models, `tools/audio` for music and sound, procedural UI and arena rendering).
+writing, UI, icons and models are original to this project. Music and selected sound effects are third-party recordings
+under the free licences listed below; the remaining generated audio comes from tools/audio.
 
 ## Reference project
 Cage Rules, by Jeremy — its code, ideas and project-owned assets were authorised for reuse. This game reuses only the
@@ -25,6 +25,13 @@ this project.
 - Barlow and Barlow Condensed — Jeremy Tribby — SIL Open Font License 1.1 (`OFL-Barlow.txt`)
 - Bungee — David Jonathan Ross — SIL Open Font License 1.1
 
+## Audio and sound
+
+- Funkorama, Backbay Lounge, Furious Freak and Volatile Reaction — Kevin MacLeod (incompetech.com), CC BY 4.0. Required attribution: “Music: Funkorama, Backbay Lounge, Furious Freak, Volatile Reaction by Kevin MacLeod (incompetech.com). Licensed under CC BY 4.0.” Source and licence links appear in the in-game Notices.
+- Selected clips from Kenney Impact Sounds, Interface Sounds, RPG Audio and Music Jingles — CC0 1.0; credit is optional and included here for provenance.
+- Waterflow Sound by TyberiusGames, crowd ambience by StarNinjas, and applause by eXpl0it3r (OpenGameArt) — CC0 1.0.
+- Exact files, hashes, licences and bank references are in game/assets/audio/replacements/replacement-audio-inventory.json and docs/audio/replacement-audio-inventory.txt.
+
 ## In-world thanks
 The Gullet Bay Athletic Commission, for sanctioning absolutely everything. Glandco, for the JUICE. Side effects not
 included in these credits.
@@ -38,4 +45,4 @@ physics bodies and skeleton contract. OpenAI's built-in image generation supplie
 exact prompts and provenance are in `docs/evidence/art/concepts/prompts.json` and `ART_PIPELINE.md`.
 Blender Foundation and contributors provide Blender; Siddharth Ahuja and contributors provide the
 optional MIT Blender MCP bridge. No third-party character, texture or material asset ships in this revamp.
-These art-branch acknowledgements are proposed for Claude to synchronize with the in-game credits data.
+These acknowledgements are included in the in-game credits.

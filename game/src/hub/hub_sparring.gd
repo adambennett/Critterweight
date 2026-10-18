@@ -66,6 +66,10 @@ static func arena_for(choices: Dictionary) -> ArenaDef:
 
 static func config(me: String, player_name: String, choices: Dictionary) -> Dictionary:
 	var opp := str(choices.get("opponent", "kid_lamprey"))
+	if opp == "random":
+		var opponents: Array[String] = ["kid_lamprey"]
+		opponents.append_array(Content.playable_creatures())
+		opp = FighterSelection.resolve("random", opponents)
 	var tier := str(choices.get("tier", "journeyman"))
 	var practice := str(choices.get("format", "spar")) == "practice"
 	var rules := {"id": "hub_spar", "name": "Ring Sparring", "mode": "practice" if practice else "standard", "rounds": 1,

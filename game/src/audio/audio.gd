@@ -38,6 +38,7 @@ var subtitles_on := true
 
 var _sfx_entries := {}               ## id -> resolved entry (aliases merged)
 var _streams := {}                   ## res path -> AudioStream
+var _loop_stream_paths := {}          ## paths whose replacement bank entries request looping
 var _missing := {}                   ## logged-once ids
 var _voices2d: Array = []            ## Array[Dictionary] {player, id, priority, started, loop, handle}
 var _voices3d: Array = []
@@ -199,7 +200,16 @@ func load_bank() -> bool:
 		Log.e("audio", "bank.json is not valid JSON")
 		return false
 	bank = parsed
+	_streams.clear()
+	_loop_stream_paths.clear()
 	var sfx: Dictionary = bank.get("sfx", {})
+	for id in sfx:
+		var entry: Dictionary = _resolve_entry(sfx, str(id), 0)
+		if bool(entry.get("loop", false)):
+			for file in entry.get("files", []): _loop_stream_paths[str(file)] = true
+	for id in bank.get("music", {}):
+		var entry: Dictionary = bank["music"][id]
+		if entry.get("loop") != null: _loop_stream_paths[str(entry.get("file", ""))] = true
 	for id in sfx:
 		_sfx_entries[id] = _resolve_entry(sfx, str(id), 0)
 	bank_loaded = true
@@ -242,6 +252,9 @@ func _stream(path: String) -> AudioStream:
 		return null
 	var s = load(path)
 	if s is AudioStream:
+		if _loop_stream_paths.has(path):
+			if s is AudioStreamMP3: (s as AudioStreamMP3).loop = true
+			elif s is AudioStreamOggVorbis: (s as AudioStreamOggVorbis).loop = true
 		_streams[path] = s
 		return s
 	return null
@@ -1661,22 +1674,31 @@ func validate() -> PackedStringArray:
 			if not ResourceLoader.exists(str(f)):
 				problems.append("%s: missing %s" % [id, f])
 			else:
-				var s = load(str(f))
-				if not (s is AudioStreamWAV):
-					problems.append("%s: %s is not an AudioStreamWAV" % [id, f])
-				elif bool(e.get("loop", false)) and (s as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_DISABLED:
-					problems.append("%s: loop entry imported without a loop" % id)
+				var s := _stream(str(f))
+				if not (s is AudioStreamWAV or s is AudioStreamMP3 or s is AudioStreamOggVorbis):
+					problems.append("%s: %s is not a supported audio stream" % [id, f])
+				elif bool(e.get("loop", false)):
+					if s is AudioStreamWAV and (s as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_DISABLED:
+						problems.append("%s: WAV loop entry imported without a loop" % id)
+					elif s is AudioStreamMP3 and not (s as AudioStreamMP3).loop:
+						problems.append("%s: MP3 loop entry is not looping" % id)
+					elif s is AudioStreamOggVorbis and not (s as AudioStreamOggVorbis).loop:
+						problems.append("%s: Ogg loop entry is not looping" % id)
 	for tid in bank.get("music", {}):
 		var m: Dictionary = bank["music"][tid]
-		var ms = load(str(m["file"])) if ResourceLoader.exists(str(m["file"])) else null
-		if not (ms is AudioStreamWAV):
-			problems.append("music %s: missing stream" % tid)
+		var ms = _stream(str(m["file"])) if ResourceLoader.exists(str(m["file"])) else null
+		if not (ms is AudioStreamWAV or ms is AudioStreamMP3 or ms is AudioStreamOggVorbis):
+			problems.append("music %s: missing or unsupported stream" % tid)
 		else:
-			var w: AudioStreamWAV = ms
 			var lp = m.get("loop")
-			if lp != null:
+			if lp is Dictionary and ms is AudioStreamWAV:
+				var w: AudioStreamWAV = ms
 				if w.loop_mode != AudioStreamWAV.LOOP_FORWARD or w.loop_begin != int(lp["begin"]) or w.loop_end != int(lp["end"]):
 					problems.append("music %s: loop points %d-%d not imported (got mode %d %d-%d)" % [tid, int(lp["begin"]), int(lp["end"]), w.loop_mode, w.loop_begin, w.loop_end])
+			elif lp != null and ms is AudioStreamMP3 and not (ms as AudioStreamMP3).loop:
+				problems.append("music %s: MP3 loop entry is not looping" % tid)
+			elif lp != null and ms is AudioStreamOggVorbis and not (ms as AudioStreamOggVorbis).loop:
+				problems.append("music %s: Ogg loop entry is not looping" % tid)
 		for L in m.get("layers", []):
 			if not ResourceLoader.exists(str(L["file"])):
 				problems.append("music %s: layer %s missing" % [tid, L["id"]])

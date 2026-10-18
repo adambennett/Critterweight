@@ -1,6 +1,6 @@
 # Generated audio and replacement candidates
 
-Audited for v0.9.12 on 2026-10-17. The shipped bank contains **638 generated WAV files, 128.8 MiB**. They were synthesized by this repository's JavaScript DSP/score pipeline, rather than recorded in Ableton or downloaded from a stock library. Replacing them is an aesthetic choice; they are not assets that must be replaced before shipping.
+The v0.9.12 audit found **638 generated WAV files, 128.8 MiB**, made by this repository's JavaScript DSP/score pipeline. v0.9.13 now layers selected free replacements over those sources in a separate bank override, preserving the generated files and making each choice reproducible.
 
 The complete, hash-checked file list is [generated-audio-inventory.txt](generated-audio-inventory.txt). The [JSON version](generated-audio-inventory.json) includes each file's SHA-256, duration, sample rate, channels and every direct bank reference. Regenerate both with `node tools/audio/inventory.js`.
 
@@ -26,7 +26,7 @@ The most valuable first replacements are the three menu/hub cues, the combat bas
 
 ## Music shortlist
 
-These are candidates selected from the creators' descriptions and metadata, **not an auditioned soundtrack selection**. Nothing here was downloaded or installed. Each listed Kevin MacLeod track offers a free **CC BY 4.0** download with attribution; his [licensing page](https://incompetech.com/music/royalty-free/licenses/) also offers paid alternatives without attribution. Keep the exact credit supplied with each download.
+These tracks were selected from the creators' descriptions and metadata, not from an in-game listening review. The four free MP3s are installed in v0.9.13 under **CC BY 4.0** with the required attribution. The Incompetech page also offers paid versions; none were used.
 
 - **Title / fight-night poster: [Funkorama](https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100474), Kevin MacLeod.** A 101 BPM funk groove with guitar, bass, organ and drums, 3:21. A plausible fit for the crooked sports-promotion tone and the gold/black menus. Try a restrained excerpt for the title and a busier section for pre-fight build-up.
 - **Cannery: [Backbay Lounge](https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1700068), Kevin MacLeod.** Relaxed piano/guitar/bass/drums lounge music, 120 BPM, 4:27. A candidate for a radio in the hub, mixed quietly beneath NPC dialogue.
@@ -38,27 +38,37 @@ These finished recordings are not synchronized replacement stems. Do not play th
 
 ## Sound shortlist
 
-- **Punches, crates and collisions: [Impact Sounds](https://kenney.nl/assets/impact-sounds), Kenney.** 130 CC0 sounds. Start with body hits, wood/metal collisions and landing transients; choose softer variants for blocked hits so heavy contact retains contrast.
+- **Punches, footsteps, crates and collisions: [Impact Sounds](https://kenney.nl/assets/impact-sounds), Kenney.** 130 CC0 sounds. Selected body hits, wood/metal collisions, landing transients and material footsteps are installed; softer variants cover blocked hits so heavy contact retains contrast.
 - **Menus and editor: [Interface Sounds](https://kenney.nl/assets/interface-sounds), Kenney.** 100 CC0 sounds for focus, accept, back, invalid, toggles, saves and editor placement. Keep focus movement very quiet because a held stick repeats it.
-- **Footsteps / prop handling: [RPG Audio](https://kenney.nl/assets/rpg-audio), Kenney.** 50 CC0 sounds. Useful source material for footsteps and handling; audition material matches before replacing the game's five surface families and creature-size variants.
-- **Harbour water: [Water waves](https://opengameart.org/content/water-waves), transitking / qubodup.** Four CC0 wave recordings. Candidates for Drydock or Slurry-related water, after trimming and seamless-loop editing.
-- **Crowd bed: [crowd idle.wav](https://freesound.org/people/moxobna/sounds/102099/), moxobna.** CC0 crowd ambience, about 93.5 seconds. A candidate for quiet arena background, with distance filtering and modest gain.
-- **Crowd reaction: [crowd cheer distant.wav](https://freesound.org/people/moxobna/sounds/102108/), moxobna.** CC0, about 18.9 seconds. A candidate for wins and dramatic hits. Inspect for prominent speech and trim distinct reactions; do not run this continuously. Freesound requires a login to download these files.
+- **Book and coin handling: [RPG Audio](https://kenney.nl/assets/rpg-audio), Kenney.** 50 CC0 sounds. Book flips and coin handling are installed for the corresponding interface cues.
+- **Harbour water: [Waterflow Sound](https://opengameart.org/content/waterflow-sound), TyberiusGames.** The CC0 MP3 is installed as the quiet dock bed. The four CC0 [Water waves](https://opengameart.org/content/water-waves) FLAC recordings from transitking / qubodup were considered but not installed because the stock Godot importer does not support FLAC.
+- **Crowd bed: [Crowd Shouting/Speaking Ambience](https://opengameart.org/content/crowd-shoutingspeaking-ambience), StarNinjas.** CC0 OGG, used at low gain for the arena bed. Freesound crowd-idle required a login, so this freely downloadable alternative was selected.
+- **Crowd reaction: [Applause in a Large Hall or Church](https://opengameart.org/content/applause-in-a-large-hall-or-church), eXpl0it3r.** CC0 WAV, wired to the crowd-cheer event as a one-shot.
 - **Optional human combat calls: [Voiceover Pack: Fighter](https://kenney.nl/assets/voiceover-pack-fighter), Kenney.** 45 CC0 voice clips. Suitable only if deliberately choosing a human voice direction; it does not replace the six creature casts or written NPC dialogue.
 
 For industrial machinery, electric arcs, steam and monster source material, the [Sonniss GDC collection](https://gdc.sonniss.com/) is a larger optional search pool. Its [GDC bundle license](https://sonniss.com/gdc-bundle-license/) permits commercial use incorporated into games without mandatory attribution, but does not permit distributing the sounds as a raw sound library. Keep any selected source recordings outside a public source/mod SDK and record their provenance. The much smaller CC0 packs above are easier starting points for this repository.
 
-## Integration approach
+## Owner listening review
 
-1. Audition music in an actual fight and hub session, with dialogue, impacts and crowd enabled. Choose the direction before replacing hundreds of small files.
-2. Save the downloaded license, author, exact source page, download date and chosen filenames in `docs/THIRD_PARTY.md`; include required CC BY credits in `docs/CREDITS.md` and the in-game credits. CC0 credit is optional but useful for provenance.
-3. Preserve bank event IDs and gameplay timing. Replace variations together so one generated outlier does not stand out. Use mono for spatial point effects, stereo where useful for music/ambience, and match perceived loudness with headroom.
-4. Store imported replacements in a distinct directory and point `game/assets/audio/bank.json` at them. The DSP builder overwrites its generated filenames; keep stock assets out of that overwrite path. Update the inventory tool to classify imported provenance when this work happens.
-5. For music, author loop points and adapt/disable layers as described above. For ambience, use sparse environmental detail and avoid persistent narrow tones. Do not normalize every quiet loop to the same loud peak as combat.
-6. Run the audio bank/content tests, import and packaged Windows checks. Then listen to a full fight, transitions between every hub room, pause/unpause, focus changes, results and the AI Lab dropdowns. Metering and automated playback tests cannot establish that a track is pleasant.
+The v0.9.13 bank and recordings are installed. The placements below were chosen from the recordings' descriptions and metadata; automated checks cover import, hashes, bank references and loop settings, but cannot judge sound quality. In-game, listen to the title/menu, Cannery radio under dialogue, a full ordinary fight, boss JUICE transitions, result stings, crowd reactions, the dock ambience and menu sounds. Check volume against dialogue and impacts, abrupt restarts after returning to a screen, and whether the repeated material fits the tone. The owner can then keep or revise individual paths and gains in `game/assets/audio/replacement-overrides.json`.
+
+The exact downloaded recordings, authors, source links, licenses, hashes and bank references are in `game/assets/audio/replacements/replacement-audio-inventory.json` and `docs/THIRD_PARTY.md`. Required CC BY attribution is in the in-game Credits and `docs/CREDITS.md`; all other installed recordings are CC0. Music is played as a finished recording without mismatched generated layers. The audio bank tests and packaged smoke checks verify technical integration, not an aesthetic approval.
+
+## Installed in v0.9.13
+
+The game contains **126 imported audio files (~34.8 MiB)**, and all 126 unique replacement paths are referenced from the bank. The separate replacement-audio-inventory.txt lists every file, source, licence, SHA-256 and bank reference; tools/audio/inventory.js rebuilds it.
+
+- **Music:** Funkorama handles both title/menu and fight-night poster; Backbay Lounge is the Cannery radio; Furious Freak fills both combat slots; Volatile Reaction is the boss cue and keeps a 7/4 section B jump for JUICE. Kenney Pizzicato/Hit jingles handle victory and defeat. The original adaptive stems are disabled for these finished tracks.
+- **Combat and movement:** Kenney punch/plate/metal impacts replace light/heavy hits, material impacts, guard/parry and wall contacts. Five-variant Kenney footsteps replace all four creature plans across canvas, concrete, steel, plank and gravel surfaces, with per-plan pitch ranges; hard floor stands in for steel and snow crunch for gravel. Landing sounds use matching impact clips.
+- **Menus:** Kenney scroll, confirmation, back, error, toggle, tick, select, open, close, coin and book sounds replace the common UI actions.
+- **World:** the low-gain StarNinjas crowd OGG loops as crowd ambience; the eXpl0it3r applause WAV is the crowd-cheer reaction; TyberiusGames waterflow MP3 is the quiet Drydock/dock bed. The water-wave FLAC candidates were not used because Godot's stock importer does not support FLAC.
+
+Every installed file is CC BY 4.0 or CC0 1.0 and free to use without a composer payment. The CC BY tracks require the Kevin MacLeod attribution shown in docs/CREDITS.md and in-game Credits; CC0 clips are credited there as provenance. Original named-creature and announcer voices remain generated because the optional human voice pack is not an appropriate drop-in replacement.
+
+The recordings are installed and automated import/bank/hash checks pass. The owner can audition them in this release and decide what should change. See game/assets/audio/replacements/provenance.json for the terms and exact sources.
 
 ## Buzz fix shipped in v0.9.12
 
 The generated beds contained sustained machinery hums, a pad and electrical buzz. Their continuous tonal layers were removed from `amb_gullet`, `amb_crusher`, `amb_rooftop`, `amb_hub_main`, `amb_hub_booth`, `amb_hub_boiler`, `amb_hub_office` and `amb_hub_juice_bar`. Environmental water, wind and sparse details remain. The ambience player's crossfades also cancel old tweens before reusing either player, so rapid room changes cannot leave an old loop fading back in after a newer request.
 
-This is the targeted fix requested for 0.9.12. It does not merge the separate Ableton experiment or claim that the proposed stock replacements have been approved by listening.
+This is the targeted fix requested for 0.9.12. The separate Ableton experiment remains untouched; the v0.9.13 stock replacements use a distinct bank override and await the owner's listening review.

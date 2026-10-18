@@ -147,12 +147,14 @@ static func build_run(b: HubBoard, p: Dictionary) -> void:
 		b.button("Campaign menu (suspended runs, co-op lobby)", sv.open_campaign_menu)
 		b.focus_first()
 		return
-	var names: Array = fighters.map(func(f): return str(Content.get_entry("creatures", str(f)).get("name", f)))
+	var fighter_ids := FighterSelection.with_random(fighters)
+	var names: Array = ["Random"]
+	names.append_array(fighters.map(func(f): return str(Content.get_entry("creatures", str(f)).get("name", f))))
 	var me := ""
 	if b.scene != null:
 		me = b.scene.call("player").creature.id
-	var fr := OptionRow.new("Fighter").setup(fighters, names, me if fighters.has(me) else (fighters[0] if not fighters.is_empty() else ""))
-	fr.set_help("Fighter", "Who walks out on the card. Your Cannery upgrades apply to whoever you pick.")
+	var fr := OptionRow.new("Fighter").setup(fighter_ids, names, me if fighters.has(me) else "random")
+	fr.set_help("Fighter", "Who walks out on the card. Random picks a cleared fighter when you sign; Cannery upgrades apply to that fighter.")
 	b.list.content.add_child(fr)
 	var diffs: Array = o.get("difficulties", [])
 	var dids: Array = diffs.map(func(d): return str(d["id"]))
@@ -214,8 +216,15 @@ static func fill_doses(row: OptionRow, doses: Array, allowed: bool, current: int
 		else "Sparring never takes a Dose: the base card only.")
 
 
+static func resolve_fighter_choice(choices: Dictionary, fighters: Array) -> Dictionary:
+	var resolved := choices.duplicate(true)
+	resolved["fighter"] = FighterSelection.resolve(str(resolved.get("fighter", "")), fighters)
+	return resolved
+
+
 ## SIGN THE WAIVER: starts the card, or — when a suspended Fight Camp run is on file — asks first.
 static func sign_up(b: HubBoard, sv: HubServices, choices: Dictionary) -> void:
+	choices = resolve_fighter_choice(choices, sv.run_options().get("fighters", []))
 	var r := sv.start_run(choices)
 	if bool(r.get("ok", false)):
 		return

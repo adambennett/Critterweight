@@ -190,6 +190,13 @@ func test_bookie_table_and_lab_terminal_for_real() -> void:
 		var lab := App.top_screen()
 		check(lab != null and lab.screen_name == "lab", "the Lab screen is up")
 		if lab != null:
+			var fighter_picker := lab.get("_fighter") as OptionButton
+			check(fighter_picker != null, "the AI Lab fighter picker is built")
+			if fighter_picker != null and fighter_picker.item_count > 0:
+				check_eq(fighter_picker.get_item_text(0), "Random", "the AI Lab offers Random")
+				fighter_picker.item_selected.emit(0)
+				var random_fighter := str(lab.call("_creature_id"))
+				check(Content.playable_creatures().has(random_fighter), "AI Lab Random resolves to a playable fighter")
 			lab.on_back()
 			await wait_physics(10)
 			await wait_frames(4)

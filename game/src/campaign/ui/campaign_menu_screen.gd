@@ -138,11 +138,12 @@ func _build_rows(focus_key := "") -> void:
 		else:
 			c.add_child(UiTheme.label(why + " The card opens once their fight kits are cleared.", "Danger", true))
 	else:
-		var names: Array = []
+		var fighter_ids := FighterSelection.with_random(fs)
+		var names: Array = ["Random"]
 		for fid in fs:
 			var info := catalog.fighter_info(str(fid))
 			names.append("%s  ·  %s" % [info.get("name", fid), Elements.display_name(str(info.get("element", "")))])
-		_option(c, "fighter", "Fighter", fs, names, fighter, "Who you take through the card: the run's rewards, supplements and scars stay with this fighter.",
+		_option(c, "fighter", "Fighter", fighter_ids, names, fighter, "Who you take through the card: Random chooses a cleared fighter when the run starts. Rewards, supplements and scars stay with that fighter.",
 			func(v) -> void: _pick_fighter(str(v)))
 		if not stand_ins and CampaignFlow.dev_tools() and fs.size() < catalog.roster().size():
 			c.add_child(_button("ENABLE DEV STAND-INS (unfinished kits)", "", func(): App.goto("campaign_menu", {"stand_ins": true, "from_hub": return_to_hub})))
@@ -384,10 +385,11 @@ func _leave() -> void:
 
 
 func _start_run() -> void:
-	if fighter == "":
+	var picked_fighter := FighterSelection.resolve(fighter, catalog.available_fighters())
+	if picked_fighter == "":
 		return
 	var seed_value := RunRng.text_to_seed(seed_text) if seed_text.strip_edges() != "" else 0
-	var cfg := FightCamp.run_config(Profiles.current, {"variant": variant, "fighter": fighter, "difficulty": difficulty, "dose": dose,
+	var cfg := FightCamp.run_config(Profiles.current, {"variant": variant, "fighter": picked_fighter, "difficulty": difficulty, "dose": dose,
 		"seed": seed_value, "coop_format": coop_format, "custom_reasons": CampaignFlow.custom_reasons(stand_ins)})
 	cfg["content_hash"] = Content.content_hash()
 	var slot := RunStore.slot_for(cfg)

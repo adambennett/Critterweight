@@ -411,8 +411,7 @@ func build_config() -> Dictionary:
 	for i in slots().size():
 		var s: Dictionary = slots()[i]
 		var cid := str(s["creature"])
-		if cid == "random":
-			cid = str(ids[randi() % ids.size()])
+		cid = FighterSelection.resolve(cid, ids)
 		var kind := str(s["kind"])
 		var nm := Profiles.player_name() if kind == "player" else str(Content.get_entry("creatures", cid).get("name", cid))
 		var base := nm

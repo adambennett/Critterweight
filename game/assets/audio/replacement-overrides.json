@@ -1,0 +1,835 @@
+{
+  "version": 1,
+  "sources": [
+    "incompetech-ccby",
+    "kenney-cc0",
+    "opengameart-cc0"
+  ],
+  "sfx": {
+    "hit_light": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactPunch_medium_000.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_medium_001.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_medium_002.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_medium_003.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_medium_004.ogg"
+      ],
+      "gain": -2
+    },
+    "hit_heavy": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactPunch_heavy_000.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_001.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_002.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_003.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_004.ogg"
+      ],
+      "gain": -2
+    },
+    "hit_layer_chitin": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactPlate_medium_000.ogg",
+        "res://assets/audio/replacements/impact/impactPlate_medium_001.ogg",
+        "res://assets/audio/replacements/impact/impactPlate_medium_002.ogg",
+        "res://assets/audio/replacements/impact/impactPlate_medium_003.ogg",
+        "res://assets/audio/replacements/impact/impactPlate_medium_004.ogg"
+      ],
+      "gain": -2
+    },
+    "hit_layer_jelly": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactGeneric_light_000.ogg",
+        "res://assets/audio/replacements/impact/impactGeneric_light_001.ogg",
+        "res://assets/audio/replacements/impact/impactGeneric_light_002.ogg",
+        "res://assets/audio/replacements/impact/impactGeneric_light_003.ogg",
+        "res://assets/audio/replacements/impact/impactGeneric_light_004.ogg"
+      ],
+      "gain": -5
+    },
+    "hit_guard": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactPlate_light_000.ogg",
+        "res://assets/audio/replacements/impact/impactPlate_light_001.ogg",
+        "res://assets/audio/replacements/impact/impactPlate_light_002.ogg",
+        "res://assets/audio/replacements/impact/impactPlate_light_003.ogg",
+        "res://assets/audio/replacements/impact/impactPlate_light_004.ogg"
+      ],
+      "gain": -2
+    },
+    "parry": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactBell_heavy_000.ogg",
+        "res://assets/audio/replacements/impact/impactBell_heavy_001.ogg",
+        "res://assets/audio/replacements/impact/impactBell_heavy_002.ogg",
+        "res://assets/audio/replacements/impact/impactBell_heavy_003.ogg",
+        "res://assets/audio/replacements/impact/impactBell_heavy_004.ogg"
+      ],
+      "gain": -2
+    },
+    "wall_splat_fence": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactMetal_medium_000.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_medium_001.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_medium_002.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_medium_003.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_medium_004.ogg"
+      ],
+      "gain": -2
+    },
+    "wall_splat_concrete": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactPunch_heavy_000.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_001.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_002.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_003.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_004.ogg"
+      ],
+      "gain": -2
+    },
+    "wall_splat_steel": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactMetal_heavy_000.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_heavy_001.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_heavy_002.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_heavy_003.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_heavy_004.ogg"
+      ],
+      "gain": -2
+    },
+    "wall_splat_railing": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactMetal_light_000.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_light_001.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_light_002.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_light_003.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_light_004.ogg"
+      ],
+      "gain": -2
+    },
+    "step_biped_canvas": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_carpet_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_004.ogg"
+      ],
+      "pitch": [
+        0.94,
+        1.06
+      ]
+    },
+    "step_crab_canvas": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_carpet_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_004.ogg"
+      ],
+      "pitch": [
+        0.82,
+        0.96
+      ]
+    },
+    "step_avian_canvas": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_carpet_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_004.ogg"
+      ],
+      "pitch": [
+        1.05,
+        1.17
+      ]
+    },
+    "step_quadruped_canvas": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_carpet_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_carpet_004.ogg"
+      ],
+      "pitch": [
+        0.84,
+        0.98
+      ]
+    },
+    "hop_land_canvas": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactPunch_medium_000.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_medium_001.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_medium_002.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_medium_003.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_medium_004.ogg"
+      ],
+      "gain": -2
+    },
+    "step_biped_concrete": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
+      ],
+      "pitch": [
+        0.94,
+        1.06
+      ]
+    },
+    "step_crab_concrete": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
+      ],
+      "pitch": [
+        0.82,
+        0.96
+      ]
+    },
+    "step_avian_concrete": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
+      ],
+      "pitch": [
+        1.05,
+        1.17
+      ]
+    },
+    "step_quadruped_concrete": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
+      ],
+      "pitch": [
+        0.84,
+        0.98
+      ]
+    },
+    "hop_land_concrete": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactPunch_heavy_000.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_001.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_002.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_003.ogg",
+        "res://assets/audio/replacements/impact/impactPunch_heavy_004.ogg"
+      ],
+      "gain": -2
+    },
+    "step_biped_steel": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
+      ],
+      "pitch": [
+        0.94,
+        1.06
+      ]
+    },
+    "step_crab_steel": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
+      ],
+      "pitch": [
+        0.82,
+        0.96
+      ]
+    },
+    "step_avian_steel": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
+      ],
+      "pitch": [
+        1.05,
+        1.17
+      ]
+    },
+    "step_quadruped_steel": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_concrete_004.ogg"
+      ],
+      "pitch": [
+        0.84,
+        0.98
+      ]
+    },
+    "hop_land_steel": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactMetal_medium_000.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_medium_001.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_medium_002.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_medium_003.ogg",
+        "res://assets/audio/replacements/impact/impactMetal_medium_004.ogg"
+      ],
+      "gain": -2
+    },
+    "step_biped_plank": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_wood_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_004.ogg"
+      ],
+      "pitch": [
+        0.94,
+        1.06
+      ]
+    },
+    "step_crab_plank": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_wood_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_004.ogg"
+      ],
+      "pitch": [
+        0.82,
+        0.96
+      ]
+    },
+    "step_avian_plank": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_wood_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_004.ogg"
+      ],
+      "pitch": [
+        1.05,
+        1.17
+      ]
+    },
+    "step_quadruped_plank": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_wood_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_wood_004.ogg"
+      ],
+      "pitch": [
+        0.84,
+        0.98
+      ]
+    },
+    "hop_land_plank": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactPlank_medium_000.ogg",
+        "res://assets/audio/replacements/impact/impactPlank_medium_001.ogg",
+        "res://assets/audio/replacements/impact/impactPlank_medium_002.ogg",
+        "res://assets/audio/replacements/impact/impactPlank_medium_003.ogg",
+        "res://assets/audio/replacements/impact/impactPlank_medium_004.ogg"
+      ],
+      "gain": -2
+    },
+    "step_biped_gravel": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_snow_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_004.ogg"
+      ],
+      "pitch": [
+        0.94,
+        1.06
+      ]
+    },
+    "step_crab_gravel": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_snow_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_004.ogg"
+      ],
+      "pitch": [
+        0.82,
+        0.96
+      ]
+    },
+    "step_avian_gravel": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_snow_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_004.ogg"
+      ],
+      "pitch": [
+        1.05,
+        1.17
+      ]
+    },
+    "step_quadruped_gravel": {
+      "files": [
+        "res://assets/audio/replacements/footsteps/footstep_snow_000.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_001.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_002.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_003.ogg",
+        "res://assets/audio/replacements/footsteps/footstep_snow_004.ogg"
+      ],
+      "pitch": [
+        0.84,
+        0.98
+      ]
+    },
+    "hop_land_gravel": {
+      "files": [
+        "res://assets/audio/replacements/impact/impactGeneric_light_000.ogg",
+        "res://assets/audio/replacements/impact/impactGeneric_light_001.ogg",
+        "res://assets/audio/replacements/impact/impactGeneric_light_002.ogg",
+        "res://assets/audio/replacements/impact/impactGeneric_light_003.ogg",
+        "res://assets/audio/replacements/impact/impactGeneric_light_004.ogg"
+      ],
+      "gain": -2
+    },
+    "ui_move": {
+      "files": [
+        "res://assets/audio/replacements/interface/scroll_001.ogg",
+        "res://assets/audio/replacements/interface/scroll_002.ogg",
+        "res://assets/audio/replacements/interface/scroll_003.ogg",
+        "res://assets/audio/replacements/interface/scroll_004.ogg",
+        "res://assets/audio/replacements/interface/scroll_005.ogg"
+      ],
+      "gain": -10
+    },
+    "ui_accept": {
+      "files": [
+        "res://assets/audio/replacements/interface/confirmation_001.ogg",
+        "res://assets/audio/replacements/interface/confirmation_002.ogg",
+        "res://assets/audio/replacements/interface/confirmation_003.ogg",
+        "res://assets/audio/replacements/interface/confirmation_004.ogg"
+      ],
+      "gain": -6
+    },
+    "ui_back": {
+      "files": [
+        "res://assets/audio/replacements/interface/back_001.ogg",
+        "res://assets/audio/replacements/interface/back_002.ogg",
+        "res://assets/audio/replacements/interface/back_003.ogg",
+        "res://assets/audio/replacements/interface/back_004.ogg"
+      ],
+      "gain": -6
+    },
+    "ui_error": {
+      "files": [
+        "res://assets/audio/replacements/interface/error_001.ogg",
+        "res://assets/audio/replacements/interface/error_002.ogg",
+        "res://assets/audio/replacements/interface/error_003.ogg",
+        "res://assets/audio/replacements/interface/error_004.ogg",
+        "res://assets/audio/replacements/interface/error_005.ogg",
+        "res://assets/audio/replacements/interface/error_006.ogg",
+        "res://assets/audio/replacements/interface/error_007.ogg",
+        "res://assets/audio/replacements/interface/error_008.ogg"
+      ],
+      "gain": -8
+    },
+    "ui_toggle": {
+      "files": [
+        "res://assets/audio/replacements/interface/toggle_001.ogg",
+        "res://assets/audio/replacements/interface/toggle_002.ogg",
+        "res://assets/audio/replacements/interface/toggle_003.ogg",
+        "res://assets/audio/replacements/interface/toggle_004.ogg"
+      ],
+      "gain": -8
+    },
+    "ui_slider": {
+      "files": [
+        "res://assets/audio/replacements/interface/tick_001.ogg",
+        "res://assets/audio/replacements/interface/tick_002.ogg",
+        "res://assets/audio/replacements/interface/tick_004.ogg"
+      ],
+      "gain": -10
+    },
+    "ui_tab": {
+      "files": [
+        "res://assets/audio/replacements/interface/select_001.ogg",
+        "res://assets/audio/replacements/interface/select_002.ogg",
+        "res://assets/audio/replacements/interface/select_003.ogg",
+        "res://assets/audio/replacements/interface/select_004.ogg",
+        "res://assets/audio/replacements/interface/select_005.ogg"
+      ],
+      "gain": -8
+    },
+    "ui_stamp": {
+      "files": [
+        "res://assets/audio/replacements/interface/bong_001.ogg"
+      ],
+      "gain": -6
+    },
+    "ui_scrip": {
+      "files": [
+        "res://assets/audio/replacements/rpg/handleCoins.ogg",
+        "res://assets/audio/replacements/rpg/handleCoins2.ogg"
+      ],
+      "gain": -8
+    },
+    "ui_purchase": {
+      "files": [
+        "res://assets/audio/replacements/rpg/handleCoins.ogg",
+        "res://assets/audio/replacements/rpg/handleCoins2.ogg"
+      ],
+      "gain": -8
+    },
+    "ui_open": {
+      "files": [
+        "res://assets/audio/replacements/interface/open_001.ogg",
+        "res://assets/audio/replacements/interface/open_002.ogg",
+        "res://assets/audio/replacements/interface/open_003.ogg",
+        "res://assets/audio/replacements/interface/open_004.ogg"
+      ],
+      "gain": -8
+    },
+    "ui_close": {
+      "files": [
+        "res://assets/audio/replacements/interface/close_001.ogg",
+        "res://assets/audio/replacements/interface/close_002.ogg",
+        "res://assets/audio/replacements/interface/close_003.ogg",
+        "res://assets/audio/replacements/interface/close_004.ogg"
+      ],
+      "gain": -8
+    },
+    "ui_card_flip": {
+      "files": [
+        "res://assets/audio/replacements/rpg/bookFlip1.ogg",
+        "res://assets/audio/replacements/rpg/bookFlip2.ogg",
+        "res://assets/audio/replacements/rpg/bookFlip3.ogg"
+      ],
+      "gain": -8
+    },
+    "crowd_murmur": {
+      "files": [
+        "res://assets/audio/replacements/crowd/crowd-shouting.ogg"
+      ],
+      "gain": -26,
+      "loop": true
+    },
+    "crowd_cheer": {
+      "files": [
+        "res://assets/audio/replacements/crowd/crowd-applause.wav"
+      ],
+      "gain": -5
+    },
+    "amb_drydock": {
+      "files": [
+        "res://assets/audio/replacements/water/waterflow.mp3"
+      ],
+      "gain": -22,
+      "loop": true
+    },
+    "amb_hub_dock": {
+      "files": [
+        "res://assets/audio/replacements/water/waterflow.mp3"
+      ],
+      "gain": -22,
+      "loop": true
+    }
+  },
+  "music": {
+    "title_night": {
+      "file": "res://assets/audio/replacements/music/Funkorama.mp3",
+      "title": "Funkorama",
+      "bpm": 101,
+      "beats_per_bar": 4,
+      "bars": 84,
+      "seconds": 201,
+      "bar_seconds": 2.376238,
+      "sections": [
+        {
+          "id": "intro",
+          "start_bar": 1,
+          "bars": 4
+        },
+        {
+          "id": "A",
+          "start_bar": 5,
+          "bars": 40
+        },
+        {
+          "id": "B",
+          "start_bar": 45,
+          "bars": 40
+        }
+      ],
+      "gain": -9,
+      "loop": true,
+      "stereo": true,
+      "sr": 44100,
+      "layers": [],
+      "tags": [
+        "title",
+        "menu_bonus"
+      ],
+      "stinger": false,
+      "replacement": true
+    },
+    "fight_night_poster": {
+      "file": "res://assets/audio/replacements/music/Funkorama.mp3",
+      "title": "Funkorama",
+      "bpm": 101,
+      "beats_per_bar": 4,
+      "bars": 84,
+      "seconds": 201,
+      "bar_seconds": 2.376238,
+      "sections": [
+        {
+          "id": "intro",
+          "start_bar": 1,
+          "bars": 4
+        },
+        {
+          "id": "A",
+          "start_bar": 5,
+          "bars": 40
+        },
+        {
+          "id": "B",
+          "start_bar": 45,
+          "bars": 40
+        }
+      ],
+      "gain": -9,
+      "loop": true,
+      "stereo": true,
+      "sr": 44100,
+      "layers": [],
+      "tags": [
+        "menu"
+      ],
+      "stinger": false,
+      "replacement": true
+    },
+    "cannery_radio": {
+      "file": "res://assets/audio/replacements/music/Backbay-Lounge.mp3",
+      "title": "Backbay Lounge",
+      "bpm": 120,
+      "beats_per_bar": 4,
+      "bars": 134,
+      "seconds": 267,
+      "bar_seconds": 2,
+      "sections": [
+        {
+          "id": "A",
+          "start_bar": 1,
+          "bars": 44
+        },
+        {
+          "id": "B",
+          "start_bar": 45,
+          "bars": 45
+        },
+        {
+          "id": "C",
+          "start_bar": 90,
+          "bars": 45
+        }
+      ],
+      "gain": -15,
+      "loop": true,
+      "stereo": true,
+      "sr": 44100,
+      "layers": [],
+      "tags": [
+        "hub",
+        "diegetic"
+      ],
+      "stinger": false,
+      "replacement": true
+    },
+    "combat_a": {
+      "file": "res://assets/audio/replacements/music/Furious-Freak.mp3",
+      "title": "Furious Freak",
+      "bpm": 160,
+      "beats_per_bar": 4,
+      "bars": 124,
+      "seconds": 187,
+      "bar_seconds": 1.5,
+      "sections": [
+        {
+          "id": "A",
+          "start_bar": 1,
+          "bars": 31
+        },
+        {
+          "id": "B",
+          "start_bar": 32,
+          "bars": 31
+        },
+        {
+          "id": "C",
+          "start_bar": 63,
+          "bars": 62
+        }
+      ],
+      "gain": -8,
+      "loop": true,
+      "stereo": true,
+      "sr": 44100,
+      "layers": [],
+      "tags": [
+        "combat"
+      ],
+      "stinger": false,
+      "replacement": true
+    },
+    "combat_b": {
+      "file": "res://assets/audio/replacements/music/Furious-Freak.mp3",
+      "title": "Furious Freak",
+      "bpm": 160,
+      "beats_per_bar": 4,
+      "bars": 124,
+      "seconds": 187,
+      "bar_seconds": 1.5,
+      "sections": [
+        {
+          "id": "A",
+          "start_bar": 1,
+          "bars": 31
+        },
+        {
+          "id": "B",
+          "start_bar": 32,
+          "bars": 31
+        },
+        {
+          "id": "C",
+          "start_bar": 63,
+          "bars": 62
+        }
+      ],
+      "gain": -8,
+      "loop": true,
+      "stereo": true,
+      "sr": 44100,
+      "layers": [],
+      "tags": [
+        "combat"
+      ],
+      "stinger": false,
+      "replacement": true
+    },
+    "boss": {
+      "file": "res://assets/audio/replacements/music/Volatile-Reaction.mp3",
+      "title": "Volatile Reaction",
+      "bpm": 155,
+      "beats_per_bar": 7,
+      "bars": 60,
+      "seconds": 165,
+      "bar_seconds": 2.709677,
+      "sections": [
+        {
+          "id": "intro",
+          "start_bar": 1,
+          "bars": 6
+        },
+        {
+          "id": "A",
+          "start_bar": 7,
+          "bars": 24
+        },
+        {
+          "id": "B",
+          "start_bar": 31,
+          "bars": 30
+        }
+      ],
+      "gain": -10,
+      "loop": true,
+      "stereo": true,
+      "sr": 44100,
+      "layers": [],
+      "tags": [
+        "boss"
+      ],
+      "stinger": false,
+      "replacement": true
+    },
+    "victory": {
+      "file": "res://assets/audio/replacements/jingles/jingles_PIZZI03.ogg",
+      "title": "Victory Jingle",
+      "bpm": 120,
+      "beats_per_bar": 4,
+      "bars": 4,
+      "seconds": 2,
+      "bar_seconds": 2,
+      "sections": [
+        {
+          "id": "fanfare",
+          "start_bar": 1,
+          "bars": 4
+        }
+      ],
+      "gain": -7,
+      "loop": null,
+      "stereo": true,
+      "sr": 44100,
+      "layers": [],
+      "tags": [
+        "sting",
+        "win"
+      ],
+      "stinger": true,
+      "replacement": true
+    },
+    "defeat": {
+      "file": "res://assets/audio/replacements/jingles/jingles_HIT02.ogg",
+      "title": "Defeat Jingle",
+      "bpm": 120,
+      "beats_per_bar": 4,
+      "bars": 4,
+      "seconds": 2,
+      "bar_seconds": 2,
+      "sections": [
+        {
+          "id": "A",
+          "start_bar": 1,
+          "bars": 4
+        }
+      ],
+      "gain": -8,
+      "loop": null,
+      "stereo": true,
+      "sr": 44100,
+      "layers": [],
+      "tags": [
+        "sting",
+        "loss"
+      ],
+      "stinger": true,
+      "replacement": true
+    }
+  }
+}

@@ -328,6 +328,18 @@ function main() {
   if (doVoice) buildVoices(bank);
   else if (prevManifest.voices) { bank.voices = prevManifest.voices; for (const v of Object.values(bank.voices)) for (const f of Object.values(v.grains)) reuse(f.replace(RES, '')); }
   if (doMusic) buildMusic(bank, report);
+  const replacementPath = path.join(OUT, 'replacement-overrides.json');
+  if (fs.existsSync(replacementPath)) {
+    const replacements = JSON.parse(fs.readFileSync(replacementPath, 'utf8'));
+    for (const [id, override] of Object.entries(replacements.sfx || {})) {
+      if (!bank.sfx[id]) throw new Error('audio replacement references unknown SFX id ' + id);
+      bank.sfx[id] = Object.assign({}, bank.sfx[id], override);
+    }
+    for (const [id, override] of Object.entries(replacements.music || {})) {
+      if (!bank.music[id]) throw new Error('audio replacement references unknown music id ' + id);
+      bank.music[id] = Object.assign({}, bank.music[id], override);
+    }
+  }
   else if (prevManifest.music) { for (const [id, m] of Object.entries(prevManifest.music)) { bank.music[id] = m; reuse(`music/${id}.wav`); for (const L of m.layers || []) reuse(`music/${id}_${L.id}.wav`); } }
   manifest.voices = bank.voices;
   manifest.music = bank.music;
@@ -339,7 +351,7 @@ function main() {
   }
   // stale files
   if (flag('--clean')) {
-    const walk = (dir) => { for (const f of fs.readdirSync(dir)) { const p = path.join(dir, f); if (fs.statSync(p).isDirectory()) walk(p); else if (f.endsWith('.wav')) { const rel = path.relative(OUT, p).replace(/\\/g, '/'); if (!produced.has(rel)) { fs.unlinkSync(p); if (fs.existsSync(p + '.import')) fs.unlinkSync(p + '.import'); log(`  removed stale ${rel}`); } } } };
+    const walk = (dir) => { for (const f of fs.readdirSync(dir)) { const p = path.join(dir, f); if (fs.statSync(p).isDirectory()) walk(p); else if (f.endsWith('.wav')) { const rel = path.relative(OUT, p).replace(/\\/g, '/'); if (!rel.startsWith('replacements/') && !produced.has(rel)) { fs.unlinkSync(p); if (fs.existsSync(p + '.import')) fs.unlinkSync(p + '.import'); log(`  removed stale ${rel}`); } } } };
     if (fs.existsSync(OUT)) walk(OUT);
   }
   fs.mkdirSync(OUT, { recursive: true });

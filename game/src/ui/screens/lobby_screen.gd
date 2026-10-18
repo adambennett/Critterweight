@@ -579,10 +579,11 @@ func _explain() -> void:
 
 func _pick_fighter() -> void:
 	App.push("character_select", {"mode": "pick", "title": "Your fighter", "current": str(me().get("creature", "")),
-		"allow_random": false, "on_pick": func(id: String) -> void:
-			Net.set_creature(id)
+		"allow_random": true, "on_pick": func(id: String) -> void:
+			var chosen := FighterSelection.resolve(id, Content.playable_creatures())
+			Net.set_creature(chosen)
 			if _rows.has("fighter"):
-				_set_pick(_rows["fighter"] as PickRow, id)})
+				_set_pick(_rows["fighter"] as PickRow, chosen)})
 
 
 func _start_match() -> void:

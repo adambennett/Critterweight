@@ -1,17 +1,17 @@
 # Progress
 
-## Status (2026-10-17) — v0.9.12 playtest fixes
+## Status (2026-10-17) — v0.9.13 audio and fighter selection
 
-The owner requested fixes for the v0.9.11 playtest and a new v0.9.12 preview. Campaign flow ownership,
-controller navigation/scrolling, menu/editor layout, visible autobattler fights, free spectating,
-Compendium, profile naming, Cannery challenges, settings and the ambience buzz are addressed. See
-[release notes](releases/v0.9.12.md) and the [issue-by-issue verification record](evidence/verification/v0.9.12/README.md).
-Published [v0.9.12](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.12) from `0e8b20f`.
-The source suite passed 710 tests with one graphical-only skip and no failures; all 20 playtest regressions
-passed in the tagged Windows executable, which boots in 4.5 seconds. All seven uploaded asset hashes match.
-The report records the full-suite-only warnings and
-the remaining physical-controller, subjective-audio and Linux gameplay validation limits.
-The larger release-candidate backlog below remains separate from this patch release.
+The owner asked for free-to-use audio replacements installed in the game and Random in every fighter
+picker. v0.9.13 adds 126 selected CC BY 4.0 / CC0 audio files with in-game attribution, hashes and bank
+references, and resolves Random to a concrete fighter before a run or fight starts. All downloads and
+the release working clone are on B:. The owner will judge the sound choices by playing this build. See
+[release notes](releases/v0.9.13.md) and the [verification record](evidence/verification/v0.9.13/README.md).
+
+The preceding [v0.9.12 playtest fixes](releases/v0.9.12.md) remain in this build, including campaign
+progression, controller navigation, Compendium, visible autobattler fights, free spectating, Cannery
+activities, settings and the ambience buzz repair. The larger release-candidate backlog below remains
+separate from this preview release.
 
 **Combat feel (0.9.11, D-035).** Hits now pause the match, punch the camera, jolt the struck body and stay lit on the health bar; walls and crowd figures between the camera and the fighters fade or shrink away. Mashed attacks still miss often (15-41 % land against the regular bot); attack magnetism is a separate, measured change for later.
 

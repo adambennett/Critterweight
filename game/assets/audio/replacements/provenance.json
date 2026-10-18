@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "downloaded": "2026-10-17",
+  "notes": [
+    "All included third-party clips were obtained from the official author or asset page without payment.",
+    "No clip file was edited; bank gain, playback loop, and pitch settings are game-side settings.",
+    "The Kenney Voiceover Pack: Fighter and OpenGameArt Water Waves FLACs are not shipped or used because they do not suit the named creature casts or current Godot audio path."
+  ],
+  "sources": {
+    "incompetech-ccby": {
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "Music: Funkorama, Backbay Lounge, Furious Freak, Volatile Reaction by Kevin MacLeod (incompetech.com). Licensed under CC BY 4.0. Source and licence: https://incompetech.com/music/royalty-free/licenses/ and https://creativecommons.org/licenses/by/4.0/.",
+      "modification": "Supplied MP3 recordings used without editing; loop and gain configured in the game."
+    },
+    "kenney-impact": {
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Kenney Impact Sounds (CC0 1.0; https://kenney.nl/assets/impact-sounds).",
+      "modification": "Supplied OGG clips used without editing; playback gain and pitch configured in the game."
+    },
+    "kenney-interface": {
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Kenney Interface Sounds (CC0 1.0; https://kenney.nl/assets/interface-sounds).",
+      "modification": "Supplied OGG clips used without editing; playback gain configured in the game."
+    },
+    "kenney-rpg": {
+      "creator": "Kenney",
+      "title": "RPG Audio",
+      "source": "https://kenney.nl/assets/rpg-audio",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Kenney RPG Audio (CC0 1.0; https://kenney.nl/assets/rpg-audio).",
+      "modification": "Supplied OGG clips used without editing; playback gain configured in the game."
+    },
+    "kenney-jingles": {
+      "creator": "Kenney",
+      "title": "Music Jingles",
+      "source": "https://kenney.nl/assets/music-jingles",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Kenney Music Jingles (CC0 1.0; https://kenney.nl/assets/music-jingles).",
+      "modification": "Supplied OGG clips used without editing."
+    },
+    "oga-waterflow": {
+      "creator": "TyberiusGames",
+      "title": "Waterflow Sound",
+      "source": "https://opengameart.org/content/waterflow-sound",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Waterflow Sound by TyberiusGames (CC0 1.0; https://opengameart.org/content/waterflow-sound).",
+      "modification": "Supplied MP3 used without editing; loop and gain configured in the game."
+    },
+    "oga-crowd": {
+      "creator": "StarNinjas",
+      "title": "Crowd Shouting/Speaking Ambience",
+      "source": "https://opengameart.org/content/crowd-shoutingspeaking-ambience",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Crowd Shouting/Speaking Ambience by StarNinjas (CC0 1.0; https://opengameart.org/content/crowd-shoutingspeaking-ambience).",
+      "modification": "Supplied OGG used without editing; loop and low gain configured in the game."
+    },
+    "oga-applause": {
+      "creator": "eXpl0it3r",
+      "title": "Applause in a Large Hall or Church",
+      "source": "https://opengameart.org/content/applause-in-a-large-hall-or-church",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Applause in a Large Hall or Church by eXpl0it3r (CC0 1.0; https://opengameart.org/content/applause-in-a-large-hall-or-church).",
+      "modification": "Supplied WAV used without editing; playback gain configured in the game."
+    }
+  },
+  "prefixes": {
+    "music/": "incompetech-ccby",
+    "impact/": "kenney-impact",
+    "footsteps/": "kenney-impact",
+    "interface/": "kenney-interface",
+    "rpg/": "kenney-rpg",
+    "jingles/": "kenney-jingles",
+    "water/": "oga-waterflow",
+    "crowd/crowd-shouting.ogg": "oga-crowd",
+    "crowd/crowd-applause.wav": "oga-applause"
+  }
+}

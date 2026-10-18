@@ -48,7 +48,7 @@ func on_enter(p: Dictionary) -> void:
 	var ids := Content.playable_creatures()
 	for id in ids:
 		_add_card(str(id))
-	if bool(p.get("allow_random", true)) and ids.size() > 1 or mode == "quick":
+	if not ids.is_empty() and (bool(p.get("allow_random", true)) or mode == "quick"):
 		_add_card("random")
 	var poster := UiTheme.panel("PanelPoster")
 	poster.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -171,7 +171,7 @@ func _choose(id: String) -> void:
 			cb.call(id)
 		return
 	# quick fight: you vs a random opponent at the default tier, standard duel in a random arena
-	var mine := str(ids[randi() % ids.size()]) if id == "random" else id
+	var mine := FighterSelection.resolve(id, ids)
 	var foe := str(ids[randi() % ids.size()])
 	var arenas := Content.ids("arenas")
 	var arena := str(arenas[randi() % arenas.size()]) if not arenas.is_empty() else "the_gullet"

@@ -1,0 +1,3078 @@
+{
+  "version": 1,
+  "source": "game/assets/audio/replacements/provenance.json",
+  "downloaded": "2026-10-17",
+  "count": 126,
+  "total_bytes": 36501227,
+  "note": "All included third-party clips were obtained from the official author or asset page without payment. No clip file was edited; bank gain, playback loop, and pitch settings are game-side settings. The Kenney Voiceover Pack: Fighter and OpenGameArt Water Waves FLACs are not shipped or used because they do not suit the named creature casts or current Godot audio path.",
+  "sources": {
+    "incompetech-ccby": {
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "Music: Funkorama, Backbay Lounge, Furious Freak, Volatile Reaction by Kevin MacLeod (incompetech.com). Licensed under CC BY 4.0. Source and licence: https://incompetech.com/music/royalty-free/licenses/ and https://creativecommons.org/licenses/by/4.0/.",
+      "modification": "Supplied MP3 recordings used without editing; loop and gain configured in the game."
+    },
+    "kenney-impact": {
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Kenney Impact Sounds (CC0 1.0; https://kenney.nl/assets/impact-sounds).",
+      "modification": "Supplied OGG clips used without editing; playback gain and pitch configured in the game."
+    },
+    "kenney-interface": {
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Kenney Interface Sounds (CC0 1.0; https://kenney.nl/assets/interface-sounds).",
+      "modification": "Supplied OGG clips used without editing; playback gain configured in the game."
+    },
+    "kenney-rpg": {
+      "creator": "Kenney",
+      "title": "RPG Audio",
+      "source": "https://kenney.nl/assets/rpg-audio",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Kenney RPG Audio (CC0 1.0; https://kenney.nl/assets/rpg-audio).",
+      "modification": "Supplied OGG clips used without editing; playback gain configured in the game."
+    },
+    "kenney-jingles": {
+      "creator": "Kenney",
+      "title": "Music Jingles",
+      "source": "https://kenney.nl/assets/music-jingles",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Kenney Music Jingles (CC0 1.0; https://kenney.nl/assets/music-jingles).",
+      "modification": "Supplied OGG clips used without editing."
+    },
+    "oga-waterflow": {
+      "creator": "TyberiusGames",
+      "title": "Waterflow Sound",
+      "source": "https://opengameart.org/content/waterflow-sound",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Waterflow Sound by TyberiusGames (CC0 1.0; https://opengameart.org/content/waterflow-sound).",
+      "modification": "Supplied MP3 used without editing; loop and gain configured in the game."
+    },
+    "oga-crowd": {
+      "creator": "StarNinjas",
+      "title": "Crowd Shouting/Speaking Ambience",
+      "source": "https://opengameart.org/content/crowd-shoutingspeaking-ambience",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Crowd Shouting/Speaking Ambience by StarNinjas (CC0 1.0; https://opengameart.org/content/crowd-shoutingspeaking-ambience).",
+      "modification": "Supplied OGG used without editing; loop and low gain configured in the game."
+    },
+    "oga-applause": {
+      "creator": "eXpl0it3r",
+      "title": "Applause in a Large Hall or Church",
+      "source": "https://opengameart.org/content/applause-in-a-large-hall-or-church",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Applause in a Large Hall or Church by eXpl0it3r (CC0 1.0; https://opengameart.org/content/applause-in-a-large-hall-or-church).",
+      "modification": "Supplied WAV used without editing; playback gain configured in the game."
+    }
+  },
+  "paths": {
+    "assets/audio/replacements/crowd/crowd-applause.wav": {
+      "sha256": "0d3bfde5a050f3c5e6685bd7f1efc7ab1d289fbad65c88c1ce9b4691228c69c9",
+      "source_id": "oga-applause",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.crowd_cheer.files[0]"
+      ]
+    },
+    "assets/audio/replacements/crowd/crowd-shouting.ogg": {
+      "sha256": "a2c23a64c127c77717cbe4abb21f138bac9d9aa6cb3cc89d62bab5d0d96dd7ca",
+      "source_id": "oga-crowd",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.crowd_murmur.files[0]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_carpet_000.ogg": {
+      "sha256": "b9524658b52a99a20590f8feefc103088637fd13ea8ec35811aee785e1f2f330",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[0]",
+        "bank.sfx.step_crab_canvas.files[0]",
+        "bank.sfx.step_avian_canvas.files[0]",
+        "bank.sfx.step_quadruped_canvas.files[0]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_carpet_001.ogg": {
+      "sha256": "9af3c3f76705107339e72036e4053bdca3eaa50ad31c8c929f42ce8d40e5d781",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[1]",
+        "bank.sfx.step_crab_canvas.files[1]",
+        "bank.sfx.step_avian_canvas.files[1]",
+        "bank.sfx.step_quadruped_canvas.files[1]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_carpet_002.ogg": {
+      "sha256": "9af3c3f76705107339e72036e4053bdca3eaa50ad31c8c929f42ce8d40e5d781",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[2]",
+        "bank.sfx.step_crab_canvas.files[2]",
+        "bank.sfx.step_avian_canvas.files[2]",
+        "bank.sfx.step_quadruped_canvas.files[2]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_carpet_003.ogg": {
+      "sha256": "4ae7454338d57c7d102145919ae653c7d010eb542797c4f25a1c7470be3a7e4c",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[3]",
+        "bank.sfx.step_crab_canvas.files[3]",
+        "bank.sfx.step_avian_canvas.files[3]",
+        "bank.sfx.step_quadruped_canvas.files[3]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_carpet_004.ogg": {
+      "sha256": "4ae7454338d57c7d102145919ae653c7d010eb542797c4f25a1c7470be3a7e4c",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[4]",
+        "bank.sfx.step_crab_canvas.files[4]",
+        "bank.sfx.step_avian_canvas.files[4]",
+        "bank.sfx.step_quadruped_canvas.files[4]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_concrete_000.ogg": {
+      "sha256": "d7267e183067757c92c169de2a379abea592cfca6b39bb2e8feea15221ad79fe",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[0]",
+        "bank.sfx.step_crab_concrete.files[0]",
+        "bank.sfx.step_avian_concrete.files[0]",
+        "bank.sfx.step_quadruped_concrete.files[0]",
+        "bank.sfx.step_biped_steel.files[0]",
+        "bank.sfx.step_crab_steel.files[0]",
+        "bank.sfx.step_avian_steel.files[0]",
+        "bank.sfx.step_quadruped_steel.files[0]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_concrete_001.ogg": {
+      "sha256": "507a75eb19b897087855a3be3cf11a12d7fa37d143ad535eeebe0b8031c7325d",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[1]",
+        "bank.sfx.step_crab_concrete.files[1]",
+        "bank.sfx.step_avian_concrete.files[1]",
+        "bank.sfx.step_quadruped_concrete.files[1]",
+        "bank.sfx.step_biped_steel.files[1]",
+        "bank.sfx.step_crab_steel.files[1]",
+        "bank.sfx.step_avian_steel.files[1]",
+        "bank.sfx.step_quadruped_steel.files[1]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_concrete_002.ogg": {
+      "sha256": "b21fa546d74941196b25da8a20b7010abd8c05c4fcf93545d1f344e66a664e13",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[2]",
+        "bank.sfx.step_crab_concrete.files[2]",
+        "bank.sfx.step_avian_concrete.files[2]",
+        "bank.sfx.step_quadruped_concrete.files[2]",
+        "bank.sfx.step_biped_steel.files[2]",
+        "bank.sfx.step_crab_steel.files[2]",
+        "bank.sfx.step_avian_steel.files[2]",
+        "bank.sfx.step_quadruped_steel.files[2]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_concrete_003.ogg": {
+      "sha256": "8b513c2f0316324060b9174b8f28df6c2147418c506e6a53b77f18e149a5547b",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[3]",
+        "bank.sfx.step_crab_concrete.files[3]",
+        "bank.sfx.step_avian_concrete.files[3]",
+        "bank.sfx.step_quadruped_concrete.files[3]",
+        "bank.sfx.step_biped_steel.files[3]",
+        "bank.sfx.step_crab_steel.files[3]",
+        "bank.sfx.step_avian_steel.files[3]",
+        "bank.sfx.step_quadruped_steel.files[3]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_concrete_004.ogg": {
+      "sha256": "24dd8db2413e5b81ad181e1205c12a1c7801da5f85715d471b92a4b2f632e45e",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[4]",
+        "bank.sfx.step_crab_concrete.files[4]",
+        "bank.sfx.step_avian_concrete.files[4]",
+        "bank.sfx.step_quadruped_concrete.files[4]",
+        "bank.sfx.step_biped_steel.files[4]",
+        "bank.sfx.step_crab_steel.files[4]",
+        "bank.sfx.step_avian_steel.files[4]",
+        "bank.sfx.step_quadruped_steel.files[4]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_snow_000.ogg": {
+      "sha256": "c05fa4a9dc9a7aabc04996466fb589537e49af76de9998d8f9e6270ec92dcef7",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[0]",
+        "bank.sfx.step_crab_gravel.files[0]",
+        "bank.sfx.step_avian_gravel.files[0]",
+        "bank.sfx.step_quadruped_gravel.files[0]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_snow_001.ogg": {
+      "sha256": "980fb9a1c9227aed7995067b0357f373053337f2416316db8ea0438418542fb4",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[1]",
+        "bank.sfx.step_crab_gravel.files[1]",
+        "bank.sfx.step_avian_gravel.files[1]",
+        "bank.sfx.step_quadruped_gravel.files[1]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_snow_002.ogg": {
+      "sha256": "db52bafdc66304f3b999f2c29227826c65993916e630ac2ffbca17d07b263178",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[2]",
+        "bank.sfx.step_crab_gravel.files[2]",
+        "bank.sfx.step_avian_gravel.files[2]",
+        "bank.sfx.step_quadruped_gravel.files[2]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_snow_003.ogg": {
+      "sha256": "68272e3f1cabcabd02d328fd344454d7c04cb58b5a86972fcdd858f845e3d007",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[3]",
+        "bank.sfx.step_crab_gravel.files[3]",
+        "bank.sfx.step_avian_gravel.files[3]",
+        "bank.sfx.step_quadruped_gravel.files[3]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_snow_004.ogg": {
+      "sha256": "7fe9ce5f5732aaa0a50ef02bb1ac162c27f6bd85214e86aaea6e13e7a41dbc00",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[4]",
+        "bank.sfx.step_crab_gravel.files[4]",
+        "bank.sfx.step_avian_gravel.files[4]",
+        "bank.sfx.step_quadruped_gravel.files[4]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_wood_000.ogg": {
+      "sha256": "5f1c252942a220d658121bd9417448cd19649ded9fff2ff15f6e50899373ce8e",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[0]",
+        "bank.sfx.step_crab_plank.files[0]",
+        "bank.sfx.step_avian_plank.files[0]",
+        "bank.sfx.step_quadruped_plank.files[0]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_wood_001.ogg": {
+      "sha256": "e4f68e1c9fd55b4dc8ca89ed2bbab6f200171bc54bdc18aa96b80d8e7336f462",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[1]",
+        "bank.sfx.step_crab_plank.files[1]",
+        "bank.sfx.step_avian_plank.files[1]",
+        "bank.sfx.step_quadruped_plank.files[1]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_wood_002.ogg": {
+      "sha256": "9ff095b05cee5eec40b081defe3f0eef7232bb16d4865ce03b9f6dbab875cfdd",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[2]",
+        "bank.sfx.step_crab_plank.files[2]",
+        "bank.sfx.step_avian_plank.files[2]",
+        "bank.sfx.step_quadruped_plank.files[2]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_wood_003.ogg": {
+      "sha256": "2a68a083daa9eda08fed0ea5da5280dfbe0de226196c576be02f95259dd139d9",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[3]",
+        "bank.sfx.step_crab_plank.files[3]",
+        "bank.sfx.step_avian_plank.files[3]",
+        "bank.sfx.step_quadruped_plank.files[3]"
+      ]
+    },
+    "assets/audio/replacements/footsteps/footstep_wood_004.ogg": {
+      "sha256": "b33e0854e2b3f6b6492e25c25ef8f90447a332f7c6bb25dd02edced9581d3441",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[4]",
+        "bank.sfx.step_crab_plank.files[4]",
+        "bank.sfx.step_avian_plank.files[4]",
+        "bank.sfx.step_quadruped_plank.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactBell_heavy_000.ogg": {
+      "sha256": "94b8bb5f2d43ab65e4bcc32b28562416e9bc2c51d9fd4be1e333660ee52f977f",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.parry.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactBell_heavy_001.ogg": {
+      "sha256": "9df61e3ae9a83dc65e5a1fd3ed19d480876f3b22b963a1b9ef6fa293592dcec4",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.parry.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactBell_heavy_002.ogg": {
+      "sha256": "a4171ed1a4a17fb858a38de1c59b5b42e50d8f046c525706c0e3ac8671f189f5",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.parry.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactBell_heavy_003.ogg": {
+      "sha256": "5572ccdeb3b62373b86fa955355b3a222c36e815f0636ba16165189a21cf2514",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.parry.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactBell_heavy_004.ogg": {
+      "sha256": "49fe4fafa2001bd0d312976796824571ca8429851f285997e1327d17bb34fd00",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.parry.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactGeneric_light_000.ogg": {
+      "sha256": "f0e982611e97512fee5f777986b67e8b435434b601f94992ec044f7e89fb5acb",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[0]",
+        "bank.sfx.hop_land_gravel.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactGeneric_light_001.ogg": {
+      "sha256": "c3cd1c073d186ae8fa35788ba94de581f1826e7427a7bb26490b2695fac18efa",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[1]",
+        "bank.sfx.hop_land_gravel.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactGeneric_light_002.ogg": {
+      "sha256": "d0bf60905b59ff630ffe01eb0edeeacd2504eaa8fb6523aeef7d2458b78264d3",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[2]",
+        "bank.sfx.hop_land_gravel.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactGeneric_light_003.ogg": {
+      "sha256": "0e8896706130f6bc88cdf1f0157aaacdbe88dce86cf0330f9136e44eb1209e81",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[3]",
+        "bank.sfx.hop_land_gravel.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactGeneric_light_004.ogg": {
+      "sha256": "f906fa3a37acc4372787b496efcedefa2856045d5ec9456a3bd6c303c0eabb41",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[4]",
+        "bank.sfx.hop_land_gravel.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_heavy_000.ogg": {
+      "sha256": "e07045693e4a2b3d165c424e3dab4c781d9ff8880a386880ac89a51315d7f831",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_heavy_001.ogg": {
+      "sha256": "83554049f81f4db9209379e103c30bfa63f65c42189a03f300b045c2c82e23ae",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_heavy_002.ogg": {
+      "sha256": "b914c8f1eb7c0f34bb165d7c77f4be0351f6be0660c13c53e65424e262e2c093",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_heavy_003.ogg": {
+      "sha256": "b0f2ba4dabde9a87eb9c188a19d31e0c2300fd321adeba08d3b9b8aa011d7037",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_heavy_004.ogg": {
+      "sha256": "6d65b463c0555dd5be16b8db6d2cbe23a94e07a4637779b8ad17d0db3e500a87",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_light_000.ogg": {
+      "sha256": "33b5e6e37c6e9d54e07bf5a89b12c76e879f40c1ea83cdd82714df1d6f9fec6d",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_light_001.ogg": {
+      "sha256": "fba69c467ddd85da7b1d82e259f936b876d9ba6a3d6f1b24bdd10468e46bfe08",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_light_002.ogg": {
+      "sha256": "25a96f90a9a1f88a531e824e126f0519504625e5635e65a72e4f31611428db29",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_light_003.ogg": {
+      "sha256": "92d5db6bfc672d9dc1b4f390b2900504f013187fa36335472554fafefa9050b1",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_light_004.ogg": {
+      "sha256": "9b1c35820fba507081261f19ab5f461f69a5e2627a7d91acdb73ca3cfc997979",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_medium_000.ogg": {
+      "sha256": "a96f879fec0864a8938e0c745b6996a6c5679c16a234ce31a01cc995e8401003",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[0]",
+        "bank.sfx.hop_land_steel.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_medium_001.ogg": {
+      "sha256": "e8a9eaba7c4d27422e4eeb3e6c7100d5d7dc0f83e005efc98c960adcc5265337",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[1]",
+        "bank.sfx.hop_land_steel.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_medium_002.ogg": {
+      "sha256": "7e89ce2ca0dbda95ea2b78d4b50791cab35c10d20e9f5ccd45dd0b00e99ff548",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[2]",
+        "bank.sfx.hop_land_steel.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_medium_003.ogg": {
+      "sha256": "2a185e2e57211d02c1bdd33b872d6b6a2fe83e6c14f4e56f426a95e717acf08e",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[3]",
+        "bank.sfx.hop_land_steel.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactMetal_medium_004.ogg": {
+      "sha256": "03e10f800199c7166208e41c11cf4acfac6cc265467f02357da71972bc967295",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[4]",
+        "bank.sfx.hop_land_steel.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlank_medium_000.ogg": {
+      "sha256": "8403cd7a043f0391574c88c55dd205743725b5363d2407f6de145f201690b68f",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlank_medium_001.ogg": {
+      "sha256": "d7c304319f8beac616231b62041fa8da74045b62d7155965516efb9b19303df4",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlank_medium_002.ogg": {
+      "sha256": "f6a14da45994229676b4f29e6a35f504b5c2ec2b8166fb1a3b1aa004bc6911ef",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlank_medium_003.ogg": {
+      "sha256": "0602a7b3eab5f53484f10fe775ee4204e7a2ba9703c886b302e012f7f6fab8de",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlank_medium_004.ogg": {
+      "sha256": "6a51318c1c63821ea757622b57fafbf44c16c28129f6d39406a784260d87c447",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_light_000.ogg": {
+      "sha256": "6e797cf8a5bfc52d7ed5eb47c227974c1cf2a674954fec5b539cea7d62c7282c",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_light_001.ogg": {
+      "sha256": "947915c2eb6ac57ee08fd3a48b297fd108d69abc72076e79882c21cad0eef56e",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_light_002.ogg": {
+      "sha256": "8ac5869ea434cf0d364872774efe70b2d666a4f02ba35ddfc1e051d336721be8",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_light_003.ogg": {
+      "sha256": "dbfb7c1d002576696df3e9a43d6639ee3f342068398b5e7b55bc2389d20508a9",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_light_004.ogg": {
+      "sha256": "9cb33b0c0cce948313f078b60769d2f8e4075472494fc8f8129aa4a23c951897",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_medium_000.ogg": {
+      "sha256": "b670d30452983369771081319c268475edaaafe782bf4e8d70bd7eef09d8823c",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_medium_001.ogg": {
+      "sha256": "68ba7701b71ef620f498f3038e832157d71ac8db7ad59424545890b250ceb24e",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_medium_002.ogg": {
+      "sha256": "68762e1ed49bb59ae6602fad6ce2ebac61958478ddb2668de9106f010cd4b6b0",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_medium_003.ogg": {
+      "sha256": "964c5fcfb91e7710e2af25c2243c8b7160756b223b0984bacc9eb25bfeea057b",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPlate_medium_004.ogg": {
+      "sha256": "f0e8164081190839caff6c2958361b22780ffba5617f77f2d4ee3a4275b318bf",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_heavy_000.ogg": {
+      "sha256": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[0]",
+        "bank.sfx.wall_splat_concrete.files[0]",
+        "bank.sfx.hop_land_concrete.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_heavy_001.ogg": {
+      "sha256": "f92f5cb6ba4ff2766497292ffd90865654317eeca976f5652e0708dbdcdc0dd9",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[1]",
+        "bank.sfx.wall_splat_concrete.files[1]",
+        "bank.sfx.hop_land_concrete.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_heavy_002.ogg": {
+      "sha256": "7993dd4c156b9979ad69f17be5ebe31850b16039a3857f8477141be54dfee1b3",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[2]",
+        "bank.sfx.wall_splat_concrete.files[2]",
+        "bank.sfx.hop_land_concrete.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_heavy_003.ogg": {
+      "sha256": "4ab53b26f4ea575120dcc1348526c9e0db2afc6af7a442aa0489bdead2ca80b6",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[3]",
+        "bank.sfx.wall_splat_concrete.files[3]",
+        "bank.sfx.hop_land_concrete.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_heavy_004.ogg": {
+      "sha256": "f4c0c3eb8ab6517583b8218ed03f28923d1b687379aab4c1d5a6d4c10cf8e500",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[4]",
+        "bank.sfx.wall_splat_concrete.files[4]",
+        "bank.sfx.hop_land_concrete.files[4]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_medium_000.ogg": {
+      "sha256": "486988aa2d6440ffc4c62a0e8ccf3c23673ba84424bd4723378d451b7255eb5c",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_light.files[0]",
+        "bank.sfx.hop_land_canvas.files[0]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_medium_001.ogg": {
+      "sha256": "e71d23abcc3f10d9d6bc9615b2a431fff70b12333a5fcdd9964457564ace4349",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_light.files[1]",
+        "bank.sfx.hop_land_canvas.files[1]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_medium_002.ogg": {
+      "sha256": "6492f9ccbc8d24dcef607bb1b48790b7870961474561f7fe5601e1c73a3018ef",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_light.files[2]",
+        "bank.sfx.hop_land_canvas.files[2]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_medium_003.ogg": {
+      "sha256": "2d7c719c05999e0532f4384e1018e04cd916db715140bf16dee2dff3f820e908",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_light.files[3]",
+        "bank.sfx.hop_land_canvas.files[3]"
+      ]
+    },
+    "assets/audio/replacements/impact/impactPunch_medium_004.ogg": {
+      "sha256": "4a256878a3afb994ec9a4399336687748e68c7c136872c08c9c797d8c4e2464a",
+      "source_id": "kenney-impact",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.hit_light.files[4]",
+        "bank.sfx.hop_land_canvas.files[4]"
+      ]
+    },
+    "assets/audio/replacements/interface/back_001.ogg": {
+      "sha256": "07db973f79f6ae0f2edc34561e7592e24d0577455919fb602cb8ecc0da991dcf",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_back.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/back_002.ogg": {
+      "sha256": "61581c58194e3f19f531072edabbc344204c7e0a2887b8ededce4357bcf09195",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_back.files[1]"
+      ]
+    },
+    "assets/audio/replacements/interface/back_003.ogg": {
+      "sha256": "ff5e87de1230b1a5f1fa83e5a4ba9d7eb1c07154267ac34b510a17d4caa03cef",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_back.files[2]"
+      ]
+    },
+    "assets/audio/replacements/interface/back_004.ogg": {
+      "sha256": "c22e3c49f42c2a5ba6748e91283efe124f32822469c1258c3e5d7b3d7ab9361c",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_back.files[3]"
+      ]
+    },
+    "assets/audio/replacements/interface/bong_001.ogg": {
+      "sha256": "d21d0f0b782445db579d11e2506b24cd1ac9d664ee33aeaf807761aa7b6fd710",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_stamp.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/close_001.ogg": {
+      "sha256": "44af8249b933e0fd35ec957a638bb1a0b01f85b53fbe9674bf77bd3ca3168ef4",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_close.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/close_002.ogg": {
+      "sha256": "bc4279d2bb2bf86592473eab6a8eab55e51b54a8619315000dbd780a83b102d8",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_close.files[1]"
+      ]
+    },
+    "assets/audio/replacements/interface/close_003.ogg": {
+      "sha256": "39a1a7f3bc001766c1881841e9903c6b16f5a10b5666e0791d7f6444677d8b05",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_close.files[2]"
+      ]
+    },
+    "assets/audio/replacements/interface/close_004.ogg": {
+      "sha256": "41b41e01ac75f4bc5a9c8dc3b0de744fa7f877757463692783c12a8ae4bfae6b",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_close.files[3]"
+      ]
+    },
+    "assets/audio/replacements/interface/confirmation_001.ogg": {
+      "sha256": "063564703b6094d70718a3e787a55cc9141611e4ecd6b6637f8828f79b4a8c3a",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_accept.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/confirmation_002.ogg": {
+      "sha256": "33b17a9a9a2397c62b285c52c33a907fdffb476909c99e42dde603f6a7a8b12c",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_accept.files[1]"
+      ]
+    },
+    "assets/audio/replacements/interface/confirmation_003.ogg": {
+      "sha256": "3091bf0be0497f825769ee0733ca7bdc3bcd59bd6c6e8f2ba8f93d580ff38022",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_accept.files[2]"
+      ]
+    },
+    "assets/audio/replacements/interface/confirmation_004.ogg": {
+      "sha256": "568967a3d9f8a8f6af54ea01729c4882284308f2a27d78c07ffd7ee0d6951661",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_accept.files[3]"
+      ]
+    },
+    "assets/audio/replacements/interface/error_001.ogg": {
+      "sha256": "46e67425d16339772e8d328fb36a49426c9467418686e11beeb71ff84b0f6433",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_error.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/error_002.ogg": {
+      "sha256": "76810ec365f41078fd0507101da5bb7b8730fe011dde43908329fdabd8575e79",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_error.files[1]"
+      ]
+    },
+    "assets/audio/replacements/interface/error_003.ogg": {
+      "sha256": "885b28175c7b511118bcffab95675b48bbac9005cf6514656ebdad979276b3ab",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_error.files[2]"
+      ]
+    },
+    "assets/audio/replacements/interface/error_004.ogg": {
+      "sha256": "0b574cea597d96507e782ae9764f88482ce49f46e931e57054bf7150047f2d69",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_error.files[3]"
+      ]
+    },
+    "assets/audio/replacements/interface/error_005.ogg": {
+      "sha256": "3f75b11df5b06d68d2c25fbf0e9c9d9e7dd9250562a4007ee34856b8a309a2ae",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_error.files[4]"
+      ]
+    },
+    "assets/audio/replacements/interface/error_006.ogg": {
+      "sha256": "a97513d7fd2b12b1210c423be943b4c1ab0e899b11db95855e9b74836e646ae0",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_error.files[5]"
+      ]
+    },
+    "assets/audio/replacements/interface/error_007.ogg": {
+      "sha256": "f1ee4c1ac8bfe1a82eacb54b26f49e8974bab93bcf10c01800bc10dbf730f559",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_error.files[6]"
+      ]
+    },
+    "assets/audio/replacements/interface/error_008.ogg": {
+      "sha256": "eba17ecb2a426bfd4a8a6acff5f8a86202b6424a77af0fd842e37809a1ab6d81",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_error.files[7]"
+      ]
+    },
+    "assets/audio/replacements/interface/open_001.ogg": {
+      "sha256": "a27c6bb0df7da1e6af5dd5937593c98bc58b6e513f42fe6a3254cd6a6949c648",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_open.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/open_002.ogg": {
+      "sha256": "24ff224fe2c09c6aed1b41249825382dc74cf324b887ff279d8494912ce2beee",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_open.files[1]"
+      ]
+    },
+    "assets/audio/replacements/interface/open_003.ogg": {
+      "sha256": "bcdca6b5c9c33aa15ca3fb18a1fa8d98a01b528b85be08c5a610e57c75fc022d",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_open.files[2]"
+      ]
+    },
+    "assets/audio/replacements/interface/open_004.ogg": {
+      "sha256": "4e02b8287bc4d9e7bf7a889cb9e48613c8eb22a310dfb0bf29c2bfd0a1e4bea5",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_open.files[3]"
+      ]
+    },
+    "assets/audio/replacements/interface/scroll_001.ogg": {
+      "sha256": "320c6aafb2c7a503eae508dc443b72d7f7c0a317bfd16813157ed400cd04cf16",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_move.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/scroll_002.ogg": {
+      "sha256": "6fbcda22bc45349c66f1ba4b56d6c211b12264e83667de4b9af1e4ffcef74be5",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_move.files[1]"
+      ]
+    },
+    "assets/audio/replacements/interface/scroll_003.ogg": {
+      "sha256": "c2fecaa6e37c73d7141d0bd303d1c2231428d97c19ce83d50236a56804818643",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_move.files[2]"
+      ]
+    },
+    "assets/audio/replacements/interface/scroll_004.ogg": {
+      "sha256": "431398a3c12ba3aa30ead97f3e2f9b05eb00978facf04b31bda138ab77a2f54c",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_move.files[3]"
+      ]
+    },
+    "assets/audio/replacements/interface/scroll_005.ogg": {
+      "sha256": "e39d059462225efa31f758fb2e01871cc96781972b5062873a24a55c88174e02",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_move.files[4]"
+      ]
+    },
+    "assets/audio/replacements/interface/select_001.ogg": {
+      "sha256": "aec0c31ea934a35936ae0d2ab8fac8123c93aa5647f935853a58dbaf90278b7a",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/select_002.ogg": {
+      "sha256": "4cc6ac5341b9b2c86fef80c347de028e9ab9f2e037586ac7d9fa59a403a1c012",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[1]"
+      ]
+    },
+    "assets/audio/replacements/interface/select_003.ogg": {
+      "sha256": "9a612fd2f513d52a296906b41071c990f75defe56be3bee60d2d4e2423b51b8b",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[2]"
+      ]
+    },
+    "assets/audio/replacements/interface/select_004.ogg": {
+      "sha256": "eb6cb435f3f2ab14f85f46a2bdd9073ec511d0f1f8d8c890c6636045703a5fd4",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[3]"
+      ]
+    },
+    "assets/audio/replacements/interface/select_005.ogg": {
+      "sha256": "ad09146e4ea33b931b2f5dfb4051a4f1fe4a36f1a48c42c5e9269c292ae21214",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[4]"
+      ]
+    },
+    "assets/audio/replacements/interface/tick_001.ogg": {
+      "sha256": "9d057b918024c787bbe6c00beed13a7ef72a3fa0c259add3cef36582792f4230",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_slider.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/tick_002.ogg": {
+      "sha256": "869442f54214be902ec7437f79e400dc91c1bfd90d18a6dd2d5b7e41ffbf457b",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_slider.files[1]"
+      ]
+    },
+    "assets/audio/replacements/interface/tick_004.ogg": {
+      "sha256": "0253d5f7d8d2afbbc370eac2a4539bb844239f0c98343e516d376b137c06d27c",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_slider.files[2]"
+      ]
+    },
+    "assets/audio/replacements/interface/toggle_001.ogg": {
+      "sha256": "ca1d2dde5f0b286abac4f070e23edab8f30927c8a533665cdf2ac6492a415e49",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_toggle.files[0]"
+      ]
+    },
+    "assets/audio/replacements/interface/toggle_002.ogg": {
+      "sha256": "1f564f5520cfa0764028ce245ad97599d3ece8f0ab504554c403af92ac72b900",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_toggle.files[1]"
+      ]
+    },
+    "assets/audio/replacements/interface/toggle_003.ogg": {
+      "sha256": "7e69aba356d590826cce291bbd9dc6a85d7c53858b0e3712fcad30e1ad080b23",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_toggle.files[2]"
+      ]
+    },
+    "assets/audio/replacements/interface/toggle_004.ogg": {
+      "sha256": "d7bf2236fc95a0fe1e3b278259392bcb062644e2d4ec5f9c96f7c09a9928262f",
+      "source_id": "kenney-interface",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_toggle.files[3]"
+      ]
+    },
+    "assets/audio/replacements/jingles/jingles_HIT02.ogg": {
+      "sha256": "1ebd52ba108c0e749d2814c54e44bba6c39d111fa30d025fddfac70538e0e241",
+      "source_id": "kenney-jingles",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.music.defeat.file"
+      ]
+    },
+    "assets/audio/replacements/jingles/jingles_PIZZI03.ogg": {
+      "sha256": "88da900ec74a79fb845f2dcf2068383998833a9ee1b87a23f074924781af5700",
+      "source_id": "kenney-jingles",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.music.victory.file"
+      ]
+    },
+    "assets/audio/replacements/music/Backbay-Lounge.mp3": {
+      "sha256": "9567e71a213b0026341b2c0ecd226950e7653abd235cf520fb9aee4247d74d96",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.cannery_radio.file"
+      ]
+    },
+    "assets/audio/replacements/music/Funkorama.mp3": {
+      "sha256": "6be229815d85a0b99382b944d31098b882702c04ac7ad899e44ab7f8ba89b5ad",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.fight_night_poster.file",
+        "bank.music.title_night.file"
+      ]
+    },
+    "assets/audio/replacements/music/Furious-Freak.mp3": {
+      "sha256": "81eeea1f99cb0f25b417cfa69b9268f040e46bb67a955247fe80a769ee426bd7",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.combat_a.file",
+        "bank.music.combat_b.file"
+      ]
+    },
+    "assets/audio/replacements/music/Volatile-Reaction.mp3": {
+      "sha256": "ced1148df201a6c69062a96b7ef49c49924572ca5023c2ac5a2d6c5828ecb218",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.boss.file"
+      ]
+    },
+    "assets/audio/replacements/rpg/bookFlip1.ogg": {
+      "sha256": "fa81ac2fedc8c641661b87e349630a36c9800e795e0c800e029214efdbe26a7d",
+      "source_id": "kenney-rpg",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_card_flip.files[0]"
+      ]
+    },
+    "assets/audio/replacements/rpg/bookFlip2.ogg": {
+      "sha256": "3409042acbfaebc24c1a6327dc073e36f9250841712e96c5040da566a97df73c",
+      "source_id": "kenney-rpg",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_card_flip.files[1]"
+      ]
+    },
+    "assets/audio/replacements/rpg/bookFlip3.ogg": {
+      "sha256": "c85db5dceb3f1df073e960630277eaa88a5afda0477c1ddd68dad707621767be",
+      "source_id": "kenney-rpg",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_card_flip.files[2]"
+      ]
+    },
+    "assets/audio/replacements/rpg/handleCoins.ogg": {
+      "sha256": "8a91f969e932df709df80ee124d86a51389eed9b67f22e5e716bc2bbf60d8dab",
+      "source_id": "kenney-rpg",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_scrip.files[0]",
+        "bank.sfx.ui_purchase.files[0]"
+      ]
+    },
+    "assets/audio/replacements/rpg/handleCoins2.ogg": {
+      "sha256": "4b857968d64f9ac9336a10ffac6694d7547e1f01566ad6857b30bc8db3ee6c32",
+      "source_id": "kenney-rpg",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.ui_scrip.files[1]",
+        "bank.sfx.ui_purchase.files[1]"
+      ]
+    },
+    "assets/audio/replacements/water/waterflow.mp3": {
+      "sha256": "5a053719d5b06a8e5005dbe81b66e020f10312635a823d66883702568c971e92",
+      "source_id": "oga-waterflow",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "bank_references": [
+        "bank.sfx.amb_drydock.files[0]",
+        "bank.sfx.amb_hub_dock.files[0]"
+      ]
+    }
+  },
+  "files": [
+    {
+      "file": "assets/audio/replacements/crowd/crowd-applause.wav",
+      "group": "crowd",
+      "bytes": 6905324,
+      "sha256": "0d3bfde5a050f3c5e6685bd7f1efc7ab1d289fbad65c88c1ce9b4691228c69c9",
+      "source_id": "oga-applause",
+      "creator": "eXpl0it3r",
+      "title": "Applause in a Large Hall or Church",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://opengameart.org/content/applause-in-a-large-hall-or-church",
+      "bank_references": [
+        "bank.sfx.crowd_cheer.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/crowd/crowd-shouting.ogg",
+      "group": "crowd",
+      "bytes": 335526,
+      "sha256": "a2c23a64c127c77717cbe4abb21f138bac9d9aa6cb3cc89d62bab5d0d96dd7ca",
+      "source_id": "oga-crowd",
+      "creator": "StarNinjas",
+      "title": "Crowd Shouting/Speaking Ambience",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://opengameart.org/content/crowd-shoutingspeaking-ambience",
+      "bank_references": [
+        "bank.sfx.crowd_murmur.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_carpet_000.ogg",
+      "group": "footsteps",
+      "bytes": 6353,
+      "sha256": "b9524658b52a99a20590f8feefc103088637fd13ea8ec35811aee785e1f2f330",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[0]",
+        "bank.sfx.step_crab_canvas.files[0]",
+        "bank.sfx.step_avian_canvas.files[0]",
+        "bank.sfx.step_quadruped_canvas.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_carpet_001.ogg",
+      "group": "footsteps",
+      "bytes": 6411,
+      "sha256": "9af3c3f76705107339e72036e4053bdca3eaa50ad31c8c929f42ce8d40e5d781",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[1]",
+        "bank.sfx.step_crab_canvas.files[1]",
+        "bank.sfx.step_avian_canvas.files[1]",
+        "bank.sfx.step_quadruped_canvas.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_carpet_002.ogg",
+      "group": "footsteps",
+      "bytes": 6411,
+      "sha256": "9af3c3f76705107339e72036e4053bdca3eaa50ad31c8c929f42ce8d40e5d781",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[2]",
+        "bank.sfx.step_crab_canvas.files[2]",
+        "bank.sfx.step_avian_canvas.files[2]",
+        "bank.sfx.step_quadruped_canvas.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_carpet_003.ogg",
+      "group": "footsteps",
+      "bytes": 6301,
+      "sha256": "4ae7454338d57c7d102145919ae653c7d010eb542797c4f25a1c7470be3a7e4c",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[3]",
+        "bank.sfx.step_crab_canvas.files[3]",
+        "bank.sfx.step_avian_canvas.files[3]",
+        "bank.sfx.step_quadruped_canvas.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_carpet_004.ogg",
+      "group": "footsteps",
+      "bytes": 6301,
+      "sha256": "4ae7454338d57c7d102145919ae653c7d010eb542797c4f25a1c7470be3a7e4c",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_canvas.files[4]",
+        "bank.sfx.step_crab_canvas.files[4]",
+        "bank.sfx.step_avian_canvas.files[4]",
+        "bank.sfx.step_quadruped_canvas.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_concrete_000.ogg",
+      "group": "footsteps",
+      "bytes": 5808,
+      "sha256": "d7267e183067757c92c169de2a379abea592cfca6b39bb2e8feea15221ad79fe",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[0]",
+        "bank.sfx.step_crab_concrete.files[0]",
+        "bank.sfx.step_avian_concrete.files[0]",
+        "bank.sfx.step_quadruped_concrete.files[0]",
+        "bank.sfx.step_biped_steel.files[0]",
+        "bank.sfx.step_crab_steel.files[0]",
+        "bank.sfx.step_avian_steel.files[0]",
+        "bank.sfx.step_quadruped_steel.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_concrete_001.ogg",
+      "group": "footsteps",
+      "bytes": 6308,
+      "sha256": "507a75eb19b897087855a3be3cf11a12d7fa37d143ad535eeebe0b8031c7325d",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[1]",
+        "bank.sfx.step_crab_concrete.files[1]",
+        "bank.sfx.step_avian_concrete.files[1]",
+        "bank.sfx.step_quadruped_concrete.files[1]",
+        "bank.sfx.step_biped_steel.files[1]",
+        "bank.sfx.step_crab_steel.files[1]",
+        "bank.sfx.step_avian_steel.files[1]",
+        "bank.sfx.step_quadruped_steel.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_concrete_002.ogg",
+      "group": "footsteps",
+      "bytes": 6255,
+      "sha256": "b21fa546d74941196b25da8a20b7010abd8c05c4fcf93545d1f344e66a664e13",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[2]",
+        "bank.sfx.step_crab_concrete.files[2]",
+        "bank.sfx.step_avian_concrete.files[2]",
+        "bank.sfx.step_quadruped_concrete.files[2]",
+        "bank.sfx.step_biped_steel.files[2]",
+        "bank.sfx.step_crab_steel.files[2]",
+        "bank.sfx.step_avian_steel.files[2]",
+        "bank.sfx.step_quadruped_steel.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_concrete_003.ogg",
+      "group": "footsteps",
+      "bytes": 5805,
+      "sha256": "8b513c2f0316324060b9174b8f28df6c2147418c506e6a53b77f18e149a5547b",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[3]",
+        "bank.sfx.step_crab_concrete.files[3]",
+        "bank.sfx.step_avian_concrete.files[3]",
+        "bank.sfx.step_quadruped_concrete.files[3]",
+        "bank.sfx.step_biped_steel.files[3]",
+        "bank.sfx.step_crab_steel.files[3]",
+        "bank.sfx.step_avian_steel.files[3]",
+        "bank.sfx.step_quadruped_steel.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_concrete_004.ogg",
+      "group": "footsteps",
+      "bytes": 5912,
+      "sha256": "24dd8db2413e5b81ad181e1205c12a1c7801da5f85715d471b92a4b2f632e45e",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_concrete.files[4]",
+        "bank.sfx.step_crab_concrete.files[4]",
+        "bank.sfx.step_avian_concrete.files[4]",
+        "bank.sfx.step_quadruped_concrete.files[4]",
+        "bank.sfx.step_biped_steel.files[4]",
+        "bank.sfx.step_crab_steel.files[4]",
+        "bank.sfx.step_avian_steel.files[4]",
+        "bank.sfx.step_quadruped_steel.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_snow_000.ogg",
+      "group": "footsteps",
+      "bytes": 7880,
+      "sha256": "c05fa4a9dc9a7aabc04996466fb589537e49af76de9998d8f9e6270ec92dcef7",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[0]",
+        "bank.sfx.step_crab_gravel.files[0]",
+        "bank.sfx.step_avian_gravel.files[0]",
+        "bank.sfx.step_quadruped_gravel.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_snow_001.ogg",
+      "group": "footsteps",
+      "bytes": 7794,
+      "sha256": "980fb9a1c9227aed7995067b0357f373053337f2416316db8ea0438418542fb4",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[1]",
+        "bank.sfx.step_crab_gravel.files[1]",
+        "bank.sfx.step_avian_gravel.files[1]",
+        "bank.sfx.step_quadruped_gravel.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_snow_002.ogg",
+      "group": "footsteps",
+      "bytes": 7694,
+      "sha256": "db52bafdc66304f3b999f2c29227826c65993916e630ac2ffbca17d07b263178",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[2]",
+        "bank.sfx.step_crab_gravel.files[2]",
+        "bank.sfx.step_avian_gravel.files[2]",
+        "bank.sfx.step_quadruped_gravel.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_snow_003.ogg",
+      "group": "footsteps",
+      "bytes": 7860,
+      "sha256": "68272e3f1cabcabd02d328fd344454d7c04cb58b5a86972fcdd858f845e3d007",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[3]",
+        "bank.sfx.step_crab_gravel.files[3]",
+        "bank.sfx.step_avian_gravel.files[3]",
+        "bank.sfx.step_quadruped_gravel.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_snow_004.ogg",
+      "group": "footsteps",
+      "bytes": 7630,
+      "sha256": "7fe9ce5f5732aaa0a50ef02bb1ac162c27f6bd85214e86aaea6e13e7a41dbc00",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_gravel.files[4]",
+        "bank.sfx.step_crab_gravel.files[4]",
+        "bank.sfx.step_avian_gravel.files[4]",
+        "bank.sfx.step_quadruped_gravel.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_wood_000.ogg",
+      "group": "footsteps",
+      "bytes": 5949,
+      "sha256": "5f1c252942a220d658121bd9417448cd19649ded9fff2ff15f6e50899373ce8e",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[0]",
+        "bank.sfx.step_crab_plank.files[0]",
+        "bank.sfx.step_avian_plank.files[0]",
+        "bank.sfx.step_quadruped_plank.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_wood_001.ogg",
+      "group": "footsteps",
+      "bytes": 5929,
+      "sha256": "e4f68e1c9fd55b4dc8ca89ed2bbab6f200171bc54bdc18aa96b80d8e7336f462",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[1]",
+        "bank.sfx.step_crab_plank.files[1]",
+        "bank.sfx.step_avian_plank.files[1]",
+        "bank.sfx.step_quadruped_plank.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_wood_002.ogg",
+      "group": "footsteps",
+      "bytes": 5895,
+      "sha256": "9ff095b05cee5eec40b081defe3f0eef7232bb16d4865ce03b9f6dbab875cfdd",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[2]",
+        "bank.sfx.step_crab_plank.files[2]",
+        "bank.sfx.step_avian_plank.files[2]",
+        "bank.sfx.step_quadruped_plank.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_wood_003.ogg",
+      "group": "footsteps",
+      "bytes": 6207,
+      "sha256": "2a68a083daa9eda08fed0ea5da5280dfbe0de226196c576be02f95259dd139d9",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[3]",
+        "bank.sfx.step_crab_plank.files[3]",
+        "bank.sfx.step_avian_plank.files[3]",
+        "bank.sfx.step_quadruped_plank.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/footsteps/footstep_wood_004.ogg",
+      "group": "footsteps",
+      "bytes": 5799,
+      "sha256": "b33e0854e2b3f6b6492e25c25ef8f90447a332f7c6bb25dd02edced9581d3441",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.step_biped_plank.files[4]",
+        "bank.sfx.step_crab_plank.files[4]",
+        "bank.sfx.step_avian_plank.files[4]",
+        "bank.sfx.step_quadruped_plank.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactBell_heavy_000.ogg",
+      "group": "impact",
+      "bytes": 13915,
+      "sha256": "94b8bb5f2d43ab65e4bcc32b28562416e9bc2c51d9fd4be1e333660ee52f977f",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.parry.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactBell_heavy_001.ogg",
+      "group": "impact",
+      "bytes": 15577,
+      "sha256": "9df61e3ae9a83dc65e5a1fd3ed19d480876f3b22b963a1b9ef6fa293592dcec4",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.parry.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactBell_heavy_002.ogg",
+      "group": "impact",
+      "bytes": 9252,
+      "sha256": "a4171ed1a4a17fb858a38de1c59b5b42e50d8f046c525706c0e3ac8671f189f5",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.parry.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactBell_heavy_003.ogg",
+      "group": "impact",
+      "bytes": 9429,
+      "sha256": "5572ccdeb3b62373b86fa955355b3a222c36e815f0636ba16165189a21cf2514",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.parry.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactBell_heavy_004.ogg",
+      "group": "impact",
+      "bytes": 6529,
+      "sha256": "49fe4fafa2001bd0d312976796824571ca8429851f285997e1327d17bb34fd00",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.parry.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactGeneric_light_000.ogg",
+      "group": "impact",
+      "bytes": 5827,
+      "sha256": "f0e982611e97512fee5f777986b67e8b435434b601f94992ec044f7e89fb5acb",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[0]",
+        "bank.sfx.hop_land_gravel.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactGeneric_light_001.ogg",
+      "group": "impact",
+      "bytes": 5636,
+      "sha256": "c3cd1c073d186ae8fa35788ba94de581f1826e7427a7bb26490b2695fac18efa",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[1]",
+        "bank.sfx.hop_land_gravel.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactGeneric_light_002.ogg",
+      "group": "impact",
+      "bytes": 5795,
+      "sha256": "d0bf60905b59ff630ffe01eb0edeeacd2504eaa8fb6523aeef7d2458b78264d3",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[2]",
+        "bank.sfx.hop_land_gravel.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactGeneric_light_003.ogg",
+      "group": "impact",
+      "bytes": 5792,
+      "sha256": "0e8896706130f6bc88cdf1f0157aaacdbe88dce86cf0330f9136e44eb1209e81",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[3]",
+        "bank.sfx.hop_land_gravel.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactGeneric_light_004.ogg",
+      "group": "impact",
+      "bytes": 5747,
+      "sha256": "f906fa3a37acc4372787b496efcedefa2856045d5ec9456a3bd6c303c0eabb41",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_jelly.files[4]",
+        "bank.sfx.hop_land_gravel.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_heavy_000.ogg",
+      "group": "impact",
+      "bytes": 6110,
+      "sha256": "e07045693e4a2b3d165c424e3dab4c781d9ff8880a386880ac89a51315d7f831",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_heavy_001.ogg",
+      "group": "impact",
+      "bytes": 7279,
+      "sha256": "83554049f81f4db9209379e103c30bfa63f65c42189a03f300b045c2c82e23ae",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_heavy_002.ogg",
+      "group": "impact",
+      "bytes": 5634,
+      "sha256": "b914c8f1eb7c0f34bb165d7c77f4be0351f6be0660c13c53e65424e262e2c093",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_heavy_003.ogg",
+      "group": "impact",
+      "bytes": 6209,
+      "sha256": "b0f2ba4dabde9a87eb9c188a19d31e0c2300fd321adeba08d3b9b8aa011d7037",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_heavy_004.ogg",
+      "group": "impact",
+      "bytes": 5788,
+      "sha256": "6d65b463c0555dd5be16b8db6d2cbe23a94e07a4637779b8ad17d0db3e500a87",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_steel.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_light_000.ogg",
+      "group": "impact",
+      "bytes": 7651,
+      "sha256": "33b5e6e37c6e9d54e07bf5a89b12c76e879f40c1ea83cdd82714df1d6f9fec6d",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_light_001.ogg",
+      "group": "impact",
+      "bytes": 6967,
+      "sha256": "fba69c467ddd85da7b1d82e259f936b876d9ba6a3d6f1b24bdd10468e46bfe08",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_light_002.ogg",
+      "group": "impact",
+      "bytes": 6804,
+      "sha256": "25a96f90a9a1f88a531e824e126f0519504625e5635e65a72e4f31611428db29",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_light_003.ogg",
+      "group": "impact",
+      "bytes": 9023,
+      "sha256": "92d5db6bfc672d9dc1b4f390b2900504f013187fa36335472554fafefa9050b1",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_light_004.ogg",
+      "group": "impact",
+      "bytes": 6675,
+      "sha256": "9b1c35820fba507081261f19ab5f461f69a5e2627a7d91acdb73ca3cfc997979",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_railing.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_medium_000.ogg",
+      "group": "impact",
+      "bytes": 7117,
+      "sha256": "a96f879fec0864a8938e0c745b6996a6c5679c16a234ce31a01cc995e8401003",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[0]",
+        "bank.sfx.hop_land_steel.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_medium_001.ogg",
+      "group": "impact",
+      "bytes": 6151,
+      "sha256": "e8a9eaba7c4d27422e4eeb3e6c7100d5d7dc0f83e005efc98c960adcc5265337",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[1]",
+        "bank.sfx.hop_land_steel.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_medium_002.ogg",
+      "group": "impact",
+      "bytes": 5857,
+      "sha256": "7e89ce2ca0dbda95ea2b78d4b50791cab35c10d20e9f5ccd45dd0b00e99ff548",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[2]",
+        "bank.sfx.hop_land_steel.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_medium_003.ogg",
+      "group": "impact",
+      "bytes": 6964,
+      "sha256": "2a185e2e57211d02c1bdd33b872d6b6a2fe83e6c14f4e56f426a95e717acf08e",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[3]",
+        "bank.sfx.hop_land_steel.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactMetal_medium_004.ogg",
+      "group": "impact",
+      "bytes": 5744,
+      "sha256": "03e10f800199c7166208e41c11cf4acfac6cc265467f02357da71972bc967295",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.wall_splat_fence.files[4]",
+        "bank.sfx.hop_land_steel.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlank_medium_000.ogg",
+      "group": "impact",
+      "bytes": 12016,
+      "sha256": "8403cd7a043f0391574c88c55dd205743725b5363d2407f6de145f201690b68f",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlank_medium_001.ogg",
+      "group": "impact",
+      "bytes": 12082,
+      "sha256": "d7c304319f8beac616231b62041fa8da74045b62d7155965516efb9b19303df4",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlank_medium_002.ogg",
+      "group": "impact",
+      "bytes": 12313,
+      "sha256": "f6a14da45994229676b4f29e6a35f504b5c2ec2b8166fb1a3b1aa004bc6911ef",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlank_medium_003.ogg",
+      "group": "impact",
+      "bytes": 12138,
+      "sha256": "0602a7b3eab5f53484f10fe775ee4204e7a2ba9703c886b302e012f7f6fab8de",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlank_medium_004.ogg",
+      "group": "impact",
+      "bytes": 12084,
+      "sha256": "6a51318c1c63821ea757622b57fafbf44c16c28129f6d39406a784260d87c447",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hop_land_plank.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_light_000.ogg",
+      "group": "impact",
+      "bytes": 10474,
+      "sha256": "6e797cf8a5bfc52d7ed5eb47c227974c1cf2a674954fec5b539cea7d62c7282c",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_light_001.ogg",
+      "group": "impact",
+      "bytes": 11730,
+      "sha256": "947915c2eb6ac57ee08fd3a48b297fd108d69abc72076e79882c21cad0eef56e",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_light_002.ogg",
+      "group": "impact",
+      "bytes": 9932,
+      "sha256": "8ac5869ea434cf0d364872774efe70b2d666a4f02ba35ddfc1e051d336721be8",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_light_003.ogg",
+      "group": "impact",
+      "bytes": 10626,
+      "sha256": "dbfb7c1d002576696df3e9a43d6639ee3f342068398b5e7b55bc2389d20508a9",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_light_004.ogg",
+      "group": "impact",
+      "bytes": 11928,
+      "sha256": "9cb33b0c0cce948313f078b60769d2f8e4075472494fc8f8129aa4a23c951897",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_guard.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_medium_000.ogg",
+      "group": "impact",
+      "bytes": 10921,
+      "sha256": "b670d30452983369771081319c268475edaaafe782bf4e8d70bd7eef09d8823c",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_medium_001.ogg",
+      "group": "impact",
+      "bytes": 11491,
+      "sha256": "68ba7701b71ef620f498f3038e832157d71ac8db7ad59424545890b250ceb24e",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_medium_002.ogg",
+      "group": "impact",
+      "bytes": 10250,
+      "sha256": "68762e1ed49bb59ae6602fad6ce2ebac61958478ddb2668de9106f010cd4b6b0",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_medium_003.ogg",
+      "group": "impact",
+      "bytes": 11616,
+      "sha256": "964c5fcfb91e7710e2af25c2243c8b7160756b223b0984bacc9eb25bfeea057b",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPlate_medium_004.ogg",
+      "group": "impact",
+      "bytes": 10803,
+      "sha256": "f0e8164081190839caff6c2958361b22780ffba5617f77f2d4ee3a4275b318bf",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_layer_chitin.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_heavy_000.ogg",
+      "group": "impact",
+      "bytes": 11617,
+      "sha256": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[0]",
+        "bank.sfx.wall_splat_concrete.files[0]",
+        "bank.sfx.hop_land_concrete.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_heavy_001.ogg",
+      "group": "impact",
+      "bytes": 10861,
+      "sha256": "f92f5cb6ba4ff2766497292ffd90865654317eeca976f5652e0708dbdcdc0dd9",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[1]",
+        "bank.sfx.wall_splat_concrete.files[1]",
+        "bank.sfx.hop_land_concrete.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_heavy_002.ogg",
+      "group": "impact",
+      "bytes": 9025,
+      "sha256": "7993dd4c156b9979ad69f17be5ebe31850b16039a3857f8477141be54dfee1b3",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[2]",
+        "bank.sfx.wall_splat_concrete.files[2]",
+        "bank.sfx.hop_land_concrete.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_heavy_003.ogg",
+      "group": "impact",
+      "bytes": 10029,
+      "sha256": "4ab53b26f4ea575120dcc1348526c9e0db2afc6af7a442aa0489bdead2ca80b6",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[3]",
+        "bank.sfx.wall_splat_concrete.files[3]",
+        "bank.sfx.hop_land_concrete.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_heavy_004.ogg",
+      "group": "impact",
+      "bytes": 10452,
+      "sha256": "f4c0c3eb8ab6517583b8218ed03f28923d1b687379aab4c1d5a6d4c10cf8e500",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_heavy.files[4]",
+        "bank.sfx.wall_splat_concrete.files[4]",
+        "bank.sfx.hop_land_concrete.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_medium_000.ogg",
+      "group": "impact",
+      "bytes": 8800,
+      "sha256": "486988aa2d6440ffc4c62a0e8ccf3c23673ba84424bd4723378d451b7255eb5c",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_light.files[0]",
+        "bank.sfx.hop_land_canvas.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_medium_001.ogg",
+      "group": "impact",
+      "bytes": 8701,
+      "sha256": "e71d23abcc3f10d9d6bc9615b2a431fff70b12333a5fcdd9964457564ace4349",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_light.files[1]",
+        "bank.sfx.hop_land_canvas.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_medium_002.ogg",
+      "group": "impact",
+      "bytes": 10399,
+      "sha256": "6492f9ccbc8d24dcef607bb1b48790b7870961474561f7fe5601e1c73a3018ef",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_light.files[2]",
+        "bank.sfx.hop_land_canvas.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_medium_003.ogg",
+      "group": "impact",
+      "bytes": 9509,
+      "sha256": "2d7c719c05999e0532f4384e1018e04cd916db715140bf16dee2dff3f820e908",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_light.files[3]",
+        "bank.sfx.hop_land_canvas.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/impact/impactPunch_medium_004.ogg",
+      "group": "impact",
+      "bytes": 10032,
+      "sha256": "4a256878a3afb994ec9a4399336687748e68c7c136872c08c9c797d8c4e2464a",
+      "source_id": "kenney-impact",
+      "creator": "Kenney",
+      "title": "Impact Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "bank_references": [
+        "bank.sfx.hit_light.files[4]",
+        "bank.sfx.hop_land_canvas.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/back_001.ogg",
+      "group": "interface",
+      "bytes": 6997,
+      "sha256": "07db973f79f6ae0f2edc34561e7592e24d0577455919fb602cb8ecc0da991dcf",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_back.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/back_002.ogg",
+      "group": "interface",
+      "bytes": 7029,
+      "sha256": "61581c58194e3f19f531072edabbc344204c7e0a2887b8ededce4357bcf09195",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_back.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/back_003.ogg",
+      "group": "interface",
+      "bytes": 7208,
+      "sha256": "ff5e87de1230b1a5f1fa83e5a4ba9d7eb1c07154267ac34b510a17d4caa03cef",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_back.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/back_004.ogg",
+      "group": "interface",
+      "bytes": 6923,
+      "sha256": "c22e3c49f42c2a5ba6748e91283efe124f32822469c1258c3e5d7b3d7ab9361c",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_back.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/bong_001.ogg",
+      "group": "interface",
+      "bytes": 4848,
+      "sha256": "d21d0f0b782445db579d11e2506b24cd1ac9d664ee33aeaf807761aa7b6fd710",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_stamp.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/close_001.ogg",
+      "group": "interface",
+      "bytes": 9915,
+      "sha256": "44af8249b933e0fd35ec957a638bb1a0b01f85b53fbe9674bf77bd3ca3168ef4",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_close.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/close_002.ogg",
+      "group": "interface",
+      "bytes": 14752,
+      "sha256": "bc4279d2bb2bf86592473eab6a8eab55e51b54a8619315000dbd780a83b102d8",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_close.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/close_003.ogg",
+      "group": "interface",
+      "bytes": 15648,
+      "sha256": "39a1a7f3bc001766c1881841e9903c6b16f5a10b5666e0791d7f6444677d8b05",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_close.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/close_004.ogg",
+      "group": "interface",
+      "bytes": 16263,
+      "sha256": "41b41e01ac75f4bc5a9c8dc3b0de744fa7f877757463692783c12a8ae4bfae6b",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_close.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/confirmation_001.ogg",
+      "group": "interface",
+      "bytes": 8968,
+      "sha256": "063564703b6094d70718a3e787a55cc9141611e4ecd6b6637f8828f79b4a8c3a",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_accept.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/confirmation_002.ogg",
+      "group": "interface",
+      "bytes": 14169,
+      "sha256": "33b17a9a9a2397c62b285c52c33a907fdffb476909c99e42dde603f6a7a8b12c",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_accept.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/confirmation_003.ogg",
+      "group": "interface",
+      "bytes": 9535,
+      "sha256": "3091bf0be0497f825769ee0733ca7bdc3bcd59bd6c6e8f2ba8f93d580ff38022",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_accept.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/confirmation_004.ogg",
+      "group": "interface",
+      "bytes": 12391,
+      "sha256": "568967a3d9f8a8f6af54ea01729c4882284308f2a27d78c07ffd7ee0d6951661",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_accept.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/error_001.ogg",
+      "group": "interface",
+      "bytes": 7373,
+      "sha256": "46e67425d16339772e8d328fb36a49426c9467418686e11beeb71ff84b0f6433",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_error.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/error_002.ogg",
+      "group": "interface",
+      "bytes": 7369,
+      "sha256": "76810ec365f41078fd0507101da5bb7b8730fe011dde43908329fdabd8575e79",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_error.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/error_003.ogg",
+      "group": "interface",
+      "bytes": 12256,
+      "sha256": "885b28175c7b511118bcffab95675b48bbac9005cf6514656ebdad979276b3ab",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_error.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/error_004.ogg",
+      "group": "interface",
+      "bytes": 6393,
+      "sha256": "0b574cea597d96507e782ae9764f88482ce49f46e931e57054bf7150047f2d69",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_error.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/error_005.ogg",
+      "group": "interface",
+      "bytes": 7266,
+      "sha256": "3f75b11df5b06d68d2c25fbf0e9c9d9e7dd9250562a4007ee34856b8a309a2ae",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_error.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/error_006.ogg",
+      "group": "interface",
+      "bytes": 8288,
+      "sha256": "a97513d7fd2b12b1210c423be943b4c1ab0e899b11db95855e9b74836e646ae0",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_error.files[5]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/error_007.ogg",
+      "group": "interface",
+      "bytes": 10225,
+      "sha256": "f1ee4c1ac8bfe1a82eacb54b26f49e8974bab93bcf10c01800bc10dbf730f559",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_error.files[6]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/error_008.ogg",
+      "group": "interface",
+      "bytes": 9215,
+      "sha256": "eba17ecb2a426bfd4a8a6acff5f8a86202b6424a77af0fd842e37809a1ab6d81",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_error.files[7]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/open_001.ogg",
+      "group": "interface",
+      "bytes": 9834,
+      "sha256": "a27c6bb0df7da1e6af5dd5937593c98bc58b6e513f42fe6a3254cd6a6949c648",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_open.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/open_002.ogg",
+      "group": "interface",
+      "bytes": 14975,
+      "sha256": "24ff224fe2c09c6aed1b41249825382dc74cf324b887ff279d8494912ce2beee",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_open.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/open_003.ogg",
+      "group": "interface",
+      "bytes": 15046,
+      "sha256": "bcdca6b5c9c33aa15ca3fb18a1fa8d98a01b528b85be08c5a610e57c75fc022d",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_open.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/open_004.ogg",
+      "group": "interface",
+      "bytes": 15879,
+      "sha256": "4e02b8287bc4d9e7bf7a889cb9e48613c8eb22a310dfb0bf29c2bfd0a1e4bea5",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_open.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/scroll_001.ogg",
+      "group": "interface",
+      "bytes": 21633,
+      "sha256": "320c6aafb2c7a503eae508dc443b72d7f7c0a317bfd16813157ed400cd04cf16",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_move.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/scroll_002.ogg",
+      "group": "interface",
+      "bytes": 24628,
+      "sha256": "6fbcda22bc45349c66f1ba4b56d6c211b12264e83667de4b9af1e4ffcef74be5",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_move.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/scroll_003.ogg",
+      "group": "interface",
+      "bytes": 29488,
+      "sha256": "c2fecaa6e37c73d7141d0bd303d1c2231428d97c19ce83d50236a56804818643",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_move.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/scroll_004.ogg",
+      "group": "interface",
+      "bytes": 20348,
+      "sha256": "431398a3c12ba3aa30ead97f3e2f9b05eb00978facf04b31bda138ab77a2f54c",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_move.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/scroll_005.ogg",
+      "group": "interface",
+      "bytes": 20448,
+      "sha256": "e39d059462225efa31f758fb2e01871cc96781972b5062873a24a55c88174e02",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_move.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/select_001.ogg",
+      "group": "interface",
+      "bytes": 5468,
+      "sha256": "aec0c31ea934a35936ae0d2ab8fac8123c93aa5647f935853a58dbaf90278b7a",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/select_002.ogg",
+      "group": "interface",
+      "bytes": 5463,
+      "sha256": "4cc6ac5341b9b2c86fef80c347de028e9ab9f2e037586ac7d9fa59a403a1c012",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/select_003.ogg",
+      "group": "interface",
+      "bytes": 6901,
+      "sha256": "9a612fd2f513d52a296906b41071c990f75defe56be3bee60d2d4e2423b51b8b",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/select_004.ogg",
+      "group": "interface",
+      "bytes": 6909,
+      "sha256": "eb6cb435f3f2ab14f85f46a2bdd9073ec511d0f1f8d8c890c6636045703a5fd4",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/select_005.ogg",
+      "group": "interface",
+      "bytes": 6767,
+      "sha256": "ad09146e4ea33b931b2f5dfb4051a4f1fe4a36f1a48c42c5e9269c292ae21214",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_tab.files[4]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/tick_001.ogg",
+      "group": "interface",
+      "bytes": 4497,
+      "sha256": "9d057b918024c787bbe6c00beed13a7ef72a3fa0c259add3cef36582792f4230",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_slider.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/tick_002.ogg",
+      "group": "interface",
+      "bytes": 4514,
+      "sha256": "869442f54214be902ec7437f79e400dc91c1bfd90d18a6dd2d5b7e41ffbf457b",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_slider.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/tick_004.ogg",
+      "group": "interface",
+      "bytes": 5031,
+      "sha256": "0253d5f7d8d2afbbc370eac2a4539bb844239f0c98343e516d376b137c06d27c",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_slider.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/toggle_001.ogg",
+      "group": "interface",
+      "bytes": 7369,
+      "sha256": "ca1d2dde5f0b286abac4f070e23edab8f30927c8a533665cdf2ac6492a415e49",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_toggle.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/toggle_002.ogg",
+      "group": "interface",
+      "bytes": 8056,
+      "sha256": "1f564f5520cfa0764028ce245ad97599d3ece8f0ab504554c403af92ac72b900",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_toggle.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/toggle_003.ogg",
+      "group": "interface",
+      "bytes": 8654,
+      "sha256": "7e69aba356d590826cce291bbd9dc6a85d7c53858b0e3712fcad30e1ad080b23",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_toggle.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/interface/toggle_004.ogg",
+      "group": "interface",
+      "bytes": 6695,
+      "sha256": "d7bf2236fc95a0fe1e3b278259392bcb062644e2d4ec5f9c96f7c09a9928262f",
+      "source_id": "kenney-interface",
+      "creator": "Kenney",
+      "title": "Interface Sounds",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "bank_references": [
+        "bank.sfx.ui_toggle.files[3]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/jingles/jingles_HIT02.ogg",
+      "group": "jingles",
+      "bytes": 11735,
+      "sha256": "1ebd52ba108c0e749d2814c54e44bba6c39d111fa30d025fddfac70538e0e241",
+      "source_id": "kenney-jingles",
+      "creator": "Kenney",
+      "title": "Music Jingles",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/music-jingles",
+      "bank_references": [
+        "bank.music.defeat.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/jingles/jingles_PIZZI03.ogg",
+      "group": "jingles",
+      "bytes": 16981,
+      "sha256": "88da900ec74a79fb845f2dcf2068383998833a9ee1b87a23f074924781af5700",
+      "source_id": "kenney-jingles",
+      "creator": "Kenney",
+      "title": "Music Jingles",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/music-jingles",
+      "bank_references": [
+        "bank.music.victory.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/Backbay-Lounge.mp3",
+      "group": "music",
+      "bytes": 8531962,
+      "sha256": "9567e71a213b0026341b2c0ecd226950e7653abd235cf520fb9aee4247d74d96",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.cannery_radio.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/Funkorama.mp3",
+      "group": "music",
+      "bytes": 8199078,
+      "sha256": "6be229815d85a0b99382b944d31098b882702c04ac7ad899e44ab7f8ba89b5ad",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.fight_night_poster.file",
+        "bank.music.title_night.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/Furious-Freak.mp3",
+      "group": "music",
+      "bytes": 5990768,
+      "sha256": "81eeea1f99cb0f25b417cfa69b9268f040e46bb67a955247fe80a769ee426bd7",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.combat_a.file",
+        "bank.music.combat_b.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/Volatile-Reaction.mp3",
+      "group": "music",
+      "bytes": 5293585,
+      "sha256": "ced1148df201a6c69062a96b7ef49c49924572ca5023c2ac5a2d6c5828ecb218",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.boss.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/rpg/bookFlip1.ogg",
+      "group": "rpg",
+      "bytes": 18248,
+      "sha256": "fa81ac2fedc8c641661b87e349630a36c9800e795e0c800e029214efdbe26a7d",
+      "source_id": "kenney-rpg",
+      "creator": "Kenney",
+      "title": "RPG Audio",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/rpg-audio",
+      "bank_references": [
+        "bank.sfx.ui_card_flip.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/rpg/bookFlip2.ogg",
+      "group": "rpg",
+      "bytes": 12393,
+      "sha256": "3409042acbfaebc24c1a6327dc073e36f9250841712e96c5040da566a97df73c",
+      "source_id": "kenney-rpg",
+      "creator": "Kenney",
+      "title": "RPG Audio",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/rpg-audio",
+      "bank_references": [
+        "bank.sfx.ui_card_flip.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/rpg/bookFlip3.ogg",
+      "group": "rpg",
+      "bytes": 9077,
+      "sha256": "c85db5dceb3f1df073e960630277eaa88a5afda0477c1ddd68dad707621767be",
+      "source_id": "kenney-rpg",
+      "creator": "Kenney",
+      "title": "RPG Audio",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/rpg-audio",
+      "bank_references": [
+        "bank.sfx.ui_card_flip.files[2]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/rpg/handleCoins.ogg",
+      "group": "rpg",
+      "bytes": 25394,
+      "sha256": "8a91f969e932df709df80ee124d86a51389eed9b67f22e5e716bc2bbf60d8dab",
+      "source_id": "kenney-rpg",
+      "creator": "Kenney",
+      "title": "RPG Audio",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/rpg-audio",
+      "bank_references": [
+        "bank.sfx.ui_scrip.files[0]",
+        "bank.sfx.ui_purchase.files[0]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/rpg/handleCoins2.ogg",
+      "group": "rpg",
+      "bytes": 13094,
+      "sha256": "4b857968d64f9ac9336a10ffac6694d7547e1f01566ad6857b30bc8db3ee6c32",
+      "source_id": "kenney-rpg",
+      "creator": "Kenney",
+      "title": "RPG Audio",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://kenney.nl/assets/rpg-audio",
+      "bank_references": [
+        "bank.sfx.ui_scrip.files[1]",
+        "bank.sfx.ui_purchase.files[1]"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/water/waterflow.mp3",
+      "group": "water",
+      "bytes": 102625,
+      "sha256": "5a053719d5b06a8e5005dbe81b66e020f10312635a823d66883702568c971e92",
+      "source_id": "oga-waterflow",
+      "creator": "TyberiusGames",
+      "title": "Waterflow Sound",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "source": "https://opengameart.org/content/waterflow-sound",
+      "bank_references": [
+        "bank.sfx.amb_drydock.files[0]",
+        "bank.sfx.amb_hub_dock.files[0]"
+      ]
+    }
+  ]
+}

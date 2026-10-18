@@ -293,9 +293,7 @@ func _start_table() -> void:
 	var fs := catalog.available_fighters()
 	if fs.is_empty():
 		return
-	var fid := fighter
-	if fid == "random" or fid == "":
-		fid = str(fs[randi() % fs.size()])
+	var fid := FighterSelection.resolve(fighter, fs)
 	var t := BookieTable.new()
 	t.name = TABLE_NAME
 	App.add_child(t)

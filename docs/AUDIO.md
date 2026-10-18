@@ -1,14 +1,8 @@
 # Audio
 
-Everything the player hears is synthesized by our own tools from editable source files in this
-repository (D-013). No third-party samples, no paid tools, no TTS. This document is the audio
-subsystem's contract: the pipeline, how to rebuild, the source formats, the runtime API, the
-integration table for the lead, the tests, and the provenance statement.
+Audio uses the repository synthesis pipeline for its editable score, SFX, creature and announcer sources, with selected free third-party recordings overlaid for v0.9.13. The audio bank remains reproducible: tools/audio/build.js writes the generated source bank, then merges game/assets/audio/replacement-overrides.json. Imported files stay in game/assets/audio/replacements/ and are protected from the generated-audio cleaner.
 
-For the v0.9.12 playtest request, [docs/audio/REPLACEMENT_GUIDE.md](audio/REPLACEMENT_GUIDE.md) links the
-complete 638-file generated inventory and a researched stock-audio shortlist. Eight ambience loops have
-had sustained hum/buzz removed, and rapid room crossfades now cancel superseded fades. No stock assets or
-unapproved Ableton branch audio are included in that patch.
+The v0.9.12 playtest removed eight sustained tonal ambience beds and fixed rapid-room crossfades. v0.9.13 adds selected CC BY 4.0 and CC0 music, combat, UI, movement, crowd and dock-water clips. The four Kevin MacLeod songs require in-game attribution. Replacement filenames, source pages, licences, hashes and bank references are in docs/audio/replacement-audio-inventory.txt; the original generated inventory remains separate. Named creature calls and custom announcer/coach lines remain generated.
 
 Spec: `docs/design/AUDIO_DIRECTION.md` (tracks, SFX list, mixing), `docs/design/ANNOUNCER_AND_TUTORIAL.md`
 (voices, lines), `docs/design/ROSTER.md` (per-fighter sound palettes).
@@ -34,7 +28,7 @@ node tools/audio/build.js                      # all: sfx + music + voice banks 
 node tools/audio/build.js --sfx --only hit_    # re-render only ids containing "hit_" (bank stays complete)
 node tools/audio/build.js --music --only boss  # one track
 node tools/audio/build.js --check              # re-render in memory and verify every committed file is byte-identical
-node tools/audio/build.js --clean              # also delete stale .wav/.import files no definition produces
+node tools/audio/build.js --clean              # remove stale generated WAVs; preserve replacements/
 node tools/audio/build.js --say "Pick the crab." --speaker barnaby --out captures/say.wav   # audition a babble line
 node tools/audio/spectro.js game/assets/audio/music/boss.wav --out captures/boss.png --seconds 40  # spectrogram + waveform PNG
 & $g --headless --path game --import           # then import (Godot fills uid/path in the generated .import files)
@@ -45,7 +39,7 @@ node tools/audio/spectro.js game/assets/audio/music/boss.wav --out captures/boss
 Renders are deterministic: all randomness goes through a seeded xoshiro RNG keyed by asset id and
 variant, dither uses a fixed LCG, so a rebuild reproduces identical bytes (`--check` proves it).
 
-Output formats: 16-bit PCM WAV. Music 44.1 kHz stereo (the diegetic hub radio is 22.05 kHz mono by
+Generated output formats: 16-bit PCM WAV. Imported replacement music and selected SFX use MP3, OGG and WAV. Music 44.1 kHz stereo (the diegetic hub radio is 22.05 kHz mono by
 design, the game filters it per room), music layers 22.05 kHz mono (stems that only add a lead or
 percussion line), SFX 44.1 kHz mono, creature voices / crowd / ambience 22.05 kHz mono, announcer grains
 22.05 kHz mono imported as PCM (the runtime reads their samples). Everything else imports as QOA

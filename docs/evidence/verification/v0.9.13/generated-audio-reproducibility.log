@@ -1,0 +1,115 @@
+CRITTERWEIGHT audio build -> B:\Critterweight\PokeMMA-v0.9.13\game\assets\audio (check only)
+  sfx: 574 files rendered, 0 kept, 15.0 s
+  voices: 2 grain banks
+  fight_night_poster: 104 bpm, 56 bars, 129.2 s, loop bars 5-56
+    foghorn            2 notes (2 rendered, 0 cached) peak -12.8 dB
+    crowd              2 notes (1 rendered, 1 cached) peak -42.3 dB
+    kick             192 notes (1 rendered, 191 cached) peak -3.3 dB
+    snare            148 notes (6 rendered, 142 cached) peak 8.7 dB
+    hat              520 notes (2 rendered, 518 cached) peak -24.6 dB
+    hatopen           48 notes (1 rendered, 47 cached) peak -26.0 dB
+    bass             224 notes (14 rendered, 210 cached) peak -9.5 dB
+    stabs            410 notes (18 rendered, 392 cached) peak 1.8 dB
+    pad               65 notes (11 rendered, 54 cached) peak -15.5 dB
+    lead             111 notes (47 rendered, 64 cached) peak -7.2 dB
+    full mix -12.5 LUFS -> gain -2.5 dB
+    -> 129.2 s, -15.01 LUFS, peak -1 dBFS, 21.7 MB
+  cannery_radio: 92 bpm, 56 bars, 146.1 s, loop bars 1-56
+    crackle           16 notes (1 rendered, 15 cached) peak -18.8 dB
+    kick             184 notes (1 rendered, 183 cached) peak -12.2 dB
+    brush            448 notes (2 rendered, 446 cached) peak -20.4 dB
+    snare            120 notes (2 rendered, 118 cached) peak -15.6 dB
+    bass             192 notes (15 rendered, 177 cached) peak -10.1 dB
+    keys             544 notes (82 rendered, 462 cached) peak -3.4 dB
+    guitar           288 notes (42 rendered, 246 cached) peak -8.3 dB
+    whistle           48 notes (38 rendered, 10 cached) peak -10.6 dB
+    organ             32 notes (13 rendered, 19 cached) peak -12.2 dB
+    full mix -16.8 LUFS -> gain +2.3 dB
+    -> 146.1 s, -17.79 LUFS, peak -1.01 dBFS, 6.1 MB
+  combat_a: 128 bpm, 56 bars, 105.0 s, loop bars 1-56
+    kick             236 notes (1 rendered, 235 cached) peak -3.6 dB
+    snare            160 notes (6 rendered, 154 cached) peak 3.7 dB
+    clap              48 notes (1 rendered, 47 cached) peak -15.3 dB
+    hat              896 notes (3 rendered, 893 cached) peak -21.4 dB
+    hatopen           96 notes (2 rendered, 94 cached) peak -23.5 dB
+    bass             400 notes (13 rendered, 387 cached) peak -10.6 dB
+    stabs            354 notes (13 rendered, 341 cached) peak 0.3 dB
+    crowdpad           1 notes (1 rendered, 0 cached) peak -43.7 dB
+    riser              1 notes (1 rendered, 0 cached) peak -22.8 dB
+    lead             133 notes (42 rendered, 91 cached) peak -8.5 dB
+    perc2             44 notes (1 rendered, 43 cached) peak -16.1 dB
+    perc3             76 notes (1 rendered, 75 cached) peak -18.2 dB
+    full mix -13.4 LUFS -> gain -1.1 dB
+    -> 105.0 s, -15 LUFS, peak -1 dBFS, 17.7 MB
+  combat_b: 128 bpm, 56 bars, 105.0 s, loop bars 1-56
+    kick             232 notes (1 rendered, 231 cached) peak -2.3 dB
+    snare            193 notes (6 rendered, 187 cached) peak 8.5 dB
+    toms             176 notes (5 rendered, 171 cached) peak -6.0 dB
+    hat              720 notes (2 rendered, 718 cached) peak -25.4 dB
+    hatopen           72 notes (2 rendered, 70 cached) peak -24.3 dB
+    crash             35 notes (1 rendered, 34 cached) peak -19.3 dB
+    bass             164 notes (28 rendered, 136 cached) peak -7.1 dB
+    stabs            358 notes (28 rendered, 330 cached) peak 1.9 dB
+    arp              384 notes (15 rendered, 369 cached) peak -16.0 dB
+    riser              1 notes (1 rendered, 0 cached) peak -21.8 dB
+    perc2             44 notes (1 rendered, 43 cached) peak -14.8 dB
+    perc3             72 notes (1 rendered, 71 cached) peak -18.9 dB
+    full mix -12.8 LUFS -> gain -1.7 dB
+    -> 105.0 s, -14.64 LUFS, peak -1 dBFS, 17.7 MB
+  boss: 132 bpm, 40 bars, 72.7 s, loop bars 9-40
+    bell               9 notes (3 rendered, 6 cached) peak -10.7 dB
+    pad              154 notes (24 rendered, 130 cached) peak -7.3 dB
+    snare            656 notes (5 rendered, 651 cached) peak -1.5 dB
+    kick             144 notes (1 rendered, 143 cached) peak -3.6 dB
+    sub              144 notes (11 rendered, 133 cached) peak -9.5 dB
+    hat              272 notes (2 rendered, 270 cached) peak -23.3 dB
+    crash             19 notes (1 rendered, 18 cached) peak -17.9 dB
+    brass             49 notes (29 rendered, 20 cached) peak -6.8 dB
+    stabs            156 notes (10 rendered, 146 cached) peak -4.8 dB
+    scream           166 notes (60 rendered, 106 cached) peak -8.3 dB
+    hat2             512 notes (1 rendered, 511 cached) peak -29.9 dB
+    wettoms           48 notes (1 rendered, 47 cached) peak -14.0 dB
+    buzz               8 notes (1 rendered, 7 cached) peak -12.9 dB
+    gavel             16 notes (1 rendered, 15 cached) peak -13.8 dB
+    full mix -10.9 LUFS -> gain -3.6 dB
+    -> 72.7 s, -15.25 LUFS, peak -1.54 dBFS, 12.2 MB
+  victory: 120 bpm, 6 bars, 12.0 s
+    brass1            16 notes (7 rendered, 9 cached) peak -7.8 dB
+    brass2            16 notes (9 rendered, 7 cached) peak -10.2 dB
+    brass3            16 notes (7 rendered, 9 cached) peak -10.7 dB
+    brass4            16 notes (7 rendered, 9 cached) peak -7.2 dB
+    sub               18 notes (9 rendered, 9 cached) peak -6.2 dB
+    snare            138 notes (6 rendered, 132 cached) peak -1.6 dB
+    kick              20 notes (2 rendered, 18 cached) peak -3.8 dB
+    crash              2 notes (1 rendered, 1 cached) peak -14.6 dB
+    choir              4 notes (4 rendered, 0 cached) peak -16.7 dB
+    hat               20 notes (2 rendered, 18 cached) peak -23.9 dB
+    trumpet            8 notes (7 rendered, 1 cached) peak -8.9 dB
+    stabtag           12 notes (6 rendered, 6 cached) peak -5.6 dB
+    full mix -10.9 LUFS -> gain -3.1 dB
+    -> 15.5 s, -14 LUFS, peak -3.08 dBFS, 2.6 MB
+  defeat: 70 bpm, 4 bars, 13.7 s
+    trumpet           12 notes (12 rendered, 0 cached) peak -11.5 dB
+    sub                1 notes (1 rendered, 0 cached) peak -12.5 dB
+    slide              3 notes (3 rendered, 0 cached) peak -17.8 dB
+    choir              3 notes (3 rendered, 0 cached) peak -21.9 dB
+    kick               1 notes (1 rendered, 0 cached) peak -12.4 dB
+    full mix -8.9 LUFS -> gain -8.1 dB
+    -> 17.7 s, -17 LUFS, peak -4.47 dBFS, 3.0 MB
+  title_night: 112 bpm, 28 bars, 60.0 s, loop bars 5-28
+    pyro               2 notes (1 rendered, 1 cached) peak -14.7 dB
+    pyro2              2 notes (2 rendered, 0 cached) peak -14.9 dB
+    crowdpad           1 notes (1 rendered, 0 cached) peak -39.7 dB
+    kick             109 notes (1 rendered, 108 cached) peak -3.8 dB
+    snare            152 notes (6 rendered, 146 cached) peak 9.6 dB
+    hat              288 notes (2 rendered, 286 cached) peak -24.0 dB
+    crash             24 notes (1 rendered, 23 cached) peak -17.2 dB
+    bass             144 notes (10 rendered, 134 cached) peak -9.5 dB
+    stabs            228 notes (13 rendered, 215 cached) peak 2.5 dB
+    lowbrass          72 notes (12 rendered, 60 cached) peak -11.4 dB
+    choir             72 notes (9 rendered, 63 cached) peak -17.4 dB
+    lead              54 notes (35 rendered, 19 cached) peak -7.5 dB
+    full mix -10.4 LUFS -> gain -3.6 dB
+    -> 60.0 s, -14.01 LUFS, peak -1 dBFS, 10.1 MB
+  music: 44.5 s
+check ok: 638 files match the committed renders

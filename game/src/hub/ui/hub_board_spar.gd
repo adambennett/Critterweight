@@ -8,12 +8,13 @@ extends RefCounted
 static func build(b: HubBoard, p: Dictionary) -> void:
 	b.frame("The practice cage", "Ring sparring", 1080.0)
 	var st := b.hub_state()
-	var ids := ["kid_lamprey"]
-	var names := ["Kid Lamprey"]
+	var fighter_ids: Array[String] = ["kid_lamprey"]
+	var names: Array[String] = ["Random", "Kid Lamprey"]
 	for c in Content.playable_creatures():
 		if str(c).begins_with("f_"):
-			ids.append(str(c))
+			fighter_ids.append(str(c))
 			names.append(str(Content.get_entry("creatures", str(c)).get("name", c)))
+	var ids := FighterSelection.with_random(fighter_ids)
 	var opp := OptionRow.new("Opponent").setup(ids, names, str(p.get("opponent", "kid_lamprey")))
 	opp.set_help("Opponent", "Kid Lamprey (the Cannery's sparring partner) or any fighter on the roster.")
 	b.list.content.add_child(opp)
@@ -60,6 +61,15 @@ static func _fill_lockers(b: HubBoard) -> void:
 	var st := b.hub_state()
 	var cur := st.loadout_fighter()
 	b.section("Walk the Cannery as")
+	var fighter_ids: Array[String] = []
+	for c in Content.playable_creatures():
+		if str(c).begins_with("f_"):
+			fighter_ids.append(str(c))
+	b.button("RANDOM FIGHTER", func() -> void:
+		var picked := FighterSelection.resolve("random", fighter_ids)
+		if b.scene != null:
+			b.scene.call("switch_fighter", picked)
+		_fill_lockers(b), "Random fighter", "Pick a fighter from the roster at random.")
 	for c in Content.playable_creatures():
 		var cid := str(c)
 		if not cid.begins_with("f_"):

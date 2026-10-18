@@ -33,6 +33,7 @@ var _ckpt_rows := PackedStringArray()     ## checkpoint rows on screen
 # ---- train ----
 var _creatures: Array = []
 var _fighter: OptionButton
+var _random_lab_fighter := ""
 var _approach: OptionButton
 var _objective: OptionButton
 var _weights_grid: GridContainer
@@ -234,13 +235,18 @@ func _build_train() -> Control:
 	root.add_child(sv[0])
 	form.add_child(LabUi.header("What to train"))
 	_creatures = Content.playable_creatures()
-	var names := []
+	_random_lab_fighter = ""
+	var names: Array[String] = []
+	if not _creatures.is_empty():
+		names.append("Random")
 	for cid in _creatures:
 		var c := Content.creature(str(cid))
 		names.append("%s (%s)" % [c.display_name if c else str(cid), str(cid)])
-	_fighter = LabUi.option(names)
-	_fighter.item_selected.connect(func(_i: int) -> void: _refresh_train_lists())
-	LabUi.row(form, "Fighter", _fighter, "Policies are trained per fighter.")
+	_fighter = LabUi.option(names, 1 if not _creatures.is_empty() else 0)
+	_fighter.item_selected.connect(func(i: int) -> void:
+		_random_lab_fighter = FighterSelection.resolve("random", _creatures) if i == 0 and not _creatures.is_empty() else ""
+		_refresh_train_lists())
+	LabUi.row(form, "Fighter", _fighter, "Policies are trained per fighter. Random chooses one roster fighter when selected.")
 	_approach = LabUi.option(Array(APPROACH_NAMES))
 	_approach.item_selected.connect(func(_i: int) -> void: _update_train_help())
 	LabUi.row(form, "Approach", _approach)
@@ -364,7 +370,14 @@ func _set_seed(v: int) -> void:
 
 
 func _creature_id() -> String:
-	return str(_creatures[_fighter.selected]) if not _creatures.is_empty() and _fighter.selected >= 0 else "dev_biped"
+	if _creatures.is_empty() or _fighter == null:
+		return "dev_biped"
+	if _fighter.selected == 0:
+		if _random_lab_fighter == "":
+			_random_lab_fighter = FighterSelection.resolve("random", _creatures)
+		return _random_lab_fighter
+	var index := _fighter.selected - 1
+	return str(_creatures[index]) if index >= 0 and index < _creatures.size() else str(_creatures[0])
 
 
 func _load_preset_weights() -> void:
@@ -951,6 +964,8 @@ func _refresh_policies() -> void:
 	if sel >= 0:
 		_pol_list.select(sel)
 	_player_creature.clear()
+	if not Content.playable_creatures().is_empty():
+		_player_creature.add_item("Random")
 	for cid in Content.playable_creatures():
 		_player_creature.add_item(str(cid))
 	_spectate_opp.clear()
@@ -1108,6 +1123,8 @@ func _fight() -> void:
 		_set_status("Pick a valid policy first.")
 		return
 	var me := _player_creature.get_item_text(_player_creature.selected) if _player_creature.selected >= 0 else p.creature
+	if me == "Random":
+		me = FighterSelection.resolve("random", Content.playable_creatures())
 	App.start_match({"arena": "the_gullet", "rules": "duel", "fighters": [
 		{"creature": me, "team": 0, "kind": "player", "name": Profiles.player_name()},
 		{"creature": p.creature, "team": 1, "kind": "policy", "policy_id": p.id, "name": p.name}]}, _back_to_lab)

@@ -19,6 +19,23 @@ were verified by that owner. This is a working inventory, **not** a legal cleara
 | Barlow, Barlow Condensed | `Barlow-400/600.woff2`, `BarlowCondensed-500/700/900.woff2` (WOFF2 web subsets) | Reused from the Cage Rules reference project (`MMAsim/lib/fonts`, byte-identical); upstream https://github.com/jpt/barlow | Copyright 2017 The Barlow Project Authors (Jeremy Tribby) | SIL Open Font License 1.1 (no Reserved Font Name declared) | Allowed: embed/bundle in commercial software; the fonts may not be sold on their own; derivatives stay OFL | Copyright + OFL text must accompany redistribution: `game/assets/fonts/OFL.txt`, embedded in `game/assets/ui/credits.json`, shown in Credits › Notices | None (Godot imports them into its font cache) | All UI text and the fight HUD |
 | Bungee (Regular) | v2.000 (`Bungee-Regular.ttf`, SHA-256 `c4f5361ce120af3e6b9156d0bf379fa19cda2ea0cd18ac01fd99596c6bf66e3f`) | Downloaded 2026-10-15 from https://github.com/google/fonts/tree/main/ofl/bungee (raw files `Bungee-Regular.ttf`, `OFL.txt`; METADATA: upstream https://github.com/djrrb/Bungee commit `eb03cf69adab5094f6b84e95357789cdf3bfeb99`) | Copyright 2023 The Bungee Project Authors (David Jonathan Ross) | SIL Open Font License 1.1 (no Reserved Font Name declared) | Same as above | `game/assets/fonts/Bungee-OFL.txt`, embedded in `credits.json`, shown in Credits › Notices | None | Wordmark (title, main menu, credits), display title cards (results winner) |
 
+## Imported audio replacements (v0.9.13)
+
+Selected recordings under game/assets/audio/replacements/ are packaged with the game. All were downloaded without payment on 2026-10-17. Only the listed open licences are used; no paid track version is included.
+
+| Item | Creator | Source | Licence and use | Changes / location |
+|---|---|---|---|---|
+| Funkorama, Backbay Lounge, Furious Freak, Volatile Reaction | Kevin MacLeod | [Incompetech](https://incompetech.com/music/royalty-free/licenses/) | CC BY 4.0; commercial use and redistribution are allowed with attribution. No fee paid. Required credit is in docs/CREDITS.md and in-game Credits. | Supplied MP3s used without editing; loop, gain and track mapping are configured in game. replacements/music/ |
+| Impact Sounds | Kenney | [kenney.nl/assets/impact-sounds](https://kenney.nl/assets/impact-sounds) | CC0 1.0; no attribution required. | Selected impact and footstep OGGs used without editing. replacements/impact/, replacements/footsteps/; included pack notice: replacements/licenses/Kenney-Impact-Sounds-License.txt |
+| Interface Sounds | Kenney | [kenney.nl/assets/interface-sounds](https://kenney.nl/assets/interface-sounds) | CC0 1.0; no attribution required. | Selected UI OGGs used without editing. replacements/interface/; included pack notice. |
+| RPG Audio | Kenney | [kenney.nl/assets/rpg-audio](https://kenney.nl/assets/rpg-audio) | CC0 1.0; no attribution required. | Selected coin and book OGGs used without editing. replacements/rpg/; included pack notice. |
+| Music Jingles | Kenney | [kenney.nl/assets/music-jingles](https://kenney.nl/assets/music-jingles) | CC0 1.0; no attribution required. | Two result stings used without editing. replacements/jingles/; included pack notice. |
+| Waterflow Sound | TyberiusGames | [OpenGameArt](https://opengameart.org/content/waterflow-sound) | CC0 1.0; no attribution required. | Supplied MP3 used without editing as quiet dock ambience. replacements/water/ |
+| Crowd Shouting/Speaking Ambience | StarNinjas | [OpenGameArt](https://opengameart.org/content/crowd-shoutingspeaking-ambience) | CC0 1.0; no attribution required. | Supplied OGG used without editing at low gain as a crowd bed. replacements/crowd/ |
+| Applause in a Large Hall or Church | eXpl0it3r | [OpenGameArt](https://opengameart.org/content/applause-in-a-large-hall-or-church) | CC0 1.0; no attribution required. | Supplied WAV used without editing as a long crowd reaction. replacements/crowd/ |
+
+CC0 deed: https://creativecommons.org/publicdomain/zero/1.0/. The exact files, SHA-256 hashes, licences and bank references are recorded in game/assets/audio/replacements/replacement-audio-inventory.json. Original creature calls and custom announcer/coach lines remain generated: the optional Kenney human-fighter pack does not preserve named creature identities or written lines. The Freesound crowd alternatives were not used because their download page required an account; public CC0 OpenGameArt clips were used instead.
+
 ## Reused from the Cage Rules reference project
 
 The brief authorises reuse of Cage Rules code, ideas and project-owned assets. Reuse by the UI: **only the Barlow font

@@ -303,3 +303,10 @@ need a listening decision and compatible loop/stem treatment before integration.
 the current stock renderer; FSR's existing NVIDIA support is explained in the setting instead.
 
 Issue-by-issue evidence and verification limits: docs/evidence/verification/v0.9.12/README.md.
+
+
+## D-043 v0.9.13 uses free licensed audio replacements behind a generated-bank overlay
+
+The owner requested a v0.9.13 preview with suitable royalty-free replacements, chosen without payment, and asked for every download to remain on B:. The four Incompetech songs ship under CC BY 4.0 with the required Kevin MacLeod attribution; selected Kenney and OpenGameArt recordings are CC0 1.0. A separate replacement-overrides.json keeps generated sources reproducible and preserves the generated-audio inventory. Finished tracks do not carry unmatched generated stems. Imported audio and hashes are tested, but the owner has not yet judged the choices by listening.
+
+Every fighter selection menu now offers Random. It resolves at the launch boundary so saved campaign/run state contains a concrete fighter id, not the UI sentinel.
