@@ -1,0 +1,6 @@
+5f3ba9893bb35a267ee9899c717334b34bdafbd90d5b4075a6c802d2f688a119  Critterweight-0.9.14-windows-x64.exe
+4421231960ca611ba12c7517f910f6b344cb763f3e1f812b0b453ebf45eb2b8c  Critterweight-0.9.14-windows-x64.zip
+24434859953b58d3dde428fd0a551f8d6fed30ecca6e369eec157815f7019afa  Critterweight-0.9.14-server-windows-x64.zip
+86417f5c91f2c8c2469b350e9106828f2acb625ca6faa639c4435aeee98f1d49  Critterweight-0.9.14-linux-x86_64.tar.gz
+41528813e9432a00e91d83716caef5f569addb92340a282cd7c50a2d5f8a7cf1  Critterweight-0.9.14-server-linux-x86_64.tar.gz
+076a0d365986793e31eb127e6b384a0f84b4fff1fb3a26ab4515f95d6f1bf840  BUILD_MANIFEST.json
