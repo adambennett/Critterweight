@@ -41,6 +41,7 @@ func start(cfg: Dictionary) -> void:
 	camera = FightCamera.new()
 	add_child(camera)
 	camera.arena_radius = (cfg["arena"] as ArenaDef).radius
+	camera.open_stage = (cfg["arena"] as ArenaDef).base == "rooftop_canvas"
 	var entries: Array = []
 	var idx := 0
 	for e in cfg["fighters"]:

@@ -1,0 +1,390 @@
+{
+  "items": [
+    {
+      "id": "editor_rooftop_canvas",
+      "name": "Rooftop Canvas",
+      "base": "rooftop_canvas",
+      "format": 2,
+      "variant": "night",
+      "size": [
+        32,
+        32
+      ],
+      "description": "A blank rooftop platform with four open ledges. Resize width and depth independently, then place props and move the starting markers.",
+      "modes": [
+        "duel",
+        "ffa",
+        "teams",
+        "coop",
+        "absolute_unit",
+        "chum_rush",
+        "boss"
+      ],
+      "props": [],
+      "markers": {
+        "spawn": [
+          {
+            "pos": [
+              0.0,
+              0.0,
+              -2.9
+            ],
+            "yaw": -0.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              2.69,
+              0.0,
+              -2.05
+            ],
+            "yaw": -52.7,
+            "team": -1
+          },
+          {
+            "pos": [
+              3.5,
+              0.0,
+              0.0
+            ],
+            "yaw": -90.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              2.69,
+              0.0,
+              2.05
+            ],
+            "yaw": -127.3,
+            "team": -1
+          },
+          {
+            "pos": [
+              0.0,
+              0.0,
+              2.9
+            ],
+            "yaw": -180.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              -2.69,
+              0.0,
+              2.05
+            ],
+            "yaw": 127.3,
+            "team": -1
+          },
+          {
+            "pos": [
+              -3.5,
+              0.0,
+              0.0
+            ],
+            "yaw": 90.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              -2.69,
+              0.0,
+              -2.05
+            ],
+            "yaw": 52.7,
+            "team": -1
+          },
+          {
+            "pos": [
+              -3.5,
+              0.0,
+              -0.9
+            ],
+            "yaw": 90.0,
+            "team": 0
+          },
+          {
+            "pos": [
+              -3.5,
+              0.0,
+              0.9
+            ],
+            "yaw": 90.0,
+            "team": 0
+          },
+          {
+            "pos": [
+              -3.0,
+              0.0,
+              -1.9
+            ],
+            "yaw": 90.0,
+            "team": 0
+          },
+          {
+            "pos": [
+              -3.0,
+              0.0,
+              1.9
+            ],
+            "yaw": 90.0,
+            "team": 0
+          },
+          {
+            "pos": [
+              3.5,
+              0.0,
+              -0.9
+            ],
+            "yaw": -90.0,
+            "team": 1
+          },
+          {
+            "pos": [
+              3.5,
+              0.0,
+              0.9
+            ],
+            "yaw": -90.0,
+            "team": 1
+          },
+          {
+            "pos": [
+              3.0,
+              0.0,
+              -1.9
+            ],
+            "yaw": -90.0,
+            "team": 1
+          },
+          {
+            "pos": [
+              3.0,
+              0.0,
+              1.9
+            ],
+            "yaw": -90.0,
+            "team": 1
+          }
+        ],
+        "boss": [
+          {
+            "pos": [
+              0,
+              0.0,
+              2.2
+            ],
+            "yaw": 180.0,
+            "team": -1
+          }
+        ],
+        "unit_spawn": [
+          {
+            "pos": [
+              0,
+              0.0,
+              -1.6
+            ],
+            "yaw": 0.0,
+            "team": -1
+          }
+        ],
+        "wave_gate": [
+          {
+            "pos": [
+              -4.8,
+              0.0,
+              4.8
+            ],
+            "yaw": 135.0,
+            "team": -1,
+            "size": [
+              2.0,
+              2.4,
+              0.2
+            ]
+          },
+          {
+            "pos": [
+              4.8,
+              0.0,
+              -4.8
+            ],
+            "yaw": -45.0,
+            "team": -1,
+            "size": [
+              2.0,
+              2.4,
+              0.2
+            ]
+          },
+          {
+            "pos": [
+              4.2,
+              0.0,
+              3.2
+            ],
+            "yaw": -135.0,
+            "team": -1,
+            "size": [
+              2.0,
+              2.4,
+              0.2
+            ]
+          },
+          {
+            "pos": [
+              -4.2,
+              0.0,
+              -3.2
+            ],
+            "yaw": 45.0,
+            "team": -1,
+            "size": [
+              2.0,
+              2.4,
+              0.2
+            ]
+          }
+        ],
+        "respawn": [
+          {
+            "pos": [
+              -3.5,
+              0.0,
+              -1.2
+            ],
+            "yaw": 90.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              3.5,
+              0.0,
+              1.2
+            ],
+            "yaw": -90.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              -1.2,
+              0.0,
+              3.5
+            ],
+            "yaw": 180.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              1.2,
+              0.0,
+              -3.5
+            ],
+            "yaw": 0.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              -3.5,
+              0.0,
+              2.6
+            ],
+            "yaw": 135.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              3.5,
+              0.0,
+              -2.6
+            ],
+            "yaw": -45.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              2.8,
+              0.0,
+              3.2
+            ],
+            "yaw": -150.0,
+            "team": -1
+          },
+          {
+            "pos": [
+              -2.8,
+              0.0,
+              -3.2
+            ],
+            "yaw": 30.0,
+            "team": -1
+          }
+        ]
+      },
+      "base_def": {
+        "id": "rooftop_canvas",
+        "name": "Rooftop Canvas",
+        "shape": "rect",
+        "style": "rooftop",
+        "description": "A blank rooftop platform with four open ledges. Resize width and depth independently, then place props and move the starting markers.",
+        "size": [
+          32,
+          32
+        ],
+        "size_min": [
+          12,
+          12
+        ],
+        "size_max": [
+          64,
+          64
+        ],
+        "size_step": 0.5,
+        "notch": [
+          0,
+          0
+        ],
+        "wall_height": 0.0,
+        "open_edges": true,
+        "allow_pits": true,
+        "quirks": {},
+        "ringout": {
+          "damage_frac": 0.08,
+          "out_time": 2.5,
+          "invuln": 1.0,
+          "fall_y": -1.2
+        },
+        "hazards": [],
+        "areas": [],
+        "builtins": [],
+        "variants": {
+          "night": {
+            "label": "Night",
+            "key": "#B9C6FF",
+            "key_energy": 0.8,
+            "rim": "#E04FB0",
+            "rim2": "#8BD426",
+            "spot": "#E9EEFF",
+            "bg": "#101624",
+            "fog": "#141B30",
+            "fog_density": 0.006,
+            "ambient": "#2A3150",
+            "ambient_energy": 0.7,
+            "crowd_energy": 0.3
+          }
+        },
+        "default_variant": "night",
+        "palette": {
+          "floor": "#2F2B2B",
+          "gravel": "#6E6A66",
+          "neon_a": "#8BD426",
+          "neon_b": "#E04FB0",
+          "sky": "#101624"
+        },
+        "uniform": false
+      }
+    }
+  ]
+}

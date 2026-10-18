@@ -408,6 +408,13 @@ static func _has_prop_entities(sim: MatchSim) -> bool:
 static func _ray_to_boundary(a: ArenaDef, p: Vector3, d: Vector3) -> float:
 	var r := a.radius
 	var best := r * 2.0
+	if a.base == "rooftop_canvas":
+		var ext := a.extent()
+		if absf(d.x) > 1e-6:
+			best = minf(best, ((ext.end.x if d.x > 0.0 else ext.position.x) - p.x) / d.x)
+		if absf(d.z) > 1e-6:
+			best = minf(best, ((ext.end.y if d.z > 0.0 else ext.position.y) - p.z) / d.z)
+		return maxf(0.0, best)
 	match a.base:
 		"square":
 			if absf(d.x) > 1e-6:
@@ -434,6 +441,8 @@ static func _ray_to_boundary(a: ArenaDef, p: Vector3, d: Vector3) -> float:
 
 ## Distance from p to the nearest boundary edge (used for "cornered" cues).
 static func _boundary_dist(a: ArenaDef, p: Vector3) -> float:
+	if a.base == "rooftop_canvas":
+		return maxf(0.0, minf(a.size.x * 0.5 - absf(p.x), a.size.y * 0.5 - absf(p.z)))
 	var r := a.radius
 	match a.base:
 		"square":

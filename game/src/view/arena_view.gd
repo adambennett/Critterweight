@@ -176,7 +176,7 @@ func _build_lights() -> void:
 	key_light.light_energy = float(variant.get("key_energy", 1.15))
 	key_light.shadow_enabled = true
 	key_light.light_angular_distance = 1.5
-	key_light.directional_shadow_max_distance = 32.0
+	key_light.directional_shadow_max_distance = maxf(32.0, arena.size.length() * 1.6)
 	key_light.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
 	key_light.rotation_degrees = Vector3(-58, 28, 0)
 	add_child(key_light)

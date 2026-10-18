@@ -64,6 +64,7 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	camera = FightCamera.new()
 	add_child(camera)
 	camera.arena_radius = arena_def.radius
+	camera.open_stage = arena_def.base == "rooftop_canvas"
 	sync_roster()
 	vfx = Vfx.new()
 	add_child(vfx)

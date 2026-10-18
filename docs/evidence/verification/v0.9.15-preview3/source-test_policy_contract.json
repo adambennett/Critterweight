@@ -1,0 +1,64 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 18,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_action_apply_and_classify_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_feature_names_match_size"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_masks_and_choice"
+		},
+		{
+			"errors": [],
+			"ms": 91,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_observation_shape_bounds_and_determinism"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_only_perceivable_state_is_observed"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_perception_lag_uses_previous_snapshot"
+		},
+		{
+			"errors": [],
+			"ms": 406,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_recorder_reproduces_policy_actions"
+		},
+		{
+			"errors": [],
+			"ms": 57,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_target_seen_in_fighter_space"
+		},
+		{
+			"errors": [],
+			"ms": 37,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_wall_rays_see_the_cage"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 9 run, 0 failed, 9 passed, 0 skipped in 10.7 s",
+	"time": "2026-10-18T17:44:34",
+	"total": 9,
+	"version": "0.9.15"
+}

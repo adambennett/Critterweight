@@ -745,125 +745,127 @@ static func build_rooftop(parent: Node3D, a: ArenaDef, v: Dictionary, out: Dicti
 	var below := ArenaMeshKit.slab(poly, -0.45, -32.0)
 	var bmi := ArenaMeshKit.add(parent, below, facade, Vector3.ZERO, Vector3.ZERO, Vector3.ONE, false)
 	bmi.set_surface_override_material(0, ArenaPropVisuals.toon(Color("#0A0A0C"), 1.0))
-	# neon sign on scaffolding past the north edge
-	var sign := Node3D.new()
-	sign.name = "NeonSign"
-	sign.position = Vector3(-1.0, 0.0, ext.end.y + 3.2)
-	parent.add_child(sign)
-	var scaffold := ArenaPropVisuals.toon(Color("#2B2F3A"), 0.5, 0.6)
-	for x in [-5.0, -1.7, 1.7, 5.0]:
-		ArenaMeshKit.add(sign, ArenaMeshKit.tube(PackedVector3Array([Vector3(x, -4.0, 0.4), Vector3(x, 6.6, 0.4)]), 0.07, 6), scaffold)
-	for y in [2.0, 6.4]:
-		ArenaMeshKit.add(sign, ArenaMeshKit.tube(PackedVector3Array([Vector3(-5.4, y, 0.4), Vector3(5.4, y, 0.4)]), 0.06, 6), scaffold)
-	var neon_g := ArenaPropVisuals.neon(Color("#8BD426"), 3.2, 0.0, 1.0)
-	var neon_p := ArenaPropVisuals.neon(Color("#E04FB0"), 3.5, 0.6, 2.0)
-	out["neon"].append(neon_p)
-	# one Label3D per letter: on a normal night the "A" is a dead tube ("GL NDCO" — it fell off and
-	# lies on the Cannery's roof); the "night_neon" variant (variant.sign_full, unlocked by fixing
-	# the sign in the Fight Camp hub) lights every letter and adds a neon border
-	var full := bool(v.get("sign_full", false))
-	var letters := Node3D.new()
-	letters.name = "Letters"
-	letters.position = Vector3(0.6, 4.3, 0.2)
-	letters.rotation = Vector3(0, PI, 0)
-	sign.add_child(letters)
-	var lfont: Font = load("res://assets/fonts/BarlowCondensed-900.woff2")
-	var word := "GLANDCO"
-	var widths: Array[float] = []
-	var total := 0.0
-	for ch in word:
-		var w := lfont.get_string_size(ch, HORIZONTAL_ALIGNMENT_LEFT, -1, 220).x * 0.012
-		widths.append(w)
-		total += w
-	var x := -total * 0.5
-	var letter_nodes: Array = []
-	for i in word.length():
-		var l := Label3D.new()
-		l.name = "Letter%d_%s" % [i, word[i]]
-		l.text = word[i]
-		l.font = lfont
-		l.font_size = 220
-		l.pixel_size = 0.012
-		var dead := i == 2 and not full
-		l.modulate = Color(0.3, 0.1, 0.24) if dead else Color(2.2, 0.6, 1.6)
-		l.outline_size = 18
-		l.outline_modulate = Color(0.1, 0.03, 0.08) if dead else Color(0.7, 0.1, 0.4)
-		l.position = Vector3(x + widths[i] * 0.5, 0, 0)
-		l.shaded = false
-		l.set_meta("lit", not dead)
-		letters.add_child(l)
-		letter_nodes.append(l)
-		x += widths[i]
-	out["sign_label"] = letters
-	out["sign_letters"] = letter_nodes
-	if full:
-		var frame_pts := PackedVector3Array([Vector3(-total * 0.5 - 0.2, 5.25, 0.25), Vector3(total * 0.5 + 0.2, 5.25, 0.25),
-			Vector3(total * 0.5 + 0.2, 3.45, 0.25), Vector3(-total * 0.5 - 0.2, 3.45, 0.25)])
-		var border_mat := ArenaPropVisuals.neon(Color("#E04FB0"), 3.6, 0.0, 3.0)
-		out["neon"].append(border_mat)
-		var border := ArenaMeshKit.add(sign, ArenaMeshKit.tube(frame_pts, 0.06, 6, true), border_mat)
-		border.name = "FullNeonBorder"
-		border.position = Vector3(0.6, 0, 0)
-	var sub := Label3D.new()
-	sub.text = "JUICE  •  FEEL THE GLAND"
-	sub.font = load("res://assets/fonts/BarlowCondensed-700.woff2")
-	sub.font_size = 96
-	sub.pixel_size = 0.01
-	sub.modulate = Color(1.2, 2.2, 0.5)
-	sub.outline_size = 10
-	sub.outline_modulate = Color(0.2, 0.5, 0.05)
-	sub.position = Vector3(0.6, 2.7, 0.2)
-	sub.rotation = Vector3(0, PI, 0)
-	sub.shaded = false
-	sign.add_child(sub)
-	# the neon drop logo
-	var drop := PackedVector3Array()
-	for k2 in 25:
-		var t := TAU * k2 / 24.0
-		var rr := 0.9
-		var px := sin(t) * rr * (1.0 - 0.45 * cos(t))
-		var py := -cos(t) * rr
-		if t > PI * 0.8 and t < PI * 1.2:
-			py = -rr - (0.6 - absf(t - PI) * 2.0)
-		drop.append(Vector3(px - 4.2, py + 4.3, 0.3))
-	ArenaMeshKit.add(sign, ArenaMeshKit.tube(drop, 0.07, 6, true), neon_g)
-	var sign_light := OmniLight3D.new()
-	sign_light.light_color = Color("#E04FB0")
-	sign_light.light_energy = 3.2 if full else 2.2
-	sign_light.omni_range = 11.0
-	sign_light.position = Vector3(0, 4.0, -1.0)
-	sign.add_child(sign_light)
-	out["sign_light"] = sign_light
-	# wind flags at the edge midpoints (point downwind on gusts)
-	for side in ["n", "s", "e", "w"]:
-		var e := a.edge_on_side(side)
-		if e.is_empty():
-			continue
-		var m: Vector2 = ((e["a"] as Vector2) + (e["b"] as Vector2)) * 0.5 + (e["n"] as Vector2) * 0.35
-		var pole := Node3D.new()
-		pole.position = Vector3(m.x, 0, m.y)
-		parent.add_child(pole)
-		ArenaMeshKit.add(pole, ArenaMeshKit.cylinder(0.035, 0.05, 3.2, 8, 0.01), scaffold, Vector3(0, 1.6, 0))
-		var flag := Node3D.new()
-		flag.position = Vector3(0, 2.9, 0)
-		pole.add_child(flag)
-		var fq := QuadMesh.new()
-		fq.size = Vector2(0.9, 0.5)
-		var fm := ArenaPropVisuals.toon(Color("#8BD426") if side in ["n", "s"] else Color("#E04FB0"), 0.7)
-		fm = fm.duplicate()
-		fm.cull_mode = BaseMaterial3D.CULL_DISABLED
-		ArenaMeshKit.add(flag, fq, fm, Vector3(0.45, 0, 0))
-		out["flags"].append(flag)
-	# pigeons
-	var pige := ArenaPropVisuals.toon(Color("#8E95A3"), 0.8)
-	for pp in [Vector3(1.2, 1.05, 0.2), Vector3(1.45, 1.05, -0.3), Vector3(-6.9, 0.95, 3.0), Vector3(6.92, 0.95, -3.4)]:
-		var bird := Node3D.new()
-		bird.position = pp
-		bird.rotation.y = rng.randf() * TAU
-		parent.add_child(bird)
-		ArenaMeshKit.add(bird, SphereMesh.new(), pige, Vector3(0, 0.07, 0), Vector3.ZERO, Vector3(0.14, 0.12, 0.2))
-		ArenaMeshKit.add(bird, SphereMesh.new(), pige, Vector3(0, 0.15, 0.08), Vector3.ZERO, Vector3(0.08, 0.08, 0.08))
-		out["pigeons"].append(bird)
+	# The blank canvas keeps its whole platform and every ledge clear.
+	if a.base != "rooftop_canvas":
+		# neon sign on scaffolding past the north edge
+		var sign := Node3D.new()
+		sign.name = "NeonSign"
+		sign.position = Vector3(-1.0, 0.0, ext.end.y + 3.2)
+		parent.add_child(sign)
+		var scaffold := ArenaPropVisuals.toon(Color("#2B2F3A"), 0.5, 0.6)
+		for x in [-5.0, -1.7, 1.7, 5.0]:
+			ArenaMeshKit.add(sign, ArenaMeshKit.tube(PackedVector3Array([Vector3(x, -4.0, 0.4), Vector3(x, 6.6, 0.4)]), 0.07, 6), scaffold)
+		for y in [2.0, 6.4]:
+			ArenaMeshKit.add(sign, ArenaMeshKit.tube(PackedVector3Array([Vector3(-5.4, y, 0.4), Vector3(5.4, y, 0.4)]), 0.06, 6), scaffold)
+		var neon_g := ArenaPropVisuals.neon(Color("#8BD426"), 3.2, 0.0, 1.0)
+		var neon_p := ArenaPropVisuals.neon(Color("#E04FB0"), 3.5, 0.6, 2.0)
+		out["neon"].append(neon_p)
+		# one Label3D per letter: on a normal night the "A" is a dead tube ("GL NDCO" — it fell off and
+		# lies on the Cannery's roof); the "night_neon" variant (variant.sign_full, unlocked by fixing
+		# the sign in the Fight Camp hub) lights every letter and adds a neon border
+		var full := bool(v.get("sign_full", false))
+		var letters := Node3D.new()
+		letters.name = "Letters"
+		letters.position = Vector3(0.6, 4.3, 0.2)
+		letters.rotation = Vector3(0, PI, 0)
+		sign.add_child(letters)
+		var lfont: Font = load("res://assets/fonts/BarlowCondensed-900.woff2")
+		var word := "GLANDCO"
+		var widths: Array[float] = []
+		var total := 0.0
+		for ch in word:
+			var w := lfont.get_string_size(ch, HORIZONTAL_ALIGNMENT_LEFT, -1, 220).x * 0.012
+			widths.append(w)
+			total += w
+		var x := -total * 0.5
+		var letter_nodes: Array = []
+		for i in word.length():
+			var l := Label3D.new()
+			l.name = "Letter%d_%s" % [i, word[i]]
+			l.text = word[i]
+			l.font = lfont
+			l.font_size = 220
+			l.pixel_size = 0.012
+			var dead := i == 2 and not full
+			l.modulate = Color(0.3, 0.1, 0.24) if dead else Color(2.2, 0.6, 1.6)
+			l.outline_size = 18
+			l.outline_modulate = Color(0.1, 0.03, 0.08) if dead else Color(0.7, 0.1, 0.4)
+			l.position = Vector3(x + widths[i] * 0.5, 0, 0)
+			l.shaded = false
+			l.set_meta("lit", not dead)
+			letters.add_child(l)
+			letter_nodes.append(l)
+			x += widths[i]
+		out["sign_label"] = letters
+		out["sign_letters"] = letter_nodes
+		if full:
+			var frame_pts := PackedVector3Array([Vector3(-total * 0.5 - 0.2, 5.25, 0.25), Vector3(total * 0.5 + 0.2, 5.25, 0.25),
+				Vector3(total * 0.5 + 0.2, 3.45, 0.25), Vector3(-total * 0.5 - 0.2, 3.45, 0.25)])
+			var border_mat := ArenaPropVisuals.neon(Color("#E04FB0"), 3.6, 0.0, 3.0)
+			out["neon"].append(border_mat)
+			var border := ArenaMeshKit.add(sign, ArenaMeshKit.tube(frame_pts, 0.06, 6, true), border_mat)
+			border.name = "FullNeonBorder"
+			border.position = Vector3(0.6, 0, 0)
+		var sub := Label3D.new()
+		sub.text = "JUICE  •  FEEL THE GLAND"
+		sub.font = load("res://assets/fonts/BarlowCondensed-700.woff2")
+		sub.font_size = 96
+		sub.pixel_size = 0.01
+		sub.modulate = Color(1.2, 2.2, 0.5)
+		sub.outline_size = 10
+		sub.outline_modulate = Color(0.2, 0.5, 0.05)
+		sub.position = Vector3(0.6, 2.7, 0.2)
+		sub.rotation = Vector3(0, PI, 0)
+		sub.shaded = false
+		sign.add_child(sub)
+		# the neon drop logo
+		var drop := PackedVector3Array()
+		for k2 in 25:
+			var t := TAU * k2 / 24.0
+			var rr := 0.9
+			var px := sin(t) * rr * (1.0 - 0.45 * cos(t))
+			var py := -cos(t) * rr
+			if t > PI * 0.8 and t < PI * 1.2:
+				py = -rr - (0.6 - absf(t - PI) * 2.0)
+			drop.append(Vector3(px - 4.2, py + 4.3, 0.3))
+		ArenaMeshKit.add(sign, ArenaMeshKit.tube(drop, 0.07, 6, true), neon_g)
+		var sign_light := OmniLight3D.new()
+		sign_light.light_color = Color("#E04FB0")
+		sign_light.light_energy = 3.2 if full else 2.2
+		sign_light.omni_range = 11.0
+		sign_light.position = Vector3(0, 4.0, -1.0)
+		sign.add_child(sign_light)
+		out["sign_light"] = sign_light
+		# wind flags at the edge midpoints (point downwind on gusts)
+		for side in ["n", "s", "e", "w"]:
+			var e := a.edge_on_side(side)
+			if e.is_empty():
+				continue
+			var m: Vector2 = ((e["a"] as Vector2) + (e["b"] as Vector2)) * 0.5 + (e["n"] as Vector2) * 0.35
+			var pole := Node3D.new()
+			pole.position = Vector3(m.x, 0, m.y)
+			parent.add_child(pole)
+			ArenaMeshKit.add(pole, ArenaMeshKit.cylinder(0.035, 0.05, 3.2, 8, 0.01), scaffold, Vector3(0, 1.6, 0))
+			var flag := Node3D.new()
+			flag.position = Vector3(0, 2.9, 0)
+			pole.add_child(flag)
+			var fq := QuadMesh.new()
+			fq.size = Vector2(0.9, 0.5)
+			var fm := ArenaPropVisuals.toon(Color("#8BD426") if side in ["n", "s"] else Color("#E04FB0"), 0.7)
+			fm = fm.duplicate()
+			fm.cull_mode = BaseMaterial3D.CULL_DISABLED
+			ArenaMeshKit.add(flag, fq, fm, Vector3(0.45, 0, 0))
+			out["flags"].append(flag)
+		# pigeons
+		var pige := ArenaPropVisuals.toon(Color("#8E95A3"), 0.8)
+		for pp in [Vector3(1.2, 1.05, 0.2), Vector3(1.45, 1.05, -0.3), Vector3(-6.9, 0.95, 3.0), Vector3(6.92, 0.95, -3.4)]:
+			var bird := Node3D.new()
+			bird.position = pp
+			bird.rotation.y = rng.randf() * TAU
+			parent.add_child(bird)
+			ArenaMeshKit.add(bird, SphereMesh.new(), pige, Vector3(0, 0.07, 0), Vector3.ZERO, Vector3(0.14, 0.12, 0.2))
+			ArenaMeshKit.add(bird, SphereMesh.new(), pige, Vector3(0, 0.15, 0.08), Vector3.ZERO, Vector3(0.08, 0.08, 0.08))
+			out["pigeons"].append(bird)
 	# the next roof over: lawn-chair crowd
 	var other := Vector3(ext.end.x + 9.5, -1.6, 0.0)
 	ArenaMeshKit.add(parent, ArenaMeshKit.chamfer_box(Vector3(9.0, 0.6, 16.0), 0.05), ArenaPropVisuals.surface(3, Color("#2A2626"), Color("#5E5A56"), Color.BLACK), other + Vector3(0, -0.3, 0), Vector3.ZERO, Vector3.ONE, false)

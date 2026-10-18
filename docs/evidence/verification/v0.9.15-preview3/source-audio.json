@@ -1,0 +1,190 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 98,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_canvas_uses_rooftop_audio_and_rectangular_policy_boundary"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_all_lines_have_ids_subtitles_and_triggers"
+		},
+		{
+			"errors": [],
+			"ms": 11,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_announce_emits_subtitle_and_substitutes_names"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_babble_plan"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_priority_interrupt_and_queue_rules"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_sim_event_mapping"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_trigger_picks_most_specific_line_and_rotates"
+		},
+		{
+			"errors": [],
+			"ms": 1344,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_babble.gd::test_babble_speaks_a_line_headless"
+		},
+		{
+			"errors": [],
+			"ms": 784,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_bank_loads_and_every_id_resolves"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_every_creature_has_a_voice_in_the_bank"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_frequent_sounds_have_variations"
+		},
+		{
+			"errors": [],
+			"ms": 157,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_literal_ids_in_code_exist"
+		},
+		{
+			"errors": [],
+			"ms": 1259,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_manifest_matches_files_on_disk"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_menu_focus_uses_soft_interface_ticks"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_music_tracks_loops_and_layers"
+		},
+		{
+			"errors": [],
+			"ms": 9,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_no_file_peaks_above_minus_one_dbfs"
+		},
+		{
+			"errors": [],
+			"ms": 308,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_replacement_assets_are_present_and_hashed"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_required_ids_present"
+		},
+		{
+			"errors": [],
+			"ms": 9,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_size_budget"
+		},
+		{
+			"errors": [],
+			"ms": 135,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_all_announcer_and_hub_templates_resolve_without_babble"
+		},
+		{
+			"errors": [],
+			"ms": 61,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_bubble_pacing_uses_recorded_duration"
+		},
+		{
+			"errors": [],
+			"ms": 64,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_custom_names_use_slot_audio_while_subtitles_keep_the_name"
+		},
+		{
+			"errors": [],
+			"ms": 61,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_dynamic_recaps_and_first_lesson_compositions_resolve"
+		},
+		{
+			"errors": [],
+			"ms": 988,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_every_authored_voice_clip_is_installed_and_decodable"
+		},
+		{
+			"errors": [],
+			"ms": 55,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_live_control_bindings_share_natural_action_audio"
+		},
+		{
+			"errors": [],
+			"ms": 51,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_owner_player_names_and_spelling_aliases_use_recordings_in_every_voice"
+		},
+		{
+			"errors": [],
+			"ms": 51,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_recorded_player_uses_full_clips_and_completion_signals"
+		},
+		{
+			"errors": [],
+			"ms": 52,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_recorded_priority_queue_stop_and_unknown_mod_fallback"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/core/test_content_targets.gd::test_audio_and_lab_targets"
+		},
+		{
+			"errors": [],
+			"ms": 2218,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_match_audio_survives_every_hub_scene_swap"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 30 run, 0 failed, 30 passed, 0 skipped in 17.3 s",
+	"time": "2026-10-18T17:44:12",
+	"total": 30,
+	"version": "0.9.15"
+}

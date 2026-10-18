@@ -22,6 +22,7 @@ var _trauma := 0.0
 var _punch := 0.0          ## zoom punch of a landed hit (HitFeel.punch), eased back out
 var _rng := RandomNumberGenerator.new()
 var arena_radius := 5.0
+var open_stage := false       ## canvas layouts have no surrounding cage/crowd to constrain framing
 var free_pos := Vector3(0, 4, 9)
 var free_yaw := 0.0
 var free_pitch := -0.3
@@ -90,6 +91,8 @@ func _update(dt: float, instant: bool) -> void:
 	var k := 1.0 if instant else MathX.damp_factor(0.6, dt)
 	yaw = lerp_angle(yaw, desired_yaw, k * (0.6 if mode == Mode.FIGHT else 1.0))
 	var want_dist := clampf(4.8 + spread * 1.35, 5.2, 14.0)
+	if open_stage:
+		want_dist = maxf(want_dist, spread * 2.6)
 	if mode == Mode.FOLLOW:
 		want_dist = 5.5
 	var kd := 1.0 if instant else MathX.damp_factor(0.35, dt)
@@ -106,6 +109,8 @@ func _update(dt: float, instant: bool) -> void:
 	# keep the camera out of the far crowd geometry
 	var hz := Vector2(pos.x, pos.z)
 	var lim := arena_radius + 7.5
+	if open_stage and mode != Mode.FOLLOW:
+		lim = maxf(lim, dist + Vector2(center.x, center.z).length())
 	if hz.length() > lim:
 		hz = hz.normalized() * lim
 		pos = Vector3(hz.x, pos.y, hz.y)

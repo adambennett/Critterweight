@@ -116,7 +116,8 @@ func set_grid_visible(on: bool) -> void:
 func _process(dt: float) -> void:
 	focus = focus.lerp(_focus_target, clampf(dt * 10.0, 0.0, 1.0))
 	pitch = clampf(pitch, deg_to_rad(18.0), deg_to_rad(88.0))
-	dist = clampf(dist, 4.0, 40.0)
+	var max_dist := 40.0 if arena == null else maxf(40.0, maxf(arena.size.x, arena.size.y) * 2.0 + 3.0)
+	dist = clampf(dist, 4.0, max_dist)
 	var off := Vector3(cos(pitch) * sin(yaw), sin(pitch), cos(pitch) * cos(yaw)) * dist
 	cam.position = focus + off
 	cam.look_at(focus, Vector3.UP)

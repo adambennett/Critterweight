@@ -508,6 +508,8 @@ func _refresh_layout_panel() -> void:
 	var lo: Vector2 = bd.get("size_min", model.size)
 	var hi: Vector2 = bd.get("size_max", model.size)
 	var uniform := bool(bd.get("uniform", false))
+	if model.base == "rooftop_canvas":
+		_layout_box.add_child(_label("Blank rooftop · four open ledges. Width and depth are independent. Move markers and props as needed after resizing.", COL_MUTED, 17))
 	_layout_box.add_child(_label("Boundary (metres): %s %.1f – %.1f" % ["size" if uniform else "width", lo.x, hi.x], COL_MUTED, 17))
 	_layout_box.add_child(_size_slider(0, lo.x, hi.x, model.size.x, float(bd.get("size_step", 0.5))))
 	if not uniform and hi.y > lo.y:
@@ -587,13 +589,16 @@ func _refresh_inspector() -> void:
 	var d := ArenaCatalog.prop(str(it["type"]))
 	_inspector.add_child(_label("%s  ·  %s" % [str(d.get("name", it["type"])), ("%d pt" % int(d.get("cost", 0))) if int(d.get("cost", 0)) > 0 else "free"], COL_TEXT, 20))
 	var pos: Vector3 = it["pos"]
-	_inspector.add_child(_spin_row("X", pos.x, -20.0, 20.0, 0.05, func(v): _set_item_value("x", v)))
-	_inspector.add_child(_spin_row("Z", pos.z, -20.0, 20.0, 0.05, func(v): _set_item_value("z", v)))
+	var bounds := model_extent().grow(1.0)
+	var limit_x := maxf(20.0, bounds.size.x * 0.5)
+	var limit_z := maxf(20.0, bounds.size.y * 0.5)
+	_inspector.add_child(_spin_row("X", pos.x, -limit_x, limit_x, 0.05, func(v): _set_item_value("x", v)))
+	_inspector.add_child(_spin_row("Z", pos.z, -limit_z, limit_z, 0.05, func(v): _set_item_value("z", v)))
 	_inspector.add_child(_spin_row("Yaw", snappedf(rad_to_deg(float(it["yaw"])), 0.1), -360.0, 360.0, float(d.get("rotation_step", 15.0)), func(v): _set_item_value("yaw", v)))
 	if it.has("pos2"):
 		var p2: Vector3 = it["pos2"]
-		_inspector.add_child(_spin_row("End X", p2.x, -20.0, 20.0, 0.05, func(v): _set_item_value("x2", v)))
-		_inspector.add_child(_spin_row("End Z", p2.z, -20.0, 20.0, 0.05, func(v): _set_item_value("z2", v)))
+		_inspector.add_child(_spin_row("End X", p2.x, -limit_x, limit_x, 0.05, func(v): _set_item_value("x2", v)))
+		_inspector.add_child(_spin_row("End Z", p2.z, -limit_z, limit_z, 0.05, func(v): _set_item_value("z2", v)))
 	if bool(d.get("is_marker", false)) and bool(d["marker"]["teams"]):
 		var opt := OptionButton.new()
 		for t in ["No team", "Team A", "Team B"]:

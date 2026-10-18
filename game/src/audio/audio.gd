@@ -1144,7 +1144,9 @@ func ambience(id: String, fade := 1.5) -> void:
 func set_arena(arena_id: String, base := "") -> void:
 	_arena_id = arena_id
 	var key := "gullet"
-	if base in ["gullet", "drydock", "crusher", "rooftop"]:
+	if base == "rooftop_canvas":
+		key = "rooftop"
+	elif base in ["gullet", "drydock", "crusher", "rooftop"]:
 		key = base
 	else:
 		for k in ["drydock", "crusher", "rooftop"]:

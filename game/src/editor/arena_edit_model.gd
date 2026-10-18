@@ -39,7 +39,7 @@ static func slug_id(s: String) -> String:
 
 ## A fresh layout on a base, starting from the base arena's markers (spawns, clusters, boss...).
 static func new_from_base(base_id: String, variant_id := "") -> ArenaEditModel:
-	var src := {}
+	var src := ArenaCatalog.editor_template(base_id)
 	var aid := ArenaCatalog.base_arena_id(base_id)
 	if aid != "":
 		src = Content.get_entry("arenas", aid).duplicate(true)

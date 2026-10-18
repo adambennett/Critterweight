@@ -32,6 +32,27 @@ such as Absolute Unit's), and a fighter the mode leaves standing is held for `ri
 by the arena at the **nearest edge/respawn marker**, health kept, with 1 s of invulnerability. With the rule
 `ringouts` off, invisible guard walls line every open edge.
 
+### Editor-only Rooftop Canvas (v0.9.15)
+
+Choose **Rooftop Canvas** in the editor's Base selector or New layout menu. It starts as a
+32 x 32 metre plain rooftop platform. In Details > Layout, width and depth can independently
+range from 12 to 64 metres in half-metre steps. All four sides are open ledges, marked with
+hazard stripes, above the rooftop city/bay backdrop. No fixed HVAC, railings, wind hazards,
+poles, sign or floating decoration occupy the blank stage. The normal prop/marker palette,
+validation, undo/redo, save, import/export and test-play tools all apply.
+
+Starting spawn/team/boss/wave/respawn markers are provided and remain valid at minimum size.
+Resizing preserves object and marker positions: move them to suit the new shape; validation
+flags anything left outside the boundary. Width and depth are separate undoable changes.
+The inspector and orbit camera support the full enlarged stage. Existing prop/budget limits
+and the existing ringout rules described above still apply; this does not add a new game mode.
+
+The creation template lives in `assets/data/editor_arena_templates.json`, outside playable
+Content. Its `rooftop_canvas` base resolves in every runtime, but the blank template is absent
+from regular arena selectors and the Compendium. Saving a custom variant makes that variant
+available normally. Packages preserve its dimensions, props and markers. Older releases do
+not understand this new base and should not be used to import its packages.
+
 ## 2. Example layouts
 
 | Id | Base / look | Modes | Props (budget) | Idea |

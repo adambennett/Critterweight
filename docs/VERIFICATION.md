@@ -1,5 +1,7 @@
 # Verification report
 
+**Local v0.9.15 preview 3, 2026-10-18.** [Canvas verification](evidence/verification/v0.9.15-preview3/README.md) records the completed source checks; local Windows export is next. It includes every completed preview 2 change and all 764 voice clips. No graphical launch or publication is authorized.
+
 **Local v0.9.15 preview 2, 2026-10-18.** [The current report](evidence/verification/v0.9.15-preview2/README.md) records the full suite, corrected fixture reruns, 764 recorded voice clips and clean Windows export from a527f2d. Packaged headless checks pass; physical controller, monitor, visuals and listening remain for the owner. The rooftop canvas is a follow-on request. No .15 release has been published.
 
 **Preview 0.9.13, 2026-10-17.** The [v0.9.13 report](evidence/verification/v0.9.13/README.md) records the free audio replacements, Random fighter choices, source and packaged checks, and release evidence. The preceding [v0.9.12 playtest report](evidence/verification/v0.9.12/README.md) records the menu and gameplay fixes carried forward here. This is a preview, not the release candidate. The release-candidate run, whole-brief audit (VER-07) and open items in `docs/PROGRESS.md` remain separate. This report distinguishes verified checks from what has not been verified. Requirement-level states live in `docs/REQUIREMENTS.md`.

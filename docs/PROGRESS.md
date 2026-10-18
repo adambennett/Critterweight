@@ -1,5 +1,15 @@
 # Progress
 
+## Status (2026-10-18) - preview 3 canvas complete, local export next
+
+The previous batch is complete. Rooftop Canvas is now implemented and source-verified:
+editor-only template, 12-64m independent width/depth, four open ledges, saved/package variants,
+large-stage editor and fight cameras, rooftop audio and rectangle-aware policy observations.
+403-script check and 61 arena / 13 preview / 30 audio / 9 policy tests pass.
+Export the Windows preview to B:/Critterweight/release-work/v0.9.15-preview3/, then verify the
+packaged executable headlessly. No graphical launch or publication. See the preview 3
+verification report and releases/v0.9.15-follow-up-notes.md for all questions and voice costs.
+
 ## Status (2026-10-18) — preview 2 final verification and local export
 
 All requested playtest changes and Breeze speech are implemented in the isolated B: checkout.

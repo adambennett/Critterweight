@@ -1,0 +1,88 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 116,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_all_health_cards_above_subtitles_and_glyph_cooldowns"
+		},
+		{
+			"errors": [],
+			"ms": 207,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_bookie_abandon_targets_new_card_after_loss"
+		},
+		{
+			"errors": [],
+			"ms": 282,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_character_panel_scroll_and_shared_stats_glyphs"
+		},
+		{
+			"errors": [],
+			"ms": 142,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_compendium_custom_arena_actions_require_confirmation"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_crate_foul_line_and_invert_default"
+		},
+		{
+			"errors": [],
+			"ms": 582,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_editor_popup_keeps_controller_focus_and_share_toggles_all_controls"
+		},
+		{
+			"errors": [],
+			"ms": 380,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_editor_unique_default_and_overwrite_confirmation"
+		},
+		{
+			"errors": [],
+			"ms": 1676,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_every_event_has_art_visible_stats_and_accessible_choices"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_jukebox_order_shuffle_repeat_and_independent_contexts"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_jukebox_persists_and_menu_stops_environment"
+		},
+		{
+			"errors": [],
+			"ms": 179,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_map_has_scroll_room_no_intro_and_modal_blocks_nodes"
+		},
+		{
+			"errors": [],
+			"ms": 192,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_rules_picker_has_hidden_cancel_and_patch_notes_archive"
+		},
+		{
+			"errors": [],
+			"ms": 331,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_team_setup_compact_cards_fit_and_keep_slot_identity"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 13 run, 0 failed, 13 passed, 0 skipped in 13.3 s",
+	"time": "2026-10-18T17:43:46",
+	"total": 13,
+	"version": "0.9.15"
+}

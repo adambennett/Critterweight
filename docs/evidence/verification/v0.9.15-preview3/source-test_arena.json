@@ -1,0 +1,376 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 1396,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_all_four_canvas_ledges_trigger_real_ringouts"
+		},
+		{
+			"errors": [],
+			"ms": 101,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_canvas_dressing_keeps_the_platform_clear"
+		},
+		{
+			"errors": [],
+			"ms": 92,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_canvas_uses_rooftop_audio_and_rectangular_policy_boundary"
+		},
+		{
+			"errors": [],
+			"ms": 1150,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_editor_controls_resize_rectangle_and_reach_outer_coordinates"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_floor_collision_and_ringout_switch"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_large_canvas_fight_camera_frames_separated_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 102,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_resize_undo_preserves_props_and_reports_outside_items"
+		},
+		{
+			"errors": [],
+			"ms": 275,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_saved_canvas_and_exported_package_are_playable"
+		},
+		{
+			"errors": [],
+			"ms": 283,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_template_is_editor_only_and_valid_at_supported_sizes"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_base_arenas_ship_required_markers"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_base_geometry_and_dimensions"
+		},
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_catalog_has_full_palette"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_context_variant_changes_only_the_look"
+		},
+		{
+			"errors": [],
+			"ms": 125,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_every_base_and_layout_loads_and_validates"
+		},
+		{
+			"errors": [],
+			"ms": 66,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_example_layout_budgets_match_spec"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_format1_mod_arena_still_loads"
+		},
+		{
+			"errors": [],
+			"ms": 16,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_round_trip_to_dict_from_dict"
+		},
+		{
+			"errors": [],
+			"ms": 9,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_schema_accepts_layouts_and_rejects_bad_base"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_spanning_edge_builtins_lie_along_their_edge"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_spawn_point_spreads_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 15,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_command_stack_undo_redo_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 154,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_malicious_packages_are_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 70,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_package_export_import_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_save_load_round_trip_and_migration"
+		},
+		{
+			"errors": [],
+			"ms": 238,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_saved_layouts_are_playable_in_normal_matches"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_stack_is_bounded_and_tracks_dirty"
+		},
+		{
+			"errors": [],
+			"ms": 204,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_controller_carry_moves_items"
+		},
+		{
+			"errors": [],
+			"ms": 412,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_controller_place_rotate_delete_undo"
+		},
+		{
+			"errors": [],
+			"ms": 170,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 566,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_mouse_select_drag_and_keyboard"
+		},
+		{
+			"errors": [],
+			"ms": 348,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_test_play_round_trip_restores_session"
+		},
+		{
+			"errors": [],
+			"ms": 652,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_campaign_style_modes_own_the_hazards"
+		},
+		{
+			"errors": [],
+			"ms": 396,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_crane_hook_lifts_then_drops"
+		},
+		{
+			"errors": [],
+			"ms": 187,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_crane_magnet_pulls_and_drops_a_scrap_bundle"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_destructible_props_break_into_their_zones"
+		},
+		{
+			"errors": [],
+			"ms": 48,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_drain_pair_teleports_with_cooldown"
+		},
+		{
+			"errors": [],
+			"ms": 68,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_electrified_plate_zaps_and_mats_insulate"
+		},
+		{
+			"errors": [],
+			"ms": 225,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_fan_and_wind_push_but_hover_ignores_wind"
+		},
+		{
+			"errors": [],
+			"ms": 1870,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_hazards_cycle_deterministically_for_a_seed"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_mode_ringout_override_is_honoured"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_pickups_heal_hype_and_respawn"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_props_take_damage_before_breaking"
+		},
+		{
+			"errors": [],
+			"ms": 56,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_ringout_eliminates_rule"
+		},
+		{
+			"errors": [],
+			"ms": 265,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_rooftop_ringout_respawns_at_nearest_edge_marker"
+		},
+		{
+			"errors": [],
+			"ms": 595,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_rules_switch_hazards_timers_and_ringouts"
+		},
+		{
+			"errors": [],
+			"ms": 26,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_solid_props_without_splat_stop_projectiles"
+		},
+		{
+			"errors": [],
+			"ms": 11,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_team_matches_start_in_team_clusters"
+		},
+		{
+			"errors": [],
+			"ms": 84,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_tidal_gutter_soaks_fighters_in_it"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_weapons_damage_low_props_without_proxies"
+		},
+		{
+			"errors": [],
+			"ms": 23,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_blocked_spawn_points_at_the_spawn"
+		},
+		{
+			"errors": [],
+			"ms": 73,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_clean_base_layouts_pass"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_hazard_and_pickup_caps"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_issue_refs_carry_editor_uids"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_missing_mode_markers"
+		},
+		{
+			"errors": [],
+			"ms": 48,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_over_budget"
+		},
+		{
+			"errors": [],
+			"ms": 44,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_spawn_near_pit_or_open_edge"
+		},
+		{
+			"errors": [],
+			"ms": 24,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_team_clusters_and_bounds"
+		},
+		{
+			"errors": [],
+			"ms": 33,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_too_little_clear_floor"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/core/test_content_audit.gd::test_arenas_have_safe_spawns_inside_bounds"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_content_targets.gd::test_arena_bases_and_example_layouts"
+		},
+		{
+			"errors": [],
+			"ms": 82,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_arena_checks_before_the_match"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 61 run, 0 failed, 61 passed, 0 skipped in 18.0 s",
+	"time": "2026-10-18T17:46:41",
+	"total": 61,
+	"version": "0.9.15"
+}

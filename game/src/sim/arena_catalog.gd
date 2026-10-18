@@ -16,10 +16,12 @@ const TABS := ["obstacles", "walls", "hazards", "pickups", "markers"]
 const TAB_LABELS := {"obstacles": "Obstacles", "walls": "Walls", "hazards": "Hazards", "pickups": "Pickups", "markers": "Markers"}
 const CORE_PROPS := "res://content/core/props"
 const CORE_ARENAS := "res://content/core/arenas"
+const EDITOR_TEMPLATES := "res://assets/data/editor_arena_templates.json"
 
 static var _props := {}            ## id -> normalized prop entry
 static var _order: Array = []      ## prop ids in catalog (file) order
 static var _bases := {}            ## base id -> normalized base_def
+static var _editor_templates := {} ## creation templates, deliberately absent from playable Content
 static var _base_arena := {}       ## base id -> arena id that defines it
 static var _src_props = null       ## identity of the Content table we normalized last
 static var _src_arenas = null
@@ -63,6 +65,7 @@ static func _load(tp, ta) -> void:
 	_order.clear()
 	_bases.clear()
 	_base_arena.clear()
+	_editor_templates.clear()
 	errors.clear()
 	var prop_entries: Array = []
 	var arena_entries: Array = []
@@ -93,6 +96,19 @@ static func _load(tp, ta) -> void:
 		var bd := normalize_base(a["base_def"], str(a.get("base", "")))
 		_bases[bd["id"]] = bd
 		_base_arena[bd["id"]] = str(a.get("id", ""))
+	# These bases must resolve at runtime for saved layouts, but their blank creation
+	# templates must never become match/campaign/compendium arena entries.
+	var templates = JSON.parse_string(FileAccess.get_file_as_string(EDITOR_TEMPLATES))
+	if templates is Dictionary:
+		for entry in templates.get("items", []):
+			var errs := Schema.validate_named(entry, "arena", EDITOR_TEMPLATES)
+			if not errs.is_empty():
+				errors.append_array(errs)
+				continue
+			var bd := normalize_base(entry["base_def"], str(entry["base"]))
+			_bases[bd["id"]] = bd
+			_base_arena.erase(bd["id"])
+			_editor_templates[bd["id"]] = entry
 	_src_props = tp
 	_src_arenas = ta
 
@@ -262,6 +278,11 @@ static func base_ids() -> Array:
 		if not ordered.has(o):
 			ordered.append(o)
 	return ordered
+
+
+static func editor_template(base_id: String) -> Dictionary:
+	ensure()
+	return (_editor_templates.get(base_id, {}) as Dictionary).duplicate(true)
 
 
 static func base_arena_id(base_id: String) -> String:
