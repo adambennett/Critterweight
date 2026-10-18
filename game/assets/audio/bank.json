@@ -4049,15 +4049,13 @@
   },
   "ui_move": {
    "files": [
-    "res://assets/audio/replacements/interface/tick_001.ogg",
-    "res://assets/audio/replacements/interface/tick_002.ogg",
-    "res://assets/audio/replacements/interface/tick_004.ogg"
+    "res://assets/audio/replacements/interface/tick_001.ogg"
    ],
    "bus": "UI",
    "gain": -14,
    "pitch": [
-    0.99,
-    1.01
+    1,
+    1
    ],
    "cooldown": 0.03,
    "priority": 70,

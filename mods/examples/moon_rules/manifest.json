@@ -2,7 +2,7 @@
   "id": "moon_rules",
   "name": "Moon Rules",
   "version": "1.0.0",
-  "game_version": "0.9.14",
+  "game_version": "0.9.15",
   "api": 1,
   "author": "Critterweight examples",
   "description": "Rules/mode example: Moon Brawl (low gravity, longer launches, wall splats heal the splatter a little) and Juice Frenzy (everyone starts juiced and Hype builds three times as fast), plus a playlist that rotates them. Pure data: rule options and hooks.",

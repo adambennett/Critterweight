@@ -25,7 +25,7 @@ func test_frequent_sounds_have_variations() -> void:
 		var e: Dictionary = Audio._sfx_entries.get(id, {})
 		check(not e.is_empty(), "%s exists" % id)
 		var n: int = e.get("files", []).size()
-		var min_variants := 1 if id == "crowd_cheer" else 3
+		var min_variants := 1 if id in ["crowd_cheer", "ui_move"] else 3
 		check(n >= min_variants, "%s has >= %d variants (got %d)" % [id, min_variants, n])
 		var pr: Array = e.get("pitch", [1, 1])
 		check(float(pr[0]) < float(pr[1]) or id.begins_with("ui_"), "%s has a random pitch range" % id)
@@ -242,12 +242,15 @@ func test_menu_focus_uses_soft_interface_ticks() -> void:
 	var entry: Dictionary = Audio._sfx_entries.get("ui_move", {})
 	var expected := [
 		"res://assets/audio/replacements/interface/tick_001.ogg",
-		"res://assets/audio/replacements/interface/tick_002.ogg",
-		"res://assets/audio/replacements/interface/tick_004.ogg",
 	]
 	var files: Array = entry.get("files", [])
-	check(files == expected, "menu focus uses brief interface ticks instead of scroll effects")
+	check(files == expected and files.size() == 1, "menu focus uses one consistent brief interface tick")
 	check(float(entry.get("gain", 0.0)) <= -14.0, "menu focus cue is mixed quietly")
+	var pitch: Array = entry.get("pitch", [])
+	check(pitch.size() == 2, "menu focus pitch range is present")
+	if pitch.size() == 2:
+		check_near(float(pitch[0]), 1.0, 0.001, "menu focus pitch stays fixed")
+		check_near(float(pitch[1]), 1.0, 0.001, "menu focus pitch stays fixed")
 	for path in files:
 		var stream := Audio._stream(str(path))
 		check(stream != null, "menu focus cue loads: %s" % path)

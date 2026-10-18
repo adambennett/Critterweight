@@ -657,13 +657,13 @@ assets/audio/replacements/interface/tick_002.ogg
   4514 bytes | SHA-256 869442f54214be902ec7437f79e400dc91c1bfd90d18a6dd2d5b7e41ffbf457b
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_move.files[1]; bank.sfx.ui_slider.files[1]
+  Bank: bank.sfx.ui_slider.files[1]
 
 assets/audio/replacements/interface/tick_004.ogg
   5031 bytes | SHA-256 0253d5f7d8d2afbbc370eac2a4539bb844239f0c98343e516d376b137c06d27c
   Interface Sounds — Kenney | Creative Commons Zero (CC0 1.0)
   Source: https://kenney.nl/assets/interface-sounds
-  Bank: bank.sfx.ui_move.files[2]; bank.sfx.ui_slider.files[2]
+  Bank: bank.sfx.ui_slider.files[2]
 
 assets/audio/replacements/interface/toggle_001.ogg
   7369 bytes | SHA-256 ca1d2dde5f0b286abac4f070e23edab8f30927c8a533665cdf2ac6492a415e49

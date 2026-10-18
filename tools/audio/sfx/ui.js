@@ -13,7 +13,7 @@ function blip(sr, f, dur = 0.08, ratio = 2, index = 1.2) {
 }
 
 module.exports = [
-  def('ui_move', Object.assign({ variants: 3, cooldown: 0.03, gain: -8 }, UI), (rng, sr) =>
+  def('ui_move', Object.assign({ variants: 1, cooldown: 0.03, gain: -8 }, UI, { pitch: [1, 1] }), (rng, sr) =>
     K.tidy(K.burst(sr, rng, { dur: 0.04, filt: [{ type: 'bp', f: jit(rng, 2400, 0.1), q: 2 }, { type: 'hp', f: 800 }], a: 0.001, curve: 2.2 }), sr)),
   def('ui_accept', Object.assign({ variants: 2 }, UI), (rng, sr) =>
     K.tidy(K.mix(sr, [{ buf: blip(sr, 523.25, 0.06), gain: 0 }, { buf: blip(sr, 783.99, 0.08), gain: 0, at: 0.04 }]), sr)),

@@ -65,3 +65,28 @@ func test_display_changes_confirm_or_roll_back() -> void:
 	Settings.revert_display(prev)
 	Settings.confirm_display()
 	check_eq(str(Settings.get_value("display.window_mode")), before, "the test leaves the window mode as it found it")
+
+## The selected output survives a fresh settings load, and stale monitor indexes fall back safely.
+func test_selected_monitor_persists_across_settings_reload() -> void:
+	var original_values: Dictionary = Settings.values.duplicate(true)
+	var original_path := Settings.path_override
+	var original_read_only := Settings.read_only
+	var original_screen_schema: Dictionary = Settings._schema["display.screen"]
+	var test_screen_schema: Dictionary = original_screen_schema.duplicate(true)
+	test_screen_schema["opts"] = [0, 1, 2]
+	test_screen_schema.erase("opts_fn")
+	Settings._schema["display.screen"] = test_screen_schema
+	Settings.path_override = temp_dir("monitor-preference-%d" % Time.get_ticks_usec()).path_join("settings.json")
+	Settings.read_only = false
+	Settings.values["display.screen"] = 0
+	Settings.set_value("display.screen", 1, false, false)
+	Settings.confirm_display()
+	Settings.values["display.screen"] = 0
+	Settings.load_settings()
+	check_eq(int(Settings.get_value("display.screen")), 1, "the saved secondary display is restored")
+	check_eq(Settings._clamp_screen_index(1, 2), 1, "a connected secondary display remains selected")
+	check_eq(Settings._clamp_screen_index(1, 1), 0, "a disconnected display falls back to the available screen")
+	Settings.values = original_values
+	Settings.path_override = original_path
+	Settings.read_only = original_read_only
+	Settings._schema["display.screen"] = original_screen_schema

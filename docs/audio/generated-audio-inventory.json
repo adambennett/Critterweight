@@ -1,8 +1,8 @@
 {
   "version": 1,
   "source": "game/assets/audio/manifest.json",
-  "count": 638,
-  "total_bytes": 135083626,
+  "count": 636,
+  "total_bytes": 135076482,
   "groups": {
     "abilities": 12,
     "ambience": 12,
@@ -17,7 +17,7 @@
     "music": 18,
     "projectiles": 20,
     "reactions": 24,
-    "ui": 40,
+    "ui": 38,
     "voices": 156,
     "zones": 8
   },
@@ -5559,35 +5559,13 @@
       "generated_by": "tools/audio/build.js"
     },
     {
-      "file": "game/assets/audio/ui/ui_move_0.wav",
+      "file": "game/assets/audio/ui/ui_move.wav",
       "group": "ui",
       "seconds": 0.04,
       "sample_rate": 44100,
       "channels": 1,
       "bytes": 3572,
       "sha256": "6bbe8a16ed577ac45f00398051c84bc9ea7b30c4c59d2df22a7373fda9e6f470",
-      "bank_references": [],
-      "generated_by": "tools/audio/build.js"
-    },
-    {
-      "file": "game/assets/audio/ui/ui_move_1.wav",
-      "group": "ui",
-      "seconds": 0.04,
-      "sample_rate": 44100,
-      "channels": 1,
-      "bytes": 3572,
-      "sha256": "f71f67ad51c718e380cc6b2935268726929a93e4a56ad56b323d06adcb85281f",
-      "bank_references": [],
-      "generated_by": "tools/audio/build.js"
-    },
-    {
-      "file": "game/assets/audio/ui/ui_move_2.wav",
-      "group": "ui",
-      "seconds": 0.04,
-      "sample_rate": 44100,
-      "channels": 1,
-      "bytes": 3572,
-      "sha256": "b2e9a08ce90bf574017e610eb97afc8fc600318da780292eaa80fe2ac6ea7abc",
       "bank_references": [],
       "generated_by": "tools/audio/build.js"
     },

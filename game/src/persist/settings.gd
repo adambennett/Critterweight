@@ -94,6 +94,10 @@ func _ready() -> void:
 	init_defaults()
 	load_settings()
 	apply_all()
+	# The native window can ignore its saved screen while the startup window is still being placed.
+	# Reapply once the main scene and window manager have finished initialization.
+	if not _headless:
+		call_deferred("_apply_window")
 	get_window().focus_entered.connect(_on_focus.bind(true))
 	get_window().focus_exited.connect(_on_focus.bind(false))
 
@@ -186,7 +190,10 @@ func _coerce(s: Dictionary, v):
 		"enum":
 			var opts := options(s["key"])
 			for o in opts:
-				if str(o) == str(v):
+				if typeof(o) in [TYPE_INT, TYPE_FLOAT] and typeof(v) in [TYPE_INT, TYPE_FLOAT]:
+					if float(o) == float(v):
+						return o
+				elif str(o) == str(v):
 					return o
 			return s["def"] if opts.has(s["def"]) or not s.has("opts") else (opts[0] if not opts.is_empty() else s["def"])
 		"string":
@@ -300,6 +307,10 @@ func _apply_bus(key: String) -> void:
 	AudioServer.set_bus_mute(idx, pct <= 0.0)
 
 
+static func _clamp_screen_index(screen: int, screen_count: int) -> int:
+	return clampi(screen, 0, maxi(screen_count - 1, 0))
+
+
 func _apply_window() -> void:
 	if _headless:
 		return
@@ -321,11 +332,19 @@ func _apply_window() -> void:
 		return
 	if cli.has("--resolution") or cli.has("--windowed") or cli.has("-w") or cli.has("--fullscreen") or cli.has("-f"):
 		return
-	var screen := clampi(int(values["display.screen"]), 0, DisplayServer.get_screen_count() - 1)
+	var screen := _clamp_screen_index(int(values["display.screen"]), DisplayServer.get_screen_count())
 	var mode := str(values["display.window_mode"])
 	var res := str(values["display.resolution"])
+	var origin := DisplayServer.screen_get_position(screen)
+	var screen_size := DisplayServer.screen_get_size(screen)
+	# Moving a fullscreen window by current_screen alone is unreliable on some desktop window
+	# managers. Temporarily place a windowed surface on the selected display before restoring mode.
 	if w.current_screen != screen:
+		w.mode = Window.MODE_WINDOWED
 		w.current_screen = screen
+		var transfer_size := Vector2i(mini(w.size.x, screen_size.x), mini(w.size.y, screen_size.y))
+		w.size = transfer_size
+		w.position = origin + (screen_size - transfer_size) / 2
 	match mode:
 		"fullscreen":
 			w.mode = Window.MODE_EXCLUSIVE_FULLSCREEN
@@ -333,16 +352,16 @@ func _apply_window() -> void:
 			w.mode = Window.MODE_FULLSCREEN
 		_:
 			w.mode = Window.MODE_WINDOWED
-			var size := DisplayServer.screen_get_size(screen)
+			var size := screen_size
 			if res != "native" and "x" in res:
 				var parts := res.split("x")
 				size = Vector2i(int(parts[0]), int(parts[1]))
 			else:
 				size = Vector2i(int(size.x * 0.8), int(size.y * 0.8))
 			w.size = size
-			var origin := DisplayServer.screen_get_position(screen)
-			var ssize := DisplayServer.screen_get_size(screen)
-			w.position = origin + (ssize - size) / 2
+			w.position = origin + (screen_size - size) / 2
+	# Set it after the mode transition too, so fullscreen uses the selected output on restart.
+	w.current_screen = screen
 
 
 ## Applies display values tentatively; returns the previous values for revert_display().

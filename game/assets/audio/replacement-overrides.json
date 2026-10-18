@@ -418,9 +418,7 @@
     },
     "ui_move": {
       "files": [
-        "res://assets/audio/replacements/interface/tick_001.ogg",
-        "res://assets/audio/replacements/interface/tick_002.ogg",
-        "res://assets/audio/replacements/interface/tick_004.ogg"
+        "res://assets/audio/replacements/interface/tick_001.ogg"
       ],
       "gain": -14
     },

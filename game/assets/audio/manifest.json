@@ -4730,7 +4730,7 @@
    "rms_db": -14.55,
    "sha256": "ffda1fceeb6e1fa5680156e455e21b26be359d1d77b5aa9c05d78d7f1f34ec7c"
   },
-  "ui/ui_move_0.wav": {
+  "ui/ui_move.wav": {
    "seconds": 0.04,
    "sr": 44100,
    "channels": 1,
@@ -4738,24 +4738,6 @@
    "peak_db": -1,
    "rms_db": -15.92,
    "sha256": "6bbe8a16ed577ac45f00398051c84bc9ea7b30c4c59d2df22a7373fda9e6f470"
-  },
-  "ui/ui_move_1.wav": {
-   "seconds": 0.04,
-   "sr": 44100,
-   "channels": 1,
-   "bytes": 3572,
-   "peak_db": -1,
-   "rms_db": -15.44,
-   "sha256": "f71f67ad51c718e380cc6b2935268726929a93e4a56ad56b323d06adcb85281f"
-  },
-  "ui/ui_move_2.wav": {
-   "seconds": 0.04,
-   "sr": 44100,
-   "channels": 1,
-   "bytes": 3572,
-   "peak_db": -1,
-   "rms_db": -16.13,
-   "sha256": "b2e9a08ce90bf574017e610eb97afc8fc600318da780292eaa80fe2ac6ea7abc"
   },
   "ui/ui_accept_0.wav": {
    "seconds": 0.12,
@@ -6604,5 +6586,5 @@
    }
   }
  },
- "bytes": 135083626
+ "bytes": 135076482
 }
