@@ -2,9 +2,9 @@
   "version": 1,
   "source": "game/assets/audio/replacements/provenance.json",
   "downloaded": "2026-10-17",
-  "count": 126,
-  "total_bytes": 36501227,
-  "note": "All included third-party clips were obtained from the official author or asset page without payment. No clip file was edited; bank gain, playback loop, and pitch settings are game-side settings. The Kenney Voiceover Pack: Fighter and OpenGameArt Water Waves FLACs are not shipped or used because they do not suit the named creature casts or current Godot audio path.",
+  "count": 134,
+  "total_bytes": 61835768,
+  "note": "All included third-party clips were obtained from the official author or asset page without payment. No clip file was edited; bank gain, playback loop, and pitch settings are game-side settings. The Kenney Voiceover Pack: Fighter and OpenGameArt Water Waves FLACs are not shipped or used because they do not suit the named creature casts or current Godot audio path. Eight loopable music tracks by MintoDog were downloaded directly from their OpenGameArt pages under CC0 1.0; the two tracks already present in the Cage Rules project were hash-verified against those official downloads. Files are unedited; loop and gain are configured in-game.",
   "sources": {
     "incompetech-ccby": {
       "creator": "Kevin MacLeod",
@@ -77,6 +77,86 @@
       "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
       "attribution": "Applause in a Large Hall or Church by eXpl0it3r (CC0 1.0; https://opengameart.org/content/applause-in-a-large-hall-or-church).",
       "modification": "Supplied WAV used without editing; playback gain configured in the game."
+    },
+    "oga-mintodog-scifi-stage": {
+      "creator": "MintoDog",
+      "title": "Sci-fi Puzzle Stage Select",
+      "source": "https://opengameart.org/content/sci-fi-puzzle-stage-select",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Sci-fi Puzzle Stage Select by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/sci-fi-puzzle-stage-select).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-trance-boss": {
+      "creator": "MintoDog",
+      "title": "Trance Boss Battle",
+      "source": "https://opengameart.org/content/trance-boss-battle",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Trance Boss Battle by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/trance-boss-battle).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-jazzy-battle": {
+      "creator": "MintoDog",
+      "title": "Jazzy Battle Theme",
+      "source": "https://opengameart.org/content/jazzy-battle-theme",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Jazzy Battle Theme by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/jazzy-battle-theme).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-fairy-battles": {
+      "creator": "MintoDog",
+      "title": "Fairy Battles",
+      "source": "https://opengameart.org/content/fairy-battles",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Fairy Battles by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/fairy-battles).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-hard-battle-1": {
+      "creator": "MintoDog",
+      "title": "Hard Battle 1",
+      "source": "https://opengameart.org/content/hard-battle-1",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Hard Battle 1 by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/hard-battle-1).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-hard-battle-2": {
+      "creator": "MintoDog",
+      "title": "Hard Battle 2",
+      "source": "https://opengameart.org/content/hard-battle-2",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Hard Battle 2 by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/hard-battle-2).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-hard-boss-1": {
+      "creator": "MintoDog",
+      "title": "Hard Boss Battle 1",
+      "source": "https://opengameart.org/content/hard-boss-battle-1",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Hard Boss Battle 1 by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/hard-boss-battle-1).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-hard-boss-2": {
+      "creator": "MintoDog",
+      "title": "Hard Boss Battle 2",
+      "source": "https://opengameart.org/content/hard-boss-battle-2",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Hard Boss Battle 2 by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/hard-boss-battle-2).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
     }
   },
   "paths": {
@@ -1132,6 +1212,70 @@
       "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
       "bank_references": [
         "bank.music.boss.file"
+      ]
+    },
+    "assets/audio/replacements/music/community/fairy_battles_bpm180.ogg": {
+      "sha256": "3cb573bdd9ea449f8851d3249fa1ec1a8d0d843cbabcdfb060e97a3c132f0cde",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.combat_mintodog_fairy_battles.file"
+      ]
+    },
+    "assets/audio/replacements/music/community/hard_battle_1_bpm170.ogg": {
+      "sha256": "f26e56b12a10811403dfb1ae3c23a9af4ec0721fcbdb17001b2888917efdd36e",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.combat_mintodog_hard_battle_1.file"
+      ]
+    },
+    "assets/audio/replacements/music/community/hard_battle_2_bpm140.ogg": {
+      "sha256": "4d29c68666227d5b324e800f96d0b3045a9038ca3efe6baa5274bc626ba369de",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.combat_mintodog_hard_battle_2.file"
+      ]
+    },
+    "assets/audio/replacements/music/community/hard_boss_battle_1_bpm200.ogg": {
+      "sha256": "f245060a9bd0ddf0c1ec2b60af47d914d94e2fe53d6f1bbd442163f46c04a30b",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.boss_mintodog_hard_boss_battle_1.file"
+      ]
+    },
+    "assets/audio/replacements/music/community/hard_boss_battle_2_bpm210.ogg": {
+      "sha256": "39dcd191ccce15110b4e10448ea196410592e3aa05345005a942c53e4bf0baf7",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.boss_mintodog_hard_boss_battle_2.file"
+      ]
+    },
+    "assets/audio/replacements/music/community/jazzy_battle_theme_bpm130.ogg": {
+      "sha256": "3608f68da4cc5c73aeb717761de75043c111b7d1f57b8bab8366b3f71fc73247",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.combat_mintodog_jazzy_battle.file"
+      ]
+    },
+    "assets/audio/replacements/music/community/sci-fi_puzzle_stage_select_bpm105.mp3": {
+      "sha256": "9ef7f3ba85a11720de9e07d9f4cc3a55159be0f5cc5780308e269b4620bc090b",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.menu_mintodog_scifi_stage_select.file"
+      ]
+    },
+    "assets/audio/replacements/music/community/trance_boss_battle_bpm150.mp3": {
+      "sha256": "ec3a2e51e1191a380d90e56b1a5b4306a195e5f71d655dd3e18de3eb5ee334d4",
+      "source_id": "incompetech-ccby",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "bank_references": [
+        "bank.music.boss_mintodog_trance_boss_battle.file"
       ]
     },
     "assets/audio/replacements/rpg/bookFlip1.ogg": {
@@ -2959,6 +3103,118 @@
       "source": "https://incompetech.com/music/royalty-free/licenses/",
       "bank_references": [
         "bank.music.boss.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/community/fairy_battles_bpm180.ogg",
+      "group": "music",
+      "bytes": 3174513,
+      "sha256": "3cb573bdd9ea449f8851d3249fa1ec1a8d0d843cbabcdfb060e97a3c132f0cde",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.combat_mintodog_fairy_battles.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/community/hard_battle_1_bpm170.ogg",
+      "group": "music",
+      "bytes": 3026131,
+      "sha256": "f26e56b12a10811403dfb1ae3c23a9af4ec0721fcbdb17001b2888917efdd36e",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.combat_mintodog_hard_battle_1.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/community/hard_battle_2_bpm140.ogg",
+      "group": "music",
+      "bytes": 3107350,
+      "sha256": "4d29c68666227d5b324e800f96d0b3045a9038ca3efe6baa5274bc626ba369de",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.combat_mintodog_hard_battle_2.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/community/hard_boss_battle_1_bpm200.ogg",
+      "group": "music",
+      "bytes": 2796698,
+      "sha256": "f245060a9bd0ddf0c1ec2b60af47d914d94e2fe53d6f1bbd442163f46c04a30b",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.boss_mintodog_hard_boss_battle_1.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/community/hard_boss_battle_2_bpm210.ogg",
+      "group": "music",
+      "bytes": 3857434,
+      "sha256": "39dcd191ccce15110b4e10448ea196410592e3aa05345005a942c53e4bf0baf7",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.boss_mintodog_hard_boss_battle_2.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/community/jazzy_battle_theme_bpm130.ogg",
+      "group": "music",
+      "bytes": 2711979,
+      "sha256": "3608f68da4cc5c73aeb717761de75043c111b7d1f57b8bab8366b3f71fc73247",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.combat_mintodog_jazzy_battle.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/community/sci-fi_puzzle_stage_select_bpm105.mp3",
+      "group": "music",
+      "bytes": 2562222,
+      "sha256": "9ef7f3ba85a11720de9e07d9f4cc3a55159be0f5cc5780308e269b4620bc090b",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.menu_mintodog_scifi_stage_select.file"
+      ]
+    },
+    {
+      "file": "assets/audio/replacements/music/community/trance_boss_battle_bpm150.mp3",
+      "group": "music",
+      "bytes": 4098214,
+      "sha256": "ec3a2e51e1191a380d90e56b1a5b4306a195e5f71d655dd3e18de3eb5ee334d4",
+      "source_id": "incompetech-ccby",
+      "creator": "Kevin MacLeod",
+      "title": "Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "source": "https://incompetech.com/music/royalty-free/licenses/",
+      "bank_references": [
+        "bank.music.boss_mintodog_trance_boss_battle.file"
       ]
     },
     {

@@ -1,0 +1,29 @@
+{
+  "batch": "announcer-expansion",
+  "date": "2026-10-18",
+  "takes": 854,
+  "speaker_clip_counts": {
+    "devon": 515,
+    "kendall": 339
+  },
+  "line_speaker_counts": {
+    "barnaby": 515,
+    "kendall": 339
+  },
+  "duration_seconds": 2961.165,
+  "installed_wav_bytes": 142173496,
+  "sample_rates_hz": {
+    "24000": 854
+  },
+  "peak_dbfs_min_max": [
+    -7.3,
+    -3.0
+  ],
+  "processed_and_raw_sha256_verified": 854,
+  "catalog_lines": 854,
+  "provider_credit_used": 5656.5,
+  "provider_credit_remaining": 343.5,
+  "provider_credit_limit": 6000.0,
+  "rare_conversation_count": 9,
+  "new_fighter_type_matchup_additions": 108
+}

@@ -339,6 +339,27 @@ function main() {
       if (!bank.music[id]) throw new Error('audio replacement references unknown music id ' + id);
       bank.music[id] = Object.assign({}, bank.music[id], override);
     }
+    for (const [id, definition] of Object.entries(replacements.additional_music || {})) {
+      if (bank.music[id]) throw new Error('additional music duplicates existing id ' + id);
+      const entry = Object.assign({ layers: [], stinger: false, replacement: true }, definition);
+      const prefix = 'res://assets/audio/';
+      if (typeof entry.file !== 'string' || !entry.file.startsWith(prefix)) {
+        throw new Error('additional music must use a res://assets/audio/ path: ' + id);
+      }
+      const rel = entry.file.slice(prefix.length);
+      const resolved = path.resolve(OUT, rel);
+      if (!resolved.startsWith(path.resolve(OUT) + path.sep) || !fs.existsSync(resolved)) {
+        throw new Error('additional music file is missing or outside the audio directory: ' + id);
+      }
+      for (const field of ['title', 'bpm', 'beats_per_bar', 'bars', 'seconds', 'bar_seconds', 'sections', 'gain', 'loop', 'stereo', 'sr', 'tags']) {
+        if (!Object.prototype.hasOwnProperty.call(entry, field)) throw new Error('additional music ' + id + ' is missing ' + field);
+      }
+      if (!(Number(entry.bpm) > 0 && Number(entry.bars) > 0 && Number(entry.seconds) > 0 && Number(entry.bar_seconds) > 0) ||
+          !Array.isArray(entry.sections) || entry.sections.length === 0 || entry.loop !== true) {
+        throw new Error('additional music has invalid timing or loop metadata: ' + id);
+      }
+      bank.music[id] = entry;
+    }
   }
   else if (prevManifest.music) { for (const [id, m] of Object.entries(prevManifest.music)) { bank.music[id] = m; reuse(`music/${id}.wav`); for (const L of m.layers || []) reuse(`music/${id}_${L.id}.wav`); } }
   manifest.voices = bank.voices;

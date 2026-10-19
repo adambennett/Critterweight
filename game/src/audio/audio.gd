@@ -75,6 +75,9 @@ var _ann_used := {}                   ## ids used in this match
 var _ann_rotation := {}               ## trigger -> int
 var _ann_seed := 0
 var _ann_last_trigger_time := {}      ## reduced mode frequency limiting
+var _ann_conversation_groups := {}    ## conversation id -> ordered Array[Dictionary]
+var _ann_conversation_queue: Array = []
+var _ann_active_conversation := ""
 var _ann_vars := {}                   ## default {p}/{o} substitutions for the match
 
 # crowd / ambience
@@ -564,7 +567,7 @@ func music(track: String, fade := 1.0, opts := {}) -> void:
 	var pitch := float(opts.get("pitch", 1.0))
 	var base := AudioStreamPlayer.new()
 	base.stream = base_stream
-	if _jukebox_context != "" and str(Jukebox.config(_jukebox_context)["mode"]) != "game":
+	if not bool(opts.get("jukebox_preview", false)) and _jukebox_context != "" and str(Jukebox.config(_jukebox_context)["mode"]) != "game":
 		base.stream = base_stream.duplicate()
 		if base.stream is AudioStreamWAV:
 			(base.stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_DISABLED
@@ -613,6 +616,23 @@ func music(track: String, fade := 1.0, opts := {}) -> void:
 	_music_cur = next_i
 	_music_pending_jump = -1.0
 	_music_pending_stop = false
+
+
+## Plays a Jukebox preview immediately, replacing any current track or preview.
+func preview_music(track: String) -> void:
+	if not enabled or not bank_loaded:
+		return
+	var entries: Dictionary = bank.get("music", {})
+	if not entries.has(track) or bool(entries[track].get("stinger", false)):
+		return
+	if _music_slots.is_empty():
+		_music_slots = [_slot_new(), _slot_new()]
+	for slot in _music_slots:
+		_free_slot(slot)
+	_music_cur = -1
+	_music_pending_jump = -1.0
+	_music_pending_stop = false
+	music(track, 0.08, {"jukebox_resolved": true, "jukebox_preview": true, "restart": true})
 
 
 func _apply_music_opts(slot: Dictionary, opts: Dictionary) -> void:
@@ -736,10 +756,14 @@ func stop_music(fade := 1.0) -> void:
 
 func _free_slot(slot: Dictionary) -> void:
 	if slot["base"] != null:
-		(slot["base"] as Node).queue_free()
+		var base := slot["base"] as AudioStreamPlayer
+		base.stop()
+		base.queue_free()
 		slot["base"] = null
 	for lid in slot["layers"]:
-		(slot["layers"][lid]["player"] as Node).queue_free()
+		var player := slot["layers"][lid]["player"] as AudioStreamPlayer
+		player.stop()
+		player.queue_free()
 	slot["layers"] = {}
 	slot["track"] = ""
 
@@ -786,6 +810,7 @@ func _load_lines() -> void:
 	_lines_by_trigger.clear()
 	_pack_lines.clear()
 	_pack_by_trigger.clear()
+	_ann_conversation_groups.clear()
 	for id in Content.ids("announcer"):
 		var e := Content.get_entry("announcer", id)
 		if str(e.get("text", "")) == "":
@@ -805,6 +830,17 @@ func _load_lines() -> void:
 		if not _lines_by_trigger.has(trig):
 			_lines_by_trigger[trig] = []
 		_lines_by_trigger[trig].append(id)
+		var conversation_id := str(e.get("conversation_id", ""))
+		if conversation_id != "":
+			var group: Array = _ann_conversation_groups.get(conversation_id, [])
+			group.append(e)
+			_ann_conversation_groups[conversation_id] = group
+	for conversation_id in _ann_conversation_groups:
+		var group: Array = _ann_conversation_groups[conversation_id]
+		group.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+			return int(a.get("conversation_turn", 0)) < int(b.get("conversation_turn", 0))
+		)
+		_ann_conversation_groups[conversation_id] = group
 
 
 ## The standard bank's line ids (pack lines: pack_line_ids).
@@ -874,6 +910,8 @@ func stop_announcer() -> void:
 	_stop_speech()
 	_ann_current = {}
 	_ann_pending = {}
+	_ann_conversation_queue.clear()
+	_ann_active_conversation = ""
 	if _babble:
 		_babble.stop()
 	_music_lead_mute(false)
@@ -885,10 +923,11 @@ func announcer_busy() -> bool:
 
 
 func _say_line(id: String, speaker: String, text: String, priority: int, vars: Dictionary, mood: String, trigger: String) -> bool:
-	if announcer_mode == "off" and speaker == "barnaby":
+	var is_announcer := speaker in ["barnaby", "kendall"]
+	if announcer_mode == "off" and is_announcer:
 		return false
 	var reduced := announcer_mode == "reduced"
-	if reduced and speaker == "barnaby" and trigger != "say" and not REDUCED_TRIGGERS.has(trigger):
+	if reduced and is_announcer and trigger != "say" and not REDUCED_TRIGGERS.has(trigger):
 		return false
 	var now := _now()
 	if reduced and trigger != "say":
@@ -910,6 +949,9 @@ func _say_line(id: String, speaker: String, text: String, priority: int, vars: D
 
 
 func _start_line(entry: Dictionary) -> void:
+	if int(entry.get("priority", 0)) >= PRIORITY_INTERRUPT:
+		_ann_conversation_queue.clear()
+		_ann_active_conversation = ""
 	var text: String = entry["text"]
 	var speaker: String = entry["speaker"]
 	_stop_speech()
@@ -980,10 +1022,30 @@ func _finish_line() -> void:
 	if not _ann_pending.is_empty():
 		var nxt := _ann_pending
 		_ann_pending = {}
+		_ann_conversation_queue.clear()
+		_ann_active_conversation = ""
 		_start_line(nxt)
+	elif not _ann_conversation_queue.is_empty() and _ann_active_conversation != "":
+		var conversation_id := _ann_active_conversation
+		get_tree().create_timer(0.45).timeout.connect(_continue_color_conversation.bind(conversation_id), CONNECT_ONE_SHOT)
 	else:
+		_ann_active_conversation = ""
 		_music_lead_mute(false)
 		_duck_target["Crowd"] = 0.0
+
+
+func _continue_color_conversation(conversation_id: String) -> void:
+	if _ann_active_conversation != conversation_id or not _ann_current.is_empty():
+		return
+	if _ann_conversation_queue.is_empty():
+		_ann_active_conversation = ""
+		_music_lead_mute(false)
+		_duck_target["Crowd"] = 0.0
+		return
+	var next_line: Dictionary = _ann_conversation_queue.pop_front()
+	if not announce(str(next_line.get("id", ""))):
+		_ann_conversation_queue.clear()
+		_ann_active_conversation = ""
 
 
 ## Picks and speaks a line for a trigger ("ko", "big_hit", ...). ctx keys are matched against each
@@ -994,6 +1056,83 @@ func announce_trigger(trigger: String, ctx := {}, vars := {}) -> String:
 	if id == "":
 		return ""
 	return id if announce(id, vars) else ""
+
+
+## Low-priority color commentary, paced during long matches. Rare booth exchanges use ordered turns.
+func announce_color_commentary(force_conversation := false) -> String:
+	if announcer_mode != "full" or not _ann_current.is_empty() or not _ann_pending.is_empty():
+		return ""
+	if force_conversation or _rng.randi_range(0, 8) == 0:
+		var conversation_line := _announce_color_conversation()
+		if conversation_line != "":
+			return conversation_line
+	var context := _color_context()
+	var roll := _rng.randi_range(0, 99)
+	var trigger := "color"
+	if roll >= 96:
+		trigger = "matchup_color"
+	elif roll >= 86:
+		trigger = "element_color"
+	elif roll >= 68:
+		trigger = "fighter_color"
+	var id := pick_line(trigger, context)
+	if id == "" and trigger != "color":
+		id = pick_line("color", context)
+	return id if id != "" and announce(id) else ""
+
+
+func _announce_color_conversation() -> String:
+	var candidates: Array = []
+	for id in _lines_by_trigger.get("color_conversation_start", []):
+		if not _ann_used.has(id):
+			candidates.append(id)
+	if candidates.is_empty():
+		return ""
+	candidates.sort()
+	var first_id := str(candidates[_rng.randi_range(0, candidates.size() - 1)])
+	var first: Dictionary = _lines.get(first_id, {})
+	var conversation_id := str(first.get("conversation_id", ""))
+	var group: Array = _ann_conversation_groups.get(conversation_id, [])
+	if conversation_id == "" or group.size() < 2:
+		return ""
+	_ann_conversation_queue.clear()
+	for i in range(1, group.size()):
+		_ann_conversation_queue.append(group[i])
+	_ann_active_conversation = conversation_id
+	if announce(first_id):
+		return first_id
+	_ann_conversation_queue.clear()
+	_ann_active_conversation = ""
+	return ""
+
+
+func _color_context() -> Dictionary:
+	var context := {"creature": [], "element": [], "matchup": []}
+	var fighters: Array = _match.get("fighters", [])
+	for fighter in fighters:
+		var creature_id := str(fighter.get("creature", ""))
+		if creature_id == "":
+			continue
+		if not context["creature"].has(creature_id):
+			context["creature"].append(creature_id)
+		var definition: Dictionary = Content.creature_entry(creature_id)
+		var element := str(definition.get("element", ""))
+		if element != "" and not context["element"].has(element):
+			context["element"].append(element)
+	for i in range(fighters.size()):
+		for j in range(i + 1, fighters.size()):
+			if int(fighters[i].get("team", -1)) == int(fighters[j].get("team", -1)):
+				continue
+			var a := str(fighters[i].get("creature", ""))
+			var b := str(fighters[j].get("creature", ""))
+			if a == "" or b == "":
+				continue
+			var pair: Array = [a, b]
+			pair.sort()
+			var matchup := str(pair[0]) + "|" + str(pair[1])
+			if not context["matchup"].has(matchup):
+				context["matchup"].append(matchup)
+	return context
 
 
 func pick_line(trigger: String, ctx := {}) -> String:
@@ -1215,6 +1354,7 @@ func begin_match(ctx: Dictionary) -> void:
 	_ann_vars["a"] = str(ctx.get("arena_name", ctx.get("arena", "")))
 	_match["names"] = names
 	_match["state"] = _default_state()
+	_match["state"]["next_color_at"] = _rng.randf_range(34.0, 42.0)
 	crowd_heat = 0.15
 	if enabled:
 		crowd_start()
@@ -1285,7 +1425,7 @@ func creature_audio(creature_id: String) -> Dictionary:
 		content_entry = Content.get_entry(kind, creature_id)
 		if not content_entry.is_empty():
 			break
-	if content_entry.has("audio") and typeof(content_entry["audio"]) == TYPE_DICTIONARY:
+	if content_entry.has("audio") and typeof(content_entry["audio"]) == TYPE_DICTIONARY and not content_entry["audio"].is_empty():
 		var merged := c.duplicate()
 		for k in content_entry["audio"]:
 			merged[k] = content_entry["audio"][k]
@@ -1547,6 +1687,7 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 			if alias_map.has(cand):
 				cand = str(alias_map[cand])
 			play.call(cand if _sfx_entries.has(cand) else "ab_generic")
+			say_t.call("ability", {"creature": _fighter_creature(fi), "slot": str(ev.get("slot", "")), "id": aid})
 		"effect":
 			var et := str(ev.get("effect", ""))
 			var el2 := str(ev.get("element", ""))
@@ -1696,6 +1837,12 @@ func _state() -> Dictionary:
 func on_match_tick(health: Array, time_left: float, dt: float) -> void:
 	var st := _state()
 	st["time"] = float(st.get("time", 0.0)) + dt
+	if float(st["time"]) >= float(st.get("next_color_at", 38.0)):
+		if _ann_current.is_empty() and _ann_pending.is_empty():
+			announce_color_commentary()
+			st["next_color_at"] = float(st["time"]) + _rng.randf_range(38.0, 54.0)
+		else:
+			st["next_color_at"] = float(st["time"]) + 5.0
 	var low: Dictionary = st.get("low", {})
 	var pi := int(_match.get("player_index", 0))
 	var low_count := 0

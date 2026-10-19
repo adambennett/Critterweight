@@ -1,7 +1,7 @@
 CRITTERWEIGHT IMPORTED AUDIO REPLACEMENT INVENTORY
 
-126 files; 34.8 MiB
-All included third-party clips were obtained from the official author or asset page without payment. No clip file was edited; bank gain, playback loop, and pitch settings are game-side settings. The Kenney Voiceover Pack: Fighter and OpenGameArt Water Waves FLACs are not shipped or used because they do not suit the named creature casts or current Godot audio path.
+134 files; 59.0 MiB
+All included third-party clips were obtained from the official author or asset page without payment. No clip file was edited; bank gain, playback loop, and pitch settings are game-side settings. The Kenney Voiceover Pack: Fighter and OpenGameArt Water Waves FLACs are not shipped or used because they do not suit the named creature casts or current Godot audio path. Eight loopable music tracks by MintoDog were downloaded directly from their OpenGameArt pages under CC0 1.0; the two tracks already present in the Cage Rules project were hash-verified against those official downloads. Files are unedited; loop and gain are configured in-game.
 
 Every installed file:
 
@@ -724,6 +724,54 @@ assets/audio/replacements/music/Volatile-Reaction.mp3
   Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
   Source: https://incompetech.com/music/royalty-free/licenses/
   Bank: bank.music.boss.file
+
+assets/audio/replacements/music/community/fairy_battles_bpm180.ogg
+  3174513 bytes | SHA-256 3cb573bdd9ea449f8851d3249fa1ec1a8d0d843cbabcdfb060e97a3c132f0cde
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.combat_mintodog_fairy_battles.file
+
+assets/audio/replacements/music/community/hard_battle_1_bpm170.ogg
+  3026131 bytes | SHA-256 f26e56b12a10811403dfb1ae3c23a9af4ec0721fcbdb17001b2888917efdd36e
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.combat_mintodog_hard_battle_1.file
+
+assets/audio/replacements/music/community/hard_battle_2_bpm140.ogg
+  3107350 bytes | SHA-256 4d29c68666227d5b324e800f96d0b3045a9038ca3efe6baa5274bc626ba369de
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.combat_mintodog_hard_battle_2.file
+
+assets/audio/replacements/music/community/hard_boss_battle_1_bpm200.ogg
+  2796698 bytes | SHA-256 f245060a9bd0ddf0c1ec2b60af47d914d94e2fe53d6f1bbd442163f46c04a30b
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.boss_mintodog_hard_boss_battle_1.file
+
+assets/audio/replacements/music/community/hard_boss_battle_2_bpm210.ogg
+  3857434 bytes | SHA-256 39dcd191ccce15110b4e10448ea196410592e3aa05345005a942c53e4bf0baf7
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.boss_mintodog_hard_boss_battle_2.file
+
+assets/audio/replacements/music/community/jazzy_battle_theme_bpm130.ogg
+  2711979 bytes | SHA-256 3608f68da4cc5c73aeb717761de75043c111b7d1f57b8bab8366b3f71fc73247
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.combat_mintodog_jazzy_battle.file
+
+assets/audio/replacements/music/community/sci-fi_puzzle_stage_select_bpm105.mp3
+  2562222 bytes | SHA-256 9ef7f3ba85a11720de9e07d9f4cc3a55159be0f5cc5780308e269b4620bc090b
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.menu_mintodog_scifi_stage_select.file
+
+assets/audio/replacements/music/community/trance_boss_battle_bpm150.mp3
+  4098214 bytes | SHA-256 ec3a2e51e1191a380d90e56b1a5b4306a195e5f71d655dd3e18de3eb5ee334d4
+  Funkorama; Backbay Lounge; Furious Freak; Volatile Reaction — Kevin MacLeod | Creative Commons Attribution 4.0 International (CC BY 4.0)
+  Source: https://incompetech.com/music/royalty-free/licenses/
+  Bank: bank.music.boss_mintodog_trance_boss_battle.file
 
 assets/audio/replacements/rpg/bookFlip1.ogg
   18248 bytes | SHA-256 fa81ac2fedc8c641661b87e349630a36c9800e795e0c800e029214efdbe26a7d

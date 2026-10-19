@@ -33,12 +33,23 @@ def prepare(raw, target):
         wav.setnchannels(1); wav.setsampwidth(2); wav.setframerate(rate); wav.writeframes(pcm)
     return {'seconds':len(pcm)/2/rate,'sample_rate':rate,'peak_dbfs':round(20*__import__('math').log10(max(1,audioop.max(pcm,2))/32768),2),'sha256':digest(target)}
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--generate',action='store_true');ap.add_argument('--max-credits',type=Decimal,default=Decimal('3500'));ap.add_argument('--limit',type=int,default=0)
+    ap=argparse.ArgumentParser()
+    ap.add_argument('--generate',action='store_true')
+    ap.add_argument('--max-credits',type=Decimal,default=Decimal('3500'))
+    ap.add_argument('--limit',type=int,default=0)
+    ap.add_argument('--plan',type=Path,default=ROOT/'docs/audio/breeze/plan.json')
+    ap.add_argument('--outdir',type=Path,default=ROOT/'game/assets/audio/speech')
+    ap.add_argument('--rawdir',type=Path,default=Path('B:/Critterweight/release-work/v0.9.15-preview2/breeze-raw'))
+    ap.add_argument('--ledger',type=Path,default=ROOT/'docs/audio/breeze/generation-ledger.jsonl')
+    ap.add_argument('--catalog',type=Path,default=None)
+    ap.add_argument('--resource-prefix',default='res://assets/audio/speech/')
+    ap.add_argument('--budget-report',type=Path,default=ROOT/'docs/audio/breeze/budget-final.json')
     args=ap.parse_args()
-    plan=json.loads((ROOT/'docs/audio/breeze/plan.json').read_text(encoding='utf-8'))
-    rawdir=Path('B:/Critterweight/release-work/v0.9.15-preview2/breeze-raw');rawdir.mkdir(exist_ok=True)
-    outdir=ROOT/'game/assets/audio/speech';outdir.mkdir(parents=True,exist_ok=True)
-    ledger=ROOT/'docs/audio/breeze/generation-ledger.jsonl'
+    plan=json.loads(args.plan.read_text(encoding='utf-8'))
+    rawdir=args.rawdir;rawdir.mkdir(parents=True,exist_ok=True)
+    outdir=args.outdir;outdir.mkdir(parents=True,exist_ok=True)
+    ledger=args.ledger;ledger.parent.mkdir(parents=True,exist_ok=True)
+    catalog_path=args.catalog or (outdir/'catalog.json')
     records=[json.loads(s) for s in ledger.read_text(encoding='utf-8').splitlines()] if ledger.exists() else []
     complete={r['id']:r for r in records if r['status']=='complete'}
     started={r['id'] for r in records if r['status']=='requested'}
@@ -46,6 +57,8 @@ def main():
     if uncertain: raise RuntimeError('Unresolved prior requests; inspect provider history before any retry: '+str(sorted(uncertain)))
     pending=[]
     for id,item in plan['clips'].items():
+        item = dict(item)
+        item.setdefault('id', id)
         if id in complete:
             r=complete[id]
             if any(r.get(k)!=item.get(k) for k in ['text','voice_id','instructions']) or r.get('model_id')!=plan['model_id'] or digest(outdir/(id+'.wav'))!=r['sha256']: raise RuntimeError('Completed take changed: '+id)
@@ -89,10 +102,12 @@ def main():
                 except Exception as e:errors.append(str(e))
             if errors:raise RuntimeError('; '.join(errors)+'; no retries made')
     if all(id in complete for id in plan['clips']):
-        catalog={k:plan[k] for k in ['version','voices','cast','fixed_tokens','tokens','lines']}
-        catalog['clips']={id:{'path':'res://assets/audio/speech/'+id+'.wav','seconds':complete[id]['seconds'],'sha256':complete[id]['sha256'],'voice':x['voice']} for id,x in plan['clips'].items()}
-        (outdir/'catalog.json').write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+        catalog={k:plan[k] for k in ['version','voices','cast','fixed_tokens','tokens','lines'] if k in plan}
+        catalog['clips']={id:{'path':args.resource_prefix+id+'.wav','seconds':complete[id]['seconds'],'sha256':complete[id]['sha256'],'voice':x['voice']} for id,x in plan['clips'].items()}
+        catalog_path.parent.mkdir(parents=True,exist_ok=True)
+        catalog_path.write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
         end=request_json('/v1/api-keys/current',key)['api_key'];safe={k:end.get(k) for k in ['status','credit_limit','credit_used','credit_reserved','credit_remaining']}
-        (ROOT/'docs/audio/breeze/budget-final.json').write_text(json.dumps(safe,indent=2)+'\n',encoding='utf-8')
+        args.budget_report.parent.mkdir(parents=True,exist_ok=True)
+        args.budget_report.write_text(json.dumps(safe,indent=2)+'\n',encoding='utf-8')
         print('Complete. Provider budget: '+json.dumps(safe),flush=True)
 if __name__=='__main__':main()

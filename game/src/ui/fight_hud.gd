@@ -369,7 +369,7 @@ func callout(text: String, seconds := 1.4, color := Color(1, 0.92, 0.7)) -> void
 
 
 ## Subtitle line (announcer / coach). Always shown when subtitles are on.
-const SPEAKERS := {"barnaby": "Barnaby Bellows", "granny": "Granny Haymaker"}
+const SPEAKERS := {"barnaby": "Barnaby Bellows", "kendall": "Kendall", "granny": "Granny Haymaker"}
 
 
 func subtitle(speaker: String, text: String, seconds := 3.0) -> void:

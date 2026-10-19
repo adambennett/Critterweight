@@ -40,3 +40,9 @@ the authorized 3,500. See budget-final.json. No further generation is pending.
 Recorded playback uses actual clip duration, sequential completion signals, and the existing
 priority/interrupt queue. NPC bubbles follow recorded duration. Explicit conversation choices
 and lesson transitions replace stale speech. Physical listening approval remains with the owner.
+
+## Announcer expansion for the v0.9.15 preview
+
+Generated 2026-10-18 for the v0.9.15 playtest preview. The approved batch contains 854 offline recordings: 515 Devon takes for Barnaby and 339 Kendall takes, totaling 49 minutes 21 seconds. The nine rare booth conversations are ten turns each. The added 108 takes call out Varga, Knell, Scrap, Spectral, ability use and eight roster matchups.
+
+The provider charged 5,656.5 credits from the owner's 6,000-credit allowance, leaving 343.5. All 854 processed WAVs and their raw masters match the generation journal SHA-256 values. Installed clips are mono 24 kHz PCM16 with peaks between -7.3 and -3.0 dBFS. Runtime files are under `game/assets/audio/speech/announcer_expansion/`; raw masters are in `B:/Critterweight/release-work/v0.9.15-preview4/breeze-raw`. See `announcer-expansion-audit.json`, `announcer-expansion-ledger.jsonl`, and `announcer-expansion-budget-final.json` for verification.

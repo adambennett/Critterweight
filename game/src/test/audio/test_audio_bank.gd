@@ -100,6 +100,11 @@ func test_manifest_matches_files_on_disk() -> void:
 
 func test_music_tracks_loops_and_layers() -> void:
 	var required := ["fight_night_poster", "cannery_radio", "combat_a", "combat_b", "boss", "victory", "defeat", "title_night"]
+	var community := [
+		"menu_mintodog_scifi_stage_select", "combat_mintodog_jazzy_battle", "combat_mintodog_fairy_battles",
+		"combat_mintodog_hard_battle_1", "combat_mintodog_hard_battle_2", "boss_mintodog_trance_boss_battle",
+		"boss_mintodog_hard_boss_battle_1", "boss_mintodog_hard_boss_battle_2"]
+	required.append_array(community)
 	var music: Dictionary = Audio.bank.get("music", {})
 	for t in required:
 		check(music.has(t), "track %s in bank" % t)

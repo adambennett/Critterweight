@@ -9,7 +9,7 @@ Adam Bennett
 
 ## Design, engineering and art direction
 Developed with AI-assisted tooling (Anthropic Claude) under the project lead's direction. All names, characters,
-writing, UI, icons and models are original to this project. Music and selected sound effects are third-party recordings
+writing, UI and icons are original to this project. Varga uses Jeremy's fighter model as credited below. Music and selected sound effects are third-party recordings
 under the free licences listed below; the remaining generated audio comes from tools/audio.
 
 ## Campaign event art
@@ -17,9 +17,10 @@ under the free licences listed below; the remaining generated audio comes from t
 29 event illustrations generated with OpenAI image_gen under the project lead's direction. Exact prompts and asset provenance: docs/evidence/art/events/prompts.json.
 
 ## Reference project
-Cage Rules, by Jeremy — its code, ideas and project-owned assets were authorised for reuse. This game reuses only the
-Barlow typefaces that came through Cage Rules (their own SIL OFL 1.1 licence applies); everything else was made for
-this project.
+Cage Rules, by Jeremy — its code, ideas and project-owned assets were authorised for reuse. Varga uses the original
+fighter model, rig, standing poses and strike definitions, adapted to Critterweight's simulation and controls. The
+Barlow typefaces also came through Cage Rules (their own SIL OFL 1.1 licence applies). Source hashes and conversion
+commands are recorded in tools/cage_rules/README.md; the original ground/submission engine is not included.
 
 ## Engine and middleware
 - Godot Engine 4.5.1 — godotengine.org — MIT License (and the licences of its bundled libraries, shown in-game)
@@ -34,6 +35,7 @@ this project.
 - Dialogue generated with BreezeBlue TTS 2 using the owner-selected Devon, Kendall and Coach Buck library voices. Original Critterweight writing; commercial-use generated outputs under an active paid subscription. See docs/audio/breeze/ for exact takes and provenance.
 
 - Funkorama, Backbay Lounge, Furious Freak and Volatile Reaction — Kevin MacLeod (incompetech.com), CC BY 4.0. Required attribution: “Music: Funkorama, Backbay Lounge, Furious Freak, Volatile Reaction by Kevin MacLeod (incompetech.com). Licensed under CC BY 4.0.” Source and licence links appear in the in-game Notices.
+- Eight loopable tracks by MintoDog — OpenGameArt, CC0 1.0 (CC0 credits are optional). The two tracks already used in Cage Rules are the same files published on those CC0 pages.
 - Selected clips from Kenney Impact Sounds, Interface Sounds, RPG Audio and Music Jingles — CC0 1.0; credit is optional and included here for provenance.
 - Waterflow Sound by TyberiusGames, crowd ambience by StarNinjas, and applause by eXpl0it3r (OpenGameArt) — CC0 1.0.
 - Exact files, hashes, licences and bank references are in game/assets/audio/replacements/replacement-audio-inventory.json and docs/audio/replacement-audio-inventory.txt.

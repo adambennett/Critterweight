@@ -4,7 +4,8 @@
   "notes": [
     "All included third-party clips were obtained from the official author or asset page without payment.",
     "No clip file was edited; bank gain, playback loop, and pitch settings are game-side settings.",
-    "The Kenney Voiceover Pack: Fighter and OpenGameArt Water Waves FLACs are not shipped or used because they do not suit the named creature casts or current Godot audio path."
+    "The Kenney Voiceover Pack: Fighter and OpenGameArt Water Waves FLACs are not shipped or used because they do not suit the named creature casts or current Godot audio path.",
+    "Eight loopable music tracks by MintoDog were downloaded directly from their OpenGameArt pages under CC0 1.0; the two tracks already present in the Cage Rules project were hash-verified against those official downloads. Files are unedited; loop and gain are configured in-game."
   ],
   "sources": {
     "incompetech-ccby": {
@@ -78,6 +79,86 @@
       "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
       "attribution": "Applause in a Large Hall or Church by eXpl0it3r (CC0 1.0; https://opengameart.org/content/applause-in-a-large-hall-or-church).",
       "modification": "Supplied WAV used without editing; playback gain configured in the game."
+    },
+    "oga-mintodog-scifi-stage": {
+      "creator": "MintoDog",
+      "title": "Sci-fi Puzzle Stage Select",
+      "source": "https://opengameart.org/content/sci-fi-puzzle-stage-select",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Sci-fi Puzzle Stage Select by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/sci-fi-puzzle-stage-select).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-trance-boss": {
+      "creator": "MintoDog",
+      "title": "Trance Boss Battle",
+      "source": "https://opengameart.org/content/trance-boss-battle",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Trance Boss Battle by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/trance-boss-battle).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-jazzy-battle": {
+      "creator": "MintoDog",
+      "title": "Jazzy Battle Theme",
+      "source": "https://opengameart.org/content/jazzy-battle-theme",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Jazzy Battle Theme by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/jazzy-battle-theme).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-fairy-battles": {
+      "creator": "MintoDog",
+      "title": "Fairy Battles",
+      "source": "https://opengameart.org/content/fairy-battles",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Fairy Battles by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/fairy-battles).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-hard-battle-1": {
+      "creator": "MintoDog",
+      "title": "Hard Battle 1",
+      "source": "https://opengameart.org/content/hard-battle-1",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Hard Battle 1 by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/hard-battle-1).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-hard-battle-2": {
+      "creator": "MintoDog",
+      "title": "Hard Battle 2",
+      "source": "https://opengameart.org/content/hard-battle-2",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Hard Battle 2 by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/hard-battle-2).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-hard-boss-1": {
+      "creator": "MintoDog",
+      "title": "Hard Boss Battle 1",
+      "source": "https://opengameart.org/content/hard-boss-battle-1",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Hard Boss Battle 1 by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/hard-boss-battle-1).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
+    },
+    "oga-mintodog-hard-boss-2": {
+      "creator": "MintoDog",
+      "title": "Hard Boss Battle 2",
+      "source": "https://opengameart.org/content/hard-boss-battle-2",
+      "license": "Creative Commons Zero (CC0 1.0)",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Hard Boss Battle 2 by MintoDog (OpenGameArt, CC0 1.0; https://opengameart.org/content/hard-boss-battle-2).",
+      "modification": "Original OpenGameArt download used unedited; loop and playback gain configured in the game.",
+      "downloaded": "2026-10-18"
     }
   },
   "prefixes": {
@@ -89,6 +170,14 @@
     "jingles/": "kenney-jingles",
     "water/": "oga-waterflow",
     "crowd/crowd-shouting.ogg": "oga-crowd",
-    "crowd/crowd-applause.wav": "oga-applause"
+    "crowd/crowd-applause.wav": "oga-applause",
+    "music/community/sci-fi_puzzle_stage_select_bpm105.mp3": "oga-mintodog-scifi-stage",
+    "music/community/trance_boss_battle_bpm150.mp3": "oga-mintodog-trance-boss",
+    "music/community/jazzy_battle_theme_bpm130.ogg": "oga-mintodog-jazzy-battle",
+    "music/community/fairy_battles_bpm180.ogg": "oga-mintodog-fairy-battles",
+    "music/community/hard_battle_1_bpm170.ogg": "oga-mintodog-hard-battle-1",
+    "music/community/hard_battle_2_bpm140.ogg": "oga-mintodog-hard-battle-2",
+    "music/community/hard_boss_battle_1_bpm200.ogg": "oga-mintodog-hard-boss-1",
+    "music/community/hard_boss_battle_2_bpm210.ogg": "oga-mintodog-hard-boss-2"
   }
 }

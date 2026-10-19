@@ -337,6 +337,43 @@ func test_team_setup_compact_cards_fit_and_keep_slot_identity() -> void:
 			check(row.get_global_rect().end.y <= s._scroll.get_global_rect().end.y, "controller reveals each fighter")
 		check(s._pick_rows[0].global_position.x != s._pick_rows[1].global_position.x, "opponents occupy different team columns")
 
+func test_jukebox_preview_button_stops_previous_track() -> void:
+	var menu_track := "menu_mintodog_scifi_stage_select"
+	var preview_track := "combat_mintodog_jazzy_battle"
+	check(Audio.bank["music"].has(menu_track), "community menu track is in the bank")
+	check(Audio.bank["music"].has(preview_track), "community fight track is in the bank")
+	if not Audio.bank["music"].has(menu_track) or not Audio.bank["music"].has(preview_track):
+		return
+	var audio_was_enabled := Audio.enabled
+	Audio.enabled = true
+	var s = App.goto("jukebox")
+	await wait_frames(4)
+	var preview := s.find_child("JukeboxPreview_" + preview_track, true, false) as UiButton
+	check(preview != null, "each Jukebox track has a controller-focusable preview button")
+	if preview == null:
+		Audio.enabled = audio_was_enabled
+		return
+	Audio.music(menu_track, 0.05, {"jukebox_resolved": true, "restart": true})
+	await wait_frames(2)
+	check(Audio._music_cur >= 0, "first track enters a music slot")
+	if Audio._music_cur < 0:
+		Audio.enabled = audio_was_enabled
+		return
+	var first_player := Audio._music_slots[Audio._music_cur]["base"] as AudioStreamPlayer
+	check(first_player.playing, "first track is playing before preview")
+	preview.pressed.emit()
+	check_eq(Audio.music_track(), preview_track, "preview button starts its selected track")
+	check(not first_player.playing, "previous track is stopped synchronously before the preview starts")
+	var playing_count := 0
+	for slot in Audio._music_slots:
+		if slot["base"] != null and (slot["base"] as AudioStreamPlayer).playing:
+			playing_count += 1
+	check_eq(playing_count, 1, "only the latest preview is playing")
+	Audio.stop_music(0.05)
+	await wait_frames(4)
+	Audio.enabled = audio_was_enabled
+
+
 func test_jukebox_persists_and_menu_stops_environment() -> void:
 	var ids := Jukebox.tracks()
 	Jukebox.save("menu", {"mode": "ordered", "tracks": ids})

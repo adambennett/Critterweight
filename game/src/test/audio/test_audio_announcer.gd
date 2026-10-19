@@ -24,7 +24,9 @@ func _on_sub(speaker: String, text: String, seconds: float) -> void:
 
 func test_all_lines_have_ids_subtitles_and_triggers() -> void:
 	var ids := Audio.line_ids()
-	var barnaby := 0
+	var standard_barnaby := 0
+	var expansion_barnaby := 0
+	var expansion_kendall := 0
 	var granny := 0
 	for id in ids:
 		var l := Audio.line(id)
@@ -33,14 +35,90 @@ func test_all_lines_have_ids_subtitles_and_triggers() -> void:
 		check(l.has("priority"), "%s has a priority" % id)
 		match str(l.get("speaker", "")):
 			"barnaby":
-				barnaby += 1
+				if str(id).begins_with("ann_exp_"):
+					expansion_barnaby += 1
+				else:
+					standard_barnaby += 1
+				check(str(l["text"]).length() <= 90, "%s subtitle <= 90 chars (%d)" % [id, str(l["text"]).length()])
+			"kendall":
+				expansion_kendall += 1
 				check(str(l["text"]).length() <= 90, "%s subtitle <= 90 chars (%d)" % [id, str(l["text"]).length()])
 			"granny":
 				granny += 1
 			_:
 				fail("%s has an unknown speaker" % id)
-	check_eq(barnaby, 163, "Barnaby line count (design doc)")
+	check_eq(standard_barnaby, 163, "standard Barnaby line count")
+	check_eq(expansion_barnaby, 515, "expanded Devon/Barnaby line count")
+	check_eq(expansion_kendall, 339, "Kendall line count")
 	check(granny >= 36, "Granny tutorial lines present (%d)" % granny)
+
+
+func test_varga_and_knell_ability_uses_get_specific_announcer_calls() -> void:
+	Audio.begin_match({"player_index": 0, "fighters": [
+		{"index": 0, "creature": "f_dozer", "name": "DOZER", "team": 0},
+		{"index": 1, "creature": "f_varga", "name": "VARGA", "team": 1},
+	], "seed": 31})
+	var acts := Audio.on_sim_event({"type": "ability", "fighter": 1, "slot": "ability1", "id": "cut_the_angle"})
+	var varga_line := ""
+	for action in acts:
+		if str(action).begins_with("line:ann_exp_"):
+			varga_line = str(action).trim_prefix("line:")
+	check(not varga_line.is_empty(), "Varga ability callout is selected")
+	check(str(Audio.line(varga_line).get("text", "")).contains("Cut the Angle"), "callout names Varga's actual ability")
+	Audio.stop_announcer()
+	Audio.begin_match({"player_index": 0, "fighters": [
+		{"index": 0, "creature": "f_dozer", "name": "DOZER", "team": 0},
+		{"index": 1, "creature": "f_knell", "name": "KNELL", "team": 1},
+	], "seed": 32})
+	acts = Audio.on_sim_event({"type": "ability", "fighter": 1, "slot": "ability1", "id": "ghost_light"})
+	var knell_line := ""
+	for action in acts:
+		if str(action).begins_with("line:ann_exp_"):
+			knell_line = str(action).trim_prefix("line:")
+	check(not knell_line.is_empty(), "Knell ability callout is selected")
+	check(str(Audio.line(knell_line).get("text", "")).contains("Ghost Light"), "callout names Knell's actual ability")
+	Audio.stop_announcer()
+	Audio.begin_match({"player_index": 0, "fighters": [
+		{"index": 0, "creature": "f_dozer", "name": "DOZER", "team": 0},
+		{"index": 1, "creature": "f_knell", "name": "KNELL", "team": 1},
+	], "seed": 33})
+	acts = Audio.on_sim_event({"type": "ability", "fighter": 1, "slot": "ability2", "id": "through_the_veil"})
+	var phase_line := ""
+	for action in acts:
+		if str(action).begins_with("line:ann_exp_"):
+			phase_line = str(action).trim_prefix("line:")
+	check(not phase_line.is_empty(), "Knell's second ability gets a callout")
+	var phase_text := str(Audio.line(phase_line).get("text", ""))
+	check(phase_text.contains("Through the Veil") or phase_text.contains("phase step"), "callout describes Knell's phase ability")
+
+
+func test_color_commentary_paces_and_interrupts_a_rare_conversation() -> void:
+	Audio.begin_match({"player_index": 0, "fighters": [
+		{"index": 0, "creature": "f_varga", "name": "VARGA", "team": 0},
+		{"index": 1, "creature": "f_knell", "name": "KNELL", "team": 1},
+		{"index": 2, "creature": "f_dozer", "name": "DOZER", "team": 1},
+	], "seed": 44})
+	var context := Audio._color_context()
+	check(context["element"].has("scrap"), "color context includes Scrap fighters")
+	check(context["element"].has("spectral"), "color context includes Spectral fighters")
+	check(context["matchup"].has("f_dozer|f_varga"), "color context includes cross-team matchup")
+	var matchup_line := Audio.pick_line("matchup_color", context)
+	check(not matchup_line.is_empty(), "matchup-specific color lines can be selected")
+	check(not Audio.pick_line("element_color", {"element": "scrap"}).is_empty(), "Scrap rules lines are selectable")
+	check(not Audio.pick_line("element_color", {"element": "spectral"}).is_empty(), "Spectral rules lines are selectable")
+	check(Audio.announce_color_commentary(true).begins_with("ann_exp_"), "rare conversation starts with a recorded line")
+	var first: Dictionary = Audio.line(str(Audio._ann_current.get("id", "")))
+	var conversation_id := str(first.get("conversation_id", ""))
+	check(not conversation_id.is_empty(), "first take identifies its conversation")
+	check_eq(Audio._ann_conversation_queue.size(), 9, "nine remaining turns are queued")
+	Audio._finish_line()
+	await get_tree().create_timer(0.55).timeout
+	var second: Dictionary = Audio.line(str(Audio._ann_current.get("id", "")))
+	check_eq(str(second.get("conversation_id", "")), conversation_id, "conversation continues in order")
+	check_eq(int(second.get("conversation_turn", 0)), 2, "second take is turn two")
+	check(Audio.announce("ann_ko_01"), "high-priority event interrupts the conversation")
+	check(Audio._ann_conversation_queue.is_empty(), "priority event cancels remaining booth turns")
+	check_eq(Audio._ann_active_conversation, "", "interrupted conversation is cleared")
 
 
 func test_announce_emits_subtitle_and_substitutes_names() -> void:

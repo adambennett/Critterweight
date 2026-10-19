@@ -3,18 +3,30 @@ extends RefCounted
 ## Offline recorded speech. Authored subtitles retain names/bindings; audio uses recorded
 ## roster names, Player 1-8 fallbacks and device-independent action names. No network access.
 const PATH := "res://assets/audio/speech/catalog.json"
+const EXPANSION_PATH := "res://assets/audio/speech/announcer_expansion/catalog.json"
 var catalog: Dictionary = {}
 var _ids: Dictionary = {}
 var _exact: Dictionary = {}
 var _patterns: Array = []
 
 func _init() -> void:
-	if not FileAccess.file_exists(PATH):
-		return
-	var data = JSON.parse_string(FileAccess.get_file_as_string(PATH))
-	if not (data is Dictionary):
-		return
-	catalog = data
+	for path in [PATH, EXPANSION_PATH]:
+		if not FileAccess.file_exists(path):
+			continue
+		var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+		if not (data is Dictionary):
+			continue
+		for key in ["clips", "tokens", "fixed_tokens", "voices", "cast"]:
+			var incoming = data.get(key, {})
+			if incoming is Dictionary:
+				var merged: Dictionary = catalog.get(key, {})
+				merged.merge(incoming, true)
+				catalog[key] = merged
+		var incoming_lines = data.get("lines", [])
+		if incoming_lines is Array:
+			var merged_lines: Array = catalog.get("lines", [])
+			merged_lines.append_array(incoming_lines)
+			catalog["lines"] = merged_lines
 	for item in catalog.get("lines", []):
 		var line: Dictionary = item
 		_ids[str(line["id"])] = line

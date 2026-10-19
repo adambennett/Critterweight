@@ -6487,6 +6487,223 @@
    ],
    "stinger": false,
    "replacement": true
+  },
+  "menu_mintodog_scifi_stage_select": {
+   "layers": [],
+   "stinger": false,
+   "replacement": true,
+   "file": "res://assets/audio/replacements/music/community/sci-fi_puzzle_stage_select_bpm105.mp3",
+   "title": "Sci-fi Puzzle Stage Select",
+   "bpm": 105,
+   "beats_per_bar": 4,
+   "bars": 28,
+   "seconds": 63.999977,
+   "bar_seconds": 2.285714,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 28
+    }
+   ],
+   "gain": -16,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "tags": [
+    "menu",
+    "synth"
+   ]
+  },
+  "combat_mintodog_jazzy_battle": {
+   "layers": [],
+   "stinger": false,
+   "replacement": true,
+   "file": "res://assets/audio/replacements/music/community/jazzy_battle_theme_bpm130.ogg",
+   "title": "Jazzy Battle Theme",
+   "bpm": 130,
+   "beats_per_bar": 4,
+   "bars": 44,
+   "seconds": 81.230774,
+   "bar_seconds": 1.846154,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 44
+    }
+   ],
+   "gain": -11,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "tags": [
+    "combat",
+    "jazz"
+   ]
+  },
+  "combat_mintodog_fairy_battles": {
+   "layers": [],
+   "stinger": false,
+   "replacement": true,
+   "file": "res://assets/audio/replacements/music/community/fairy_battles_bpm180.ogg",
+   "title": "Fairy Battles",
+   "bpm": 180,
+   "beats_per_bar": 4,
+   "bars": 73,
+   "seconds": 97.333336,
+   "bar_seconds": 1.333333,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 73
+    }
+   ],
+   "gain": -13,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "tags": [
+    "combat",
+    "fantasy",
+    "synth"
+   ]
+  },
+  "combat_mintodog_hard_battle_1": {
+   "layers": [],
+   "stinger": false,
+   "replacement": true,
+   "file": "res://assets/audio/replacements/music/community/hard_battle_1_bpm170.ogg",
+   "title": "Hard Battle 1",
+   "bpm": 170,
+   "beats_per_bar": 4,
+   "bars": 64,
+   "seconds": 90.352951,
+   "bar_seconds": 1.411765,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 64
+    }
+   ],
+   "gain": -12,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "tags": [
+    "combat",
+    "hard"
+   ]
+  },
+  "combat_mintodog_hard_battle_2": {
+   "layers": [],
+   "stinger": false,
+   "replacement": true,
+   "file": "res://assets/audio/replacements/music/community/hard_battle_2_bpm140.ogg",
+   "title": "Hard Battle 2",
+   "bpm": 140,
+   "beats_per_bar": 4,
+   "bars": 52,
+   "seconds": 89.14286,
+   "bar_seconds": 1.714286,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 52
+    }
+   ],
+   "gain": -12,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "tags": [
+    "combat",
+    "hard"
+   ]
+  },
+  "boss_mintodog_trance_boss_battle": {
+   "layers": [],
+   "stinger": false,
+   "replacement": true,
+   "file": "res://assets/audio/replacements/music/community/trance_boss_battle_bpm150.mp3",
+   "title": "Trance Boss Battle",
+   "bpm": 150,
+   "beats_per_bar": 4,
+   "bars": 64,
+   "seconds": 102.400002,
+   "bar_seconds": 1.6,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 64
+    }
+   ],
+   "gain": -12,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "tags": [
+    "boss",
+    "trance"
+   ]
+  },
+  "boss_mintodog_hard_boss_battle_1": {
+   "layers": [],
+   "stinger": false,
+   "replacement": true,
+   "file": "res://assets/audio/replacements/music/community/hard_boss_battle_1_bpm200.ogg",
+   "title": "Hard Boss Battle 1",
+   "bpm": 200,
+   "beats_per_bar": 4,
+   "bars": 67,
+   "seconds": 80.099998,
+   "bar_seconds": 1.2,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 67
+    }
+   ],
+   "gain": -13,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "tags": [
+    "boss",
+    "hard"
+   ]
+  },
+  "boss_mintodog_hard_boss_battle_2": {
+   "layers": [],
+   "stinger": false,
+   "replacement": true,
+   "file": "res://assets/audio/replacements/music/community/hard_boss_battle_2_bpm210.ogg",
+   "title": "Hard Boss Battle 2",
+   "bpm": 210,
+   "beats_per_bar": 4,
+   "bars": 98,
+   "seconds": 112,
+   "bar_seconds": 1.142857,
+   "sections": [
+    {
+     "id": "A",
+     "start_bar": 1,
+     "bars": 98
+    }
+   ],
+   "gain": -12,
+   "loop": true,
+   "stereo": true,
+   "sr": 44100,
+   "tags": [
+    "boss",
+    "hard"
+   ]
   }
  },
  "voices": {
