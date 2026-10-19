@@ -1,0 +1,58 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 967,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_every_screen_has_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 721,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 519,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_menu_settings_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 151,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_online_match_does_not_pause"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_stick_keyboard_mouse_and_prompts"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_text_and_ui_scale_apply_live"
+		},
+		{
+			"errors": [],
+			"ms": 79,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_text_entry_with_controller"
+		},
+		{
+			"errors": [],
+			"ms": 283,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_versus_pause_disconnect_and_quit"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 8 run, 0 failed, 8 passed, 0 skipped in 9.0 s",
+	"time": "2026-10-18T22:02:13",
+	"total": 8,
+	"version": "0.9.15"
+}

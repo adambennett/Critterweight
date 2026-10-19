@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 667,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_every_screen_has_focus_and_back"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 3.9 s",
+	"time": "2026-10-18T22:07:12",
+	"total": 1,
+	"version": "0.9.15"
+}

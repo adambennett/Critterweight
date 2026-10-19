@@ -227,3 +227,12 @@ Scope and owner review checklist: docs/releases/v0.9.15-preview3.md. Prior monit
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|
 | CNT-09 | Seventh playable Cage Rules guest with source model, limb/modifier controls on keyboard/controller, native abilities/JUICE; eighth Spectral fighter with standard controls; both selectable, networkable and campaign-upgradable | I B T | docs/releases/v0.9.15-fighters-preview.md; 406 scripts, 130 source and 62 packaged tests pass, including 19 new-fighter physical/input/integration regressions. Ground/submission simulation explicitly outside the guest adaptation. Windows executable exported; physical controller and rendered playtest pending. |
+
+## v0.9.15 combined audio and fighter preview
+
+| ID | Requirement / acceptance | State | Evidence |
+|---|---|---|---|
+| P15-13 | Offline Devon/Kendall expansion includes 854 additional takes, new-fighter/type/matchup calls and paced interruptible conversations; earlier cast/name recordings preserved | I B T | test_audio_announcer and test_recorded_speech; all 1,618 recordings load in the exported executable; docs/releases/v0.9.15-combined-preview.md |
+| P15-14 | Eight additional community tracks retain provenance and are selectable/previewable in the persisted Jukebox without simultaneous previews | I B T | test_audio_bank and test_preview_0915::test_jukebox_preview_button_stops_previous_track; source and packaged checks pass; corrected credits generator preserves prior notices |
+
+Combined verification for P15-01 through P15-14 and CNT-09: full source suite 774 passed, zero failed, one graphical-audio skip; final package 70 passed, zero failed, two source-only skips. No new physical/controller/graphical W claim; the owner requested an unopened local preview. Evidence: docs/evidence/verification/v0.9.15-combined/summary.json.

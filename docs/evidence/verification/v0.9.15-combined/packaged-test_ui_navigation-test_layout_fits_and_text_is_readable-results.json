@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 940,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_layout_fits_and_text_is_readable"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 4.2 s",
+	"time": "2026-10-18T22:07:20",
+	"total": 1,
+	"version": "0.9.15"
+}

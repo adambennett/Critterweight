@@ -1,0 +1,64 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 1043,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_all_four_canvas_ledges_trigger_real_ringouts"
+		},
+		{
+			"errors": [],
+			"ms": 48,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_canvas_dressing_keeps_the_platform_clear"
+		},
+		{
+			"errors": [],
+			"ms": 94,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_canvas_uses_rooftop_audio_and_rectangular_policy_boundary"
+		},
+		{
+			"errors": [],
+			"ms": 691,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_editor_controls_resize_rectangle_and_reach_outer_coordinates"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_floor_collision_and_ringout_switch"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_large_canvas_fight_camera_frames_separated_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 60,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_resize_undo_preserves_props_and_reports_outside_items"
+		},
+		{
+			"errors": [],
+			"ms": 166,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_saved_canvas_and_exported_package_are_playable"
+		},
+		{
+			"errors": [],
+			"ms": 187,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_template_is_editor_only_and_valid_at_supported_sizes"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 9 run, 0 failed, 9 passed, 0 skipped in 5.6 s",
+	"time": "2026-10-18T22:07:05",
+	"total": 9,
+	"version": "0.9.15"
+}

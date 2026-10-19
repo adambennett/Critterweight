@@ -1,0 +1,120 @@
+{
+  "version": "0.9.15",
+  "kind": "local combined playtest preview",
+  "build_commit": "8f9baff",
+  "build_working_tree_dirty": false,
+  "built_at": "2026-10-18T22:05:29",
+  "binary": "B:\\Critterweight\\release-work\\v0.9.15-combined-preview\\Critterweight-windows-x64\\Critterweight.exe",
+  "bytes": 298854336,
+  "sha256": "ade278780feafa21f14b8c06ac56a46382ebe8b572b2f8b673e2110387eede75",
+  "scripts_checked": 406,
+  "compile_failures": 0,
+  "source_full_suite": {
+    "summary": "tests: 775 run, 0 failed, 774 passed, 1 skipped in 2485.9 s",
+    "total": 775,
+    "failed": 0,
+    "skipped": 1
+  },
+  "source_skip_reasons": [
+    "Requires the graphical audio backend"
+  ],
+  "post_credits_ui": "tests: 8 run, 0 failed, 8 passed, 0 skipped in 9.0 s",
+  "package_checks": [
+    {
+      "name": "packaged-test_arena_canvas",
+      "summary": "tests: 9 run, 0 failed, 9 passed, 0 skipped in 5.6 s",
+      "total": 9,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0,
+      "skip_reasons": []
+    },
+    {
+      "name": "packaged-test_audio_announcer",
+      "summary": "tests: 8 run, 0 failed, 8 passed, 0 skipped in 3.3 s",
+      "total": 8,
+      "failed": 0,
+      "passed": 8,
+      "skipped": 0,
+      "skip_reasons": []
+    },
+    {
+      "name": "packaged-test_audio_bank",
+      "summary": "tests: 11 run, 0 failed, 9 passed, 2 skipped in 3.8 s",
+      "total": 11,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 2,
+      "skip_reasons": [
+        "scans GDScript source; exported builds ship compiled scripts (runs in the source suite)",
+        "exported builds ship imported samples, not the source .wav files"
+      ]
+    },
+    {
+      "name": "packaged-test_new_fighters",
+      "summary": "tests: 19 run, 0 failed, 19 passed, 0 skipped in 16.4 s",
+      "total": 19,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0,
+      "skip_reasons": []
+    },
+    {
+      "name": "packaged-test_preview_0915",
+      "summary": "tests: 14 run, 0 failed, 14 passed, 0 skipped in 6.1 s",
+      "total": 14,
+      "failed": 0,
+      "passed": 14,
+      "skipped": 0,
+      "skip_reasons": []
+    },
+    {
+      "name": "packaged-test_recorded_speech",
+      "summary": "tests: 9 run, 0 failed, 9 passed, 0 skipped in 4.8 s",
+      "total": 9,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0,
+      "skip_reasons": []
+    },
+    {
+      "name": "packaged-test_ui_navigation-test_every_screen_has_focus_and_back",
+      "summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 3.9 s",
+      "total": 1,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0,
+      "skip_reasons": []
+    },
+    {
+      "name": "packaged-test_ui_navigation-test_layout_fits_and_text_is_readable",
+      "summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 4.2 s",
+      "total": 1,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0,
+      "skip_reasons": []
+    }
+  ],
+  "package_totals": {
+    "total": 72,
+    "failed": 0,
+    "passed": 70,
+    "skipped": 2
+  },
+  "all_game_files_frozen_during_full_suite": true,
+  "only_runtime_content_changed_after_full_suite": [
+    "game/assets/ui/credits.json"
+  ],
+  "generated_audio_reproduction": "636 generated files match committed renders (node tools/audio/build.js --check)",
+  "original_recorded_clips": 764,
+  "new_recorded_clips": 854,
+  "total_recorded_clips": 1618,
+  "new_music_tracks": 8,
+  "distinct_jukebox_choices": 12,
+  "music_bank_entries_including_duplicates_and_stings": 16,
+  "gameplay_fighters": 8,
+  "graphical_game_launched": false,
+  "published": false,
+  "full_logs": "B:\\Critterweight\\combined-verification-20261018"
+}
