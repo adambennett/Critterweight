@@ -161,7 +161,7 @@ func to_world(rp: Vector3, yb: Basis, p: Vector3) -> Vector3:
 
 
 func _in_limb(idx: int) -> bool:
-	return _limb_flags[idx] == 1
+	return _limb_flags[idx] == 1 and not overlay_joints.has(idx)
 
 
 func _chain_target(cname: String, c: BodyDef.Chain, gb: float) -> Vector3:
@@ -265,7 +265,7 @@ func _update_gait(dt: float, yb: Basis, rp: Vector3) -> void:
 			any_stepping[f["group"]] = true
 	for f in _feet:
 		var c: BodyDef.Chain = f["chain"]
-		if overlay_chains.has(c.name):
+		if overlay_chains.has(c.name) or overlay_joints.has(c.segs[0]) or overlay_joints.has(c.segs[1]):
 			continue
 		var home_off := c.foot_home - Vector3(_root_rest.x, 0.0, _root_rest.z)
 		var home := Vector3(rp.x, gy + c.foot_home.y, rp.z) + yb * Vector3(home_off.x, 0.0, home_off.z)

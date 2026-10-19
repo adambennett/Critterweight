@@ -134,7 +134,12 @@ static func practice_cage() -> ArenaDef:
 static func fill(text: String, c: CreatureDef) -> String:
 	var out := text
 	for a in ["light", "heavy", "guard", "dodge", "grab", "ability1", "ability2", "juice", "taunt", "pause", "target"]:
-		out = out.replace("{%s}" % a, "[%s]" % Controls.prompt_for(a))
+		var action: String = a
+		if c and c.tags.has("martial"):
+			action = {"light": "mma_lh", "heavy": "mma_rl"}.get(a, "mma_" + a if MartialControls.MAP.has("mma_" + a) else a)
+		out = out.replace("{%s}" % a, "[%s]" % Controls.prompt_for(action))
+	for action in MartialControls.MAP:
+		out = out.replace("{%s}" % action, "[%s]" % Controls.prompt_for(action))
 	var mv := "Left stick" if Controls.last_device == "gamepad" else "%s %s %s %s" % [Controls.prompt_for("move_up"), Controls.prompt_for("move_left"), Controls.prompt_for("move_down"), Controls.prompt_for("move_right")]
 	out = out.replace("{move}", mv)
 	if c:

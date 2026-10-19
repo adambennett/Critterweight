@@ -432,17 +432,18 @@ static func roster_creature(e: Dictionary) -> CreatureDef:
 	return base
 
 
-# ---- input samples (client -> server): 4 + BUTTON_COUNT bytes each ----
+# ---- input samples (client -> server): 17 bytes core, 24 with guest counters ----
 
 static func write_input(w: NetWriter, fi: FighterInput) -> void:
 	w.i8(int(clampf(fi.move.x, -1.0, 1.0) * 127.0))
 	w.i8(int(clampf(fi.move.z, -1.0, 1.0) * 127.0))
-	w.u16(fi.held & ((1 << FighterInput.BUTTON_COUNT) - 1))
+	var count := fi.wire_counter_count()
+	w.u32((fi.held & ((1 << FighterInput.BUTTON_COUNT) - 1)) | (FighterInput.WIRE_EXTENDED if count == FighterInput.BUTTON_COUNT else 0))
 	var pc := fi.press_count
 	if pc.size() != FighterInput.BUTTON_COUNT:
 		pc = pc.duplicate()
 		pc.resize(FighterInput.BUTTON_COUNT)
-	w.raw(pc)
+	w.raw(pc.slice(0, count))
 
 
 ## Reads one sample; move is clamped to unit length and held bits masked (never trusted).
@@ -453,8 +454,11 @@ static func read_input(r: NetReader) -> FighterInput:
 	fi.move = Vector3(clampf(mx / 127.0, -1.0, 1.0), 0.0, clampf(mz / 127.0, -1.0, 1.0))
 	if fi.move.length() > 1.0:
 		fi.move = fi.move.normalized()
-	fi.held = r.u16() & ((1 << FighterInput.BUTTON_COUNT) - 1)
-	var pc := r.raw(FighterInput.BUTTON_COUNT)
-	if pc.size() == FighterInput.BUTTON_COUNT:
-		fi.press_count = pc
+	var word := r.u32()
+	fi.held = word & ((1 << FighterInput.BUTTON_COUNT) - 1)
+	var count := FighterInput.BUTTON_COUNT if word & FighterInput.WIRE_EXTENDED else FighterInput.CORE_BUTTON_COUNT
+	var pc := r.raw(count)
+	if pc.size() == count:
+		for b in count:
+			fi.press_count[b] = pc[b]
 	return fi

@@ -2,6 +2,8 @@ class_name CompendiumData
 extends RefCounted
 ## Read-only field guide. Stats/cooldowns/status values come from the loaded content, including mods.
 const ABILITIES := {
+	"f_varga": ["Slip a short distance in your movement direction with brief evasion, then deal 18% more damage for two seconds.", "Take a breath: stamina regeneration doubles and poise regeneration rises by 50% for four seconds. It restores resources over time, not HP.", "Push nearby rivals, then attack 20% faster with 20% more damage and 50% faster stamina regeneration for seven seconds, in addition to the standard JUICE bonus."],
+	"f_knell": ["Send a violet ghost-light toward your target. It gently tracks them, deals Spectral damage and builds Haunted.", "Vanish briefly, then emerge 3.2 metres in the movement direction. A small pulse punishes enemies near your exit. Mired prevents the dive.", "Ring three expanding pulses around yourself, building Haunted. For six seconds, take 20% less damage and 25% less knockback. The pulses can be escaped or interrupted."],
 	"f_stoke": ["Vent a short cone of steam in front of you, pushing enemies and destroying incoming projectiles.", "A four-second self buff: attacks animate 25% faster and hits add Scorch. Stamina stops regenerating and you lose 1 HP per second (cannot kill you). Use it before a combo; it does not shoot anything.", "Burst around you, then gain armor against everything except heavy hits for six seconds. Hits add Scorch and leave burning ground. Costs 30 stamina when it ends."],
 	"f_dredge": ["Spit a Brine glob that leaves a puddle when it expires.", "Plant yourself for a 2.5-second counter stance. Incoming knockback is halved and frontal attacks trigger a Brine counter. Bait an enemy into hitting you; pressing it at range will not fire a shot.", "Release a knockdown wave and flood the arena for eight seconds. Move faster and throw farther while the tide lasts."],
 	"f_gusto": ["Fire a wind projectile with strong knockback; it bursts into a pushing gust.", "Hover above the floor for 1.2 seconds. Move during the hover to reposition or escape ground hazards. Jolted and Mired can prevent hovering.", "Push a cone of opponents away, then gain speed and free dodges for seven seconds. Dodges leave vortices and taunts heal you."],
@@ -19,6 +21,9 @@ const MODES := {
 	"practice": "A training cage with no meaningful win/loss stakes. Use the practice options to set the opponent and work on specific moves.",
 }
 const REACTIONS := {
+	"bell_ringer": "Consumes Rattled and Haunted for a short stun, damage and a burst of poise damage.",
+	"grave_chill": "Consumes Soaked and slows movement for two seconds.",
+	"crack_guard": "Consumes Caked to deal damage and briefly open the target's guard.",
 	"steam_burst": "Consumes both statuses, damages and pushes nearby fighters, and leaves steam that obscures bots' sight.",
 	"flare_up": "Burns away Sludge in an explosive launch. Nearby fighters, including the attacker, can take damage and Scorch build-up.",
 	"backdraft": "Refreshes Scorch, spreads its build-up to nearby fighters and doubles the push.",
@@ -101,10 +106,12 @@ static func fighter_text(c: CreatureDef) -> String:
 	for slot in ["ability1", "ability2", "juice"]:
 		if c.abilities.has(slot):
 			var a: MoveDef = c.abilities[slot]
-			text += "\n[b]%s · %s[/b]\n" % [Controls.prompt_for(slot), a.display_name]
+			text += "\n[b]%s · %s[/b]\n" % [Controls.prompt_for(MartialControls.action(slot, c)), a.display_name]
 			text += str(ABILITIES[c.id][i]) if ABILITIES.has(c.id) else ability_summary(a)
 			text += "\n" + ("Requires full Hype" if slot == "juice" else "Cooldown %s s · stamina %s · charges %s" % [c.cooldowns.get(slot, 0), a.stamina, c.ability_charges.get(slot, 1)]) + "\n"
 		i += 1
+	if c.tags.has("martial"):
+		text += "\n" + MartialControls.description()
 	return text
 
 static func ability_summary(a: MoveDef) -> String:

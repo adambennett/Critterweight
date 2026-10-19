@@ -1,0 +1,31 @@
+{
+  "captured": "2026-10-18",
+  "authorization": "Owner request to import Jeremy's Cage Rules fighter for v0.9.15",
+  "source_root": "C:\\Users\\eX_Di\\git\\PokemonMMA\\Cage Rules\\MMAsim",
+  "files": [
+    {
+      "source": "lib/three.min.js",
+      "retained": "source/three.min.js",
+      "sha256": "7ae04663bb431808bc025280122162029ea3a354efc5fcca8bd8f95d1a1933e9",
+      "bytes": 603451
+    },
+    {
+      "source": "js/sim.js",
+      "retained": "source/sim.js",
+      "sha256": "b69793294b6d34958eff734d7530e8241b1938b5887f9cb5cb654d2792c1dfe2",
+      "bytes": 87149
+    },
+    {
+      "source": "js/physics.js",
+      "retained": "source/physics.js",
+      "sha256": "223c50fca0f6b27c81a5d98bb90c7e156e4566df45eff55ab1997b20fc7fdce4",
+      "bytes": 97083
+    },
+    {
+      "source": "js/render.js",
+      "retained": "source/render.js",
+      "sha256": "c5cc3fa2f769a06bd722214fb600b3aa9f1281cc9432ef2f1b687092ed943c67",
+      "bytes": 125607
+    }
+  ]
+}

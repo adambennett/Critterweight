@@ -11,8 +11,27 @@ signal joy_connection(device: int, connected: bool)
 
 const GAME_ACTIONS := ["move_left", "move_right", "move_up", "move_down", "light", "heavy", "guard",
 	"dodge", "grab", "ability1", "ability2", "juice", "taunt", "target", "tag", "cam_left", "cam_right",
-	"pause", "scoreboard", "interact"]
+	"pause", "scoreboard", "interact", "mma_lh", "mma_rh", "mma_ll", "mma_rl", "mma_mod1", "mma_mod2", "mma_mod3", "mma_guard", "mma_dodge", "mma_grab", "mma_stance", "mma_check", "mma_ability1", "mma_ability2", "mma_juice", "mma_target", "mma_taunt", "mma_tag"]
 const ACTION_LABELS := {
+	"mma_lh": "Cage Rules: Left hand",
+	"mma_rh": "Cage Rules: Right hand",
+	"mma_ll": "Cage Rules: Left leg",
+	"mma_rl": "Cage Rules: Right leg",
+	"mma_mod1": "Cage Rules: Hooks / body kicks (hold)",
+	"mma_mod2": "Cage Rules: Straights / head kicks (hold)",
+	"mma_mod3": "Cage Rules: Overhands / low kicks (hold)",
+	"mma_guard": "Cage Rules: Guard",
+	"mma_target": "Cage Rules: Switch target",
+	"mma_taunt": "Cage Rules: Touch gloves / cheer",
+	"mma_tag": "Cage Rules: Tag partner",
+	"mma_dodge": "Cage Rules: Slip / dash",
+	"mma_grab": "Cage Rules: Takedown / throw",
+	"mma_stance": "Cage Rules: Switch stance",
+	"mma_check": "Cage Rules: Check low kicks (hold)",
+	"mma_ability1": "Cage Rules: Cut the Angle",
+	"mma_ability2": "Cage Rules: Second Wind",
+	"mma_juice": "Cage Rules: Championship Rounds",
+
 	"move_left": "Move left", "move_right": "Move right", "move_up": "Move forward", "move_down": "Move back",
 	"light": "Light attack", "heavy": "Heavy attack (hold to charge)", "guard": "Guard (tap to parry)",
 	"dodge": "Dodge", "grab": "Grab / throw", "ability1": "Ability 1", "ability2": "Ability 2",
@@ -30,6 +49,7 @@ var vibration := 1.0
 var guard_toggle := false
 var prompt_style := "auto"          ## auto | xbox | playstation | keyboard
 var _guard_toggled := false
+var _mma_view_used := false
 var _defaults := {}
 
 
@@ -46,6 +66,24 @@ func _default_bindings() -> Dictionary:
 		"move_right": [_key(KEY_D), _key(KEY_RIGHT), _axis(JOY_AXIS_LEFT_X, 1.0)],
 		"move_up": [_key(KEY_W), _key(KEY_UP), _axis(JOY_AXIS_LEFT_Y, -1.0)],
 		"move_down": [_key(KEY_S), _key(KEY_DOWN), _axis(JOY_AXIS_LEFT_Y, 1.0)],
+		"mma_lh": [_key(KEY_U), _joy(JOY_BUTTON_X)],
+		"mma_rh": [_key(KEY_I), _joy(JOY_BUTTON_Y)],
+		"mma_ll": [_key(KEY_J), _joy(JOY_BUTTON_A)],
+		"mma_rl": [_key(KEY_K), _joy(JOY_BUTTON_B)],
+		"mma_mod1": [_key(KEY_Q), _joy(JOY_BUTTON_LEFT_SHOULDER)],
+		"mma_mod2": [_key(KEY_E), _joy(JOY_BUTTON_RIGHT_SHOULDER)],
+		"mma_mod3": [_key(KEY_R), _axis(JOY_AXIS_TRIGGER_LEFT, 1.0)],
+		"mma_guard": [_key(KEY_L), _key(KEY_SEMICOLON), _axis(JOY_AXIS_TRIGGER_RIGHT, 1.0)],
+		"mma_dodge": [_key(KEY_SHIFT), _joy(JOY_BUTTON_RIGHT_STICK)],
+		"mma_grab": [_key(KEY_SPACE), _joy(JOY_BUTTON_LEFT_STICK)],
+		"mma_stance": [_key(KEY_X), _joy(JOY_BUTTON_DPAD_LEFT)],
+		"mma_check": [_key(KEY_O), _joy(JOY_BUTTON_DPAD_DOWN)],
+		"mma_ability1": [_key(KEY_F1), _joy(JOY_BUTTON_DPAD_UP)],
+		"mma_ability2": [_key(KEY_F2), _joy(JOY_BUTTON_DPAD_RIGHT)],
+		"mma_juice": [_key(KEY_V), _joy(JOY_BUTTON_BACK)],
+		"mma_target": [_key(KEY_TAB)],
+		"mma_taunt": [_key(KEY_T)],
+		"mma_tag": [_key(KEY_G)],
 		"light": [_key(KEY_J), _mouse(MOUSE_BUTTON_LEFT), _joy(JOY_BUTTON_X)],
 		"heavy": [_key(KEY_K), _mouse(MOUSE_BUTTON_RIGHT), _joy(JOY_BUTTON_Y)],
 		"guard": [_key(KEY_SHIFT), _key(KEY_L), _axis(JOY_AXIS_TRIGGER_LEFT, 1.0)],
@@ -177,6 +215,8 @@ func rebind(action: String, ev: InputEvent) -> String:
 	var stolen := ""
 	var is_pad := ev is InputEventJoypadButton or ev is InputEventJoypadMotion
 	for a in GAME_ACTIONS:
+		if a.begins_with("mma_") != action.begins_with("mma_"):
+			continue
 		for existing in InputMap.action_get_events(a):
 			if existing.is_match(ev, true) or (ev is InputEventJoypadMotion and existing is InputEventJoypadMotion and existing.axis == ev.axis and signf(existing.axis_value) == signf(ev.axis_value)):
 				InputMap.action_erase_event(a, existing)
@@ -237,7 +277,13 @@ func camera_axis() -> float:
 
 
 ## Fills a FighterInput from the devices. `cam_basis` turns the stick into a world direction.
-func fill(fi: FighterInput, cam_basis: Basis) -> void:
+func fill(fi: FighterInput, cam_basis: Basis, creature: CreatureDef = null, toward := Vector3.ZERO) -> void:
+	if creature and creature.tags.has("martial"):
+		fill_martial(fi, cam_basis, toward)
+		return
+	# Clear guest-only held state when switching a seat or tagging to a normal fighter.
+	_mma_view_used = false
+	fi.held &= (1 << FighterInput.MMA_LL) - 1
 	var mv := move_vector()
 	var fwd := -cam_basis.z
 	fwd.y = 0.0
@@ -311,3 +357,42 @@ func event_label(ev: InputEvent) -> String:
 			JOY_AXIS_LEFT_X, JOY_AXIS_LEFT_Y: return "Left Stick"
 			JOY_AXIS_RIGHT_X, JOY_AXIS_RIGHT_Y: return "Right Stick"
 	return "?"
+
+func fill_martial(fi: FighterInput, cam_basis: Basis, toward: Vector3) -> void:
+	var mv := move_vector()
+	var forward := toward
+	forward.y = 0.0
+	if forward.length_squared() < 0.001:
+		forward = -cam_basis.z
+		forward.y = 0.0
+	forward = forward.normalized()
+	fi.move = forward * mv.y + forward.cross(Vector3.UP) * mv.x
+	fi.held = 0
+	# View is a release-to-JUICE modifier: chords never also activate the ultimate.
+	var chords := {"mma_check": FighterInput.TAG, "mma_stance": FighterInput.TARGET, "mma_ability1": FighterInput.TAUNT}
+	var chord_active := {}
+	if Input.is_action_pressed("mma_juice"):
+		if Input.is_action_pressed("mma_guard"):
+			chord_active["mma_guard"] = true
+			_mma_view_used = true  # reserved for the Cannery return chord
+		for action: String in chords:
+			if Input.is_action_pressed(action):
+				chord_active[action] = true
+				_mma_view_used = true
+				if Input.is_action_just_pressed(action) or Input.is_action_just_pressed("mma_juice"):
+					fi.press(chords[action])
+	for a in MartialControls.MAP:
+		var b: int = MartialControls.MAP[a]
+		if a == "mma_juice":
+			if Input.is_action_just_released(a) and not Input.is_action_pressed(a):
+				if not _mma_view_used:
+					fi.press(b)
+				_mma_view_used = false
+			continue
+		if chord_active.has(a):
+			continue
+		if Input.is_action_just_pressed(a):
+			fi.press(b)
+			if a == "mma_guard" and guard_toggle:
+				_guard_toggled = not _guard_toggled
+		fi.set_held(b, _guard_toggled if a == "mma_guard" and guard_toggle else Input.is_action_pressed(a))

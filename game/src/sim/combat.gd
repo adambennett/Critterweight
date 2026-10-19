@@ -220,6 +220,15 @@ func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 	var from: Vector3 = h.get("from", a.pos() if a else b.pos())
 	var guard_from: Vector3 = h.get("guard_from", from)   # attacker-attached bursts: see EffectsSystem.area
 	var guarding := not bool(h.get("unblockable", false)) and not b.statuses.flag("no_guard") and (b.guards_against(guard_from) or (bool(h.get("guard_seg", false)) and b.state == Fighter.State.GUARD))
+	if b.creature.tags.has("martial") and bool(h.get("melee", false)):
+		var low_hit := str(h.get("part", "")) == "leg"
+		var checking := b.input.is_held(FighterInput.MMA_CHECK) and b.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD]
+		if low_hit and checking:
+			var incoming := guard_from - b.pos()
+			incoming.y = 0.0
+			guarding = not bool(h.get("unblockable", false)) and not b.statuses.flag("no_guard") and (incoming.length_squared() < .001 or b.forward().dot(incoming.normalized()) > 0.0)
+		elif b.input.is_held(FighterInput.MMA_MOD3) and str(h.get("part", "")) == "head":
+			guarding = false
 	if guarding:
 		var melee := bool(h.get("melee", false))
 		if b.in_parry_window(a) and (melee or bool(h.get("parryable", false))):

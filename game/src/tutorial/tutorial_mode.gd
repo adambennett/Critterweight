@@ -120,16 +120,16 @@ func _adaptation(ex: Dictionary, c: CreatureDef) -> Dictionary:
 	var a := {}
 	match str(ex.get("check", "")):
 		"heavy_then_charged":
-			if not c.moves.has("heavy_charged") and (not c.moves.has("heavy") or (c.moves["heavy"] as MoveDef).charge_time <= 0.0):
+			if c.tags.has("martial") or (not c.moves.has("heavy_charged") and (not c.moves.has("heavy") or (c.moves["heavy"] as MoveDef).charge_time <= 0.0)):
 				a["no_charge"] = true
 		"dodge_then_dash":
-			if not c.moves.has("dash_attack"):
+			if c.tags.has("martial") or not c.moves.has("dash_attack"):
 				a["no_dash"] = true
 		"ability_connect":
 			if not c.abilities.has(str((ex.get("params", {}) as Dictionary).get("slot", "ability1"))):
 				a["skip"] = true
 		"finisher_juice":
-			if not c.moves.has("finisher"):
+			if c.tags.has("martial") or not c.moves.has("finisher"):
 				a["no_finisher"] = true
 			if not c.abilities.has("juice"):
 				a["no_juice"] = true
@@ -145,6 +145,10 @@ func _adaptation(ex: Dictionary, c: CreatureDef) -> Dictionary:
 ## for the first adaptation flag that has one, else the exercise's own.
 func exercise_text(key: String) -> String:
 	var ex := current()
+	if player().creature.tags.has("martial"):
+		var guest := _martial_text(str(ex.get("check", "")), key)
+		if guest != "":
+			return guest
 	var blocks: Dictionary = ex.get("adapt", {})
 	for flag in (data.get("adapt", {}) as Dictionary):
 		var b: Dictionary = blocks.get(flag, {})
@@ -310,7 +314,7 @@ func _check(dt: float, evs: Array) -> void:
 			for i in evs.size():
 				var ev: Dictionary = evs[i]
 				if ev["type"] == "move_start" and int(ev["fighter"]) == 0:
-					_note_swing(str(ev.get("slot", "")).split("@")[0], string)
+					_note_swing(_tutorial_slot(str(ev.get("slot", "")), p.creature), string)
 					continue
 				if ev["type"] != "hit" or int(ev["fighter"]) != 0 or int(ev["target"]) != 1 or bool(ev["blocked"]):
 					continue
@@ -539,7 +543,7 @@ static func _hit_slot(evs: Array, i: int, f: Fighter) -> String:
 	var ev: Dictionary = evs[i]
 	var slot := str(ev.get("slot", ""))
 	if slot != "effect":
-		return slot.split("@")[0]
+		return _tutorial_slot(slot, f.creature)
 	var eid := str(ev.get("move", ""))
 	for s in f.creature.moves:
 		for e in (f.creature.moves[s] as MoveDef).effects:
@@ -661,7 +665,9 @@ func view_state() -> Dictionary:
 ## Kid Lamprey's scripted behaviours (attack toggles controlled by the exercise).
 class KidScript:
 	extends InputSource
-	var mode
+	var _mode: WeakRef
+	var mode: TutorialMode:
+		get: return _mode.get_ref() as TutorialMode
 	var behavior := "idle"
 	var string_active := false
 	var _t := 0.0
@@ -688,7 +694,7 @@ class KidScript:
 	var _evaded := false         ## the player dodged the current attack
 
 	func _init(m) -> void:
-		mode = m
+		_mode = weakref(m)
 
 	func label() -> String:
 		return "Kid Lamprey (%s)" % behavior
@@ -847,3 +853,32 @@ class KidScript:
 					_phase = "rest"
 					_phase_t = 0.0
 					string_active = false
+
+
+static func _tutorial_slot(slot: String, c: CreatureDef) -> String:
+	var basic := slot.split("@")[0]
+	if not c.tags.has("martial"):
+		return basic
+	if slot.ends_with("@southpaw") and basic.begins_with("rh_"):
+		basic = "lh_" + basic.substr(3)
+	elif slot.ends_with("@southpaw") and basic.begins_with("lh_"):
+		basic = "rh_" + basic.substr(3)
+	return "heavy" if basic.ends_with("_hkick") else basic
+
+
+static func _martial_text(kind: String, key: String) -> String:
+	var text := ""
+	match kind:
+		"footwork":
+			text = "Forward moves toward your opponent; back opens distance. Left and right circle them. Visit the rings, then circle the Kid."
+		"light_string":
+			text = "Hold Straights {mma_mod2}: left hand {mma_lh}, then right hand {mma_rh}. Switch to Hooks {mma_mod1} and land left hand {mma_lh}. Let each hit land before the next."
+		"heavy_then_charged":
+			text = "Hold Straights {mma_mod2} and press right leg {mma_rl} for a head kick. Land one clean kick. Varga's strikes do not charge."
+		"ability_connect":
+			text = "Use Cut the Angle {ability1}, then land a strike within two seconds to use the damage bonus. The step itself does not deal damage."
+		"grab_throw":
+			text = "Step close and press {grab} to clinch. Aim a direction and press {grab} again to throw. Limb buttons pummel while holding."
+		"finisher_juice":
+			text = "Fill Hype with hits or {taunt}. Tap and release {juice} for Championship Rounds. Varga has independent strikes instead of the standard combo finisher."
+	return text if key in ["intro", "goal", "hint"] else ""

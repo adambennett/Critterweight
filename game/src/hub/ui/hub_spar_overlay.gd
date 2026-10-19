@@ -7,11 +7,13 @@ extends Control
 var scene: MatchScene
 var spar := {}
 var _left := false
+var _martial := false
 
 
 func bind(s: MatchScene) -> void:
 	scene = s
 	spar = s.config.get("hub_spar", {})
+	_martial = not s.sim.fighters.is_empty() and s.sim.fighters[0].creature.tags.has("martial")
 	theme = UiTheme.get_theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -26,7 +28,7 @@ func bind(s: MatchScene) -> void:
 	var fmt := "PRACTICE" if str(spar.get("format", "")) == "practice" else "SPAR"
 	hb.add_child(UiTheme.label("RING SPARRING · %s vs %s (%s)" % [fmt, HubSparring.opponent_name(str(spar.get("opponent", ""))),
 		BotTiers.display_name(str(spar.get("tier", "journeyman")))], "BodyStrong"))
-	var back := ButtonPrompt.new(["scoreboard"], "Back to the Cannery", 36.0)
+	var back := ButtonPrompt.new(["mma_juice", "mma_guard"] if _martial else ["scoreboard"], "Hold together: Back to the Cannery" if _martial else "Back to the Cannery", 36.0)
 	back.pressed.connect(_leave)
 	hb.add_child(back)
 	chip.add_child(hb)
@@ -34,7 +36,10 @@ func bind(s: MatchScene) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("scoreboard") and App.top_screen() == null:
+	var wants_back := event.is_action_pressed("scoreboard")
+	if _martial:
+		wants_back = (event.is_action_pressed("mma_guard") or event.is_action_pressed("mma_juice")) and Input.is_action_pressed("mma_juice") and Input.is_action_pressed("mma_guard")
+	if wants_back and App.top_screen() == null:
 		get_viewport().set_input_as_handled()
 		_leave()
 

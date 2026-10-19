@@ -13,7 +13,7 @@ extends RefCounted
 ## An event never softlocks: when nothing can be taken, the decider may PASS (move on, no
 ## outcome) — logged like any choice, so replays reproduce it.
 
-const ELEMENT_ROLL := ["scorch", "brine", "static", "sludge", "grit", "gale"]
+const ELEMENT_ROLL := ["scorch", "brine", "static", "sludge", "grit", "gale", "scrap", "spectral"]
 const PASS := "_pass"            ## reserved choice id: nothing can be taken, move on
 
 

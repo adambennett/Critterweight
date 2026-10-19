@@ -609,11 +609,45 @@ func _on_snapshot(r: NetReader) -> void:
 # Sending
 # =====================================================================================
 
+
+## Use the server-selected target, even when a different enemy happens to be nearer.
+static func control_direction(fighter: Fighter, fighters: Array[Fighter]) -> Vector3:
+	if fighter.target and is_instance_valid(fighter.target) and not fighter.target.is_out():
+		return fighter.target.pos() - fighter.pos()
+	var toward := Vector3.ZERO
+	var best := INF
+	for other: Fighter in fighters:
+		if other == fighter or other.team == fighter.team or other.is_out():
+			continue
+		var delta := other.pos() - fighter.pos()
+		if delta.length_squared() < best:
+			best = delta.length_squared()
+			toward = delta
+	return toward
+
+
+
+## Keep the newest sample and as much redundancy as fits the original traffic budget.
+## Core inputs retain four copies; full guest samples retain three, at the same 60 Hz.
+static func input_batch_count(history: Array[FighterInput]) -> int:
+	var bytes := 0
+	var count := 0
+	for sample in history:
+		var size := 6 + sample.wire_counter_count()
+		if count > 0 and bytes + size > 72:
+			break
+		bytes += size
+		count += 1
+	return count
+
+
 func _sample_and_send() -> void:
 	if input_enabled and input_sampler.is_valid():
 		input_sampler.call(_input)
 	elif input_enabled and scene != null:
-		Controls.fill(_input, scene.input_basis())
+		var fighter: Fighter = scene.mirror.sim.fighters[scene.my_index] if scene.mirror and scene.my_index >= 0 and scene.my_index < scene.mirror.sim.fighters.size() else null
+		var toward := control_direction(fighter, scene.mirror.sim.fighters) if fighter else Vector3.ZERO
+		Controls.fill(_input, scene.input_basis(), fighter.creature if fighter else null, toward)
 	else:
 		_input.move = Vector3.ZERO
 		_input.held = 0
@@ -628,9 +662,10 @@ func _sample_and_send() -> void:
 	var w := NetWriter.new(NetProtocol.C_INPUT)
 	w.u16(_seq)
 	w.u32(_last_tick)
-	w.u8(_hist.size())
-	for fi in _hist:
-		NetSnapshot.write_input(w, fi)
+	var count := input_batch_count(_hist)
+	w.u8(count)
+	for i in count:
+		NetSnapshot.write_input(w, _hist[i])
 	transport.send(1, NetProtocol.CH_INPUT, w.data(), false)
 	inputs_sent += 1
 

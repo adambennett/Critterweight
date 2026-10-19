@@ -19,7 +19,8 @@ class_name NetProtocol
 ## rules and mode, checked by campaign_match_problem; the arena's look travels as its variant) and
 ## large party payloads packed ({_z, _n}: unpack_party_payload).
 
-const VERSION := 5
+## 6 = 32-bit held mask with an extension flag; 11 core or 18 guest counters.
+const VERSION := 6
 
 ## ---- channels (ENet) ----
 const CH_CONTROL := 0      ## reliable ordered: handshake, lobby, chat, app messages, match lifecycle

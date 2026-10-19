@@ -1,0 +1,162 @@
+{
+  "items": [
+    {
+      "id": "tech_varga_fast_hands",
+      "type": "technique",
+      "fighter": "f_varga",
+      "name": "Fast Hands",
+      "build": "build_varga_pocket",
+      "tags": [
+        "pocket"
+      ],
+      "effect": "Attacks animate 10% faster.",
+      "apply": {
+        "mods": [
+          {
+            "key": "move_speed",
+            "mul": 1.1
+          }
+        ]
+      }
+    },
+    {
+      "id": "tech_varga_calm_breath",
+      "type": "technique",
+      "fighter": "f_varga",
+      "name": "Calm Breath",
+      "build": "build_varga_pocket",
+      "tags": [
+        "pocket"
+      ],
+      "effect": "Stamina regenerates 20% faster.",
+      "apply": {
+        "mods": [
+          {
+            "key": "stamina_regen",
+            "mul": 1.2
+          }
+        ]
+      }
+    },
+    {
+      "id": "build_varga_pocket",
+      "type": "build",
+      "fighter": "f_varga",
+      "name": "Pocket Technician",
+      "techniques": [
+        "tech_varga_fast_hands",
+        "tech_varga_calm_breath"
+      ],
+      "tags": [
+        "pocket"
+      ],
+      "blurb": "Work behind fast hands."
+    },
+    {
+      "id": "tech_varga_hip_drive",
+      "type": "technique",
+      "fighter": "f_varga",
+      "name": "Hip Drive",
+      "build": "build_varga_wrestler",
+      "tags": [
+        "wrestler"
+      ],
+      "effect": "Throws travel 20% farther.",
+      "apply": {
+        "mods": [
+          {
+            "key": "throw_distance",
+            "mul": 1.2
+          }
+        ]
+      }
+    },
+    {
+      "id": "tech_varga_iron_base",
+      "type": "technique",
+      "fighter": "f_varga",
+      "name": "Iron Base",
+      "build": "build_varga_wrestler",
+      "tags": [
+        "wrestler"
+      ],
+      "effect": "Gain 18 poise.",
+      "apply": {
+        "patches": [
+          {
+            "op": "add",
+            "path": "stats.poise",
+            "value": 18
+          }
+        ]
+      }
+    },
+    {
+      "id": "build_varga_wrestler",
+      "type": "build",
+      "fighter": "f_varga",
+      "name": "Cage Wrestler",
+      "techniques": [
+        "tech_varga_hip_drive",
+        "tech_varga_iron_base"
+      ],
+      "tags": [
+        "wrestler"
+      ],
+      "blurb": "Make every clinch matter."
+    },
+    {
+      "id": "tech_varga_read",
+      "type": "technique",
+      "fighter": "f_varga",
+      "name": "Read the Shoulder",
+      "build": "build_varga_counter",
+      "tags": [
+        "counter"
+      ],
+      "effect": "Parry window is 0.03 seconds wider.",
+      "apply": {
+        "mods": [
+          {
+            "key": "parry_window_add",
+            "add": 0.03
+          }
+        ]
+      }
+    },
+    {
+      "id": "tech_varga_angles",
+      "type": "technique",
+      "fighter": "f_varga",
+      "name": "Sharp Angles",
+      "build": "build_varga_counter",
+      "tags": [
+        "counter"
+      ],
+      "effect": "Cut the Angle cooldown is 20% shorter.",
+      "apply": {
+        "patches": [
+          {
+            "op": "mul",
+            "path": "abilities.ability1.cooldown",
+            "value": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "build_varga_counter",
+      "type": "build",
+      "fighter": "f_varga",
+      "name": "Counter Specialist",
+      "techniques": [
+        "tech_varga_read",
+        "tech_varga_angles"
+      ],
+      "tags": [
+        "counter"
+      ],
+      "blurb": "Defend, angle out and punish."
+    }
+  ]
+}

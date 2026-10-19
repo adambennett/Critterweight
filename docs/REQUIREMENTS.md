@@ -220,3 +220,10 @@ B is added after the Windows export succeeds. No new W claims: the owner request
 | P15-12 | Editor-only blank rooftop canvas; independent 12-64m dimensions, four ledges, standard props, save/package/play support and large-stage camera | I B T | test_arena_canvas: nine integration, geometry, controller, simulation, audio and policy tests; source and packaged arena suites 61/61; preview 3 Windows export verified |
 
 Scope and owner review checklist: docs/releases/v0.9.15-preview3.md. Prior monitor/single-tick regressions remain applicable.
+
+
+## v0.9.15 roster expansion
+
+| ID | Requirement / acceptance | State | Evidence |
+|---|---|---|---|
+| CNT-09 | Seventh playable Cage Rules guest with source model, limb/modifier controls on keyboard/controller, native abilities/JUICE; eighth Spectral fighter with standard controls; both selectable, networkable and campaign-upgradable | I B T | docs/releases/v0.9.15-fighters-preview.md; 406 scripts, 130 source and 62 packaged tests pass, including 19 new-fighter physical/input/integration regressions. Ground/submission simulation explicitly outside the guest adaptation. Windows executable exported; physical controller and rendered playtest pending. |

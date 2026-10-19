@@ -36,7 +36,7 @@ const WARM := Color("#ffd9a0")
 const TEAM := [Color("#ff5a5a"), Color("#4da3ff"), Color("#ffc43d"), Color("#b06bff")]
 const TEAM_LETTERS := ["A", "B", "C", "D", "E", "F", "G", "H"]
 const ELEMENT_COLORS := {"scorch": Color("#ff6b2b"), "brine": Color("#2e9be0"), "static": Color("#f7e04a"),
-	"sludge": Color("#8bd426"), "grit": Color("#b8905e"), "gale": Color("#cff4f2")}
+	"sludge": Color("#8bd426"), "grit": Color("#b8905e"), "gale": Color("#cff4f2"), "scrap": Color("#e79664"), "spectral": Color("#ac8dff")}
 
 # --- spacing (du) ------------------------------------------------------------------------------
 const GAP_XS := 6

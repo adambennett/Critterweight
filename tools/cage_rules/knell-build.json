@@ -1,0 +1,82 @@
+[
+ {
+  "id": "f_knell",
+  "out": "creatures/f_knell.glb",
+  "bytes": 800784,
+  "vertices": 11749,
+  "triangles": 14000,
+  "materials": [
+   "cloth",
+   "iron",
+   "skin",
+   "soul"
+  ],
+  "gore_triangles": 250,
+  "bounds": {
+   "min": [
+    -0.467,
+    -0.042,
+    -0.288
+   ],
+   "max": [
+    0.467,
+    1.823,
+    0.324
+   ]
+  },
+  "bones": [
+   {
+    "id": "pelvis",
+    "dominant_vertices": 1446
+   },
+   {
+    "id": "chest",
+    "dominant_vertices": 2326
+   },
+   {
+    "id": "head",
+    "dominant_vertices": 2707
+   },
+   {
+    "id": "uarm_l",
+    "dominant_vertices": 542
+   },
+   {
+    "id": "farm_l",
+    "dominant_vertices": 1167
+   },
+   {
+    "id": "uarm_r",
+    "dominant_vertices": 598
+   },
+   {
+    "id": "farm_r",
+    "dominant_vertices": 1169
+   },
+   {
+    "id": "thigh_l",
+    "dominant_vertices": 233
+   },
+   {
+    "id": "shin_l",
+    "dominant_vertices": 711
+   },
+   {
+    "id": "thigh_r",
+    "dominant_vertices": 218
+   },
+   {
+    "id": "shin_r",
+    "dominant_vertices": 632
+   }
+  ],
+  "resolution": 0.009,
+  "grid": [
+   107,
+   211,
+   71
+  ],
+  "ms": 2110,
+  "definition": "tools/forge/defs/creatures/f_knell.js"
+ }
+]

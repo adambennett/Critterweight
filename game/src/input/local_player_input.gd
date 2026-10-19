@@ -23,4 +23,4 @@ func poll(f: Fighter, _sim, _dt: float) -> void:
 			b = camera.input_basis()
 		else:
 			b = camera.global_basis
-	Controls.fill(f.input, b)
+	Controls.fill(f.input, b, f.creature, f.target.pos() - f.pos() if f.target else f.forward())

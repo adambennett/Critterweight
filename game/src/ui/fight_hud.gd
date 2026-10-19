@@ -117,16 +117,19 @@ func _add_control_hints(_n: int) -> void:
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bar.add_theme_constant_override("h_separation", 20)
 	bar.alignment = FlowContainer.ALIGNMENT_CENTER
+	var fighter: Fighter = sim.fighters[player_index]
 	if bool(Settings.get_value("gameplay.tutorial_prompts")):
-		for item in [["light", "Light"], ["heavy", "Heavy"], ["guard", "Guard"], ["dodge", "Dodge"], ["grab", "Grab"]]:
+		var hints := [["light", "Light"], ["heavy", "Heavy"], ["guard", "Guard"], ["dodge", "Dodge"], ["grab", "Grab"]]
+		if fighter.creature.tags.has("martial"):
+			hints = [["mma_lh", "L hand"], ["mma_rh", "R hand"], ["mma_ll", "L leg"], ["mma_rl", "R leg"], ["mma_mod1", "Hooks"], ["mma_mod2", "Straights"], ["mma_mod3", "Overhands"], ["mma_guard", "Guard"], ["mma_grab", "Grapple"], ["mma_dodge", "Slip"]]
+		for item in hints:
 			var prompt := ButtonPrompt.new([item[0]], item[1], 36)
 			prompt.clickable = false
 			bar.add_child(prompt)
-	var fighter: Fighter = sim.fighters[player_index]
 	for slot in ["ability1", "ability2", "juice"]:
 		if slot != "juice" and not fighter.creature.abilities.has(slot):
 			continue
-		var prompt := CombatPrompt.new([slot], "JUICE" if slot == "juice" else ("Trick 1" if slot == "ability1" else "Trick 2"), 40)
+		var prompt := CombatPrompt.new([MartialControls.action(slot, fighter.creature)], "JUICE" if slot == "juice" else ("Trick 1" if slot == "ability1" else "Trick 2"), 40)
 		bar.add_child(prompt)
 		_ability_prompts[slot] = prompt
 	var strip := PanelContainer.new()
@@ -138,11 +141,14 @@ func _add_control_hints(_n: int) -> void:
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	strip.add_child(bar)
 	strip.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	strip.offset_top = -78
+	strip.offset_top = -116 if fighter.creature.tags.has("martial") else -78
 	strip.offset_bottom = -16
 	strip.offset_left = -850
 	strip.offset_right = 850
 	add_child(strip)
+	if fighter.creature.tags.has("martial"):
+		_sub.offset_top = -224
+		_sub.offset_bottom = -124
 	_hints = strip
 	_hints_bottom = true
 
@@ -151,13 +157,14 @@ func _add_control_hints(_n: int) -> void:
 ## bar laid over the match (The Bookie's Table) never hides them.
 func set_bottom_inset(px: float) -> void:
 	_bottom_inset = px
+	var martial := player_index >= 0 and player_index < sim.fighters.size() and sim.fighters[player_index].creature.tags.has("martial")
 	if _sub:
-		_sub.offset_top = -180.0 - px
-		_sub.offset_bottom = -88.0 - px
+		_sub.offset_top = (-224.0 if martial else -180.0) - px
+		_sub.offset_bottom = (-124.0 if martial else -88.0) - px
 	if _margin:
 		_margin.add_theme_constant_override("margin_bottom", 28 + int(px))
 	if _hints and _hints_bottom:
-		_hints.offset_top = -78.0 - px
+		_hints.offset_top = (-116.0 if martial else -78.0) - px
 		_hints.offset_bottom = -16.0 - px
 
 

@@ -1,5 +1,7 @@
 # Verification report
 
+**Local v0.9.15 fighters preview, 2026-10-18.** [Fighter build report](releases/v0.9.15-fighters-preview.md): Varga (Scrap) and Knell (Spectral), 406 scripts compile, 130 focused source tests and 62 packaged tests pass with zero failures/skips. The Windows export includes the concurrent announcer expansion. The earlier changing-source full run is diagnostic only; physical controller, visual presentation and balance await the owner. No graphical launch or release publication.
+
 **Local v0.9.15 preview 3, 2026-10-18.** [The current report](evidence/verification/v0.9.15-preview3/README.md) records the completed rooftop canvas, clean Windows export from 9d8f44e and packaged verification: 403 scripts, 89 tests passed, zero failed, one source-only skip. It includes every preview 2 change and all 764 voice clips/names. No graphical launch or publication; owner playtesting is next.
 
 **Local v0.9.15 preview 2, 2026-10-18.** [The current report](evidence/verification/v0.9.15-preview2/README.md) records the full suite, corrected fixture reruns, 764 recorded voice clips and clean Windows export from a527f2d. Packaged headless checks pass; physical controller, monitor, visuals and listening remain for the owner. The rooftop canvas is a follow-on request. No .15 release has been published.

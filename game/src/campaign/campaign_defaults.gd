@@ -9,6 +9,8 @@ extends RefCounted
 static func rules() -> Dictionary:
 	return {
 		"roster": {
+			"f_varga": {"name": "VARGA", "element": "scrap", "class": "scrapper"},
+			"f_knell": {"name": "KNELL", "element": "spectral", "class": "scrapper"},
 			"f_stoke": {"name": "STOKE", "element": "scorch", "class": "scrapper"},
 			"f_dredge": {"name": "DREDGE", "element": "brine", "class": "absolute_unit"},
 			"f_gusto": {"name": "GUSTO", "element": "gale", "class": "pipsqueak"},

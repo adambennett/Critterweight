@@ -119,6 +119,31 @@ func _pv(k: String, def := 0.0) -> float:
 
 
 func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
+	var before := f.input.press_count.duplicate()
+	_poll_standard(f, sim, dt)
+	if not f.creature.tags.has("martial") or f.state in [Fighter.State.HELD, Fighter.State.GRABBING]:
+		return
+	for hand in [FighterInput.LIGHT, FighterInput.HEAVY]:
+		if before[hand] == f.input.press_count[hand]:
+			continue
+		var gap := f.pos().distance_to(f.target.pos()) if f.target else 1.0
+		var limb: int = hand
+		var mod := rng.randi_range(0, 3)
+		if (hand == FighterInput.HEAVY or rng.randf() < 0.3) and f.rig.grounded:
+			limb = FighterInput.MMA_LL if rng.randf() < 0.5 else FighterInput.MMA_RL
+			if gap > 1.3 and mod == 0:
+				limb = FighterInput.MMA_LL
+		elif gap > 1.1:
+			mod = 2
+		for b in [FighterInput.MMA_MOD1, FighterInput.MMA_MOD2, FighterInput.MMA_MOD3]:
+			f.input.set_held(b, b == FighterInput.MMA_MOD1 + mod - 1 and mod > 0)
+		if limb != hand:
+			f.input.press_count[hand] = before[hand]
+			f.input.set_held(hand, false)
+			f.input.press(limb)
+
+
+func _poll_standard(f: Fighter, sim: MatchSim, dt: float) -> void:
 	_t += dt
 	if _kit_pre_poll(f):
 		return
@@ -333,7 +358,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 					dir = out.normalized()
 			_move = dir
 			if f.state_time > rng.randf_range(0.15, 0.6):
-				f.input.press(FighterInput.HEAVY if rng.randf() < 0.7 else FighterInput.LIGHT)
+				f.input.press((FighterInput.GRAB if f.creature.tags.has("martial") else FighterInput.HEAVY) if rng.randf() < 0.7 else FighterInput.LIGHT)
 			return
 	var obj: Dictionary = objective_override if not objective_override.is_empty() else (sim.mode.bot_objective(f) if sim.mode else {})
 	if obj.has("target"):

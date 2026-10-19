@@ -24,7 +24,9 @@
     {"id": "grit", "name": "Grit", "status_name": "Caked", "color": "#B8905E", "icon": "nugget",
      "status": {"id": "caked", "name": "Caked", "duration": 5.0, "poise_max": 0.7, "poise_regen": 0.5, "dodge_cost": 1.5, "heavy_poise_taken": 1.2, "buildup_received": {"static": 0.75}}},
     {"id": "gale", "name": "Gale", "status_name": "Winded", "color": "#CFF4F2", "outline": "#4FB3B8", "icon": "swirl",
-     "status": {"id": "winded", "name": "Winded", "duration": 4.0, "stamina_regen": 0.0, "dodge_cost": 2.0, "knockback_taken": 1.3, "push_taken": 2.0}}
+     "status": {"id": "winded", "name": "Winded", "duration": 4.0, "stamina_regen": 0.0, "dodge_cost": 2.0, "knockback_taken": 1.3, "push_taken": 2.0}},
+    {"id": "scrap", "name": "Scrap", "status_name": "Rattled", "color": "#E79664", "icon": "fist", "status": {"id": "rattled", "name": "Rattled", "duration": 4, "guard_cost": 1.25, "poise_regen": 0.65}},
+    {"id": "spectral", "name": "Spectral", "status_name": "Haunted", "color": "#AC8DFF", "icon": "ghost", "status": {"id": "haunted", "name": "Haunted", "duration": 5, "cooldown_rate": 0.75, "heal": 0.8}}
   ],
   "matchups": [
     {"attacker": "scorch", "defender": "gale", "mult": 1.15}, {"attacker": "gale", "defender": "scorch", "mult": 0.85},
@@ -32,7 +34,13 @@
     {"attacker": "sludge", "defender": "grit", "mult": 1.15}, {"attacker": "grit", "defender": "sludge", "mult": 0.85},
     {"attacker": "grit", "defender": "static", "mult": 1.15}, {"attacker": "static", "defender": "grit", "mult": 0.85},
     {"attacker": "static", "defender": "brine", "mult": 1.15}, {"attacker": "brine", "defender": "static", "mult": 0.85},
-    {"attacker": "brine", "defender": "scorch", "mult": 1.15}, {"attacker": "scorch", "defender": "brine", "mult": 0.85}
+    {"attacker": "brine", "defender": "scorch", "mult": 1.15}, {"attacker": "scorch", "defender": "brine", "mult": 0.85},
+    {"attacker": "scrap", "defender": "grit", "mult": 1.15},
+    {"attacker": "grit", "defender": "scrap", "mult": 0.85},
+    {"attacker": "spectral", "defender": "scrap", "mult": 1.15},
+    {"attacker": "scrap", "defender": "spectral", "mult": 0.85},
+    {"attacker": "static", "defender": "spectral", "mult": 1.15},
+    {"attacker": "spectral", "defender": "static", "mult": 0.85}
   ],
   "reactions": [
     {"id": "steam_burst", "name": "Steam Burst", "a": "scorch", "b": "brine", "consumes": "both",
@@ -59,7 +67,10 @@
      "zone": {"kind": "sludge_puddle", "radius": 1.5, "duration": 3.0}},
     {"id": "sandblast", "name": "Sandblast", "a": "grit", "b": "gale", "consumes": "grit",
      "damage": 6, "status": {"id": "guard_open", "name": "Guard Open", "duration": 1.5, "no_guard": true},
-     "cone_behind": {"radius": 2.0, "cone_deg": 70, "buildup": {"grit": 30}}}
+     "cone_behind": {"radius": 2.0, "cone_deg": 70, "buildup": {"grit": 30}}},
+    {"id": "bell_ringer", "name": "Bell Ringer", "a": "scrap", "b": "spectral", "consumes": "both", "damage": 6, "poise": 22, "stun": 0.2},
+    {"id": "grave_chill", "name": "Grave Chill", "a": "spectral", "b": "brine", "consumes": "brine", "status": {"id": "grave_chill", "name": "Grave Chill", "duration": 2, "speed": 0.8}},
+    {"id": "crack_guard", "name": "Crack Guard", "a": "scrap", "b": "grit", "consumes": "grit", "damage": 4, "status": {"id": "guard_open", "name": "Guard Open", "duration": 0.7, "no_guard": true}}
   ],
   "zones": {
     "scorch_patch": {"element": "scorch", "radius": 1.5, "duration": 3.0, "tick": 0.5, "tick_damage": 1.5, "buildup": 7.5, "vfx": "scorch_patch"},

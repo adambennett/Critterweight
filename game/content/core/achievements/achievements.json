@@ -3,7 +3,7 @@
     {"id": "ach_first_win", "name": "First Purse", "description": "Win your first match.", "hidden": false},
     {"id": "ach_tutorial", "name": "Granny's Seal of Approval", "description": "Finish all ten of Granny Haymaker's exercises.", "hidden": false},
     {"id": "ach_juice_ko", "name": "Overdose", "description": "Knock someone out while your JUICE is running.", "hidden": false},
-    {"id": "ach_full_card", "name": "Full Card", "description": "Win a match with each of the six fighters.", "hidden": false},
+    {"id": "ach_full_card", "name": "Full Card", "description": "Win a match with every playable fighter.", "hidden": false},
     {"id": "ach_house_rules", "name": "House Rules", "description": "Win a match with rules you made yourself.", "hidden": false},
     {"id": "ach_hat_trick", "name": "Hat Trick", "description": "Score three goals in one Chumball match.", "hidden": false},
     {"id": "ach_last_call", "name": "Last Call Survivor", "description": "Reach wave 20 in Chum Rush.", "hidden": false},

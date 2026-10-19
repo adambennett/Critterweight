@@ -8,7 +8,9 @@
     "f_gusto": {"name": "GUSTO", "element": "gale", "class": "pipsqueak"},
     "f_dozer": {"name": "DOZER", "element": "grit", "class": "lunker"},
     "f_slurry": {"name": "SLURRY", "element": "sludge", "class": "scrapper"},
-    "f_jitters": {"name": "JITTERS", "element": "static", "class": "pipsqueak"}
+    "f_jitters": {"name": "JITTERS", "element": "static", "class": "pipsqueak"},
+    "f_varga": {"name": "VARGA", "element": "scrap", "class": "scrapper"},
+    "f_knell": {"name": "KNELL", "element": "spectral", "class": "scrapper"}
   },
   "start_scrip": 60,
   "fallback_arena": "the_gullet",

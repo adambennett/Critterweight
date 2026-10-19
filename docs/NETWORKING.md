@@ -14,7 +14,7 @@ Code: `game/src/net/`. Tests: `game/src/test/net/`. Dedicated server operation: 
 |---|---|
 | Authority | The server (listen host or dedicated) runs the only `MatchSim`. Clients send input and requests; damage, KOs, results, rewards and progression are decided only on the server. |
 | Simulation | Jolt physics + fighter logic at **120 Hz** fixed step (`server.tick_rate`, tuned at 120). |
-| Client input | `FighterInput` (world-space move, held bits, per-button press counters) sampled every client physics tick, sent at **60 Hz**, each packet carrying the 4 newest samples (redundancy). |
+| Client input | `FighterInput` (world-space move, held bits, per-button press counters) sampled every client physics tick, sent at **60 Hz**, each packet carrying the newest sample plus redundant history (four core samples or three full guest samples within a 72-byte sample budget). |
 | Server output | Full-state **snapshots at 30 Hz** (unreliable) + simulation **events** (reliable, tick-stamped) + roster changes (reliable). |
 | Client view | No local simulation, no prediction/rollback: active ragdolls cannot be reconciled, so clients render an **interpolated** past (adaptive buffer: 40-90 ms measured over loopback, depending on machine load) and fire event feedback when the render clock reaches the event's tick. |
 | Listen host | The host's fighter is driven by `LocalPlayerInput` inside the authoritative sim: **zero added latency** for the host. |
@@ -69,7 +69,7 @@ fighter in a slot before any event refers to them; snapshots carry the match id 
 when they belong to another match. Disconnects carry a reason code (ENet disconnect data) as a
 fallback when the reason message itself could not be delivered.
 
-## 5. Protocol (version 5)
+## 5. Protocol (version 6)
 
 Every packet: `[u8 message id][payload]`. Ids 1-63 client->server, 64-127 server->client; the wrong
 direction, an unknown id, the wrong channel, an oversized payload or a failed bounds-checked decode
@@ -83,7 +83,7 @@ is a **protocol violation**. Layouts are documented in `src/net/net_protocol.gd`
 | 3 | LOBBY | C->S | 1 KB | kind (ready, creature, team, spectate, assist, cosmetics) + value |
 | 4 | CHAT | C->S | 600 B | text (<= 200 chars after cleaning) |
 | 5 | VOTE | C->S | 16 B | candidate index (-1 = none) |
-| 6 | INPUT | C->S | 256 B | seq, last snapshot tick, n (1-8), n x sample (4 + BUTTON_COUNT bytes) |
+| 6 | INPUT | C->S | 256 B | seq, last snapshot tick, n (1-8), n x sample (17 bytes core, 24 with guest counters) |
 | 7 | APP | C->S | 64 KB | type, payload (plain data) |
 | 8 | PING | C->S | 32 B | client ms |
 | 64 | CHALLENGE | S->C | | protocol, game version, server name, 16-byte nonce, flags, players, max players, gameplay content hash, packages [{id, version, hash, client_only}] |
@@ -210,8 +210,8 @@ Unknown types/keys travel as strings, so events added by other systems replicate
 changes (the parity test lists those without a 1-byte id). `seq` is implicit; `seed` never leaves
 the server.
 
-**Input sample**: `[i8 move.x x127][i8 move.z x127][u16 held][u8 x BUTTON_COUNT press counters]`
-(same layout as `FighterInput.encode`; 15 bytes with the TAG button).
+**Input sample**: `[i8 move.x x127][i8 move.z x127][u32 held/extension][u8 x 11 core press counters][optional u8 x 7 guest counters]`
+(same layout as `FighterInput.encode`; 17 bytes for core samples, 24 for guest samples). Bit 31 of the held word marks the extension. It is present whenever an extra held bit or counter is nonzero, so release-only and wrapped presses remain reliable; it is removed from the decoded held mask.
 
 **Lobby, MATCH_START, MATCH_END** use Godot `var_to_bytes` of plain dictionaries (never objects;
 `bytes_to_var` refuses objects) inside our framing; they come only from the server. **App
@@ -391,7 +391,7 @@ cost, traffic, memory, objects/nodes/orphans).
 
 ## 13. Version compatibility
 
-* `NetProtocol.VERSION` (now **5**: co-op campaign fights on the session - MATCH_START `campaign`
+* `NetProtocol.VERSION` (now **6**: 32-bit held masks and optional extra counters for the Cage Rules guest; **5**: co-op campaign fights on the session - MATCH_START `campaign`
   with the campaign's own rules/mode, the arena's look as its variant - and packed party payloads;
   4 = party seats, cosmetics, arena packages and policy hashes in MATCH_START; 3 = content package
   lists with hashes in the challenge and hello, aim assist; 2 = 11-button input samples, roster

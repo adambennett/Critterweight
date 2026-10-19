@@ -1,0 +1,1890 @@
+/* ============================================================
+   3D renderer — Three.js (global THREE, r128)
+   Builds the arena + two procedurally animated fighters driven
+   by sim state snapshots. Uses analytic two-bone IK for limbs.
+   ============================================================ */
+(function (root) {
+  'use strict';
+  const { STRIKES, strikeTip, IN } = root.MMASim;
+  const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+  const smooth = t => t * t * (3 - 2 * t);
+  const expo = (dt, k) => 1 - Math.exp(-dt * k);
+
+  // ---------- dimensions ----------
+  const HIP_H = 0.92; // hip height the ground / fallback poses are authored against
+
+  // ---------- poses (torso-space hand targets, body-space foot targets) ----------
+  // h: hip height, lean: torso pitch (rad, + forward), yaw: torso twist, roll,
+  // lh/rh: left/right hand targets (torso frame), lf/rf: foot targets XZ (root frame), fy: foot lift (world)
+  // hp: head pitch, hy: head yaw, lie: body pitch (0 standing, -PI/2 on back)
+  function P(o) {
+    return Object.assign({
+      h: HIP_H, lean: 0.08, yaw: -0.25, roll: 0,
+      lh: [0.14, 0.42, 0.34], rh: [-0.16, 0.38, 0.22],
+      lf: [0.16, 0.2], rf: [-0.2, -0.24], lfy: 0, rfy: 0, lfz: null, rfz: null,
+      hp: 0.05, hy: 0.15, lie: 0, ox: 0, oz: 0, elbowOut: 0.5, elbowUp: 0, hipYaw: 0, lPole: [0, 0, 1], rPole: [0, 0, 1]
+    }, o);
+  }
+  const POSES = {
+    idle: P({}),
+    block: P({ lh: [0.09, 0.68, 0.22], rh: [-0.09, 0.66, 0.2], h: HIP_H - 0.05, lean: 0.18, hp: 0.25, elbowOut: 0.25 }),
+    blockLow: P({ yaw: -0.6, lean: 0.12, h: HIP_H - 0.04, lh: [-0.08, 0.1, 0.3], rh: [-0.14, 0.5, 0.2], hp: 0.2, hy: 0.35, elbowOut: 0.2 }),
+    dodge: P({ lean: -0.42, h: HIP_H - 0.08, oz: -0.18, lh: [0.14, 0.5, 0.3], rh: [-0.16, 0.48, 0.22], hp: -0.2 }),
+    hitHead: P({ lean: -0.3, hp: -0.55, hy: -0.4, lh: [0.2, 0.3, 0.25], rh: [-0.22, 0.25, 0.1], h: HIP_H - 0.03 }),
+    hitBody: P({ lean: 0.5, h: HIP_H - 0.14, hp: 0.4, lh: [0.1, 0.1, 0.3], rh: [-0.15, 0.05, 0.25] }),
+    hitLegs: P({ lean: 0.25, h: HIP_H - 0.2, roll: -0.25, lh: [0.14, 0.3, 0.3], rh: [-0.3, 0.2, 0.1] }),
+    push: P({ lean: 0.3, h: HIP_H - 0.06, oz: 0.08, lh: [0.17, 0.46, 0.66], rh: [-0.17, 0.46, 0.66], hp: 0.05, elbowOut: 0.2 }),
+    stumble: P({ lean: 0.55, h: HIP_H - 0.25, lh: [0.3, -0.1, 0.4], rh: [-0.3, -0.05, 0.35], hp: 0.3 }),
+    sprawl: P({ lean: 1.05, h: HIP_H - 0.32, lh: [0.26, -0.3, 0.5], rh: [-0.26, -0.3, 0.5], lf: [0.2, -0.25], rf: [-0.22, -0.3], hp: -0.3 }),
+    tdWind: P({ lean: 0.75, h: HIP_H - 0.3, lh: [0.2, 0.0, 0.5], rh: [-0.2, 0.0, 0.45], lf: [0.16, 0.3], rf: [-0.2, -0.3], hp: -0.3 }),
+    tdShoot: P({ lean: 1.0, h: HIP_H - 0.36, lh: [0.22, -0.15, 0.75], rh: [-0.22, -0.15, 0.7], lf: [0.16, 0.55], rf: [-0.2, -0.1], oz: 0.25, hp: -0.5 }),
+    celebrate: P({ lean: -0.15, lh: [0.3, 1.0, 0.1], rh: [-0.3, 1.0, 0.1], hp: -0.3, hy: 0, yaw: 0 }),
+    // ground
+    bottom: P({ lie: -Math.PI / 2, h: 0.2, lean: 0.25, yaw: 0, lh: [0.16, 0.5, 0.32], rh: [-0.16, 0.48, 0.3], lf: [0.2, -0.14], rf: [-0.2, -0.14], lfy: -0.48, rfy: -0.5, hp: 0.35, hy: 0 }),
+    bottomBlock: P({ lie: -Math.PI / 2, h: 0.2, lean: 0.25, yaw: 0, lh: [0.1, 0.62, 0.42], rh: [-0.1, 0.6, 0.42], lf: [0.2, -0.14], rf: [-0.2, -0.14], lfy: -0.48, rfy: -0.5, hp: 0.5, hy: 0 }),
+    bottomHit: P({ lie: -Math.PI / 2, h: 0.2, lean: 0.05, yaw: -0.2, lh: [0.3, 0.3, 0.2], rh: [-0.3, 0.3, 0.15], lf: [0.24, -0.14], rf: [-0.16, -0.14], lfy: -0.52, rfy: -0.46, hp: -0.2, hy: -0.5 }),
+    down: P({ lie: -Math.PI / 2, h: 0.17, lean: 0, yaw: 0, lh: [0.5, 0.75, 0.05], rh: [-0.5, 0.7, 0.05], lf: [0.24, -0.1], rf: [-0.2, -0.1], lfy: -0.9, rfy: -0.88, hp: 0.2, hy: -0.4 }),
+    top: P({ h: 0.5, lean: 0.55, yaw: 0, lh: [0.2, -0.05, 0.4], rh: [-0.2, -0.05, 0.4], lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.3, hy: 0 }),
+    topPosture: P({ h: 0.55, lean: 0.25, yaw: 0, lh: [0.2, 0.1, 0.45], rh: [-0.2, 0.1, 0.45], lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.35, hy: 0 }),
+    topSub: P({ h: 0.38, lean: 1.15, yaw: -0.3, lh: [0.1, -0.2, 0.55], rh: [-0.2, -0.15, 0.5], lf: [0.3, -0.5], rf: [-0.3, -0.45], hp: 0.1, hy: -0.3 }),
+    topHit: P({ h: 0.5, lean: -0.1, yaw: -0.2, lh: [0.3, 0.3, 0.3], rh: [-0.3, 0.3, 0.3], lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: -0.3 }),
+    // --- positional ground poses ---
+    // Lying poses: lf/rf = [across, height above the hips], lfy/rfy = -(distance towards the feet end); the knee
+    // poles are [across, towards the head, up]. The top fighter kneels GROUND_OFF.guard (0.32 m) towards the feet end
+    // with his hips 0.5 m up, so the guard's ankles cross behind his back: 0.55 m down the axis, 0.62 m off the mat.
+    // bottom in closed guard: hips lifted onto the top's thighs, knees out wide around his waist, ankles crossed behind him
+    bottomGuard: P({ lie: -Math.PI / 2, h: 0.3, lean: 0.3, yaw: 0, lh: [0.18, 0.45, 0.35], rh: [-0.18, 0.42, 0.33], lf: [-0.1, 0.32], rf: [0.1, 0.3], lfy: -0.55, rfy: -0.55, lPole: [1, 0, 0.5], rPole: [-1, 0, 0.5], hp: 0.4, hy: 0 }),
+    // half guard: one leg hooked around the top's thigh (knee out, foot behind his knee), the other flat
+    bottomHalf: P({ lie: -Math.PI / 2, h: 0.2, lean: 0.25, yaw: -0.15, lh: [0.18, 0.45, 0.35], rh: [-0.18, 0.42, 0.33], lf: [0.0, 0.2], rf: [-0.22, -0.2], lfy: -0.55, rfy: -0.5, lPole: [1, 0, 0.6], hp: 0.4, hy: 0 }),
+    // flat on the back (side control / mount): framing with the arms, legs flat
+    bottomFlat: P({ lie: -Math.PI / 2, h: 0.18, lean: 0.1, yaw: 0, lh: [0.2, 0.55, 0.3], rh: [-0.2, 0.52, 0.3], lf: [0.22, -0.2], rf: [-0.22, -0.2], lfy: -0.5, rfy: -0.5, hp: 0.3, hy: 0 }),
+    // turtled (back control): on hands and knees
+    turtle: P({ lie: 0, h: 0.48, lean: 1.35, yaw: 0, lh: [0.22, -0.25, 0.42], rh: [-0.22, -0.25, 0.42], lf: [0.22, -0.4], rf: [-0.22, -0.4], lfy: 0, rfy: 0, hp: 0.2, hy: 0 }),
+    // bottom attacking a submission from the guard: legs high, pulling the top down
+    bottomSub: P({ lie: -Math.PI / 2, h: 0.24, lean: 0.5, yaw: 0, lh: [0.14, 0.15, 0.6], rh: [-0.14, 0.15, 0.6], lf: [0.2, 0.55], rf: [-0.2, 0.55], lfy: 0.2, rfy: 0.25, hp: 0.5, hy: 0 }),
+    // top inside the guard: kneeling, posture mid
+    topGuard: P({ h: 0.5, lean: 0.5, yaw: 0, lh: [0.2, -0.1, 0.42], rh: [-0.2, -0.1, 0.42], lf: [0.28, -0.5], rf: [-0.28, -0.5], hp: 0.3, hy: 0 }),
+    // side control: chest down across them, hips low
+    topSide: P({ h: 0.42, lean: 1.0, yaw: -0.2, lh: [0.25, -0.2, 0.5], rh: [-0.25, -0.25, 0.45], lf: [0.3, -0.5], rf: [-0.3, -0.35], hp: 0.2, hy: -0.2 }),
+    // mount: sat upright on the hips, knees wide
+    topMount: P({ h: 0.56, lean: 0.25, yaw: 0, lh: [0.2, 0.25, 0.4], rh: [-0.2, 0.25, 0.4], lf: [0.4, -0.2], rf: [-0.4, -0.2], hp: 0.35, hy: 0 }),
+    // back control: chest on their back, hooks in, arms around the neck
+    topBack: P({ h: 0.62, lean: 1.1, yaw: 0, lh: [0.15, -0.3, 0.5], rh: [-0.15, -0.25, 0.55], lf: [0.3, -0.4], rf: [-0.3, -0.4], hp: 0.2, hy: 0 }),
+    // caught in a submission from the bottom: bent down, head pulled in
+    topCaught: P({ h: 0.4, lean: 1.25, yaw: -0.2, lh: [0.2, -0.3, 0.55], rh: [-0.3, -0.1, 0.4], lf: [0.3, -0.5], rf: [-0.3, -0.45], hp: 0.3, hy: -0.3 })
+  };
+  // strike keyframes per strike kind: [windup, hit], authored for the RIGHT limb (rear side, orthodox).
+  // Left-limb strikes use mirrored copies (upper body only for punches, so the stance stays orthodox).
+  // The striking limb's own target is overridden every frame by the simulation's tip path (see update()).
+  const STRIKE_POSES = {
+    straight: [P({ yaw: -0.5, lean: 0.05, lh: [0.14, 0.44, 0.3], rh: [-0.26, 0.36, 0.0] }),
+               P({ yaw: 0.55, lean: 0.25, lh: [0.22, 0.45, 0.25], rh: [0.05, 0.48, 0.92], oz: 0.12, hp: 0.1 })],
+    hook: [P({ yaw: -0.55, lean: 0.1, lh: [0.14, 0.44, 0.3], rh: [-0.36, 0.42, 0.15], elbowOut: 1.0, elbowUp: 0.9 }),
+           P({ yaw: 0.8, lean: 0.12, roll: 0.12, lh: [0.22, 0.45, 0.25], rh: [0.25, 0.5, 0.55], elbowOut: 1.2, elbowUp: 1.3, oz: 0.08 })],
+    uppercut: [P({ yaw: -0.45, lean: 0.22, h: HIP_H - 0.06, lh: [0.14, 0.44, 0.3], rh: [-0.3, 0.12, 0.12], hp: 0.15 }),
+               P({ yaw: 0.4, lean: -0.1, h: HIP_H + 0.01, lh: [0.2, 0.45, 0.28], rh: [0.0, 0.62, 0.5], oz: 0.08, hp: -0.1 })],
+    overhand: [P({ yaw: -0.4, lean: 0.05, lh: [0.14, 0.44, 0.3], rh: [-0.46, 0.6, 0.15], elbowOut: 1.3, elbowUp: 1.1 }),
+               P({ yaw: 0.6, lean: 0.3, roll: 0.15, lh: [0.24, 0.4, 0.25], rh: [0.1, 0.45, 0.8], oz: 0.14, hp: 0.25, elbowOut: 1.1, elbowUp: 1.1 })],
+    hkick: [P({ yaw: 0.1, lean: 0.0, roll: -0.15, h: HIP_H - 0.05, hipYaw: 0.5, lh: [0.18, 0.5, 0.3], rh: [-0.34, 0.3, -0.05], rf: [-0.42, 0.25], rfy: 0.72, rPole: [-1, 0.3, 0.1], lf: [0.1, 0.02], lPole: [-0.4, 0, 1] }),
+            P({ yaw: 0.9, lean: -0.5, roll: -0.5, h: HIP_H + 0.02, hipYaw: 1.4, lh: [-0.05, 0.42, 0.28], rh: [-0.3, -0.15, -0.3], rf: [0.5, 0.55], rfy: 1.4, rPole: [-0.9, 0.6, 0.0], lf: [0.1, 0.02], lPole: [-0.9, 0, 0.4], oz: 0.1, hp: 0.1, hy: -0.7 })],
+    bkick: [P({ yaw: 0.1, lean: 0.0, roll: -0.12, h: HIP_H - 0.05, hipYaw: 0.45, lh: [0.18, 0.5, 0.3], rh: [-0.34, 0.3, -0.05], rf: [-0.4, 0.25], rfy: 0.6, rPole: [-1, 0.2, 0.1], lf: [0.1, 0.02], lPole: [-0.4, 0, 1] }),
+            P({ yaw: 0.8, lean: -0.35, roll: -0.4, h: HIP_H - 0.02, hipYaw: 1.25, lh: [-0.05, 0.42, 0.28], rh: [-0.3, -0.12, -0.3], rf: [0.45, 0.65], rfy: 1.0, rPole: [-0.9, 0.4, 0.1], lf: [0.1, 0.02], lPole: [-0.9, 0, 0.4], oz: 0.1, hp: 0.1, hy: -0.6 })],
+    lkick: [P({ yaw: 0.1, lean: 0.08, roll: -0.1, h: HIP_H - 0.07, hipYaw: 0.4, lh: [0.18, 0.5, 0.3], rh: [-0.34, 0.3, -0.05], rf: [-0.38, 0.2], rfy: 0.45, rPole: [-1, 0.1, 0.2], lf: [0.1, 0.02], lPole: [-0.4, 0, 1] }),
+            P({ yaw: 0.75, lean: -0.1, roll: -0.3, h: HIP_H - 0.1, hipYaw: 1.2, lh: [-0.05, 0.42, 0.28], rh: [-0.3, -0.1, -0.3], rf: [0.4, 0.75], rfy: 0.4, rPole: [-0.9, 0.2, 0.2], lf: [0.1, 0.02], lPole: [-0.9, 0, 0.4], oz: 0.12, hp: 0.15, hy: -0.55 })],
+    knee: [P({ yaw: -0.25, lean: 0.15, h: HIP_H - 0.04, lh: [0.14, 0.5, 0.3], rh: [-0.2, 0.5, 0.25], rf: [-0.2, -0.3], rfy: 0.1, lf: [0.14, 0.1] }),
+           P({ yaw: 0.15, lean: -0.35, h: HIP_H - 0.02, lh: [0.12, 0.35, 0.45], rh: [-0.14, 0.35, 0.45], rf: [-0.1, 0.4], rfy: 0.8, rPole: [-0.2, 0.3, 1], lf: [0.14, 0.1], oz: 0.16, hp: 0.1 })],
+    teep: [P({ yaw: -0.2, lean: 0.12, h: HIP_H - 0.04, lh: [0.14, 0.48, 0.3], rh: [-0.18, 0.46, 0.22], rf: [-0.2, 0.0], rfy: 0.5, rPole: [-0.2, 0.2, 1], lf: [0.12, 0.02] }),
+           P({ yaw: -0.1, lean: -0.3, h: HIP_H - 0.03, lh: [0.16, 0.5, 0.26], rh: [-0.2, 0.46, 0.18], rf: [-0.1, 0.95], rfy: 1.0, rPole: [-0.2, 0.4, 1], lf: [0.12, 0.02], oz: 0.1, hp: -0.1 })],
+    // ground strikes (top position)
+    gpunch: [P({ h: 0.52, lean: 0.35, yaw: 0.3, lh: [0.2, -0.05, 0.4], rh: [-0.25, 0.2, 0.25], lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.3 }),
+             P({ h: 0.48, lean: 0.75, yaw: 0.0, lh: [0.2, -0.05, 0.4], rh: [-0.05, -0.3, 0.55], lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.3 })],
+    ghammer: [P({ h: 0.55, lean: 0.1, yaw: 0.3, lh: [0.2, -0.05, 0.4], rh: [-0.35, 0.55, 0.1], lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.3 }),
+              P({ h: 0.46, lean: 0.85, yaw: 0.0, lh: [0.2, -0.05, 0.4], rh: [-0.05, -0.35, 0.55], lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.3 })],
+    gelbow: [P({ h: 0.55, lean: 0.2, yaw: 0.5, lh: [0.2, -0.05, 0.4], rh: [-0.45, 0.4, 0.2], elbowOut: 1.3, lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.3 }),
+             P({ h: 0.46, lean: 0.8, yaw: -0.3, lh: [0.2, -0.05, 0.4], rh: [0.15, -0.3, 0.5], elbowOut: 1.3, lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.3 })],
+    gbody: [P({ h: 0.52, lean: 0.3, yaw: 0.3, lh: [0.2, -0.05, 0.4], rh: [-0.3, 0.1, 0.3], lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.3 }),
+            P({ h: 0.5, lean: 0.6, yaw: -0.1, lh: [0.2, -0.05, 0.4], rh: [-0.05, -0.3, 0.3], lf: [0.26, -0.55], rf: [-0.26, -0.55], hp: 0.3 })],
+    gknee: [P({ h: 0.55, lean: 0.4, yaw: 0, lh: [0.2, -0.05, 0.4], rh: [-0.2, -0.05, 0.4], lf: [0.26, -0.55], rf: [-0.3, -0.45], rfy: 0.25, hp: 0.3 }),
+            P({ h: 0.5, lean: 0.7, yaw: 0, lh: [0.2, -0.05, 0.4], rh: [-0.2, -0.05, 0.4], lf: [0.26, -0.55], rf: [-0.15, 0.15], rfy: 0.3, hp: 0.3 })]
+  };
+  const HAND_KINDS = { straight: 1, hook: 1, uppercut: 1, overhand: 1, gpunch: 1, ghammer: 1, gelbow: 1, gbody: 1 };
+  function mirrorPose(p, upperOnly) {
+    const m = {};
+    for (const k in p) m[k] = Array.isArray(p[k]) ? p[k].slice() : p[k];
+    m.lh = [-p.rh[0], p.rh[1], p.rh[2]]; m.rh = [-p.lh[0], p.lh[1], p.lh[2]];
+    m.yaw = -p.yaw; m.roll = -p.roll; m.hy = -p.hy; m.ox = -p.ox;
+    if (!upperOnly) {
+      m.lf = [-p.rf[0], p.rf[1]]; m.rf = [-p.lf[0], p.lf[1]];
+      m.lfy = p.rfy; m.rfy = p.lfy;
+      m.lPole = [-p.rPole[0], p.rPole[1], p.rPole[2]]; m.rPole = [-p.lPole[0], p.lPole[1], p.lPole[2]];
+      m.hipYaw = -p.hipYaw;
+    }
+    return m;
+  }
+  const STRIKE_POSES_L = {};
+  for (const k in STRIKE_POSES) STRIKE_POSES_L[k] = STRIKE_POSES[k].map(p => mirrorPose(p, !!HAND_KINDS[k]));
+
+  // top fighter placement relative to the bottom fighter's hips: [along the ground axis (+ = towards their head), across]
+  const GROUND_OFF = { guard: [-0.32, 0], half: [-0.26, -0.08], side: [0.12, -0.42], mount: [-0.02, 0], back: [-0.48, 0] };
+
+  function lerpPose(a, b, t, out) {
+    out = out || {};
+    for (const k in a) {
+      const va = a[k], vb = b[k];
+      if (Array.isArray(va)) { out[k] = out[k] || []; for (let i = 0; i < va.length; i++) out[k][i] = va[i] + (vb[i] - va[i]) * t; }
+      else if (typeof va === 'number') out[k] = va + ((vb == null ? va : vb) - va) * t;
+      else out[k] = va;
+    }
+    return out;
+  }
+  function copyPose(a, out) { return lerpPose(a, a, 0, out); }
+  // a ground transition: commit into the move over its duration, rolling / pitching the way it goes (a.dir)
+  function transK(a) { return 0.25 + 0.55 * Math.min(1, a.t / Math.max(0.2, a.dur)); }
+  function transLean(p, a) {
+    const k = Math.min(1, a.t / Math.max(0.2, a.dur));
+    if (a.dir === 'LEFT') p.roll += 0.35 * k; else if (a.dir === 'RIGHT') p.roll -= 0.35 * k;
+    else if (a.dir === 'FWD') p.lean += 0.25 * k; else if (a.dir === 'BACK') p.lean -= 0.2 * k;
+    return p;
+  }
+  // take the hips and legs of `legs` (a lying position pose) into `pose`, keeping its upper body
+  function legsFrom(pose, legs) {
+    pose.h = legs.h; pose.lfy = legs.lfy; pose.rfy = legs.rfy;
+    for (const k of ['lf', 'rf', 'lPole', 'rPole']) { pose[k] = pose[k] || []; for (let i = 0; i < legs[k].length; i++) pose[k][i] = legs[k][i]; }
+    return pose;
+  }
+
+  // ---------- two-bone IK ----------
+  const _d = new THREE.Vector3(), _p = new THREE.Vector3(), _u = new THREE.Vector3(), _e = new THREE.Vector3(), _l = new THREE.Vector3();
+  const DOWN = new THREE.Vector3(0, -1, 0);
+  const _qU = new THREE.Quaternion(), _qL = new THREE.Quaternion(), _qInv = new THREE.Quaternion();
+  function solveIK(rootPos, target, L1, L2, pole, upperGroup, lowerGroup) {
+    _d.copy(target).sub(rootPos);
+    let dist = _d.length();
+    const maxR = L1 + L2 - 0.005, minR = Math.abs(L1 - L2) + 0.02;
+    if (dist < 1e-4) { _d.set(0, -1, 0); dist = 1e-4; }
+    const dn = _d.multiplyScalar(1 / dist);
+    dist = clamp(dist, minR, maxR);
+    const cosA = clamp((L1 * L1 + dist * dist - L2 * L2) / (2 * L1 * dist), -1, 1);
+    const a = Math.acos(cosA);
+    _p.copy(pole).addScaledVector(dn, -pole.dot(dn));
+    if (_p.lengthSq() < 1e-6) _p.set(0, 0, 1).addScaledVector(dn, -dn.z);
+    _p.normalize();
+    _u.copy(dn).multiplyScalar(Math.cos(a)).addScaledVector(_p, Math.sin(a));
+    _e.copy(rootPos).addScaledVector(_u, L1);
+    _l.copy(rootPos).addScaledVector(dn, dist).sub(_e).normalize();
+    _qU.setFromUnitVectors(DOWN, _u);
+    _qL.setFromUnitVectors(DOWN, _l);
+    upperGroup.quaternion.copy(_qU);
+    _qInv.copy(_qU).invert();
+    lowerGroup.quaternion.copy(_qInv.multiply(_qL));
+  }
+
+  // ---------- fighter model ----------
+  // The visible fighter is one skinned body bound to eleven segment frames (the same rig as js/physics.js:
+  // box pelvis and chest, ball head, capsule limbs, ball gloves, box feet). While the ragdoll is live the
+  // segments copy its bodies one-to-one from the sim's pose snapshot. On the ground (and in the menu /
+  // without physics) a hidden two-bone IK skeleton is posed from POSES and the segments are snapped onto
+  // its bones, so both paths drive the same mesh.
+  const SEGS = (root.MMAPhys && root.MMAPhys.SEGS) || null;
+  const SEG_ORDER = ['pelvis', 'chest', 'head', 'lUpperArm', 'lForearm', 'rUpperArm', 'rForearm', 'lThigh', 'lShin', 'rThigh', 'rShin'];
+  const ANKLE_PIVOT = [0, -0.215, -0.02]; // where the foot hinges on the shin — mirrors js/physics.js
+  const RIG = { // segment dims (metres) — mirrors js/physics.js SEGS
+    pelvis: [0.16, 0.09, 0.11], chest: [0.19, 0.20, 0.12], headR: 0.12,
+    upperArm: [0.12, 0.05], forearm: [0.12, 0.045], fistR: 0.062, fistY: -0.18,
+    thigh: [0.18, 0.075], shin: [0.18, 0.055], foot: [0.05, 0.035, 0.11], footPos: [0, -0.22, 0.05],
+    chestUp: 0.34, headUp: 0.34, shoulder: [0.23, 0.17], hip: [0.10, -0.08]
+  };
+  if (SEGS) {
+    const s = SEGS;
+    RIG.pelvis = s.pelvis.shape.slice(1); RIG.chest = s.chest.shape.slice(1); RIG.headR = s.head.shape[1];
+    RIG.upperArm = s.lUpperArm.shape.slice(1); RIG.forearm = s.lForearm.shape.slice(1); RIG.fistR = s.lForearm.extra.shape[1]; RIG.fistY = s.lForearm.extra.pos[1];
+    RIG.thigh = s.lThigh.shape.slice(1); RIG.shin = s.lShin.shape.slice(1); RIG.foot = s.lShin.extra.shape.slice(1); RIG.footPos = s.lShin.extra.pos.slice();
+    RIG.chestUp = s.chest.anchorParent[1] - s.chest.anchorSelf[1];
+    RIG.headUp = s.head.anchorParent[1] - s.head.anchorSelf[1];
+    RIG.shoulder = [s.lUpperArm.anchorParent[0], s.lUpperArm.anchorParent[1]];
+    RIG.hip = [s.lThigh.anchorParent[0], s.lThigh.anchorParent[1]];
+  }
+  // IK bone lengths derived from the rig: joint-to-joint for the upper bones, joint-to-weapon for the lower
+  const UPPER_L = RIG.upperArm[0] * 2 + 0.04, FORE_L = RIG.forearm[0] + 0.02 - RIG.fistY;   // elbow -> glove centre
+  const THIGH_L = RIG.thigh[0] * 2 + 0.06, SHIN_L = RIG.shin[0] + 0.03 - RIG.footPos[1];     // knee -> foot centre
+  const SH_X = RIG.shoulder[0], SH_Y = RIG.chestUp + RIG.shoulder[1], HIP_XX = RIG.hip[0], HIP_Y = RIG.hip[1];
+  const _q = new THREE.Quaternion(), _pw = new THREE.Vector3(), _off = new THREE.Vector3();
+  const BUILD_SCALE = { lean: 0.93, athletic: 1, heavy: 1.1 }; // body width per look.build (mirrors LOOK.build in js/career.js)
+
+  // ---------- procedural skinned body ----------
+  // Tubes lofted through cross-section rings (ellipses with separate front / back fullness, optional
+  // squareness and radial grooves), with vertices blended across adjacent segments so joints bend as skin.
+  // Bone order: the eleven SEG_ORDER segments, then the two ankle-hinged feet.
+  const BONES = SEG_ORDER.concat(['lFoot', 'rFoot']);
+  const BI = {}; BONES.forEach((n, i) => { BI[n] = i; });
+  const TAU = Math.PI * 2;
+  const W1 = (b) => [[BI[b], 1]];
+  const W2 = (a, b, t) => [[BI[a], 1 - t], [BI[b], t]];
+  // radial modifier: a groove `depth` deep centred at `deg` (0 = +X, the fighter's left, 90 = front, 270 = back)
+  const groove = (deg, depth, width) => { const a = deg * Math.PI / 180; return (th) => { let d = ((th - a) % TAU + TAU) % TAU; if (d > Math.PI) d = TAU - d; return 1 - depth * Math.exp(-(d / width) * (d / width)); }; };
+  const mods = (...f) => (th) => f.reduce((s, g) => s * g(th), 1);
+
+  class MeshBuilder {
+    constructor() { this.pos = []; this.si = []; this.sw = []; this.idx = {}; this.n = 0; }
+    vert(x, y, z, w) {
+      this.pos.push(x, y, z);
+      let s = 0; for (const p of w) s += p[1];
+      for (let i = 0; i < 4; i++) { const p = w[i]; this.si.push(p ? p[0] : 0); this.sw.push(p ? p[1] / s : 0); }
+      return this.n++;
+    }
+    tri(a, b, c, m) { (this.idx[m] || (this.idx[m] = [])).push(a, b, c); }
+    // triangle wound so its normal points away from `ref`
+    face(a, b, c, ref, m) {
+      const P = this.pos, ax = P[a * 3], ay = P[a * 3 + 1], az = P[a * 3 + 2];
+      const e1x = P[b * 3] - ax, e1y = P[b * 3 + 1] - ay, e1z = P[b * 3 + 2] - az;
+      const e2x = P[c * 3] - ax, e2y = P[c * 3 + 1] - ay, e2z = P[c * 3 + 2] - az;
+      const nx = e1y * e2z - e1z * e2y, ny = e1z * e2x - e1x * e2z, nz = e1x * e2y - e1y * e2x;
+      if (nx * (ax - ref[0]) + ny * (ay - ref[1]) + nz * (az - ref[2]) < 0) this.tri(a, c, b, m); else this.tri(a, b, c, m);
+    }
+    // ring: { c:[x,y,z], rx, rz, u, v, zf, zb, n, w, mat, mod, ha (half angle of a partial ring, centred on the back), ref }
+    ring(r, N) {
+      const full = r.ha === undefined, u = r.u || [1, 0, 0], v = r.v || [0, 0, 1], n = r.n || 2, zf = r.zf || 1, zb = r.zb || 1;
+      const a0 = full ? 0 : (270 - r.ha) * Math.PI / 180, a1 = full ? TAU : (270 + r.ha) * Math.PI / 180, M = full ? N : N + 1;
+      const out = [];
+      for (let k = 0; k < M; k++) {
+        const th = a0 + (a1 - a0) * k / N;
+        let cs = Math.cos(th), sn = Math.sin(th);
+        if (n !== 2) { cs = Math.sign(cs) * Math.pow(Math.abs(cs), 2 / n); sn = Math.sign(sn) * Math.pow(Math.abs(sn), 2 / n); }
+        let a = r.rx * cs, b = r.rz * sn * (sn > 0 ? zf : zb);
+        if (r.mod) { const s = r.mod(th); a *= s; b *= s; }
+        out.push(this.vert(r.c[0] + u[0] * a + v[0] * b, r.c[1] + u[1] * a + v[1] * b, r.c[2] + u[2] * a + v[2] * b, r.w));
+      }
+      return out;
+    }
+    // loft a tube through the rings; `poles` = [startPole, endPole] positions ([x,y,z] or null) close the ends
+    loft(rings, N, mat, poles) {
+      const rows = rings.map((r) => this.ring(r, N));
+      for (let i = 0; i + 1 < rings.length; i++) {
+        const A = rows[i], B = rows[i + 1], full = rings[i].ha === undefined, M = A.length;
+        const m = rings[i + 1].mat || rings[i].mat || mat, ref = rings[i].ref || rings[i].c, cnt = full ? M : M - 1;
+        for (let k = 0; k < cnt; k++) { const k1 = (k + 1) % M; this.face(A[k], A[k1], B[k1], ref, m); this.face(A[k], B[k1], B[k], ref, m); }
+      }
+      const cap = (row, r, pole, ref) => {
+        const p = this.vert(pole[0], pole[1], pole[2], r.w), M = row.length, full = r.ha === undefined, m = r.mat || mat;
+        for (let k = 0; k < (full ? M : M - 1); k++) this.face(row[k], row[(k + 1) % M], p, ref, m);
+      };
+      if (poles && poles[0]) cap(rows[0], rings[0], poles[0], rings[1].c);
+      if (poles && poles[1]) cap(rows[rows.length - 1], rings[rings.length - 1], poles[1], rings[rings.length - 2].c);
+    }
+    build(matOrder) {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(this.pos, 3));
+      g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(this.si, 4));
+      g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(this.sw, 4));
+      g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(this.n * 3).fill(1), 3)); // tinted per vertex by the bruise map
+      const index = []; let start = 0;
+      matOrder.forEach((m, i) => { const a = this.idx[m] || []; if (a.length) g.addGroup(start, a.length, i); for (const v of a) index.push(v); start += a.length; });
+      g.setIndex(index);
+      g.computeVertexNormals();
+      return g;
+    }
+  }
+  // rounded end: rings shrinking along `dir` over `len`, then the pole
+  function dome(r, dir, len, w) {
+    const out = [];
+    for (const t of [0.45, 0.78, 0.94]) {
+      const s = Math.sqrt(1 - t * t);
+      out.push(Object.assign({}, r, { c: [r.c[0] + dir[0] * len * t, r.c[1] + dir[1] * len * t, r.c[2] + dir[2] * len * t], rx: r.rx * s, rz: r.rz * s, w: w || r.w, mod: null }));
+    }
+    return { rings: out, pole: [r.c[0] + dir[0] * len, r.c[1] + dir[1] * len, r.c[2] + dir[2] * len] };
+  }
+
+  function BloodField(scene) {
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = this.canvas.height = 512;
+    this.g = this.canvas.getContext('2d');
+    this.tex = new THREE.CanvasTexture(this.canvas);
+    this.mesh = new THREE.Mesh(
+      new THREE.CircleGeometry(4.55, 40),
+      new THREE.MeshBasicMaterial({ map: this.tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })
+    );
+    this.mesh.rotation.x = -Math.PI / 2;
+    this.mesh.position.y = 0.045;
+    this.mesh.visible = false;
+    this.mesh.renderOrder = 1;
+    scene.add(this.mesh);
+    const geo = new THREE.SphereGeometry(0.04, 6, 5);
+    const mat = new THREE.MeshBasicMaterial({ color: 0x8a1014 });
+    this.drops = [];
+    for (let i = 0; i < 140; i++) {
+      const m = new THREE.Mesh(geo, mat);
+      m.visible = false;
+      m.castShadow = false;
+      scene.add(m);
+      this.drops.push({ m, v: new THREE.Vector3(), life: 0 });
+    }
+    this.on = false;
+  }
+  BloodField.prototype.stamp = function (x, z, size) {
+    const u = (x / 9.1 + 0.5) * 512;
+    const v = (z / 9.1 + 0.5) * 512;
+    const rad = 8 + size * 16;
+    const g = this.g;
+    const grd = g.createRadialGradient(u, v, 0, u, v, rad);
+    grd.addColorStop(0, 'rgba(110, 6, 10, 0.9)');
+    grd.addColorStop(0.55, 'rgba(80, 4, 8, 0.5)');
+    grd.addColorStop(1, 'rgba(80, 4, 8, 0)');
+    g.fillStyle = grd;
+    g.beginPath();
+    g.arc(u, v, rad, 0, Math.PI * 2);
+    g.fill();
+    this.tex.needsUpdate = true;
+    this.mesh.visible = true;
+  };
+  BloodField.prototype.burst = function (origin, power) {
+    if (!this.on || !origin) return;
+    const pwr = power < 0.3 ? 0.3 : power > 1.4 ? 1.4 : power;
+    const n = 12 + Math.round(pwr * 20);
+    let spawned = 0;
+    for (let i = 0; i < this.drops.length && spawned < n; i++) {
+      const d = this.drops[i];
+      if (d.life > 0) continue;
+      d.life = 0.55 + Math.random() * 0.55;
+      d.m.visible = true;
+      d.m.scale.setScalar(1);
+      d.m.position.copy(origin);
+      const ang = Math.random() * Math.PI * 2;
+      const sp = 1.1 + pwr * 3.2 * Math.random();
+      d.v.set(Math.cos(ang) * sp, 1.5 + Math.random() * 2.6 * pwr, Math.sin(ang) * sp);
+      spawned++;
+    }
+    const stains = 5 + Math.round(pwr * 8);
+    for (let i = 0; i < stains; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const rad = Math.random() * (0.45 + pwr);
+      this.stamp(origin.x + Math.cos(ang) * rad, origin.z + Math.sin(ang) * rad, 0.45 + Math.random() * pwr);
+    }
+  };
+  BloodField.prototype.step = function (dt) {
+    for (let i = 0; i < this.drops.length; i++) {
+      const d = this.drops[i];
+      if (d.life <= 0) continue;
+      d.life -= dt;
+      d.v.y -= 10 * dt;
+      d.m.position.x += d.v.x * dt;
+      d.m.position.y += d.v.y * dt;
+      d.m.position.z += d.v.z * dt;
+      if (d.m.position.y <= 0.05 || d.life <= 0) {
+        if (d.m.position.y <= 0.35) this.stamp(d.m.position.x, d.m.position.z, 0.55 + Math.random() * 0.7);
+        d.life = 0;
+        d.m.visible = false;
+      }
+    }
+  };
+  BloodField.prototype.clear = function () {
+    this.g.clearRect(0, 0, 512, 512);
+    this.tex.needsUpdate = true;
+    this.mesh.visible = false;
+    for (let i = 0; i < this.drops.length; i++) { this.drops[i].life = 0; this.drops[i].m.visible = false; }
+  };
+
+  // ---------- skin marks ----------
+  // Bruises and welts, painted into the skinned body's vertex colours. A mark is a soft ellipse on one bone (in
+  // that bone's bind frame, so it rides the limb): a fresh red flush that fades over a couple of minutes, and the
+  // purple bruise that comes up behind it. A shot landing on an existing mark deepens and widens it instead of
+  // stacking a new one, so the thigh that keeps eating low kicks grows one big welt.
+  class SkinMarks {
+    constructor(mesh, boneNames) {
+      const g = mesh.geometry, pos = g.attributes.position, nor = g.attributes.normal, si = g.attributes.skinIndex, sw = g.attributes.skinWeight;
+      this.color = g.attributes.color; this.n = pos.count;
+      this.red = new Float32Array(this.n); this.br = new Float32Array(this.n);
+      // per bone: the vertices it moves (weight >= 0.25), with their positions and normals in the bone's bind frame
+      this.bones = {};
+      const inv = mesh.skeleton.boneInverses, v = new THREE.Vector3(), nv = new THREE.Vector3();
+      for (const name of boneNames) this.bones[name] = { idx: [], loc: [], nrm: [] };
+      for (let i = 0; i < this.n; i++) {
+        for (let k = 0; k < 4; k++) {
+          const w = sw.array[i * 4 + k]; if (w < 0.25) continue;
+          const bi = si.array[i * 4 + k], b = this.bones[boneNames[bi]];
+          v.fromBufferAttribute(pos, i).applyMatrix4(inv[bi]);
+          nv.fromBufferAttribute(nor, i).transformDirection(inv[bi]);
+          b.idx.push(i); b.loc.push(v.x, v.y, v.z); b.nrm.push(nv.x, nv.y, nv.z);
+        }
+      }
+      for (const n in this.bones) { const b = this.bones[n]; b.idx = Int32Array.from(b.idx); b.loc = Float32Array.from(b.loc); b.nrm = Float32Array.from(b.nrm); }
+      this.marks = []; this.age = 0; this.dirty = false; this.nextPaint = 0; this.seeded = false;
+    }
+    // the vertex of `bone` nearest a bone-local point (an index into the bone's lists), or -1
+    _nearest(bone, x, y, z) {
+      const b = this.bones[bone]; if (!b || !b.idx.length) return -1;
+      const L = b.loc; let best = -1, bd = Infinity;
+      for (let k = 0; k < b.idx.length; k++) { const dx = L[k * 3] - x, dy = L[k * 3 + 1] - y, dz = L[k * 3 + 2] - z, d = dx * dx + dy * dy + dz * dz; if (d < bd) { bd = d; best = k; } }
+      return best;
+    }
+    // project a bone-local point onto the skin: out.p on the surface (lifted `lift` along the normal), out.n the normal
+    surface(bone, x, y, z, lift, out) {
+      const k = this._nearest(bone, x, y, z), b = this.bones[bone];
+      out = out || { p: new THREE.Vector3(), n: new THREE.Vector3() };
+      if (k < 0) { out.p.set(x, y, z); out.n.set(0, 0, 1); return out; }
+      const L = b.loc, N = b.nrm; out.n.set(N[k * 3], N[k * 3 + 1], N[k * 3 + 2]).normalize();
+      // slide along the tangent plane at that vertex, so a point between vertices still sits on the skin
+      const dx = x - L[k * 3], dy = y - L[k * 3 + 1], dz = z - L[k * 3 + 2], h = dx * out.n.x + dy * out.n.y + dz * out.n.z;
+      out.p.set(x - out.n.x * h, y - out.n.y * h, z - out.n.z * h).addScaledVector(out.n, lift || 0);
+      return out;
+    }
+    // r: radius around the limb, ry: along it; red / br: strength of the flush and of the bruise; age: seconds old
+    add(bone, x, y, z, r, ry, red, br, age) {
+      const k = this._nearest(bone, x, y, z); if (k < 0) return null;
+      const L = this.bones[bone].loc, sx = L[k * 3], sy = L[k * 3 + 1], sz = L[k * 3 + 2];
+      for (const m of this.marks) {
+        if (m.bone !== bone || Math.hypot(m.x - sx, m.y - sy, m.z - sz) > Math.min(m.r, r) * 0.7) continue;
+        m.red = Math.min(2.4, m.red + red); m.br = Math.min(3, m.br + br);
+        m.r = Math.min(m.r * 1.1, r * 1.7); m.ry = Math.min(m.ry * 1.1, ry * 1.7);
+        m.t0 += (this.age - m.t0) * 0.6; // freshens the flush without resetting the bruise under it
+        this.dirty = true; return m;
+      }
+      const m = { bone, x: sx, y: sy, z: sz, r, ry, red, br, t0: this.age - (age || 0) };
+      this.marks.push(m); this.dirty = true; return m;
+    }
+    tick(dt) {
+      this.age += dt;
+      if (this.marks.length && (this.dirty || this.age >= this.nextPaint)) this.paint();
+    }
+    paint() {
+      this.dirty = false; this.nextPaint = this.age + 0.5;
+      const R = this.red, B = this.br; R.fill(0); B.fill(0);
+      for (const m of this.marks) {
+        const age = Math.max(0, this.age - m.t0);
+        const red = m.red * (0.3 + 0.7 * Math.exp(-age / 75)), br = m.br * Math.min(1, 0.25 + age / 50);
+        const b = this.bones[m.bone], L = b.loc, I = b.idx;
+        for (let k = 0; k < I.length; k++) {
+          const dx = L[k * 3] - m.x, dy = (L[k * 3 + 1] - m.y) / m.ry, dz = L[k * 3 + 2] - m.z;
+          const d2 = (dx * dx + dz * dz) / (m.r * m.r) + dy * dy;
+          if (d2 >= 1) continue;
+          const w = 1 - d2 * d2;
+          R[I[k]] += red * w; B[I[k]] += br * w;
+        }
+      }
+      // the flush pulls the skin towards a dusky red, the bruise on top of it towards purple-grey
+      const C = this.color;
+      for (let i = 0; i < this.n; i++) {
+        const r = Math.min(1, R[i]), b = Math.min(1, B[i]) * 0.85;
+        let cr = 1 - 0.1 * r, cg = 1 - 0.42 * r, cb = 1 - 0.42 * r;
+        cr += (0.52 - cr) * b; cg += (0.4 - cg) * b; cb += (0.56 - cb) * b;
+        C.setXYZ(i, cr, cg, cb);
+      }
+      C.needsUpdate = true;
+    }
+  }
+
+  // ---------- face wounds ----------
+  // Cuts, bleeding and swelling: small decals riding the head frame at the landmark nearest each shot. A cut over
+  // either eyebrow with blood running past the eye, a mouse on either cheek or brow, a nose that bleeds over the
+  // lip, a split lip that runs down the chin. Each landmark keeps its own hurt total, so the eye that keeps
+  // catching the hook is the one that closes. Head-local frame: centre = origin, face at +Z, +X = the fighter's left.
+  const FACE_LM = [
+    { id: 'browL', p: [0.052, 0.058, 0.1], sx: 1 }, { id: 'browR', p: [-0.052, 0.058, 0.1], sx: -1 },
+    { id: 'cheekL', p: [0.074, -0.012, 0.08], sx: 1 }, { id: 'cheekR', p: [-0.074, -0.012, 0.08], sx: -1 },
+    { id: 'nose', p: [0, -0.02, 0.115] }, { id: 'mouth', p: [0, -0.065, 0.105] },
+    { id: 'templeL', p: [0.1, 0.035, 0.04] }, { id: 'templeR', p: [-0.1, 0.035, 0.04] }, { id: 'chin', p: [0, -0.1, 0.08] },
+    { id: 'earL', p: [0.112, -0.005, -0.012] }, { id: 'earR', p: [-0.112, -0.005, -0.012] }, { id: 'back', p: [0, 0.02, -0.11] }
+  ];
+  const _m4 = new THREE.Matrix4(), _zero = new THREE.Vector3(), _up = new THREE.Vector3(0, 1, 0);
+  class FaceWounds {
+    constructor(head, marks) {
+      this.hurt = {}; for (const lm of FACE_LM) this.hurt[lm.id] = 0;
+      this.bloodMat = new THREE.MeshStandardMaterial({ color: 0x5a070a, roughness: 0.32, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+      this.cutMat = new THREE.MeshStandardMaterial({ color: 0x2a0405, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+      this.swellMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.62 });
+      this._c = new THREE.Color(); this._swellTint = new THREE.Color(0.74, 0.5, 0.56);
+      const S = { p: new THREE.Vector3(), n: new THREE.Vector3() };
+      // a decal sitting on the skin at a head-local point, its +Z along the skin normal, its +Y up the face
+      const place = (mesh, x, y, z, lift) => {
+        marks.surface('head', x, y, z, lift, S); mesh.position.copy(S.p);
+        _m4.lookAt(S.n, _zero, _up); mesh.quaternion.setFromRotationMatrix(_m4);
+        mesh.castShadow = false; mesh.receiveShadow = false; head.add(mesh); return mesh;
+      };
+      const hanging = (w, h, mat) => new THREE.Mesh(new THREE.PlaneGeometry(w, h).translate(0, -h / 2, 0), mat); // top edge at the origin
+      // a run of blood: a chain of quads down the face from (x, y), drifting sideways by `drift` a step; set(len) reveals it
+      const trickle = (x, y, z, drift, w0, steps) => {
+        const q = [], step = 0.016; let cx = x, cy = y;
+        for (let i = 0; i < steps; i++) { const t = i / Math.max(1, steps - 1); const m = place(hanging(w0 * (1 - 0.55 * t), step, this.bloodMat), cx, cy, z, 0.0025); m.visible = false; q.push(m); cx += drift; cy -= step * 0.97; }
+        return { set(len) { for (let i = 0; i < q.length; i++) { const l = (len - i * step) / step; q[i].visible = l > 0.05; q[i].scale.y = Math.max(0.05, Math.min(1, l)); } } };
+      };
+      const swelling = (x, y, z, sx, sy, sz) => { const m = place(new THREE.Mesh(new THREE.SphereGeometry(0.03, 14, 12), this.swellMat), x, y, z, -0.007); m.visible = false; m.castShadow = true; return { set(s) { m.visible = s > 0.08; m.scale.set(sx * s, sy * s, sz * s); } }; };
+      const q = new THREE.Quaternion(), zAxis = new THREE.Vector3(0, 0, 1);
+      this.side = {};
+      for (const sx of [1, -1]) {
+        const cut = place(new THREE.Mesh(new THREE.PlaneGeometry(0.03, 0.006), this.cutMat), sx * 0.052, 0.062, 0.1, 0.003);
+        cut.quaternion.multiply(q.setFromAxisAngle(zAxis, sx * 0.35)); cut.visible = false;
+        this.side[sx] = {
+          cut, run: trickle(sx * 0.062, 0.05, 0.1, sx * 0.004, 0.009, 5),           // down the outside of the eye onto the cheek
+          brow: swelling(sx * 0.056, 0.042, 0.095, 1.9, 1.1, 0.85),
+          cheek: swelling(sx * 0.074, -0.012, 0.08, 1.35, 1.2, 0.7)
+        };
+      }
+      this.nose = [trickle(0.012, -0.044, 0.108, 0, 0.006, 2), trickle(-0.012, -0.044, 0.108, 0, 0.006, 2)];
+      this.lip = place(new THREE.Mesh(new THREE.PlaneGeometry(0.046, 0.007), this.bloodMat), 0, -0.069, 0.1, 0.012); this.lip.visible = false;
+      this.lipSide = Math.random() < 0.5 ? 1 : -1;
+      this.lipRun = trickle(this.lipSide * 0.024, -0.069, 0.1, this.lipSide * 0.002, 0.007, 3);  // from one corner of the mouth down the chin
+    }
+    // a shot at head-local point q: `hurt` goes to the nearest landmark
+    hit(q, hurt) {
+      let best = null, bd = Infinity;
+      for (const lm of FACE_LM) { const d = (lm.p[0] - q.x) ** 2 + (lm.p[1] - q.y) ** 2 + (lm.p[2] - q.z) ** 2; if (d < bd) { bd = d; best = lm; } }
+      this.hurt[best.id] += hurt;
+      this.refresh();
+    }
+    refresh() {
+      const H = this.hurt, u = (x) => Math.max(0, Math.min(1, x));
+      for (const sx of [1, -1]) {
+        const s = this.side[sx], brow = H[sx > 0 ? 'browL' : 'browR'], cheek = H[sx > 0 ? 'cheekL' : 'cheekR'];
+        s.cut.visible = brow >= 5;                       // the brow opens up
+        s.run.set(u((brow - 5) / 16) * 0.08);
+        s.brow.set(u(brow / 22));
+        s.cheek.set(u((cheek + brow * 0.3) / 18));       // a mouse under the eye
+      }
+      for (const t of this.nose) t.set(u((H.nose - 2.5) / 10) * 0.032);
+      this.lip.visible = H.mouth >= 2.5;
+      this.lipRun.set(u((H.mouth - 5) / 12) * 0.048);
+    }
+    // the swelling is skin, tinted towards the bruise, and flashes with the rest of the head
+    update(skinColor, emissive) {
+      this.swellMat.color.copy(skinColor).lerp(this._c.copy(skinColor).multiply(this._swellTint), 0.85);
+      this.swellMat.emissive.copy(emissive);
+    }
+  }
+  const ZERO_DMG = { head: 0, body: 0, legs: 0 };
+
+  class FighterModel {
+    // opts.ref: dressed as the referee (shirt, slacks, shoes, nitrile gloves) instead of a fighter
+    // opts.look: { hair, hairColor, beard, build, gloves, trim } (see LOOK in js/career.js); missing fields take the defaults
+    constructor(scene, color, skin, idx, opts) {
+      this.idx = idx;
+      const isRef = this.isRef = !!(opts && opts.ref);
+      const look = this.look = Object.assign({ hair: 'short', hairColor: 0x1a1210, beard: 'none', build: 'athletic', gloves: null, trim: 0xf2f2f2 }, opts && opts.look);
+      const bw = isRef ? 1 : (BUILD_SCALE[look.build] || 1); // body width: lean / athletic / heavy
+      // ---- segment frames (world-space groups), one per physics body, plus a foot hinged on each shin
+      this.segs = {}; this.feet = {};
+      for (const name of SEG_ORDER) { const g = new THREE.Group(); scene.add(g); this.segs[name] = g; }
+      for (const side of ['l', 'r']) { const foot = new THREE.Group(); foot.position.set(ANKLE_PIVOT[0], ANKLE_PIVOT[1], ANKLE_PIVOT[2]); this.segs[side + 'Shin'].add(foot); this.feet[side] = foot; }
+      const addMesh = (g, geo, mat, offset, scale) => {
+        const m = new THREE.Mesh(geo, mat); m.castShadow = true; m.receiveShadow = true;
+        if (offset) m.position.set(...offset); if (scale) m.scale.set(...scale); g.add(m); return m;
+      };
+
+      // ---- hidden IK skeleton (drives the segments when the ragdoll is parked)
+      this.root = new THREE.Group();
+      this.body = new THREE.Group(); this.root.add(this.body);           // hips; y = hip height
+      this.torso = new THREE.Group(); this.body.add(this.torso);         // pitch / yaw
+      this.neck = new THREE.Group(); this.neck.position.y = RIG.chestUp + RIG.headUp; this.torso.add(this.neck);
+      this.lSh = new THREE.Group(); this.lSh.position.set(SH_X, SH_Y, 0); this.torso.add(this.lSh);
+      this.rSh = new THREE.Group(); this.rSh.position.set(-SH_X, SH_Y, 0); this.torso.add(this.rSh);
+      this.lEl = new THREE.Group(); this.lEl.position.y = -UPPER_L; this.lSh.add(this.lEl);
+      this.rEl = new THREE.Group(); this.rEl.position.y = -UPPER_L; this.rSh.add(this.rEl);
+      this.lHip = new THREE.Group(); this.lHip.position.set(HIP_XX, HIP_Y, 0); this.body.add(this.lHip);
+      this.rHip = new THREE.Group(); this.rHip.position.set(-HIP_XX, HIP_Y, 0); this.body.add(this.rHip);
+      this.lKn = new THREE.Group(); this.lKn.position.y = -THIGH_L; this.lHip.add(this.lKn);
+      this.rKn = new THREE.Group(); this.rKn.position.y = -THIGH_L; this.rHip.add(this.rKn);
+      scene.add(this.root);
+
+      // ---- bind pose: the skeleton standing straight at the origin, arms hanging, facing +Z. The body is
+      // modelled in this frame and bound to the segments here, then skinned to wherever they go.
+      this.body.position.set(0, HIP_H, 0);
+      this._applySkeleton();
+      for (const n of SEG_ORDER) this.segs[n].updateMatrixWorld(true);
+      const R = RIG, Sg = this.segs;
+      const L = {
+        hipY: Sg.rThigh.position.y + R.thigh[0] + 0.03, headY: Sg.head.position.y,
+        shX: SH_X, shY: Sg.rUpperArm.position.y + R.upperArm[0] + 0.02, elY: Sg.rForearm.position.y + R.forearm[0] + 0.02, fistY: Sg.rForearm.position.y + R.fistY,
+        hipX: HIP_XX, kneeY: Sg.rShin.position.y + R.shin[0] + 0.03,
+        ankleY: Sg.rShin.position.y + ANKLE_PIVOT[1], ankleZ: ANKLE_PIVOT[2], footY: Sg.rShin.position.y + R.footPos[1], footZ: R.footPos[2]
+      };
+      const MATS = ['body', 'head', 'legs', 'shorts', 'band', 'trim', 'hair', 'sleeve', 'arm', 'feet'];
+      const skinOpts = { roughness: 0.62, metalness: 0.0, skinning: true };
+      const bodyMat = new THREE.MeshStandardMaterial(Object.assign({ color: skin, vertexColors: !isRef }, skinOpts)); // vertex colours carry the bruise map
+      const headMat = bodyMat.clone(), legMat = bodyMat.clone(), skinMat = bodyMat.clone();
+      const shortsMat = new THREE.MeshStandardMaterial({ color, roughness: 0.55, skinning: true, side: THREE.DoubleSide });
+      const bandSkinMat = new THREE.MeshStandardMaterial({ color: 0x15151a, roughness: 0.85, skinning: true });
+      const trimSkinMat = new THREE.MeshStandardMaterial({ color: isRef ? 0xf2f2f2 : look.trim, roughness: 0.7, skinning: true });
+      const hairMat = new THREE.MeshStandardMaterial({ color: isRef ? 0x8a8a8e : look.hairColor, roughness: 0.95, skinning: true });
+      const hairRigidMat = new THREE.MeshStandardMaterial({ color: isRef ? 0x8a8a8e : look.hairColor, roughness: 0.95 }); // beard, top knot
+      const gloveMat = new THREE.MeshStandardMaterial({ color: isRef ? 0x4f8fe0 : look.gloves != null ? look.gloves : idx === 0 ? 0xc62828 : 0x1e5bd6, roughness: 0.4, metalness: 0.05 });
+      // the referee: the 'body' (torso) and 'sleeve' groups are his shirt, 'legs' / 'shorts' his slacks, 'feet' his shoes
+      const shirtMat = isRef ? new THREE.MeshStandardMaterial({ color: 0x1e2028, roughness: 0.8, skinning: true }) : null;
+      const pantsMat = isRef ? new THREE.MeshStandardMaterial({ color: 0x2c2d33, roughness: 0.75, skinning: true, side: THREE.DoubleSide }) : null;
+      const shoeMat = isRef ? new THREE.MeshStandardMaterial({ color: 0x0c0c0e, roughness: 0.45, skinning: true }) : null;
+      const darkMat = new THREE.MeshStandardMaterial({ color: 0x1c1c22, roughness: 0.9 });
+      const bandMat = new THREE.MeshStandardMaterial({ color: 0x15151a, roughness: 0.85 });
+      const eyeWhite = new THREE.MeshStandardMaterial({ color: 0xf4f0ea, roughness: 0.4 });
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0x5a2a2a, roughness: 0.8 });
+      this.mats = { skinMat, shortsMat, gloveMat, headMat, bodyMat, legMat, hairMat, hairRigidMat, trimSkinMat };
+      this.skinBase = new THREE.Color(skin);
+
+      const B = new MeshBuilder();
+      const ring = (y, rx, rz, w, o) => Object.assign({ c: [0, y, 0], rx, rz, w }, o || {});
+      // -- torso, neck and head: one tube from the hips to the crown
+      {
+        const { hipY, shY, headY } = L, sternum = groove(90, 0.035, 0.28), spine = groove(270, 0.03, 0.3), linea = groove(90, 0.018, 0.2);
+        const T = [
+          ring(hipY - 0.03, 0.15, 0.10, W1('pelvis')),
+          ring(hipY, 0.17, 0.115, W1('pelvis'), { zb: 1.12 }),
+          ring(hipY + 0.07, 0.165, 0.11, W1('pelvis'), { zb: 1.05, mod: linea }),
+          ring(hipY + 0.14, 0.15, 0.10, W2('pelvis', 'chest', 0.35), { zf: 1.02, mod: mods(linea, spine) }),
+          ring(hipY + 0.21, 0.156, 0.105, W2('pelvis', 'chest', 0.8), { zf: 1.03, mod: mods(linea, spine) }),
+          ring(hipY + 0.29, 0.168, 0.115, W1('chest'), { zf: 1.06, mod: mods(sternum, spine) }),
+          ring(hipY + 0.37, 0.185, 0.122, W1('chest'), { zf: 1.13, mod: mods(sternum, spine) }),
+          ring(hipY + 0.45, 0.20, 0.128, W1('chest'), { zf: 1.16, mod: mods(sternum, spine) }),
+          ring(hipY + 0.52, 0.205, 0.125, W1('chest'), { zf: 1.08, mod: spine }),
+          ring(shY - 0.02, 0.20, 0.115, W1('chest')),
+          ring(shY + 0.025, 0.145, 0.095, W1('chest')),
+          ring(shY + 0.05, 0.095, 0.08, W1('chest')),
+          ring(shY + 0.065, 0.068, 0.066, W2('chest', 'head', 0.3), { c: [0, shY + 0.065, -0.005] }),
+          ring(headY - 0.08, 0.07, 0.07, W2('chest', 'head', 0.7), { zf: 1.25, mat: 'head' }),
+          ring(headY - 0.05, 0.092, 0.092, W1('head'), { zf: 1.15, mat: 'head' }),
+          ring(headY - 0.015, 0.106, 0.105, W1('head'), { zf: 1.05, mat: 'head' }),
+          ring(headY + 0.02, 0.114, 0.115, W1('head'), { zb: 1.04, mat: 'head' }),
+          ring(headY + 0.06, 0.113, 0.112, W1('head'), { zf: 0.98, zb: 1.08, mat: 'head' }),
+          ring(headY + 0.095, 0.10, 0.105, W1('head'), { zb: 1.06, mat: 'head' }),
+          ring(headY + 0.12, 0.072, 0.078, W1('head'), { mat: 'head' }),
+          ring(headY + 0.135, 0.035, 0.04, W1('head'), { mat: 'head' })
+        ];
+        // the build widens everything below the neck; a heavy fighter also carries a belly
+        for (const r of T) if (r.c[1] < shY + 0.06) { r.rx *= bw; r.rz *= bw; if (bw > 1 && r.c[1] > hipY && r.c[1] < hipY + 0.35) r.zf = (r.zf || 1) * (1 + (bw - 1) * 1.6); }
+        B.loft(T, 36, 'body', [[0, hipY - 0.05, 0], [0, headY + 0.142, 0]]);
+        // hair: a thin shell over the crown, open at the forehead, reaching down behind the ears
+        const style = isRef ? 'short' : look.hair;
+        const crown = [
+          { y: headY - 0.01, ha: 80, rx: 0.111, rz: 0.112, zb: 1.04 }, { y: headY + 0.02, ha: 100, rx: 0.114, rz: 0.115, zb: 1.04 },
+          { y: headY + 0.05, ha: 125, rx: 0.1135, rz: 0.113, zf: 0.985, zb: 1.07 }, { y: headY + 0.072, ha: 150, rx: 0.11, rz: 0.11, zf: 0.98, zb: 1.075 },
+          { y: headY + 0.09, ha: 170, rx: 0.102, rz: 0.106, zb: 1.06 }, { y: headY + 0.105, ha: 180, rx: 0.09, rz: 0.096, zb: 1.03 },
+          { y: headY + 0.122, ha: 180, rx: 0.068, rz: 0.075 }, { y: headY + 0.136, ha: 180, rx: 0.033, rz: 0.038 }
+        ];
+        // the long style hangs the shell down the back of the neck; the afro is the whole shell puffed out
+        const mane = [
+          { y: headY - 0.21, ha: 45, rx: 0.108, rz: 0.108, zb: 1.15 }, { y: headY - 0.15, ha: 55, rx: 0.118, rz: 0.118, zb: 1.15 },
+          { y: headY - 0.09, ha: 65, rx: 0.12, rz: 0.12, zb: 1.12 }, { y: headY - 0.04, ha: 75, rx: 0.118, rz: 0.118, zb: 1.08 }
+        ];
+        const shell = (rings, k, lift) => rings.map((h) => ring(h.y + (lift || 0.003), h.rx * k, h.rz * k, W1('head'), { ha: h.ha, zf: h.zf, zb: h.zb, mat: 'hair' }));
+        let H = null;
+        if (style === 'short') H = shell(crown, 1.04);
+        else if (style === 'buzz' || style === 'bun') H = shell(crown, 1.012);
+        else if (style === 'long') H = shell(mane, 1.0).concat(shell(crown, 1.05));
+        else if (style === 'afro') H = shell([[-0.07, 95, 0.12], [-0.03, 110, 0.15], [0.02, 128, 0.165], [0.07, 142, 0.168], [0.12, 165, 0.158], [0.16, 180, 0.135], [0.19, 180, 0.1], [0.21, 180, 0.055]]
+          .map(([y, ha, r]) => ({ y: headY + y, ha, rx: r, rz: r, zf: 0.96 })), 1.0, 0); // a round mass well clear of the skull, open at the face
+        if (H) B.loft(H, 36, 'hair', [null, [0, headY + (style === 'afro' ? 0.222 : 0.146), 0]]);
+        if (style === 'mohawk') {
+          // a crest lofted front to back along the midline, each ring standing upright in the x/y plane (its lower half is inside the skull)
+          const M = [[0.105, 0.072, 0.03], [0.075, 0.106, 0.05], [0.04, 0.127, 0.065], [0, 0.137, 0.075], [-0.04, 0.131, 0.07], [-0.075, 0.113, 0.06], [-0.105, 0.082, 0.045], [-0.122, 0.045, 0.028]]
+            .map(([z, y, h]) => ({ c: [0, headY + y, z], u: [1, 0, 0], v: [0, 1, 0], rx: 0.02, rz: h, zf: 1.7, zb: 0.6, n: 2.6, w: W1('head'), mat: 'hair' }));
+          B.loft(M, 12, 'hair', [[0, headY + 0.078, 0.115], [0, headY + 0.03, -0.13]]);
+        }
+      }
+      for (const side of ['l', 'r']) {
+        const sx = side === 'l' ? 1 : -1, ua = side + 'UpperArm', fa = side + 'Forearm', th = side + 'Thigh', sh = side + 'Shin', ft = side + 'Foot';
+        // -- arm: deltoid over the shoulder, bicep / triceps, elbow, forearm, down into the glove
+        {
+          const { shX, shY, elY, fistY } = L, x = sx * shX;
+          const r = (y, rx, rz, w, o) => Object.assign({ c: [x, y, 0], rx, rz, w }, o || {});
+          const A = [
+            r(shY + 0.062, 0.044, 0.044, W2('chest', ua, 0.3), { c: [sx * (shX - 0.025), shY + 0.062, 0] }),
+            r(shY + 0.038, 0.068, 0.066, W2('chest', ua, 0.4), { c: [sx * (shX - 0.012), shY + 0.038, 0] }),
+            r(shY + 0.005, 0.08, 0.076, W2('chest', ua, 0.6)),
+            r(shY - 0.045, 0.079, 0.075, W2('chest', ua, 0.85), { zf: 1.03 }),
+            r(shY - 0.10, 0.069, 0.067, W1(ua), { zf: 1.08, zb: 1.06 }),
+            r(elY + 0.12, 0.066, 0.063, W1(ua), { zf: 1.14, zb: 1.06 }),
+            r(elY + 0.06, 0.057, 0.055, W1(ua), { zf: 1.04 }),
+            r(elY + 0.025, 0.052, 0.053, W2(ua, fa, 0.3)),
+            r(elY, 0.05, 0.053, W2(ua, fa, 0.5), { zb: 1.08 }),
+            r(elY - 0.03, 0.052, 0.052, W2(ua, fa, 0.75)),
+            r(elY - 0.07, 0.057, 0.054, W1(fa), { zf: 1.04 }),
+            r(elY - 0.12, 0.051, 0.048, W1(fa)),
+            r(elY - 0.18, 0.043, 0.041, W1(fa)),
+            r(fistY + 0.09, 0.038, 0.036, W1(fa)),
+            r(fistY + 0.06, 0.036, 0.034, W1(fa))
+          ];
+          for (let i = 0; i < 5; i++) A[i].mat = 'sleeve'; // shoulder to mid upper arm: a short sleeve on the referee
+          for (const r of A) { r.rx *= bw; r.rz *= bw; r.c[0] += sx * (bw - 1) * 0.12; } // the build: thicker arms, set a little wider on a broad chest
+          const d = dome(A[A.length - 1], [0, -1, 0], 0.04);
+          B.loft(A.concat(d.rings), 24, 'arm', [[sx * (shX - 0.03), shY + 0.075, 0], d.pole]);
+        }
+        // -- leg: glute / quad, knee, calf, ankle
+        {
+          const { hipX, hipY, kneeY, ankleY, ankleZ } = L, x = sx * hipX;
+          const r = (y, rx, rz, w, o) => Object.assign({ c: [x, y, 0], rx, rz, w }, o || {});
+          const G = [
+            r(hipY + 0.07, 0.075, 0.075, W2('pelvis', th, 0.3)),
+            r(hipY + 0.02, 0.086, 0.09, W2('pelvis', th, 0.45), { zb: 1.16 }),
+            r(hipY - 0.04, 0.088, 0.092, W2('pelvis', th, 0.7), { zb: 1.12, zf: 1.02 }),
+            r(hipY - 0.11, 0.09, 0.092, W2('pelvis', th, 0.9), { zf: 1.1, zb: 1.1 }),
+            r(hipY - 0.20, 0.086, 0.09, W1(th), { zf: 1.12, zb: 1.04 }),
+            r(hipY - 0.29, 0.078, 0.082, W1(th), { zf: 1.1 }),
+            r(kneeY + 0.08, 0.068, 0.072, W1(th), { zf: 1.06 }),
+            r(kneeY + 0.035, 0.062, 0.066, W2(th, sh, 0.3), { zf: 1.06 }),
+            r(kneeY, 0.06, 0.066, W2(th, sh, 0.5), { zf: 1.1 }),
+            r(kneeY - 0.035, 0.06, 0.066, W2(th, sh, 0.75), { zb: 1.1 }),
+            r(kneeY - 0.09, 0.062, 0.07, W1(sh), { zb: 1.3 }),
+            r(kneeY - 0.16, 0.058, 0.066, W1(sh), { zb: 1.32 }),
+            r(kneeY - 0.23, 0.05, 0.056, W1(sh), { zb: 1.18 }),
+            r(ankleY + 0.09, 0.043, 0.047, W1(sh)),
+            r(ankleY + 0.04, 0.04, 0.044, W1(sh), { c: [x, ankleY + 0.04, ankleZ * 0.5] }),
+            r(ankleY, 0.04, 0.045, W2(sh, ft, 0.4), { c: [x, ankleY, ankleZ] }),
+            r(ankleY - 0.03, 0.038, 0.042, W2(sh, ft, 0.7), { c: [x, ankleY - 0.03, ankleZ] })
+          ];
+          for (const r of G) if (r.c[1] > ankleY + 0.1) { r.rx *= bw; r.rz *= bw; }
+          const d = dome(G[G.length - 1], [0, -1, 0], 0.04, W2(sh, ft, 0.85));
+          B.loft(G.concat(d.rings), 24, 'legs', [[x, hipY + 0.09, 0], d.pole]);
+          // -- foot: cross-sections from the heel to the toes, flat sole, arched instep
+          const { footY, footZ } = L, sole = footY - R.foot[1];
+          const f = (dz, rx, ry, o) => Object.assign({ c: [x, sole + ry, footZ + dz], u: [1, 0, 0], v: [0, 1, 0], rx, rz: ry, n: 2.4, w: W1(ft) }, o || {});
+          const F = [
+            f(-0.105, 0.03, 0.026), f(-0.08, 0.042, 0.034), f(-0.04, 0.047, 0.038, { zf: 1.1 }), f(0.0, 0.05, 0.036, { zf: 1.06 }),
+            f(0.05, 0.053, 0.031), f(0.09, 0.054, 0.025), f(0.115, 0.045, 0.018)
+          ];
+          B.loft(F, 20, 'feet', [[x, sole + 0.02, footZ - 0.115], [x, sole + 0.012, footZ + 0.126]]);
+        }
+        // -- shorts leg: a loose tube from inside the trunk to just above the knee, with a hem stripe
+        {
+          const { hipX, hipY } = L, x = sx * (hipX - 0.005);
+          const r = (y, rx, rz, w, o) => Object.assign({ c: [x, y, 0], rx: rx * bw, rz: rz * bw, w }, o || {});
+          B.loft([
+            r(hipY + 0.01, 0.095, 0.104, W2('pelvis', th, 0.45)),
+            r(hipY - 0.05, 0.105, 0.112, W2('pelvis', th, 0.7)),
+            r(hipY - 0.12, 0.106, 0.112, W2('pelvis', th, 0.9), { zf: 1.02 }),
+            r(hipY - 0.19, 0.104, 0.108, W1(th), { zf: 1.04 }),
+            r(hipY - 0.25, 0.102, 0.106, W1(th), { zf: 1.03 }),
+            r(hipY - 0.272, 0.103, 0.107, W1(th), { mat: 'trim' }),
+            r(hipY - 0.285, 0.103, 0.107, W1(th), { mat: 'trim' })
+          ], 24, 'shorts', null);
+        }
+      }
+      // -- shorts trunk: waistband, hips, closed under the crotch
+      {
+        const { hipY } = L, waistY = hipY + 0.16, th0 = 'rThigh';
+        const belly = bw > 1 ? 1 + (bw - 1) * 1.4 : 1;
+        const ring = (y, rx, rz, w, o) => Object.assign({ c: [0, y, 0], rx: rx * bw, rz: rz * bw }, o || {}, { w, zf: ((o && o.zf) || 1) * belly });
+        B.loft([
+          ring(waistY + 0.012, 0.165, 0.112, W2('pelvis', 'chest', 0.3), { mat: 'band' }),
+          ring(waistY - 0.018, 0.172, 0.117, W2('pelvis', 'chest', 0.2), { mat: 'band' }),
+          ring(waistY - 0.035, 0.173, 0.118, W1('pelvis'), { mat: 'shorts' }),
+          ring(waistY - 0.09, 0.19, 0.126, W1('pelvis'), { zb: 1.1 }),
+          ring(hipY, 0.20, 0.133, W1('pelvis'), { zb: 1.12 }),
+          ring(hipY - 0.04, 0.206, 0.136, W2('pelvis', th0, 0.1), { zb: 1.06 }),
+          ring(hipY - 0.06, 0.204, 0.134, W2('pelvis', th0, 0.15))
+        ], 36, 'shorts', [null, [0, hipY - 0.07, 0]]);
+      }
+      const bones = BONES.map((n) => n === 'lFoot' ? this.feet.l : n === 'rFoot' ? this.feet.r : this.segs[n]);
+      const skinMesh = new THREE.SkinnedMesh(B.build(MATS), isRef
+        ? [shirtMat, headMat, pantsMat, pantsMat, bandSkinMat, pantsMat, hairMat, shirtMat, skinMat, shoeMat]
+        : [bodyMat, headMat, legMat, shortsMat, bandSkinMat, trimSkinMat, hairMat, bodyMat, bodyMat, legMat]);
+      skinMesh.castShadow = true; skinMesh.receiveShadow = true; skinMesh.frustumCulled = false;
+      scene.add(skinMesh);
+      skinMesh.bind(new THREE.Skeleton(bones));
+      this.skinMesh = skinMesh;
+
+      // ---- rigid details riding on the segments
+      // face: ears, brow ridge, nose, eyes and mouth sit on the head frame (head centre = origin, face at +Z)
+      const head = this.segs.head, chest = this.segs.chest;
+      const faceMat = headMat.clone(); faceMat.skinning = false; faceMat.vertexColors = false; this.faceMat = faceMat;
+      addMesh(head, new THREE.SphereGeometry(0.028, 12, 10), faceMat, [0.112, -0.005, -0.012], [0.5, 1.0, 0.8]);    // ears
+      addMesh(head, new THREE.SphereGeometry(0.028, 12, 10), faceMat, [-0.112, -0.005, -0.012], [0.5, 1.0, 0.8]);
+      addMesh(head, new THREE.SphereGeometry(0.03, 14, 10), faceMat, [0, 0.047, 0.104], [1.75, 0.28, 0.45]);       // brow ridge
+      addMesh(head, new THREE.SphereGeometry(0.02, 12, 10), faceMat, [0, -0.02, 0.104], [0.7, 1.3, 0.9]);          // nose
+      for (const sx of [-1, 1]) {
+        addMesh(head, new THREE.SphereGeometry(0.02, 12, 10), eyeWhite, [sx * 0.045, 0.02, 0.102], [1.15, 0.8, 0.7]);
+        addMesh(head, new THREE.SphereGeometry(0.011, 10, 8), darkMat, [sx * 0.045, 0.02, 0.117]);
+      }
+      addMesh(head, new THREE.BoxGeometry(0.05, 0.008, 0.01), mouthMat, [0, -0.065, 0.104]);                     // mouth
+      if (!isRef) {
+        const beard = look.beard;
+        if (beard === 'mustache' || beard === 'goatee' || beard === 'full') addMesh(head, new THREE.SphereGeometry(0.02, 12, 10), hairRigidMat, [0, -0.047, 0.106], [1.7, 0.38, 0.55]);
+        if (beard === 'goatee') addMesh(head, new THREE.SphereGeometry(0.03, 12, 10), hairRigidMat, [0, -0.094, 0.088], [1.0, 0.8, 0.6]);
+        if (beard === 'full') {
+          addMesh(head, new THREE.SphereGeometry(0.05, 14, 12), hairRigidMat, [0, -0.1, 0.05], [1.45, 0.72, 0.9]);                 // under the chin
+          for (const sx of [-1, 1]) addMesh(head, new THREE.SphereGeometry(0.045, 12, 10), hairRigidMat, [sx * 0.08, -0.058, 0.025], [0.6, 1.1, 1.5]); // along the jaw
+        }
+        if (look.hair === 'bun') addMesh(head, new THREE.SphereGeometry(0.036, 12, 10), hairRigidMat, [0, 0.152, -0.015], [1, 0.85, 1]);
+      }
+      // MMA gloves: padded fist with a squared knuckle block, thumb and a wrist strap, on the forearm frame
+      for (const side of ['l', 'r']) {
+        const sx = side === 'l' ? 1 : -1, g = this.segs[side + 'Forearm'], GB = new MeshBuilder(), fy = R.fistY, w = [[0, 1]];
+        if (isRef) { // the referee's gloved hand: an open hand, not a fist
+          addMesh(g, new THREE.SphereGeometry(0.045, 14, 10), gloveMat, [0, fy + 0.01, 0.004], [0.75, 1.45, 0.62]);
+          addMesh(g, new THREE.SphereGeometry(0.018, 10, 8), gloveMat, [-sx * 0.035, fy + 0.03, 0.02], [0.8, 1.5, 0.8]);
+          continue;
+        }
+        const r = (y, rx, rz, o) => Object.assign({ c: [0, y, 0.004], rx, rz, w }, o || {});
+        GB.loft([
+          r(fy + 0.095, 0.046, 0.044, { mat: 'band' }), r(fy + 0.08, 0.057, 0.053, { mat: 'band' }), r(fy + 0.065, 0.058, 0.054, { mat: 'glove' }),
+          r(fy + 0.045, 0.063, 0.057, { n: 2.4 }), r(fy + 0.02, 0.069, 0.061, { zf: 1.1, n: 2.6 }), r(fy - 0.005, 0.07, 0.061, { zf: 1.15, n: 2.6 }),
+          r(fy - 0.03, 0.066, 0.057, { zf: 1.1, n: 2.4 }), r(fy - 0.05, 0.05, 0.046), r(fy - 0.062, 0.028, 0.026)
+        ], 24, 'glove', [[0, fy + 0.102, 0.004], [0, fy - 0.068, 0.004]]);
+        const glove = new THREE.Mesh(GB.build(['glove', 'band']), [gloveMat, bandMat]);
+        glove.castShadow = true; glove.receiveShadow = true; g.add(glove);
+        addMesh(g, new THREE.SphereGeometry(0.028, 12, 10), gloveMat, [-sx * 0.058, fy + 0.015, 0.03], [0.8, 1.3, 0.8]);   // thumb
+      }
+      // wounds: bruises painted into the skin's vertex colours where strikes land, cuts / bleeding / swelling on the face
+      this.marks = isRef ? null : new SkinMarks(skinMesh, BONES);
+      this.wounds = isRef ? null : new FaceWounds(head, this.marks);
+
+      // shadow blob
+      const blob = new THREE.Mesh(new THREE.CircleGeometry(0.42, 20), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false }));
+      blob.rotation.x = -Math.PI / 2; blob.position.y = 0.012; scene.add(blob);
+      this.blob = blob;
+
+      this.scene = scene;
+      this.pose = copyPose(POSES.idle);
+      this.px = 0; this.pz = 0; this.yaw = 0; this.initialized = false; this.physMode = false;
+      this.flash = 0; this.stepPhase = 0; this.vx = 0; this.vz = 0;
+      this._v = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+      this._pole = new THREE.Vector3();
+      this._tipV = new THREE.Vector3();
+      this._dmgC = new THREE.Color(); this._red = new THREE.Color(0.75, 0.25, 0.22); this._wq = new THREE.Vector3();
+      this._eul = new THREE.Euler(); this._qHip = new THREE.Quaternion(); this._yAxis = new THREE.Vector3(0, 1, 0);
+      this._tipArr = [0, 0, 0];
+    }
+
+    dispose() {
+      // every geometry / material here belongs to this model alone; three keeps their GPU buffers (and the
+      // skeleton's bone texture) until dispose(), so removing them from the scene is not enough
+      const geos = new Set(), mats = new Set();
+      const own = (o) => { if (o.geometry) geos.add(o.geometry); if (o.material) for (const m of [].concat(o.material)) mats.add(m); };
+      for (const n in this.segs) { this.segs[n].traverse(own); this.scene.remove(this.segs[n]); }
+      own(this.blob); own(this.skinMesh);
+      this.scene.remove(this.root); this.scene.remove(this.blob); this.scene.remove(this.skinMesh);
+      for (const g of geos) g.dispose();
+      for (const m of mats) m.dispose();
+      this.skinMesh.skeleton.dispose();
+    }
+
+    setVisible(v) {
+      for (const n in this.segs) this.segs[n].visible = v;
+      this.skinMesh.visible = v; this.blob.visible = v;
+    }
+
+    // look: only its colours can change on a built model (hair style, beard and build are baked into the mesh)
+    setColors(color, skin, look) {
+      this.mats.shortsMat.color.setHex(color); this.skinBase.setHex(skin); for (const k of ['skinMat', 'headMat', 'bodyMat', 'legMat']) this.mats[k].color.setHex(skin); this.faceMat.color.setHex(skin);
+      if (look && !this.isRef) {
+        if (typeof look.hairColor === 'number') { this.mats.hairMat.color.setHex(look.hairColor); this.mats.hairRigidMat.color.setHex(look.hairColor); }
+        if (typeof look.gloves === 'number') this.mats.gloveMat.color.setHex(look.gloves);
+        if (typeof look.trim === 'number') this.mats.trimSkinMat.color.setHex(look.trim);
+      }
+    }
+
+    // the skin: hit flash, a faint flush over a region as its damage climbs, the bruise map and the face wounds
+    updateDamage(f, dt) {
+      if (this.isRef) return;
+      const fl = Math.max(0, this.flash), D = f.dmg || ZERO_DMG;
+      if (this.marks && !this.marks.seeded) this.seedCarried(D);
+      const tint = (mat, d) => {
+        this._dmgC.copy(this.skinBase).lerp(this._red, Math.min(1, d / 70) * 0.18);
+        mat.color.copy(this._dmgC); mat.emissive.setRGB(fl * 0.6, fl * 0.1, fl * 0.1);
+      };
+      tint(this.mats.headMat, D.head); tint(this.mats.bodyMat, D.body); tint(this.mats.legMat, D.legs);
+      this.faceMat.color.copy(this.mats.headMat.color); this.faceMat.emissive.copy(this.mats.headMat.emissive);
+      this.mats.skinMat.emissive.setRGB(fl * 0.6, fl * 0.1, fl * 0.1);
+      if (this.marks) this.marks.tick(dt || 0);
+      if (this.wounds) this.wounds.update(this.mats.headMat.color, this.mats.headMat.emissive);
+    }
+
+    // damage carried into the fight (career mode) shows as old, settled bruises: a few on the face, ribs and one thigh
+    seedCarried(D) {
+      this.marks.seeded = true;
+      const rnd = (a, b) => a + Math.random() * (b - a), OLD = 900;
+      const nH = Math.min(4, Math.round((D.head || 0) / 10)), nB = Math.min(4, Math.round((D.body || 0) / 12)), nL = Math.min(3, Math.round((D.legs || 0) / 12));
+      for (let i = 0; i < nH; i++) {
+        const lm = FACE_LM[(Math.random() * 9) | 0];
+        this.marks.add('head', lm.p[0] + rnd(-0.02, 0.02), lm.p[1] + rnd(-0.02, 0.02), lm.p[2], 0.045, 0.045, 0.5, 0.7, OLD);
+        if (this.wounds && i === 0 && D.head >= 20) this.wounds.hit({ x: lm.p[0], y: lm.p[1], z: lm.p[2] }, 6 + D.head * 0.15);
+      }
+      for (let i = 0; i < nB; i++) this.marks.add(i % 2 ? 'pelvis' : 'chest', rnd(-0.14, 0.14), rnd(-0.1, 0.14), 0.13, 0.07, 0.07, 0.4, 0.6, OLD);
+      const sx = Math.random() < 0.5 ? 1 : -1;
+      for (let i = 0; i < nL; i++) this.marks.add(sx > 0 ? 'lThigh' : 'rThigh', sx * 0.085, rnd(-0.12, 0.1), 0.01, 0.09, 0.055, 0.4, 0.7, OLD);
+    }
+
+    // a landed or blocked strike marks the skin where it hit. ev.at is the contact point (world) and ev.seg the
+    // collider it struck; ground strikes carry neither, so they get a plausible spot for the part they hit.
+    wound(ev, p) {
+      if (!this.marks) return;
+      const blocked = ev.k === 'block', kind = ev.kind || '', part = ev.part || 'body';
+      const kick = /kick|teep/.test(kind), knee = kind === 'knee', elbow = kind === 'gelbow';
+      const dmg = ev.dmg != null ? ev.dmg : ev.big ? 4 : blocked ? 2 : 1.6;
+      let bone = ev.seg && this.segs[ev.seg] ? ev.seg : null;
+      const q = this._wq;
+      if (p && !bone) { // the collider wasn't a body segment (or wasn't named): the nearest one for the part
+        const cands = part === 'head' ? ['head'] : part === 'legs' ? ['lThigh', 'rThigh', 'lShin', 'rShin'] : ['chest', 'pelvis'];
+        let bd = Infinity; for (const n of cands) { const d = this.segs[n].position.distanceToSquared(p); if (d < bd) { bd = d; bone = n; } }
+      }
+      if (p && bone) this.segs[bone].worldToLocal(q.copy(p));
+      else if (part === 'head') { bone = 'head'; const lm = FACE_LM[(Math.random() * 6) | 0]; q.set(lm.p[0] + (Math.random() - 0.5) * 0.03, lm.p[1] + (Math.random() - 0.5) * 0.03, lm.p[2]); }
+      else if (part === 'body') { bone = 'chest'; q.set((Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.24, 0.14); }
+      else return;
+      const s = clamp(dmg / 4, 0.35, 1.6) * (blocked ? 0.45 : 1) * 0.5; // bruising rate: how much skin colour one shot adds
+      let r, ry, red, br;
+      if (bone === 'head') { r = ry = kick || knee ? 0.07 : 0.055; red = 0.9 * s; br = 0.5 * s; }
+      else if (/Forearm|UpperArm/.test(bone)) { r = 0.04; ry = 0.05; red = 0.6 * s; br = 0.35 * s; }   // blocked shots bruise the arms
+      else if (/Shin/.test(bone)) { r = 0.05; ry = 0.075; red = 0.9 * s; br = 0.55 * s; }
+      else if (/Thigh/.test(bone)) { r = 0.1; ry = 0.06; red = 1.1 * s; br = 0.65 * s; q.y = Math.min(q.y, -0.09); } // a low kick's welt wraps the thigh, kept below the shorts' hem
+      else if (kick || knee) { r = 0.1; ry = 0.06; red = 0.95 * s; br = 0.5 * s; }                      // a shin or knee across the ribs
+      else { r = ry = 0.075; red = 0.8 * s; br = 0.45 * s; }
+      this.marks.add(bone, q.x, q.y, q.z, r, ry, red, br);
+      // sharp weapons open the face up faster than a glove
+      if (bone === 'head' && !blocked && this.wounds) this.wounds.hit(q, dmg * 0.5 * (elbow ? 2.4 : knee ? 1.8 : kick ? 1.5 : kind === 'ghammer' ? 1.2 : 1)); // face rate: cuts, swelling and bleeding build at half speed
+    }
+
+    // compute target pose from sim state
+    targetPose(f, S, out) {
+      const a = f.act;
+      let pose;
+      if (S.phase === 'over' && S.result && S.result.winner === f.idx) pose = POSES.celebrate;
+      else if (a.type === 'down') pose = POSES.down;
+      else if (f.ground === 'bottom') {
+        const pos = S.ground ? S.ground.pos : 'guard';
+        const base = pos === 'guard' ? POSES.bottomGuard : pos === 'half' ? POSES.bottomHalf : pos === 'back' ? POSES.turtle : POSES.bottomFlat;
+        if (a.type === 'strike') return this._strikePose(f, out, base);
+        // in guard / half guard the legs stay wrapped around the top fighter whatever the upper body is doing
+        const wrap = pos === 'guard' || pos === 'half';
+        if (a.type === 'sub') pose = POSES.bottomSub;
+        else if (a.type === 'hit') pose = pos === 'back' ? POSES.turtle : POSES.bottomHit;
+        else if (a.type === 'caught') pose = POSES.bottomHit;
+        else if (a.type === 'trans') return transLean(lerpPose(base, pos === 'back' ? POSES.bottomHalf : POSES.bottomHit, transK(a), out), a);
+        else if ((this.inputHint & IN.BLOCK) && pos !== 'back') return legsFrom(lerpPose(base, POSES.bottomBlock, 0.6, out), base);
+        else pose = base;
+        if (wrap && pose !== base && pose !== POSES.bottomSub) return legsFrom(copyPose(pose, out), base);
+      } else if (f.ground === 'top') {
+        const pos = S.ground ? S.ground.pos : 'guard';
+        const base = pos === 'guard' ? POSES.topGuard : pos === 'half' ? POSES.top : pos === 'side' ? POSES.topSide : pos === 'mount' ? POSES.topMount : POSES.topBack;
+        if (a.type === 'strike') return this._strikePose(f, out, base);
+        if (a.type === 'sub') pose = pos === 'back' ? POSES.topBack : POSES.topSub;
+        else if (a.type === 'caught') pose = POSES.topCaught;
+        else if (a.type === 'hit') pose = POSES.topHit;
+        else if (a.type === 'trans') return transLean(lerpPose(base, POSES.topPosture, transK(a), out), a);
+        else pose = f.posture ? POSES.topPosture : base;
+      } else {
+        switch (a.type) {
+          case 'strike': return this._strikePose(f, out);
+          case 'hit': pose = a.name === 'body' ? POSES.hitBody : a.name === 'legs' ? POSES.hitLegs : POSES.hitHead; break;
+          case 'dodge': pose = POSES.dodge; break;
+          case 'push': pose = a.t < 0.26 ? POSES.push : POSES.idle; break;
+          case 'stumble': pose = POSES.stumble; break;
+          case 'sprawl': pose = POSES.sprawl; break;
+          case 'takedown': {
+            const u = clamp(a.t / 0.32, 0, 1);
+            if (!a.hit) return lerpPose(POSES.tdWind, POSES.tdShoot, smooth(u), out);
+            return lerpPose(POSES.tdShoot, POSES.stumble, smooth(clamp((a.t - 0.32) / 0.4, 0, 1)), out);
+          }
+          case 'celebrate': pose = POSES.celebrate; break;
+          default: pose = f.blocking ? ((this.inputHint & IN.MOD3) ? POSES.blockLow : POSES.block) : POSES.idle;
+        }
+      }
+      return copyPose(pose, out);
+    }
+
+    _strikePose(f, out, groundBase) {
+      const a = f.act, st = STRIKES[a.name];
+      const left = st.limb === 'lh' || st.limb === 'll';
+      let kf = (left ? STRIKE_POSES_L : STRIKE_POSES)[st.kind] || STRIKE_POSES.straight;
+      const tf = a.tf || 1;
+      const w = st.w * tf, ac = st.a * tf, r = st.r * tf;
+      const base = groundBase || (f.ground ? POSES.top : POSES.idle);
+      if (f.ground === 'bottom' && st.ground) {
+        // striking up from the back: blend the ground punch keyframes onto the lying pose
+        const kfB = kf.map(k => Object.assign(copyPose(base), { lh: k.lh.map((v, i) => i === 1 ? v + 0.45 : v), rh: k.rh.map((v, i) => i === 1 ? v + 0.45 : v) }));
+        kf = kfB;
+      }
+      if (a.t < w) return lerpPose(base, kf[0], smooth(clamp(a.t / w, 0, 1)), out);
+      if (a.t < w + ac) return lerpPose(kf[0], kf[1], smooth(clamp((a.t - w) / (ac * 0.6), 0, 1)), out);
+      return lerpPose(kf[1], base, smooth(clamp((a.t - w - ac) / r, 0, 1)), out);
+    }
+
+    // While a standing strike is live, drive the striking limb from the simulation's tip path so the
+    // hand / foot on screen is exactly where the hit detection says it is. Returns the root-local tip.
+    _limbOverride(f, p) {
+      const a = f.act;
+      if (a.type !== 'strike' || f.ground) return null;
+      const st = STRIKES[a.name];
+      if (!st || st.ground || !st.path) return null;
+      const tip = strikeTip(st, a.t, a.tf || 1, this._tipArr);
+      // sim frame [fwd, side(left), height] -> root-local (x = side, y = height, z = fwd)
+      const lx = tip[1], ly = tip[2], lz = tip[0];
+      const hand = st.tip === 'hand';
+      if (hand) {
+        // lunge: if the fist is beyond the arm's reach, carry the body forward with it
+        const sx = (st.limb === 'lh' ? SH_X : -SH_X) + p.ox, sy = p.h + SH_Y, sz = p.oz + 0.05;
+        const over = Math.hypot(lx - sx, ly - sy, lz - sz) - (UPPER_L + FORE_L + 0.07);
+        if (over > 0) { p.oz += Math.min(0.32, over); p.lean += Math.min(0.25, over * 0.6); }
+      } else {
+        const hx0 = st.limb === 'll' ? HIP_XX : -HIP_XX;
+        const hx = hx0 * Math.cos(p.hipYaw) + p.ox, hy = p.h + HIP_Y, hz = -hx0 * Math.sin(p.hipYaw) + p.oz;
+        const reach = st.tip === 'knee' ? THIGH_L : THIGH_L + SHIN_L;
+        const over = Math.hypot(lx - hx, ly - hy, lz - hz) - (reach + 0.02);
+        if (over > 0) { p.oz += Math.min(0.28, over * 0.9); if (st.tip !== 'knee') p.h -= Math.min(0.06, over * 0.2); }
+      }
+      return { st, lx, ly, lz, hand };
+    }
+
+    // ---- segments <- physics snapshot (11 x [px,py,pz,qx,qy,qz,qw])
+    _applySnapshot(pose, dt, k) {
+      const a = 1 - Math.exp(-dt * k);
+      for (let i = 0; i < SEG_ORDER.length; i++) {
+        const g = this.segs[SEG_ORDER[i]], o = i * 7;
+        _pw.set(pose[o], pose[o + 1], pose[o + 2]);
+        _q.set(pose[o + 3], pose[o + 4], pose[o + 5], pose[o + 6]);
+        if (this.physMode) { g.position.lerp(_pw, a); g.quaternion.slerp(_q, a); }
+        else { g.position.copy(_pw); g.quaternion.copy(_q); }
+      }
+      // ankles (plantar-flexion, rad) ride along after the eleven segments
+      const n = SEG_ORDER.length * 7;
+      const al = pose.length > n + 1 ? pose[n] : 0, ar = pose.length > n + 1 ? pose[n + 1] : 0;
+      if (this.physMode) { this.feet.l.rotation.x += (al - this.feet.l.rotation.x) * a; this.feet.r.rotation.x += (ar - this.feet.r.rotation.x) * a; }
+      else { this.feet.l.rotation.x = al; this.feet.r.rotation.x = ar; }
+    }
+    // ---- segments <- hidden IK skeleton
+    _segFromBone(name, bone, offY, offZ) {
+      const g = this.segs[name];
+      bone.getWorldQuaternion(g.quaternion);
+      bone.getWorldPosition(g.position);
+      if (offY || offZ) { _off.set(0, offY || 0, offZ || 0).applyQuaternion(g.quaternion); g.position.add(_off); }
+    }
+    _applySkeleton() {
+      this.root.updateMatrixWorld(true);
+      this._segFromBone('pelvis', this.body);
+      this._segFromBone('chest', this.torso, RIG.chestUp);
+      this._segFromBone('head', this.neck);
+      this._segFromBone('lUpperArm', this.lSh, -RIG.upperArm[0] - 0.02); this._segFromBone('rUpperArm', this.rSh, -RIG.upperArm[0] - 0.02);
+      this._segFromBone('lForearm', this.lEl, -RIG.forearm[0] - 0.02); this._segFromBone('rForearm', this.rEl, -RIG.forearm[0] - 0.02);
+      this._segFromBone('lThigh', this.lHip, -RIG.thigh[0] - 0.03); this._segFromBone('rThigh', this.rHip, -RIG.thigh[0] - 0.03);
+      this._segFromBone('lShin', this.lKn, -RIG.shin[0] - 0.03); this._segFromBone('rShin', this.rKn, -RIG.shin[0] - 0.03);
+      this.feet.l.rotation.x = 0; this.feet.r.rotation.x = 0;
+    }
+
+    // this.forced = { x, z, yaw, pose, moving, speed } places and poses the model directly instead of from the sim
+    // state (the referee always, the fighters for the post-fight hand raise). this.snap jumps straight there.
+    update(f, S, opp, dt, time, groundAxis, posLerp) {
+      const forced = this.forced;
+      // ---- live ragdoll: copy every segment straight from the sim snapshot
+      if (!forced && f.pose && f.pose.length >= SEG_ORDER.length * 7 && !f.ground) {
+        this._applySnapshot(f.pose, dt, posLerp && posLerp < 15 ? 14 : 40); // guests smooth between snapshots
+        const pv = this.segs.pelvis.position;
+        this.px = pv.x; this.pz = pv.z;
+        _off.set(0, 0, 1).applyQuaternion(this.segs.pelvis.quaternion);
+        this.yaw = Math.atan2(_off.x, _off.z);
+        this.initialized = true;
+        this.physMode = true;
+        this.blob.position.set(this.px, 0.012, this.pz);
+        this.blob.material.opacity = 0.35;
+        if (this.flash > 0) this.flash -= dt * 4;
+        this.updateDamage(f, dt);
+        return;
+      }
+      const wasPhys = this.physMode;
+      this.physMode = false;
+
+      // ---- position & facing ----
+      let tx = f.x, tz = f.z, tyaw;
+      if (forced) {
+        tx = forced.x; tz = forced.z; tyaw = forced.yaw;
+      } else if (S.ground && f.ground) {
+        const ax = groundAxis.x, az = groundAxis.z;
+        // top keeps facing +axis; bottom lies with head towards +axis (local -Z after lying back)
+        const pos = S.ground.pos || 'guard';
+        if (f.ground === 'bottom') {
+          tyaw = pos === 'back' ? Math.atan2(ax, az) : Math.atan2(-ax, -az);  // turtled: faces +axis
+          tx = f.x; tz = f.z;
+        } else {
+          const off = GROUND_OFF[pos] || GROUND_OFF.guard;   // [along axis, across axis]
+          const px = -az, pz = ax;                            // perpendicular
+          tx = f.x + ax * off[0] + px * off[1]; tz = f.z + az * off[0] + pz * off[1];
+          tyaw = pos === 'side' ? Math.atan2(px, pz) : Math.atan2(ax, az);
+        }
+      } else if (f.act.type === 'down') {
+        tyaw = this.yaw;
+      } else if (S.phase === 'break') {
+        tx = f.idx === 0 ? -3.1 : 3.1; tz = 0; tyaw = Math.atan2(-tx, 0.001);
+      } else {
+        tyaw = Math.atan2(opp.x - f.x, opp.z - f.z);
+      }
+      const snap = this.snap; this.snap = false;
+      if (!this.initialized || snap) { this.px = tx; this.pz = tz; this.yaw = tyaw; this.initialized = true; this.vx = 0; this.vz = 0; }
+      const k = posLerp || 18, opx = this.px, opz = this.pz;
+      this.px += (tx - this.px) * expo(dt, k); this.pz += (tz - this.pz) * expo(dt, k);
+      if (dt > 0) { const ev = expo(dt, 10); this.vx += ((this.px - opx) / dt - this.vx) * ev; this.vz += ((this.pz - opz) / dt - this.vz) * ev; }
+      let dy = tyaw - this.yaw; while (dy > Math.PI) dy -= Math.PI * 2; while (dy < -Math.PI) dy += Math.PI * 2;
+      this.yaw += dy * expo(dt, 10);
+      const moving = forced ? !!forced.moving : f.act.type === 'move' && !f.ground;
+
+      // ---- pose ----
+      const target = forced ? copyPose(forced.pose, this._tp) : this.targetPose(f, S, this._tp);
+      this._tp = target;
+      const speed = forced ? (forced.speed || 12) : (f.act.type === 'strike' || f.act.type === 'hit' || f.act.type === 'dodge' || f.act.type === 'push') ? 26 : 12;
+      if (wasPhys || snap) copyPose(target, this.pose); // coming off the ragdoll: start from the new pose, not a stale one
+      else lerpPose(this.pose, target, expo(dt, speed), this.pose);
+      // overrides (striking limb, lunge) are applied to a per-frame copy so they never feed back into the smoothing
+      const p = copyPose(this.pose, this._rp); this._rp = p;
+
+      // procedural: breathing bob, rocked wobble, footwork
+      const bob = Math.sin(time * 2.1 + f.idx) * 0.012;
+      let wob = 0;
+      if (!forced && f.rocked > 0 && !f.ground && f.act.type !== 'down') wob = (Math.sin(time * 7) * 0.12 * Math.min(1, f.rocked) + Math.sin(time * 3.3) * 0.08) * (f.rockLight ? 0.3 : 1);
+
+      const ov = forced ? null : this._limbOverride(f, p);
+      this.root.position.set(this.px, 0, this.pz);
+      this.root.rotation.set(0, this.yaw, 0);
+      this.body.position.set(p.ox, p.h + bob, p.oz);
+      this.body.rotation.set(p.lie, p.hipYaw, 0);
+      // torso angles are authored in the root frame so a turned-over hip (kicks) doesn't change what lean/roll mean
+      this._eul.set(p.lean + wob * 0.5, p.yaw, p.roll + wob);
+      this.torso.quaternion.setFromEuler(this._eul);
+      if (p.hipYaw) { this._qHip.setFromAxisAngle(this._yAxis, -p.hipYaw); this.torso.quaternion.premultiply(this._qHip); }
+      this.neck.rotation.set(p.hp, p.hy, 0);
+
+      if (ov) {
+        if (ov.hand) {
+          // root-local -> torso-local for the arm IK
+          this.root.updateMatrixWorld(true);
+          const t = this._tipV.set(ov.lx, ov.ly, ov.lz);
+          this.root.localToWorld(t); this.torso.worldToLocal(t);
+          const tgt = ov.st.limb === 'lh' ? p.lh : p.rh;
+          tgt[0] = t.x; tgt[1] = t.y; tgt[2] = t.z;
+          const keep = ov.st.limb === 'lh' ? this.pose.lh : this.pose.rh; // so the limb eases back from where it really was
+          keep[0] = t.x; keep[1] = t.y; keep[2] = t.z;
+        } else {
+          // feet are already in the root frame; a knee strike carries the foot tucked under the knee
+          const left = ov.st.limb === 'll';
+          const fxz = left ? p.lf : p.rf;
+          if (ov.st.tip === 'knee') { fxz[0] = ov.lx; fxz[1] = ov.lz - 0.22; if (left) p.lfy = ov.ly - SHIN_L * 0.85; else p.rfy = ov.ly - SHIN_L * 0.85; }
+          else { fxz[0] = ov.lx; fxz[1] = ov.lz; if (left) p.lfy = ov.ly; else p.rfy = ov.ly; }
+          const kxz = left ? this.pose.lf : this.pose.rf; kxz[0] = fxz[0]; kxz[1] = fxz[1];
+          if (left) this.pose.lfy = p.lfy; else this.pose.rfy = p.rfy;
+        }
+      }
+
+      // ---- IK arms (torso frame) ----
+      const v = this._v;
+      v[0].set(SH_X, SH_Y, 0); v[1].fromArray(p.lh);
+      this._pole.set(1, -0.4 - p.elbowOut * 0.3 + p.elbowUp, -0.6); // elbows down/out/back (raised for hooks)
+      solveIK(v[0], v[1], UPPER_L, FORE_L, this._pole, this.lSh, this.lEl);
+      v[0].set(-SH_X, SH_Y, 0); v[1].fromArray(p.rh);
+      this._pole.set(-1, -0.4 - p.elbowOut * 0.3 + p.elbowUp, -0.6);
+      solveIK(v[0], v[1], UPPER_L, FORE_L, this._pole, this.rSh, this.rEl);
+
+      // ---- IK legs (body frame) ----
+      if (p.lie > -0.5) {
+        // standing: foot targets are in the root frame; undo the body offset and hip yaw to get body frame
+        let lfx = p.lf[0], lfz = p.lf[1], rfx = p.rf[0], rfz = p.rf[1];
+        let lfy = p.lfy, rfy = p.rfy;
+        if (moving) {
+          // stride along the way he's actually travelling, in his own frame: forward / back the feet pass heel to toe,
+          // sideways it's a step-and-close (the stance opens and closes, the feet never cross). Each foot is lifted
+          // while it moves the way he's going and planted while the body passes over it.
+          this.stepPhase += dt * 9;
+          const s = Math.sin(this.stepPhase), c = Math.cos(this.stepPhase);
+          const cy = Math.cos(this.yaw), sy = Math.sin(this.yaw), sp = Math.hypot(this.vx, this.vz);
+          let ux = 0, uz = 1;
+          if (sp > 0.15) { ux = (this.vx * cy - this.vz * sy) / sp; uz = (this.vx * sy + this.vz * cy) / sp; }
+          const A = 0.12 - 0.03 * Math.abs(ux);
+          lfx += ux * A * s; lfz += uz * A * s; rfx -= ux * A * s; rfz -= uz * A * s;
+          lfy += Math.max(0, c) * 0.08; rfy += Math.max(0, -c) * 0.08;
+        }
+        const ch = Math.cos(p.hipYaw), sh = Math.sin(p.hipYaw);
+        const toBody = (x, z, out) => { out.x = x * ch - z * sh; out.z = x * sh + z * ch; return out; };
+        toBody(lfx - p.ox, lfz - p.oz, v[1]); v[1].y = lfy - (p.h + bob) + 0.05;
+        v[0].set(HIP_XX, HIP_Y, 0); this._pole.fromArray(p.lPole); solveIK(v[0], v[1], THIGH_L, SHIN_L, this._pole, this.lHip, this.lKn);
+        toBody(rfx - p.ox, rfz - p.oz, v[1]); v[1].y = rfy - (p.h + bob) + 0.05;
+        v[0].set(-HIP_XX, HIP_Y, 0); this._pole.fromArray(p.rPole); solveIK(v[0], v[1], THIGH_L, SHIN_L, this._pole, this.rHip, this.rKn);
+      } else {
+        // lying on back: targets are given directly in the body frame (layout documented above POSES.bottomGuard);
+        // the +0.3 pole bias tips the knees a little towards the head
+        v[0].set(HIP_XX, HIP_Y, 0); v[1].set(p.lf[0], p.lfy, p.lf[1]);
+        this._pole.set(p.lPole[0], p.lPole[1] + 0.3, p.lPole[2]); solveIK(v[0], v[1], THIGH_L, SHIN_L, this._pole, this.lHip, this.lKn);
+        v[0].set(-HIP_XX, HIP_Y, 0); v[1].set(p.rf[0], p.rfy, p.rf[1]);
+        this._pole.set(p.rPole[0], p.rPole[1] + 0.3, p.rPole[2]); solveIK(v[0], v[1], THIGH_L, SHIN_L, this._pole, this.rHip, this.rKn);
+      }
+      this._applySkeleton();
+      this.blob.position.set(this.px, 0.012, this.pz);
+      this.blob.material.opacity = p.lie < -0.5 ? 0.15 : 0.35;
+
+      // hit flash + accumulated damage on the skin
+      if (this.flash > 0) { this.flash -= dt * 4; }
+      this.updateDamage(f, dt);
+    }
+
+    headWorld(out) { return out.copy(this.segs.head.position); }
+    torsoWorld(out) { return out.copy(this.segs.chest.position); }
+  }
+
+  // ---------- referee ----------
+  // Not part of the simulation: the renderer steers him from the sim state alone, so a guest sees the same ref as
+  // the host without any of it going over the wire. During the fight he keeps a T to the fighters on the far side
+  // from the camera, circling with them (sidestepping, never cutting between them). In a striking-only match he
+  // rushes in over a knockdown (holds the attacker off with an outstretched arm, then bends over the downed man and
+  // waves him up if he stays down the full count); with grappling allowed he stays out of it, since the fight may
+  // well go on on the mat. He waves off a stoppage, and finally stands in the centre between the two fighters and
+  // raises the winner's hand.
+  const KD_T = (root.MMASim && root.MMASim.KD) || { STAY: 4.0 };
+  const REF_CAGE = 3.9;   // he stays this far inside the cage centre
+  const KD_HOLD = 1.5;    // seconds he holds the attacker off once he's in between them
+  const REF_SPEED = 1.3;  // scales all his walking speeds
+  const REF_ROOM = 1.7;   // he keeps at least this much room to either fighter when picking his spot
+  const LUNGE_V = 5.2, LUNGE_T = 0.28, LUNGE_CD = 0.9; // the hop out of the way: speed, duration, cooldown
+  // distance on the mat from (x, z) to the segment a-b
+  function segDist(x, z, ax, az, bx, bz) {
+    const vx = bx - ax, vz = bz - az, l2 = vx * vx + vz * vz;
+    const u = l2 > 1e-6 ? clamp(((x - ax) * vx + (z - az) * vz) / l2, 0, 1) : 0;
+    return Math.hypot(x - ax - vx * u, z - az - vz * u);
+  }
+  const RP = (o) => P(Object.assign({ yaw: 0, hy: 0, hp: 0.05, lean: 0.06, elbowOut: 0.3, lf: [0.15, 0.02], rf: [-0.15, -0.02] }, o));
+  const REF_POSES = {
+    // off to the side of the action: knees soft, hands up in front, ready to jump in
+    watch: RP({ h: HIP_H - 0.05, lean: 0.2, hp: -0.12, lh: [0.17, 0.2, 0.26], rh: [-0.17, 0.2, 0.26], lf: [0.2, 0.06], rf: [-0.2, -0.06] }),
+    // crouched over a ground fight
+    ground: RP({ h: HIP_H - 0.16, lean: 0.55, hp: -0.1, lh: [0.18, 0.02, 0.33], rh: [-0.18, 0.02, 0.33], lf: [0.24, 0.08], rf: [-0.24, -0.08] }),
+    ready: RP({ lean: 0.04, lh: [0.06, 0.08, 0.2], rh: [-0.06, 0.08, 0.2] }),
+    // "fight!": both hands out between them
+    go: RP({ lean: 0.15, lh: [0.12, 0.4, 0.5], rh: [-0.12, 0.4, 0.5] }),
+    // over a knockdown, facing the attacker: one arm straight out to hold him off
+    stop: RP({ h: HIP_H - 0.03, lean: 0.1, lh: [0.18, 0.2, 0.25], rh: [-0.08, 0.52, 0.56], elbowOut: 0.15 }),
+    // bent over the downed fighter, watching him
+    kdWatch: RP({ h: HIP_H - 0.12, lean: 0.5, hp: 0.2, lh: [0.17, 0.12, 0.34], rh: [-0.17, 0.12, 0.34], lf: [0.2, 0.1], rf: [-0.2, -0.1] }),
+    waveUp: RP({ h: HIP_H - 0.1, lean: 0.42, hp: 0.15, elbowOut: 0.2 }),
+    waveOff: RP({ lean: 0.08, hp: -0.05, elbowOut: 0.6 }),
+    // the announcement: a wrist in each hand ...
+    hold: RP({ lean: 0.02, hp: 0, lh: [0.4, 0.14, 0.08], rh: [-0.4, 0.14, 0.08] })
+  };
+  // ... then up goes the winner's (the fighter on the -x side is on the ref's right, he faces +z; both on a draw)
+  REF_POSES.raiseL = Object.assign(copyPose(REF_POSES.hold), { lh: [0.36, 1.02, 0.08], hp: -0.1 });
+  REF_POSES.raiseR = Object.assign(copyPose(REF_POSES.hold), { rh: [-0.36, 1.02, 0.08], hp: -0.1 });
+  REF_POSES.raiseBoth = Object.assign(copyPose(REF_POSES.hold), { lh: [0.36, 1.02, 0.08], rh: [-0.36, 1.02, 0.08], hp: -0.1 });
+  // the fighters in the line-up, authored for the one on the ref's left, at +x (his right hand is in the ref's grip);
+  // the other fighter uses mirrored copies
+  const FL = (o) => P(Object.assign({ yaw: 0, hy: 0, lean: 0.02, hp: 0.05, elbowOut: 0.2, lf: [0.14, 0.02], rf: [-0.14, -0.02], lh: [0.26, -0.07, 0.05], rh: [-0.3, 0.13, 0.08] }, o));
+  const LINE_POSES = {
+    stand: FL({}),
+    lose: FL({ hp: 0.38, lean: 0.08 }),
+    raised: FL({ hp: -0.1, rh: [-0.24, 1.04, 0.08] }),                                 // hand raised by the ref (a draw)
+    win: FL({ hp: -0.18, lean: -0.04, rh: [-0.24, 1.04, 0.08], lh: [0.3, 0.98, 0.12] }) // ... and the other one up too
+  };
+  const LINE_POSES_M = {};
+  for (const k in LINE_POSES) LINE_POSES_M[k] = mirrorPose(LINE_POSES[k], false);
+  const LINE_X = 0.78;    // fighters stand this far either side of the ref
+
+  // post-fight timeline, seconds after the result: fade out, cut to the line-up, hand goes up, end screen
+  function ceremonyTimes(res) {
+    const stoppage = !!res && !/Decision|Draw/.test(res.method);
+    const fade = stoppage ? 3.0 : 1.2; // a stoppage gets waved off first
+    return { stoppage, fade, cut: fade + 0.45, raise: fade + 1.9, end: fade + 4.8 };
+  }
+
+  // a comic speech bubble that floats over the ref's head; redrawn only when the line changes
+  class SpeechBubble {
+    constructor(scene) {
+      this.canvas = document.createElement('canvas');
+      this.canvas.width = 512; this.canvas.height = 192;
+      this.g = this.canvas.getContext('2d');
+      this.tex = new THREE.CanvasTexture(this.canvas);
+      this.sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: this.tex, transparent: true, depthTest: false, depthWrite: false }));
+      this.sprite.renderOrder = 10;
+      this.sprite.visible = false;
+      this.text = null;
+      scene.add(this.sprite);
+    }
+    show(text, x, y, z) {
+      if (!text) { this.sprite.visible = false; return; }
+      if (text !== this.text) this._draw(text);
+      this.sprite.position.set(x, y, z);
+      this.sprite.visible = true;
+    }
+    hide() { this.sprite.visible = false; }
+    _draw(text) {
+      this.text = text;
+      const g = this.g, W = this.canvas.width, H = this.canvas.height;
+      let fs = 64;
+      g.font = 'bold ' + fs + 'px Arial, sans-serif';
+      while (fs > 28 && g.measureText(text).width > W - 70) { fs -= 4; g.font = 'bold ' + fs + 'px Arial, sans-serif'; }
+      const tw = Math.min(W - 20, g.measureText(text).width + 60), bh = 120, bx = (W - tw) / 2, by = 8, r = 34;
+      g.clearRect(0, 0, W, H);
+      g.beginPath();
+      g.moveTo(bx + r, by); g.lineTo(bx + tw - r, by); g.quadraticCurveTo(bx + tw, by, bx + tw, by + r);
+      g.lineTo(bx + tw, by + bh - r); g.quadraticCurveTo(bx + tw, by + bh, bx + tw - r, by + bh);
+      g.lineTo(W / 2 + 22, by + bh); g.lineTo(W / 2 - 4, H - 10); g.lineTo(W / 2 - 18, by + bh); // the tail, down to his head
+      g.lineTo(bx + r, by + bh); g.quadraticCurveTo(bx, by + bh, bx, by + bh - r);
+      g.lineTo(bx, by + r); g.quadraticCurveTo(bx, by, bx + r, by);
+      g.closePath();
+      g.fillStyle = '#fff'; g.fill();
+      g.lineWidth = 7; g.strokeStyle = '#111'; g.stroke();
+      g.fillStyle = '#111'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(text, W / 2, by + bh / 2 + 2);
+      this.tex.needsUpdate = true;
+      this.sprite.scale.set(1.5, 1.5 * H / W, 1);
+    }
+  }
+
+  class Referee {
+    constructor(scene) {
+      this.model = new FighterModel(scene, 0x1e2028, 0xc99a74, 2, { ref: true });
+      this.bubble = new SpeechBubble(scene);
+      this._head = new THREE.Vector3();
+      this.f = { idx: 2, x: 0, z: 0, act: { type: 'idle', name: '', t: 0 }, ground: null, rocked: 0, pose: null };
+      this.pose = copyPose(REF_POSES.watch);
+      this.reset();
+    }
+    reset() {
+      this.x = 0; this.z = -1.5; this.vx = 0; this.vz = 0; this.goal = null; this.yaw = 0;
+      this.overT = -1; this.cut = false; this.ceremony = false; this.fade = 0;
+      this.lungeT = 0; this.lungeCD = 0; this.lvx = 0; this.lvz = 0;
+      this.kd = [{ downT: 0, phase: null, forced: false, arrive: -1 }, { downT: 0, phase: null, forced: false, arrive: -1 }];
+      this.model.initialized = false;
+      this.model.forced = null;
+    }
+    setVisible(v) { this.model.setVisible(v); if (!v) this.bubble.hide(); }
+
+    // neutral spot, the "T": about `D` out from the middle of the action, square to the line between the fighters so
+    // both stay in his view. He prefers the side away from the camera so he doesn't block the shot; when the fence
+    // is in the way he angles off square or comes in closer rather than drifting onto the fighters' line, and only
+    // as a last resort crosses to the camera side. Sticks with the current spot until it has gone bad.
+    _neutral(mx, mz, camSide, D, models) {
+      const m0 = models[0], m1 = models[1];
+      const ux = m1.px - m0.px, uz = m1.pz - m0.pz, gap = Math.hypot(ux, uz);
+      let nx = -camSide.x, nz = -camSide.z;
+      if (gap > 0.3) { nx = -uz / gap; nz = ux / gap; if (nx * camSide.x + nz * camSide.z > 0) { nx = -nx; nz = -nz; } }
+      const ra = Math.atan2(this.z - mz, this.x - mx);
+      let best = null, bestS = -1e9;
+      for (const side of [1, -1]) for (const ang of [0, 0.3, -0.3, 0.6, -0.6, 0.9, -0.9]) for (const dd of [D, D * 0.8, Math.max(1.4, D * 0.6)]) {
+        const c = Math.cos(ang), s = Math.sin(ang);
+        let px = mx + (nx * c - nz * s) * side * dd, pz = mz + (nx * s + nz * c) * side * dd;
+        const r = Math.hypot(px, pz);
+        let score = -Math.abs(ang) * 1.2 - (1 - dd / D) * 2.5 - (side < 0 ? 3.5 : 0) - Math.max(0, r - REF_CAGE) * 6;
+        if (r > REF_CAGE) { px *= REF_CAGE / r; pz *= REF_CAGE / r; }
+        for (const m of models) { const d = Math.hypot(px - m.px, pz - m.pz); if (d < REF_ROOM) score -= (REF_ROOM - d) * 6; }
+        // how far round the action he'd have to walk to get there
+        let da = Math.atan2(pz - mz, px - mx) - ra; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
+        score -= Math.abs(da) * 0.5;
+        if (this.goal) score -= Math.hypot(px - this.goal[0], pz - this.goal[1]) * 0.6; // stick with the current spot
+        if (score > bestS) { bestS = score; best = [px, pz]; }
+      }
+      if (!this.goal || Math.hypot(best[0] - this.goal[0], best[1] - this.goal[1]) > 0.4) this.goal = best;
+      return this.goal;
+    }
+
+    // he walks round the fighters, never through them: when the straight line to (tx, tz) passes close to either man
+    // or the gap between them, he heads for a point further round an arc about the middle of the action instead,
+    // going the short way unless that way runs him into the fence
+    _route(tx, tz, mx, mz, models) {
+      const m0 = models[0], m1 = models[1], half = Math.hypot(m1.px - m0.px, m1.pz - m0.pz) / 2;
+      let near = 1e9;
+      for (let i = 0; i <= 8; i++) {
+        const u = i / 8, x = this.x + (tx - this.x) * u, z = this.z + (tz - this.z) * u;
+        near = Math.min(near, segDist(x, z, m0.px, m0.pz, m1.px, m1.pz));
+      }
+      if (near > 1.0) return [tx, tz];
+      const ra = Math.atan2(this.z - mz, this.x - mx);
+      let da = Math.atan2(tz - mz, tx - mx) - ra; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
+      const R = Math.max(Math.hypot(this.x - mx, this.z - mz), half + 1.2, 1.6), step = Math.min(Math.abs(da) + 0.15, 0.7);
+      const way = (dir) => {
+        const a = ra + dir * step, x = mx + Math.cos(a) * R, z = mz + Math.sin(a) * R;
+        return [x, z, Math.max(0, Math.hypot(x, z) - REF_CAGE)];
+      };
+      let w = way(da >= 0 ? 1 : -1); const w2 = way(da >= 0 ? -1 : 1);
+      if (w[2] > w2[2] + 0.3) w = w2;
+      const r = Math.hypot(w[0], w[1]);
+      return r > REF_CAGE ? [w[0] * REF_CAGE / r, w[1] * REF_CAGE / r] : [w[0], w[1]];
+    }
+
+    // backed up near the fence with a fighter close: rather than getting pinned, he slides round the inside of the
+    // cage, whichever way takes him further from the fighters (and, all else equal, toward where he wanted to go)
+    _escapeArc(tx, tz, models) {
+      const m0 = models[0], m1 = models[1];
+      const R = REF_CAGE - 0.25, ra = Math.atan2(this.z, this.x);
+      let best = null, bestS = -1e9;
+      for (const dir of [1, -1]) {
+        const a = ra + dir * 0.75, x = Math.cos(a) * R, z = Math.sin(a) * R;
+        let s = segDist(x, z, m0.px, m0.pz, m1.px, m1.pz) * 2 - Math.hypot(tx - x, tz - z) * 0.3;
+        for (const m of models) s += Math.min(2.5, Math.hypot(x - m.px, z - m.pz));
+        if (s > bestS) { bestS = s; best = [x, z]; }
+      }
+      return best;
+    }
+
+    // the lunge: a quick hop in whichever direction gets him clear of both fighters without cutting between them
+    // or running into the fence
+    _lungeDir(models) {
+      const m0 = models[0], m1 = models[1], L = LUNGE_V * LUNGE_T;
+      let best = null, bestS = -1e9;
+      for (let i = 0; i < 16; i++) {
+        const a = i / 16 * Math.PI * 2, ux = Math.cos(a), uz = Math.sin(a);
+        let ex = this.x + ux * L, ez = this.z + uz * L, s = 0;
+        const r = Math.hypot(ex, ez);
+        if (r > REF_CAGE) { s -= (r - REF_CAGE) * 8; ex *= REF_CAGE / r; ez *= REF_CAGE / r; }
+        let line = 1e9;
+        for (let k = 1; k <= 4; k++) {
+          const u = k / 4;
+          line = Math.min(line, segDist(this.x + (ex - this.x) * u, this.z + (ez - this.z) * u, m0.px, m0.pz, m1.px, m1.pz));
+        }
+        s += Math.min(line, 1.5) * 3;
+        for (const m of models) s += Math.min(2.0, Math.hypot(ex - m.px, ez - m.pz)) * 2;
+        if (s > bestS) { bestS = s; best = [ux, uz]; }
+      }
+      return best;
+    }
+
+    // plans the frame, poses the fighters' models for the line-up, then moves and poses the ref
+    update(S, models, camSide, dt, time, groundAxis) {
+      const m0 = models[0], m1 = models[1];
+      const mx = (m0.px + m1.px) / 2, mz = (m0.pz + m1.pz) / 2;
+      let tx = this.x, tz = this.z, fx = mx, fz = mz, maxSp = 1.8, repR = 1.15, speed = 10;
+      let pose = REF_POSES.watch, lineup = false, route = false, say = null;
+      const p = this.pose;
+      this.fade = 0; this.ceremony = false;
+      this.overT = S.phase === 'over' && S.result ? (this.overT < 0 ? 0 : this.overT + dt) : -1;
+      if (this.overT < 0 && this.cut) { this.cut = false; m0.forced = null; m1.forced = null; }
+      if (S.phase !== 'fight') this.goal = null;
+      // knockdown bookkeeping: did he get up on his own, or did the count run out?
+      for (let i = 0; i < 2; i++) {
+        const a = S.f[i].act, k = this.kd[i];
+        const ph = a && a.type === 'kd' ? a.name : null;
+        if (ph === 'fall' && k.phase !== 'fall') k.arrive = -1;
+        if (ph === 'down') k.downT = a.t;
+        if (ph === 'rise' && k.phase !== 'rise') k.forced = k.downT >= KD_T.STAY - 0.15;
+        k.phase = ph;
+      }
+      // only a striking-only match is his to step into: with grappling on, the attacker may follow him down
+      const kdI = S.phase === 'fight' && S.grappling === false ? S.f.findIndex(f => f.act && f.act.type === 'kd') : -1;
+
+      if (this.overT >= 0) {
+        const T = ceremonyTimes(S.result), t = this.overT, res = S.result;
+        if (t < T.cut) {
+          const loser = res.winner == null ? -1 : 1 - res.winner;
+          if (T.stoppage && loser >= 0) {
+            // jump in between them and wave it off
+            const lm = models[loser], wm = models[1 - loser];
+            let ux = wm.px - lm.px, uz = wm.pz - lm.pz; const l = Math.hypot(ux, uz) || 1; ux /= l; uz /= l;
+            tx = lm.px + ux * 0.85; tz = lm.pz + uz * 0.85; fx = lm.px; fz = lm.pz; maxSp = 4.5; repR = 0.55; speed = 24;
+            const u = 0.5 + 0.5 * Math.sin(time * 9);
+            pose = copyPose(REF_POSES.waveOff, p);
+            pose.lh = [0.45 - 0.6 * u, 0.86, 0.32]; pose.rh = [-0.45 + 0.6 * u, 0.86, 0.24];
+          } else {
+            const g = this._neutral(mx, mz, camSide, 1.5, models); tx = g[0]; tz = g[1]; pose = REF_POSES.ready; route = true;
+          }
+          this.fade = clamp((t - T.fade) / (T.cut - T.fade), 0, 1);
+        } else {
+          // the line-up in the centre of the cage, everyone facing the camera
+          lineup = true; this.ceremony = true;
+          this.fade = 1 - clamp((t - T.cut) / 0.5, 0, 1);
+          if (!this.cut) {
+            this.cut = true;
+            this.x = 0; this.z = 0; this.vx = 0; this.vz = 0; this.model.snap = true; m0.snap = true; m1.snap = true;
+          }
+          tx = 0; tz = 0; fx = 0; fz = 5; speed = 9;
+          const up = t >= T.raise, w = res.winner;
+          pose = !up ? REF_POSES.hold : w == null ? REF_POSES.raiseBoth : w === 0 ? REF_POSES.raiseR : REF_POSES.raiseL;
+          if (up) say = w == null ? "It's a draw!" : (S.f[w].name || 'Fighter ' + (w + 1)) + ' Wins!';
+          for (let i = 0; i < 2; i++) {
+            const set = i === 0 ? LINE_POSES_M : LINE_POSES;
+            const fp = w != null && w !== i ? set.lose : !up ? set.stand : w == null ? set.raised : set.win;
+            models[i].forced = { x: i === 0 ? -LINE_X : LINE_X, z: 0, yaw: 0, pose: fp, moving: false, speed: 9 };
+          }
+        }
+      } else if (kdI >= 0) {
+        // knockdown: he rushes in between them and holds the attacker off with an outstretched arm, then turns and
+        // bends over the downed fighter; near the end of the count he waves him up, and keeps waving while he rises
+        const a = S.f[kdI].act, k = this.kd[kdI], dm = models[kdI], am = models[1 - kdI];
+        let ux = am.px - dm.px, uz = am.pz - dm.pz; const l = Math.hypot(ux, uz) || 1; ux /= l; uz /= l;
+        // a little to the side of the line, on the far side from the camera, so he doesn't hide the downed man
+        let px = -uz, pz = ux; if (px * camSide.x + pz * camSide.z > 0) { px = -px; pz = -pz; }
+        maxSp = 4.6; repR = 0.55;
+        const wave = (a.name === 'down' && a.t > KD_T.STAY - 1.0) || (a.name === 'rise' && k.forced);
+        const holding = !wave && a.name !== 'rise' && (k.arrive < 0 || time - k.arrive < KD_HOLD);
+        if (holding) {
+          // in between: square to the attacker, arm out
+          const along = Math.min(1.1, l * 0.55);
+          tx = dm.px + ux * along + px * 0.3; tz = dm.pz + uz * along + pz * 0.3;
+          if (k.arrive < 0 && Math.hypot(tx - this.x, tz - this.z) < 0.5) k.arrive = time;
+          fx = am.px; fz = am.pz; pose = REF_POSES.stop; speed = 20; say = 'Back up!';
+        } else {
+          // over the downed man
+          tx = dm.px + ux * 0.8 + px * 0.5; tz = dm.pz + uz * 0.8 + pz * 0.5; maxSp = 2.5;
+          fx = dm.px; fz = dm.pz;
+          if (wave) {
+            // "up you get": both hands, palms up, lifting
+            speed = 22;
+            const u = 0.5 + 0.5 * Math.sin(time * 8);
+            pose = copyPose(REF_POSES.waveUp, p);
+            pose.lh = [0.2, 0.05 + 0.6 * u, 0.46 - 0.1 * u]; pose.rh = [-0.2, 0.05 + 0.6 * u, 0.46 - 0.1 * u];
+          } else pose = a.name === 'rise' ? REF_POSES.watch : REF_POSES.kdWatch;
+        }
+      } else if (S.phase === 'break') {
+        tx = 0; tz = 0; fx = camSide.x * 5; fz = camSide.z * 5; pose = REF_POSES.ready;
+      } else if (S.phase === 'intro') {
+        // between them for the instructions, then "fight!"
+        tx = mx - camSide.x * 0.8; tz = mz - camSide.z * 0.8;
+        pose = S.phaseT > 2.6 ? REF_POSES.go : REF_POSES.ready;
+      } else if (S.ground) {
+        const g = this._neutral(mx, mz, camSide, 2.2, models); tx = g[0]; tz = g[1]; pose = REF_POSES.ground; repR = 1.0; route = true;
+      } else {
+        const d = Math.hypot(m1.px - m0.px, m1.pz - m0.pz);
+        const g = this._neutral(mx, mz, camSide, clamp(2.5 + d * 0.4, 2.7, 3.3), models); tx = g[0]; tz = g[1];
+        maxSp = 2.2; route = true;
+        // a fighter down with grappling on: he stays out of it, crouched and ready for it to go to the mat
+        if (S.f.some(f => f.act && f.act.type === 'kd')) pose = REF_POSES.ground;
+      }
+      // how boxed in he is: the nearest fighter, and whether his back is to the fence
+      const rr = Math.hypot(this.x, this.z), nearFence = rr > REF_CAGE - 0.6;
+      const near = Math.min(Math.hypot(this.x - m0.px, this.z - m0.pz), Math.hypot(this.x - m1.px, this.z - m1.pz));
+      if (route) {
+        if (nearFence && near < 1.8) { const w = this._escapeArc(tx, tz, models); tx = w[0]; tz = w[1]; maxSp = Math.max(maxSp, 2.6); }
+        else { const w = this._route(tx, tz, mx, mz, models); tx = w[0]; tz = w[1]; }
+      }
+
+      // walk there: eased speed, a dead zone so he isn't forever shuffling, and he steps away from anyone too close
+      let vx = 0, vz = 0;
+      const dx = tx - this.x, dz = tz - this.z, d = Math.hypot(dx, dz);
+      if (d > (Math.hypot(this.vx, this.vz) > 0.2 ? 0.06 : 0.3)) { const sp = Math.min(maxSp, d * 2.6) * REF_SPEED; vx = dx / d * sp; vz = dz / d * sp; }
+      if (!lineup) {
+        for (const m of models) {
+          const rx = this.x - m.px, rz = this.z - m.pz, rd = Math.hypot(rx, rz) || 0.001;
+          if (rd < repR) {
+            const push = (repR - rd) * 5 * REF_SPEED;
+            let ux = rx / rd, uz = rz / rd;
+            if (nearFence && rr > 0.01) {
+              // a push into the fence becomes a slide along it
+              const ox = this.x / rr, oz = this.z / rr, out = ux * ox + uz * oz;
+              if (out > 0) { ux -= ox * out; uz -= oz * out; const l = Math.hypot(ux, uz); if (l > 0.05) { ux /= l; uz /= l; } else { ux = -oz; uz = ox; } }
+            }
+            vx += ux * push; vz += uz * push;
+          }
+        }
+      }
+      // lunge clear when a fighter is right on top of him, or he's caught between one and the fence
+      this.lungeCD = Math.max(0, this.lungeCD - dt);
+      if (route && this.lungeT <= 0 && this.lungeCD <= 0 && (near < 0.75 || (nearFence && near < 1.15))) {
+        const u = this._lungeDir(models);
+        this.lvx = u[0] * LUNGE_V; this.lvz = u[1] * LUNGE_V; this.lungeT = LUNGE_T; this.lungeCD = LUNGE_CD;
+      }
+      if (this.lungeT > 0) {
+        this.lungeT -= dt;
+        this.vx = this.lvx; this.vz = this.lvz;
+      } else {
+        const e = expo(dt, 8);
+        this.vx += (vx - this.vx) * e; this.vz += (vz - this.vz) * e;
+      }
+      if (lineup) { this.vx = 0; this.vz = 0; this.lungeT = 0; }
+      this.x += this.vx * dt; this.z += this.vz * dt;
+      const r = Math.hypot(this.x, this.z);
+      if (r > REF_CAGE) { this.x *= REF_CAGE / r; this.z *= REF_CAGE / r; }
+      const fdx = fx - this.x, fdz = fz - this.z;
+      if (Math.hypot(fdx, fdz) > 0.2) this.yaw = Math.atan2(fdx, fdz);
+
+      if (pose !== p) copyPose(pose, p);
+      this.model.forced = { x: this.x, z: this.z, yaw: this.yaw, pose: p, moving: Math.hypot(this.vx, this.vz) > 0.3, speed: this.lungeT > 0 ? Math.max(speed, 22) : speed };
+      this.f.x = this.x; this.f.z = this.z;
+      this.model.update(this.f, S, null, dt, time, groundAxis, 1000);
+      if (say && this.model.skinMesh.visible) { const h = this.model.headWorld(this._head); this.bubble.show(say, h.x, h.y + 0.5, h.z); }
+      else this.bubble.hide();
+    }
+  }
+
+  // ---------- arena ----------
+  function chainLinkTexture() {
+    const c = document.createElement('canvas'); c.width = 128; c.height = 128;
+    const g = c.getContext('2d');
+    g.clearRect(0, 0, 128, 128);
+    g.strokeStyle = 'rgba(200,205,215,0.95)'; g.lineWidth = 2.2;
+    const s = 32;
+    g.beginPath();
+    for (let i = -4; i < 8; i++) {
+      g.moveTo(i * s, 0); g.lineTo(i * s + 128, 128);
+      g.moveTo(i * s + 128, 0); g.lineTo(i * s, 128);
+    }
+    g.stroke();
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 2.4); t.anisotropy = 4;
+    return t;
+  }
+  function matTexture() {
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+    const g = c.getContext('2d');
+    g.fillStyle = '#2b2b30'; g.fillRect(0, 0, 1024, 1024);
+    // subtle noise
+    for (let i = 0; i < 4000; i++) { g.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.03) + ')'; g.fillRect(Math.random() * 1024, Math.random() * 1024, 3, 3); }
+    g.strokeStyle = '#d8d8dc'; g.lineWidth = 10;
+    g.beginPath(); g.arc(512, 512, 430, 0, Math.PI * 2); g.stroke();
+    g.beginPath(); g.arc(512, 512, 150, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = 'rgba(220,220,225,0.9)'; g.font = 'bold 110px Impact, Arial Black, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('CAGE', 512, 460); g.fillText('RULES', 512, 570);
+    const t = new THREE.CanvasTexture(c); t.anisotropy = 8;
+    return t;
+  }
+
+  function buildArena(scene) {
+    const R = 4.75, N = 8, H = 1.85;
+    const g = new THREE.Group();
+    const plat = new THREE.Mesh(new THREE.CylinderGeometry(R + 0.5, R + 0.9, 0.7, N), new THREE.MeshStandardMaterial({ color: 0x15151a, roughness: 0.9 }));
+    plat.position.y = -0.37; plat.receiveShadow = true; plat.rotation.y = Math.PI / N; g.add(plat); // top face at -0.02: just under the mat so the two never share a plane
+    const mat = new THREE.Mesh(new THREE.CylinderGeometry(R, R, 0.06, N), new THREE.MeshStandardMaterial({ map: matTexture(), roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
+    mat.position.y = -0.03; mat.receiveShadow = true; mat.rotation.y = Math.PI / N; g.add(mat);
+    // fence + posts
+    const fenceMat = new THREE.MeshStandardMaterial({ map: chainLinkTexture(), transparent: true, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.5, alphaTest: 0.2, depthWrite: false });
+    const postMat = new THREE.MeshStandardMaterial({ color: 0x111115, roughness: 0.6, metalness: 0.4 });
+    const padMat = new THREE.MeshStandardMaterial({ color: 0x1b1b22, roughness: 0.8 });
+    const accent = new THREE.MeshStandardMaterial({ color: 0xc9a227, roughness: 0.5, metalness: 0.3, emissive: 0x3a2a05 });
+    const segments = [];
+    for (let i = 0; i < N; i++) {
+      const a0 = (i / N) * Math.PI * 2 + Math.PI / N, a1 = ((i + 1) / N) * Math.PI * 2 + Math.PI / N;
+      const x0 = Math.cos(a0) * R, z0 = Math.sin(a0) * R, x1 = Math.cos(a1) * R, z1 = Math.sin(a1) * R;
+      // per-segment material clones so the fence nearest the camera can fade out
+      const fM = fenceMat.clone(), pM = postMat.clone(), dM = padMat.clone(), aM = accent.clone();
+      for (const m of [pM, dM, aM]) m.transparent = true;
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, H, 10), pM);
+      post.position.set(x0, H / 2, z0); post.castShadow = true; g.add(post);
+      const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, H - 0.3, 10), dM);
+      pad.position.set(x0, H / 2 + 0.05, z0); g.add(pad);
+      const len = Math.hypot(x1 - x0, z1 - z0);
+      const panel = new THREE.Mesh(new THREE.PlaneGeometry(len, H - 0.25), fM);
+      panel.position.set((x0 + x1) / 2, (H - 0.25) / 2 + 0.05, (z0 + z1) / 2);
+      panel.lookAt(0, (H - 0.25) / 2 + 0.05, 0);
+      g.add(panel);
+      // top rail padding + bottom rail
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(len, 0.14, 0.14), dM);
+      rail.position.set((x0 + x1) / 2, H - 0.02, (z0 + z1) / 2); rail.lookAt(0, H - 0.02, 0); g.add(rail);
+      const rail2 = new THREE.Mesh(new THREE.BoxGeometry(len, 0.05, 0.08), aM);
+      rail2.position.set((x0 + x1) / 2, H + 0.07, (z0 + z1) / 2); rail2.lookAt(0, H + 0.07, 0); g.add(rail2);
+      const base = new THREE.Mesh(new THREE.BoxGeometry(len, 0.12, 0.1), padMat);
+      base.position.set((x0 + x1) / 2, 0.06, (z0 + z1) / 2); base.lookAt(0, 0.06, 0); g.add(base);
+      const am = (a0 + a1) / 2;
+      segments.push({ dir: [Math.cos(am), Math.sin(am)], postDir: [Math.cos(a0), Math.sin(a0)], mats: [fM, dM, aM], postMats: [pM, dM], meshes: [post, pad, panel, rail, rail2] });
+    }
+    g.userData.segments = segments;
+    const floor = new THREE.Mesh(new THREE.CircleGeometry(40, 48), new THREE.MeshStandardMaterial({ color: 0x08080b, roughness: 1 }));
+    floor.rotation.x = -Math.PI / 2; floor.position.y = -0.7; floor.receiveShadow = true; g.add(floor);
+    const crowdGeo = new THREE.BoxGeometry(0.5, 1.0, 0.5);
+    const crowdMat = new THREE.MeshStandardMaterial({ color: 0x3a3a48, roughness: 1 });
+    const count = 900;
+    const crowd = new THREE.InstancedMesh(crowdGeo, crowdMat, count);
+    const m = new THREE.Matrix4(), col = new THREE.Color();
+    for (let i = 0; i < count; i++) {
+      const ring = Math.floor(i / 150), ang = (i % 150) / 150 * Math.PI * 2 + ring * 0.02;
+      const rad = 8.5 + ring * 1.6 + Math.random() * 0.5;
+      const y = -0.7 + ring * 0.55 + 0.5 + Math.random() * 0.1;
+      m.makeRotationY(-ang + Math.PI / 2); m.setPosition(Math.cos(ang) * rad, y, Math.sin(ang) * rad);
+      crowd.setMatrixAt(i, m);
+      col.setHSL(Math.random(), 0.35, 0.18 + Math.random() * 0.15); crowd.setColorAt(i, col);
+    }
+    crowd.instanceMatrix.needsUpdate = true;
+    g.add(crowd);
+    for (let r = 0; r < 6; r++) {
+      const tier = new THREE.Mesh(new THREE.CylinderGeometry(8 + r * 1.6 + 1.2, 8 + r * 1.6 + 1.2, 0.55, 48, 1, true), new THREE.MeshStandardMaterial({ color: 0x101016, roughness: 1, side: THREE.DoubleSide }));
+      tier.position.y = -0.7 + r * 0.55 + 0.27; g.add(tier);
+    }
+    scene.add(g);
+    return g;
+  }
+
+  // ---------- renderer ----------
+  class Renderer {
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      this.renderer.setClearColor(0x07070a, 1);
+      this.renderer.shadowMap.enabled = true;
+      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      this.renderer.outputEncoding = THREE.sRGBEncoding;
+      this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      this.renderer.toneMappingExposure = 1.05;
+      this.scene = new THREE.Scene();
+      this.blood = new BloodField(this.scene);
+      this.stain = false;
+      this.scene.background = new THREE.Color(0x07070a);
+      this.scene.fog = new THREE.Fog(0x07070a, 18, 42);
+      this.camera = new THREE.PerspectiveCamera(42, 16 / 9, 0.1, 100);
+      this.camera.position.set(0, 2.2, 7.5);
+      this.camTarget = new THREE.Vector3(0, 1, 0);
+      this.camPos = new THREE.Vector3(0, 2.2, 7.5);
+      this.camSide = new THREE.Vector3(0, 0, 1);
+      this.shake = 0;
+
+      // lights
+      const hemi = new THREE.HemisphereLight(0x8899bb, 0x201a14, 0.55); this.scene.add(hemi);
+      const key = new THREE.SpotLight(0xfff2dd, 1.6, 40, 0.55, 0.5, 1.2);
+      key.position.set(4, 9, 5); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0005; key.shadow.radius = 3;
+      key.target.position.set(0, 0, 0); this.scene.add(key); this.scene.add(key.target);
+      const fill = new THREE.SpotLight(0xa9c4ff, 0.8, 40, 0.6, 0.5, 1.2);
+      fill.position.set(-6, 8, -3); fill.castShadow = true; fill.shadow.mapSize.set(1024, 1024); fill.shadow.bias = -0.0005;
+      this.scene.add(fill); this.scene.add(fill.target);
+      const rim = new THREE.PointLight(0xff8844, 0.6, 25); rim.position.set(0, 4, -8); this.scene.add(rim);
+      const rim2 = new THREE.PointLight(0x4488ff, 0.5, 25); rim2.position.set(0, 4, 8); this.scene.add(rim2);
+      // overhead rig glow
+      const rig = new THREE.Mesh(new THREE.TorusGeometry(5.2, 0.12, 8, 48), new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0xfff0d0, emissiveIntensity: 0.9 }));
+      rig.rotation.x = Math.PI / 2; rig.position.y = 7.5; this.scene.add(rig);
+      this.arenaLights = [hemi, key, fill, rim, rim2, rig];
+
+      this.arena = buildArena(this.scene);
+      this.models = [];
+      this.ref = new Referee(this.scene);
+      this.ref.setVisible(false);
+      this.sphereOn = true; // the 'Impact sphere' option: off skips the glowing contact sphere (camera shake stays)
+      this.refOn = true; // the 'Show referee' option: off hides him (he still runs the post-fight line-up, unseen)
+      // black card in front of the lens for the cut to the post-fight line-up
+      this.fadeCard = new THREE.Mesh(new THREE.PlaneGeometry(4, 4), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0, depthTest: false, depthWrite: false, fog: false }));
+      this.fadeCard.position.z = -0.15; this.fadeCard.renderOrder = 999; this.fadeCard.visible = false;
+      this.camera.add(this.fadeCard); this.scene.add(this.camera);
+      this.groundAxis = new THREE.Vector3(1, 0, 0);
+      this.lastGround = false;
+      this.fx = [];
+      this.time = 0;
+      this._tmp = new THREE.Vector3();
+      this.resize();
+      window.addEventListener('resize', () => this.resize());
+    }
+
+    resize() {
+      const w = this.canvas.clientWidth || window.innerWidth, h = this.canvas.clientHeight || window.innerHeight;
+      this.renderer.setSize(w, h, false);
+      this.camera.aspect = w / h; this.camera.updateProjectionMatrix();
+    }
+
+    // the career gym (js/gym.js) borrows the scene: hide the cage, crowd and arena lighting while it is up
+    setArenaVisible(v) {
+      this.arena.visible = v;
+      this.ref.setVisible(this.refOn && v && this.models.length > 0);
+      for (const l of this.arenaLights) l.visible = v;
+    }
+
+    setRefVisible(on) {
+      this.refOn = !!on;
+      this.ref.setVisible(this.refOn && this.arena.visible && this.models.length > 0);
+    }
+
+    setFighters(S) {
+      for (const m of this.models) m.dispose();
+      this.models = S.f.map((f, i) => new FighterModel(this.scene, f.color, f.skin, i, { look: f.look }));
+      this.lastGround = false;
+      this.ref.reset();
+      this.ref.setVisible(this.refOn && this.arena.visible);
+      if (this.blood) this.blood.clear();
+    }
+
+    setMarks(on) {
+      this.stain = !!on;
+      if (this.blood) {
+        this.blood.on = this.stain;
+        if (!this.stain) this.blood.clear();
+      }
+    }
+
+    setImpactSphere(on) { this.sphereOn = !!on; }
+
+    impact(pos, big, color) {
+      if (big) this.shake = Math.min(1, this.shake + 0.6);
+      if (!this.sphereOn) return;
+      const geo = new THREE.SphereGeometry(big ? 0.22 : 0.13, 10, 8);
+      const mat = new THREE.MeshBasicMaterial({ color: color || 0xffe9b0, transparent: true, opacity: 0.9 });
+      const m = new THREE.Mesh(geo, mat); m.position.copy(pos); this.scene.add(m);
+      this.fx.push({ m, t: 0, dur: big ? 0.35 : 0.22 });
+    }
+
+    handleEvent(ev) {
+      if (!this.models.length) return;
+      if (ev.k === 'hit') {
+        const victim = this.models[ev.j];
+        const p = ev.at ? new THREE.Vector3(ev.at[0], ev.at[1], ev.at[2])
+          : ev.part === 'head' ? victim.headWorld(this._tmp.clone()) : ev.part === 'legs' ? new THREE.Vector3(victim.px, 0.5, victim.pz) : victim.torsoWorld(this._tmp.clone());
+        this.impact(p, ev.big || ev.rocked, ev.rocked ? 0xff5533 : ev.jammed ? 0xaaaaaa : ev.momentum ? 0xffb347 : 0xffe9b0);
+        victim.flash = ev.rocked ? 1 : 0.5;
+        if (this.stain && this.blood && (ev.big || ev.rocked)) {
+          const power = Math.max(0.45, Math.min(1.35, (ev.dmg || 4) / 7));
+          this.blood.burst(p, power);
+        }
+        victim.wound(ev, ev.at ? p : null);
+      } else if (ev.k === 'block') {
+        const victim = this.models[ev.j];
+        const p = ev.at ? new THREE.Vector3(ev.at[0], ev.at[1], ev.at[2]) : victim.headWorld(this._tmp.clone()).add(new THREE.Vector3(0, -0.1, 0));
+        this.impact(p, false, 0x88aaff);
+        if (ev.at) {
+          victim.wound(ev, p);
+          // a checked kick is shin on shin: the kicker's leg takes the worse of it
+          const kicker = ev.checked && this.models[ev.i];
+          if (kicker) kicker.wound({ k: 'hit', kind: ev.kind, part: 'legs', seg: ev.weapon, dmg: 3.2 }, p);
+        }
+      } else if (ev.k === 'kd' || ev.k === 'td' || ev.k === 'sweep') {
+        this.shake = 1;
+      } else if (ev.k === 'ko' || ev.k === 'tap') {
+        this.shake = 1.2;
+      }
+    }
+
+    update(S, dt, inputs) {
+      this.time += dt;
+      if (this.blood) this.blood.step(dt);
+      if (!this.models.length) return;
+      const F = S.f;
+      // ground axis: frozen to the top fighter's facing when the ground phase starts.
+      // +axis runs from the bottom fighter's feet towards their head (see GROUND_OFF).
+      if (S.ground && !this.lastGround) {
+        const top = F[S.ground.top], bot = F[S.ground.bottom];
+        const mt = this.models[top.idx];
+        this.groundAxis.set(Math.sin(mt.yaw), 0, Math.cos(mt.yaw)).normalize();
+      }
+      this.lastGround = !!S.ground;
+      // the ref goes first: in the post-fight line-up he also places the fighters
+      this.ref.update(S, this.models, this.camSide, dt, this.time, this.groundAxis);
+      for (let i = 0; i < 2; i++) {
+        this.models[i].inputHint = inputs ? inputs[i] : 0;
+        this.models[i].update(F[i], S, F[1 - i], dt, this.time, this.groundAxis, this.posLerp);
+      }
+
+      // fx
+      for (let i = this.fx.length - 1; i >= 0; i--) {
+        const e = this.fx[i]; e.t += dt;
+        const u = e.t / e.dur;
+        if (u >= 1) { this.scene.remove(e.m); e.m.geometry.dispose(); e.m.material.dispose(); this.fx.splice(i, 1); continue; }
+        e.m.scale.setScalar(1 + u * 2.5); e.m.material.opacity = 0.9 * (1 - u);
+      }
+
+      // camera
+      const m0 = this.models[0], m1 = this.models[1];
+      const mx = (m0.px + m1.px) / 2, mz = (m0.pz + m1.pz) / 2;
+      const dx = m1.px - m0.px, dz = m1.pz - m0.pz;
+      const dist = Math.hypot(dx, dz);
+      let sx, sz;
+      if (dist > 0.3 && !S.ground) { sx = -dz / dist; sz = dx / dist; } else { sx = this.camSide.x; sz = this.camSide.z; }
+      // keep camera on the same side (avoid flipping)
+      if (sx * this.camSide.x + sz * this.camSide.z < 0) { sx = -sx; sz = -sz; }
+      this.camSide.x += (sx - this.camSide.x) * expo(dt, 3); this.camSide.z += (sz - this.camSide.z) * expo(dt, 3); this.camSide.normalize();
+      const ground = !!S.ground;
+      const want = ground ? 4.8 : clamp(4.4 + dist * 1.1, 4.8, 7.6);
+      const height = ground ? 3.1 : 2.55 + dist * 0.15;
+      const tx = mx + this.camSide.x * want, tz = mz + this.camSide.z * want;
+      this.camPos.x += (tx - this.camPos.x) * expo(dt, 4); this.camPos.z += (tz - this.camPos.z) * expo(dt, 4); this.camPos.y += (height - this.camPos.y) * expo(dt, 4);
+      this.camTarget.x += (mx - this.camTarget.x) * expo(dt, 5); this.camTarget.z += (mz - this.camTarget.z) * expo(dt, 5);
+      this.camTarget.y += ((ground ? 0.45 : 0.95) - this.camTarget.y) * expo(dt, 4);
+      if (this.ref.ceremony) {
+        // the line-up: straight on, a little below head height
+        this.camPos.set(0, 1.45, 5.0); this.camTarget.set(0, 1.08, 0); this.camSide.set(0, 0, 1); this.shake = 0;
+      }
+      this.fadeCard.visible = this.ref.fade > 0.001;
+      this.fadeCard.material.opacity = this.ref.fade;
+      // fade the cage segments that sit between the camera and the action
+      const cl = Math.hypot(this.camPos.x, this.camPos.z) || 1, cx = this.camPos.x / cl, cz = this.camPos.z / cl;
+      const outside = cl > 3.6;
+      for (const seg of this.arena.userData.segments) {
+        const d = seg.dir[0] * cx + seg.dir[1] * cz;
+        const near = outside || cl > 2.2;
+        const o = near ? (d > 0.92 ? 0.08 : d > 0.55 ? 0.08 + (0.92 - d) / 0.37 * 0.92 : 1) : 1;
+        for (const m of seg.mats) { m.opacity += (o - m.opacity) * expo(dt, 8); }
+        const dp = seg.postDir[0] * cx + seg.postDir[1] * cz;
+        const op = (near && dp > 0.6) ? 0.1 : 1;
+        for (const m of seg.postMats) { if (m !== seg.mats[1]) m.opacity += (op - m.opacity) * expo(dt, 8); }
+        for (const mesh of seg.meshes) mesh.castShadow = mesh.material.opacity > 0.5;
+      }
+      this.camera.position.copy(this.camPos);
+      if (this.shake > 0) {
+        this.camera.position.x += (Math.random() - 0.5) * 0.08 * this.shake;
+        this.camera.position.y += (Math.random() - 0.5) * 0.08 * this.shake;
+        this.shake = Math.max(0, this.shake - dt * 3);
+      }
+      this.camera.lookAt(this.camTarget);
+      this.renderer.render(this.scene, this.camera);
+    }
+  }
+
+  // seconds from the end of the fight until the hand raise is over (the end screen waits for it)
+  const ceremonyEnd = (res) => ceremonyTimes(res).end;
+  root.MMARender = { Renderer, FighterModel, POSES, ceremonyEnd };
+})(typeof window !== 'undefined' ? window : globalThis);

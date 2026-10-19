@@ -10,7 +10,7 @@ func test_matchup_matrix_is_mild_and_cyclic() -> void:
 	check_near(Elements.damage_mult("scorch", "gale"), 1.15, 0.001)
 	check_near(Elements.damage_mult("gale", "scorch"), 0.85, 0.001)
 	check_near(Elements.damage_mult("scorch", "grit"), 1.0, 0.001, "neutral pair")
-	check_eq(Elements.reactions.size(), 11, "eleven reactions")
+	check_eq(Elements.reactions.size(), 14, "fourteen reactions")
 
 
 func test_buildup_triggers_status_at_threshold() -> void:

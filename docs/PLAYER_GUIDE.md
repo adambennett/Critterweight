@@ -172,3 +172,10 @@ Everything you create is stored in your user folder (Windows `%APPDATA%\Critterw
 (suspended campaign runs), `mods/`, `policies/` (AI Lab), `logs/`. Saves are written atomically with a
 backup and a checksum; a damaged file is set aside (never deleted) and the newest good copy is used.
 Start with `-- --safe-mode` if a mod setup ever gets in your way.
+
+
+## New fighters in the v0.9.15 preview
+
+**Varga (Scrap)** imports Jeremy's Cage Rules human fighter and standing moves. He has a special four-limb layout: keyboard U/I/J/K, controller X/Y/A/B. Hold Q/E/R or LB/RB/LT to select hooks/body kicks, straights/head kicks, or overhands/low kicks. Unmodified buttons give uppercuts, a lead teep and rear knee. Guard is L/RT; grapple is Space/left-stick click; slip is Shift/right-stick click. X/D-left switches stance, O/D-down checks, F1/D-up and F2/D-right fire abilities, and releasing V/View fires JUICE. View chords supply target/tag/taunt without spending JUICE. In Cannery sparring, View+RT (keyboard V+L) returns to the hub. His fighter sheet contains the full controls and current binding glyphs. See `kits/f_varga.md` in the source repository for the complete guide. Grappling uses this game's clinch and throws, rather than Cage Rules' ground/submission system.
+
+**Knell (Spectral)** is a haunted diving suit with the standard layout: Ghost Light is a homing projectile, Through the Veil is a phasing escape with an emergence pulse, and Last Bell sends three spectral pulses while protecting the diver. See `kits/f_knell.md` in the source repository. Both fighters have three campaign build paths and appear in normal fighter selectors, the Compendium and Random selection.

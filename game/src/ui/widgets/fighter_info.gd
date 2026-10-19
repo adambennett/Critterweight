@@ -39,12 +39,19 @@ func show_fighter(id: String) -> void:
 	if blurb == "":
 		blurb = "%s · %s" % ["Opponent / NPC" if c.npc_only else "Playable fighter", c.title]
 	content.add_child(UiTheme.label(blurb, "Body", true))
+	if c.tags.has("martial"):
+		content.add_child(UiTheme.label("CAGE RULES CONTROLS", "Eyebrow"))
+		content.add_child(UiTheme.label(MartialControls.description(), "Body", true))
+		for pair in [["mma_lh", "Left hand"], ["mma_rh", "Right hand"], ["mma_ll", "Left leg"], ["mma_rl", "Right leg"], ["mma_mod1", "Hooks / body kicks"], ["mma_mod2", "Straights / head kicks"], ["mma_mod3", "Overhands / low kicks"], ["mma_guard", "Guard"], ["mma_grab", "Grapple"], ["mma_dodge", "Slip"], ["mma_stance", "Stance"], ["mma_check", "Check"]]:
+			var key := ButtonPrompt.new([pair[0]], pair[1], 34)
+			key.clickable = false
+			content.add_child(key)
 	content.add_child(UiTheme.label("KIT", "Eyebrow"))
 	var i := 0
 	for slot in ["ability1", "ability2", "juice"]:
 		if c.abilities.has(slot):
 			var move: MoveDef = c.abilities[slot]
-			var prompt := ButtonPrompt.new([slot], move.display_name, 38)
+			var prompt := ButtonPrompt.new([MartialControls.action(slot, c)], move.display_name, 38)
 			prompt.clickable = false
 			prompt._label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			prompt._label.size_flags_horizontal = Control.SIZE_EXPAND_FILL

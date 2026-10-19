@@ -1,0 +1,1470 @@
+/* ============================================================
+   CAGE RULES — fight simulation
+   Pure, deterministic (seeded), fixed-step. No DOM, no Three.js.
+   Runs on the host (or locally in practice mode); clients only
+   receive snapshots of `sim.state`.
+
+   Striking: every strike is a limb (left/right hand or leg) + a
+   kind chosen by the fighter's moveset and the modifier being held.
+   The standing game requires js/physics.js (MMAPhys, Rapier) and
+   runs on active ragdolls: strikes are keyframed poses the joint
+   motors chase, and a strike scores only when its fist / shin /
+   foot collider arrives on the opponent with speed, square to the
+   target. Guarding puts the forearms physically in the way. The
+   ground game (takedowns, positions, submissions) is abstract and
+   runs with the ragdolls parked.
+   ============================================================ */
+(function (root) {
+  'use strict';
+
+  // ---------- Input bits ----------
+  const IN = {
+    FWD: 1, BACK: 2, LEFT: 4, RIGHT: 8,
+    LHAND: 16, RHAND: 32, LLEG: 64, RLEG: 128,
+    MOD1: 256, MOD2: 512, MOD3: 1024,
+    BLOCK: 2048, GRAPPLE: 4096, DODGE: 8192,
+    STANCE: 1 << 16, // switch orthodox / southpaw (bits 14 and 15 are the app's own)
+    CHECK: 1 << 17   // lift the lead leg to check low kicks (hold)
+  };
+  const LIMB_BITS = IN.LHAND | IN.RHAND | IN.LLEG | IN.RLEG;
+  const DIR_BITS = IN.FWD | IN.BACK | IN.LEFT | IN.RIGHT;
+  const LIMBS = ['lh', 'rh', 'll', 'rl'];
+  const LIMB_BIT = { lh: IN.LHAND, rh: IN.RHAND, ll: IN.LLEG, rl: IN.RLEG };
+  const LIMB_NAME = { lh: 'Left hand', rh: 'Right hand', ll: 'Left leg', rl: 'Right leg' };
+  const MODS = ['none', 'mod1', 'mod2', 'mod3'];
+  const MOD_BIT = { none: 0, mod1: IN.MOD1, mod2: IN.MOD2, mod3: IN.MOD3 };
+  const HAND_KINDS = ['straight', 'hook', 'uppercut', 'overhand'];
+  const LEG_KINDS = ['teep', 'knee', 'bkick', 'hkick', 'lkick'];
+  const KIND_LABEL = { straight: 'Straight', hook: 'Hook', uppercut: 'Uppercut', overhand: 'Overhand', teep: 'Teep', knee: 'Knee', bkick: 'Body kick', hkick: 'Head kick', lkick: 'Low kick' };
+
+  // which strike each limb throws for each held modifier (orthodox stance: left side leads)
+  const DEFAULT_MOVESET = {
+    none: { lh: 'uppercut', rh: 'uppercut', ll: 'teep', rl: 'knee' },
+    mod1: { lh: 'hook', rh: 'hook', ll: 'bkick', rl: 'bkick' },
+    mod2: { lh: 'straight', rh: 'straight', ll: 'hkick', rl: 'hkick' },
+    mod3: { lh: 'overhand', rh: 'overhand', ll: 'lkick', rl: 'lkick' }
+  };
+  function normalizeMoveset(ms) {
+    const out = {};
+    for (const m of MODS) {
+      out[m] = {};
+      for (const l of LIMBS) {
+        const kinds = (l === 'lh' || l === 'rh') ? HAND_KINDS : LEG_KINDS;
+        const v = ms && ms[m] && ms[m][l];
+        out[m][l] = kinds.indexOf(v) >= 0 ? v : DEFAULT_MOVESET[m][l];
+      }
+    }
+    return out;
+  }
+  // right foot forward?
+  function isSouthpaw(f) { return !!f.southpaw; }
+  const OTHER_SIDE = { lh: 'rh', rh: 'lh', ll: 'rl', rl: 'll' };
+  function modOf(held) { return (held & IN.MOD3) ? 'mod3' : (held & IN.MOD2) ? 'mod2' : (held & IN.MOD1) ? 'mod1' : 'none'; }
+
+  // ---------- Roster ----------
+  // stats 0..1 : pow (power), spd (speed), chin, wre (wrestling), bjj (submissions / scrambles), car (cardio)
+  const ROSTER = {
+    striker: { key: 'striker', name: 'K. Varga', style: 'Striker', nick: 'The Hammer',
+      stats: { pow: 0.9, spd: 0.8, chin: 0.7, wre: 0.45, bjj: 0.42, car: 0.62 },
+      color: 0xd93b3b, skin: 0xe0b48c, desc: 'Devastating hands and head kicks. Weak off his back.' },
+    wrestler: { key: 'wrestler', name: 'D. Okafor', style: 'Wrestler', nick: 'The Anchor',
+      stats: { pow: 0.62, spd: 0.6, chin: 0.78, wre: 0.92, bjj: 0.55, car: 0.72 },
+      color: 0x2f6fd9, skin: 0x6b4a2c, desc: 'Relentless takedowns, heavy top control and ground-and-pound.' },
+    grappler: { key: 'grappler', name: 'R. Costa', style: 'Jiu-Jitsu', nick: 'Anaconda',
+      stats: { pow: 0.48, spd: 0.66, chin: 0.56, wre: 0.6, bjj: 0.93, car: 0.66 },
+      color: 0x2fb36b, skin: 0xc9956a, desc: 'Sweeps, scrambles and finishing submissions from anywhere.' },
+    balanced: { key: 'balanced', name: 'J. Park', style: 'All-rounder', nick: 'Metronome',
+      stats: { pow: 0.66, spd: 0.72, chin: 0.66, wre: 0.66, bjj: 0.64, car: 0.8 },
+      color: 0xe8a62a, skin: 0xf0c9a0, desc: 'No holes in the game, elite cardio, wins late rounds.' }
+  };
+
+  // ---------- Strikes ----------
+  // Tip paths are authored in the attacker's root frame as [t, fwd, side, height]:
+  // fwd = metres towards the opponent, side = metres to the attacker's LEFT, height = metres above the mat.
+  // t is seconds at time-factor 1; the whole path stretches with the strike's time factor (speed / fatigue).
+  const HAND_GUARD = { lh: [0.34, 0.15, 1.27], rh: [0.22, -0.16, 1.24] };
+  const FOOT_STANCE = { ll: [0.2, 0.16, 0], rl: [-0.24, -0.2, 0] };
+  const TIP_R = { hand: 0.09, foot: 0.1, knee: 0.1 };
+  const ARM_REACH = 0.71, LEG_REACH = 1.04, KNEE_REACH = 0.54;
+  // rig proportions applied to the authored paths: forward-reach scale, and height offset (m) for hips / hands
+  const REACH_SCALE = 1.06, Y_SHIFT = 0.06;
+
+  // [windup, active, recover, damage, stamina] for lead (left) and rear (right) limbs
+  const KIND_STATS = {
+    straight: { lead: [0.12, 0.07, 0.16, 1.275, 2.5], rear: [0.20, 0.08, 0.24, 2.55, 4.5], part: 'head', names: ['jab', 'cross'] },
+    hook:     { lead: [0.20, 0.08, 0.22, 2.465, 5.0], rear: [0.24, 0.08, 0.26, 2.975, 5.5], part: 'head', names: ['lead hook', 'right hook'] },
+    uppercut: { lead: [0.18, 0.08, 0.22, 2.38, 5.0], rear: [0.23, 0.08, 0.26, 3.06, 5.5], part: 'head', names: ['lead uppercut', 'rear uppercut'] },
+    overhand: { lead: [0.26, 0.09, 0.30, 2.72, 6.0], rear: [0.30, 0.09, 0.32, 3.57, 7.0], part: 'head', names: ['looping left', 'overhand right'] },
+    hkick:    { lead: [0.28, 0.10, 0.34, 4.3, 9.0], rear: [0.34, 0.10, 0.38, 5.4, 10 ], part: 'head', names: ['lead head kick', 'head kick'] },
+    bkick:    { lead: [0.24, 0.10, 0.30, 3.1, 7.0], rear: [0.28, 0.10, 0.34, 3.8, 8.0], part: 'body', names: ['lead body kick', 'body kick'] },
+    lkick:    { lead: [0.18, 0.10, 0.24, 2.3, 5.0], rear: [0.22, 0.10, 0.28, 2.8, 6.0], part: 'legs', names: ['lead low kick', 'low kick'] },
+    teep:     { lead: [0.16, 0.10, 0.24, 2.0, 5.0], rear: [0.22, 0.10, 0.28, 2.6, 6.0], part: 'body', names: ['teep', 'rear teep'], push: true },
+    knee:     { lead: [0.16, 0.08, 0.24, 2.8, 6.0], rear: [0.18, 0.08, 0.26, 3.4, 6.5], part: 'body', names: ['lead knee', 'knee'] }
+  };
+
+  function handPath(limb, kind, w, a, r) {
+    const s = limb === 'lh' ? 1 : -1, lead = limb === 'lh';
+    const g = HAND_GUARD[limb], end = w + a + r;
+    const G = [0, g[0], g[1], g[2]], E = [end, g[0], g[1], g[2]];
+    switch (kind) {
+      case 'straight': return [G, [w, g[0] - 0.08, s * 0.17, 1.3], [w + a * 0.75, lead ? 0.92 : 1.0, s * 0.02, 1.5], [w + a, lead ? 0.88 : 0.96, s * 0.02, 1.49], E];
+      case 'hook':     return [G, [w, 0.28, s * 0.4, 1.4], [w + a * 0.35, 0.64, s * 0.3, 1.5], [w + a * 0.8, 0.86, -s * 0.06, 1.5], [w + a, 0.72, -s * 0.3, 1.48], E];
+      case 'uppercut': return [G, [w, 0.2, s * 0.2, 1.0], [w + a * 0.7, 0.72, s * 0.05, 1.5], [w + a, 0.66, s * 0.04, 1.74], E];
+      // overhand: out wide and up beside the head, over the top, then down AND across onto the jaw (a diagonal loop, not a chop)
+      case 'overhand': return [G, [w * 0.5, 0.08, s * 0.34, 1.34], [w, 0.24, s * 0.44, 1.56], [w + a * 0.3, 0.58, s * 0.24, 1.6], [w + a * 0.8, 0.9, -s * 0.04, 1.42], [w + a, 0.84, -s * 0.18, 1.3], E];
+    }
+  }
+  function legPath(limb, kind, w, a, r) {
+    const s = limb === 'll' ? 1 : -1;
+    const f = FOOT_STANCE[limb], end = w + a + r;
+    const G = [0, f[0], f[1], f[2]], E = [end, f[0], f[1], f[2]];
+    // Roundhouse kicks: the foot lifts out to the kicker's own side (the knee chambers high and
+    // the hips turn over), then whips ACROSS the target in an arc and follows through past it.
+    // s*0.6 is "out on the kicking side"; -s*0.45 is "past the centre line on the far side".
+    const round = (chamberY, midY, hitY, hitF, followY) => [
+      G,
+      [w * 0.45, f[0] + 0.1, s * 0.42, chamberY * 0.45],
+      [w, 0.3, s * 0.6, chamberY],
+      [w + a * 0.35, hitF - 0.2, s * 0.4, midY],
+      [w + a * 0.7, hitF, -s * 0.02, hitY],
+      [w + a, hitF - 0.35, -s * 0.5, followY],
+      [w + a + r * 0.45, 0.15, s * 0.3, chamberY * 0.5],
+      E
+    ];
+    switch (kind) {
+      case 'hkick': return round(0.75, 1.2, 1.48, 1.05, 1.3);
+      case 'bkick': return round(0.55, 0.9, 1.08, 1.08, 0.95);
+      case 'lkick': return round(0.32, 0.4, 0.42, 1.0, 0.45);
+      // teep: knee comes up in front, then the foot drives straight out and back
+      case 'teep':  return [G, [w * 0.6, 0.2, s * 0.12, 0.45], [w, 0.3, s * 0.1, 0.7], [w + a * 0.7, 1.12, s * 0.05, 1.02], [w + a, 1.05, s * 0.05, 1.0], [w + a + r * 0.5, 0.3, s * 0.12, 0.3], E];
+      // knee: the path is the KNEE itself — it drives up and forward as the hips thrust in
+      case 'knee':  return [G, [w, 0.12, s * 0.1, 0.5], [w + a * 0.7, 0.58, s * 0.06, 1.02], [w + a, 0.52, s * 0.06, 1.08], [w + a + r * 0.5, 0.15, s * 0.1, 0.45], E];
+    }
+  }
+
+  // tip position [fwd, side, height] at time t (seconds since the strike started), path stretched by tf
+  function strikeTip(st, t, tf, out) {
+    const p = st.path, u = t / (tf || 1);
+    out = out || [0, 0, 0];
+    let k = p[p.length - 1];
+    if (u <= p[0][0]) k = p[0];
+    else {
+      for (let i = 1; i < p.length; i++) {
+        const k1 = p[i];
+        if (u <= k1[0]) {
+          const k0 = p[i - 1], s = (u - k0[0]) / Math.max(1e-6, k1[0] - k0[0]);
+          out[0] = k0[1] + (k1[1] - k0[1]) * s; out[1] = k0[2] + (k1[2] - k0[2]) * s; out[2] = k0[3] + (k1[3] - k0[3]) * s;
+          return out;
+        }
+      }
+    }
+    out[0] = k[1]; out[1] = k[2]; out[2] = k[3];
+    return out;
+  }
+
+  const PART_R = { head: 0.15, body: 0.2, legs: 0.18 };
+  const STRIKES = {};
+  (function buildStrikes() {
+    for (const limb of LIMBS) {
+      const hand = limb === 'lh' || limb === 'rh';
+      const lead = limb === 'lh' || limb === 'll';
+      for (const kind of (hand ? HAND_KINDS : LEG_KINDS)) {
+        const ks = KIND_STATS[kind], v = lead ? ks.lead : ks.rear;
+        const st = {
+          key: limb + '_' + kind, limb, kind, bit: LIMB_BIT[limb], name: ks.names[lead ? 0 : 1],
+          w: v[0], a: v[1], r: v[2], dmg: v[3], stam: v[4], part: ks.part, push: !!ks.push,
+          tip: hand ? 'hand' : kind === 'knee' ? 'knee' : 'foot',
+          reach: hand ? ARM_REACH : kind === 'knee' ? KNEE_REACH : LEG_REACH
+        };
+        st.path = hand ? handPath(limb, kind, st.w, st.a, st.r) : legPath(limb, kind, st.w, st.a, st.r);
+        // scale the authored paths to the rig: forward reach, hands raised by Y_SHIFT, leg heights scaled by (1 + Y_SHIFT)
+        for (const k of st.path) { if (k[1] > 0) k[1] *= REACH_SCALE; k[3] = hand ? k[3] + Y_SHIFT : k[3] * (1 + Y_SHIFT); }
+        // impact keyframe: furthest-forward keyframe inside the active window
+        let imp = null, best = -1e9;
+        for (let i = 0; i < st.path.length; i++) {
+          const k = st.path[i];
+          if (k[0] >= st.w - 1e-6 && k[0] <= st.w + st.a + 1e-6 && k[1] > best) { best = k[1]; imp = k; }
+        }
+        // root-to-root distance at which a clean impact lands on the intended region of a square-on opponent
+        st.range = imp[1] + 0.06 + PART_R[st.part] + TIP_R[st.tip];
+        STRIKES[st.key] = st;
+      }
+    }
+    // ground strikes (top position): timed, always in range
+    const G = {
+      gpunch:  { w: 0.18, a: 0.05, r: 0.28, dmg: 1.36, stam: 3,   part: 'head', names: ['left hand', 'right hand'] },
+      gelbow:  { w: 0.26, a: 0.05, r: 0.36, dmg: 2.7,  stam: 4.5, part: 'head', names: ['left elbow', 'right elbow'] },
+      ghammer: { w: 0.24, a: 0.05, r: 0.34, dmg: 2.3,  stam: 4,   part: 'head', names: ['left hammer fist', 'right hammer fist'] },
+      gbody:   { w: 0.20, a: 0.05, r: 0.30, dmg: 1.95, stam: 3,   part: 'body', names: ['left to the body', 'right to the body'] },
+      gknee:   { w: 0.22, a: 0.05, r: 0.32, dmg: 2.2,  stam: 3.5, part: 'body', names: ['left knee to the body', 'right knee to the body'] }
+    };
+    for (const kind in G) {
+      const g = G[kind];
+      const limbs = kind === 'gknee' ? ['ll', 'rl'] : ['lh', 'rh'];
+      limbs.forEach((limb, i) => {
+        STRIKES[limb + '_' + kind] = { key: limb + '_' + kind, limb, kind, bit: LIMB_BIT[limb], name: g.names[i], w: g.w, a: g.a, r: g.r, dmg: g.dmg, stam: g.stam, part: g.part, ground: true, range: 9 };
+      });
+    }
+  })();
+
+  const SUBS = ['armbar', 'rear-naked choke', 'guillotine', 'kimura', 'triangle choke', 'americana', 'arm triangle'];
+
+  // ---------- Ground positions ----------
+  // Named from the top fighter's point of view. The bottom fighter 'has guard' in guard / half guard.
+  const POS_NAME = { guard: 'closed guard', half: 'half guard', side: 'side control', mount: 'mount', back: 'back control' };
+  // top strike damage multiplier by position, and whether the bottom can strike up
+  const POS_STRIKE = { guard: 0.6, half: 0.7, side: 0.85, mount: 1.1, back: 0.8 };
+  const BOTTOM_CAN_STRIKE = { guard: true, half: true, side: false, mount: false, back: false };
+  // Transitions are READS, not dice. GRAPPLE + a direction starts a move; for a short window the other fighter
+  // can deny it by holding BLOCK + the same direction (the HUD shows the direction, the window shrinks with
+  // momentum and advantage). No input or the wrong direction: the move lands. The right direction: the move is
+  // denied, the attacker is exposed and the denier gets momentum. `read` = what happens to a risky move that
+  // gets denied (to = attacker ends in that position, flip = attacker gets reversed). to / flip / stand as before.
+  // winMul > 1 = a bigger, slower move that is easier to read.
+  const MOVES = {
+    top: {
+      guard: { FWD:   { name: 'pass the guard', to: 'half', stam: 5 },
+               LEFT:  { name: 'stack pass', to: 'side', stam: 7, winMul: 1.3, read: { flip: 'half' } },
+               RIGHT: { name: 'stack pass', to: 'side', stam: 7, winMul: 1.3, read: { flip: 'half' } } },
+      half:  { FWD:   { name: 'pass to side control', to: 'side', stam: 5 },
+               LEFT:  { name: 'knee slide to mount', to: 'mount', stam: 7, winMul: 1.3, read: { to: 'guard' } },
+               RIGHT: { name: 'knee slide to mount', to: 'mount', stam: 7, winMul: 1.3, read: { to: 'guard' } } },
+      side:  { FWD:   { name: 'take mount', to: 'mount', stam: 5 },
+               LEFT:  { name: 'spin to the back', to: 'back', stam: 7, winMul: 1.3, read: { to: 'half' } },
+               RIGHT: { name: 'spin to the back', to: 'back', stam: 7, winMul: 1.3, read: { to: 'half' } } },
+      mount: { FWD:   { name: 'take the back', to: 'back', stam: 6, winMul: 1.15, read: { to: 'half' } } },
+      back:  {}
+    },
+    bottom: {
+      guard: { FWD:   { name: 'stand up', stand: true, stam: 6, winMul: 1.15, read: { to: 'half' } },
+               LEFT:  { name: 'sweep', flip: 'half', stam: 7, winMul: 1.15, read: { to: 'half' } },
+               RIGHT: { name: 'sweep', flip: 'half', stam: 7, winMul: 1.15, read: { to: 'half' } } },
+      half:  { BACK:  { name: 'recover guard', to: 'guard', stam: 4 },
+               FWD:   { name: 'stand up', stand: true, stam: 7, winMul: 1.15, read: { to: 'side' } },
+               LEFT:  { name: 'sweep', flip: 'half', stam: 7, winMul: 1.15, read: { to: 'side' } },
+               RIGHT: { name: 'sweep', flip: 'half', stam: 7, winMul: 1.15, read: { to: 'side' } } },
+      side:  { BACK:  { name: 'shrimp to half guard', to: 'half', stam: 5 },
+               FWD:   { name: 'turn and stand', stand: true, stam: 8, winMul: 1.2, read: { to: 'back' } },
+               LEFT:  { name: 'bridge and roll', flip: 'guard', stam: 8, winMul: 1.2, read: { to: 'mount' } },
+               RIGHT: { name: 'bridge and roll', flip: 'guard', stam: 8, winMul: 1.2, read: { to: 'mount' } } },
+      mount: { BACK:  { name: 'elbow escape to half guard', to: 'half', stam: 6 },
+               LEFT:  { name: 'bridge and roll', flip: 'guard', stam: 8, winMul: 1.15 },
+               RIGHT: { name: 'bridge and roll', flip: 'guard', stam: 8, winMul: 1.15 } },
+      back:  { BACK:  { name: 'turn in to half guard', to: 'half', stam: 6 },
+               FWD:   { name: 'stand up', stand: true, stam: 8, winMul: 1.2 },
+               LEFT:  { name: 'shake off the hooks', to: 'side', stam: 7, winMul: 1.2 },
+               RIGHT: { name: 'shake off the hooks', to: 'side', stam: 7, winMul: 1.2 } }
+    }
+  };
+  // submissions available by role and position (GRAPPLE with no direction). The entry is a read like any other
+  // move: the defender denies it with GRAPPLE + BACK (pull the limb out / posture up).
+  const SUBS_BY = {
+    top:    { guard: ['guillotine'], half: ['kimura'], side: ['kimura', 'americana'], mount: ['armbar', 'arm triangle'], back: ['rear-naked choke'] },
+    bottom: { guard: ['triangle choke', 'armbar', 'guillotine'], half: ['kimura'], side: [], mount: [], back: [] }
+  };
+  const SUB_DENY_DIR = 'BACK';
+  // where the defender ends up after escaping a submission
+  function subEscapePos(attRole, pos) {
+    if (attRole === 'bottom') return 'side'; // scrambled out of the guard
+    return { mount: 'half', side: 'half', half: 'guard', back: 'half', guard: 'guard' }[pos];
+  }
+  const DIR_KEYS = { FWD: IN.FWD, BACK: IN.BACK, LEFT: IN.LEFT, RIGHT: IN.RIGHT };
+  // ground tuning
+  const MOVE_DUR = 0.55;        // seconds a transition takes to play out (the position changes at the end)
+  const MOVE_WIN = 0.5;         // base deny window (s) at the start of a move; stats, momentum and advantage shape it
+  const MOVE_WIN_MIN = 0.2, MOVE_WIN_MAX = 1.1;
+  const MOVE_CD = 0.25;         // seconds before the same fighter may attempt again
+  const DENY_STAM = 3;          // what a guess costs the defender (right or wrong)
+  const MOMENTUM_T = 1.5;       // seconds of momentum after landing a move / a correct deny: the next move is harder to deny
+  const MOMENTUM_WIN = 0.55;    // deny window multiplier while the attacker has momentum
+  const ADV_MAX = 100;          // grapple advantage: built by landed strikes, denials and transitions, spent on shorter windows
+  const ADV_DECAY = 6;          // advantage lost per second
+  const ADV_WIN = 180;          // window *= 1 - adv / ADV_WIN
+  const SUB_ATTEMPT_STAM = 7;   // stamina cost of a submission entry
+  const SUB_FAIL_CD = 1.2;      // attacker's cooldown (s) after a denied, lost or escaped submission
+  const SUB_DECAY = 14;         // hold progress lost per second while not squeezing
+  const SUB_CRANK_WIN = 0.52;   // base window to read a crank
+  const SUB_CRANK_CD = 0.9;     // seconds between cranks
+  const SUB_CRANK_GAIN = 14;    // progress a crank adds when it is not read
+  const SUB_CRANK_LOSS = 16;    // progress a read crank costs the attacker
+  const TD_FAIL_STUN = 0.25;    // multiplier on a failed takedown's stumble duration
+  const TD_FAIL_CD = 3.0;       // seconds before the shooter may shoot again after a failed takedown
+  const REF_WARN_T = 5;         // seconds of nobody working before the referee warns them
+  const REF_STAND_T = 8;        // ... and stands them up
+  function dirOf(held) { for (const k in DIR_KEYS) if (held & DIR_KEYS[k]) return k; return null; }
+
+  const CAGE_R = 3.9;      // max fighter radius from centre
+  const MIN_DIST = 0.78;   // body collision distance
+  const DT = 1 / 60;
+
+  // ---------- Seeded RNG ----------
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  function makeFighter(idx, key, name, color, moveset, extra) {
+    const r = ROSTER[key] || ROSTER.balanced;
+    extra = extra || {};
+    const stats = Object.assign({}, r.stats);
+    if (extra.stats) for (const k in stats) if (typeof extra.stats[k] === 'number') stats[k] = clamp(extra.stats[k], 0, 1);
+    return {
+      idx, key: r.key, name: name || r.name, style: extra.style || r.style,
+      stats,
+      color: color != null ? color : r.color, skin: extra.skin != null ? extra.skin : r.skin,
+      look: extra.look && typeof extra.look === 'object' ? extra.look : null, // hair / beard / build / glove and trim colours (js/render.js); null = the default body
+      moveset: normalizeMoveset(moveset),
+      x: idx === 0 ? -1.3 : 1.3, z: 0,
+      vx: 0, vz: 0,
+      dmg: { head: clamp(extra.dmg && extra.dmg.head || 0, 0, 60), body: clamp(extra.dmg && extra.dmg.body || 0, 0, 60), legs: clamp(extra.dmg && extra.dmg.legs || 0, 0, 60) }, // starting damage carried in (career mode)
+      stam: 100,
+      stamMax: 100,       // ceiling stamina regens to; eroded by head/body damage and by swinging on empty
+      act: { type: 'idle', name: '', t: 0, dur: 0, hit: false },
+      buf: null,          // buffered strike {key, t}
+      combo: 0, comboT: 0, // strikes chained without a pause
+      lastStrike: '', repeatN: 0, // key of the last strike thrown and how many times in a row (see REPEAT_FREE)
+      blocking: false,
+      checking: false,    // lead leg lifted to check low kicks (CHECK held)
+      southpaw: false,   // stance: right foot forward (see isSouthpaw)
+      blockTap: -9,       // sim time of the last BLOCK press (double tap = push)
+      lungeReady: -9,     // sim time the next dash may start
+      kickReady: -9,      // sim time the kicking foot is back on the mat: no kick can start before it
+      restT: 0,           // seconds since he last blocked or threw: stamina regen ramps up the longer this runs
+      rocked: 0,          // seconds remaining rocked
+      rockLight: false,   // the current rock is a brief stun (slight wobble) rather than a heavy, leaning-back daze
+      tdCd: 0,            // seconds until he may shoot again after a failed takedown
+      wobble: 0,          // visual wobble intensity
+      kdCount: 0,
+      ground: null,       // null | 'top' | 'bottom'
+      cover: false,       // on the mat: BLOCK held (covers strikes / hand-fights); GRAPPLE + direction is a read
+      posture: false,     // drawn postured up / framing
+      // round stats (reset per round)
+      rs: { thrown: 0, landed: 0, blocked: 0, sig: 0, td: 0, tdAtt: 0, ctrl: 0, subs: 0, kd: 0 },
+      // total stats
+      ts: { thrown: 0, landed: 0, blocked: 0, sig: 0, td: 0, tdAtt: 0, ctrl: 0, subs: 0, kd: 0 },
+      lastInput: 0
+    };
+  }
+  const idleAct = () => ({ type: 'idle', name: '', t: 0, dur: 0, hit: false });
+  // true while a kick's foot is off the mat: during the strike (including recovery) and until f.kickReady
+  function kickInFlight(f, now) {
+    if (now != null && now < f.kickReady) return true;
+    if (f.act.type !== 'strike') return false;
+    const st = STRIKES[f.act.name];
+    return !!st && !st.ground && (st.limb === 'll' || st.limb === 'rl');
+  }
+  function isKickKey(key) { return key.startsWith('ll_') || key.startsWith('rl_'); }
+  // A strike past its active window can be cancelled into the next action (combo flow),
+  // except a slipped one: an over-committed whiff has to be ridden out.
+  function recovering(f) {
+    const a = f.act;
+    if (a.type !== 'strike') return false;
+    const st = STRIKES[a.name];
+    const cancelAt = a.cancelAt != null ? a.cancelAt : (st.w + st.a) * a.tf;
+    return !a.slipped && a.t >= cancelAt;
+  }
+  const PHYS_PUSH = 0.9; // teep shove (impulse per kg) in the physics model
+  const BUFFER_T = 0.3; // seconds a buffered strike press stays valid
+  const BODY_TOUGHNESS = 0.5; // body damage bar fills this much per point of damage (the stamina drain still uses the full hit)
+  const LEG_TOUGHNESS = 1 / 1.3; // legs take 30% more punishment before the bar fills
+  const PART_TOUGHNESS = { body: BODY_TOUGHNESS, legs: LEG_TOUGHNESS };
+  // push: BLOCK tapped twice in quick succession stiff-arms the opponent off you
+  const PUSH_TAP_T = 0.3;   // the second BLOCK tap has to come within this many seconds of the first
+  const PUSH_DIST = 1.0;    // arm's length — any further and the push grabs air
+  const PUSH_COST = 4;      // stamina
+  const PUSH_SHOVE = 2.8;   // impulse per kg given to the opponent (cf. PHYS_PUSH for a teep)
+  const PUSH_DUR = 0.38;    // seconds the pusher is committed
+  const PUSH_STUN_DIST = PUSH_DIST * 0.5; // stumble / stagger applies only inside this range; beyond it the push just shoves
+  // dash: the DASH key bursts the way he is stepping (in / out / left / right, diagonals too) to close / make distance
+  // or angle off; with no direction held he hops straight back
+  const LUNGE_DUR = 0.32;    // seconds the burst lasts (it tapers off over the back half)
+  const LUNGE_IN = 3.2;      // extra speed (m/s) on top of his step, lunging in
+  const LUNGE_OUT = 2.7;     // ... and backing out
+  const LUNGE_SIDE = 2.9;    // ... and angling off to either side
+  const LUNGE_COST = 4;      // stamina
+  const LUNGE_CD = 0.55;     // seconds from one dash to the next
+  // slip: BLOCK pressed while a strike is on its way also moves the head off the line, outside the striking limb
+  const SLIP_COST = 5;
+  const SLIP_DUR = 0.45;
+  const SLIP_SIDE = 0.4;     // impulse per kg sideways ...
+  const SLIP_BACK = 0.3;     // ... and back
+  // stamina economy
+  const MISS_PENALTY = 0.30;   // a whiffed strike costs this much extra (fraction of its cost)
+  const CLEAN_REFUND = 0.33;   // an unblocked landing gives this much of its cost back
+  const BLOCK_REWARD = 0.08;   // a strike taken on a raised guard gives the BLOCKER this much of its cost
+  const GROUND_BLOCK_REWARD = 0.4; // stamina for covering a ground strike
+  const STAM_MAX_FLOOR = 30;   // lower bound for max-stamina erosion
+  const EMPTY_SWING_COST = 1.5; // max stamina lost per strike press made with an empty tank
+  const OVERDRAW_COST = 0.5;   // max stamina lost per point a strike overdraws the tank
+  const ROUND_MAX_RECOVERY = 20; // max stamina regained in the corner
+  const BREAK_T = 5;            // seconds between rounds
+  // rest ramp: regen doubles every REST_DOUBLE_T seconds spent neither blocking nor striking, up to REST_MAX x.
+  // Blocking or throwing anything resets it (f.restT).
+  const REST_DOUBLE_T = 1.2;
+  const REST_MAX = 4;
+  const CHECK_DMG = 0.10;      // a checked low kick does this share of its damage to the defender's legs...
+  const CHECK_SELF_DMG = 0.15; // ...and this share of it to the kicker's own legs
+  const KICK_CANCEL_DMG = 2.8; // min damage of a clean hand strike that cancels the opponent's kick in flight
+  const KICK_CANCEL_BONUS = 1.3; // damage multiplier for that kick-cancelling strike
+  const KICK_CANCEL_STUN = 0.3; // extra seconds of hit-stun for being caught on one leg
+  // spamming: the same strike thrown more than REPEAT_FREE times in a row loses half its power per extra throw
+  // (3rd = x0.5, 4th = x0.25, ...); any different strike resets the count
+  const REPEAT_FREE = 2;
+  // hitstun halves the same way (3rd = x0.5, 4th = x0.25) and is gone from the throw after STUN_REPEAT_MAX on
+  const STUN_REPEAT_MAX = 4;
+  const KICK_PLANT_T = 0.2;     // seconds after a kick ends before the foot is planted enough to kick again
+  const TEEP_PLANT_T = 0.2;     // same, after a teep
+  // rocked / knockdown tuning
+  const ROCK_TIME_MULT = 0.35;  // scales every rocked duration
+  const ROCK_T0 = 1.3, ROCK_PER_DMG = 0.05; // seconds rocked = (ROCK_T0 + dmg * ROCK_PER_DMG) * ROCK_TIME_MULT
+  const ROCK_HEAVY_P = 0.15;    // chance a rocking shot is a heavy daze (wobble pose, leans back); otherwise a brief stun
+  const ROCK_LIGHT_T = 0.35;    // seconds rocked by a light (stun) rock
+  const ROCK_LIGHT_WOBBLE = 0.15; // ragdoll wobble during a light rock: below the WOBBLE pose threshold, just small shoves
+  const KD_THR_MIN = 3.4;       // weakest head shot that drops an already-rocked fighter
+  const KD_THR_FRAC = 0.62;     // ...or this fraction of his rock threshold, whichever is higher
+  const KD_FLASH_FRAC = 1.9;    // a shot this many times the rock threshold drops him outright
+  const KD_FALL = 1.0;          // seconds a knocked-down fighter is falling / limp before he can do anything
+  const KD_STAY = 4.0;          // longest he may stay down before the referee waves him up
+  const KD_RISE = 1.0;          // seconds it takes him to climb back to his feet
+  const KD_ROCKED = 3.2;        // rocked time set by a knockdown (before ROCK_TIME_MULT)
+  const KD_DOWN_RECOVER = 2.5;  // rocked timer drains this many times faster while he stays down
+  const KD_FOLLOW_DIST = 2.3;   // the attacker can dive on him from this far (takedown key)
+  const KD_SHOVE = 0.5;         // impulse per kg the knockdown blow gives the falling body
+  const KD_RISE_KEYS = DIR_BITS | IN.DODGE; // a direction or the dash key gets a downed fighter up
+
+  class Sim {
+    constructor(opts) {
+      opts = opts || {};
+      this.rand = mulberry32(opts.seed != null ? opts.seed : 1337);
+      this.settings = { rounds: opts.rounds || 3, roundLen: opts.roundLen || 180, grappling: opts.grappling !== false };
+      const p = opts.players || [{}, {}];
+      this.state = {
+        t: 0,                     // sim time
+        phase: 'intro',           // intro | fight | break | over
+        phaseT: 0,
+        round: 1,
+        clock: this.settings.roundLen,
+        rounds: this.settings.rounds,
+        roundLen: this.settings.roundLen,
+        grappling: this.settings.grappling, // false = striking only: no takedowns, knockdowns are standing eight-counts
+        f: [makeFighter(0, p[0].fighter || 'striker', p[0].name, p[0].color, p[0].moveset, p[0]),
+            makeFighter(1, p[1].fighter || 'wrestler', p[1].name, p[1].color, p[1].moveset, p[1])],
+        ground: null,             // { top, bottom, pos, trans, sub, ctrlT, idleT, cd:[..] }
+        cards: [],                // per round [{p0, p1, j:[[10,9],[10,9],[10,9]]}]
+        result: null,
+        evSeq: 0
+      };
+      this.events = [];           // {seq, k, ...}
+      this._resetRoundScore();
+      this.inputs = [{ held: 0, pressed: 0 }, { held: 0, pressed: 0 }];
+      // physics (standing game). Off for guest placeholders / menu demos.
+      const PH = root.MMAPhys;
+      this.phys = null;
+      // training (the career gym): fighter 1 is a heavy bag (opts.world.bag), the round never ends, nothing is stopped
+      this.training = !!opts.training;
+      if (this.training) {
+        const F = this.state.f;
+        if (opts.spawn) { F[0].x = opts.spawn.x; F[0].z = opts.spawn.z; }
+        const bag = opts.world && opts.world.bag;
+        if (bag) { F[1].x = bag.x; F[1].z = bag.z; }
+        this.state.phase = 'fight';
+        this.state.clock = this.state.roundLen = Infinity;
+      }
+      if (opts.physics !== false && PH && PH.ready()) {
+        const F = this.state.f;
+        this.phys = new PH.World(Object.assign({}, opts.world, { rand: this.rand, positions: [[F[0].x, F[0].z], [F[1].x, F[1].z]] }));
+        this.state.phys = true;
+        // the AI and the stamina economy read ranges / costs from STRIKES: use the physical ones
+        if (!STRIKES._physTuned) {
+          for (const k in PH.STRIKES) if (STRIKES[k]) { STRIKES[k].range = PH.STRIKES[k].range; STRIKES[k].stam = PH.STRIKES[k].cost; STRIKES[k].part = PH.STRIKES[k].part; STRIKES[k].name = PH.STRIKES[k].name; }
+          Object.defineProperty(STRIKES, '_physTuned', { value: true, enumerable: false });
+        }
+      }
+    }
+
+    destroy() { if (this.phys) { this.phys.free(); this.phys = null; } }
+
+    // -------- public --------
+    setInput(i, held, pressed) {
+      this.inputs[i].held = held | 0;
+      this.inputs[i].pressed |= (pressed | 0);
+    }
+
+    step(dt) {
+      // real-time accumulator: exactly 60 ticks per simulated second regardless of monitor refresh rate
+      this.acc = (this.acc || 0) + Math.min(dt, 0.25);
+      let n = 0;
+      while (this.acc >= DT && n < 8) {
+        this._tick(DT); this.acc -= DT; n++;
+        // a press belongs to the first tick only: a frame that runs two ticks must not see one tap twice
+        // (that turned a single tap into a double-tap push and threw two strikes for one press)
+        this.inputs[0].pressed = 0; this.inputs[1].pressed = 0;
+      }
+    }
+
+    drainEvents() { const e = this.events; this.events = []; return e; }
+
+    // -------- internals --------
+    _emit(ev) { ev.seq = ++this.state.evSeq; ev.t = this.state.t; this.events.push(ev); return ev; }
+
+    _resetRoundScore() {
+      for (const f of this.state.f) f.rs = { thrown: 0, landed: 0, blocked: 0, sig: 0, td: 0, tdAtt: 0, ctrl: 0, subs: 0, kd: 0 };
+    }
+
+    _tick(dt) {
+      const S = this.state;
+      S.t += dt; S.phaseT += dt;
+      switch (S.phase) {
+        case 'intro':
+          if (this.phys) this._physTick(dt);
+          if (S.phaseT >= 3.2) { S.phase = 'fight'; S.phaseT = 0; this._emit({ k: 'bell', round: S.round }); }
+          break;
+        case 'fight':
+          this._fightTick(dt);
+          break;
+        case 'break':
+          if (S.phaseT >= BREAK_T) this._startRound();
+          break;
+        case 'over':
+          this._cooldown(dt);
+          if (this.phys && !S.ground) this._physTick(dt);
+          break;
+      }
+    }
+
+    _startRound() {
+      const S = this.state;
+      S.round++;
+      S.clock = this.settings.roundLen;
+      S.phase = 'intro'; S.phaseT = 1.2;
+      for (const f of S.f) {
+        f.x = f.idx === 0 ? -1.3 : 1.3; f.z = 0; f.vx = 0; f.vz = 0;
+        f.act = idleAct();
+        f.rocked = 0; f.ground = null; f.blocking = false;
+      }
+      S.ground = null;
+      this._resetRoundScore();
+      if (this.phys) { this.phys.place(S.f[0], S.f[1]); this.phys.setActive(true); for (const f of S.f) f.pose = null; }
+      this._emit({ k: 'round', round: S.round });
+    }
+
+    _endRound(finished) {
+      const S = this.state;
+      // score the round
+      const sc = S.f.map(f => f.rs.sig * 1.0 + f.rs.landed * 0.35 + f.rs.td * 6 + f.rs.ctrl * 0.45 + f.rs.subs * 5 + f.rs.kd * 12);
+      const judges = [];
+      for (let j = 0; j < 3; j++) {
+        const bias = j === 0 ? 0 : (this.rand() - 0.5) * 8; // judges see it a little differently
+        const d = (sc[0] - sc[1]) + bias;
+        let a = 10, b = 10;
+        if (Math.abs(d) >= 2) {
+          if (d > 0) { b = 9; if (d >= 48 || (S.f[0].rs.kd > 0 && d >= 30)) b = 8; }
+          else { a = 9; if (-d >= 48 || (S.f[1].rs.kd > 0 && -d >= 30)) a = 8; }
+        }
+        judges.push([a, b]);
+      }
+      S.cards.push({ round: S.round, p0: Math.round(sc[0]), p1: Math.round(sc[1]), j: judges });
+      for (const f of S.f) for (const k in f.rs) f.ts[k] += f.rs[k];
+      if (finished) return;
+      this._emit({ k: 'bell', end: true, round: S.round });
+      if (S.round >= S.rounds) {
+        this._decision();
+      } else {
+        S.phase = 'break'; S.phaseT = 0; S.ground = null;
+        if (this.phys) { this.phys.setActive(false); for (const f of S.f) f.pose = null; }
+        for (const f of S.f) {
+          f.ground = null; f.act = idleAct();
+          // corner recovery
+          f.stamMax = Math.min(100, f.stamMax + ROUND_MAX_RECOVERY);
+          f.stam = f.stamMax;
+          f.dmg.head = Math.max(0, f.dmg.head - 10);
+          f.dmg.body = Math.max(0, f.dmg.body - 8);
+          f.dmg.legs = Math.max(0, f.dmg.legs - 5);
+          f.rocked = 0;
+        }
+      }
+    }
+
+    _decision() {
+      const S = this.state;
+      const tot = [[0, 0], [0, 0], [0, 0]];
+      for (const c of S.cards) for (let j = 0; j < 3; j++) { tot[j][0] += c.j[j][0]; tot[j][1] += c.j[j][1]; }
+      let w0 = 0, w1 = 0;
+      for (let j = 0; j < 3; j++) { if (tot[j][0] > tot[j][1]) w0++; else if (tot[j][1] > tot[j][0]) w1++; }
+      // 3-0 unanimous, 2-0-1 majority (third judge a draw), 2-1 split; draws: 0-0-3 unanimous, 1-0-2 majority, 1-1-1 split
+      const d = 3 - w0 - w1;
+      let winner = null, type;
+      if (w0 >= 2 || w1 >= 2) {
+        winner = w0 >= 2 ? 0 : 1;
+        type = (d === 0 && (w0 === 3 || w1 === 3) ? 'Unanimous' : d === 1 ? 'Majority' : 'Split') + ' Decision';
+      } else type = (d === 3 ? 'Unanimous' : d === 2 ? 'Majority' : 'Split') + ' Draw';
+      this._finish({ method: type, winner, round: S.round, time: 0, totals: tot });
+    }
+
+    _finish(res) {
+      const S = this.state;
+      S.result = res; S.phase = 'over'; S.phaseT = 0;
+      for (const f of S.f) f.blocking = false;
+      this._emit({ k: 'end', res });
+    }
+
+    _cooldown(dt) {
+      for (const f of this.state.f) {
+        if (f.act.type !== 'idle' && f.act.type !== 'down') {
+          f.act.t += dt; if (f.act.t >= f.act.dur) f.act = idleAct();
+        }
+      }
+    }
+
+    // unit vectors of f's frame: fwd towards o, l = fwd rotated 90° (the fighter's right: fwd x up)
+    _frame(f, o) {
+      const dx = o.x - f.x, dz = o.z - f.z;
+      const d = Math.hypot(dx, dz) || 0.001;
+      const fx = dx / d, fz = dz / d;
+      return { fx, fz, lx: -fz, lz: fx, d };
+    }
+
+    // ---------------------------------------------------------
+    _fightTick(dt) {
+      const S = this.state;
+      S.clock -= dt;
+      const F = S.f;
+      const dx = F[1].x - F[0].x, dz = F[1].z - F[0].z;
+      const dist = Math.hypot(dx, dz) || 0.001;
+      const ux = dx / dist, uz = dz / dist;
+
+      // stamina / timers
+      for (const f of F) {
+        if (f.tdCd > 0) f.tdCd = Math.max(0, f.tdCd - dt);
+        if (f.rocked > 0) { f.rocked -= dt * (f.act.type === 'kd' && f.act.name === 'down' ? KD_DOWN_RECOVER : 1); if (f.rocked < 0) f.rocked = 0; }
+        if (f.rocked <= 0) f.rockLight = false;
+        f.wobble = Math.max(0, f.wobble - dt * 0.8);
+        if (f.blocking) f.restT = 0; else f.restT += dt;
+        let regen = 2.2 + f.stats.car * 4.5;
+        regen *= Math.min(REST_MAX, Math.pow(2, f.restT / REST_DOUBLE_T));
+        regen *= (1 - f.dmg.body / 160);
+        if (f.blocking) regen *= 0.75;
+        if (f.act.type === 'move') regen *= 0.85;
+        if (f.ground === 'bottom') regen *= (S.ground && (S.ground.pos === 'mount' || S.ground.pos === 'back')) ? 0.45 : 0.7;
+        if (S.ground && S.ground.sub) regen = 0;
+        f.stam = clamp(f.stam + regen * dt, 0, f.stamMax);
+      }
+
+      if (S.ground) this._groundTick(dt);
+      else this._standTick(dt, dist, ux, uz);
+
+      // actions progress
+      for (const f of F) {
+        const a = f.act;
+        if (a.type === 'idle' || a.type === 'move' || a.type === 'down') continue;
+        a.t += dt;
+        if (a.type === 'strike') {
+          const st = STRIKES[a.name];
+          // ground strikes are timed; standing strikes are physical and resolve in _physTick after the world steps
+          if (st.ground && !a.hit && a.t >= st.w * a.tf) { a.hit = true; this._resolveGroundStrike(f, st); }
+          if (a.t >= a.dur && f.act === a) f.act = idleAct();
+        } else if (a.type === 'takedown') {
+          if (!a.hit && a.t >= 0.32) { a.hit = true; this._resolveTakedown(f); }
+          if (a.t >= a.dur && f.act === a) f.act = idleAct();
+        } else if (a.t >= a.dur) {
+          f.act = idleAct();
+        }
+      }
+
+      // standing physics: ragdolls move, strike, collide; contacts become hits
+      if (this.phys && !S.ground) this._physTick(dt);
+
+      // round / finish checks
+      if (S.phase === 'fight') {
+        const stop = this._checkStoppage();
+        if (!stop && S.clock <= 0) { S.clock = 0; this._endRound(false); }
+      }
+    }
+
+    _checkStoppage() {
+      const S = this.state;
+      if (this.training) {
+        // the bag soaks up everything and is fresh again for the next shot
+        const b = S.f[1];
+        b.dmg.head = b.dmg.body = b.dmg.legs = 0; b.rocked = 0; b.wobble = 0; b.stam = b.stamMax = 100;
+        return false;
+      }
+      for (const f of S.f) {
+        const o = S.f[1 - f.idx];
+        let method = null;
+        if (f.dmg.head >= 100) method = 'KO';
+        else if (f.dmg.body >= 100) method = 'TKO (body)';
+        else if (f.dmg.legs >= 100) method = 'TKO (leg kicks)';
+        else if (f.ground && f.dmg.head >= 92 && f.act.type === 'hit') method = 'TKO (ground strikes)';
+        if (method) {
+          f.act = { type: 'down', name: '', t: 0, dur: 99, hit: false };
+          o.act = { type: 'celebrate', name: '', t: 0, dur: 99, hit: false };
+          const min = Math.floor((S.roundLen - S.clock) / 60), sec = Math.floor((S.roundLen - S.clock) % 60);
+          this._endRound(true);
+          this._emit({ k: 'ko', i: o.idx, j: f.idx, method });
+          this._finish({ method, winner: o.idx, round: S.round, time: min + ':' + (sec < 10 ? '0' : '') + sec });
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // ---------------------------------------------------------
+    //  STANDING
+    // ---------------------------------------------------------
+    _standTick(dt, dist, ux, uz) {
+      const S = this.state, F = S.f;
+      for (let i = 0; i < 2; i++) {
+        const f = F[i];
+        const inp = this.inputs[i];
+        const held = inp.held, pressed = inp.pressed;
+        const striking = f.act.type === 'strike';
+        const canCancel = recovering(f);
+        const busy = f.act.type !== 'idle' && f.act.type !== 'move' && !canCancel;
+        if (f.comboT > 0) { f.comboT -= dt; if (f.comboT <= 0) f.combo = 0; }
+        // a limb pressed while a strike is still live is remembered and fired the moment it can be
+        if (striking && !canCancel && (pressed & LIMB_BITS)) {
+          const key = this._pickStrikeKey(f, pressed, held, false);
+          if (key) f.buf = { key, t: S.t };
+        }
+        const sign = i === 0 ? 1 : -1; // direction towards opponent along (ux,uz)
+
+        // facing vector towards opponent
+        const fx = ux * sign, fz = uz * sign;
+        // lateral (circle) vector = fighter's right (fwd x up)
+        const lx = -fz, lz = fx;
+
+        f.blocking = (!busy || f.act.type === 'dodge') && !!(held & IN.BLOCK) && f.rocked <= 0.4; // the guard stays up through a slip
+        f.checking = !busy && !striking && !!(held & IN.CHECK) && f.rocked <= 0.4;
+        // BLOCK tapped twice quickly = push (the taps are remembered even mid-strike, the push waits until he is free)
+        let push = false;
+        if (pressed & IN.BLOCK) { push = S.t - f.blockTap <= PUSH_TAP_T; f.blockTap = push ? -9 : S.t; }
+        // a single BLOCK press while the opponent's strike is still on its way = block and slip it
+        const opp = F[1 - i];
+        const incoming = opp.act.type === 'strike' && !opp.act.hit && opp.act.t < (opp.act.cancelAt != null ? opp.act.cancelAt : opp.act.dur);
+        const slip = !push && !!(pressed & IN.BLOCK) && incoming && dist < 2.2;
+        const rag = this.phys.fighters[i];
+        rag.move[0] = 0; rag.move[1] = 0;
+
+        // knocked down: fall -> down (his choice: get up now, or stay down a while and recover) -> rise
+        if (f.act.type === 'kd') { this._kdTick(f, i, held, pressed); continue; }
+
+        // movement — allowed while striking at half speed, so you can step into (or away from) shots
+        if (!busy || striking) {
+          const slow = (1 - f.dmg.legs / 140) * (f.rocked > 0 ? 0.45 : 1) * (0.7 + f.stam / 330) * (f.blocking ? 0.8 : 1) * (f.checking ? 0.5 : 1);
+          const spd = (1.9 + f.stats.spd * 1.0) * slow;
+          // hand the ragdoll a local move vector (x = its right, z = toward the opponent)
+          let rx = 0, rz = 0;
+          if (held & IN.FWD) rz += 1;
+          if (held & IN.BACK) rz -= 1;
+          if (held & IN.LEFT) rx -= 1;
+          if (held & IN.RIGHT) rx += 1;
+          rag.move[0] = rx; rag.move[1] = rz; rag.moveSpeed = spd / 1.9;
+          if (rx || rz) { if (!busy) f.act = { type: 'move', name: '', t: 0, dur: 0, hit: false }; }
+          else if (f.act.type === 'move') f.act = idleAct();
+          // DASH: burst the way he is stepping (straight back when standing still)
+          if ((pressed & IN.DODGE) && S.t >= f.lungeReady && f.stam > LUNGE_COST && f.rocked <= 0) {
+            f.stam -= LUNGE_COST; f.restT = 0; f.lungeReady = S.t + LUNGE_CD;
+            const legs = 1 - f.dmg.legs / 140;
+            const k = (0.85 + f.stats.spd * 0.3) * legs;
+            let fwd = rz > 0 ? LUNGE_IN : rz < 0 ? -LUNGE_OUT : 0;
+            let side = rx > 0 ? LUNGE_SIDE : rx < 0 ? -LUNGE_SIDE : 0;
+            if (!rx && !rz) fwd = -LUNGE_OUT;
+            if (fwd && side) { fwd *= Math.SQRT1_2; side *= Math.SQRT1_2; }
+            rag.dash(fwd * k, LUNGE_DUR, side * k);
+          }
+        }
+
+        if (!busy && (pressed & IN.STANCE)) {
+          f.southpaw = !f.southpaw;
+          this._emit({ k: 'stance', i, southpaw: f.southpaw });
+        }
+        if (!busy) {
+          // actions (press-triggered)
+          if (push && f.stam > PUSH_COST && f.rocked <= 0) {
+            this._push(f, F[1 - i], dist, fx, fz);
+          } else if (slip && f.stam > SLIP_COST + 1 && f.rocked <= 0) {
+            f.stam -= SLIP_COST;
+            // slip outside the limb that is coming: his right hand / leg is on my left, so I go left (-l), and vice versa
+            const oSt = STRIKES[opp.act.name];
+            const oLimb = oSt && oSt.limb ? (isSouthpaw(opp) ? OTHER_SIDE[oSt.limb] : oSt.limb) : 'rh'; // the physical limb
+            const out = oLimb[0] === 'r' ? -SLIP_SIDE : SLIP_SIDE;
+            // the ragdoll's SLIP pose leans past the lead shoulder (mirrored for southpaw): pick the pose for the other side when needed
+            const toLead = (out < 0) === !isSouthpaw(f);
+            f.act = { type: 'dodge', name: toLead ? 'SLIP' : 'SLIP_R', t: 0, dur: SLIP_DUR, hit: false };
+            rag.shove(lx * out - fx * SLIP_BACK, lz * out - fz * SLIP_BACK, 1.1);
+            this._emit({ k: 'slip', i, j: 1 - i, name: oSt ? oSt.name : '' });
+          } else if (pressed & IN.GRAPPLE && S.grappling && this._canFollow(f, F[1 - i], dist)) {
+            // dive on a knocked-down opponent: flat on his back he gives up side control, half guard if he was already rising
+            const o = F[1 - i];
+            this._emit({ k: 'follow', i, j: 1 - i });
+            this._enterGround(f, o, 'kd', o.act.name === 'down' ? 'side' : 'half');
+            return;
+          } else if (pressed & IN.GRAPPLE && f.rocked <= 0 && S.grappling) {
+            if (dist <= 1.7 && f.stam > 8 && !(f.tdCd > 0)) {
+              f.stam -= 7; f.rs.tdAtt++;
+              f.act = { type: 'takedown', name: '', t: 0, dur: 0.75, hit: false };
+              f.blocking = false;
+              this._emit({ k: 'shoot', i });
+            }
+          } else if (pressed & LIMB_BITS) {
+            const key = this._pickStrikeKey(f, pressed, held, false);
+            // no kicking with a leg already off the ground
+            if (key && !(isKickKey(key) && kickInFlight(f, S.t))) this._startStrike(f, key, canCancel);
+          } else if (f.buf && S.t - f.buf.t <= BUFFER_T && !(isKickKey(f.buf.key) && kickInFlight(f, S.t))) {
+            this._startStrike(f, f.buf.key, canCancel);
+          }
+          if (f.buf && (f.act.type !== 'strike' || S.t - f.buf.t > BUFFER_T || f.act.t === 0)) f.buf = null;
+        }
+      }
+    }
+
+    // stiff-arm: lands inside PUSH_DIST, harder the closer he is, and interrupts his action (a strike in flight is
+    // cancelled; its stamina stays spent). Has no effect on a knocked-down fighter.
+    _push(f, o, dist, fx, fz) {
+      const S = this.state;
+      f.stam = Math.max(0, f.stam - PUSH_COST);
+      f.act = { type: 'push', name: '', t: 0, dur: PUSH_DUR, hit: false };
+      f.blocking = false; f.buf = null; f.restT = 0;
+      const rag = this.phys.fighters[f.idx];
+      const orag = this.phys.fighters[o.idx];
+      const ok = dist <= PUSH_DIST && o.act.type !== 'kd' && o.act.type !== 'down';
+      if (ok) {
+        const w = 0.6 + 0.4 * clamp(1 - (dist - MIN_DIST) / (PUSH_DIST - MIN_DIST), 0, 1); // closer = more of the push lands
+        const ot = o.act.type;
+        const stuns = dist <= PUSH_STUN_DIST;
+        if (stuns && (ot === 'idle' || ot === 'move' || ot === 'strike' || ot === 'dodge' || ot === 'sprawl')) {
+          o.act = { type: 'stumble', name: 'push', t: 0, dur: (0.45 * w + 0.1) * 0.5, hit: false };
+          o.blocking = false; o.buf = null;
+        }
+        orag.shove(fx, fz, PUSH_SHOVE * w); if (stuns) orag.stagger(0.15 * w);
+        rag.shove(-fx, -fz, 0.2 * w); // equal and opposite: a little of it comes back through his arms
+        f.act.hit = true;
+      }
+      this._emit({ k: 'push', i: f.idx, j: o.idx, ok, t: S.t });
+    }
+
+    // the attacker may dive on a knocked-down opponent while he is falling, lying there, or just starting to get up
+    _canFollow(f, o, dist) {
+      const a = o.act;
+      if (a.type !== 'kd' || dist > KD_FOLLOW_DIST) return false;
+      return a.name !== 'rise' || a.t < 0.3;
+    }
+
+    // knocked-down fighter: act.name is the phase. 'fall' (limp, KD_FALL s) -> 'down' (he can get up with a direction /
+    // the stand-up key, or stay down and recover faster, up to KD_STAY s) -> 'rise' (KD_RISE s) -> idle, still rocked.
+    _kdTick(f, i, held, pressed) {
+      const a = f.act, rag = this.phys.fighters[i];
+      f.blocking = false; f.buf = null;
+      if (a.name === 'fall' && a.t >= KD_FALL) { a.name = 'down'; a.t = 0; }
+      if (a.name === 'down') {
+        // a press works at once; a key that was already held when he hit the mat has to be held a moment longer
+        const wants = (pressed & KD_RISE_KEYS) || (a.t > 0.25 && (held & KD_RISE_KEYS));
+        if (wants || a.t >= KD_STAY) {
+          a.name = 'rise'; a.t = 0;
+          rag.getUp(KD_RISE);
+          this._emit({ k: 'getup', i, forced: !wants });
+        }
+      }
+      if (a.name === 'rise' && a.t >= KD_RISE) f.act = idleAct();
+    }
+
+    // limb pressed + modifier held -> strike key, via the fighter's moveset
+    _pickStrikeKey(f, pressed, held, ground) {
+      let limb = null;
+      for (const l of LIMBS) if (pressed & LIMB_BIT[l]) { limb = l; break; }
+      if (!limb) return null;
+      const mod = modOf(held);
+      if (ground) {
+        const hand = limb === 'lh' || limb === 'rh';
+        const kind = !hand ? 'gknee' : mod === 'mod1' ? 'gelbow' : mod === 'mod2' ? 'ghammer' : mod === 'mod3' ? 'gbody' : 'gpunch';
+        return limb + '_' + kind;
+      }
+      const kind = f.moveset[mod][limb];
+      // strike keys are lead / rear (orthodox: left leads). Southpaw, the button's own hand or leg is the other
+      // side's strike, which the mirrored ragdoll throws with that same hand or leg.
+      const side = isSouthpaw(f) ? OTHER_SIDE[limb] : limb;
+      const key = side + '_' + kind;
+      return STRIKES[key] ? key : side + '_' + DEFAULT_MOVESET[mod][limb];
+    }
+
+    _startStrike(f, key, chained) {
+      const st = STRIKES[key];
+      if (f.stam < 3) { // swinging on empty wears the tank down
+        f.stamMax = Math.max(STAM_MAX_FLOOR, f.stamMax - EMPTY_SWING_COST);
+        f.stam = Math.min(f.stam, f.stamMax); f.buf = null;
+        return;
+      }
+      let tf = (1.15 - f.stats.spd * 0.3) * (1 + (1 - f.stam / 100) * 0.4) * (f.rocked > 0 ? 1.3 : 1);
+      f.combo = chained ? Math.min(3, f.combo + 1) : 0;
+      f.comboT = 0.45;
+      f.buf = null;
+      const pdef = this.phys && !st.ground ? root.MMAPhys.STRIKES[key] : null;
+      const baseCost = (pdef && pdef.cost) ? pdef.cost : st.stam;
+      const cost = baseCost * (f.stam < 25 ? 0.6 : 1) * (chained ? 1.1 : 1);
+      if (cost > f.stam) f.stamMax = Math.max(STAM_MAX_FLOOR, f.stamMax - (cost - f.stam) * OVERDRAW_COST); // overdrawing the tank erodes it
+      f.stam = Math.max(0, Math.min(f.stam, f.stamMax) - cost);
+      if (pdef) {
+        const wind = pdef.active ? pdef.active[0] : pdef.w;
+        const live = pdef.active ? pdef.active[1] - pdef.active[0] : pdef.a;
+        f.act = { type: 'strike', name: key, t: 0, dur: pdef.dur * tf, tf, hit: false, slipped: false, chained: !!chained, cost, phys: true, cancelAt: (wind + live) * tf };
+        this.phys.fighters[f.idx].startStrike(pdef, tf);
+      } else {
+        f.act = { type: 'strike', name: key, t: 0, dur: (st.w + st.a + st.r) * tf, tf, hit: false, slipped: false, chained: !!chained, cost, cancelAt: (st.w + st.a) * tf };
+      }
+      f.repeatN = key === f.lastStrike ? f.repeatN + 1 : 1;
+      f.lastStrike = key;
+      f.act.powMul = Math.pow(0.5, Math.max(0, f.repeatN - REPEAT_FREE));
+      f.act.stunMul = f.repeatN > STUN_REPEAT_MAX ? 0 : f.act.powMul;
+      f.blocking = false; f.restT = 0;
+      f.rs.thrown++;
+      // the next kick waits until this one's foot has planted (see kickInFlight)
+      if (!st.ground && (st.limb === 'll' || st.limb === 'rl')) f.kickReady = this.state.t + f.act.dur + (st.push ? TEEP_PLANT_T : KICK_PLANT_T);
+    }
+
+    // a strike that finds nothing costs extra; one that lands clean gives some of its cost back
+    _missCost(f, act) { f.stam = Math.max(0, f.stam - (act.cost || 0) * MISS_PENALTY); }
+    _cleanRefund(f, act) { f.stam = Math.min(f.stamMax, f.stam + (act.cost || 0) * CLEAN_REFUND); }
+
+    _whiff(f, st) {
+      const o = this.state.f[1 - f.idx];
+      this._missCost(f, f.act);
+      if (f.act.slipped) {
+        this._emit({ k: 'miss', i: f.idx, j: o.idx, name: st.name, slipped: true });
+        f.act.dur *= 1.35; // over-committed
+      } else this._emit({ k: 'miss', i: f.idx, name: st.name, whiff: true });
+    }
+
+    // ---------------------------------------------------------
+    //  PHYSICS (standing): drive the ragdolls from the fighters' state, step the world,
+    //  turn contacts into hits, and publish bone poses for the renderer / network.
+    // ---------------------------------------------------------
+    _physTick(dt) {
+      const S = this.state, F = S.f, W = this.phys;
+      if (!W.active) W.setActive(true);
+      for (let i = 0; i < 2; i++) {
+        const f = F[i], rag = W.fighters[i], a = f.act;
+        rag.southpaw = isSouthpaw(f);
+        rag.guard = f.blocking && a.type !== 'strike';
+        rag.guardLow = rag.guard && !!(this.inputs[i].held & IN.MOD3);
+        rag.check = f.checking && a.type !== 'strike';
+        // body language from the action
+        let ov = null;
+        if (a.type === 'dodge') ov = a.t < 0.32 ? (a.name || 'SLIP') : null;
+        else if (a.type === 'push') ov = a.t < 0.26 ? 'PUSH' : null;
+        else if (a.type === 'takedown') ov = a.t < 0.32 ? 'SHOOT' : 'STUMBLE';
+        else if (a.type === 'stumble') ov = 'STUMBLE';
+        else if (a.type === 'sprawl') ov = 'SPRAWL';
+        else if (a.type === 'celebrate' || (S.phase === 'over' && S.result && S.result.winner === i)) ov = 'CELEBRATE';
+        rag.override = ov;
+        if (a.type === 'down' && !rag.ko) rag.knockOut();
+        rag.wobble = f.rocked > 0 ? (f.rockLight ? ROCK_LIGHT_WOBBLE : Math.min(1, 0.4 + f.rocked * 0.25)) : 0;
+        rag.gainTarget = f.rocked > 0 ? (f.rockLight ? 0.85 : 0.72) : (f.stam < 15 ? 0.85 : 1);
+        if (S.phase !== 'fight' || a.type === 'hit' || a.type === 'down' || a.type === 'kd') { rag.move[0] = 0; rag.move[1] = 0; rag.guard = false; rag.check = false; }
+        // the sim may have replaced a strike (hit reaction, takedown landed): keep the ragdoll honest
+        if (a.type !== 'strike' && rag.strike) rag.cancelStrike();
+      }
+      const hits = W.step();
+      for (let i = 0; i < 2; i++) {
+        const f = F[i], rag = W.fighters[i];
+        const p = rag.position(), v = rag.velocity();
+        f.x = p.x; f.z = p.z; f.vx = v.x; f.vz = v.z;
+      }
+      for (let i = 0; i < 2; i++) {
+        const f = F[i], o = F[1 - i], a = f.act, h = hits[i];
+        if (a.type !== 'strike' || !a.phys || a.hit) continue;
+        const def = root.MMAPhys.STRIKES[a.name];
+        const st = STRIKES[a.name];
+        if (h && !h.glance && S.phase === 'fight' && o.act.type !== 'kd') { a.hit = true; this._landPhys(f, o, def, h); }
+        else if (a.t >= a.cancelAt) { a.hit = true; this._whiff(f, STRIKES[a.name] || def); }
+      }
+      if (S.ground || !W.active) return; // a knockdown / takedown landed during this tick: the ragdolls are parked
+      for (let i = 0; i < 2; i++) F[i].pose = W.fighters[i].snapshot(F[i].pose);
+    }
+
+    // a physical contact becomes damage (sim units), stamina, events and a hit reaction
+    _landPhys(f, o, def, h) {
+      const PH = root.MMAPhys;
+      const rag = this.phys.fighters[o.idx];
+      // a low kick into a lifted lead leg is checked: the shin-on-shin hurts the kicker more than the defender
+      const checked = o.checking && def.isKick && def.part === 'legs' && h.region === 'legs';
+      // scored as the clean thigh shot it would have been; CHECK_DMG / CHECK_SELF_DMG then split it
+      const res = PH.impactDamage(def, checked ? Object.assign({}, h, { partName: 'thigh' }) : h, f, o.blocking && !checked, o.blocking && !!(this.inputs[o.idx].held & IN.MOD3));
+      if (checked) { res.blocked = true; res.region = 'legs'; }
+      const part = res.region;
+      const counter = o.act.type === 'strike' && !o.act.hit;
+      let dmg = res.dmg * (0.7 + f.stats.pow * 0.6) * lerp(0.9, 1.1, this.rand());
+      if (f.act.powMul != null) dmg *= f.act.powMul;
+      if (counter) dmg *= 1.35;
+      if (o.rocked > 0) dmg *= 1.25;
+      if (f.rocked > 0) dmg *= 0.7;
+      const oSt = o.act.type === 'strike' ? STRIKES[o.act.name] : null;
+      const oKicking = !!oSt && !o.act.hit && !oSt.ground && (oSt.limb === 'll' || oSt.limb === 'rl');
+      const kickCancel = oKicking && (def.limb === 'lh' || def.limb === 'rh') && !res.blocked && dmg >= KICK_CANCEL_DMG;
+      if (kickCancel) dmg *= KICK_CANCEL_BONUS;
+      const at = [Math.round(h.point.x * 100) / 100, Math.round(h.point.y * 100) / 100, Math.round(h.point.z * 100) / 100]; // contact point; `seg` / `weapon` name the collider struck and the one that struck it, so the renderer can mark the skin where it landed
+      const fwd = this._frame(f, o);
+      if (checked) {
+        f.dmg.legs = clamp(f.dmg.legs + dmg * CHECK_SELF_DMG * (PART_TOUGHNESS.legs || 1), 0, 100);
+        dmg *= CHECK_DMG;
+      }
+      o.dmg[part] = clamp(o.dmg[part] + dmg * (PART_TOUGHNESS[part] || 1), 0, 100);
+      if (res.blocked) f.rs.blocked++; else f.rs.landed++; // blocked / checked shots count apart from clean ones
+      f.rs.sig += dmg;
+      rag.takeHit(h, dmg, res.blocked);
+      if (res.blocked) {
+        if (o.blocking) o.stam = Math.min(o.stamMax, o.stam + def.cost * BLOCK_REWARD); // a stray arm in the way is free, a real block is rewarded
+        this._emit({ k: 'block', i: f.idx, j: o.idx, name: def.name, kind: def.kind, part, at, seg: h.seg, weapon: h.weapon, passive: !o.blocking && !checked, checked, vn: Math.round(h.vn * 10) / 10 });
+        if (def.push) rag.shove(fwd.fx, fwd.fz, PHYS_PUSH * 0.5);
+        return;
+      }
+      this._cleanRefund(f, f.act);
+      if (kickCancel) this._missCost(o, o.act);
+      o.hitChain = (o.act.type === 'hit' && this.state.t - (o.lastHitT || -9) < 0.7) ? (o.hitChain || 0) + 1 : 0;
+      o.lastHitT = this.state.t;
+      // repeat penalty: stun is scaled by stunMul off the unpenalised damage, so the power cut doesn't count twice
+      const pm = f.act.powMul || 1, sm = f.act.stunMul != null ? f.act.stunMul : 1;
+      const stun = ((0.2 + dmg / pm * 0.025) * 0.6 * Math.pow(0.6, o.hitChain) + (kickCancel ? KICK_CANCEL_STUN : 0)) * sm;
+      if (def.name !== 'jab' && sm > 0) { // the jab scores damage without hitstun
+        o.act = { type: 'hit', name: part, t: 0, dur: stun, hit: false };
+        o.blocking = false;
+      }
+      if (def.push) rag.shove(fwd.fx, fwd.fz, PHYS_PUSH);
+      const ev = this._emit({ k: 'hit', i: f.idx, j: o.idx, name: def.name, kind: def.kind, part, intended: def.part, dmg: Math.round(dmg * 10) / 10, counter, big: dmg >= 3.6,
+        vn: Math.round(h.vn * 10) / 10, clean: Math.round(h.clean * 100) / 100, momentum: h.vn >= 8, combo: f.combo, kickCancel, at, seg: h.seg, weapon: h.weapon, phys: true });
+      this._afterHit(f, o, part, dmg, ev, false);
+    }
+
+    _afterHit(f, o, part, dmg, ev, onGround) {
+      // head and body damage shrink the tank
+      if (part === 'head') o.stamMax = Math.max(STAM_MAX_FLOOR, o.stamMax - dmg * 0.35);
+      else if (part === 'body') o.stamMax = Math.max(STAM_MAX_FLOOR, o.stamMax - dmg * 0.7);
+      if (o.stam > o.stamMax) o.stam = o.stamMax;
+      // rocked / knockdown
+      if (part === 'head') {
+        const thr = (4.6 + o.stats.chin * 4.6) * (1 - o.dmg.head / 170);
+        // a rocked fighter goes down to a solid follow-up shot, not to a pawing jab; the bar drops as his head damage climbs
+        const kdThr = Math.max(KD_THR_MIN, thr * KD_THR_FRAC);
+        if (o.rocked > 0 && dmg >= kdThr && !onGround) {
+          this._knockdown(f, o);
+        } else if (dmg >= thr) {
+          // most rocks are a short stun; now and then (or on a shot that nearly drops him) he's properly dazed
+          if (this.rand() < ROCK_HEAVY_P || dmg >= thr * KD_FLASH_FRAC) {
+            o.rocked = Math.max(o.rocked, (ROCK_T0 + dmg * ROCK_PER_DMG) * ROCK_TIME_MULT);
+            o.rockLight = false;
+            o.wobble = 1;
+          } else {
+            if (o.rocked <= 0) o.rockLight = true; // never downgrade a heavy daze still running
+            o.rocked = Math.max(o.rocked, ROCK_LIGHT_T);
+            o.wobble = Math.max(o.wobble, 0.3);
+          }
+          ev.rocked = true;
+          this._emit({ k: 'rocked', i: f.idx, j: o.idx });
+          if (!onGround && dmg >= thr * KD_FLASH_FRAC) this._knockdown(f, o);
+        }
+      } else if (part === 'body' && dmg >= 3.6 && this.rand() < 0.35) {
+        o.stam = Math.max(0, o.stam - 12);
+        ev.winded = true;
+      } else if (part === 'legs' && o.dmg.legs > 65 && dmg >= 3 && this.rand() < 0.4 && !onGround) {
+        o.act = { type: 'stumble', name: 'legs', t: 0, dur: 0.9, hit: false };
+        ev.buckled = true;
+      }
+    }
+
+    _resolveGroundStrike(f, st) {
+      const S = this.state, o = S.f[1 - f.idx];
+      if (!S.ground) return;
+      const posMul = f.ground === 'top' ? POS_STRIKE[S.ground.pos] : 0.5;
+      let dmg = st.dmg * posMul * (0.7 + f.stats.pow * 0.6) * (0.6 + 0.4 * f.stam / 100) * lerp(0.85, 1.15, this.rand());
+      if (f.act.powMul != null) dmg *= f.act.powMul;
+      if (o.rocked > 0) dmg *= 1.25;
+      if (f.rocked > 0) dmg *= 0.7;
+      let blocked = false;
+      if (o.cover) { blocked = true; dmg *= 0.3; o.stam = Math.min(o.stamMax, o.stam + GROUND_BLOCK_REWARD); }
+      S.ground.adv[f.idx] = Math.min(ADV_MAX, S.ground.adv[f.idx] + (blocked ? 1.5 : dmg * 5)); // strikes feed the positional battle
+      o.dmg[st.part] = clamp(o.dmg[st.part] + dmg * (PART_TOUGHNESS[st.part] || 1), 0, 100);
+      f.rs.landed++; f.rs.sig += dmg;
+      if (blocked) { this._emit({ k: 'block', i: f.idx, j: o.idx, name: st.name, part: st.part }); return; }
+      this._cleanRefund(f, f.act);
+      const pm = f.act.powMul || 1, sm = f.act.stunMul != null ? f.act.stunMul : 1;
+      const stun = (0.2 + dmg / pm * 0.025) * 0.5 * sm;
+      if (sm > 0) o.act = { type: 'hit', name: st.part, t: 0, dur: stun, hit: false };
+      this._work();
+      const ev = this._emit({ k: 'hit', i: f.idx, j: o.idx, name: st.name, kind: st.kind, part: st.part, intended: st.part, dmg: Math.round(dmg * 10) / 10, counter: false, big: dmg >= 3.6, ground: true });
+      this._afterHit(f, o, st.part, dmg, ev, true);
+    }
+
+    _knockdown(att, vic) {
+      const S = this.state;
+      if (S.ground) return;
+      vic.kdCount++; att.rs.kd++;
+      vic.rocked = Math.max(vic.rocked, 3 * ROCK_TIME_MULT); vic.rockLight = false;
+      if (vic.dmg.head >= 84) { this._emit({ k: 'kd', i: att.idx, j: vic.idx, standing: !S.grappling }); vic.dmg.head = 100; return; } // flash KO, caught by stoppage check
+      this._emit({ k: 'kd', i: att.idx, j: vic.idx });
+      if (this.phys) {
+        // he drops where he stands; the fall / down / rise phases run in _kdTick
+        vic.rocked = Math.max(vic.rocked, KD_ROCKED * ROCK_TIME_MULT);
+        vic.act = { type: 'kd', name: 'fall', t: 0, dur: 99, hit: false };
+        vic.blocking = false; vic.buf = null;
+        vic.stamMax = Math.max(STAM_MAX_FLOOR, vic.stamMax - 6);
+        const rag = this.phys.fighters[vic.idx], fr = this._frame(att, vic);
+        // which way he goes: a shot that drives him back sits him down onto his back (he comes up in an open guard);
+        // otherwise — or when the legs just give out — he crumples forward onto his hands and knees (turtle)
+        const facing = Math.sin(rag.yaw) * fr.fx + Math.cos(rag.yaw) * fr.fz; // shove along his own facing (< 0: pushed backward)
+        const dir = facing < -0.2 && this.rand() < 0.65 ? 'back' : 'fwd';
+        rag.knockDown(KD_FALL, dir, this.rand() < 0.5 ? -1 : 1);
+        rag.shove(fr.fx, fr.fz, dir === 'back' ? KD_SHOVE : KD_SHOVE * 0.35);
+        return;
+      }
+      if (!S.grappling) { vic.rocked = Math.max(vic.rocked, 4 * ROCK_TIME_MULT); vic.act = { type: 'hit', name: 'head', t: 0, dur: 1.0, hit: false }; return; }
+      this._enterGround(att, vic, 'kd', 'half');
+    }
+
+    _resolveTakedown(f) {
+      const S = this.state, o = S.f[1 - f.idx];
+      const dist = Math.hypot(o.x - f.x, o.z - f.z);
+      if (dist > 1.85) {
+        f.act = { type: 'stumble', name: 'td', t: 0, dur: 0.7 * TD_FAIL_STUN, hit: false };
+        f.tdCd = TD_FAIL_CD;
+        this._emit({ k: 'tdfail', i: f.idx, j: o.idx, air: true });
+        return;
+      }
+      let p = 0.38 + (f.stats.wre - o.stats.wre) * 0.45;
+      if (o.act.type === 'strike' && !o.act.hit) p += 0.22;      // caught mid-strike
+      if (o.act.type === 'dodge') p -= 0.1;
+      if (o.blocking) p -= 0.33;                                  // sprawl
+      if (o.rocked > 0) p += 0.3;
+      p += (100 - o.stam) / 400 - (100 - f.stam) / 300;
+      p += (o.dmg.legs / 250);
+      p = clamp(p, 0.08, 0.92);
+      if (this.rand() < p) {
+        f.rs.td++;
+        o.stam = Math.max(0, o.stam - 6);
+        this._emit({ k: 'td', i: f.idx, j: o.idx });
+        this._enterGround(f, o, 'td', (o.act.type === 'strike' || o.rocked > 0) && f.stats.wre > 0.7 ? 'half' : 'guard');
+      } else {
+        f.act = { type: 'stumble', name: 'td', t: 0, dur: 0.95 * TD_FAIL_STUN, hit: false };
+        f.tdCd = TD_FAIL_CD;
+        f.stam = Math.max(0, f.stam - 6);
+        if (o.blocking) o.act = { type: 'sprawl', name: '', t: 0, dur: 0.35, hit: false };
+        this._emit({ k: 'tdfail', i: f.idx, j: o.idx, sprawl: o.blocking });
+      }
+    }
+
+    _enterGround(top, bottom, how, pos) {
+      const S = this.state;
+      const mx = (top.x + bottom.x) / 2, mz = (top.z + bottom.z) / 2;
+      // keep off the fence a bit
+      const r = Math.hypot(mx, mz), lim = CAGE_R - 0.9;
+      const cx = r > lim ? mx * lim / r : mx, cz = r > lim ? mz * lim / r : mz;
+      top.x = cx; top.z = cz; bottom.x = cx; bottom.z = cz;
+      top.vx = top.vz = bottom.vx = bottom.vz = 0;
+      top.ground = 'top'; bottom.ground = 'bottom';
+      top.blocking = false; bottom.blocking = false; top.buf = null; bottom.buf = null;
+      top.act = idleAct();
+      bottom.act = { type: 'hit', name: 'head', t: 0, dur: how === 'kd' ? 0.8 : 0.5, hit: false };
+      S.ground = { top: top.idx, bottom: bottom.idx, pos: pos || 'guard', trans: null, sub: null, ctrlT: 0, idleT: 0, refWarn: false, cd: [0, 0], mom: [0, 0], adv: [0, 0], n: 0 };
+      S.ground.adv[top.idx] = how === 'kd' ? 30 : 15; // landing on top is a head start
+      if (this.phys) { this.phys.setActive(false); top.pose = null; bottom.pose = null; }
+    }
+
+    _standUp(reason) {
+      const S = this.state; if (!S.ground) return;
+      const top = S.f[S.ground.top], bot = S.f[S.ground.bottom];
+      top.ground = null; bot.ground = null;
+      top.act = idleAct();
+      bot.act = idleAct();
+      top.posture = false; bot.posture = false; top.cover = false; bot.cover = false;
+      // separate
+      const ang = this.rand() * Math.PI * 2;
+      bot.x = clamp(bot.x + Math.cos(ang) * 0.9, -CAGE_R, CAGE_R); bot.z = clamp(bot.z + Math.sin(ang) * 0.9, -CAGE_R, CAGE_R);
+      top.x = clamp(top.x - Math.cos(ang) * 0.6, -CAGE_R, CAGE_R); top.z = clamp(top.z - Math.sin(ang) * 0.6, -CAGE_R, CAGE_R);
+      S.ground = null;
+      if (this.phys) { this.phys.place(top, bot); this.phys.setActive(true); }
+      this._emit({ k: 'standup', i: bot.idx, reason });
+    }
+
+    _setPos(pos) {
+      const S = this.state, G = S.ground;
+      G.pos = pos; this._work();
+    }
+    // reversal: the bottom fighter becomes the top fighter
+    _flip(pos) {
+      const S = this.state, G = S.ground;
+      const top = S.f[G.top], bot = S.f[G.bottom];
+      top.ground = 'bottom'; bot.ground = 'top';
+      G.top = bot.idx; G.bottom = top.idx;
+      top.posture = false; bot.posture = false;
+      this._setPos(pos);
+    }
+
+    // ---------------------------------------------------------
+    //  GROUND
+    //  - GRAPPLE + direction: a transition. The other fighter has a short window (G.trans.win) to deny it with
+    //    GRAPPLE + the same direction; his first GRAPPLE + direction is his one guess for that move. Right: the
+    //    move is denied, the attacker is exposed, the denier gets momentum (and a risky move's `read` punishment).
+    //    Wrong or nothing: it lands, and a wrong guess leaves the defender open too. One key does both: when you
+    //    are free GRAPPLE + direction is your move, while their move is up it is your read.
+    //  - GRAPPLE alone: submission entry, a read like any other move (deny with GRAPPLE + BACK). Once locked: hold
+    //    GRAPPLE to squeeze, tap a direction to crank (a read the defender matches with GRAPPLE + that direction).
+    //    Progress 100 = tap, 0 = escape. The defender hand-fights with BLOCK to slow the squeeze.
+    //  - Limb keys: strikes (power depends on position; bottom can only strike from guard / half guard). Landed
+    //    strikes build grapple advantage, which shortens the opponent's deny windows.
+    //  - BLOCK: top postures, bottom covers (strikes do 30 %). It never reads.
+    //  - Momentum: landing a move or a correct deny makes your next move harder to deny for MOMENTUM_T seconds.
+    // ---------------------------------------------------------
+    _groundTick(dt) {
+      const S = this.state, G = S.ground;
+      const top = S.f[G.top], bot = S.f[G.bottom];
+      const ti = this.inputs[top.idx], bi = this.inputs[bot.idx];
+      top.rs.ctrl += dt; G.ctrlT += dt; G.idleT += dt;
+      top.blocking = false; bot.blocking = false;
+      for (let i = 0; i < 2; i++) {
+        G.cd[i] = Math.max(0, G.cd[i] - dt);
+        G.mom[i] = Math.max(0, G.mom[i] - dt);
+        G.adv[i] = Math.max(0, G.adv[i] - ADV_DECAY * dt);
+      }
+      // covering / posturing is BLOCK; reading is GRAPPLE + a direction, and you cannot do both at once
+      for (const [f, inp] of [[top, ti], [bot, bi]]) {
+        f.cover = !!(inp.held & IN.BLOCK) && !(inp.held & IN.GRAPPLE);
+        f.posture = f.cover && f.act.type === 'idle';   // what the renderer draws
+        if (inp.held & IN.BLOCK) f.stam = Math.max(0, f.stam - dt * (f === top ? 2.0 : 3.0)); // basing / framing is work
+      }
+
+      if (G.sub) { this._subTick(dt); return; }
+      if (G.trans) { this._transTick(dt); if (!S.ground || G.trans) return; }
+
+      const roles = [[top, ti, 'top'], [bot, bi, 'bottom']];
+      for (const [f, inp, role] of roles) {
+        const o = role === 'top' ? bot : top;
+        if (f.act.type !== 'idle') continue; // no recovery-cancels on the mat: ground strikes are deliberate
+        if (role === 'top' && (inp.pressed & IN.DODGE)) { this._standUp('letup'); return; }
+        if (inp.pressed & IN.GRAPPLE && f.rocked <= 0 && G.cd[f.idx] <= 0) {
+          const dir = dirOf(inp.held);
+          const mv = dir && MOVES[role][G.pos][dir];
+          if (mv) { if (f.stam >= mv.stam) this._startTrans(f, o, role, mv, dir); return; }
+          if (dir) continue; // no move that way from here
+          const subs = SUBS_BY[role][G.pos];
+          if (subs.length && f.stam > 12) {
+            const name = subs[Math.floor(this.rand() * subs.length)];
+            this._startTrans(f, o, role, { name, sub: true, stam: SUB_ATTEMPT_STAM, winMul: role === 'bottom' ? 2.8 : 1.4 }, SUB_DENY_DIR); // a sub off your back is slow to set up: twice the window
+            return;
+          }
+        } else if ((inp.pressed & LIMB_BITS) && !(inp.held & IN.BLOCK)) {
+          if (role === 'top' || BOTTOM_CAN_STRIKE[G.pos]) {
+            const key = this._pickStrikeKey(f, inp.pressed, inp.held, true);
+            if (key) { this._startStrike(f, key, false); this._work(); }
+          }
+        }
+      }
+      if (G.idleT > REF_WARN_T && !G.refWarn) { G.refWarn = true; this._emit({ k: 'refwarn' }); }
+      if (G.idleT > REF_STAND_T) { this._standUp('ref'); return; }
+    }
+
+    // somebody did something: the referee's stand-up clock restarts
+    _work() { const G = this.state.ground; if (G) { G.idleT = 0; G.refWarn = false; } }
+
+    // how long the defender gets to read a move
+    _denyWindow(att, def, mv, role) {
+      const G = this.state.ground;
+      let w = MOVE_WIN * (mv.winMul || 1);
+      if (role === 'top') w *= 1 + (def.stats.bjj - att.stats.wre) * 0.35;
+      else w *= 1 + (def.stats.wre - att.stats.bjj) * 0.35;
+      w *= 1 + (def.stam - att.stam) / 400;              // the fresher man reacts
+      if (def.rocked > 0) w *= 0.5;
+      if (G.mom[att.idx] > 0) w *= MOMENTUM_WIN;
+      w *= 1 - G.adv[att.idx] / ADV_WIN;
+      return clamp(w, MOVE_WIN_MIN, MOVE_WIN_MAX);
+    }
+
+    _startTrans(f, o, role, mv, dir) {
+      const G = this.state.ground;
+      f.stam = Math.max(0, f.stam - mv.stam);
+      const win = this._denyWindow(f, o, mv, role);
+      const dur = Math.max(win + 0.12, MOVE_DUR * (G.mom[f.idx] > 0 ? 0.8 : 1));
+      G.trans = { id: ++G.n, by: f.idx, role, name: mv.name, mv, dir, t: 0, dur, win, guess: null, res: null, sub: !!mv.sub };
+      this._work();
+      f.act = { type: 'trans', name: mv.name, t: 0, dur, hit: false, dir };
+      this._emit({ k: 'gattempt', i: f.idx, j: o.idx, name: mv.name, dir, sub: !!mv.sub });
+    }
+
+    _transTick(dt) {
+      const S = this.state, G = S.ground, T = G.trans;
+      const f = S.f[T.by], o = S.f[1 - T.by];
+      T.t += dt;
+      // the deny window: the defender's first GRAPPLE + direction is his guess (one per move). A fighter who is
+      // busy (swinging, stunned, exposed) has no guess: he was caught.
+      if (T.res === null) {
+        const inp = this.inputs[o.idx];
+        if (T.guess === null && o.act.type === 'idle' && (inp.held & IN.GRAPPLE)) {
+          const d = dirOf(inp.held);
+          if (d) { T.guess = d; o.stam = Math.max(0, o.stam - DENY_STAM); }
+        }
+        if (T.t >= T.win) {
+          T.res = T.guess === T.dir ? 'denied' : T.guess ? 'wrong' : 'land';
+          this._emit({ k: 'gread', i: o.idx, j: f.idx, name: T.name, res: T.res, sub: T.sub });
+        }
+      }
+      if (T.t < T.dur) return;
+      const mv = T.mv, res = T.res;
+      G.trans = null; G.cd[f.idx] = MOVE_CD; this._work();
+      f.act = idleAct();
+      if (res === 'denied') {
+        f.act = { type: 'hit', name: 'body', t: 0, dur: 0.45, hit: false }; // exposed: the denier gets a free move
+        f.stam = Math.max(0, f.stam - 3);
+        G.mom[o.idx] = MOMENTUM_T; G.mom[f.idx] = 0;
+        G.adv[o.idx] = Math.min(ADV_MAX, G.adv[o.idx] + 10);
+        if (T.sub) { G.cd[f.idx] = SUB_FAIL_CD; this._emit({ k: 'subfail', i: f.idx, j: o.idx, name: T.name, stuffed: true }); return; }
+        const rd = mv.read;
+        if (rd && rd.flip) { o.rs.td++; this._flip(rd.flip); }
+        else if (rd && rd.to) this._setPos(rd.to);
+        this._emit({ k: 'gresult', i: f.idx, j: o.idx, ok: false, name: mv.name, denied: true, pos: rd ? (rd.flip || rd.to) : null, flip: !!(rd && rd.flip) });
+        return;
+      }
+      // it lands (no read, or the wrong one: a wrong guess also leaves the defender open)
+      G.mom[f.idx] = MOMENTUM_T; G.mom[o.idx] = 0;
+      G.adv[f.idx] = Math.min(ADV_MAX, G.adv[f.idx] + (res === 'wrong' ? 18 : 12));
+      if (res === 'wrong') o.act = { type: 'hit', name: 'body', t: 0, dur: 0.35, hit: false };
+      if (T.sub) { this._startSub(f, o, T.role, T.name); return; }
+      if (mv.stand) { this._emit({ k: 'gresult', i: f.idx, j: o.idx, ok: true, name: mv.name, stand: true, wrong: res === 'wrong' }); this._standUp('escape'); return; }
+      if (mv.flip) { f.rs.td++; this._flip(mv.flip); this._emit({ k: 'gresult', i: f.idx, j: o.idx, ok: true, name: mv.name, flip: true, pos: mv.flip, wrong: res === 'wrong' }); return; }
+      this._setPos(mv.to);
+      this._emit({ k: 'gresult', i: f.idx, j: o.idx, ok: true, name: mv.name, pos: mv.to, wrong: res === 'wrong' });
+    }
+
+    _startSub(f, o, role, name) {
+      const G = this.state.ground;
+      G.sub = { name, att: f.idx, def: o.idx, role, prog: 15 + f.stats.bjj * 10, t: 0, squeezing: false, defending: false, crank: null, crankCd: 0.5, n: 0 };
+      this._work();
+      f.act = { type: 'sub', name, t: 0, dur: 99, hit: false };
+      o.act = { type: 'caught', name, t: 0, dur: 99, hit: false };
+      f.rs.subs++;
+      this._emit({ k: 'sub', i: f.idx, j: o.idx, name });
+    }
+
+    _subTick(dt) {
+      const S = this.state, G = S.ground, sub = G.sub;
+      const att = S.f[sub.att], def = S.f[sub.def];
+      const ai = this.inputs[att.idx], di = this.inputs[def.idx];
+      sub.t += dt;
+      sub.crankCd = Math.max(0, sub.crankCd - dt);
+      sub.squeezing = !!(ai.held & IN.GRAPPLE);
+      sub.defending = !!(di.held & IN.BLOCK) && !(di.held & IN.GRAPPLE); // hand fighting; GRAPPLE + direction is a read instead
+      if (sub.squeezing) {
+        let rate = (4 + att.stats.bjj * 5) * (1 + (100 - def.stam) / 200) * (def.rocked > 0 ? 1.5 : 1);
+        if (sub.defending) rate *= 0.5;
+        sub.prog += rate * dt;
+        att.stam = Math.max(0, att.stam - dt * 6);
+      } else sub.prog -= SUB_DECAY * dt;
+      if (di.held & IN.BLOCK) def.stam = Math.max(0, def.stam - dt * 3);
+      // cranks: the attacker taps a direction; the defender reads it with GRAPPLE + the same direction
+      const C = sub.crank;
+      if (C) {
+        C.t += dt;
+        if (C.guess === null && (di.held & IN.GRAPPLE)) { const d = dirOf(di.held); if (d) { C.guess = d; def.stam = Math.max(0, def.stam - DENY_STAM); } }
+        if (C.t >= C.win) {
+          sub.crank = null; sub.crankCd = SUB_CRANK_CD;
+          if (C.guess === C.dir) { sub.prog -= SUB_CRANK_LOSS; att.stam = Math.max(0, att.stam - 4); this._emit({ k: 'subcrank', i: att.idx, j: def.idx, name: sub.name, ok: false }); }
+          else { sub.prog += SUB_CRANK_GAIN * (def.rocked > 0 ? 1.4 : 1); this._emit({ k: 'subcrank', i: att.idx, j: def.idx, name: sub.name, ok: true, wrong: !!C.guess }); }
+        }
+      } else if (sub.crankCd <= 0 && att.stam >= 4 && (ai.pressed & DIR_BITS)) {
+        const d = dirOf(ai.pressed);
+        att.stam = Math.max(0, att.stam - 4);
+        const win = SUB_CRANK_WIN * (1 + (def.stats.bjj - att.stats.bjj) * 0.4) * (1 + (def.stam - att.stam) / 400) * (def.rocked > 0 ? 0.6 : 1);
+        sub.crank = { id: ++sub.n, dir: d, t: 0, win: clamp(win, MOVE_WIN_MIN, MOVE_WIN_MAX), guess: null };
+      }
+      sub.prog = clamp(sub.prog, 0, 100);
+      if (sub.prog >= 100) {
+        this._endRound(true);
+        this._emit({ k: 'tap', i: att.idx, j: def.idx, name: sub.name });
+        def.act = { type: 'down', name: '', t: 0, dur: 99, hit: false };
+        att.act = { type: 'celebrate', name: '', t: 0, dur: 99, hit: false };
+        const min = Math.floor((S.roundLen - S.clock) / 60), sec = Math.floor((S.roundLen - S.clock) % 60);
+        this._finish({ method: 'Submission (' + sub.name + ')', winner: att.idx, round: S.round, time: min + ':' + (sec < 10 ? '0' : '') + sec });
+        return;
+      }
+      if (sub.prog <= 0 || att.stam <= 1) {
+        const pos = subEscapePos(sub.role, G.pos);
+        G.sub = null; G.cd[att.idx] = SUB_FAIL_CD;
+        att.stam = Math.max(0, att.stam - 4);
+        att.act = { type: 'hit', name: 'body', t: 0, dur: 0.5, hit: false };
+        def.act = idleAct();
+        G.mom[def.idx] = MOMENTUM_T;
+        this._emit({ k: 'subescape', i: def.idx, j: att.idx, name: sub.name });
+        this._setPos(pos);
+      }
+    }
+
+    _countBits(v) { let c = 0; while (v) { c += v & 1; v >>>= 1; } return c; }
+  }
+
+  // ---------- Commentary ----------
+  function describe(ev, S) {
+    const n = i => S.f[i].name;
+    switch (ev.k) {
+      case 'bell': return ev.end ? 'End of round ' + ev.round + '.' : 'Round ' + ev.round + ' — FIGHT!';
+      case 'round': return 'Round ' + ev.round + ' coming up.';
+      case 'stance': return n(ev.i) + ' switches to ' + (ev.southpaw ? 'southpaw' : 'orthodox') + '.';
+      case 'hit': {
+        const where = ev.part && ev.intended && ev.part !== ev.intended ? ' to the ' + (ev.part === 'legs' ? 'leg' : ev.part) : '';
+        if (ev.rocked) return n(ev.i) + ' ROCKS ' + n(ev.j) + ' with a ' + ev.name + where + '!';
+        if (ev.kickCancel) return n(ev.i) + ' catches ' + n(ev.j) + ' on one leg with a ' + ev.name + where + '!';
+        if (ev.counter) return 'Counter ' + ev.name + where + ' by ' + n(ev.i) + '!';
+        if (ev.buckled) return n(ev.j) + "'s leg buckles from that " + ev.name + '!';
+        if (ev.winded) return 'That ' + ev.name + ' takes the wind out of ' + n(ev.j) + '.';
+        if (ev.momentum) return n(ev.j) + ' walks into a ' + ev.name + where + '!';
+        if (ev.combo >= 2) return n(ev.i) + ' follows up with a ' + ev.name + where + (ev.combo >= 3 ? ' — beautiful combination!' : '.');
+        if (ev.big) return n(ev.i) + ' lands a heavy ' + ev.name + where + '.';
+        if (ev.jammed) return n(ev.i) + "'s " + ev.name + ' is smothered' + where + ' — no room on it.';
+        return n(ev.i) + ' lands a ' + ev.name + where + '.';
+      }
+      case 'block': return ev.checked ? n(ev.j) + ' checks the ' + ev.name + '!' : ev.passive ? n(ev.i) + "'s " + ev.name + ' is picked off by the arms.' : n(ev.j) + ' blocks the ' + ev.name + '.';
+      case 'slip': return n(ev.i) + ' slips the ' + ev.name + '.';
+      case 'push': return ev.ok ? n(ev.i) + ' shoves ' + n(ev.j) + ' off.' : n(ev.i) + ' pushes at air.';
+      case 'miss': return ev.slipped ? n(ev.j) + ' slips the ' + ev.name + '.' : n(ev.i) + ' misses with the ' + ev.name + '.';
+      case 'rocked': return null;
+      case 'kd': return n(ev.j) + ' GOES DOWN!';
+      case 'follow': return n(ev.i) + ' dives on him!';
+      case 'getup': return ev.forced ? 'The referee waves ' + n(ev.i) + ' back up.' : n(ev.i) + ' climbs back to his feet.';
+      case 'shoot': return n(ev.i) + ' shoots for the takedown...';
+      case 'td': return 'Takedown complete — ' + n(ev.i) + ' is on top.';
+      case 'tdfail': return ev.sprawl ? n(ev.j) + ' sprawls and stuffs it!' : ev.air ? n(ev.i) + ' shoots at air.' : n(ev.j) + ' defends the takedown.';
+      case 'gattempt': return ev.sub ? n(ev.i) + ' is hunting for a ' + ev.name + '!' : n(ev.i) + (ev.name.indexOf('stand') >= 0 ? ' tries to ' : ' goes for the ') + ev.name + '...';
+      case 'gread': return null;
+      case 'refwarn': return 'The referee wants some action.';
+      case 'subcrank': return ev.ok ? n(ev.i) + ' cranks the ' + ev.name + ' tighter!' : n(ev.j) + ' reads the crank and loosens the ' + ev.name + '.';
+      case 'gresult': {
+        if (ev.ok) {
+          if (ev.stand) return n(ev.i) + ' gets back to his feet!';
+          if (ev.flip) return 'REVERSAL! ' + n(ev.i) + ' sweeps into ' + POS_NAME[ev.pos] + (ev.wrong ? ' as ' + n(ev.j) + ' guesses wrong!' : '!');
+          return n(ev.i) + ' ' + (ev.name.indexOf('pass') >= 0 ? 'passes to ' : ev.name.indexOf('mount') >= 0 ? 'takes the ' : 'gets to ') + POS_NAME[ev.pos] + '.';
+        }
+        if (ev.flip) return 'REVERSAL! ' + n(ev.j) + ' reads the ' + ev.name + ' and sweeps into ' + POS_NAME[ev.pos] + '!';
+        if (ev.pos) return n(ev.j) + ' reads the ' + ev.name + ' and punishes it: ' + POS_NAME[ev.pos] + '!';
+        return n(ev.j) + ' reads the ' + ev.name + ' and shuts it down.';
+      }
+      case 'subescape': return n(ev.i) + ' slips out of the ' + ev.name + '!';
+      case 'subhold': return n(ev.i) + ' keeps the ' + ev.name + ' locked in.';
+      case 'standup': return ev.reason === 'ref' ? 'The referee stands them up.' : ev.reason === 'letup' ? n(ev.i) + ' is let back to his feet.' : null;
+      case 'sub': return n(ev.i) + ' LOCKS UP the ' + ev.name + '!';
+      case 'subfail': return ev.stuffed ? n(ev.j) + ' sees the ' + ev.name + ' coming and shuts it down.' : n(ev.j) + ' works free of the ' + ev.name + '.';
+      case 'tap': return "IT'S OVER! " + n(ev.j) + ' taps to the ' + ev.name + '!';
+      case 'ko': return "IT'S ALL OVER! " + n(ev.i) + ' wins by ' + ev.method + '!';
+      case 'end': return null;
+    }
+    return null;
+  }
+
+  const API = { IN, STRIKES, ROSTER, SUBS, POS_NAME, MOVES, SUBS_BY, SUB_DENY_DIR, BOTTOM_CAN_STRIKE, GROUND: { MOVE_WIN, MOVE_DUR, MOMENTUM_T, ADV_MAX, REF_WARN_T, REF_STAND_T, SUB_CRANK_CD }, Sim, describe, CAGE_R, DT, BREAK_T,
+    KD: { FALL: KD_FALL, STAY: KD_STAY, RISE: KD_RISE, FOLLOW_DIST: KD_FOLLOW_DIST },
+    LIMBS, LIMB_BIT, LIMB_NAME, MODS, MOD_BIT, HAND_KINDS, LEG_KINDS, KIND_LABEL, KIND_STATS, DEFAULT_MOVESET, normalizeMoveset, modOf, isSouthpaw, strikeTip, TIP_R, recovering, mulberry32 };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  root.MMASim = API;
+})(typeof window !== 'undefined' ? window : globalThis);

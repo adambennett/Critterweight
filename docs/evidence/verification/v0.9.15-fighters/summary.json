@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-18",
+  "source_branch": "feature/v0.9.15-fighters",
+  "export_base_commit": "c25e309",
+  "export_included_uncommitted_changes": true,
+  "engine": "Godot 4.5.1",
+  "script_check": {
+    "checked": 406,
+    "failures": 0
+  },
+  "binary": "B:\\Critterweight\\release-work\\v0.9.15-fighters-preview\\Critterweight-windows-x64\\Critterweight.exe",
+  "bytes": 273196480,
+  "sha256": "a229c187f8da623f5a003ec0df54c7fda3e162fb0ee95464f6f56f45e8bae6c4",
+  "results": [
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-knell-tutorial.log",
+      "run": 16,
+      "failed": 0,
+      "passed": 16,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_audio_announcer.log",
+      "run": 8,
+      "failed": 0,
+      "passed": 8,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_audio_bank.log",
+      "run": 11,
+      "failed": 0,
+      "passed": 11,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_content_targets.log",
+      "run": 7,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_elements.log",
+      "run": 6,
+      "failed": 0,
+      "passed": 6,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_net_codec.log",
+      "run": 24,
+      "failed": 0,
+      "passed": 24,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_net_loopback.log",
+      "run": 19,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_net_measure.log",
+      "run": 1,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_new_fighters.log",
+      "run": 19,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_online_ui.log",
+      "run": 7,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_recorded_speech.log",
+      "run": 9,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0
+    },
+    {
+      "group": "source",
+      "log": "B:\\Critterweight\\fighters-verification\\final-test_roster_lint.log",
+      "run": 3,
+      "failed": 0,
+      "passed": 3,
+      "skipped": 0
+    },
+    {
+      "group": "package",
+      "log": "B:\\Critterweight\\fighters-verification\\packaged-test_content_targets.log",
+      "run": 7,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0
+    },
+    {
+      "group": "package",
+      "log": "B:\\Critterweight\\fighters-verification\\packaged-test_net_codec.log",
+      "run": 24,
+      "failed": 0,
+      "passed": 24,
+      "skipped": 0
+    },
+    {
+      "group": "package",
+      "log": "B:\\Critterweight\\fighters-verification\\packaged-test_new_fighters.log",
+      "run": 19,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0
+    },
+    {
+      "group": "package",
+      "log": "B:\\Critterweight\\fighters-verification\\packaged-test_recorded_speech.log",
+      "run": 9,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0
+    },
+    {
+      "group": "package",
+      "log": "B:\\Critterweight\\fighters-verification\\packaged-test_roster_lint.log",
+      "run": 3,
+      "failed": 0,
+      "passed": 3,
+      "skipped": 0
+    }
+  ],
+  "graphical_launch": false,
+  "published": false,
+  "notes": [
+    "Networking is loopback on one Windows machine.",
+    "Codec fuzz/sanitizer tests intentionally emit invalid UTF-8/object-decode rejection diagnostics.",
+    "The earlier shared full run loaded changing source; final verification uses the fresh focused source and packaged runs listed here.",
+    "The package includes the concurrent announcer expansion; those source/audio changes are outside the fighter commit.",
+    "Physical controller feel, rendered in-game presentation and competitive balance await owner review."
+  ]
+}

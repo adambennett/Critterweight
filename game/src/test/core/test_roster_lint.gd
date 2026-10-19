@@ -4,7 +4,7 @@ extends TestCase
 ## 1.6 m from the fighter's root (posed reach, without the hit sphere's radius; lunges are visible
 ## movement and are judged by the kits' own range tests).
 
-const ROSTER := ["f_stoke", "f_dredge", "f_gusto", "f_dozer", "f_slurry", "f_jitters"]
+const ROSTER := ["f_stoke", "f_dredge", "f_gusto", "f_dozer", "f_slurry", "f_jitters", "f_varga", "f_knell"]
 const MOVES := ["l1", "l2", "l3", "heavy", "heavy_charged", "finisher", "dash_attack", "grab", "pummel", "taunt"]
 const ABILITIES := ["ability1", "ability2", "juice"]
 const REACH_CAP := 1.6

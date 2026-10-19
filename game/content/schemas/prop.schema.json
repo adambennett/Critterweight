@@ -13,7 +13,7 @@
     "palette": {"type": "boolean"},
     "tab": {"enum": ["obstacles", "walls", "hazards", "pickups", "markers"]},
     "description": {"type": "string", "maxLength": 300},
-    "element": {"enum": ["", "scorch", "brine", "static", "sludge", "grit", "gale"]},
+    "element": {"enum": ["", "scorch", "brine", "static", "sludge", "grit", "gale", "scrap", "spectral"]},
     "icon": {"type": "string", "maxLength": 32},
     "override": {"type": "boolean"},
     "footprint": {

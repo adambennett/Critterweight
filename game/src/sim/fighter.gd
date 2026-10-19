@@ -99,6 +99,8 @@ var _counter := {}
 var _submerge := {}
 var _splat := {}
 var despawned := false           ## body parked off-world; slot reserved for reuse (see MatchSim)
+var martial_southpaw := false
+var _martial_guard_tap := -99.0
 var focus_point = null           ## Vector3 objective worth facing (set by the mode each tick) or null
 
 # ---- modifiers (upgrades, modes). Multiplicative unless noted. ----
@@ -150,6 +152,8 @@ func reset_vitals() -> void:
 	for slot in creature.abilities:
 		charges_left[slot] = int(creature.ability_charges.get(slot, 1))
 	timed_flags.clear()
+	martial_southpaw = false
+	_martial_guard_tap = -99.0
 	_set_state(State.NEUTRAL)
 
 
@@ -328,7 +332,7 @@ func sim_tick(dt: float) -> void:
 		presses = 0          # presses during the intro / after the end never carry into the fight
 	for b in FighterInput.BUTTON_COUNT:
 		if (presses >> b) & 1:
-			_buffer.append({"b": b, "t": time})
+			_buffer.append({"b": b, "t": time, "mma_mod": MartialStyle.modifier(input)})
 	var buf_window := Tuning.v("input_buffer")
 	while not _buffer.is_empty() and time - float(_buffer[0]["t"]) > buf_window:
 		_buffer.pop_front()
@@ -351,6 +355,8 @@ func sim_tick(dt: float) -> void:
 		State.HELD: _st_held(dt, presses)
 		State.KO, State.DOWNED, State.INACTIVE: _st_out(dt)
 		State.CELEBRATE: _st_celebrate(dt)
+	if creature.tags.has("martial"):
+		MartialStyle.pose(self)
 	_apply_stagger(dt)
 	rig.yaw_target = facing_yaw
 	motor.locomotion_vel = rig.com_velocity()
@@ -605,7 +611,9 @@ func _try_actions(from_cancel: bool) -> bool:
 		var gv: Array = _move_variant("grab")
 		_start_move(gv[0], gv[1], State.ATTACK)
 		return true
-	if _peek(FighterInput.HEAVY):
+	if creature.tags.has("martial") and MartialStyle.actions(self, from_cancel):
+		return true
+	if not creature.tags.has("martial") and _peek(FighterInput.HEAVY):
 		_consume(FighterInput.HEAVY)
 		if from_cancel and _light_step > 0 and creature.moves.has("finisher") and not has_flag("hovering"):
 			var fv: Array = _move_variant("finisher")
@@ -617,7 +625,7 @@ func _try_actions(from_cancel: bool) -> bool:
 			_charging = hm.charge_time > 0.0 and not bool(mods.get("auto_charge", false))
 		_light_step = 0
 		return true
-	if _peek(FighterInput.LIGHT):
+	if not creature.tags.has("martial") and _peek(FighterInput.LIGHT):
 		_consume(FighterInput.LIGHT)
 		if state == State.DODGE or (from_cancel and move_slot == "dodge"):
 			if creature.moves.has("dash_attack"):
@@ -644,7 +652,13 @@ func _try_actions(from_cancel: bool) -> bool:
 		return true
 	if not from_cancel and guard_held:
 		_set_state(State.GUARD)
-		guard_pressed_at = time if _consume(FighterInput.GUARD) else time - 1.0
+		var fresh_guard := _consume(FighterInput.GUARD)
+		guard_pressed_at = time if fresh_guard else time - 1.0
+		if creature.tags.has("martial") and fresh_guard:
+			if time - _martial_guard_tap < 0.32 and sim and stamina >= 5.0:
+				sim.effects.fire(self, {"type": "push", "radius": 1.2, "strength": 2.0})
+				spend_stamina(5.0)
+			_martial_guard_tap = time
 		return true
 	return false
 
@@ -776,6 +790,14 @@ func _st_guard(dt: float) -> void:
 	if not guard_held:
 		_set_state(State.NEUTRAL)
 		return
+	if creature.tags.has("martial"):
+		if _consume(FighterInput.GUARD):
+			if time - _martial_guard_tap < 0.32 and sim and stamina >= 5.0:
+				sim.effects.fire(self, {"type": "push", "radius": 1.2, "strength": 2.0})
+				spend_stamina(5.0)
+			_martial_guard_tap = time
+		if MartialStyle.actions(self, false):
+			return
 	# a successful parry grants a short free cancel into anything
 	if time - _last_parry < Tuning.v("parry_free_cancel"):
 		if _try_actions(false):
@@ -1253,9 +1275,9 @@ func _st_grabbing(dt: float) -> void:
 	if target:
 		_turn_toward(_yaw_to_target(), 3.0, dt)
 	var throw_dir := Vector3.ZERO
-	if _consume(FighterInput.HEAVY) or _consume(FighterInput.GRAB):
+	if (not creature.tags.has("martial") and _consume(FighterInput.HEAVY)) or _consume(FighterInput.GRAB):
 		throw_dir = input.move if input.move.length() > 0.3 else forward()
-	elif _pummel_ready() and _consume(FighterInput.LIGHT) and _pummels < int(Tuning.v("pummel_max")):
+	elif _pummel_ready() and (_consume(FighterInput.LIGHT) or (creature.tags.has("martial") and (_consume(FighterInput.HEAVY) or _consume(FighterInput.MMA_LL) or _consume(FighterInput.MMA_RL)))) and _pummels < int(Tuning.v("pummel_max")):
 		_pummels += 1
 		var pm: MoveDef = creature.moves.get("pummel")
 		_pummel_next = time + (pm.interval if pm else 0.0)

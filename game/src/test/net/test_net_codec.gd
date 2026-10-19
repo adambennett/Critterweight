@@ -159,13 +159,13 @@ func test_input_sample_codec_is_strict() -> void:
 	fi.press(FighterInput.HEAVY)
 	var w := NetWriter.new()
 	NetSnapshot.write_input(w, fi)
-	check_eq(w.size(), 4 + FighterInput.BUTTON_COUNT, "sample is 4 + BUTTON_COUNT bytes")
+	check_eq(w.size(), 17, "core sample stays compact without guest counters")
 	var back := NetSnapshot.read_input(NetReader.new(w.data()))
 	check(back.move.distance_to(fi.move) < 0.02, "move survives (%s)" % back.move)
 	check(back.is_held(FighterInput.GUARD), "held bits")
 	check_eq(int(back.press_count[FighterInput.LIGHT]), 2, "press counters")
 	# hostile sample: every bit set, extreme move
-	var raw := PackedByteArray([127, 127, 0xFF, 0xFF])
+	var raw := PackedByteArray([127, 127, 0xFF, 0xFF, 0xFF, 0xFF])
 	for i in FighterInput.BUTTON_COUNT:
 		raw.append(255)
 	var h := NetSnapshot.read_input(NetReader.new(raw))
@@ -504,3 +504,33 @@ func test_rate_limiter() -> void:
 	check_eq(ok, 5, "burst capacity")
 	await wait_physics(13)
 	check(rl.take(), "refills with (wall-clock or simulated) time")
+
+
+func test_mixed_core_and_guest_input_samples_preserve_packet_boundaries() -> void:
+	var plain := FighterInput.new()
+	plain.press(FighterInput.LIGHT)
+	var guest := FighterInput.new()
+	guest.press(FighterInput.MMA_CHECK)
+	guest.set_held(FighterInput.MMA_CHECK, false) # released presses still need their counter
+	var w := NetWriter.new()
+	NetSnapshot.write_input(w, plain)
+	NetSnapshot.write_input(w, guest)
+	NetSnapshot.write_input(w, plain)
+	check_eq(w.size(), 17 + 24 + 17, "only the guest sample pays for extended counters")
+	var r := NetReader.new(w.data())
+	check_eq(NetSnapshot.read_input(r).press_count, plain.press_count)
+	check_eq(NetSnapshot.read_input(r).press_count, guest.press_count)
+	check_eq(NetSnapshot.read_input(r).press_count, plain.press_count)
+	check(r.ok and r.at_end(), "mixed redundancy batch consumes exact bytes")
+	var truncated := NetReader.new(w.data().slice(17, 40))
+	NetSnapshot.read_input(truncated)
+	check(not truncated.ok, "truncated guest extension is rejected")
+
+
+func test_guest_input_redundancy_stays_inside_bandwidth_budget() -> void:
+	var core := FighterInput.new()
+	var guest := FighterInput.new()
+	guest.press(FighterInput.MMA_LL)
+	check_eq(NetClient.input_batch_count([core, core, core, core]), 4, "standard roster keeps four samples")
+	check_eq(NetClient.input_batch_count([guest, guest, guest, guest]), 3, "guest keeps three samples without increasing send rate")
+	check_eq(NetClient.input_batch_count([core, guest, core, guest]), 3, "tagging across layouts stays within budget")

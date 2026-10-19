@@ -2,7 +2,7 @@ extends TestCase
 ## CNT-04: the committed content targets (docs/DESIGN.md §4) hold in the shipped core package.
 ## Counts only content that comes from the core package, so an enabled mod can't satisfy a target.
 
-const FIGHTERS := ["f_dozer", "f_dredge", "f_gusto", "f_jitters", "f_slurry", "f_stoke"]
+const FIGHTERS := ["f_dozer", "f_dredge", "f_gusto", "f_jitters", "f_knell", "f_slurry", "f_stoke", "f_varga"]
 const BASES := ["gullet", "drydock", "crusher", "rooftop"]
 const BONUS_MODES := ["spotlight_hog", "chumball", "absolute_unit", "chum_rush"]
 
@@ -26,13 +26,13 @@ func _read_json(path: String) -> Dictionary:
 	return d if d is Dictionary else {}
 
 
-func test_six_playable_fighters_and_npc_cast() -> void:
+func test_eight_playable_fighters_and_npc_cast() -> void:
 	var playable := []
 	for id in Content.playable_creatures():
 		if Content.origin_of("creatures", str(id)) == "core":
 			playable.append(str(id))
 	playable.sort()
-	check_eq(playable, FIGHTERS, "exactly the six roster fighters are selectable")
+	check_eq(playable, FIGHTERS, "exactly the eight roster fighters are selectable")
 	for id in FIGHTERS:
 		var c := Content.creature(id)
 		check(c != null and c.is_valid(), "%s parses without errors %s" % [id, c.errors if c else []])
@@ -58,8 +58,8 @@ func test_six_playable_fighters_and_npc_cast() -> void:
 
 func test_elements_and_reactions() -> void:
 	var d := _read_json("res://content/core/elements.json")
-	check_eq((d.get("elements", []) as Array).size(), 6, "six elements")
-	check_eq((d.get("reactions", []) as Array).size(), 11, "eleven reactions")
+	check_eq((d.get("elements", []) as Array).size(), 8, "eight elements")
+	check_eq((d.get("reactions", []) as Array).size(), 14, "fourteen reactions")
 	check_eq((d.get("zone_reactions", []) as Array).size(), 11, "zone versions of the reactions")
 
 
