@@ -596,6 +596,8 @@ func _build_history() -> void:
 			org += " · " + str(d["title_note"])
 		card.body.add_child(UiTheme.label(org, "Caption", true))
 		card.help_title = "Fight %d" % (h.size() - i)
+		# the judges' totals (winner first) of a decision, or round and time of a stoppage
+		card.help_text = "%s · %s rounds" % [CareerUi.method_line(d), CareerFight.rounds_label({"rounds": int(d.get("rounds", 3))})]
 		_scroll.content.add_child(card)
 		i += 1
 	_section("News")
@@ -610,6 +612,7 @@ func _build_history() -> void:
 			chunk = CareerUi.ActionCard.new("news:%d" % k)
 			chunk.inert = true
 			chunk.help_title = "News"
+			chunk.help_text = "What happened in your career, newest first (the last %d items)." % int(ctrl.rules.get("news_cap", 60))
 			_scroll.content.add_child(chunk)
 			k += 1
 		var row := UiTheme.hbox(UiTheme.GAP_S)
