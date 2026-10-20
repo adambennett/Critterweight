@@ -62,7 +62,9 @@ func _physics_process(dt: float) -> void:
 	var health: Array = []
 	for f in fighters:
 		health.append(f.health_frac())
-	for ev in sim.call("events_since", _cursor):
+	var evs: Array = sim.call("events_since", _cursor)
+	for k in evs.size():
+		var ev: Dictionary = evs[k]
 		_cursor = int(ev["seq"])
 		var fi := int(ev.get("fighter", -1))
 		var info := {"health": health, "time": float(sim.get("time"))}
@@ -76,6 +78,14 @@ func _physics_process(dt: float) -> void:
 			if mode != null:
 				var rounds := int(sim.get("rules").get("rounds", 3))
 				info["final_round"] = int(ev.get("round", 1)) >= rounds
+		var et := str(ev.get("type", ""))
+		if et == "timeout" or et == "judges_decision":
+			# 10-point: every bell is a timeout; only the judges' decision is announced
+			info["ten_point"] = _ten_point()
+		if et == "judges_decision":
+			info["sudden_death_follows"] = _sudden_death_after(evs, k)
+		if et == "knockdown":
+			info["referee"] = _referee()
 		Audio.on_sim_event(ev, listener, info)
 	# footsteps, drags, hovers
 	for f in fighters:
@@ -97,6 +107,47 @@ func _physics_process(dt: float) -> void:
 				lowest = minf(lowest, float(h))
 		Audio.music_intensity(clampf((0.5 - lowest) / 0.35, 0.0, 1.0))
 		_tick_accum = 0.0
+
+
+## The match is judged on 10-point cards: the local mode runs a judge, or (network mirror, no
+## judge there) the replicated hud_state carries the judges' running totals.
+func _ten_point() -> bool:
+	var mode = sim.get("mode")
+	if mode == null:
+		return false
+	if mode.has_method("unlimited_health") and bool(mode.call("unlimited_health")):
+		return true
+	if mode.has_method("hud_state"):
+		var hs = mode.call("hud_state")
+		return typeof(hs) == TYPE_DICTIONARY and (hs as Dictionary).has("cards")
+	return false
+
+
+## A referee officiates (local: the mode runs one; network mirror: the replicated rules of a
+## standard duel ask for one, the server's gate).
+func _referee() -> bool:
+	var mode = sim.get("mode")
+	if mode == null:
+		return false
+	if mode.has_method("has_referee") and bool(mode.call("has_referee")):
+		return true
+	var rules = sim.get("rules")
+	if typeof(rules) != TYPE_DICTIONARY or not mode.has_method("id"):
+		return false
+	return bool((rules as Dictionary).get("referee", false)) and str((rules as Dictionary).get("format", "")) == "duel" \
+		and str(mode.call("id")) == "standard"
+
+
+## A drawn decision is followed by a sudden death in the same tick (the drawn cards are not the
+## end): its "sudden_death" event comes right after it.
+static func _sudden_death_after(evs: Array, k: int) -> bool:
+	for j in range(k + 1, evs.size()):
+		var t := str((evs[j] as Dictionary).get("type", ""))
+		if t == "sudden_death":
+			return true
+		if t == "round_end" or t == "match_end":
+			return false
+	return false
 
 
 func _footsteps(f: Fighter, dt: float) -> void:
