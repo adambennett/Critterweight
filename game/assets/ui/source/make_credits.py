@@ -24,6 +24,7 @@ data = {
         {"heading": "Reference project",
          "lines": ["Cage Rules, by Jeremy — its code, ideas and project-owned assets are reused with permission.",
                    "Varga adapts Jeremy's original fighter model, rig, standing poses and strike definitions.",
+                   "The referee is Jeremy's original referee model and outfit, with his poses and ring positioning ported to Critterweight.",
                    "The Barlow typefaces came to this project through Cage Rules (their own OFL licence still applies)."]},
         {"heading": "Creature art (Blender revamp)",
          "lines": ["Creature models and concept direction assisted by OpenAI Codex (Astra), under the project lead's direction.",

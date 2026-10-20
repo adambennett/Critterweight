@@ -3,8 +3,15 @@
 Creature art has two editable source paths. The original SDF forge remains available for every
 historical model and continues to own the hub/crowd models. The creature revamp adds original Blender
 meshes with deterministic GLB export; `tools/blender/adopted.json` identifies the models it owns.
-No third-party character geometry or texture is used. See `ART_REVAMP.md` for adoption and verification
-status, and the proposed D-041 update to D-012.
+No third-party character geometry or texture is used, except the authorised Cage Rules models below. See
+`ART_REVAMP.md` for adoption and verification status, and the proposed D-041 update to D-012.
+
+A third, non-editable path imports Jeremy's Cage Rules models: `node tools/cage_rules/import.js` rebuilds
+Varga (`creatures/f_varga.glb` + `content/core/creatures/f_varga.json`) and the view-only referee
+(`referee/cage_referee.glb` + `assets/data/cage_referee.json`) from the retained original sources. It is
+deterministic and outside the forge and Blender rebuilds; `tools/cage_rules/source-manifest.json` records the
+input and output hashes to compare against (`tools/cage_rules/README.md`). Its generator string names the
+adapter.
 
 The GLB generator string and root extras identify the source path. Blender sources retain the original
 GLB as a hidden, non-exported registration reference, exact segment bones, vertex colours and weights.
@@ -245,7 +252,9 @@ Use both engine `--resolution` and user `--size`/`--windowed` flags to keep Sett
 previous fullscreen size. The capture helper records the complete arguments beside each image. Blister motion uses 8–11 seconds because its self-pop ends the standard duel before the 20-second window. The motion helper disables focus-loss pausing only in its scratch profile, using `configure_capture.gd` and the game's Settings/Saves API; player profiles are untouched.
 
 `verify_exports.ps1` re-exports every adopted saved source and checks all model hashes.
-`verify_forge.ps1` rebuilds the ten retained models and checks that all 22 shipped GLBs remain byte-identical.
+`verify_forge.ps1` rebuilds the retained forge models and checks that every shipped GLB remains byte-identical
+(25 in v0.9.16: 11 forge, 12 Blender, 2 from the Cage Rules adapter). Its hard-coded expectation of exactly ten forge
+outputs predates Knell (the default forge now writes 11) and must be updated before the script is run again.
 Run `powershell -File tools/blender/package_evidence.ps1` with Windows PowerShell 5.1 for its System.Drawing conversion. It makes JPEG comparisons, motion contact sheets and 48 px silhouettes from the raw captures;
 it records the shared crop and source hashes. In a fresh shell, `final_suite.ps1` validates the isolated B: cleanup
 root and calls the required suite runner without a filter, preserving the default TEMP and recording the result.
