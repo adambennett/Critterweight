@@ -211,6 +211,10 @@ func _resolve_melee(a: Fighter, b: Fighter, widx: int, wp: Vector3, wv: Vector3,
 func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 	if b.is_out() or (b.is_evading() and not bool(h.get("ignore_evade", false))):
 		return
+	# mode rules may void an opponent's hit (a referee keeps strikes off a downed fighter)
+	if a and a != b and sim.mode and not sim.mode.hit_allowed(a, b, h):
+		return
+	var was_down := b.is_down()
 	var ally := bool(h.get("ally", false))
 	if ally:
 		# direct elemental/ally hits do nothing; reaction areas/zones are scaled by EffectsSystem
@@ -317,17 +321,31 @@ func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 		else:
 			a.hooks.fire("hit_dealt", ctx3)
 			b.hooks.fire("hit_taken", {"hit": h, "other": a, "slot": h.get("slot", ""), "move_class": h.get("move_class", "")})
-	sim.emit_event({"type": "hit", "fighter": a.index if a else -1, "target": b.index, "damage": float(h["damage"]),
+	# melee: a weapon strike (judges count only these as strikes landed). was_down (only when
+	# true): the target was already down before this hit (judges never credit it under a referee)
+	var ev := {"type": "hit", "fighter": a.index if a else -1, "target": b.index, "damage": float(h["damage"]),
 		"point": h["point"], "normal": h["normal"], "blocked": h["blocked"], "parried": h["parried"], "counter": h.get("counter", false),
 		"part": h.get("part", "core"), "element": el, "quality": h.get("quality", 1.0), "move": str(h.get("move", "")),
 		"slot": str(h.get("slot", "")), "charged": bool(h.get("charged", false)), "move_class": str(h.get("move_class", "")),
-		"knockdown": h.get("knockdown", false), "otg": b.is_down()})
+		"knockdown": h.get("knockdown", false), "otg": b.is_down(), "melee": bool(h.get("melee", false))}
+	if was_down:
+		ev["was_down"] = true
+	sim.emit_event(ev)
+
+
+## Damage kinds of the grab / cage package: never voided by MatchMode.hit_allowed.
+const GRAB_PACKAGE := ["throw", "slam", "wall_splat", "pummel"]
 
 
 ## Non-weapon damage (pummels, throws, slams, hazards). Never guarded or parried.
 func apply_simple_damage(source: Fighter, b: Fighter, amount: float, kind: String, extra := {}) -> void:
 	if b.is_out():
 		return
+	# fighter-sourced zones and reactions obey the same mode rule as strikes (a referee keeps them
+	# off a downed fighter); the grab / cage package and source-less environment damage do not
+	if source and source != b and not kind in GRAB_PACKAGE and sim.mode and not sim.mode.hit_allowed(source, b, {"move_class": kind, "simple": true}):
+		return
+	var was_down := b.is_down()
 	var dmg := amount * float(b.mods["defense"]) * b.eff("defense") * b.statuses.damage_taken_mult()
 	if source:
 		dmg *= float(source.mods["damage"]) * source.eff("power")
@@ -337,10 +355,13 @@ func apply_simple_damage(source: Fighter, b: Fighter, amount: float, kind: Strin
 		"stun": float(extra.get("stun", 0.0)), "poise": float(extra.get("poise", 0.0)),
 		"knockdown": bool(extra.get("knockdown", false)), "hype_mult": 1.0, "move_class": kind}
 	b.receive_hit(h)
-	sim.emit_event({"type": "hit", "fighter": source.index if source else -1, "target": b.index,
+	var ev := {"type": "hit", "fighter": source.index if source else -1, "target": b.index,
 		"damage": dmg, "point": b.pos(), "normal": Vector3.UP, "blocked": false, "parried": false,
 		"counter": false, "part": "core", "element": str(extra.get("element", "")), "quality": 1.0,
-		"move": kind, "slot": kind, "knockdown": h["knockdown"], "otg": false})
+		"move": kind, "slot": kind, "knockdown": h["knockdown"], "otg": false}
+	if was_down:
+		ev["was_down"] = true
+	sim.emit_event(ev)
 
 
 ## Damage-over-time tick from a status. `no_kill` keeps the target at ≥ 1 HP.
@@ -353,10 +374,16 @@ func apply_dot(source, b: Fighter, amount: float, status_id: String, element: St
 		amount = maxf(0.0, b.health - 1.0)
 		if amount <= 0.0:
 			return
+	var was_down := b.is_down()
 	b.health -= amount
 	b.stats_record["damage_taken"] += amount
 	if source is Fighter and source != b:
 		(source as Fighter).stats_record["damage_dealt"] += amount
 	if b.health <= 0.0:
 		sim.on_fighter_depleted(b, source if source is Fighter else null, {"dot": status_id})
-	sim.emit_event({"type": "dot", "fighter": b.index, "damage": amount, "element": element, "status": status_id})
+	# "fighter" is the victim; "by" the status's source (-1 none)
+	var ev := {"type": "dot", "fighter": b.index, "damage": amount, "element": element, "status": status_id,
+		"by": (source as Fighter).index if source is Fighter else -1}
+	if was_down:
+		ev["was_down"] = true
+	sim.emit_event(ev)
