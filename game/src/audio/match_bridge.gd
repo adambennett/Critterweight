@@ -99,7 +99,7 @@ func _physics_process(dt: float) -> void:
 		var time_left := -1.0
 		if mode2 != null and mode2.get("round_timer") != null and float(sim.get("rules").get("round_time", 99.0)) > 0.0:
 			time_left = float(mode2.get("round_timer"))
-		Audio.on_match_tick(health, time_left, _tick_accum)
+		Audio.on_match_tick(health, time_left, _tick_accum, _edge_info(fighters))
 		# music intensity: lead layer when any fighter is below 50 % HP
 		var lowest := 1.0
 		for h in health:
@@ -107,6 +107,26 @@ func _physics_process(dt: float) -> void:
 				lowest = minf(lowest, float(h))
 		Audio.music_intensity(clampf((0.5 - lowest) / 0.35, 0.0, 1.0))
 		_tick_accum = 0.0
+
+
+## A standing fighter pressed against the cage (or at a roof's open edge) for the booth's edge
+## observations: {edge_fighter, edge_kind: "roof" | "cage"} or {}.
+func _edge_info(fighters: Array) -> Dictionary:
+	var arena = sim.get("arena")
+	if arena == null:
+		return {}
+	var radius := float(arena.get("radius"))
+	if radius <= 0.0:
+		return {}
+	var open_edge := str(arena.get("base")) in ["rooftop", "rooftop_canvas"] or str(arena.get("id")).contains("rooftop")
+	for f in fighters:
+		var fighter: Fighter = f
+		if fighter.is_out() or not fighter.rig.grounded:
+			continue
+		var p := fighter.pos()
+		if Vector2(p.x, p.z).length() > radius - 0.8:
+			return {"edge_fighter": fighter.index, "edge_kind": "roof" if open_edge else "cage"}
+	return {}
 
 
 ## The match is judged on 10-point cards: the local mode runs a judge, or (network mirror, no

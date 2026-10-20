@@ -86,6 +86,28 @@ class Studio:
         scene.render.engine='BLENDER_EEVEE'
         bpy.context.preferences.filepaths.temporary_directory=str(ROOT.parent/'tmp')
 
+    def view_bone(self,bone_id,parent,head):
+        """A view-only joint (v0.9.17): eyes, lids, jaws, crests, chains. The game animates it on
+        top of its parent; it never touches the body contract (segment bones and pivots)."""
+        if not bone_id.startswith('fx_'):
+            raise ValueError('view bones are named fx_*: '+bone_id)
+        known=[b['id'] for b in json.loads(bpy.context.scene.get('cw_view_bones','[]'))]
+        if parent not in self.segments and parent not in known:
+            raise ValueError('unknown parent for '+bone_id+': '+parent)
+        bpy.context.view_layer.objects.active=self.rig
+        self.rig.select_set(True)
+        bpy.ops.object.mode_set(mode='EDIT')
+        bone=self.armature.edit_bones.new(bone_id)
+        bone.head=blender(head)
+        bone.tail=bone.head+Vector((0,0,.03))
+        bone.parent=self.armature.edit_bones[parent]
+        bpy.ops.object.mode_set(mode='OBJECT')
+        self.rig.select_set(False)
+        views=json.loads(bpy.context.scene.get('cw_view_bones','[]'))
+        views.append(dict(id=bone_id,parent=parent,head=[round(float(x),6) for x in head]))
+        bpy.context.scene['cw_view_bones']=json.dumps(views)
+        return bone_id
+
     def mesh(self,name,verts,faces,bone,color,mat='skin',glow=0,soft=False,role='body',smooth=True):
         mesh=bpy.data.meshes.new(name)
         mesh.from_pydata([blender(v) for v in verts],[],faces)

@@ -146,4 +146,9 @@ static func build(catalog: CampaignCatalog, rules: Dictionary, st: Dictionary, o
 		"no_record": true, "custom": false,
 		"context": {"career": true, "variant": str(offer.get("arena_variant", "")), "career_id": str(st.get("career_id", "")),
 			"fight_id": str(offer.get("id", "")), "title": bool(offer.get("title", false))}}
+	# what the booth knows about the bout (commentary only; never gameplay)
+	var rec: Dictionary = st.get("record", {})
+	(out["config"]["context"] as Dictionary)["booth"] = {"title": bool(offer.get("title", false)),
+		"debut": int(rec.get("w", 0)) + int(rec.get("l", 0)) + int(rec.get("d", 0)) == 0,
+		"champion": bool(st.get("champion", false)), "streak": int(st.get("streak", 0)), "tier": int(offer.get("tier", 0))}
 	return out

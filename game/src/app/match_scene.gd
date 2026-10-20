@@ -113,7 +113,7 @@ func start(cfg: Dictionary) -> void:
 	sim.finished.connect(_on_finished)
 	_apply_presentation_settings()
 	# audio bridge: impacts, voices, crowd, announcer and music follow the sim (docs/AUDIO.md §6)
-	Audio.attach_match(sim, player_index, {"context": str(cfg.get("audio_context", "versus"))})
+	Audio.attach_match(sim, player_index, audio_context(cfg))
 	Audio.music(str(cfg.get("music", _default_music())), 1.5, {"seed": int(cfg.get("seed", 1))})
 	if not Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.connect(hud.subtitle)
@@ -128,6 +128,20 @@ func start(cfg: Dictionary) -> void:
 		hud_layer.add_child(ov)
 		if ov.has_method("bind"):
 			ov.call("bind", self)
+
+
+## The commentary context of a match config (docs/audio/COMMENTARY.md): a Career bout tells the booth
+## what kind of bout it is (debut, title fight, champion defending); a spectated match has no "player"
+## for the booth to address.
+static func audio_context(cfg: Dictionary) -> Dictionary:
+	var out := {"context": str(cfg.get("audio_context", "versus"))}
+	var ctx = cfg.get("context", {})
+	if typeof(ctx) == TYPE_DICTIONARY and bool((ctx as Dictionary).get("career", false)):
+		out["context"] = "career"
+		out["career"] = ((ctx as Dictionary).get("booth", {"title": bool((ctx as Dictionary).get("title", false))}) as Dictionary).duplicate()
+	elif bool(cfg.get("spectate", false)) and not cfg.has("audio_context"):
+		out["context"] = "spectate"
+	return out
 
 
 ## Combat debug visualization (F3): hit capsules, weapon spheres by phase, reach, targets, hits.
@@ -462,7 +476,7 @@ func _on_event(ev: Dictionary) -> void:
 			Audio.announce_trigger("mode", {"mode": "spotlight"})
 		"sudden_death":
 			hud.callout("SUDDEN DEATH", 1.8, Color(1.0, 0.35, 0.3))
-			Audio.announce_trigger("time", {"kind": "sudden_death"})
+			# the booth calls it from the event itself (CommentaryDirector)
 
 
 func _is_local_player() -> bool:

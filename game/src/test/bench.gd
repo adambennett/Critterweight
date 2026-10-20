@@ -13,6 +13,8 @@ extends Node
 ##        memory, objects, nodes, orphan nodes and video memory after each (run windowed)
 ##   -- --bench roster [--bouts 4] [--tier pro] [--round 60]: bot round robin between the
 ##        playable fighters (win rates, hits/min, damage per hit) for balance and size checks
+##   -- --bench commentary --out <json> [--label x] [--sequence 1|0] [--start-bout k] [--bouts n]:
+##        the commentary audit (src/test/audio/commentary_audit.gd); headless, real time
 ##
 ## Rendered benches disable VSync and the frame cap so the numbers show real headroom; the
 ## "frames over 16.7 ms" figure is what matters for the 60 fps target.
@@ -42,6 +44,12 @@ func run(scene: String, a: PackedStringArray) -> void:
 			await _roster(int(_arg("--bouts", "4")), _arg("--tier", "pro"), float(_arg("--round", "60")))
 		"tiers":
 			await _tiers(int(_arg("--bouts", "12")), float(_arg("--round", "60")))
+		"commentary":
+			# the commentary audit (docs/audio/COMMENTARY.md) writes its own log and quits
+			var audit = load("res://src/test/audio/commentary_audit.gd").new()
+			add_child(audit)
+			await audit.run(args)
+			return
 		_:
 			print("unknown bench '%s' (busy, duel, sim, soak, client_soak, roster, tiers)" % scene)
 			get_tree().quit(2)

@@ -473,12 +473,14 @@ func end_round(team: int) -> void:
 		for f: Fighter in sim.fighters:
 			if f.team == team and not f.despawned:
 				f.celebrate()
-	sim.emit_event({"type": "round_end", "winner": team, "round": round_index + 1})
 	var total_rounds := int(rules.get("rounds", 3))
 	if team >= 0 and int(round_wins[team]) >= rounds_to_win():
 		winner_team = team
 	elif round_index + 1 >= total_rounds * 2:
 		winner_team = _most_round_wins()
+	# "decided": this round_end also decides the bout (presentation: the booth calls a KO that ends
+	# the fight differently from one that only takes a round). Emitted after the decision, same tick.
+	sim.emit_event({"type": "round_end", "winner": team, "round": round_index + 1, "decided": winner_team != -2})
 
 
 func _most_round_wins() -> int:

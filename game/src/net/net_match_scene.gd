@@ -665,4 +665,4 @@ func _on_event(ev: Dictionary) -> void:
 			Audio.announce_trigger("mode", {"mode": "spotlight"})
 		"sudden_death":
 			hud.callout("SUDDEN DEATH", 1.8, Color(1.0, 0.35, 0.3))
-			Audio.announce_trigger("time", {"kind": "sudden_death"})
+			# the booth calls it from the event itself (CommentaryDirector)

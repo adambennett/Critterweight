@@ -74,10 +74,16 @@ def export(out_path, scratch=None):
     if scene.get('cw_body_sha256') != digest:
         raise ValueError('Body contract differs from the source reference; review registration before exporting')
     bones = json.loads(scene['cw_bones'])
-    bone_ids = [b['id'] for b in bones]
+    # v0.9.17 view bones ("fx_*"): expression/secondary-motion joints the game animates; never
+    # physics. Segment bones stay first so joint i < len(bones) is always segment i.
+    view_bones = json.loads(scene.get('cw_view_bones', '[]'))
+    bone_ids = [b['id'] for b in bones] + [v['id'] for v in view_bones]
     rig = next(o for o in scene.objects if o.get('cw_role') == 'rig')
     if set(bone_ids) != set(b.name for b in rig.data.bones):
         raise ValueError('Skeleton names changed')
+    for v in view_bones:
+        if not v['id'].startswith('fx_') or v['parent'] not in bone_ids[:bone_ids.index(v['id'])]:
+            raise ValueError(f"View bone {v['id']} must be named fx_* and follow its parent {v['parent']}")
     for b in bones:
         actual = fighter(rig.matrix_world @ rig.data.bones[b['id']].head_local)
         if max(abs(a-c) for a, c in zip(actual, b['pivot'])) > 0.00001:
@@ -91,6 +97,7 @@ def export(out_path, scratch=None):
     if not body or not gore:
         raise ValueError('Missing body or gore mesh')
     payload = dict(name=scene['cw_id'], generator='Critterweight Blender source / deterministic forge GLB writer', bones=bones, materials=materials,
+                   view_bones=view_bones,
                    mesh=extract(body, bone_ids, True), gore=dict(mesh=extract(gore, [], False)),
                    extras=dict(author='Critterweight original art', body_sha256=digest, source='tools/blender/'+scene['cw_id']+'.blend',
                                pipeline='Blender editable meshes; deterministic forge GLB writer'))

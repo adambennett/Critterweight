@@ -96,19 +96,37 @@ function writeGlb(outPath, model) {
   json.nodes.push({ name: 'model', children: [1] });
   json.nodes.push({ name: 'rig', children: [] });
   const jointNodes = [];
+  const nodeOf = new Map();
   for (const b of model.bones) {
     json.nodes.push({ name: b.id, translation: b.pivot.map((x) => +x.toFixed(6)) });
     const idx = json.nodes.length - 1;
     json.nodes[1].children.push(idx);
     jointNodes.push(idx);
+    nodeOf.set(b.id, { node: idx, pivot: b.pivot });
   }
-  const ibm = new Float32Array(model.bones.length * 16);
-  model.bones.forEach((b, i) => {
+  // Optional view bones (v0.9.17): expression/secondary-motion joints ("fx_*") that the game
+  // animates on top of their parent (a segment bone or another view bone). They are children of
+  // their parent's node, translated by (head - parent head); segment joints stay flat and first,
+  // so joint indices 0..bones-1 keep meaning "segment i".
+  const viewBones = model.view_bones || [];
+  for (const v of viewBones) {
+    const parent = nodeOf.get(v.parent);
+    if (!parent) throw new Error(`view bone ${v.id}: unknown parent ${v.parent}`);
+    const t = v.head.map((x, k) => +(x - parent.pivot[k]).toFixed(6));
+    json.nodes.push({ name: v.id, translation: t });
+    const idx = json.nodes.length - 1;
+    (json.nodes[parent.node].children = json.nodes[parent.node].children || []).push(idx);
+    jointNodes.push(idx);
+    nodeOf.set(v.id, { node: idx, pivot: v.head });
+  }
+  const all = model.bones.map((b) => b.pivot).concat(viewBones.map((v) => v.head));
+  const ibm = new Float32Array(all.length * 16);
+  all.forEach((p, i) => {
     const o = i * 16;
     ibm[o] = 1; ibm[o + 5] = 1; ibm[o + 10] = 1; ibm[o + 15] = 1;
-    ibm[o + 12] = -b.pivot[0]; ibm[o + 13] = -b.pivot[1]; ibm[o + 14] = -b.pivot[2];
+    ibm[o + 12] = -p[0]; ibm[o + 13] = -p[1]; ibm[o + 14] = -p[2];
   });
-  json.skins.push({ name: model.name + '_skin', joints: jointNodes, skeleton: 1, inverseBindMatrices: accessor(json, bin, ibm, 'MAT4', 'f32', model.bones.length) });
+  json.skins.push({ name: model.name + '_skin', joints: jointNodes, skeleton: 1, inverseBindMatrices: accessor(json, bin, ibm, 'MAT4', 'f32', all.length) });
   const meshIdx = addMesh(json, bin, model.mesh, model.name + '_mesh', materialIndex);
   json.nodes.push({ name: model.name + '_mesh', mesh: meshIdx, skin: 0 });
   json.nodes[0].children.push(json.nodes.length - 1);

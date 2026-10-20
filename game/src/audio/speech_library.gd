@@ -122,8 +122,9 @@ func _token(voice: String, token: String, value: String, context: Dictionary) ->
 	var normalized := value.strip_edges().to_lower()
 	var words: Array = []
 	if token in ["p", "o", "player"]:
-		if vocabulary.has(normalized):
-			words = [normalized]
+		var spoken := spoken_name(normalized, vocabulary, context)
+		if spoken != "":
+			words = [spoken]
 		else:
 			var index := int(context.get("player_index", 0)) if token != "o" else 1
 			for fighter in context.get("fighters", []):
@@ -144,6 +145,28 @@ func _token(voice: String, token: String, value: String, context: Dictionary) ->
 		if vocabulary.has(word):
 			out.append(vocabulary[word])
 	return out
+
+## The recorded word for a fighter's display name, or "": the name itself; the name without the
+## decorations the menus add ("Dredge (bot)", a second "Dredge 2"); or, for a fighter named after
+## no recording (a renamed bot, a guest), its creature's name ("varga") when that is recorded.
+## Team names ("Stoke & Dredge") stay unresolved here (the caller falls back to Player N).
+static func spoken_name(normalized: String, vocabulary: Dictionary, context: Dictionary) -> String:
+	if vocabulary.has(normalized):
+		return normalized
+	var stripped := normalized.replace("(bot)", "").strip_edges()
+	var re := RegEx.create_from_string("\\s+\\d+$")
+	stripped = re.sub(stripped, "").strip_edges()
+	if vocabulary.has(stripped):
+		return stripped
+	for fighter in context.get("fighters", []):
+		if str(fighter.get("name", "")).to_lower() != normalized:
+			continue
+		var cid := str(fighter.get("creature", ""))
+		var creature_name := cid.trim_prefix("f_").replace("_", " ")
+		if vocabulary.has(creature_name):
+			return creature_name
+	return ""
+
 
 static func _number(value: int) -> Array:
 	var small := ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]

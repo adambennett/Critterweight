@@ -3,7 +3,10 @@ extends Node
 ## Impacts/Movement/Zones -> SFX, Creatures/Dialogue -> Voice, Crowd -> Ambience), the sound bank
 ## (assets/audio/bank.json, built by tools/audio/build.js), pooled 2D/3D players with priorities and
 ## variation rules, music with crossfades, bar-synced jumps, stingers and intensity/variant layers,
-## the announcer/coach queue (babble + subtitles), crowd heat and arena/hub ambience.
+## the announcer/coach queue (recorded speech or babble + subtitles; v0.9.17 commentary engine:
+## CommentaryDirector decides what to say, CommentarySelector picks fresh lines against the persistent
+## CommentaryHistory, the queue expires stale calls — docs/audio/COMMENTARY.md), crowd heat and
+## arena/hub ambience.
 ## Contract (docs/ARCHITECTURE.md): sfx(id, pos?, vol_db, pitch), music(track, fade), announce(line_id)
 ## + `subtitle` signal. Integration helpers: attach_match(sim, player_index) / on_sim_event(ev).
 ## Invariants: headless/server/lab processes never load or play audio (every call is a safe no-op
@@ -12,6 +15,9 @@ extends Node
 signal subtitle(speaker: String, text: String, seconds: float)
 signal line_started(line_id: String)
 signal line_finished(line_id: String)
+## v0.9.17 commentary log (audit tool and tests): {kind: request|queued|started|finished|dropped|
+## expired|interrupted|invalidated, id, ...}. Emitted only while something is connected.
+signal commentary_event(ev: Dictionary)
 
 const BANK_PATH := "res://assets/audio/bank.json"
 const BUSES := ["Music", "SFX", "Voice", "UI", "Ambience"]
@@ -19,9 +25,28 @@ const SUB_BUSES := {"Impacts": ["SFX", 0.0], "Movement": ["SFX", -4.0], "Zones":
 const POOL_2D := 24
 const POOL_3D := 32
 const DUCK_RECOVER := 6.0            ## dB per second
-const REDUCED_TRIGGERS := ["ko", "round_start", "juice", "win", "draw", "boss_intro", "boss_phase2", "intro", "time"]
-const PRIORITY_INTERRUPT := 90
-const PRIORITY_QUEUE := 70
+const REDUCED_TRIGGERS := ["ko", "round_start", "juice", "win", "draw", "boss_intro", "boss_phase2", "intro", "time", "stoppage",
+	"decision", "career_intro", "career_result"]
+const PRIORITY_INTERRUPT := 90       ## interrupts anything at or below its own priority
+const PRIORITY_QUEUE_MIN := 25        ## below this a line is only spoken when the booth is free
+const QUEUE_MAX := 3
+const LINE_GAP_LOW := 1.1            ## seconds of breathing room before a low-priority line
+const LINE_GAP_MEDIUM := 0.3
+const INTERRUPT_FADE := 0.12         ## an interrupted recording fades instead of clicking off
+const SPEECH_DB := -2.0
+## When a request finds no line of its own: accurate stand-ins only ([trigger, extra ctx]).
+const REQUEST_FALLBACK := {
+	"career_intro": [["intro", {}]],
+	"career_result": [["win", {}]],
+	"decision": [["time", {"kind": "decision"}]],
+	"comeback": [["reversal", {}]],
+	"hurt": [["low_health", {}]],
+	"ability_hit": [["ability", {}]],
+	"element": [["element_color", {}]],
+	"fighter_color": [["color", {}]],
+	"matchup_color": [["color", {}]],
+	"element_color": [["color", {}]],
+}
 
 var enabled := false                  ## false when headless / dedicated server / lab worker
 var bank := {}                        ## parsed bank.json
@@ -68,12 +93,17 @@ var _lines_by_trigger := {}           ## trigger -> Array of ids
 var _babble: Babble
 var _speech := preload("res://src/audio/speech_library.gd").new()
 var _speech_player: AudioStreamPlayer
+var _speech_player_b: AudioStreamPlayer   ## the other half of the interrupt crossfade
 var _speech_clips: Array = []
-var _ann_current := {}                ## {id, priority, until, speaker}
-var _ann_pending := {}                ## one queued line
-var _ann_used := {}                   ## ids used in this match
-var _ann_rotation := {}               ## trigger -> int
+var _ann_current := {}                ## {id, priority, until, speaker, follow, trigger}
+var _ann_queue: Array = []            ## waiting lines, best first (QUEUE_MAX), each with expires/not_before/tag
+var _ann_last_end := -100.0           ## when the booth last finished a line (breathing room)
+var _ann_speakers: Array = []         ## the last few speakers (voice balance)
 var _ann_seed := 0
+var _history: CommentaryHistory = null
+var _history_in_memory := false
+var _selector: CommentarySelector = null
+var _director: CommentaryDirector = null   ## present between begin_match and end_match
 var _ann_last_trigger_time := {}      ## reduced mode frequency limiting
 var _ann_conversation_groups := {}    ## conversation id -> ordered Array[Dictionary]
 var _ann_conversation_queue: Array = []
@@ -122,8 +152,12 @@ func _ready() -> void:
 			_babble.add_voice(str(sp), bank["voices"][sp])
 		_speech_player = _make_2d("Dialogue")
 		_speech_player.name = "RecordedSpeech"
-		_speech_player.volume_db = -2.0
-		_speech_player.finished.connect(_advance_speech)
+		_speech_player.volume_db = SPEECH_DB
+		_speech_player.finished.connect(_advance_speech.bind(_speech_player))
+		_speech_player_b = _make_2d("Dialogue")
+		_speech_player_b.name = "RecordedSpeechB"
+		_speech_player_b.volume_db = SPEECH_DB
+		_speech_player_b.finished.connect(_advance_speech.bind(_speech_player_b))
 		_music_sting = AudioStreamPlayer.new()
 		_music_sting.bus = "Music"
 		_music_sting.name = "Sting"
@@ -802,8 +836,16 @@ func _tick_music(dt: float) -> void:
 
 
 # ---------------------------------------------------------------------------------------
-# Announcer and coach
+# Announcer and coach (v0.9.17: docs/audio/COMMENTARY.md)
 # ---------------------------------------------------------------------------------------
+# Lines come from content (announcer/*.json): {id, speaker, trigger, when, priority, text} plus the
+# v0.9.17 metadata {families, energy, situation, also}. `also` lists further triggers a line is
+# accurate for. Selection (CommentarySelector) scores every line whose `when` matches against the
+# persistent CommentaryHistory. The queue holds up to QUEUE_MAX waiting lines, best first; each one
+# expires (a late call is worse than none) and a result call (KO, stoppage, decision, match end)
+# invalidates everything less urgent that was waiting. During a match CommentaryDirector decides
+# what to talk about; announce()/announce_trigger()/say() stay the API for menus, the hub, the
+# tutorial and the modes.
 
 func _load_lines() -> void:
 	_lines.clear()
@@ -816,20 +858,24 @@ func _load_lines() -> void:
 		if str(e.get("text", "")) == "":
 			continue
 		var pk := str(e.get("pack", ""))
+		var triggers: Array = [str(e.get("trigger", ""))]
+		for extra in e.get("also", []):
+			if not triggers.has(str(extra)):
+				triggers.append(str(extra))
 		if pk != "":
 			_pack_lines[id] = e
 			if not _pack_by_trigger.has(pk):
 				_pack_by_trigger[pk] = {}
-			var pt := str(e.get("trigger", ""))
-			if not (_pack_by_trigger[pk] as Dictionary).has(pt):
-				_pack_by_trigger[pk][pt] = []
-			_pack_by_trigger[pk][pt].append(id)
+			for pt in triggers:
+				if not (_pack_by_trigger[pk] as Dictionary).has(pt):
+					_pack_by_trigger[pk][pt] = []
+				_pack_by_trigger[pk][pt].append(id)
 			continue
 		_lines[id] = e
-		var trig := str(e.get("trigger", ""))
-		if not _lines_by_trigger.has(trig):
-			_lines_by_trigger[trig] = []
-		_lines_by_trigger[trig].append(id)
+		for trig in triggers:
+			if not _lines_by_trigger.has(trig):
+				_lines_by_trigger[trig] = []
+			_lines_by_trigger[trig].append(id)
 		var conversation_id := str(e.get("conversation_id", ""))
 		if conversation_id != "":
 			var group: Array = _ann_conversation_groups.get(conversation_id, [])
@@ -854,6 +900,11 @@ func line(id: String) -> Dictionary:
 	return _lines.get(id, _pack_lines.get(id, {}))
 
 
+## Standard-bank ids registered for a trigger (its own lines and the ones listing it in `also`).
+func trigger_line_ids(trigger: String) -> Array:
+	return (_lines_by_trigger.get(trigger, []) as Array).duplicate()
+
+
 ## Line packs installed (ids), e.g. ["vintage_bellows"].
 func line_packs() -> Array:
 	var out: Array = _pack_by_trigger.keys()
@@ -864,7 +915,9 @@ func line_packs() -> Array:
 func pack_line_ids(pack: String) -> Array:
 	var out: Array = []
 	for t in _pack_by_trigger.get(pack, {}):
-		out.append_array(_pack_by_trigger[pack][t])
+		for id in _pack_by_trigger[pack][t]:
+			if not out.has(id):
+				out.append(id)
 	out.sort()
 	return out
 
@@ -872,6 +925,27 @@ func pack_line_ids(pack: String) -> Array:
 ## Selects the active line pack ("" or an unknown pack = the standard bank).
 func set_announcer_pack(pack: String) -> void:
 	announcer_pack = pack if _pack_by_trigger.has(pack) else ""
+
+
+## The commentary memory (persistent across matches and restarts; see CommentaryHistory).
+func commentary_history() -> CommentaryHistory:
+	_ensure_commentary()
+	return _history
+
+
+func _ensure_commentary() -> void:
+	if _history == null:
+		_history = CommentaryHistory.open_default() if not _history_in_memory else CommentaryHistory.new()
+		_selector = CommentarySelector.new(_history)
+		_selector.seed_match(_ann_seed)
+
+
+## Tests and tools: keep the history in memory (no file) from now on, starting empty.
+func use_memory_history() -> void:
+	_history_in_memory = true
+	_history = CommentaryHistory.new()
+	_selector = CommentarySelector.new(_history)
+	_selector.seed_match(_ann_seed)
 
 
 func _substitute(text: String, vars: Dictionary) -> String:
@@ -885,17 +959,19 @@ func _substitute(text: String, vars: Dictionary) -> String:
 
 
 ## Speaks a line from the bank by id (announcer or coach). Returns false if dropped.
-func announce(line_id: String, vars := {}) -> bool:
+## opts: {ttl, tag, priority (overrides the line's), follow (a request spoken after it)}.
+func announce(line_id: String, vars := {}, opts := {}) -> bool:
 	var l: Dictionary = _lines.get(line_id, _pack_lines.get(line_id, {}))
 	if l.is_empty():
 		_warn_missing("line:" + line_id)
 		return false
-	return _say_line(line_id, str(l.get("speaker", "barnaby")), str(l["text"]), int(l.get("priority", 50)), vars, str(l.get("mood", "")), str(l.get("trigger", "")))
+	var priority := int(opts.get("priority", l.get("priority", 50)))
+	return _say_line(line_id, str(l.get("speaker", "barnaby")), str(l["text"]), priority, vars, str(l.get("mood", "")), str(l.get("trigger", "")), opts)
 
 
 ## Speaks arbitrary text (coach prompts, mod lines). Returns false if dropped.
 func say(speaker: String, text: String, priority := 50, vars := {}, mood := "") -> bool:
-	return _say_line("say:%d" % hash(text), speaker, text, priority, vars, mood, "say")
+	return _say_line("say:%d" % hash(text), speaker, text, priority, vars, mood, "say", {})
 
 
 ## Recorded duration for world bubbles and scripted dialogue pacing; zero for unrecorded text.
@@ -909,7 +985,7 @@ func speech_seconds(speaker: String, text: String, vars := {}) -> float:
 func stop_announcer() -> void:
 	_stop_speech()
 	_ann_current = {}
-	_ann_pending = {}
+	_ann_queue.clear()
 	_ann_conversation_queue.clear()
 	_ann_active_conversation = ""
 	if _babble:
@@ -922,30 +998,98 @@ func announcer_busy() -> bool:
 	return not _ann_current.is_empty()
 
 
-func _say_line(id: String, speaker: String, text: String, priority: int, vars: Dictionary, mood: String, trigger: String) -> bool:
+## The waiting lines, best first (inspection/tests): [{id, priority, expires, tag, ...}].
+func announcer_queue() -> Array:
+	return _ann_queue
+
+
+static func default_ttl(priority: int) -> float:
+	if priority >= 90:
+		return 5.0
+	if priority >= 70:
+		return 3.0
+	if priority >= 50:
+		return 2.0
+	return 1.5
+
+
+func _say_line(id: String, speaker: String, text: String, priority: int, vars: Dictionary, mood: String, trigger: String, opts := {}) -> bool:
 	var is_announcer := speaker in ["barnaby", "kendall"]
 	if announcer_mode == "off" and is_announcer:
+		_log_commentary("dropped", {"id": id, "why": "off"})
 		return false
 	var reduced := announcer_mode == "reduced"
-	if reduced and is_announcer and trigger != "say" and not REDUCED_TRIGGERS.has(trigger):
+	if reduced and is_announcer and trigger != "say" and not REDUCED_TRIGGERS.has(trigger) and not REDUCED_TRIGGERS.has(str(opts.get("request", ""))):
+		_log_commentary("dropped", {"id": id, "why": "reduced"})
 		return false
 	var now := _now()
 	if reduced and trigger != "say":
 		if now - float(_ann_last_trigger_time.get(trigger, -100.0)) < 8.0:
+			_log_commentary("dropped", {"id": id, "why": "reduced_rate"})
 			return false
 		_ann_last_trigger_time[trigger] = now
-	var entry := {"id": id, "speaker": speaker, "text": _substitute(text, vars), "priority": priority, "mood": mood, "vars": vars, "source": text}
-	if not _ann_current.is_empty():
-		if priority >= PRIORITY_INTERRUPT and priority >= int(_ann_current["priority"]):
+	var ttl := float(opts.get("ttl", default_ttl(priority)))
+	var entry := {"id": id, "speaker": speaker, "text": _substitute(text, vars), "priority": priority, "mood": mood, "vars": vars, "source": text,
+		"expires": now + ttl, "tag": str(opts.get("tag", "")), "queued_at": now, "trigger": trigger, "follow": opts.get("follow", {})}
+	if _ann_current.is_empty():
+		# breathing room: low-priority talk waits a beat after the last line
+		var gap := LINE_GAP_LOW if priority < 50 else (LINE_GAP_MEDIUM if priority < 80 else 0.0)
+		if now - _ann_last_end >= gap:
 			_start_line(entry)
 			return true
-		if priority >= PRIORITY_QUEUE:
-			if _ann_pending.is_empty() or priority >= int(_ann_pending["priority"]):
-				_ann_pending = entry
-			return true
-		return false
-	_start_line(entry)
+		entry["not_before"] = _ann_last_end + gap
+		return _enqueue(entry)
+	var cur_p := int(_ann_current["priority"])
+	if (priority >= PRIORITY_INTERRUPT and priority >= cur_p) or (priority >= 80 and cur_p <= 40):
+		_log_commentary("interrupted", {"id": str(_ann_current["id"]), "by": id})
+		_start_line(entry)
+		return true
+	if priority >= PRIORITY_QUEUE_MIN:
+		return _enqueue(entry)
+	_log_commentary("dropped", {"id": id, "why": "busy"})
+	return false
+
+
+func _enqueue(entry: Dictionary) -> bool:
+	_ann_queue.append(entry)
+	_ann_queue.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		if int(a["priority"]) != int(b["priority"]):
+			return int(a["priority"]) > int(b["priority"])
+		return float(a["queued_at"]) < float(b["queued_at"]))
+	while _ann_queue.size() > QUEUE_MAX:
+		var gone: Dictionary = _ann_queue.pop_back()
+		_log_commentary("dropped", {"id": str(gone["id"]), "why": "queue_full"})
+		if gone == entry:
+			return false
+	_log_commentary("queued", {"id": str(entry["id"]), "priority": int(entry["priority"]), "ttl": float(entry["expires"]) - _now()})
 	return true
+
+
+## Drops waiting lines that are stale now: everything below `below` priority (a result call), or
+## only those carrying `tag` (a new round makes the last round's calls stale).
+func invalidate_queued(below: int, tag := "") -> void:
+	var keep: Array = []
+	for e in _ann_queue:
+		if int(e["priority"]) < below and (tag == "" or str(e["tag"]) == tag):
+			_log_commentary("invalidated", {"id": str(e["id"])})
+		else:
+			keep.append(e)
+	_ann_queue = keep
+
+
+## The next waiting line that is still fresh, or {} (expired ones are dropped and logged).
+func _next_queued(now: float) -> Dictionary:
+	while not _ann_queue.is_empty():
+		var e: Dictionary = _ann_queue[0]
+		if now > float(e["expires"]):
+			_ann_queue.pop_front()
+			_log_commentary("expired", {"id": str(e["id"]), "waited": now - float(e["queued_at"])})
+			continue
+		if now < float(e.get("not_before", 0.0)):
+			return {}
+		_ann_queue.pop_front()
+		return e
+	return {}
 
 
 func _start_line(entry: Dictionary) -> void:
@@ -954,7 +1098,7 @@ func _start_line(entry: Dictionary) -> void:
 		_ann_active_conversation = ""
 	var text: String = entry["text"]
 	var speaker: String = entry["speaker"]
-	_stop_speech()
+	_stop_speech(true)
 	if _babble:
 		_babble.stop()
 	var merged := _ann_vars.duplicate()
@@ -976,18 +1120,42 @@ func _start_line(entry: Dictionary) -> void:
 		seconds = _babble.speak(str(entry["id"]), speaker, text, _ann_seed + hash(str(entry["id"])), reduced and speaker == "barnaby", names, str(entry["mood"]))
 	if seconds <= 0.0:
 		seconds = clampf(float(text.length()) * 0.055, 1.2, 4.0)
-	_ann_current = {"id": entry["id"], "priority": entry["priority"], "until": _now() + seconds + 0.15, "speaker": speaker, "recorded": not recording.is_empty()}
-	_ann_used[entry["id"]] = true
+	_ann_current = {"id": entry["id"], "priority": entry["priority"], "until": _now() + seconds + 0.15, "speaker": speaker,
+		"recorded": not recording.is_empty(), "follow": entry.get("follow", {}), "trigger": str(entry.get("trigger", ""))}
+	var fams: Array = line(str(entry["id"])).get("families", [])
+	if speaker in ["barnaby", "kendall"]:
+		_ensure_commentary()
+		_history.note_play(str(entry["id"]), fams)
+		_ann_speakers.append(speaker)
+		if _ann_speakers.size() > 4:
+			_ann_speakers.pop_front()
+	if _director:
+		_director.note_line_started(_director.t)
 	if subtitles_on:
 		subtitle.emit(speaker, text, seconds + 0.6)
+	_log_commentary("started", {"id": str(entry["id"]), "speaker": speaker, "seconds": seconds, "priority": int(entry["priority"]),
+		"waited": _now() - float(entry.get("queued_at", _now())), "said": text})
 	line_started.emit(str(entry["id"]))
 	_music_lead_mute(true)
 	_duck_target["Crowd"] = -3.0
 
 
-func _stop_speech() -> void:
+## crossfade = true: the outgoing recording fades for INTERRUPT_FADE instead of clicking off.
+func _stop_speech(crossfade := false) -> void:
 	_speech_clips.clear()
-	if _speech_player:
+	if _speech_player == null:
+		return
+	if crossfade and _speech_player.playing and enabled:
+		var old := _speech_player
+		_speech_player = _speech_player_b
+		_speech_player_b = old
+		var tw := create_tween()
+		tw.tween_property(old, "volume_db", -40.0, INTERRUPT_FADE)
+		tw.tween_callback(func() -> void:
+			old.stop()
+			old.stream = null
+			old.volume_db = SPEECH_DB)
+	else:
 		_speech_player.stop()
 		_speech_player.stream = null
 
@@ -998,10 +1166,13 @@ func _play_speech_clip() -> void:
 	var path := str(_speech_clips.pop_front())
 	_speech_player.stream = _stream(path)
 	_speech_player.pitch_scale = 1.0
+	_speech_player.volume_db = SPEECH_DB
 	_speech_player.play()
 
 
-func _advance_speech() -> void:
+func _advance_speech(player: AudioStreamPlayer = null) -> void:
+	if player != null and player != _speech_player:
+		return      # the faded-out recording of an interrupted line
 	if _speech_clips.is_empty():
 		_finish_line()
 	else:
@@ -1016,19 +1187,31 @@ func _finish_line() -> void:
 	if _ann_current.is_empty():
 		return
 	var id := str(_ann_current["id"])
+	var follow: Dictionary = _ann_current.get("follow", {})
 	_stop_speech()
 	_ann_current = {}
+	_ann_last_end = _now()
+	if _director:
+		_director.note_line_finished(_director.t)
+	_log_commentary("finished", {"id": id})
 	line_finished.emit(id)
-	if not _ann_pending.is_empty():
-		var nxt := _ann_pending
-		_ann_pending = {}
+	if not follow.is_empty() and _director != null and announcer_mode == "full":
+		var r := follow.duplicate()
+		r["ctx"] = (r.get("ctx", {}) as Dictionary)
+		r["priority"] = int(CommentaryDirector.CLASS_PRIORITY.get(str(r.get("class", "color")), 15))
+		r["after"] = id
+		_do_request(r)
+	if not _ann_current.is_empty():
+		return
+	var nxt := _next_queued(_now())
+	if not nxt.is_empty():
 		_ann_conversation_queue.clear()
 		_ann_active_conversation = ""
 		_start_line(nxt)
 	elif not _ann_conversation_queue.is_empty() and _ann_active_conversation != "":
 		var conversation_id := _ann_active_conversation
 		get_tree().create_timer(0.45).timeout.connect(_continue_color_conversation.bind(conversation_id), CONNECT_ONE_SHOT)
-	else:
+	elif _ann_queue.is_empty():
 		_ann_active_conversation = ""
 		_music_lead_mute(false)
 		_duck_target["Crowd"] = 0.0
@@ -1049,31 +1232,61 @@ func _continue_color_conversation(conversation_id: String) -> void:
 
 
 ## Picks and speaks a line for a trigger ("ko", "big_hit", ...). ctx keys are matched against each
-## line's `when` (string equality or membership when the ctx value is an Array); the most specific
-## matching lines win, rotate by seed and are not repeated within a match. Returns the id or "".
+## line's `when` (string equality, or membership when either side is an Array); among the matching
+## lines CommentarySelector prefers specific, fresh lines from fresh joke families. Returns the id or "".
 func announce_trigger(trigger: String, ctx := {}, vars := {}) -> String:
 	var id := pick_line(trigger, ctx)
 	if id == "":
 		return ""
-	return id if announce(id, vars) else ""
+	return id if announce(id, vars, {"request": trigger}) else ""
 
 
-## Low-priority color commentary, paced during long matches. Rare booth exchanges use ordered turns.
-func announce_color_commentary(force_conversation := false) -> String:
-	if announcer_mode != "full" or not _ann_current.is_empty() or not _ann_pending.is_empty():
+## A director request {trigger, ctx, vars, class, priority, ttl, tag, energy, speaker_pref, follow}.
+## Returns the line id spoken or queued ("" when nothing fits or it was dropped).
+func _do_request(r: Dictionary) -> String:
+	var trigger := str(r.get("trigger", ""))
+	var ctx: Dictionary = r.get("ctx", {})
+	var priority := int(r.get("priority", CommentaryDirector.CLASS_PRIORITY.get(str(r.get("class", "low")), 40)))
+	if priority >= 100 and str(r.get("tag", "")) in ["result", "final"]:
+		invalidate_queued(100)
+	elif trigger == "round_start":
+		invalidate_queued(100, "round")
+	if trigger == "color_conversation":
+		var conv := _announce_color_conversation()
+		_log_commentary("request", {"trigger": trigger, "class": str(r.get("class", "")), "picked": conv})
+		return conv
+	var pref := str(r.get("speaker_pref", ""))
+	if pref == "" and int(priority) < 50 and _ann_speakers.size() >= 2 and _ann_speakers[-1] == _ann_speakers[-2]:
+		pref = "kendall" if _ann_speakers[-1] == "barnaby" else "barnaby"
+	var id := pick_line(trigger, ctx, {"speaker_pref": pref, "energy": str(r.get("energy", ""))})
+	for fb in REQUEST_FALLBACK.get(trigger, []):
+		if id != "":
+			break
+		id = pick_line(str(fb[0]), (fb[1] as Dictionary).merged(ctx, false), {"speaker_pref": pref})
+	_log_commentary("request", {"trigger": trigger, "class": str(r.get("class", "")), "picked": id, "ctx": ctx,
+		"score": _selector.last_breakdown.duplicate() if _selector else {}})
+	if id == "":
 		return ""
-	if force_conversation or _rng.randi_range(0, 8) == 0:
+	var opts := {"ttl": float(r.get("ttl", default_ttl(priority))), "tag": str(r.get("tag", "")), "priority": priority, "request": trigger}
+	if r.has("follow"):
+		opts["follow"] = r["follow"]
+	return id if announce(id, r.get("vars", {}), opts) else ""
+
+
+## Low-priority color commentary (tests and the menu path; matches use the director's pacing).
+func announce_color_commentary(force_conversation := false) -> String:
+	if announcer_mode != "full" or not _ann_current.is_empty() or not _ann_queue.is_empty():
+		return ""
+	if force_conversation:
 		var conversation_line := _announce_color_conversation()
 		if conversation_line != "":
 			return conversation_line
 	var context := _color_context()
-	var roll := _rng.randi_range(0, 99)
 	var trigger := "color"
-	if roll >= 96:
+	var roll := _rng.randi_range(0, 99)
+	if roll >= 90:
 		trigger = "matchup_color"
-	elif roll >= 86:
-		trigger = "element_color"
-	elif roll >= 68:
+	elif roll >= 66:
 		trigger = "fighter_color"
 	var id := pick_line(trigger, context)
 	if id == "" and trigger != "color":
@@ -1082,9 +1295,10 @@ func announce_color_commentary(force_conversation := false) -> String:
 
 
 func _announce_color_conversation() -> String:
+	_ensure_commentary()
 	var candidates: Array = []
 	for id in _lines_by_trigger.get("color_conversation_start", []):
-		if not _ann_used.has(id):
+		if _history.matches_since(str(id)) > 3:
 			candidates.append(id)
 	if candidates.is_empty():
 		return ""
@@ -1135,60 +1349,30 @@ func _color_context() -> Dictionary:
 	return context
 
 
-func pick_line(trigger: String, ctx := {}) -> String:
+## The best line for a trigger in this context (CommentarySelector), or "". An active line pack
+## (Vintage Bellows) answers first for the triggers it covers.
+func pick_line(trigger: String, ctx := {}, opts := {}) -> String:
+	_ensure_commentary()
 	if announcer_pack != "":
 		var pack_ids: Array = (_pack_by_trigger.get(announcer_pack, {}) as Dictionary).get(trigger, [])
-		var pid := _pick_from(pack_ids, _pack_lines, trigger, ctx)
+		var pid := _selector.pick(pack_ids, _pack_lines, ctx, opts)
 		if pid != "":
 			return pid
-	return _pick_from(_lines_by_trigger.get(trigger, []), _lines, trigger, ctx)
-
-
-## The most specific line of `ids` (entries in `table`) matching ctx, rotating through equals.
-func _pick_from(ids: Array, table: Dictionary, trigger: String, ctx: Dictionary) -> String:
-	if ids.is_empty():
-		return ""
-	var best: Array = []
-	var best_spec := -1
-	for id in ids:
-		var l: Dictionary = table[id]
-		var when: Dictionary = l.get("when", {})
-		var ok := true
-		for k in when:
-			if not ctx.has(k) or not _matches(ctx[k], when[k]):
-				ok = false
-				break
-		if not ok:
-			continue
-		var spec := when.size()
-		if spec > best_spec:
-			best_spec = spec
-			best = [id]
-		elif spec == best_spec:
-			best.append(id)
-	if best.is_empty():
-		return ""
-	var fresh: Array = []
-	for id in best:
-		if not _ann_used.has(id):
-			fresh.append(id)
-	var pool: Array = fresh if not fresh.is_empty() else best
-	pool.sort()
-	var rot := int(_ann_rotation.get(trigger, _ann_seed))
-	_ann_rotation[trigger] = rot + 1
-	return str(pool[posmod(rot, pool.size())])
+	return _selector.pick(_lines_by_trigger.get(trigger, []), _lines, ctx, opts)
 
 
 static func _matches(ctx_value, want) -> bool:
-	if typeof(ctx_value) == TYPE_ARRAY:
-		for v in ctx_value:
-			if _matches(v, want):
-				return true
-		return false
-	var numeric := typeof(want) == TYPE_FLOAT or typeof(want) == TYPE_INT
-	if numeric and (typeof(ctx_value) == TYPE_FLOAT or typeof(ctx_value) == TYPE_INT):
-		return is_equal_approx(float(ctx_value), float(want))  # JSON numbers parse as floats
-	return str(ctx_value) == str(want)
+	return CommentarySelector.matches(ctx_value, want)
+
+
+func _log_commentary(kind: String, data: Dictionary) -> void:
+	if commentary_event.get_connections().is_empty():
+		return
+	var d := data.duplicate()
+	d["kind"] = kind
+	d["now"] = _now()
+	d["match_t"] = _director.t if _director else 0.0
+	commentary_event.emit(d)
 
 
 # ---------------------------------------------------------------------------------------
@@ -1336,10 +1520,13 @@ func set_room(room: String) -> void:
 func begin_match(ctx: Dictionary) -> void:
 	stop_announcer()  # a menu quip must never block the walk-in line
 	_match = ctx.duplicate(true)
-	_ann_used.clear()
-	_ann_rotation.clear()
 	_ann_seed = int(ctx.get("seed", 0))
 	_ann_vars = {}
+	_ann_speakers.clear()
+	_ann_last_end = -100.0
+	_ensure_commentary()
+	_history.begin_match()
+	_selector.seed_match(_ann_seed)
 	# the profile's announcer line pack (Vintage Bellows from the Cannery) unless the caller names one
 	var pf: Dictionary = Profiles.current if typeof(Profiles.current) == TYPE_DICTIONARY else {}
 	set_announcer_pack(str(ctx.get("announcer_pack", pf.get("announcer_pack", ""))))
@@ -1354,7 +1541,16 @@ func begin_match(ctx: Dictionary) -> void:
 	_ann_vars["a"] = str(ctx.get("arena_name", ctx.get("arena", "")))
 	_match["names"] = names
 	_match["state"] = _default_state()
-	_match["state"]["next_color_at"] = _rng.randf_range(34.0, 42.0)
+	# the director: enrich the fighters with their element for element/matchup talk
+	var dfs: Array = []
+	for f in ctx.get("fighters", []):
+		var fd: Dictionary = (f as Dictionary).duplicate()
+		fd["element"] = str(Content.creature_entry(str(fd.get("creature", ""))).get("element", ""))
+		dfs.append(fd)
+	_director = CommentaryDirector.new()
+	_director.begin({"fighters": dfs, "player_index": pi, "context": str(ctx.get("context", "versus")), "seed": _ann_seed,
+		"career": ctx.get("career", {}), "ten_point": bool(ctx.get("ten_point", false)), "referee": bool(ctx.get("referee", false)),
+		"rounds": int(ctx.get("rounds", 1))})
 	crowd_heat = 0.15
 	if enabled:
 		crowd_start()
@@ -1373,6 +1569,9 @@ func end_match(owner_sim: Node = null) -> void:
 	crowd_stop(1.5)
 	stop_announcer()
 	_match = {}
+	_director = null
+	if _history:
+		_history.save_file()
 	detach_match()
 
 
@@ -1393,6 +1592,11 @@ func attach_match(sim: Node, player_index: int, ctx := {}) -> Node:
 		c["arena_base"] = str(sim.get("arena").base)
 	if not c.has("seed"):
 		c["seed"] = int(sim.get("seed_value"))
+	var rules = sim.get("rules")
+	if typeof(rules) == TYPE_DICTIONARY:
+		c["rounds"] = int((rules as Dictionary).get("rounds", 1))
+		c["ten_point"] = str((rules as Dictionary).get("scoring", "")) == "ten_point"
+		c["referee"] = bool((rules as Dictionary).get("referee", false))
 	begin_match(c)
 	var bridge := AudioMatchBridge.new()
 	bridge.name = "MatchBridge"
@@ -1494,14 +1698,9 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 	if pos != null and not (pos is Vector3):
 		pos = null
 	var st := _state()
-	var t := float(info.get("time", st.get("time", 0.0)))
 	var play := func(id: String, p = null, vol: float = 0.0, pitch: float = 1.0) -> void:
 		sfx(id, p if p != null else pos, vol, pitch)
 		acts.append(id)
-	var say_t := func(trigger: String, ctx: Dictionary = {}) -> void:
-		var id := announce_trigger(trigger, ctx)
-		if id != "":
-			acts.append("line:" + id)
 	match type:
 		"hit":
 			var ti := int(ev.get("target", -1))
@@ -1540,81 +1739,14 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 					add_heat(dmg / 120.0)
 				if dmg >= 10.0:
 					crowd("crowd_ooh")
-				# announcer
-				if not bool(st.get("first_hit", false)) and dmg > 0.5:
-					st["first_hit"] = true
-					var c1 := _who(fi, ti)
-					if heavy:
-						c1["kind"] = "heavy"
-					say_t.call("first_hit", c1)
-				elif dmg >= 10.0:
-					var kinds: Array = []
-					if bool(ev.get("counter", false)):
-						kinds.append("counter")
-					if dmg >= 15.0:
-						kinds.append("big_damage")
-					if str(ev.get("move", "")).contains("charged") or slot == "charged":
-						kinds.append("charged")
-					if float(ev.get("launch", 0.0)) > 0.0:
-						kinds.append("launcher")
-					var c2 := _who(fi, ti)
-					c2["kind"] = kinds
-					say_t.call("big_hit", c2)
-				# combo counting per attacker
-				var combo: Dictionary = st["combo"]
-				var cc: Dictionary = combo.get(fi, {"n": 0, "t": -10.0})
-				if t - float(cc["t"]) < 1.1 and dmg > 0.5:
-					cc["n"] = int(cc["n"]) + 1
-				elif dmg > 0.5:
-					cc["n"] = 1
-				cc["t"] = t
-				combo[fi] = cc
-				var n := int(cc["n"])
-				if slot == "finisher":
-					var c3 := _who(fi, ti)
-					c3["kind"] = "finisher"
-					say_t.call("combo", c3)
-				elif n == 3 or n == 4 or n == 6:
-					var c4 := _who(fi, ti)
-					c4["kind"] = "three" if n == 3 else ("four_plus" if n == 4 else "six_plus")
-					say_t.call("combo", c4)
 		"glance":
 			play.call("glance")
 		"parry":
 			play.call("parry")
-			st["parries"] = int(st.get("parries", 0)) + 1
-			var attacker := int(ev.get("attacker", -1))
-			var cp := _who(fi, attacker)
-			var kinds2: Array = []
-			if str(st["last_slot"].get(fi, "")) == "heavy":
-				kinds2.append("heavy")
-			if int(st["parries"]) == 3:
-				kinds2.append("third")
-			cp["kind"] = kinds2
-			say_t.call("parry", cp)
 		"knockdown":
 			play.call("knockdown")
 			_voice(fi, "hurt", pos)
-			st["knockdowns"] = int(st.get("knockdowns", 0)) + 1
 			add_heat(0.12)
-			var reason := str(ev.get("reason", "hit"))
-			var att := int(st["last_attacker"].get(fi, -1))
-			var ck := _who(att, fi)
-			var kinds3: Array = []
-			if reason == "poise":
-				kinds3.append("poise")
-			elif reason == "throw":
-				kinds3.append("throw")
-			elif reason == "trip":
-				kinds3.append("trip")
-			if int(st["knockdowns"]) == 3:
-				kinds3.append("third")
-			ck["kind"] = kinds3
-			if bool(info.get("referee", false)):
-				# a referee is counting: no "Let him up or don't, I'm not the ref!" (the only
-				# knockdown line keyed on "who")
-				ck.erase("who")
-			say_t.call("knockdown", ck)
 			if _is_player(fi):
 				crowd("crowd_aww")
 			else:
@@ -1625,28 +1757,13 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 			play.call("ko")
 			if str(Settings.get_value("access.gore")) == "full":
 				play.call("ko_piece", pos, 0.0, 1.0)
+				info["gore_full"] = true
 			_voice(fi, "ko", pos)
 			add_heat(0.4)
 			crowd("crowd_cheer")
-			var att2 := int(st["last_attacker"].get(fi, -1))
-			var slot2 := str(st["last_slot"].get(fi, ""))
-			var ck2 := _who(att2, fi)
-			var kinds4: Array = []
-			if slot2 == "heavy" or slot2 == "finisher":
-				kinds4.append("heavy")
-			elif slot2 == "throw" or slot2 == "slam":
-				kinds4.append("throw")
-			elif slot2 == "zone" or slot2 == "reaction":
-				kinds4.append("zone")
-			if str(ev.get("by", "")) == "juice" or bool(info.get("attacker_juiced", false)):
-				kinds4.append("juice")
-			if t - float(st.get("round_started_at", 0.0)) < 30.0:
-				kinds4.append("fast")
-			if str(Settings.get_value("access.gore")) == "full":
-				kinds4.append("piece")
-			ck2["kind"] = kinds4
-			if type == "ko":
-				say_t.call("ko", ck2)
+			if type == "downed":
+				# a downed fighter (co-op / bonus modes) is not knocked out: no KO call
+				return acts
 		"guard_break":
 			play.call("guard_break")
 			_voice(fi, "hurt", pos)
@@ -1659,7 +1776,6 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 			_voice(fi, "juice", pos)
 			add_heat(0.3)
 			crowd("crowd_cheer")
-			say_t.call("juice", {"creature": _fighter_creature(fi)})
 			if music_track() == "combat_b":
 				music_jump("B")
 		"juice_end":
@@ -1679,11 +1795,6 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 		"taunt":
 			play.call("taunt_sting")
 			_voice(fi, "taunt", pos)
-			var ct := {"creature": _fighter_creature(fi)}
-			var hp: Array = info.get("health", [])
-			if fi >= 0 and fi < hp.size() and float(hp[fi]) < 0.2:
-				ct["kind"] = "low"
-			say_t.call("taunt", ct)
 		"move_start":
 			var ms := str(ev.get("slot", ""))
 			if ms in ["heavy", "finisher"]:
@@ -1691,8 +1802,6 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 				_voice(fi, "grunt", pos)
 			elif ms in ["l1", "l2", "l3", "dash_attack"]:
 				play.call("whoosh_light")
-			elif ms == "taunt":
-				pass
 		"ability":
 			var aid := str(ev.get("id", ""))
 			var cand := "ab_" + aid
@@ -1700,7 +1809,6 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 			if alias_map.has(cand):
 				cand = str(alias_map[cand])
 			play.call(cand if _sfx_entries.has(cand) else "ab_generic")
-			say_t.call("ability", {"creature": _fighter_creature(fi), "slot": str(ev.get("slot", "")), "id": aid})
 		"effect":
 			var et := str(ev.get("effect", ""))
 			var el2 := str(ev.get("element", ""))
@@ -1741,7 +1849,6 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 				play.call("react_" + rid)
 			add_heat(0.1)
 			crowd("crowd_ooh")
-			say_t.call("reaction", {"reaction": rid})
 		"slam":
 			var mat2 := "wall_splat_fence"
 			if _arena_id.contains("crusher"):
@@ -1752,120 +1859,66 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 				mat2 = "wall_splat_railing"
 			play.call(mat2)
 			add_heat(0.1)
-			var att3 := int(st["last_attacker"].get(fi, -1))
-			var cs := _who(att3, fi)
-			cs["kind"] = "wall"
-			say_t.call("big_hit", cs)
 		"ringout":
 			play.call("whoosh_heavy")
 			crowd("crowd_laugh")
-			var cr := _who(-1, fi)
-			if _is_player(fi):
-				cr["who"] = "player"
-			say_t.call("ringout", cr)
 		"reflect":
 			play.call("proj_reflect")
 		"round_intro":
-			var rnd := int(ev.get("round", 1))
-			st["round"] = rnd
+			st["round"] = int(ev.get("round", 1))
 			play.call("ui_round_card", null)
-			if rnd == 1:
-				# the opponent gets the walk-in line (one line fits the intro window)
-				for f in _match.get("fighters", []):
-					if not _is_player(int(f.get("index", -1))):
-						var cid := str(f.get("creature", ""))
-						if cid.begins_with("b_"):
-							say_t.call("boss_intro", {"boss": cid})
-						else:
-							say_t.call("intro", {"creature": cid})
-						break
 		"round_start":
 			play.call("ui_fight", null)
 			play.call("ann_bell", null)
-			st["round_started_at"] = t
-			st["first_hit"] = false
-			var rnd2 := int(ev.get("round", 1))
-			var cr2 := {}
-			if rnd2 >= 2:
-				cr2["round"] = "2plus"
-			if bool(info.get("final_round", false)):
-				cr2["round"] = "final"
-			if str(_match.get("context", "")) == "campaign":
-				cr2["context"] = "campaign"
-			announce_trigger("round_start", cr2, {"n": rnd2})
-			acts.append("line:round_start")
+			st["round_started_at"] = float(info.get("time", st.get("time", 0.0)))
 		"round_end":
 			play.call("ann_bell_triple", null)
 			crowd("crowd_cheer")
 		"timeout":
 			play.call("ann_bell", null)
-			# 10-point scoring rings the bell at the end of every round: the cards are announced
-			# once, on the judges' decision (info.ten_point comes from the bridge)
-			if not bool(info.get("ten_point", false)):
-				say_t.call("time", {"kind": "decision"})
 		"round_scored":
 			play.call("ui_card_flip", null)
 		"judges_decision":
-			# 10-point: the decision is read with the WINNER's name (recorded "time" templates with {p})
-			var wt := int(ev.get("winner", -1))
-			var method := str(ev.get("method", ""))
 			play.call("ann_sting", null)
-			if wt >= 0 and method == "TKO":
-				pass   # the stoppage already had its call (ref_stoppage)
-			elif wt >= 0 and method.begins_with("Sudden Death"):
-				say_t.call("time", {"kind": "sudden_death_won"})
-			elif wt >= 0:
-				var wid := announce_trigger("time", {"kind": "decision"}, {"p": _team_name(wt)})
-				if wid != "":
-					acts.append("line:" + wid)
-			elif not bool(info.get("sudden_death_follows", false)):
-				say_t.call("draw", {})
-				st["draw_announced"] = true
 		"ref_count":
 			play.call("ui_timer_tick", null, -4.0)
 		"ref_wave_up":
 			crowd("crowd_whistle")
 		"ref_stoppage":
-			# the referee waves it off: the KO bell and a KO call
+			# the referee waves it off: the KO bell (the director's stoppage call invalidates any
+			# knockdown call still waiting, so it never follows the T.K.O.)
 			play.call("ann_bell_triple", null)
 			play.call("ko")
 			add_heat(0.4)
 			crowd("crowd_cheer")
-			# a queued knockdown call is stale once the referee waves it off (it would follow the T.K.O.)
-			if not _ann_pending.is_empty() and int(_ann_pending.get("priority", 0)) < 100:
-				_ann_pending = {}
-			# no KO line names a stoppage: the generic calls (or the player's own "is OUT") fit it
-			var cks := _who(int(ev.get("by", -1)), fi)
-			cks["kind"] = ["stoppage"]
-			say_t.call("ko", cks)
 		"match_end":
 			var w := int(ev.get("winner", -1))
 			var my_team := -99
-			var winner_creature := ""
 			for f in _match.get("fighters", []):
 				if _is_player(int(f.get("index", -1))):
 					my_team = int(f.get("team", -99))
-				if int(f.get("team", -98)) == w and winner_creature == "":
-					winner_creature = str(f.get("creature", ""))
 			if w < 0:
-				if not bool(st.get("draw_announced", false)):
-					say_t.call("draw", {})
 				sting("defeat")
 			elif w == my_team:
 				sting("victory")
 				crowd("crowd_cheer")
 				crowd("crowd_can_shower")
-				say_t.call("win", {"creature": winner_creature})
 			else:
 				sting("defeat")
 				crowd("crowd_aww")
-				say_t.call("win", {"creature": winner_creature})
 		"respawn", "revived":
 			play.call("blink_up")
-		"elimination":
+		"elimination", "round_reset", "match_start", "effect_end":
 			pass
-		"round_reset", "match_start", "effect_end":
-			pass
+	# the booth (CommentaryDirector): what this event means for the commentary
+	if _director == null:
+		_director = CommentaryDirector.new()
+		_director.begin({"fighters": _match.get("fighters", []), "player_index": int(_match.get("player_index", 0)),
+			"context": str(_match.get("context", "versus")), "seed": _ann_seed})
+	for r in _director.on_event(ev, info):
+		var id := _do_request(r)
+		if id != "":
+			acts.append("line:" + id)
 	_match["state"] = st
 	return acts
 
@@ -1885,47 +1938,17 @@ func _state() -> Dictionary:
 	return _match["state"]
 
 
-## Low-health / time watchers (called by the bridge or the lead once per second).
-func on_match_tick(health: Array, time_left: float, dt: float) -> void:
+## The 4 Hz watchers (called by the bridge, or by NetMatchScene for replicated matches): the
+## director's low-health / clock / momentum calls and its paced observations and color in lulls.
+## info: optional {edge_fighter} (a fighter standing at the cage or roof edge).
+func on_match_tick(health: Array, time_left: float, dt: float, info := {}) -> void:
 	var st := _state()
 	st["time"] = float(st.get("time", 0.0)) + dt
-	if float(st["time"]) >= float(st.get("next_color_at", 38.0)):
-		if _ann_current.is_empty() and _ann_pending.is_empty():
-			announce_color_commentary()
-			st["next_color_at"] = float(st["time"]) + _rng.randf_range(38.0, 54.0)
-		else:
-			st["next_color_at"] = float(st["time"]) + 5.0
-	var low: Dictionary = st.get("low", {})
-	var pi := int(_match.get("player_index", 0))
-	var low_count := 0
-	for i in health.size():
-		var h := float(health[i])
-		if h < 0.2 and h > 0.0:
-			low_count += 1
-		if h < 0.2 and h > 0.0 and not bool(low.get(i, false)):
-			low[i] = true
-			var ctx := {}
-			if i == pi:
-				ctx["who"] = "player"
-			else:
-				ctx["who"] = "opponent"
-			if low_count >= 2:
-				ctx["who"] = "both"
-			if h < 0.1:
-				ctx["kind"] = "ten"
-			if str(_match.get("context", "")) == "coop":
-				ctx["context"] = "coop"
-			announce_trigger("low_health", ctx)
-		elif h >= 0.3:
-			low[i] = false
-	st["low"] = low
-	if time_left > 0.0 and time_left <= 10.0 and not bool(st.get("ten_warned", false)):
-		st["ten_warned"] = true
-		announce_trigger("time", {"kind": "ten_seconds"})
-		sfx("ui_timer_tick", null)
-	elif time_left > 10.0:
-		st["ten_warned"] = false
 	_match["state"] = st
+	if _director == null:
+		return
+	for r in _director.on_tick(health, time_left, dt, info):
+		_do_request(r)
 
 
 # ---------------------------------------------------------------------------------------
@@ -1993,6 +2016,7 @@ func _process(dt: float) -> void:
 		# keep the announcer queue moving for subtitles even without audio
 		if not _ann_current.is_empty() and _now() >= float(_ann_current["until"]):
 			_finish_line()
+		_pump_queue()
 		return
 	_tick_music(dt)
 	_tick_crowd(dt)
@@ -2024,6 +2048,7 @@ func _process(dt: float) -> void:
 	var speech_playing := _speech_player != null and _speech_player.playing
 	if not speech_playing and not _ann_current.is_empty() and now >= float(_ann_current["until"]) + 0.5:
 		_finish_line()
+	_pump_queue()
 	# ducking: impacts duck movement/zones/creatures briefly; dialogue ducks crowd
 	var impact_duck := now < _impact_duck_until
 	_duck_target["Movement"] = -3.0 if impact_duck else 0.0
@@ -2039,6 +2064,18 @@ func _process(dt: float) -> void:
 			var idx := AudioServer.get_bus_index(b)
 			if idx >= 0 and str(b) != "Radio":
 				AudioServer.set_bus_volume_db(idx, _bus_base_db(str(b)) + cur_d)
+
+
+## Starts the best waiting line once the booth is free and its breathing room has passed.
+func _pump_queue() -> void:
+	if not _ann_current.is_empty() or _ann_queue.is_empty():
+		return
+	var nxt := _next_queued(_now())
+	if not nxt.is_empty():
+		_start_line(nxt)
+	elif _ann_queue.is_empty() and _ann_active_conversation == "":
+		_music_lead_mute(false)
+		_duck_target["Crowd"] = 0.0
 
 
 func _playlist_finished(track: String) -> void:
