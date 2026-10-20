@@ -382,13 +382,14 @@ The owner asked for an optional referee that behaves like Cage Rules' referee, i
 scoring setting, and for Jeremy's referee model if it exists (2026-10-19). Rules gain `referee` (bool,
 default false, standard mode, duel only).
 
-- **Sim rules** (`RefereeRules`, src/sim/modes/referee_rules.gd), deterministic and RNG-free, active
-  only in FIGHT with the round open: a downed fighter is protected (no opponent hit lands while
-  KNOCKDOWN/DOWN/GETUP, including fighter-sourced zones; the grab/cage package and environment
-  damage are unchanged); strike knockdowns are counted once per second (`ref_count`); input gets up
-  at any time, the automatic get-up waits 4 s in DOWN (Cage Rules KD_STAY) and is a wave-up
-  (`getup.forced`, `ref_wave_up`); staying down regenerates stamina 2.5× (Cage Rules lets a downed
-  fighter clear his head); bots back off ~2.4 m while an opponent is down. One strike-knockdown
+- **Sim rules** (`RefereeRules`, src/sim/modes/referee_rules.gd), deterministic and RNG-free. In
+  every phase a downed fighter is protected (no opponent hit lands while KNOCKDOWN/DOWN/GETUP,
+  including fighter-sourced zones; the grab/cage package and environment damage are unchanged) and
+  bots back off ~2.4 m while an opponent is down. Only in FIGHT with the round open: strike
+  knockdowns are counted once per second (`ref_count`); input gets up at any time, the automatic
+  get-up waits 4 s in DOWN (Cage Rules KD_STAY) and is a wave-up (`getup.forced`, `ref_wave_up`);
+  staying down regenerates stamina 2.5× (Cage Rules lets a downed fighter clear his head); and
+  stoppages are called. One strike-knockdown
   definition (reason poise/move/hit by an enemy) serves judge and referee; throw, hazard and self
   knockdowns are never counted.
 - **Stoppage.** Five strike knockdowns of one fighter in one round stop the fight (`ref_stoppage`):
@@ -448,7 +449,9 @@ reliable saves), first in the Campaign menu, without grappling (2026-10-19).
 - **Rankings.** Cage Rules has no ranking table: standing is the tier, the popularity label, a
   contender number (#15…#1) in the top promotion and Champion.
 - **Fidelity choices:** quitting a career bout from the pause menu is a withdrawal (popularity −4, no
-  purse, as in Cage Rules); only a crash re-fights the same bout (same seed, opponent and arena).
+  purse, as in Cage Rules) until the judges or the referee have decided it; after that, leaving books
+  the result (Cage Rules settles a fight that has a result). Only a crash re-fights the same bout
+  (same seed, opponent and arena).
   Opponents are playable Critterweight fighters with original ring names; no real promotion or
   fighter names. Bot tier follows opponent level (Punching Bag … Headliner) with an Easy/Normal/Hard
   career difficulty; Hall-of-Famers appear only on Hard. Not recreated: Cage Rules' walkable 3D gym

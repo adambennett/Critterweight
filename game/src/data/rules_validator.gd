@@ -28,7 +28,7 @@ const FIELDS := {
 	"rounds": {"group": "Rounds & winning", "label": "Rounds", "type": "int", "def": 3, "min": 1, "max": 9,
 		"help": "Best of this many rounds. Odd numbers avoid ties. With 10-point scoring every round is fought and judged."},
 	"round_time": {"group": "Rounds & winning", "label": "Round time (s)", "type": "float", "def": 99.0, "min": 0.0, "max": 600.0, "step": 10.0,
-		"help": "0 = no timer. When time runs out the round goes to score, then remaining health."},
+		"help": "0 = no timer. When time runs out the round goes to score, then remaining health. With 10-point scoring the judges score the round at the bell (a timer is required)."},
 	"win": {"group": "Rounds & winning", "label": "Win condition", "type": "enum", "def": "ko", "options": WIN,
 		"help": "KO: last side standing. Score: first to the score target (KOs or mode points). Survive: co-op modes, last as long as you can. None: practice, nobody wins."},
 	"score_target": {"group": "Rounds & winning", "label": "Score target", "type": "int", "def": 5, "min": 1, "max": 200,

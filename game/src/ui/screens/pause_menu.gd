@@ -172,8 +172,11 @@ func _ask_restart() -> void:
 
 func _ask_quit() -> void:
 	if _career != null:
-		App.dialog("Pull out of this fight?", _career.withdraw_terms(),
-			[{"label": "Pull out", "id": "pull", "danger": true}, {"label": "Keep fighting", "id": "stay", "cancel": true, "default": true}],
+		# a bout the judges or the referee already decided is settled, not withdrawn from
+		var decided := CareerFlow.bout_decided()
+		App.dialog("Leave the fight?" if decided else "Pull out of this fight?",
+			"The decision stands and is booked." if decided else _career.withdraw_terms(),
+			[{"label": "Leave" if decided else "Pull out", "id": "pull", "danger": true}, {"label": "Keep fighting", "id": "stay", "cancel": true, "default": true}],
 			_on_pull_out_choice)
 		return
 	App.dialog("Quit to the main menu?", "The current fight ends without a result." if not _online else "You will leave the online match.",
@@ -183,7 +186,8 @@ func _ask_quit() -> void:
 				MatchFlow.quit_to_menu())
 
 
-## Career bout: "Pull out" withdraws (popularity -4, week +1, no purse) and returns to the menu.
+## Career bout: "Pull out" withdraws (popularity -4, week +1, no purse) and returns to the menu; after
+## the judges' decision or a stoppage, "Leave" books that result (CareerFlow.pull_out).
 func _on_pull_out_choice(id: String) -> void:
 	if id == "pull" and _career != null:
 		_career.pull_out()

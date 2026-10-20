@@ -145,8 +145,27 @@ func finish_fight(result: Dictionary) -> Dictionary:
 	return s
 
 
-## The pause menu's quit in a career bout (D4): a withdrawal, then back to the main menu.
+## True while the current bout has already been decided by the judges or the referee: the closing
+## ceremony (the DECISION_TIME round end) before sim.finish delivers the result.
+static func bout_decided() -> bool:
+	var ms := MatchFlow.current_match()
+	return ms != null and ms.sim != null and ms.sim.mode != null and not ms.sim.is_finished 		and ms.sim.mode.winner_team != -2
+
+
+## The pause menu's quit in a career bout (D4): a withdrawal, then back to the main menu. Once the
+## judges or the referee have decided the bout, leaving books that result instead of withdrawing
+## (Cage Rules' settleCareerFight applies a fight that already has a result), so a lost decision or
+## a lost belt can never be swapped for the cheaper withdrawal. Returns true for a withdrawal.
 func pull_out() -> bool:
+	if bout_decided():
+		var sim := MatchFlow.current_match().sim
+		MatchFlow.set_paused(false)
+		# deferred: we are inside the pause menu's dialog callback; finishing runs the normal path
+		# (match_finished -> _on_match_finished -> finish_fight -> career_result)
+		(func() -> void:
+			if is_instance_valid(sim) and not sim.is_finished:
+				sim.finish(sim.mode.build_result())).call_deferred()
+		return false
 	var ok := ctrl != null and ctrl.withdraw()
 	var terms := withdraw_terms()
 	MatchFlow.quit_to_menu()

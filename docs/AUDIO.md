@@ -259,6 +259,16 @@ creature sounds, UI feedback, ambience, mixing) and AUD-02 (variations, transiti
 alternatives, no missing assets, no clipping) — implemented, built, auto-tested, Windows-runtime verified by
 the showcase; UI-05's bus/device/mute settings were already wired by Settings and are honoured here.
 
+## 7b. 10-point scoring and the referee (v0.9.16)
+
+`AudioMatchBridge` passes `ten_point`, `referee` and `sudden_death_follows` with each sim event. Under
+10-point scoring a round's `timeout` keeps the bell but no decision line; `judges_decision` plays a sting
+and the recorded `time {kind: decision}` line with `{p}` = the WINNER's name (a sudden-death win uses
+`sudden_death_won`, a draw the draw line unless sudden death follows, a T.K.O. no second call).
+`ref_count` ticks (`ui_timer_tick`, −4 dB), `ref_wave_up` plays a crowd whistle, `ref_stoppage` the
+triple bell and a KO call. With a referee the knockdown context omits `who`, so "I'm not the ref!" is
+never chosen. No new announcer lines were added (every line stays recorded).
+
 ## 8. Known gaps and decisions
 
 - Size: 128.9 MB rendered against the ~120 MB target. The eight tracks follow the spec's bar structures at

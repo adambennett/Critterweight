@@ -211,8 +211,10 @@ changes (the parity test lists those without a 1-byte id). `seq` is implicit; `s
 the server.
 
 v0.9.16 10-point scoring and the referee add no wire layout: the events `round_scored`,
-`judges_decision`, `ref_count`, `ref_wave_up`, `ref_stoppage` and the fields `melee`, `forced`, `by`
-(knockdown, dot) and `was_down` travel as strings, so the protocol stays at 6. Running card totals
+`judges_decision`, `ref_count`, `ref_wave_up`, `ref_stoppage` and the new fields `melee`, `forced`,
+`was_down`, `n` and the card keys (`teams`, `judges`, `scores`, `tally`, `totals`, `stoppage`,
+`method`) travel as strings (`by` on knockdown, dot and ref_stoppage reuses the existing one-byte
+key), so the protocol stays at 6. Running card totals
 also reach late joiners through the replicated `hud_state.cards`; the referee figure is drawn from the
 replicated phase, fighter roots/states and `view_state.referee`. Rules travel whole in MATCH_START, so
 `scoring`/`referee` need no wire change; only the server judges and referees.

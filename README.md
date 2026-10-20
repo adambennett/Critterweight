@@ -1,6 +1,6 @@
 # CRITTERWEIGHT
 
-An original physical creature cage-fighting game. Six cartoon fighters with real active-ragdoll bodies hit,
+An original physical creature cage-fighting game. Eight cartoon fighters with real active-ragdoll bodies hit,
 block, grab and throw each other inside a chain-link cage, with elements, bonus modes, two campaigns,
 co-op, online play, local mods, an arena editor, spectating and a local AI Lab.
 

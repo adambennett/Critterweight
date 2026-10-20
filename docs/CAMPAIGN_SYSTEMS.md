@@ -595,8 +595,10 @@ CareerFlow (UI glue: FIGHT -> begin_fight -> App.start_match -> apply_result -> 
   one below (Cage Rules weights); slot 0 is the title fight at popularity 92 (or a defence for the
   champion). Nine promotions in four tiers (Regional, National, Major, The Big League) with Cage
   Rules' gates, purses and opponent levels; tier caps 42/66/88/100; the Grand Circuit holds the only
-  belt. Purse = level-scaled range × short-notice premium (title × 2.5); win bonus 60% of the purse
-  (100% in the top tier).
+  belt. Purse = the promotion's purse range, placed 70% by how far your popularity is above its gate
+  (÷ 30, clamped 0–1) and 30% at random, × the short-notice premium (1 + 0.03 per week under 10),
+  × 2.5 for a title fight, rounded to 50; the opponent's level does not affect it. Win bonus 60% of
+  the purse (100% in the top tier).
 * **Opponents.** A playable creature with stats `level + (shape − 0.66) × 0.55 ± 0.04`, a generated
   record, an original ring name, nickname and home town, and a bot tier from its level (< 0.33
   Punching Bag, < 0.48 Journeyman, < 0.63 Contender, else Headliner; Easy −1 / Hard +1 tier, and only
@@ -614,7 +616,8 @@ CareerFlow (UI glue: FIGHT -> begin_fight -> App.start_match -> apply_result -> 
 * **Bouts.** Rules = the `cage_rules` preset (10-point judges + referee) with 3 rounds (5 for a
   title), the preset's 99 s rounds and sudden death off; arena from the career arena list; `no_record`
   and `context.career`. `begin_fight()` saves `booked.in_fight` before launch: a crash re-fights the
-  identical bout; quitting from the pause menu is a withdrawal (popularity −4, week + 1, no purse).
+  identical bout; quitting from the pause menu is a withdrawal (popularity −4, week + 1, no purse),
+  except once the judges or the referee have decided the bout: then leaving books that result.
 * **Results** (`apply_result`, idempotent per fight id): reads `result.scoring` (method, cards,
   per-team tallies) or derives the outcome from `winner_team`. Popularity as Cage Rules (tier
   multipliers 1/1.4/1.8/2.4; finish bonus by rounds left; split × 0.75; title +6/−3; streak +1.5;

@@ -63,7 +63,7 @@ Dozer raises a dust cloud, Slurry dives, and Jitters places a spring pad.
 | Fight › Spectate | Bots only; Y cycles Follow / Locked / Free, LB/RB chooses a fighter, D-pad speed, X hides HUD |
 | Fight › Tutorial | Ten short exercises with Granny Haymaker; retry, skip or replay any of them |
 | Bonus modes (rules presets) | **Spotlight Hog** (hold the moving light), **Chumball** (knock the ball into the goal), **Absolute Unit** (KO the giant to become the giant), **Chum Rush** (co-op waves), **Tag Team** |
-| Campaign | **Off the Street** (fresh runs, no permanent power) and **Fight Camp** (persistent upgrades, The Cannery hub), plus **The Bookie's Table** (watch AI fight your build); The Dosage difficulty ladder 1–10; co-op with friends |
+| Campaign | **Career** (one persistent fighter: offers, training, purses, titles; three save slots), **Off the Street** (fresh runs, no permanent power) and **Fight Camp** (persistent upgrades, The Cannery hub), plus **The Bookie's Table** (watch AI fight your build); The Dosage difficulty ladder 1–10; co-op with friends |
 | Online | Host a game, join by address or LAN, or connect to a dedicated server with playlists |
 | Create › Rules | Make, test-play, save, share and import your own rules presets |
 | Create › Arena | Build arenas from props, hazards and spawns; test-play and share them |
@@ -179,3 +179,39 @@ Start with `-- --safe-mode` if a mod setup ever gets in your way.
 **Varga (Scrap)** imports Jeremy's Cage Rules human fighter and standing moves. He has a special four-limb layout: keyboard U/I/J/K, controller X/Y/A/B. Hold Q/E/R or LB/RB/LT to select hooks/body kicks, straights/head kicks, or overhands/low kicks. Unmodified buttons give uppercuts, a lead teep and rear knee. Guard is L/RT; grapple is Space/left-stick click; slip is Shift/right-stick click. X/D-left switches stance, O/D-down checks, F1/D-up and F2/D-right fire abilities, and releasing V/View fires JUICE. View chords supply target/tag/taunt without spending JUICE. In Cannery sparring, View+RT (keyboard V+L) returns to the hub. His fighter sheet contains the full controls and current binding glyphs. See `kits/f_varga.md` in the source repository for the complete guide. Grappling uses this game's clinch and throws, rather than Cage Rules' ground/submission system.
 
 **Knell (Spectral)** is a haunted diving suit with the standard layout: Ghost Light is a homing projectile, Through the Veil is a phasing escape with an emergence pulse, and Last Bell sends three spectral pulses while protecting the diver. See `kits/f_knell.md` in the source repository. Both fighters have three campaign build paths and appear in normal fighter selectors, the Compendium and Random selection.
+
+## New in v0.9.16: Career, 10-point scoring and the referee
+
+**Career** (Campaign › Career) builds one fighter over many fights, recreated from Cage Rules' career.
+Pick a fighter, a ring name (and an optional nickname) and a difficulty (Easy, Normal, Hard: how good
+the opponents' corners are). Each week you train one stat — Stamina, Chin, Speed, Power, Clinch or
+Defence; the card shows this week's exact gain — or rest to heal faster. Two or three promoters send
+offers each week: accept one, keep training through the camp, then press FIGHT on fight week. Offers
+show the opponent's fighter, record, rating and a danger tag (FAVOURED, EVEN, UNDERDOG, LONG SHOT),
+the purse and win bonus, the weeks to the fight and the rounds. Wins — especially early stoppages —
+raise popularity, which opens bigger promotions; each tier caps how famous it can make you, so move up.
+At popularity 92 the Grand Circuit offers a five-round title fight; champions defend the belt. Purses
+buy gym upgrades (a room per stat, a recovery tank and a head coach). Injuries from a bout (head, body,
+legs) heal week by week; until then they slow training and carry into the next fight. The History tab
+keeps every bout and a news log. Bouts use Cage Rules: 10-point judges, the referee, three rounds (five
+for titles) and possible draws. Everything saves after each action, in three slots per profile; Retire
+moves a save aside instead of deleting it. Quitting a bout from the pause menu pulls you out of it (no
+purse, popularity −4); once the judges or the referee have decided it, leaving keeps that result.
+
+**10-point scoring** (Rules Editor › Rounds & winning › Scoring, Duel only): nobody can be knocked out
+by damage, so the HP bars disappear. Every round is fought and three judges score it — Even card
+(everything counts equally), Volume (leans toward clean strikes landed and parries) and Impact (leans
+toward damage and knockdowns): 10-9 to the better fighter, 10-10 when too close to call, 10-8 for a
+dominant round. Under the timer the HUD shows the round and each judge's running total, and a small
+scorecard appears between rounds. After the last round the judges decide (Unanimous, Majority or Split
+Decision, or a Draw); a drawn decision goes to sudden death when Sudden death is on. The results screen
+shows every judge's card and what the judges counted.
+
+**Referee** (Rules Editor › Referee, Duel only, works with either scoring): nobody can hit a fighter who
+is down. When a strike knocks you down the referee counts: get up any time, or stay down to recover
+stamina faster until he waves you up after four seconds. Five knockdowns in one round and he stops it — a
+T.K.O. win with 10-point scoring, the round with Health scoring. Throws and hazards never count. Jeremy's
+Cage Rules referee walks the cage, holds the attacker back ("Back up!"), waves off stoppages and raises the
+winner's arm.
+
+The built-in **Cage Rules** preset is the Standard Duel with 10-point scoring and the referee on.

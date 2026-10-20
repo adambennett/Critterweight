@@ -50,7 +50,7 @@ func on_enter(p: Dictionary) -> void:
 	for line in ["Each week you train one stat or rest. Accept a fight offer and the weeks until it are your camp.",
 			"Wins (and quick finishes) make you popular; popularity brings bigger promotions, bigger purses and, at the top, a title shot.",
 			"Purses buy gym upgrades. Damage you take heals over the weeks and slows training while it lasts.",
-			"Bouts are three rounds under Cage Rules: three judges score every round and the referee stops it after five knockdowns in one."]:
+			"Bouts are three rounds (five for title fights) under Cage Rules: three judges score every round and the referee stops it after five knockdowns in one."]:
 		pv.add_child(UiTheme.label(line, "Body", true))
 	_help = HelpPanel.new(_scroll)
 	_help.size_flags_vertical = Control.SIZE_EXPAND_FILL

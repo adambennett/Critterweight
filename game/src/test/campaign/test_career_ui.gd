@@ -529,6 +529,53 @@ func test_pause_menu_quit_pulls_out_of_a_career_bout() -> void:
 	check_near(float(ctrl.state["pop"]), 16.0, 0.001, "and changes nothing")
 
 
+## Once the judges or the referee have decided a career bout (its closing ceremony, before the
+## result reaches the flow), quitting from the pause menu books that result: a champion who loses a
+## title defence cannot keep the belt by pulling out (Cage Rules settles a fight that has a result).
+func test_pause_quit_after_the_decision_books_the_result() -> void:
+	var ctrl := make_career(1)
+	ctrl.state["champion"] = true
+	ctrl.state["pop"] = 95.0
+	var o := book(ctrl, {"title": true, "defence": true, "tier": 3, "rounds": 5})
+	var losses := int(ctrl.state["record"]["l"])
+	var f := CareerFlow.make(cat(), ctrl)
+	check(f.fight(), "the bout launches: %s" % f.last_error)
+	var ms := MatchFlow.current_match()
+	check(ms != null, "a presented match is running")
+	if ms == null:
+		return
+	# let the intro end, then the referee stops the career fighter (index 0) in round one
+	for i in 600:
+		if ms.sim.mode.phase == MatchMode.Phase.FIGHT:
+			break
+		await wait_physics(1)
+	check_eq(int(ms.sim.mode.phase), int(MatchMode.Phase.FIGHT), "the round is live")
+	ms.sim.mode.referee_stoppage({"fighter": 0, "by": 1, "reason": "knockdowns", "round": 1, "time": 3.0})
+	check(CareerFlow.bout_decided(), "decided: the closing ceremony runs before the result arrives")
+	check(not ms.sim.is_finished, "the sim has not finished yet")
+	MatchFlow.open_pause()
+	await wait_frames(4)
+	check_eq(top_name(), "pause", "the pause menu still opens during the ceremony")
+	var ok: bool = await nav_to("quit")
+	check(ok, "Quit to main menu is reachable")
+	await action("ui_accept")
+	await wait_frames(3)
+	check_eq(top_name(), "dialog", "quitting asks first")
+	check(find_label(top(), "Leave the fight?") != null, "a decided bout is left, not pulled out of")
+	check(find_label(top(), "The decision stands and is booked.") != null, "the result stands")
+	ok = await nav_to("pull", "ui_left")
+	await action("ui_accept")
+	await wait_frames(8)
+	check_eq(top_name(), "career_result", "the result screen shows the booked result")
+	check_eq(int(ctrl.state["record"]["l"]), losses + 1, "the loss is on the record")
+	check(not bool(ctrl.state["champion"]), "the title defence was lost: the belt is gone")
+	check(not ctrl.is_booked(), "the bout is settled")
+	var late := ctrl.apply_result(scoring_result(0, "Unanimous Decision"), str(o["id"]))
+	check(not bool(late["ok"]) and bool(late["duplicate"]), "the bout cannot be settled twice")
+	var st := reload(1)
+	check(not bool(st["champion"]), "the belt loss was saved")
+
+
 ## The booked camp's PULL OUT is the same withdrawal, behind a danger confirmation.
 func test_hub_pull_out_is_a_confirmed_withdrawal() -> void:
 	var ctrl := make_career(1)

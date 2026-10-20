@@ -125,14 +125,18 @@ func on_back() -> bool: return false       # true = handled (close a sub-panel, 
 | Name (`App.SCREENS`) | Notes |
 |---|---|
 | `title` | Wordmark stamp-in, glint, falling JUICE can; "press any button"; boot hook for dev flags |
-| `main_menu` | Poster layout; categories Fight (Quick Fight / Versus / Practice / Spectate), Campaign (Off the Street / Fight Camp / Bookie's Table), Online, Tutorial, Create (Rules Editor / Arena Editor), AI Lab, Mods, Profile, Settings, Credits, Quit. **Entries whose screen does not exist are hidden** (dev only; listed once in the log). Campaign entries open `campaign_menu` with `{variant: "off_the_street"|"fight_camp"}` and `bookie` |
+| `main_menu` | Poster layout; categories Fight (Quick Fight / Versus / Practice / Spectate), Campaign (Career / Off the Street / Fight Camp / Bookie's Table; Career is first and focused), Online, Tutorial, Create (Rules Editor / Arena Editor), AI Lab, Mods, Profile, Settings, Credits, Quit. **Entries whose screen does not exist are hidden** (dev only; listed once in the log). Campaign entries open `campaign_menu` with `{variant: "off_the_street"|"fight_camp"}` and `bookie` |
 | `settings` | Tabs generated from `Settings.SCHEMA` categories; Controls tab adds full rebinding for `Controls.GAME_ACTIONS`; per-tab reset (confirm); display rollback; restart badges (`"restart": true` in the schema); diagnostics report (copy / open logs). Params: `{tab, in_game}` |
 | `profile` | Switch / create / rename / delete (confirm, never the last); stats, records, Dosage, per-fighter |
 | `credits` | From `credits.json`; Notices tab: font OFL texts + Godot licence and component licences read from the engine |
 | `dialog`, `text_entry` | Generic modal / on-screen keyboard (§4) |
 | `pause` | Offline: freezes sim + physics. Online: does not pause and says so. Resume, Restart fight, Settings, Controls, Quit (confirm); quick controls reference; `{notice}` banner |
 | `controls` | Read-only reference of every action (both device columns), shortcut to rebinding |
-| `results` | Pushed by `App.start_match`; winner stamp, round score, stats per fighter; Rematch (`MatchFlow.launch(config)`), Change fighters (back to the setup in `config.ui`), Main menu |
+| `results` | Pushed by `App.start_match`; winner stamp, round score, stats per fighter; Rematch (`MatchFlow.launch(config)`), Change fighters (back to the setup in `config.ui`), Main menu. With `result.scoring` (10-point): the method and judges' totals, a `ScorecardPanel` above the stats inside the scroll area (right stick scrolls), captions "Went the distance" / "Stopped (T.K.O.)" |
+| `career` | Career slots (three per profile): Continue, New career, Retire (moves the save aside), Move aside for an unreadable save, Re-fight an interrupted bout |
+| `career_new` | Fighter pick with preview and starting stats, ring name (required, ≤ 14), nickname (≤ 16), difficulty; START CAREER (or Y) |
+| `career_hub` | Header KPIs; tabs (LB/RB) CAMP/TRAINING, OFFERS, GYM, HISTORY; side stats and condition; FIGHT on fight week; Pull out (confirm). `--screen career_hub --screen-arg tab=<tab>` opens the profile's first career |
+| `career_result` | Result, method, pay, popularity, standing, injuries, stacked `ScorecardPanel`; Continue back to the hub |
 | `versus_setup` | `{mode: versus|practice|spectate, setup, fighters}`; rules preset (`Content.ids("rules")`), arena (`Content.ids("arenas")`), up to 8 fighters: pick, team, bot tier, dummy (practice), remove; validation; Y starts |
 | `spectate` | `versus_setup` with every fighter a bot; launches with the director camera + spectator bar |
 | `character_select` | Cards for `Content.playable_creatures()` + Random; poster: name, epithet, element icon + name + status, weight class, stat bars, playstyle (`blurb`), kit. `{mode: quick|pick, on_pick}` |
