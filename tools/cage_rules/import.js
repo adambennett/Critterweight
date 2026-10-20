@@ -6,8 +6,18 @@ const {writeGlb}=require('../forge/lib/gltf');
 const root=path.resolve(__dirname,'../..');
 const ctx={console}; ctx.window=ctx; ctx.globalThis=ctx;
 vm.createContext(ctx);
-for(const f of ['three.min.js','sim.js','physics.js','render.js'])
+for(const f of ['three.min.js','sim.js','physics.js'])
   vm.runInContext(fs.readFileSync(path.join(__dirname,'source',f),'utf8'),ctx,{filename:f});
+// render.js keeps the referee's poses, tuning and rig constants in its closure. They are exposed in
+// memory only, by extending the export line once (the retained file on disk stays unchanged); the
+// assertion fails loudly if the original export line ever changes.
+const EXPORT='root.MMARender = { Renderer, FighterModel, POSES, ceremonyEnd };';
+const EXPORT_REF='root.MMARender = { Renderer, FighterModel, POSES, ceremonyEnd, REF_POSES, LINE_POSES, ceremonyTimes,'+
+ ' REF_TUNING: { REF_CAGE, KD_HOLD, REF_SPEED, REF_ROOM, LUNGE_V, LUNGE_T, LUNGE_CD, LINE_X, KD_STAY: KD_T.STAY },'+
+ ' REF_RIG: { HIP_H, SH_X, SH_Y, HIP_XX, HIP_Y, UPPER_L, FORE_L, THIGH_L, SHIN_L, RIG, ANKLE_PIVOT } };';
+const renderSrc=fs.readFileSync(path.join(__dirname,'source','render.js'),'utf8');
+if(renderSrc.split(EXPORT).length!==2) throw Error('render.js export line not found exactly once');
+vm.runInContext(renderSrc.replace(EXPORT,()=>EXPORT_REF),ctx,{filename:'render.js'});
 const PH=ctx.MMAPhys, THREE=ctx.THREE;
 const scene=new THREE.Scene(), model=new ctx.MMARender.FighterModel(scene,0xb52d37,0xe0b48c,0,
   {look:{hair:'short',beard:'goatee',build:'athletic',gloves:0x24232a,trim:0xe6c45f}});
@@ -95,8 +105,9 @@ const c={id:'f_varga',name:'Varga',title:'the Cage Rules Guest',element:'scrap',
  art:{model:'res://assets/models/creatures/f_varga.glb',outline:.007,roughness:.7},ai:{aggression:.1,attack_range:1.2,reach:{l1:1.15,heavy:1.45,grab:1.15},abilities:{ability1:{chance:3,when:[{max:2,chance:.3}]},ability2:{chance:3,when:[{self_health_below:.65,chance:.6}]}}}};
 fs.writeFileSync(path.join(root,'game/content/core/creatures/f_varga.json'),JSON.stringify(c,null,2)+'\n');
 // Flatten the original continuous skinned mesh AND the original face/gloves into the game's segment rig.
-const out={positions:[],normals:[],colors:[],joints:[],weights:[],groups:[]},materials={};
 const bones=names.map(n=>({id:n,pivot:pivots[n]})), sourceBones=names.concat(['lFoot','rFoot']);
+function exportGlb(model,id,rel,generator,doubleSided){
+const out={positions:[],normals:[],colors:[],joints:[],weights:[],groups:[]},materials={};
 function append(mesh,rigid){
  const g=mesh.geometry, idx=g.index?Array.from(g.index.array):Array.from({length:g.attributes.position.count},(_,i)=>i);
  const groups=g.groups.length?g.groups:[{start:0,count:idx.length,materialIndex:0}];
@@ -104,6 +115,7 @@ function append(mesh,rigid){
  for(const group of groups){
   const mat=mats[group.materialIndex||0]||mats[0], tag='detail_source_'+Object.keys(materials).length;
   materials[tag]={roughness:mat.roughness||.7,metallic:mat.metalness||0};
+  if(doubleSided&&mat.side===THREE.DoubleSide)doubleSided.push(tag);
   const indices=[];
   for(let k=group.start;k<group.start+group.count;k++){
    const i=idx[k], v=new THREE.Vector3().fromBufferAttribute(g.attributes.position,i).applyMatrix4(mesh.matrixWorld).multiplyScalar(scale);
@@ -118,8 +130,73 @@ function append(mesh,rigid){
 }
 append(model.skinMesh);
 for(const name of names)model.segs[name].traverse(m=>{if(m.isMesh&&m.visible)append(m,names.indexOf(name));});
-writeGlb(path.join(root,'game/assets/models/creatures/f_varga.glb'),{name:'f_varga',bones,materials,mesh:{
+writeGlb(path.join(root,'game/assets/models',rel),{name:id,bones,materials,mesh:{
  positions:Float32Array.from(out.positions),normals:Float32Array.from(out.normals),colors:Float32Array.from(out.colors),
- joints:Uint8Array.from(out.joints),weights:Float32Array.from(out.weights),groups:out.groups},
- generator:'Cage Rules original procedural fighter, adapted by tools/cage_rules/import.js'});
-console.log('Imported Varga: '+Object.keys(PH.STRIKES).length+' source strikes; '+out.positions.length/3+' mesh vertices.');
+ joints:Uint8Array.from(out.joints),weights:Float32Array.from(out.weights),groups:out.groups},generator});
+return out.positions.length/3;
+}
+const vargaVerts=exportGlb(model,'f_varga','creatures/f_varga.glb','Cage Rules original procedural fighter, adapted by tools/cage_rules/import.js');
+
+// ---- The original referee (render.js class Referee). He is the same procedural body and bind skeleton as the
+// fighter (body width 1, short hair), dressed by opts.ref (shirt, slacks, shoes, open nitrile hands), built with
+// Referee's own constructor arguments. View-only: his model and data live under game/assets, never as a content
+// creature (no gameplay kind, so the multiplayer content hash is unchanged).
+const R=ctx.MMARender;
+const refScene=new THREE.Scene(), refModel=new R.FighterModel(refScene,0x1e2028,0xc99a74,2,{ref:true});
+refScene.updateMatrixWorld(true);
+// Varga's bone pivots are reused, so the referee's bind frames must match them exactly
+for(const n of names){const c=pos(refModel.segs[n].getWorldPosition(new THREE.Vector3()));if(c.some((x,i)=>Math.abs(x-centers[n][i])>1e-9))throw Error('referee bind differs from Varga at '+n);}
+fs.mkdirSync(path.join(root,'game/assets/models/referee'),{recursive:true});
+const refDouble=[]; // surfaces Cage Rules draws double-sided (the slacks' open tubes); glTF keeps them single-sided
+const refVerts=exportGlb(refModel,'cage_referee','referee/cage_referee.glb','Cage Rules original referee, adapted by tools/cage_rules/import.js',refDouble);
+// Baked segment transforms from the original pose evaluator (FighterModel.update, forced path: P() pose, lerpPose,
+// two-bone IK, hierarchy, _applySkeleton, breathing bob, stepping) on a separate model, in Critterweight's segment
+// convention (origin on the pivot = scale*(centre + q*anchorSelf), world, metres). The view's GDScript port is
+// tested against these (game/src/test/core/test_referee_view.gd).
+const RR=R.REF_RIG, r6=x=>Math.round(x*1e6)/1e6, clone2=x=>JSON.parse(JSON.stringify(x));
+const ANCHOR={}; for(const n of names) ANCHOR[n]=(PH.SEGS[n].anchorSelf||[0,0,0]).slice();
+const bakeModel=new R.FighterModel(new THREE.Scene(),0x1e2028,0xc99a74,2,{ref:true});
+const actor={idx:2,x:0,z:0,act:{type:'idle',name:'',t:0},ground:null,rocked:0,pose:null};
+const animated=(kind,u)=>{ // the per-frame hands of Referee.update (render.js waveOff / waveUp)
+ const p=clone2(R.REF_POSES[kind]);
+ if(kind==='waveOff'){p.lh=[0.45-0.6*u,0.86,0.32];p.rh=[-0.45+0.6*u,0.86,0.24];}
+ else{p.lh=[0.2,0.05+0.6*u,0.46-0.1*u];p.rh=[-0.2,0.05+0.6*u,0.46-0.1*u];}
+ return p;
+};
+const baked=[];
+function bake(id,s){
+ const m=bakeModel, pose=s.anim?animated(s.pose,s.u):R.REF_POSES[s.pose];
+ if(s.start){m.initialized=true;m.snap=false;m.physMode=false;m.px=s.start.px;m.pz=s.start.pz;m.yaw=s.start.yaw;m.vx=s.start.vx;m.vz=s.start.vz;
+  m.stepPhase=s.start.step;m.pose=clone2(R.REF_POSES[s.start.pose]);}
+ else m.snap=true;
+ m.forced={x:s.x,z:s.z,yaw:s.yaw,pose,moving:s.moving,speed:s.speed};
+ m.update(actor,{},null,s.dt,s.time,new THREE.Vector3(1,0,0),1000);
+ const segs={};
+ for(const n of names){const g=m.segs[n],q=g.quaternion,o=new THREE.Vector3(...ANCHOR[n]).applyQuaternion(q).add(g.position).multiplyScalar(scale);
+  segs[n]={p:[o.x,o.y,o.z].map(r6),q:[q.x,q.y,q.z,q.w].map(r6)};}
+ baked.push({id,...s,segs});
+}
+const still={x:0,z:0,yaw:0,time:0,dt:1/60,moving:false,speed:12};
+for(const k of Object.keys(R.REF_POSES)) bake(k,{pose:k,...still});
+for(const k of ['waveOff','waveUp']) for(const u of [0,1]) bake(k+'@u'+u,{pose:k,anim:true,u,...still});
+bake('watch@placed',{...still,pose:'watch',x:1.2,z:-0.7,yaw:0.8,time:0.4});
+bake('stop@lerp',{...still,pose:'stop',dt:0.05,speed:20,start:{px:0,pz:0,yaw:0,vx:0,vz:0,step:0,pose:'watch'}});
+bake('watch@step',{pose:'watch',x:0.015,z:0.004,yaw:0.5,time:0.7,dt:1/60,moving:true,speed:10,start:{px:0,pz:0,yaw:0.3,vx:0.8,vz:0.2,step:1.1,pose:'watch'}});
+const segOff={pelvis:0,chest:RR.RIG.chestUp,head:0,lUpperArm:-RR.RIG.upperArm[0]-0.02,lForearm:-RR.RIG.forearm[0]-0.02,
+ rUpperArm:-RR.RIG.upperArm[0]-0.02,rForearm:-RR.RIG.forearm[0]-0.02,lThigh:-RR.RIG.thigh[0]-0.03,lShin:-RR.RIG.shin[0]-0.03,
+ rThigh:-RR.RIG.thigh[0]-0.03,rShin:-RR.RIG.shin[0]-0.03};
+const refData={_doc:'Generated by tools/cage_rules/import.js from the retained Cage Rules js/render.js (class Referee, REF_POSES, '+
+ 'FighterModel). View-only data for src/view/referee_view.gd, never a content creature. Poses are the source P() format in '+
+ 'source units (metres, radians, unscaled); body pivots and baked transforms are scaled by `scale`.',
+ id:'cage_referee',name:'Referee',scale,model:'res://assets/models/referee/cage_referee.glb',art:{outline:.007,roughness:.7},double_sided:refDouble,
+ body:{id:'cage_referee_body',gait:body.gait,hover_height:body.hover_height,stride:body.stride,step_height:body.step_height,
+  step_time:body.step_time,segments:body.segments,chains:body.chains,weapons:{},poses:{stance:body.poses.stance}},
+ rig:{hip_h:RR.HIP_H,sh_x:RR.SH_X,sh_y:RR.SH_Y,hip_xx:RR.HIP_XX,hip_y:RR.HIP_Y,upper_l:RR.UPPER_L,fore_l:RR.FORE_L,thigh_l:RR.THIGH_L,
+  shin_l:RR.SHIN_L,neck_y:RR.RIG.chestUp+RR.RIG.headUp,seg_offset:segOff,anchor_self:ANCHOR},
+ poses:R.REF_POSES,line_poses:R.LINE_POSES,tuning:R.REF_TUNING,
+ ceremony:{stoppage:R.ceremonyTimes({method:'KO'}),decision:R.ceremonyTimes({method:'Decision'})},baked};
+// numeric arrays on one line, so the file stays readable and diffs small
+const refJson=JSON.stringify(refData,null,1).replace(/\[[\d\s.,eE+-]*\]/g,m=>m.replace(/\s+/g,'').replace(/,/g,', '))+'\n';
+fs.writeFileSync(path.join(root,'game/assets/data/cage_referee.json'),refJson);
+console.log('Imported Varga: '+Object.keys(PH.STRIKES).length+' source strikes; '+vargaVerts+' mesh vertices. Referee: '+refVerts+
+ ' mesh vertices, '+Object.keys(R.REF_POSES).length+' poses, '+baked.length+' baked pose checks.');

@@ -9,7 +9,7 @@ Adam Bennett
 
 ## Design, engineering and art direction
 Developed with AI-assisted tooling (Anthropic Claude) under the project lead's direction. All names, characters,
-writing, UI and icons are original to this project. Varga uses Jeremy's fighter model as credited below. Music and selected sound effects are third-party recordings
+writing, UI and icons are original to this project. Varga and the referee use Jeremy's models as credited below. Music and selected sound effects are third-party recordings
 under the free licences listed below; the remaining generated audio comes from tools/audio.
 
 ## Campaign event art
@@ -19,6 +19,7 @@ under the free licences listed below; the remaining generated audio comes from t
 ## Reference project
 Cage Rules, by Jeremy — its code, ideas and project-owned assets were authorised for reuse. Varga uses the original
 fighter model, rig, standing poses and strike definitions, adapted to Critterweight's simulation and controls. The
+referee is Jeremy's original referee model and outfit, with his poses and ring positioning ported to Critterweight. The
 Barlow typefaces also came through Cage Rules (their own SIL OFL 1.1 licence applies). Source hashes and conversion
 commands are recorded in tools/cage_rules/README.md; the original ground/submission engine is not included.
 

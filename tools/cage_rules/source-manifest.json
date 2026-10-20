@@ -1,31 +1,76 @@
 {
   "captured": "2026-10-18",
   "authorization": "Owner request to import Jeremy's Cage Rules fighter for v0.9.15",
+  "captures": [
+    {
+      "date": "2026-10-18",
+      "release": "v0.9.15",
+      "authorization": "Owner request to import Jeremy's Cage Rules fighter for v0.9.15",
+      "outputs": "Varga"
+    },
+    {
+      "date": "2026-10-19",
+      "release": "v0.9.16",
+      "authorization": "Owner request to import Jeremy's Cage Rules referee via the established Cage Rules asset workflow for v0.9.16 (Career, 10-point scoring, referee, Cage Rules preset)",
+      "outputs": "the referee (model, poses, view data); the source files were re-hashed and are unchanged since the 2026-10-18 capture"
+    }
+  ],
   "source_root": "C:\\Users\\eX_Di\\git\\PokemonMMA\\Cage Rules\\MMAsim",
+  "line_endings": "sha256/bytes: the source working tree (CRLF). retained_sha256/retained_bytes: the copies in this repository, stored with LF line endings (.gitattributes text=auto eol=lf). Converting a retained file LF -> CRLF reproduces the source hash.",
   "files": [
     {
       "source": "lib/three.min.js",
       "retained": "source/three.min.js",
       "sha256": "7ae04663bb431808bc025280122162029ea3a354efc5fcca8bd8f95d1a1933e9",
-      "bytes": 603451
+      "bytes": 603451,
+      "retained_sha256": "9274bbcec8d96168626c732b5d31c775aa8cfb7eaa0599bec0c175908a2c1ce2",
+      "retained_bytes": 603445
     },
     {
       "source": "js/sim.js",
       "retained": "source/sim.js",
       "sha256": "b69793294b6d34958eff734d7530e8241b1938b5887f9cb5cb654d2792c1dfe2",
-      "bytes": 87149
+      "bytes": 87149,
+      "retained_sha256": "d5f861d37998e4881803a751c5317af335c1cc33568ff94fc1135b8dc1d52e21",
+      "retained_bytes": 85679
     },
     {
       "source": "js/physics.js",
       "retained": "source/physics.js",
       "sha256": "223c50fca0f6b27c81a5d98bb90c7e156e4566df45eff55ab1997b20fc7fdce4",
-      "bytes": 97083
+      "bytes": 97083,
+      "retained_sha256": "a12c9ae35eaf32bbf479cfa49c852b3be8f1f7f23d591ac9a7cda87f070bc6c0",
+      "retained_bytes": 95796
     },
     {
       "source": "js/render.js",
       "retained": "source/render.js",
       "sha256": "c5cc3fa2f769a06bd722214fb600b3aa9f1281cc9432ef2f1b687092ed943c67",
-      "bytes": 125607
+      "bytes": 125607,
+      "retained_sha256": "739dfd6a17de0ffd4c7bc6e2d09bf26b08ed4f79d66027964c1560798704f652",
+      "retained_bytes": 123717
+    }
+  ],
+  "outputs": [
+    {
+      "path": "game/content/core/creatures/f_varga.json",
+      "sha256": "b8e2979ea556a895e51eba7c5f4d5b3a6a335dc2eb1bf8af36fe644f9744bcc0",
+      "bytes": 387756
+    },
+    {
+      "path": "game/assets/models/creatures/f_varga.glb",
+      "sha256": "4fa78a8a66cb46739b793bc095501e3957a5aed27bafe1901141ba4c90d460fc",
+      "bytes": 1997272
+    },
+    {
+      "path": "game/assets/models/referee/cage_referee.glb",
+      "sha256": "a62c14c90609281fe2212636b9d5076489571ef4c8cd5138b543f35eb280d14d",
+      "bytes": 1820124
+    },
+    {
+      "path": "game/assets/data/cage_referee.json",
+      "sha256": "af6e04575acdbb985c2b01d7b608babfc64d3dab7719714baa9ad3f6e41bcab7",
+      "bytes": 40881
     }
   ]
 }
