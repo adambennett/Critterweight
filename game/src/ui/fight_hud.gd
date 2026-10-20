@@ -3,17 +3,45 @@ extends Control
 ## In-match HUD: per-fighter cards (health with damage trail, stamina, hype/JUICE meter, ability
 ## cooldowns, status icons with text), round timer/pips, mode status, centre callouts and
 ## subtitles. Every essential cue has text, not only colour.
+##
+## 10-point scoring and the referee (MCH-07/08), presentation only, keyed off what the sim
+## produced (local: mode.unlimited_health(); network mirror: hud_state "cards"), never the raw
+## rules flags, so it runs unchanged on a NetHudMirror (no rig segments, no judge there):
+##  * 10-point: every card's HP stack is hidden (cards[i]["hp_stack"]) and a team chip (letter +
+##    colour) marks each fighter; under the timer a round line "ROUND n / N" (or the drawn-cards
+##    note during a sudden death that follows them) and the judges' running totals from
+##    hud_state.cards ("CARDS A–B 20–18 · 20–18 · 19–19").
+##  * show_round_card(round_scored event): a between-rounds scorecard (the three judges' 10-x for
+##    the round by name, the running totals, the round winner or "even round"), up through the
+##    ROUND_END / intro break; show_decision(judges_decision event): the decision banner (winner or
+##    draw, method, the three totals). Both sit above the subtitle band, below the centre callout.
+##  * Referee (view_state.referee): the counted fighter's card status shows "DOWN · n", a stopped
+##    fighter "STOPPED", and the local player being counted gets a hint with the wave-up time.
 
 var sim: MatchSim
 var player_index := 0
 const TRAIL_HOLD := 0.6          ## seconds a hit's chunk stays lit on the health bar
 const TRAIL_DRAIN := 0.5         ## then it drains this much of the bar per second
+const ROUND_CARD_MIN := 2.0      ## seconds the between-rounds scorecard stays up at least
+const ROUND_CARD_MAX := 8.0      ## ... and at most (it leaves when the next round starts)
+const DECISION_SECONDS := 7.0    ## the decision banner (the results screen covers it at the bout end)
+const DRAW_TO_SD_SECONDS := 3.5  ## a drawn decision that goes to sudden death clears for the fight
 
 var cards := {}                  ## fighter index -> Dictionary of nodes
 var _center: Label
 var _sub: Label
 var _timer: Label
 var _mode_label: Label
+var _round_label: Label          ## 10-point: "ROUND n / N" (or the drawn-cards note)
+var _cards_label: Label          ## 10-point: the judges' running totals
+var _ref_hint: Label             ## referee: the local player is being counted
+var _round_panel: Control = null ## between-rounds scorecard (round_scored)
+var _round_panel_shown := 0.0
+var _banner: Control = null      ## the judges' decision (judges_decision)
+var _banner_until := 0.0
+var _banner_shown := 0.0
+var _banner_draw := false
+var _ten := false                ## the match is judged on 10-point cards (refreshed every frame)
 var _center_until := 0.0
 var _sub_until := 0.0
 var _font_heavy: Font
@@ -62,6 +90,15 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 	_timer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_mode_label = _label("", 26, _font)
 	_mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_round_label = _label("", 32, _font_heavy)
+	_round_label.name = "RoundLine"
+	_round_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_round_label.visible = false
+	_cards_label = _label("", 28, _font)
+	_cards_label.name = "CardsLine"
+	_cards_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_cards_label.add_theme_color_override("font_color", UiTheme.WARM)
+	_cards_label.visible = false
 	if n <= 2:
 		cards[sim.fighters[0].index] = _make_card(sim.fighters[0], n, _top, false)
 		_top.add_child(mid)
@@ -81,6 +118,8 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 		for f in sim.fighters:
 			cards[f.index] = _make_card(f, n, _bottom, false)
 	mid.add_child(_timer)
+	mid.add_child(_round_label)
+	mid.add_child(_cards_label)
 	mid.add_child(_mode_label)
 	_center = _label("", 110, _font_heavy)
 	_center.set_anchors_preset(Control.PRESET_CENTER)
@@ -105,7 +144,18 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 	_sub.add_theme_constant_override("outline_size", 10)
 	_sub.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	add_child(_sub)
+	_ref_hint = _label("", 30, _font)
+	_ref_hint.name = "RefereeHint"
+	_ref_hint.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_ref_hint.offset_left = -760
+	_ref_hint.offset_right = 760
+	_ref_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_ref_hint.add_theme_color_override("font_color", UiTheme.WARM)
+	_ref_hint.add_theme_constant_override("outline_size", 10)
+	_ref_hint.visible = false
+	add_child(_ref_hint)
 	_add_control_hints(n)
+	_place_bottom_panels()
 
 
 ## Settings › Gameplay › Control hints: the core actions with the live bindings (players only).
@@ -166,6 +216,22 @@ func set_bottom_inset(px: float) -> void:
 	if _hints and _hints_bottom:
 		_hints.offset_top = (-116.0 if martial else -78.0) - px
 		_hints.offset_bottom = -16.0 - px
+	_place_bottom_panels()
+
+
+## The referee hint and the scorecard / decision panels sit just above the subtitle band (which
+## moves with martial control hints and set_bottom_inset), below the centre callouts.
+func _place_bottom_panels() -> void:
+	if _sub == null:
+		return
+	var top := _sub.offset_top
+	if _ref_hint:
+		_ref_hint.offset_bottom = top - 6.0
+		_ref_hint.offset_top = top - 52.0
+	for p in [_round_panel, _banner]:
+		if p != null and is_instance_valid(p):
+			(p as Control).offset_bottom = top - 10.0
+			(p as Control).offset_top = top - 10.0
 
 
 func _label(t: String, size: int, font: Font) -> Label:
@@ -213,6 +279,10 @@ func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dic
 	var head := HBoxContainer.new()
 	# the profile owner's card wears the equipped profile frame (a Cannery cosmetic)
 	box.add_child(ProfileFrame.wrap(head, ProfileFrame.style(), 26) if f.index == _owner_index() else head)
+	# 10-point only: the team letter + colour the judges' totals are read in (hidden otherwise)
+	var chip := TeamChip.new(f.team, 34.0)
+	chip.visible = false
+	head.add_child(chip)
 	var name_l := _label(f.display_name.to_upper(), 32 if big else 26, _font_heavy)
 	name_l.add_theme_color_override("font_color", team_col.lightened(0.3))
 	head.add_child(name_l)
@@ -245,7 +315,7 @@ func _make_card(f: Fighter, n: int, parent: Container, right_align: bool) -> Dic
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(status)
 	return {"box": box, "name": name_l, "hp": hp, "trail": trail, "hp_text": hp_text, "st": st, "hype": hype, "hype_l": hype_l,
-		"status": status, "lives": lives, "trail_v": 1.0, "big": big}
+		"status": status, "lives": lives, "trail_v": 1.0, "big": big, "hp_stack": hp_stack, "chip": chip}
 
 
 ## Damage trail behind the health bar: the chunk a hit took stays lit for TRAIL_HOLD seconds
@@ -272,6 +342,14 @@ func _owner_index() -> int:
 func _process(dt: float) -> void:
 	if sim == null:
 		return
+	var mm := sim.mode
+	var hs: Dictionary = mm.hud_state() if mm else {}
+	var ref := {}
+	if mm:
+		var rv = mm.view_state().get("referee", {})
+		if typeof(rv) == TYPE_DICTIONARY:
+			ref = rv
+	_ten = ten_point_of(mm, hs)
 	for f in sim.fighters:
 		if not cards.has(f.index):
 			continue
@@ -279,6 +357,11 @@ func _process(dt: float) -> void:
 		(c["box"] as Control).visible = not f.despawned
 		if f.despawned:
 			continue
+		(c["hp_stack"] as Control).visible = not _ten
+		var chip := c["chip"] as TeamChip
+		chip.visible = _ten
+		if chip.team != f.team:
+			chip.set_team(f.team)
 		(c["name"] as Label).text = f.display_name.to_upper()
 		var frac := f.health_frac()
 		(c["hp"] as ProgressBar).value = frac
@@ -313,13 +396,17 @@ func _process(dt: float) -> void:
 			var left := float(s["left"])
 			# mode-long statuses (e.g. the Absolute Unit) show no countdown
 			st_txt.append(nm if left > 999.0 else "%s %.0fs" % [nm, ceilf(left)])
+		var ref_line := referee_status(f, ref)
+		if ref_line != "":
+			st_txt.push_front(ref_line)
 		(c["status"] as Label).text = "  ".join(st_txt)
 		(c["lives"] as Label).text = ("  x%d" % f.lives) if f.lives > 1 or (f.lives >= 0 and sim.rules.get("lives", 1) > 1) else ""
-	var mm := sim.mode
+	_update_ten_point_lines(hs)
+	_update_ref_hint(ref)
+	_update_panels(hs)
 	if mm:
 		var rt := float(sim.rules.get("round_time", 99.0))
 		_timer.text = "%d" % ceili(mm.round_timer) if rt > 0.0 else ""
-		var hs: Dictionary = mm.hud_state()
 		var parts := []
 		for row in hs.get("rows", []):
 			parts.append("%s %d" % [str(row["label"]), int(row["value"])])
@@ -356,6 +443,292 @@ func _apply_highlight(which: String) -> void:
 				(_ability_prompts["ability1"] as CanvasItem).modulate = on
 
 
+# =====================================================================================
+# 10-point scoring and the referee (presentation only; every key is optional)
+# =====================================================================================
+
+## True when the match is judged on 10-point cards: the local mode runs a judge
+## (unlimited_health) or the replicated hud_state carries the judges' running totals (a network
+## mirror has no judge of its own).
+static func ten_point_of(mm: MatchMode, hs := {}) -> bool:
+	if mm == null:
+		return false
+	if mm.unlimited_health():
+		return true
+	var h: Dictionary = hs if not hs.is_empty() else mm.hud_state()
+	return typeof(h.get("cards", null)) == TYPE_DICTIONARY
+
+
+func is_ten_point() -> bool:
+	return sim != null and ten_point_of(sim.mode)
+
+
+## Card status from view_state.referee: "DOWN · n" while the referee counts this fighter,
+## "STOPPED" once he has waved it off for them (a KO already reads "KO" on the card).
+static func referee_status(f: Fighter, ref: Dictionary) -> String:
+	var cnt = ref.get("count", {})
+	if typeof(cnt) == TYPE_DICTIONARY and int((cnt as Dictionary).get("fighter", -1)) == f.index:
+		var n := int((cnt as Dictionary).get("n", 0))
+		return "DOWN · %d" % n if n > 0 else "DOWN"
+	if ref.has("stop") and int(ref["stop"]) == f.index and f.state != Fighter.State.KO:
+		return "STOPPED"
+	return ""
+
+
+## The two judged teams, ascending (the order of every pair in cards and totals).
+func duel_teams() -> Array:
+	var t: Array = []
+	for f in sim.fighters:
+		if not f.despawned and not t.has(f.team):
+			t.append(f.team)
+	t.sort()
+	while t.size() < 2:
+		t.append(t.size())
+	return t.slice(0, 2)
+
+
+## Display name of a team: its fighters' names ("TEAM B" when nobody is listed).
+func team_name(team: int) -> String:
+	var names := PackedStringArray()
+	for f in sim.fighters:
+		if f.team == team and not f.despawned:
+			names.append(f.display_name.to_upper())
+	return " & ".join(names) if not names.is_empty() else "TEAM %s" % UiTheme.team_letter(team)
+
+
+## "20–18 · 20–18 · 19–19": three [a, b] pairs in team order, or winner first when `first` is one
+## of the two teams (how a decision is read out).
+static func totals_text(totals: Array, teams: Array = [0, 1], first := -1) -> String:
+	var flip := teams.size() == 2 and first >= 0 and first == int(teams[1])
+	var parts := PackedStringArray()
+	for p in totals:
+		if typeof(p) != TYPE_ARRAY or (p as Array).size() < 2:
+			continue
+		var a := int(p[1]) if flip else int(p[0])
+		var b := int(p[0]) if flip else int(p[1])
+		parts.append("%d–%d" % [a, b])
+	return " · ".join(parts)
+
+
+## The big centre callout for a judges_decision: "SPLIT DECISION", "T.K.O.!", "DRAW", or the
+## winner after a sudden death that followed drawn cards.
+static func decision_callout(ev: Dictionary, winner_label := "") -> String:
+	var m := str(ev.get("method", ""))
+	if m == "TKO":
+		return "T.K.O.!"
+	if int(ev.get("winner", -1)) < 0:
+		return "DRAW"
+	if m.begins_with("Sudden Death"):
+		return ("%s WINS!" % winner_label) if winner_label != "" else "SUDDEN DEATH!"
+	return m.to_upper() if m != "" else "DECISION"
+
+
+func _update_ten_point_lines(hs: Dictionary) -> void:
+	_round_label.visible = _ten
+	_cards_label.visible = _ten
+	if not _ten or sim.mode == null:
+		return
+	var total := maxi(1, int(sim.rules.get("rounds", 3)))
+	if bool(hs.get("sd", false)):
+		_round_label.text = "DRAWN CARDS — SUDDEN DEATH"
+	else:
+		_round_label.text = "ROUND %d / %d" % [mini(sim.mode.round_index + 1, total), total]
+	var cd = hs.get("cards", {})
+	var n := 0
+	var t: Array = []
+	if typeof(cd) == TYPE_DICTIONARY:
+		n = int((cd as Dictionary).get("n", 0))
+		var tv = (cd as Dictionary).get("t", [])
+		if typeof(tv) == TYPE_ARRAY:
+			t = tv
+	var teams := duel_teams()
+	if n <= 0 or t.is_empty():
+		_cards_label.text = "3 JUDGES · 10-POINT MUST"
+	else:
+		_cards_label.text = "CARDS %s–%s   %s" % [UiTheme.team_letter(int(teams[0])), UiTheme.team_letter(int(teams[1])), totals_text(t)]
+
+
+## The local player is on the referee's count: when he waves them up, and that staying down
+## recovers (RefereeRules.KD_DOWN_RECOVER).
+func _update_ref_hint(ref: Dictionary) -> void:
+	var cnt = ref.get("count", {})
+	var mine := typeof(cnt) == TYPE_DICTIONARY and int((cnt as Dictionary).get("fighter", -1)) == player_index \
+		and player_index >= 0 and player_index < sim.fighters.size() and sim.fighters[player_index].controller_kind == "player"
+	_ref_hint.visible = mine
+	if mine:
+		var left := float((cnt as Dictionary).get("left", 0.0))
+		_ref_hint.text = "Stay down to recover, or get up — the referee waves you up in %ds" % maxi(1, ceili(left))
+
+
+func _now() -> float:
+	return Time.get_ticks_msec() / 1000.0
+
+
+func _update_panels(hs: Dictionary) -> void:
+	var now := _now()
+	if _round_panel != null and is_instance_valid(_round_panel):
+		var age := now - _round_panel_shown
+		var live := sim.mode != null and sim.mode.phase == MatchMode.Phase.FIGHT
+		if age > ROUND_CARD_MAX or (age > ROUND_CARD_MIN and live):
+			_round_panel.queue_free()
+			_round_panel = null
+	if _banner != null and is_instance_valid(_banner):
+		if _banner_draw and bool(hs.get("sd", false)):
+			_banner_until = minf(_banner_until, _banner_shown + DRAW_TO_SD_SECONDS)
+		if now > _banner_until:
+			_banner.queue_free()
+			_banner = null
+
+
+## A themed panel anchored above the subtitle band (grows upward, centred).
+func _bottom_panel(panel_name: String) -> PanelContainer:
+	var p := UiTheme.panel("PanelSolid", 18.0)
+	p.name = panel_name
+	p.theme = UiTheme.get_theme()
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.anchor_left = 0.5
+	p.anchor_right = 0.5
+	p.anchor_top = 1.0
+	p.anchor_bottom = 1.0
+	p.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	p.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	add_child(p)
+	return p
+
+
+## "[A] STOKE   [B] DREDGE": the team letters the pairs are read in (colour never the only cue).
+func _legend(teams: Array) -> HBoxContainer:
+	var row := UiTheme.hbox(UiTheme.GAP_M)
+	for t in teams:
+		var h := UiTheme.hbox(UiTheme.GAP_XS)
+		h.add_child(TeamChip.new(int(t), 32.0))
+		h.add_child(UiTheme.label(team_name(int(t)), "CaptionStrong"))
+		row.add_child(h)
+	return row
+
+
+func _cell(text: String, variation: String) -> Label:
+	var l := UiTheme.label(text, variation)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	return l
+
+
+## The between-rounds scorecard for a round_scored event {round, teams, judges [[a,b] x3],
+## winner, stoppage, totals [[A,B] x3]}: shown through the ROUND_END / intro break.
+func show_round_card(ev: Dictionary) -> void:
+	if _round_panel != null and is_instance_valid(_round_panel):
+		_round_panel.queue_free()
+	var teams: Array = ev.get("teams", [])
+	if teams.size() != 2:
+		teams = duel_teams()
+	var rn := int(ev.get("round", 0))
+	var p := _bottom_panel("RoundScorecard")
+	var col := UiTheme.vbox(UiTheme.GAP_S)
+	p.add_child(col)
+	# one header row (round, its winner, the A/B legend) keeps the card short: the break shows the
+	# fighters and the referee above it
+	var head := UiTheme.hbox(UiTheme.GAP_L)
+	var eb := UiTheme.label("ROUND %d %s" % [rn, "STOPPED" if bool(ev.get("stoppage", false)) else "SCORED"], "Eyebrow")
+	eb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(eb)
+	var w := int(ev.get("winner", -1))
+	var res := UiTheme.hbox(UiTheme.GAP_XS)
+	if w >= 0:
+		res.add_child(TeamChip.new(w, 34.0))
+		res.add_child(UiTheme.label("ROUND TO %s" % team_name(w), "H3"))
+	else:
+		res.add_child(UiTheme.label("EVEN ROUND", "H3"))
+	head.add_child(res)
+	var lg := _legend(teams)
+	lg.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lg.alignment = BoxContainer.ALIGNMENT_END
+	head.add_child(lg)
+	col.add_child(head)
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 40)
+	grid.add_theme_constant_override("v_separation", 6)
+	grid.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	grid.add_child(UiTheme.label("JUDGE", "Caption"))
+	for j in RoundJudge.JUDGE_NAMES:
+		grid.add_child(_cell(str(j), "CaptionStrong"))
+	var js: Array = ev.get("judges", [])
+	var tot: Array = ev.get("totals", [])
+	grid.add_child(UiTheme.label("ROUND %d" % rn, "Body"))
+	for j in 3:
+		grid.add_child(_cell(totals_text([js[j]]) if j < js.size() else "–", "Value"))
+	grid.add_child(UiTheme.label("TOTAL", "Body"))
+	for j in 3:
+		grid.add_child(_cell(totals_text([tot[j]]) if j < tot.size() else "–", "ValueGold"))
+	col.add_child(grid)
+	_round_panel = p
+	_round_panel_shown = _now()
+	_place_bottom_panels()
+
+
+## The decision banner for a judges_decision event {winner (team | -1), method, totals, teams}:
+## the winner (or DRAW), the method and the three totals (winner first). `round_no` names the
+## round of a T.K.O.
+func show_decision(ev: Dictionary, round_no := 0) -> void:
+	if _round_panel != null and is_instance_valid(_round_panel):
+		_round_panel.queue_free()
+		_round_panel = null
+	if _banner != null and is_instance_valid(_banner):
+		_banner.queue_free()
+	var teams: Array = ev.get("teams", [])
+	if teams.size() != 2:
+		teams = duel_teams()
+	var w := int(ev.get("winner", -1))
+	var m := str(ev.get("method", ""))
+	var p := _bottom_panel("DecisionBanner")
+	var col := UiTheme.vbox(UiTheme.GAP_XS)
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	p.add_child(col)
+	var eyebrow := "THE JUDGES' DECISION"
+	if m == "TKO":
+		eyebrow = "THE REFEREE STOPS IT"
+	elif m.begins_with("Sudden Death"):
+		eyebrow = "SUDDEN DEATH"
+	elif w < 0:
+		eyebrow = "THE CARDS ARE LEVEL"
+	col.add_child(_cell(eyebrow, "Eyebrow"))
+	# three short rows (eyebrow, who + how, the cards) so the referee's ceremony stays in view
+	var who := UiTheme.hbox(UiTheme.GAP_L)
+	who.alignment = BoxContainer.ALIGNMENT_CENTER
+	var name_row := UiTheme.hbox(UiTheme.GAP_S)
+	if w >= 0:
+		name_row.add_child(TeamChip.new(w, 48.0))
+		name_row.add_child(UiTheme.label("%s WINS" % team_name(w), "H2"))
+	else:
+		name_row.add_child(UiTheme.label("DRAW", "H2"))
+	who.add_child(name_row)
+	var how := m.to_upper() if m != "" else "DECISION"
+	if m == "TKO":
+		how = ("T.K.O. · ROUND %d" % round_no) if round_no > 0 else "T.K.O."
+	var how_l := UiTheme.label(how, "H3")
+	how_l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	who.add_child(how_l)
+	col.add_child(who)
+	var tot: Array = ev.get("totals", [])
+	var cards_row := UiTheme.hbox(UiTheme.GAP_M)
+	cards_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	if not tot.is_empty():
+		var lead := "CARDS AT THE STOPPAGE" if m == "TKO" else "CARDS"
+		cards_row.add_child(UiTheme.label("%s   %s" % [lead, totals_text(tot, teams, w)], "Value"))
+	if w >= 0:
+		if not tot.is_empty():
+			var note := UiTheme.label("(winner first)", "Caption")
+			note.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			cards_row.add_child(note)
+	else:
+		cards_row.add_child(_legend(teams))
+	if cards_row.get_child_count() > 0:
+		col.add_child(cards_row)
+	_banner = p
+	_banner_shown = _now()
+	_banner_until = _banner_shown + DECISION_SECONDS
+	_banner_draw = w < 0
+	_place_bottom_panels()
 
 
 func callout(text: String, seconds := 1.4, color := Color(1, 0.92, 0.7)) -> void:

@@ -9,6 +9,9 @@ extends Node3D
 ## LocalPlayerInput). Event feedback mirrors MatchScene._on_event (a parity test checks that every
 ## event MatchScene reacts to is handled here too). Mode choices offered to this player (e.g.
 ## Chum Rush picks) are sent to the server as requests; the server validates and applies them.
+## The Cage Rules referee (MCH-08) is a view-only RefereeView, created when the replicated rules
+## have a referee in a standard duel (the server's gate), a sibling of ModeView fed from the
+## mirror every frame (RefereeView.state_from_sim(mirror.sim, true)); never in camera framing.
 
 signal results_received(result: Dictionary)
 
@@ -40,6 +43,10 @@ var _spec_label: Label = null
 var _goals_by_me := 0
 var _audio_bridge: Node = null
 var bench_hint: Label = null             ## co-op tag fights: what a benched partner can do
+var referee_view: RefereeView = null     ## the view-only referee (replicated rules with a referee)
+var _decision_round := -1                ## 10-point: the round a judges' decision closed
+var _scored_round := -1                  ## 10-point: the last round the judges scored (round_scored)
+var _stopped_round := -1                 ## the round the referee stopped
 
 
 ## info: MATCH_START dictionary from the server. Returns "" or an error text.
@@ -73,6 +80,10 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 		mode_view = mv_script.new()
 		add_child(mode_view)
 		mode_view.set("head_of", Callable(self, "head_pos"))
+	if has_referee(info):
+		referee_view = RefereeView.new()
+		add_child(referee_view)
+		referee_view.setup(arena_def, info.get("rules", {}))
 	camera.points_provider = _camera_points
 	camera.focus_provider = _camera_focus
 	mirror = NetHudMirror.new()
@@ -114,6 +125,17 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	if not Audio.subtitle.is_connected(hud.subtitle):
 		Audio.subtitle.connect(hud.subtitle)
 	return ""
+
+
+## The server runs a referee only in a standard-mode duel with "referee": true (MatchMode gate);
+## the client shows one under the same replicated rules.
+static func has_referee(match_info: Dictionary) -> bool:
+	var r = match_info.get("rules", {})
+	if typeof(r) != TYPE_DICTIONARY:
+		return false
+	var rules: Dictionary = r
+	return bool(rules.get("referee", false)) and str(rules.get("format", "")) == "duel" \
+		and str(match_info.get("mode", rules.get("mode", "standard"))) == "standard"
 
 
 func _default_music() -> String:
@@ -222,6 +244,8 @@ func _process(dt: float) -> void:
 	mirror.update(_sample, dt)
 	if mode_view:
 		mode_view.call("update_state", _sample["mode"].get("view", {}), dt)
+	if referee_view:
+		referee_view.update_view(RefereeView.state_from_sim(mirror.sim, true), camera.global_position, dt)
 	_update_pick_panel()
 	if bench_hint:
 		var mine := _slot(my_index)
@@ -580,9 +604,34 @@ func _on_event(ev: Dictionary) -> void:
 			hud.callout("FIGHT!", 1.0, Color(1.0, 0.85, 0.3))
 		"round_end":
 			var w := int(ev.get("winner", -1))
-			hud.callout("DRAW" if w < 0 else "%s WINS THE ROUND" % _team_label(w), 2.4)
+			var rn := int(ev.get("round", -9))
+			if rn == _decision_round or rn == _stopped_round:
+				pass   # the decision / T.K.O. callout stays (10-point: the cards, not this round, decide)
+			elif hud.is_ten_point():
+				hud.callout("EVEN ROUND" if w < 0 else "%s WINS THE ROUND" % _team_label(w), 2.4)
+			else:
+				hud.callout("DRAW" if w < 0 else "%s WINS THE ROUND" % _team_label(w), 2.4)
 		"timeout":
 			hud.callout("TIME!", 1.2)
+		"round_scored":
+			_scored_round = int(ev.get("round", -1))
+			hud.show_round_card(ev)
+		"judges_decision":
+			var wd := int(ev.get("winner", -1))
+			# the round the cards just closed (round_scored precedes the decision in the same tick)
+			_decision_round = _scored_round if _scored_round > 0 else (mirror.mode.round_index + 1 if mirror != null and mirror.mode != null else -1)
+			hud.show_decision(ev, _decision_round)
+			hud.callout(FightHud.decision_callout(ev, _team_label(wd) if wd >= 0 else ""), 2.6, Color(1.0, 0.85, 0.3))
+		"ref_count":
+			if fi >= 0:
+				vfx.word(head_pos(fi) + Vector3.UP * 0.6, "%d" % int(ev.get("n", 0)), Color(1.0, 0.95, 0.85), 72)
+		"ref_wave_up":
+			if fi >= 0:
+				vfx.word(head_pos(fi) + Vector3.UP * 0.6, "UP!", Color(0.6, 0.95, 1.0), 64)
+		"ref_stoppage":
+			_stopped_round = int(ev.get("round", -1))
+			hud.callout("T.K.O.!", 2.6, Color(1.0, 0.35, 0.3))
+			camera.add_trauma(0.3)
 		"match_end":
 			var w2 := int(ev.get("winner", -1))
 			hud.callout("DRAW!" if w2 < 0 else "%s WINS!" % _team_label(w2), 3.0, Color(1.0, 0.85, 0.3))
