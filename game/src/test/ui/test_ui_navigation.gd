@@ -533,7 +533,7 @@ func test_every_screen_has_focus_and_back() -> void:
 	await open_main_menu()
 	var specs := [["settings", {}], ["profile", {}], ["credits", {}], ["tutorial_menu", {}], ["controls", {}],
 		["versus_setup", {"mode": "practice"}], ["versus_setup", {"mode": "versus", "fighters": 8}], ["spectate", {}],
-		["character_select", {"mode": "quick"}], ["ui_gallery", {}]]
+		["character_select", {"mode": "quick"}], ["ui_gallery", {}], ["career", {}], ["career_new", {}]]
 	for s in specs:
 		var name_: String = s[0]
 		App.push(name_, (s[1] as Dictionary).duplicate())
@@ -585,6 +585,7 @@ func test_every_screen_has_focus_and_back() -> void:
 func test_layout_fits_and_text_is_readable() -> void:
 	await wait_frames(2)
 	await open_main_menu()
+	var career := _career_with_one_fight()
 	var root := get_tree().root
 	var old := root.size
 	for res in [Vector2i(1280, 800), Vector2i(1920, 1080)]:
@@ -602,7 +603,11 @@ func test_layout_fits_and_text_is_readable() -> void:
 			["credits", {}], ["tutorial_menu", {}], ["controls", {}], ["versus_setup", {"mode": "versus", "fighters": 8}],
 			["spectate", {"fighters": 8}], ["character_select", {"mode": "quick"}], ["pause", {"notice": "Controller disconnected. Reconnect it, or carry on with keyboard and mouse."}],
 			["results", {"result": result8, "config": {"ui": {"mode": "versus"}}}],
-			["text_entry", {"title": "Player name", "value": "Rookie"}]]
+			["text_entry", {"title": "Player name", "value": "Rookie"}],
+			["career", {}], ["career_new", {}]]
+		if career != null:
+			specs.append(["career_hub", {"flow": career}])
+			specs.append(["career_result", {"flow": career, "summary": career.last_summary}])
 		for s in specs:
 			var name_: String = s[0]
 			if name_ != "main_menu":
@@ -620,6 +625,33 @@ func test_layout_fits_and_text_is_readable() -> void:
 		await wait_frames(2)
 	root.size = old
 	await wait_frames(2)
+
+
+## A career (no store: nothing is saved) one fight in, for the career hub and result screens (CMP-08).
+func _career_with_one_fight() -> CareerFlow:
+	var cat := CampaignCatalog.shared()
+	var fighters := cat.available_fighters()
+	if not check(not fighters.is_empty(), "a playable fighter for the career screens"):
+		return null
+	var made := CareerController.create(cat, {"name": "Rookie", "nick": "Low Tide", "fighter": str(fighters[0]), "seed": 77, "created_at": 1})
+	if not check(bool(made["ok"]), "career created: %s" % made["error"]):
+		return null
+	var ctrl: CareerController = made["ctrl"]
+	check(ctrl.accept(str(ctrl.state["offers"][0]["id"])), "offer accepted")
+	ctrl.state["booked"]["weeks_left"] = 0
+	var cards := []
+	for i in 3:
+		cards.append({"round": i + 1, "teams": [0, 1], "judges": [[10, 9], [10, 9], [9, 10]], "scores": [[40.0, 31.5], [40.0, 31.5], [40.0, 31.5]],
+			"tally": [{"landed": 14, "damage": 60.0, "knockdowns": 1, "taken_head": 8.0, "taken_body": 20.0, "taken_legs": 2.0},
+				{"landed": 9, "damage": 30.0, "knockdowns": 0, "taken_head": 15.0, "taken_body": 40.0, "taken_legs": 5.0}],
+			"winner": 0, "stoppage": false})
+	var res := {"mode": "standard", "winner_team": 0, "rounds": 3, "time": 300.0, "fighters": [],
+		"scoring": {"mode": "ten_point", "method": "Split Decision", "winner": 0, "teams": [0, 1], "cards": cards,
+			"totals": [[30, 27], [30, 27], [27, 30]], "judges": ["Even card", "Volume", "Impact"], "stoppage": {}, "sudden_death": false}}
+	var f := CareerFlow.make(cat, ctrl)
+	f.last_summary = ctrl.apply_result(res, ctrl.booked_id())
+	check(bool(f.last_summary.get("ok", false)), "the synthetic bout settles: %s" % f.last_summary.get("error", ""))
+	return f
 
 
 func _audit(s: Screen, tag: String, vr: Rect2, px_per_du: float) -> void:

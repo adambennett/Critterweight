@@ -2,6 +2,9 @@ extends Screen
 ## Pause ("pause"). Offline: freezes the match (simulation + physics, MatchFlow.set_paused) until
 ## it closes. Online: nothing pauses — the menu says so and the fight keeps running behind it.
 ## Resume · Restart fight (offline) · Settings · Controls · Quit to main menu (confirmed).
+## In a career bout (the match scene carries meta "career_flow", design contract D4) there is no
+## Restart, and quitting is pulling out of the fight: the confirmation says so ("No purse,
+## popularity -4.") and the career's withdrawal is applied before returning to the main menu.
 ## A quick reference shows the core actions with the CURRENT bindings for the active device.
 ## Start / Esc / B close it. params: {notice: String} (e.g. "Controller disconnected ...").
 
@@ -10,6 +13,7 @@ const QUICK_REF := [["move_up", "Move", "left_stick"], ["light", "Light attack",
 	["ability2", "Ability 2", ""], ["juice", "JUICE", ""], ["taunt", "Taunt", ""], ["target", "Switch target", ""]]
 
 var _online := false
+var _career: CareerFlow = null       ## the career bout's flow (null outside career bouts)
 var _resume: UiButton
 var _ref_box: VBoxContainer
 
@@ -17,6 +21,7 @@ var _ref_box: VBoxContainer
 func on_enter(p: Dictionary) -> void:
 	is_overlay = true
 	_online = MatchFlow.is_online()
+	_career = CareerFlow.of_scene(MatchFlow.current_match()) if not _online else null
 	if not _online:
 		MatchFlow.set_paused(true)
 	add_dimmer(0.66)
@@ -63,7 +68,7 @@ func on_enter(p: Dictionary) -> void:
 			tb.disabled = OnlineFlow.coop.session.my_pause_budget() <= 0.0
 		if OnlineFlow.coop.is_host():
 			_button(lv, "Forfeit this fight", "close", "forfeit", _ask_forfeit)
-	if not _online and not MatchFlow.last_config.is_empty():
+	if not _online and not MatchFlow.last_config.is_empty() and _career == null:
 		_button(lv, "Restart fight", "restart", "restart", _ask_restart)
 	_button(lv, "Settings", "settings", "settings", func() -> void: App.push("settings", {"in_game": true}))
 	_button(lv, "Controls", "gamepad", "controls", func() -> void: App.push("controls", {"in_game": true}))
@@ -166,11 +171,22 @@ func _ask_restart() -> void:
 
 
 func _ask_quit() -> void:
+	if _career != null:
+		App.dialog("Pull out of this fight?", _career.withdraw_terms(),
+			[{"label": "Pull out", "id": "pull", "danger": true}, {"label": "Keep fighting", "id": "stay", "cancel": true, "default": true}],
+			_on_pull_out_choice)
+		return
 	App.dialog("Quit to the main menu?", "The current fight ends without a result." if not _online else "You will leave the online match.",
 		[{"label": "Quit fight", "id": "quit", "danger": true}, {"label": "Keep fighting", "id": "stay", "cancel": true, "default": true}],
 		func(id: String) -> void:
 			if id == "quit":
 				MatchFlow.quit_to_menu())
+
+
+## Career bout: "Pull out" withdraws (popularity -4, week +1, no purse) and returns to the menu.
+func _on_pull_out_choice(id: String) -> void:
+	if id == "pull" and _career != null:
+		_career.pull_out()
 
 
 func on_exit() -> void:

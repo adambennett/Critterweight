@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/test/campaign/career_shots.gd" id="1_careershots"]
+
+[node name="CareerShots" type="Node"]
+script = ExtResource("1_careershots")
