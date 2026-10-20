@@ -1,0 +1,76 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 113,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_career_files_are_never_listed_as_runs"
+		},
+		{
+			"errors": [],
+			"ms": 30,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_check_reports_invariants"
+		},
+		{
+			"errors": [],
+			"ms": 95,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_content_block_and_defaults"
+		},
+		{
+			"errors": [],
+			"ms": 118,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_create_save_load_round_trip_is_identical"
+		},
+		{
+			"errors": [],
+			"ms": 66,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_damaged_main_recovers_from_backup"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_damaged_newer_missing_saves_are_reported_and_kept"
+		},
+		{
+			"errors": [],
+			"ms": 141,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_missing_content_handling"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_new_career_basics"
+		},
+		{
+			"errors": [],
+			"ms": 116,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_retire_frees_the_slot_and_never_resurrects"
+		},
+		{
+			"errors": [],
+			"ms": 62,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_slot_rules"
+		},
+		{
+			"errors": [],
+			"ms": 30,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_starting_stats_follow_the_fighter"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 11 run, 0 failed, 11 passed, 0 skipped in 4.1 s",
+	"time": "2026-10-20T00:28:43",
+	"total": 11,
+	"version": "0.9.16"
+}

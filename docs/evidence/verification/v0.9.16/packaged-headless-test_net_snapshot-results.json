@@ -1,0 +1,40 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 3919,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_fk_reconstruction_matches_simulation"
+		},
+		{
+			"errors": [],
+			"ms": 59,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_hud_mirror_drives_real_fight_hud"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_replica_interpolation_teleports_and_events"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_roster_codec_and_generations"
+		},
+		{
+			"errors": [],
+			"ms": 13215,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_snapshot_sizes_fit_one_packet"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 5 run, 0 failed, 5 passed, 0 skipped in 20.4 s",
+	"time": "2026-10-20T00:29:59",
+	"total": 5,
+	"version": "0.9.16"
+}

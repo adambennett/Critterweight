@@ -1,0 +1,112 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 30,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_diminishing_returns_and_cap"
+		},
+		{
+			"errors": [],
+			"ms": 36,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_duplicate_result_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 30,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_gym_upgrades"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_healing_and_rest"
+		},
+		{
+			"errors": [],
+			"ms": 207,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_interrupted_fight_is_refought_with_the_same_seed"
+		},
+		{
+			"errors": [],
+			"ms": 8,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_names_are_original"
+		},
+		{
+			"errors": [],
+			"ms": 70,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_offer_pool_follows_popularity"
+		},
+		{
+			"errors": [],
+			"ms": 48,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_offers_are_deterministic_per_seed_and_week"
+		},
+		{
+			"errors": [],
+			"ms": 41,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_opponents_follow_the_org_band_and_d5_tiers"
+		},
+		{
+			"errors": [],
+			"ms": 57,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_popularity_deltas_match_cage_rules"
+		},
+		{
+			"errors": [],
+			"ms": 71,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_purse_and_bonus_formulas"
+		},
+		{
+			"errors": [],
+			"ms": 37,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_record_buckets_streak_and_pay"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_standing_danger_and_hints"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_title_shot_champion_defences_and_belt_loss"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_training_gain_matches_cage_rules"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_weeks_and_idle_popularity"
+		},
+		{
+			"errors": [],
+			"ms": 103,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_withdraw"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 17 run, 0 failed, 17 passed, 0 skipped in 4.1 s",
+	"time": "2026-10-20T00:28:50",
+	"total": 17,
+	"version": "0.9.16"
+}

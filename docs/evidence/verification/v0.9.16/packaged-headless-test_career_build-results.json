@@ -1,0 +1,64 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 84,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_career_builds_never_leak"
+		},
+		{
+			"errors": [],
+			"ms": 46,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_chin_raises_poise_and_getup_never_the_poise_multiplier"
+		},
+		{
+			"errors": [],
+			"ms": 41,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_clinch_improves_the_grab_game"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_defence_improves_guard_parry_dodge_never_damage_taken"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_injuries_handicap_poise_stamina_and_footwork"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_mid_stats_are_the_base_kit"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_power_raises_damage_and_knockdown_force"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_speed_raises_footwork_and_tempo"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_stamina_raises_tank_and_regen"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 9 run, 0 failed, 9 passed, 0 skipped in 3.6 s",
+	"time": "2026-10-20T00:28:56",
+	"total": 9,
+	"version": "0.9.16"
+}

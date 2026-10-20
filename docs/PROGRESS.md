@@ -1,5 +1,22 @@
 # Progress
 
+## Status (2026-10-20) — v0.9.16: Career, 10-point scoring, referee, Cage Rules preset
+
+v0.9.15 is published (2026-10-19, tag `v0.9.15` at `f8e4bbb`). v0.9.16 adds the owner-requested
+Career (Campaign › Career, first; three save slots; Cage Rules' week/offer/training/purse/popularity
+loop without grappling), optional 10-point must scoring and an independent referee for the standard
+duel (Jeremy's Cage Rules referee imported through tools/cage_rules), and the built-in Cage Rules
+preset. Decisions D-044..D-048; ledger rows CMP-08, MCH-07..MCH-09, ART-09. Source: 437 scripts,
+full suite 862 run / 861 passed / 0 failed / 1 graphical-audio skip on the release commit. PACKAGED
+
+Before the work the deleted local checkouts (Recycle Bin, 2026-10-19) were audited against git: every
+branch tip was already on GitHub and every uncommitted v0.9.15 edit was already in the release; only
+the never-adopted Ableton audio experiment (D-040) exists solely in the Recycle Bin.
+
+Open owner questions are listed in docs/releases/v0.9.16.md's verification notes and the session
+report (judging closeness, referee knockdown limit, crash/Alt+F4 re-fights, profile history, referee
+height, scorecard placement).
+
 ## Status (2026-10-18) - preview 3 complete and packaged
 
 All prior fixes, event art and 764 recorded clips/names are included, plus the editor-only

@@ -1,0 +1,22 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 46,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_fights.gd::test_bout_config_shape"
+		},
+		{
+			"errors": [],
+			"ms": 26140,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_fights.gd::test_headless_career_bout_end_to_end"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 2 run, 0 failed, 2 passed, 0 skipped in 29.5 s",
+	"time": "2026-10-20T00:29:29",
+	"total": 2,
+	"version": "0.9.16"
+}

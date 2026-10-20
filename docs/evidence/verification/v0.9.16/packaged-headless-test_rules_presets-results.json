@@ -1,0 +1,52 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_cage_rules_preset_is_the_standard_duel_with_officials"
+		},
+		{
+			"errors": [],
+			"ms": 492,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_custom_preset_drives_a_match"
+		},
+		{
+			"errors": [],
+			"ms": 8,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_every_core_preset_and_mode_default_validates"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_invalid_combinations_are_explained"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_normalize_clamps_and_keeps_unknown_keys"
+		},
+		{
+			"errors": [],
+			"ms": 266,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_presets_save_version_duplicate_rename_export_import_delete"
+		},
+		{
+			"errors": [],
+			"ms": 44,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_scoring_and_referee_fields_validate_and_default_to_the_old_rules"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 7 run, 0 failed, 7 passed, 0 skipped in 4.1 s",
+	"time": "2026-10-20T00:29:36",
+	"total": 7,
+	"version": "0.9.16"
+}

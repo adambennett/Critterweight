@@ -1,0 +1,76 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 547,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_campaign_menu_lists_career_first"
+		},
+		{
+			"errors": [],
+			"ms": 938,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_create_a_career_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 1263,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_every_career_screen_has_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 371,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_fight_through_career_flow_to_the_result_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 784,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_hub_pull_out_is_a_confirmed_withdrawal"
+		},
+		{
+			"errors": [],
+			"ms": 254,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_interrupted_bout_is_offered_again"
+		},
+		{
+			"errors": [],
+			"ms": 1663,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 831,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_menu_quit_pulls_out_of_a_career_bout"
+		},
+		{
+			"errors": [],
+			"ms": 2878,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_quit_after_the_decision_books_the_result"
+		},
+		{
+			"errors": [],
+			"ms": 753,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_retire_and_move_aside_free_the_slot"
+		},
+		{
+			"errors": [],
+			"ms": 934,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_walk_weeks_with_real_input"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 11 run, 0 failed, 11 passed, 0 skipped in 14.6 s",
+	"time": "2026-10-20T00:30:54",
+	"total": 11,
+	"version": "0.9.16"
+}

@@ -190,6 +190,8 @@ func test_rules_picker_has_hidden_cancel_and_patch_notes_archive() -> void:
 	check(notes.default_focus() != null, "offline patch notes have controller focus")
 	var archive = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/patch_notes.json"))
 	check(archive.size() >= 15, "archive contains every published version")
+	check(archive.size() > 0 and str(archive[0].get("tag", "")) == "v" + str(ProjectSettings.get_setting("application/config/version")),
+		"the newest archive entry is this build's version")
 
 func test_map_has_scroll_room_no_intro_and_modal_blocks_nodes() -> void:
 	var f := flow()

@@ -1,0 +1,76 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 42,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_break_between_rounds_goes_to_the_centre_facing_the_camera"
+		},
+		{
+			"errors": [],
+			"ms": 59,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_draw_raises_both_arms_and_decision_waits_for_the_cards"
+		},
+		{
+			"errors": [],
+			"ms": 215,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_fight_neutral_spot_is_a_far_side_t_and_never_between_them"
+		},
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_intro_between_the_fighters_on_the_far_side_then_go"
+		},
+		{
+			"errors": [],
+			"ms": 59,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_knockdown_hold_off_watch_and_wave_up"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_pose_port_reproduces_the_cage_rules_baked_transforms"
+		},
+		{
+			"errors": [],
+			"ms": 240,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_rect_arena_with_props_and_large_fighters_keeps_him_clear"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_referee_model_binds_every_segment_and_is_view_only"
+		},
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_state_from_sim_and_from_the_net_mirror"
+		},
+		{
+			"errors": [],
+			"ms": 68,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_stoppage_wave_off_then_the_winners_arm_goes_up"
+		},
+		{
+			"errors": [],
+			"ms": 20,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_voluntary_get_up_is_watched_not_waved"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 11 run, 0 failed, 11 passed, 0 skipped in 4.3 s",
+	"time": "2026-10-20T00:28:36",
+	"total": 11,
+	"version": "0.9.16"
+}
