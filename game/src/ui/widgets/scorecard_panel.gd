@@ -11,7 +11,8 @@ extends PanelContainer
 ##   "stoppage": {"round", "time"} | {}}. Pairs are always ordered like "teams".
 ## names: display names aligned with "teams" (falls back to "Team A"/"Team B").
 ## Layout: the legend on top, then the judges x rounds grid and (show_tally) the fight totals side by
-## side, so a 5-round card stays short enough for the results screen at 1280x800; a round the
+## side, so a 5-round card stays short enough for the results screen at 1280x800; `stacked` puts the
+## totals under the cards instead, for a narrow column (the career result screen). A round the
 ## referee stopped is starred and footnoted. Smallest text is Caption (28 du).
 
 ## Fight-total rows: tally key, label, always shown. Rows whose key appears in no tally are skipped,
@@ -24,7 +25,7 @@ var scoring := {}
 var names: Array = []
 
 
-func _init(scoring_ := {}, names_: Array = [], show_tally := true) -> void:
+func _init(scoring_ := {}, names_: Array = [], show_tally := true, stacked := false) -> void:
 	scoring = scoring_
 	names = names_
 	theme_type_variation = "PanelSolid"
@@ -37,12 +38,12 @@ func _init(scoring_ := {}, names_: Array = [], show_tally := true) -> void:
 	var col := UiTheme.vbox(UiTheme.GAP_S)
 	add_child(col)
 	col.add_child(_legend())
-	var body := UiTheme.hbox(UiTheme.GAP_XL)
+	var body: BoxContainer = UiTheme.vbox(UiTheme.GAP_M) if stacked else UiTheme.hbox(UiTheme.GAP_XL)
 	body.add_child(_cards_grid())
 	if show_tally:
 		var t := _tally_grid()
 		if t:
-			var sep := VSeparator.new()
+			var sep: Separator = HSeparator.new() if stacked else VSeparator.new()
 			sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			body.add_child(sep)
 			body.add_child(t)

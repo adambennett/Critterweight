@@ -59,7 +59,7 @@ func on_enter(p: Dictionary) -> void:
 	_scroll.add_child(sv)
 	var sc: Dictionary = summary.get("scoring", {}) if typeof(summary.get("scoring", {})) == TYPE_DICTIONARY else {}
 	if not sc.is_empty() and not (sc.get("cards", []) as Array).is_empty():
-		sv.add_child(ScorecardPanel.new(sc, _names_for(sc), true))
+		sv.add_child(ScorecardPanel.new(sc, _names_for(sc), true, true))
 	else:
 		var np := UiTheme.panel("PanelSolid", 22.0)
 		np.add_child(UiTheme.label("No judges' cards for this bout: it was decided on health.", "Caption", true))
