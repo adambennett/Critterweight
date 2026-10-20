@@ -19,8 +19,10 @@ const ENTRIES := [
 			{"id": "tutorial", "label": "Tutorial", "icon": "tutorial", "screen": "tutorial_menu", "params": {},
 				"desc": "Granny Haymaker's corner: ten short lessons from footwork to the JUICE."},
 		]},
-	{"id": "campaign", "label": "Campaign", "icon": "campaign", "desc": "Run a seeded fight card from the Undercard to the Title Card.",
+	{"id": "campaign", "label": "Campaign", "icon": "campaign", "desc": "A persistent fighter career, or a seeded fight card from the Undercard to the Title Card.",
 		"children": [
+			{"id": "career", "label": "Career", "icon": "star", "screen": "career", "params": {},
+				"desc": "Build one fighter's career: take fights, train between bouts and chase the belt."},
 			{"id": "off_the_street", "label": "Off the Street", "icon": "campaign", "screen": "campaign_menu", "params": {"variant": "off_the_street"},
 				"desc": "A fresh run with nothing carried over. Climb The Dosage on skill alone."},
 			{"id": "fight_camp", "label": "Fight Camp", "icon": "trophy", "screen": "hub", "params": {"from": "menu"},
