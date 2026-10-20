@@ -213,6 +213,89 @@ func test_sim_event_mapping() -> void:
 	check_eq(Audio.sfx("definitely_missing_id"), -1, "missing id never crashes")
 
 
+## MCH-07/08 (v0.9.16): 10-point bells, the judges' decision (read with the WINNER's name, from the
+## recorded "time" / "draw" templates), the referee's count, wave-up and stoppage. No new Content
+## lines: the counts above stay pinned. The campaign's own "decision" event stays unmapped.
+func test_ten_point_and_referee_event_mapping() -> void:
+	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_stoke", "name": "STOKE", "team": 0},
+		{"index": 1, "creature": "f_dredge", "name": "DREDGE", "team": 1}], "arena": "the_gullet", "seed": 12})
+	var lines := func(acts: Array) -> Array:
+		return acts.filter(func(a): return str(a).begins_with("line:"))
+	# every 10-point bell is a timeout: the bell rings, the cards are not announced yet
+	var acts := Audio.on_sim_event({"type": "timeout"}, Vector3.ZERO, {"ten_point": true})
+	check(acts.has("ann_bell"), "10-point bell (%s)" % str(acts))
+	check((lines.call(acts) as Array).is_empty(), "no decision line at a 10-point bell (%s)" % str(acts))
+	acts = Audio.on_sim_event({"type": "round_scored", "round": 1, "teams": [0, 1], "judges": [[10, 9], [10, 9], [10, 9]], "winner": 0})
+	check(acts.has("ui_card_flip"), "the scorecard turns over (%s)" % str(acts))
+	# Health scoring keeps the old decision call at time
+	acts = Audio.on_sim_event({"type": "timeout"})
+	check(acts.has("ann_bell") and acts.has("line:ann_time_02"), "HP timeout still goes to the cards (%s)" % str(acts))
+	Audio.stop_announcer()
+	_subs.clear()
+	# the decision names the winner (DREDGE), not the local player
+	acts = Audio.on_sim_event({"type": "judges_decision", "winner": 1, "method": "Split Decision", "totals": [[29, 28], [28, 29], [28, 29]],
+		"judges": [0, 1, 1], "teams": [0, 1]}, Vector3.ZERO, {"ten_point": true})
+	check(acts.has("ann_sting") and acts.has("line:ann_time_02"), "decision call (%s)" % str(acts))
+	check(not _subs.is_empty() and str(_subs[-1]["text"]).contains("DREDGE") and not str(_subs[-1]["text"]).contains("STOKE"),
+		"the winner's name is read: %s" % str(_subs))
+	Audio.stop_announcer()
+	# a sudden-death win after drawn cards
+	acts = Audio.on_sim_event({"type": "judges_decision", "winner": 0, "method": "Sudden Death (after a Split Draw)", "teams": [0, 1]},
+		Vector3.ZERO, {"ten_point": true})
+	check(acts.has("line:ann_time_04"), "sudden-death win call (%s)" % str(acts))
+	Audio.stop_announcer()
+	# a T.K.O. decision: the stoppage already had its call
+	acts = Audio.on_sim_event({"type": "judges_decision", "winner": 0, "method": "TKO", "teams": [0, 1]}, Vector3.ZERO, {"ten_point": true})
+	check((lines.call(acts) as Array).is_empty(), "no second call for a T.K.O. decision (%s)" % str(acts))
+	# drawn cards: the draw line, unless a sudden death follows (it has its own call), and once only
+	acts = Audio.on_sim_event({"type": "judges_decision", "winner": -1, "method": "Split Draw", "teams": [0, 1]}, Vector3.ZERO,
+		{"ten_point": true, "sudden_death_follows": true})
+	check((lines.call(acts) as Array).is_empty(), "no draw line before a sudden death (%s)" % str(acts))
+	acts = Audio.on_sim_event({"type": "judges_decision", "winner": -1, "method": "Majority Draw", "teams": [0, 1]}, Vector3.ZERO, {"ten_point": true})
+	var drew := false
+	for a in acts:
+		drew = drew or str(a).begins_with("line:ann_draw_")
+	check(drew, "drawn decision uses the draw line (%s)" % str(acts))
+	Audio.stop_announcer()
+	acts = Audio.on_sim_event({"type": "match_end", "winner": -1})
+	check((lines.call(acts) as Array).is_empty(), "the draw is not announced twice (%s)" % str(acts))
+	# the referee: Barnaby's "I'm not the ref!" knockdown quip stays out while one is counting
+	Audio.stop_announcer()
+	Audio.on_sim_event({"type": "hit", "fighter": 0, "target": 1, "damage": 6.0, "point": Vector3.ZERO, "normal": Vector3.UP, "blocked": false,
+		"parried": false, "counter": false, "part": "head", "element": "", "quality": 0.5, "move": "l1", "slot": "l1", "knockdown": false, "otg": false})
+	Audio.stop_announcer()
+	acts = Audio.on_sim_event({"type": "knockdown", "fighter": 1, "reason": "move", "by": 0})
+	check(acts.has("line:ann_kd_04"), "without a referee the player's knockdown quip is the pick (%s)" % str(acts))
+	Audio.stop_announcer()
+	Audio._ann_used.clear()
+	acts = Audio.on_sim_event({"type": "knockdown", "fighter": 1, "reason": "move", "by": 0}, Vector3.ZERO, {"referee": true})
+	check(acts.has("knockdown") and not acts.has("line:ann_kd_04"), "no 'I'm not the ref!' under a referee (%s)" % str(acts))
+	check(not (lines.call(acts) as Array).is_empty(), "another knockdown call instead (%s)" % str(acts))
+	acts = Audio.on_sim_event({"type": "ref_count", "fighter": 1, "n": 2})
+	check(acts.has("ui_timer_tick"), "count tick (%s)" % str(acts))
+	acts = Audio.on_sim_event({"type": "ref_wave_up", "fighter": 1})
+	check((lines.call(acts) as Array).is_empty(), "wave-up has no announcer line (%s)" % str(acts))
+	Audio.stop_announcer()
+	# the stopping knockdown's call is still queued behind another line when the referee waves it off
+	check(Audio.announce("ann_low_01"), "a line is playing")
+	check(Audio.announce("ann_kd_01") and not Audio._ann_pending.is_empty(), "a knockdown call is queued")
+	acts = Audio.on_sim_event({"type": "ref_stoppage", "fighter": 1, "by": 0, "reason": "knockdowns", "round": 2})
+	check(acts.has("ann_bell_triple") and acts.has("ko"), "stoppage bell + KO sound (%s)" % str(acts))
+	check(Audio._ann_pending.is_empty(), "the stale knockdown call never follows the T.K.O. call")
+	var ko_line := false
+	for a2 in acts:
+		ko_line = ko_line or str(a2).begins_with("line:ann_ko_")
+	check(ko_line, "an existing KO call for the stoppage (%s)" % str(acts))
+	# the campaign's own "decision" (party / enemy HP) is untouched: no mapping
+	Audio.stop_announcer()
+	acts = Audio.on_sim_event({"type": "decision", "party": 0.5, "enemy": 0.4})
+	check(acts.is_empty(), "campaign decision stays unmapped (%s)" % str(acts))
+	# the bridge's look-ahead for drawn cards
+	check(AudioMatchBridge._sudden_death_after([{"type": "judges_decision"}, {"type": "sudden_death"}], 0), "sudden death follows")
+	check(not AudioMatchBridge._sudden_death_after([{"type": "judges_decision"}, {"type": "round_end"}, {"type": "sudden_death"}], 0),
+		"a round_end ends the look-ahead")
+
+
 func test_babble_plan() -> void:
 	var voice: Dictionary = Audio.bank.get("voices", {}).get("barnaby", {})
 	check(not voice.is_empty(), "barnaby voice bank in bank.json")

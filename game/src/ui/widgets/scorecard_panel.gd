@@ -10,10 +10,15 @@ extends PanelContainer
 ##   "tally": [{...ta}, {...tb}], "stoppage": bool}], "totals": [[A, B] x3], "method": String,
 ##   "stoppage": {"round", "time"} | {}}. Pairs are always ordered like "teams".
 ## names: display names aligned with "teams" (falls back to "Team A"/"Team B").
+## Layout: the legend on top, then the judges x rounds grid and (show_tally) the fight totals side by
+## side, so a 5-round card stays short enough for the results screen at 1280x800; a round the
+## referee stopped is starred and footnoted. Smallest text is Caption (28 du).
 
-## Fight-total rows: tally key, label, decimals. Rows whose key appears in no tally are skipped.
-const TALLY_ROWS := [["landed", "Strikes landed", 0], ["damage", "Damage dealt", 0], ["knockdowns", "Knockdowns", 0],
-	["throws", "Throws", 0], ["ringouts", "Ring-outs", 0], ["parries", "Parries", 0]]
+## Fight-total rows: tally key, label, always shown. Rows whose key appears in no tally are skipped,
+## and the optional ones (always = false) also when both sides are at zero. "Knockdowns scored":
+## the results table's KNOCKDOWNS column counts the ones a fighter suffered.
+const TALLY_ROWS := [["landed", "Strikes landed", true], ["damage", "Damage dealt", true], ["knockdowns", "Knockdowns scored", true],
+	["throws", "Throws", false], ["ringouts", "Ring-outs", false], ["parries", "Parries", false]]
 
 var scoring := {}
 var names: Array = []
@@ -32,11 +37,25 @@ func _init(scoring_ := {}, names_: Array = [], show_tally := true) -> void:
 	var col := UiTheme.vbox(UiTheme.GAP_S)
 	add_child(col)
 	col.add_child(_legend())
-	col.add_child(_cards_grid())
+	var body := UiTheme.hbox(UiTheme.GAP_XL)
+	body.add_child(_cards_grid())
 	if show_tally:
 		var t := _tally_grid()
 		if t:
-			col.add_child(t)
+			var sep := VSeparator.new()
+			sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			body.add_child(sep)
+			body.add_child(t)
+	col.add_child(body)
+	if _any_stoppage():
+		col.add_child(UiTheme.label("* the referee stopped the fight in that round", "Caption"))
+
+
+func _any_stoppage() -> bool:
+	for c in scoring.get("cards", []):
+		if typeof(c) == TYPE_DICTIONARY and bool((c as Dictionary).get("stoppage", false)):
+			return true
+	return false
 
 
 func teams() -> Array:
@@ -107,8 +126,13 @@ func _tally_grid() -> Control:
 					sums[i][k] = float(sums[i].get(k, 0.0)) + float(d[k])
 	var rows := []
 	for r in TALLY_ROWS:
-		if (sums[0] as Dictionary).has(r[0]) or (sums[1] as Dictionary).has(r[0]):
-			rows.append(r)
+		var a: Dictionary = sums[0]
+		var b: Dictionary = sums[1]
+		if not a.has(r[0]) and not b.has(r[0]):
+			continue
+		if not bool(r[2]) and float(a.get(r[0], 0.0)) == 0.0 and float(b.get(r[0], 0.0)) == 0.0:
+			continue
+		rows.append(r)
 	if rows.is_empty():
 		return null
 	var grid := GridContainer.new()

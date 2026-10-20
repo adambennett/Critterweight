@@ -3,6 +3,12 @@ extends Screen
 ## in over the finished fight, then per-fighter stats and the round score. Rematch replays the same
 ## config (MatchFlow.launch), Change fighters returns to the setup that produced the fight (from
 ## config.ui), Main menu leaves. params: {result: MatchMode.build_result(), config: launch config}
+## 10-point results (result.scoring, MCH-07): the score line becomes the method and the judges'
+## totals ("UNANIMOUS DECISION · 30–27 · 29–28 · 29–28", "T.K.O. · ROUND 2 · 1:34"), a
+## ScorecardPanel sits above the stat table inside the scroll area (the right stick scrolls it),
+## and each fighter's caption says "Went the distance" / "Stopped (T.K.O.)" instead of HP. A
+## referee's stoppages under Health scoring (result.referee) are named on the score line. Results
+## without those keys look exactly as before.
 
 const COLUMNS := [["damage_dealt", "DMG DEALT"], ["damage_taken", "DMG TAKEN"], ["hits", "HITS"], ["blocks", "BLOCKS"],
 	["parries", "PARRIES"], ["knockdowns", "KNOCKDOWNS"], ["kos", "KOS"]]
@@ -10,6 +16,8 @@ const COLUMNS := [["damage_dealt", "DMG DEALT"], ["damage_taken", "DMG TAKEN"], 
 var result := {}
 var config := {}
 var _rematch: UiButton
+var _scroll: ScrollContainer = null
+var scorecard: ScorecardPanel = null     ## 10-point results only
 
 
 func on_enter(p: Dictionary) -> void:
@@ -45,10 +53,23 @@ func on_enter(p: Dictionary) -> void:
 	ts.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	ts.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(ts)
+	_scroll = ts
 	var tc := CenterContainer.new()
 	tc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	ts.add_child(tc)
-	tc.add_child(_table())
+	var sc := scoring()
+	if sc.is_empty():
+		tc.add_child(_table())
+	else:
+		# the judges' cards above the stat table, both inside the scroll area
+		var stack := UiTheme.vbox(UiTheme.GAP_M)
+		tc.add_child(stack)
+		scorecard = ScorecardPanel.new(sc, scorecard_names(result), true)
+		scorecard.name = "Scorecard"
+		stack.add_child(scorecard)
+		var table := _table()
+		table.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		stack.add_child(table)
 	var buttons := UiTheme.hbox(UiTheme.GAP_M)
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_child(buttons)
@@ -91,6 +112,12 @@ func default_focus() -> Control:
 	return _rematch
 
 
+## The right stick scrolls the scorecards and stats while focus stays on the buttons (10-point
+## results; other results keep the plain behaviour).
+func right_stick_scroll_target() -> Control:
+	return _scroll if scorecard != null else null
+
+
 func winner_team() -> int:
 	return int(result.get("winner_team", -1))
 
@@ -123,7 +150,81 @@ func _outcome_for_player() -> String:
 	return "VICTORY" if w == mine else "DEFEAT"
 
 
+## result.scoring when the match was judged on 10-point cards ({} otherwise).
+func scoring() -> Dictionary:
+	var s = result.get("scoring", {})
+	return s if typeof(s) == TYPE_DICTIONARY and not (s as Dictionary).is_empty() else {}
+
+
+## Fighter names aligned with result.scoring.teams (from result.fighters), for the ScorecardPanel.
+static func scorecard_names(res: Dictionary) -> Array:
+	var s = res.get("scoring", {})
+	var teams: Array = (s as Dictionary).get("teams", [0, 1]) if typeof(s) == TYPE_DICTIONARY else [0, 1]
+	var out: Array = []
+	for t in teams:
+		var names := PackedStringArray()
+		for f in res.get("fighters", []):
+			var d: Dictionary = f
+			if int(d.get("team", -9)) == int(t):
+				names.append(str(d.get("name", "?")))
+		out.append(" & ".join(names))
+	return out
+
+
+## "1:34": seconds into a round.
+static func clock_text(seconds: float) -> String:
+	var s := maxi(0, roundi(seconds))
+	return "%d:%02d" % [s / 60, s % 60]
+
+
+## The 10-point score line: the method and the judges' totals, read winner first
+## ("UNANIMOUS DECISION · 30–27 · 29–28 · 29–28"), "T.K.O. · ROUND 2 · 1:34", a draw in team order
+## ("SPLIT DRAW · 29–28 · 28–29 · 28–28") or "SUDDEN DEATH (AFTER A SPLIT DRAW)".
+static func method_text(sc: Dictionary) -> String:
+	var m := str(sc.get("method", ""))
+	if m == "TKO":
+		var parts := PackedStringArray(["T.K.O."])
+		var st = sc.get("stoppage", {})
+		if typeof(st) == TYPE_DICTIONARY:
+			if (st as Dictionary).has("round"):
+				parts.append("ROUND %d" % int(st["round"]))
+			if (st as Dictionary).has("time"):
+				parts.append(clock_text(float(st["time"])))
+		return " · ".join(parts)
+	if m == "" or m == "No decision":
+		return "NO DECISION"
+	if m.begins_with("Sudden Death"):
+		return m.to_upper()
+	var line := m.to_upper()
+	var tot: Array = sc.get("totals", [])
+	var teams: Array = sc.get("teams", [0, 1])
+	var pairs := FightHud.totals_text(tot, teams, int(sc.get("winner", -1)))
+	return line + (" · " + pairs if pairs != "" else "")
+
+
+## Under Health scoring a referee may have stopped rounds: "T.K.O. · ROUND 2" ("" without any).
+static func referee_text(res: Dictionary) -> String:
+	var r = res.get("referee", {})
+	if typeof(r) != TYPE_DICTIONARY:
+		return ""
+	var rounds := PackedStringArray()
+	for s in (r as Dictionary).get("stoppages", []):
+		if typeof(s) == TYPE_DICTIONARY:
+			rounds.append(str(int((s as Dictionary).get("round", 0))))
+	if rounds.is_empty():
+		return ""
+	return "T.K.O. · ROUND%s %s" % ["S" if rounds.size() > 1 else "", ", ".join(rounds)]
+
+
 func _score_text() -> String:
+	var sc := scoring()
+	if not sc.is_empty():
+		return method_text(sc)
+	var ref := referee_text(result)
+	return _rounds_text() + ("   ·   " + ref if ref != "" else "")
+
+
+func _rounds_text() -> String:
 	var rw: Dictionary = result.get("round_wins", {})
 	var parts: PackedStringArray = PackedStringArray()
 	var keys := rw.keys()
@@ -164,6 +265,13 @@ func _table() -> Control:
 		var cid := str(d.get("creature", ""))
 		var cname := str(Content.get_entry("creatures", cid).get("name", cid))
 		var state := "KO'd" if bool(d.get("out", false)) else "%d HP left" % ceili(float(d.get("health", 0.0)))
+		var sc := scoring()
+		if not sc.is_empty():
+			# 10-point: HP never drops, so the caption says how the fighter's night ended
+			var stop = sc.get("stoppage", {})
+			var stopped := typeof(stop) == TYPE_DICTIONARY and (stop as Dictionary).has("fighter") \
+				and int((stop as Dictionary)["fighter"]) == int(d.get("index", -1))
+			state = "Stopped (T.K.O.)" if stopped else "Went the distance"
 		nc.add_child(UiTheme.label("%s  ·  %s" % [cname, state], "Caption"))
 		grid.add_child(ProfileFrame.wrap(nc, ProfileFrame.style()) if is_owner else nc)
 		if team == w:

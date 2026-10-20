@@ -1449,6 +1449,15 @@ func _fighter_name(i: int) -> String:
 	return ""
 
 
+## Display name of a team (its fighters' names joined), for {p} in a decision line.
+func _team_name(team: int) -> String:
+	var names := PackedStringArray()
+	for f in _match.get("fighters", []):
+		if int(f.get("team", -99)) == team and str(f.get("name", "")) != "":
+			names.append(str(f.get("name", "")))
+	return " & ".join(names) if not names.is_empty() else str(_ann_vars.get("p", ""))
+
+
 func _is_player(i: int) -> bool:
 	return i == int(_match.get("player_index", -1))
 
@@ -1601,6 +1610,10 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 			if int(st["knockdowns"]) == 3:
 				kinds3.append("third")
 			ck["kind"] = kinds3
+			if bool(info.get("referee", false)):
+				# a referee is counting: no "Let him up or don't, I'm not the ref!" (the only
+				# knockdown line keyed on "who")
+				ck.erase("who")
 			say_t.call("knockdown", ck)
 			if _is_player(fi):
 				crowd("crowd_aww")
@@ -1786,7 +1799,45 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 			crowd("crowd_cheer")
 		"timeout":
 			play.call("ann_bell", null)
-			say_t.call("time", {"kind": "decision"})
+			# 10-point scoring rings the bell at the end of every round: the cards are announced
+			# once, on the judges' decision (info.ten_point comes from the bridge)
+			if not bool(info.get("ten_point", false)):
+				say_t.call("time", {"kind": "decision"})
+		"round_scored":
+			play.call("ui_card_flip", null)
+		"judges_decision":
+			# 10-point: the decision is read with the WINNER's name (recorded "time" templates with {p})
+			var wt := int(ev.get("winner", -1))
+			var method := str(ev.get("method", ""))
+			play.call("ann_sting", null)
+			if wt >= 0 and method == "TKO":
+				pass   # the stoppage already had its call (ref_stoppage)
+			elif wt >= 0 and method.begins_with("Sudden Death"):
+				say_t.call("time", {"kind": "sudden_death_won"})
+			elif wt >= 0:
+				var wid := announce_trigger("time", {"kind": "decision"}, {"p": _team_name(wt)})
+				if wid != "":
+					acts.append("line:" + wid)
+			elif not bool(info.get("sudden_death_follows", false)):
+				say_t.call("draw", {})
+				st["draw_announced"] = true
+		"ref_count":
+			play.call("ui_timer_tick", null, -4.0)
+		"ref_wave_up":
+			crowd("crowd_whistle")
+		"ref_stoppage":
+			# the referee waves it off: the KO bell and a KO call
+			play.call("ann_bell_triple", null)
+			play.call("ko")
+			add_heat(0.4)
+			crowd("crowd_cheer")
+			# a queued knockdown call is stale once the referee waves it off (it would follow the T.K.O.)
+			if not _ann_pending.is_empty() and int(_ann_pending.get("priority", 0)) < 100:
+				_ann_pending = {}
+			# no KO line names a stoppage: the generic calls (or the player's own "is OUT") fit it
+			var cks := _who(int(ev.get("by", -1)), fi)
+			cks["kind"] = ["stoppage"]
+			say_t.call("ko", cks)
 		"match_end":
 			var w := int(ev.get("winner", -1))
 			var my_team := -99
@@ -1797,7 +1848,8 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 				if int(f.get("team", -98)) == w and winner_creature == "":
 					winner_creature = str(f.get("creature", ""))
 			if w < 0:
-				say_t.call("draw", {})
+				if not bool(st.get("draw_announced", false)):
+					say_t.call("draw", {})
 				sting("defeat")
 			elif w == my_team:
 				sting("victory")

@@ -3,6 +3,10 @@ extends Node3D
 ## Runs a LOCAL authoritative match with full presentation: MatchSim + ArenaView +
 ## CreatureViews + VFX + camera + HUD, translating simulation events into feedback.
 ## (Networked clients use NetMatchScene, which renders the same views from snapshots.)
+## With a referee (sim.mode.has_referee(), MCH-08) a view-only RefereeView stands in the arena as
+## a sibling of ModeView (never under it, never in camera framing), fed every rendered frame from
+## RefereeView.state_from_sim(sim). 10-point cards and decisions (round_scored, judges_decision)
+## and the referee's count / wave-up / stoppage are presented by FightHud and callouts.
 
 signal match_finished(result: Dictionary)
 
@@ -29,6 +33,10 @@ var _bench_hint: Label = null   ## campaign tag-team fights: what a benched part
 var _pause_until_us := 0        ## hit pause end (Time ticks), 0 = none
 var _pause_base := 1.0          ## the time scale a hit pause returns to
 var _pause_token := 0           ## the latest hit pause (only its timer ends the pause)
+var referee_view: RefereeView = null   ## the view-only referee (only when the sim runs one)
+var _decision_round := -1       ## 10-point: the round a judges' decision closed (its callout stays)
+var _scored_round := -1         ## 10-point: the last round the judges scored (round_scored)
+var _stopped_round := -1        ## the round the referee stopped (the T.K.O. callout stays)
 
 
 ## config: {arena: ArenaDef, rules: {}, seed: int, mode: MatchMode, fighters: [{creature, team, kind:"player"|"bot", difficulty, name}]}
@@ -84,6 +92,11 @@ func start(cfg: Dictionary) -> void:
 	mode_view = ModeView.new()
 	add_child(mode_view)
 	mode_view.head_of = _head_of
+	if sim.mode != null and sim.mode.has_referee():
+		# a sibling of ModeView (ModeView frees its children); not part of camera framing
+		referee_view = RefereeView.new()
+		add_child(referee_view)
+		referee_view.setup(cfg["arena"], sim.rules)
 	camera.points_provider = _camera_points
 	camera.focus_provider = _camera_focus
 	if bool(cfg.get("spectate", false)):
@@ -252,6 +265,8 @@ func _process(delta: float) -> void:
 	if sim.mode:
 		mode_view.update_state(sim.mode.view_state(), _dt)
 		_update_pick_panel()
+	if referee_view:
+		referee_view.update_view(RefereeView.state_from_sim(sim), camera.global_position, delta)
 	if _bench_hint:
 		var mf := sim.fighters[player_index] if player_index < sim.fighters.size() else null
 		_bench_hint.visible = live and mf != null and _is_local_player() and mf.state == Fighter.State.INACTIVE and mf.health > 0.0
@@ -376,9 +391,36 @@ func _on_event(ev: Dictionary) -> void:
 			hud.callout("FIGHT!", 1.0, Color(1.0, 0.85, 0.3))
 		"round_end":
 			var w := int(ev["winner"])
-			hud.callout("DRAW" if w < 0 else "%s WINS THE ROUND" % _team_label(w), 2.4)
+			var rn := int(ev.get("round", -9))
+			if rn == _decision_round or rn == _stopped_round:
+				pass   # the decision / T.K.O. callout stays (10-point: the cards, not this round, decide)
+			elif hud.is_ten_point():
+				hud.callout("EVEN ROUND" if w < 0 else "%s WINS THE ROUND" % _team_label(w), 2.4)
+			else:
+				hud.callout("DRAW" if w < 0 else "%s WINS THE ROUND" % _team_label(w), 2.4)
 		"timeout":
 			hud.callout("TIME!", 1.2)
+		"round_scored":
+			_scored_round = int(ev.get("round", -1))
+			hud.show_round_card(ev)
+		"judges_decision":
+			var wd := int(ev.get("winner", -1))
+			# the round the cards just closed (round_scored precedes the decision in the same tick)
+			_decision_round = _scored_round if _scored_round > 0 else (sim.mode.round_index + 1 if sim.mode else -1)
+			hud.show_decision(ev, _decision_round)
+			hud.callout(FightHud.decision_callout(ev, _team_label(wd) if wd >= 0 else ""), 2.6, Color(1.0, 0.85, 0.3))
+		"ref_count":
+			var ci := int(ev.get("fighter", -1))
+			if ci >= 0 and ci < sim.fighters.size():
+				vfx.word(_head_of(ci) + Vector3.UP * 0.6, "%d" % int(ev.get("n", 0)), Color(1.0, 0.95, 0.85), 72)
+		"ref_wave_up":
+			var ui := int(ev.get("fighter", -1))
+			if ui >= 0 and ui < sim.fighters.size():
+				vfx.word(_head_of(ui) + Vector3.UP * 0.6, "UP!", Color(0.6, 0.95, 1.0), 64)
+		"ref_stoppage":
+			_stopped_round = int(ev.get("round", -1))
+			hud.callout("T.K.O.!", 2.6, Color(1.0, 0.35, 0.3))
+			camera.add_trauma(0.3)
 		"match_end":
 			Engine.time_scale = 1.0
 			var w2 := int(ev["winner"])
