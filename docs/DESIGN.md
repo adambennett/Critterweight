@@ -71,3 +71,17 @@ flow now has explicit ownership until the result is committed.
 
 ## 5. Campaign, co-op and modes
 See docs/design/CAMPAIGN.md, MODES.md, HUB.md. Engine notes are added here as systems land.
+
+- **10-point scoring and the referee (v0.9.16, D-044..D-047).** `MatchMode` owns an optional
+  `RoundJudge` (rules `scoring: "ten_point"`) and `RefereeRules` (`referee: true`), created only
+  for a two-fighter standard duel. The judge tallies each round from the event stream and scores it
+  with three fixed perspectives; health is held full and depletion never eliminates. The referee
+  protects downed fighters, counts strike knockdowns (4 s stay-down, forced wave-up) and stops a
+  fight after five in a round. `RefereeView` draws Jeremy's Cage Rules referee from replicated plain
+  data (view only).
+- **Career (v0.9.16, D-048).** `src/campaign/career/`: `CareerState`/`CareerStore` (Saves kind
+  `career`, three slots per profile under `careers/`), `CareerOffers` (seeded promotions and
+  opponents), `CareerBuild` (six trained stats → fighter mods through `BuildApplier`),
+  `CareerFight` (Cage Rules bouts: 3 rounds, 5 for titles, no sudden death) and
+  `CareerController` (weeks, training, offers, gym, injuries, popularity, titles, history). Data:
+  the `career` block of `content/core/ladder/campaign_rules.json` over `CareerDefaults`.

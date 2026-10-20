@@ -38,12 +38,27 @@ const REACTIONS := {
 }
 const GUIDE := {
 	"Combat basics": "Light attacks chain; heavy attacks can be charged. Guard faces forward, and a precisely timed guard parries. Dodges have brief evasion windows. Grabs beat passive defense. Damage depends on physical contact and closing speed, so spacing matters.\n\nAbilities use stamina and cooldowns. You cannot start one while knocked down, stunned or committed to an uninterruptible action. The HUD shows the binding, move name and cooldown. Defensive abilities need the right situation to show their benefit. JUICE requires a full Hype meter.",
-	"Campaign & saves": "Off the Street is a fresh three-act run. Fight Camp adds the Cannery and permanent upgrades. Select a connected node on the map, resolve its fight or encounter, collect any reward, then choose the next route. Progress saves after committed choices and completed fights. Resume returns to the pending reward, shop, event, rest or map. Quitting during an unfinished fight restarts that fight.",
+	"Campaign & saves": "Career is one persistent fighter: take fights, train between them and climb to the belt; it saves after every action in one of three slots. Off the Street is a fresh three-act run. Fight Camp adds the Cannery and permanent upgrades. Select a connected node on the map, resolve its fight or encounter, collect any reward, then choose the next route. Progress saves after committed choices and completed fights. Resume returns to the pending reward, shop, event, rest or map. Quitting during an unfinished fight restarts that fight.",
+	"Career": "Create a fighter from any playable creature, give them a ring name and pick a difficulty. Each week you train one stat (Stamina, Chin, Speed, Power, Clinch, Defence) or rest to heal. Promoters send two or three fight offers; accept one, train through the camp, then fight on fight week. Wins and finishes raise popularity, which opens bigger promotions (popularity caps per tier: 42, 66, 88), and at 92 the Grand Circuit offers a five-round title shot. Purses buy gym upgrades that make training count for more or heal injuries faster. Injuries from a fight carry into training and the next bout until they heal. Bouts use Cage Rules: 10-point judges and a referee, three rounds (five for titles), and a draw is possible. Quitting a bout from the pause menu pulls you out: no purse and minus 4 popularity.",
+	"Ten-point scoring": "With 10-point must scoring nobody can be knocked out by damage: health stays full and the HP bars are hidden. Three judges score every round. Even card weighs everything evenly; Volume leans toward clean strikes landed and parries; Impact leans toward damage and knockdowns. Each judge gives the better fighter 10-9, a round too close to call 10-10 and a dominant round 10-8. The round line under the timer shows each judge's running total; the cards appear between rounds. After the last round the judges decide: Unanimous, Majority or Split Decision, or a Draw. A drawn decision goes to sudden death (next clean hit wins) when Sudden death is on.",
+	"Referee": "With the referee on, nobody can hit a fighter who is down. The referee counts a knockdown from a strike; you can get up at once, or stay down to recover stamina faster until he waves you up after four seconds. Five knockdowns in one round and he stops it: with 10-point scoring that is a T.K.O. win, with Health scoring it wins the round. Throws and hazards never count as knockdowns. He also holds the attacker back, waves off stoppages and raises the winner's arm.",
 	"Needles, Scrip & Clout": "Scrip is money for the current run. Shop nodes on the campaign map sell supplements, consumables and one service per stall. Rub-down removes side effects; Antidote gives a consumable for later; Restock rerolls the stall once. Selling returns half price.\n\nNeedles' Cannery board is a preview catalog: purchases happen on campaign Shop nodes. Clout buys permanent Fight Camp upgrades and cosmetics; it is not spent at campaign shops.",
 	"Cannery challenges": "Chum Cannon: select Warm-up, Pressure or Homing hell. Block, dodge or parry buckets for 45 seconds. Harder settings fire faster and predict your movement; Homing hell also steers early in flight. A parry adds five to the streak. Clout milestones are shared.\n\nCrate Toss: ten throws from behind the line. Near, middle and far rings score 5, 10 and 20. The called ring rotates after each throw. Hit it for +25, plus up to +20 for a consecutive streak. Light tosses and partially charged heaves help hit nearer rings. Fouls, water and misses break your streak. Crates reset when the game ends.",
 	"Watching fights": "Spectate offers FOLLOW (automatic director), LOCKED (one fighter) and FREE. Camera cycles with Y / R. LB / RB chooses a fighter. In FREE, use the left stick or WASD to move, right stick or right-mouse drag to look, A / Space to rise and LT / Shift to descend. D-pad or arrow keys adjust playback speed.\n\nThe Bookie's Table can show every AI fight, run it at 1–4x speed or skip ahead at 8x. Watch fights returns to the same bout immediately. Taking over hands you the campaign decisions; the AI still fights.",
 	"Profile & controls": "Open Profile from the main menu to rename your profile. Dialogue and fight cards use that name, with Rookie as the default.\n\nFocused text panels scroll with the right stick. Left/right moves between panels; LB/RB changes tabs. In the Arena Editor, View switches between locked map controls and the side panels; Palette and Details buttons hide those panels. Help lists all editing controls.",
 }
+
+## Extra lines for a rules preset that uses 10-point scoring or a referee (empty otherwise).
+static func officials_text(rules: Dictionary) -> String:
+	if str(rules.get("mode", "standard")) != "standard":
+		return ""
+	var lines := ""
+	if str(rules.get("scoring", "hp")) == "ten_point":
+		lines += "\nScoring: 10-point must (three judges; no knockouts, every round is fought)"
+	if bool(rules.get("referee", false)):
+		lines += "\nReferee: on (knockdown count, no hits on a downed fighter, stops it after five knockdowns in a round)"
+	return lines
+
 
 static func entries(section: String) -> Array:
 	var result: Array = []
@@ -79,7 +94,7 @@ static func entries(section: String) -> Array:
 		"rules":
 			for id in Content.ids("rules"):
 				var d := Content.get_entry("rules", str(id))
-				result.append({"id": id, "name": d.get("name", id), "text": "%s\n\n%s\n\nRounds: %s\nRound timer: %s seconds (0 = unlimited)\nLives: %s\nScore target: %s" % [d.get("description", d.get("desc", "")), MODES.get(str(d.get("mode", "standard")), MODES["standard"]), d.get("rounds", 1), d.get("round_time", 0), d.get("lives", 1), d.get("score_target", "see objective HUD")]})
+				result.append({"id": id, "name": d.get("name", id), "text": "%s\n\n%s\n\nRounds: %s\nRound timer: %s seconds (0 = unlimited)\nLives: %s\nScore target: %s%s" % [d.get("description", d.get("desc", "")), MODES.get(str(d.get("mode", "standard")), MODES["standard"]), d.get("rounds", 1), d.get("round_time", 0), d.get("lives", 1), d.get("score_target", "see objective HUD"), officials_text(d)]})
 		"field":
 			for id in Elements.zones:
 				var d: Dictionary = Elements.zones[id]

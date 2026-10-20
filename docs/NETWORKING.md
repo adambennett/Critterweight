@@ -210,6 +210,13 @@ Unknown types/keys travel as strings, so events added by other systems replicate
 changes (the parity test lists those without a 1-byte id). `seq` is implicit; `seed` never leaves
 the server.
 
+v0.9.16 10-point scoring and the referee add no wire layout: the events `round_scored`,
+`judges_decision`, `ref_count`, `ref_wave_up`, `ref_stoppage` and the fields `melee`, `forced`, `by`
+(knockdown, dot) and `was_down` travel as strings, so the protocol stays at 6. Running card totals
+also reach late joiners through the replicated `hud_state.cards`; the referee figure is drawn from the
+replicated phase, fighter roots/states and `view_state.referee`. Rules travel whole in MATCH_START, so
+`scoring`/`referee` need no wire change; only the server judges and referees.
+
 **Input sample**: `[i8 move.x x127][i8 move.z x127][u32 held/extension][u8 x 11 core press counters][optional u8 x 7 guest counters]`
 (same layout as `FighterInput.encode`; 17 bytes for core samples, 24 for guest samples). Bit 31 of the held word marks the extension. It is present whenever an extra held bit or counter is nonzero, so release-only and wrapped presses remain reliable; it is removed from the decoded held mask.
 

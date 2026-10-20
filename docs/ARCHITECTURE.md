@@ -15,7 +15,7 @@ persist (atomic versioned JSON) ◄── settings, profiles, runs, presets, are
 | Name | File | Contract |
 |---|---|---|
 | `Log` | src/core/log.gd | `Log.i/w/e/d(tag, msg)`; `Log.open(channel, dir)` bounded rotating files |
-| `Paths` | src/persist/paths.gd | user-data root and subfolders (profiles, mods, arenas, presets, policies, playlists, runs, logs, lab, captures); `--user-root <dir>` override for tests; never writes into the install folder |
+| `Paths` | src/persist/paths.gd | user-data root and subfolders (profiles, mods, arenas, presets, policies, playlists, runs, careers, logs, lab, captures); `--user-root <dir>` override for tests; never writes into the install folder |
 | `Saves` | src/persist/saves.gd | `write_json(path, kind, version, data) -> Error` (temp + flush + rename + .bak), `read_json(path, kind, migrator) -> SaveResult` (validates checksum, recovers from .bak/.tmp, never silently overwrites a recoverable file) |
 | `Settings` | src/persist/settings.gd | schema of every option (default/range/apply/restart flag); `get_value(key)`, `set_value(key, v)`, `reset(category)`, `changed(key)` signal; applies display/audio/input/accessibility |
 | `Profiles` | src/persist/profiles.gd | active profile: stats, records, unlocks, ladder (The Dosage), Fight Camp meta-progression, cosmetics |

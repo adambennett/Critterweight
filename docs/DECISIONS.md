@@ -310,3 +310,149 @@ Issue-by-issue evidence and verification limits: docs/evidence/verification/v0.9
 The owner requested a v0.9.13 preview with suitable royalty-free replacements, chosen without payment, and asked for every download to remain on B:. The four Incompetech songs ship under CC BY 4.0 with the required Kevin MacLeod attribution; selected Kenney and OpenGameArt recordings are CC0 1.0. A separate replacement-overrides.json keeps generated sources reproducible and preserves the generated-audio inventory. Finished tracks do not carry unmatched generated stems. Imported audio and hashes are tested, but the owner has not yet judged the choices by listening.
 
 Every fighter selection menu now offers Random. It resolves at the launch boundary so saved campaign/run state contains a concrete fighter id, not the UI sentinel.
+
+
+## D-044 10-point must scoring: a judged, knockout-free standard duel (v0.9.16)
+
+The owner asked for an optional Rules Editor setting that replaces the HP-based decision with 10-point
+must scoring, with effectively unlimited HP, deterministic judging, visible round scores and a clear
+final decision (2026-10-19). Rules gain `scoring` (`"hp"` default | `"ten_point"`) for the standard
+mode; anything without the key, including every old preset and save, is HP scoring.
+
+- **Where it runs.** `RoundJudge` (src/sim/modes/round_judge.gd) is owned by `MatchMode` and exists
+  only for the standard mode, a two-fighter two-team duel and a round timer (`_setup_officials`);
+  otherwise the match runs plain HP rules and logs once. Every other mode is untouched. Presentation
+  keys off what the sim produced (`result.scoring`, `hud_state.cards`), never the raw rules flags,
+  because local play does not validate rules.
+- **Unlimited HP.** Health is held at full every tick, `on_depleted` refills instead of eliminating,
+  and `Fighter.receive_hit` sets full health and falls through to the poise/knockdown/stun code so a
+  heavy blow's reaction is never lost. Max HP is never inflated (snapshots carry u16 health × 10).
+  Damage is still accounted and judged; HP-conditioned hooks and low-health lines no longer trigger.
+- **Every round is fought.** No best-of: at each bell the judges score the round (`round_scored`),
+  and after the last round the decision is computed (`judges_decision`) before `end_round`, so the
+  match winner is set first and only the match winner celebrates. One closing procedure
+  (`MatchMode._ten_point_close`) handles the bell and a referee stoppage.
+- **What is judged** (Critterweight actions only; no grappling, ground control or submissions): a
+  per-team tally from the event stream between round start and the bell — damage normalised by the
+  target's max HP, clean melee strikes landed, strike knockdowns caused, throws, ring-outs caused,
+  parries and guard breaks. Round score `P = dmg_pts + 0.5·landed + 10·knockdowns + 4·throws +
+  6·ringouts + 2·parries + 2·guard_breaks`. Three fixed judge perspectives replace Cage Rules' random
+  ±4 bias so judging is RNG-free and explainable: "Even card" (P), "Volume" (+0.5·landed, +1·parries)
+  and "Impact" (+0.25·dmg_pts, +2·knockdowns).
+- **Cards.** Per judge, |d| < 3 is 10-10; otherwise 10-9, and 10-8 for |d| ≥ 80 or, when the round
+  winner scored more knockdowns, |d| ≥ 65 (calibration: D-045). No 10-7, no deductions. Decision
+  over totals: Unanimous/Majority/Split Decision or Unanimous/Majority/Split Draw, as in Cage Rules.
+- **Ties, consistently.** A level card is a level round. A drawn decision follows the existing
+  `sudden_death` rule exactly like a tied HP decision: on → next clean hit wins (method "Sudden Death
+  (after a … Draw)"), off → the match is a draw. The Cage Rules preset inherits sudden death on from
+  the Standard Duel; the Career turns it off (Cage Rules careers have draws).
+- **Data.** Cards, events and `result.scoring` use arrays aligned with `teams` (never dictionaries
+  keyed by team), so they survive Saves' JSON round trip and travel as plain data; `hud_state.cards`
+  carries the running judge totals for late joiners within the 400 B duel snapshot budget (367 B
+  measured during sudden death with a live count). New event types travel as strings, so the network
+  protocol version is unchanged; the server alone judges.
+- Tests: test_ten_point_scoring, test_rules_presets, test_net_snapshot.
+
+## D-045 Judge, referee and career constants come from measured bot duels
+
+52 headless Cage Rules bot duels (36 same-tier: 12 pairings incl. mirrors × journeyman/contender/
+headliner; 16 Hall-of-Famer mismatches), recorded with the referee limit disabled so every limit can
+be evaluated exactly offline, and 16 re-runs with the final constants that matched the offline
+prediction card for card.
+
+- Same-tier rounds are lopsided: per side 39 dmg_pts and 15 strikes landed per round on average, a
+  median judge margin of 25 and 0.77 strike knockdowns per fighter-round. With the initial dominance
+  thresholds (30/18) 54% of cards were 10-8, so they were raised to 80/65: same-tier cards are now
+  ~8% 10-10, ~88% 10-9, ~5% 10-8; mismatch cards ~3/64/33%.
+- Split and majority decisions are rare (~3% of same-tier decisions; the side with more damage won
+  27 of 31). Stronger judge perspectives raised them to 12–15% only by also raising 10-8s and draws,
+  so they were rejected; human fights may be closer. Recorded as an owner question.
+- Career inputs: the fight-of-the-night pace is 44 combined strikes landed per round (85th
+  percentile; Cage Rules used 45 for 180 s rounds). Damage taken per fight is ~3.6× max HP after a
+  decision win and ~5.8× after a decision loss, so career injuries take 0.07 per % of max HP taken
+  (+2 head per knockdown suffered, +10 head when stopped): about 28 after a decision win, 46 after a
+  decision loss, 53 after a stoppage loss, 13 after a stoppage win — Cage Rules' scale, where a hard
+  fight costs a few weeks of healing.
+- Raw data and analysis scripts were kept outside the repository; the method and numbers are here and
+  in the RoundJudge/RefereeRules headers.
+
+## D-046 The referee: Cage Rules' striking-only referee as sim rules plus a view-only figure
+
+The owner asked for an optional referee that behaves like Cage Rules' referee, independent of the
+scoring setting, and for Jeremy's referee model if it exists (2026-10-19). Rules gain `referee` (bool,
+default false, standard mode, duel only).
+
+- **Sim rules** (`RefereeRules`, src/sim/modes/referee_rules.gd), deterministic and RNG-free, active
+  only in FIGHT with the round open: a downed fighter is protected (no opponent hit lands while
+  KNOCKDOWN/DOWN/GETUP, including fighter-sourced zones; the grab/cage package and environment
+  damage are unchanged); strike knockdowns are counted once per second (`ref_count`); input gets up
+  at any time, the automatic get-up waits 4 s in DOWN (Cage Rules KD_STAY) and is a wave-up
+  (`getup.forced`, `ref_wave_up`); staying down regenerates stamina 2.5× (Cage Rules lets a downed
+  fighter clear his head); bots back off ~2.4 m while an opponent is down. One strike-knockdown
+  definition (reason poise/move/hit by an enemy) serves judge and referee; throw, hazard and self
+  knockdowns are never counted.
+- **Stoppage.** Five strike knockdowns of one fighter in one round stop the fight (`ref_stoppage`):
+  with 10-point scoring that ends the match as a T.K.O., with HP scoring it ends the round like a KO.
+  This is a Critterweight addition — Cage Rules stops fights on accumulated damage, which unlimited
+  HP removes. 5 was chosen from D-045's data: 3 would stop 31% of same-tier duels, 4 would stop 25%,
+  5 stops ~8% (25% of mismatches), so four or more knockdowns in a round mark a one-sided beating.
+- **Ceremony.** A match-ending ROUND_END lasts 6 s when a judge or referee is active, for the
+  wave-off/hand raise and the card reveal; all other round ends keep 3 s.
+- **Not imported:** ground stand-ups, inactivity warnings and the ground crouch are grappling-only in
+  Cage Rules; Critterweight has no ground game (CMB-06).
+- **The figure** (`RefereeView`, view-only, no collision, never in camera framing) is Jeremy's referee:
+  `tools/cage_rules/import.js` builds it from the retained Cage Rules render.js as `FighterModel(…,
+  {ref: true})` (shirt, slacks, shoes, blue nitrile hands) on Varga's rig, with its poses, tuning and
+  ceremony times exported to `game/assets/data/cage_referee.json`. It is not a content creature (no
+  content-hash change, no gameplay stats). `RefereePose` ports the original pose evaluator (two-bone
+  IK, stepping) and reproduces Node-baked transforms to 1e-6 m; the director ports positioning,
+  knockdown hold-off ("Back up!"), wave-up, wave-off and the hand raise. Fighters are not forced into
+  Cage Rules' line-up (they are physics rigs of many shapes); the referee raises the arm on the
+  winner's side beside the winner. It is driven from replicated plain data, so online clients see the
+  same referee without extra network data.
+- Tests: test_referee_rules, test_referee_view.
+
+## D-047 The built-in Cage Rules preset
+
+`content/core/rules/cage_rules.json` is the Standard Duel (`duel.json`) field for field with only
+`scoring: "ten_point"` and `referee: true` added (plus its own id, name and description): three
+99-second rounds, sudden death on. The owner asked for exactly that inheritance, so the preset keeps
+Critterweight pacing rather than Cage Rules' 3:00 rounds, and drawn cards go to sudden death under the
+inherited rule (D-044). It appears automatically wherever built-in presets are listed (versus setup,
+online host, lobby, Rules Editor, Compendium) and is validated by the existing preset tests.
+
+## D-048 Career: a persistent fighter career beside the run-based campaign
+
+The owner asked for a conventional fighter career recreated from Cage Rules' career (create a
+fighter, fight offers, training and recovery between bouts, records, standing, purses, history,
+reliable saves), first in the Campaign menu, without grappling (2026-10-19).
+
+- **Separate from runs.** The Career lives in src/campaign/career/ with its own state (`CareerState`,
+  VERSION 1), store and controller; it does not reuse RunState/RunController (a seeded three-act
+  roguelike) or RunStore (whose folder listing would show a career as a damaged run). Saves go
+  through `Saves` (kind "career") at `careers/<profile>/slot_<n>.json`, three slots per profile,
+  autosaved after every action and before a bout. Retire moves every copy (.json/.tmp/.bak) aside so
+  backup recovery can never resurrect it.
+- **Cage Rules loop kept:** weeks; train one stat or rest; seeded offers from nine original
+  promotions in four tiers with Cage Rules' popularity gates, tier caps (42/66/88/100), purses, short
+  notice premium, title shot at 92 and one belt; gym upgrades (8 × 5, Cage Rules costs); injuries in
+  head/body/legs with Cage Rules healing; Cage Rules' popularity formula; history and a news log.
+- **Translations.** The grappling stats BJJ and Wrestling become Clinch (Critterweight's grab layer:
+  holds, throws, escaping holds) and Defence (guard, parry, dodge). Each of the six stats maps to
+  fixed Critterweight fighter modifiers through one function used for the player and the generated
+  opponents (never `defense`, which multiplies damage taken, nor the `poise` multiplier, which would
+  count twice). Career power applies only inside career bouts. Bouts use the Cage Rules preset with 3
+  rounds (5 for title fights) and sudden death off; finishes are referee T.K.O.s, so the record has
+  T.K.O. and decision buckets (the submission bucket is dropped). Carried injuries become fight-start
+  handicaps (head → less poise, body → slower stamina, legs → slower movement) because HP is unlimited.
+- **Rankings.** Cage Rules has no ranking table: standing is the tier, the popularity label, a
+  contender number (#15…#1) in the top promotion and Champion.
+- **Fidelity choices:** quitting a career bout from the pause menu is a withdrawal (popularity −4, no
+  purse, as in Cage Rules); only a crash re-fights the same bout (same seed, opponent and arena).
+  Opponents are playable Critterweight fighters with original ring names; no real promotion or
+  fighter names. Bot tier follows opponent level (Punching Bag … Headliner) with an Easy/Normal/Hard
+  career difficulty; Hall-of-Famers appear only on Hard. Not recreated: Cage Rules' walkable 3D gym
+  and heavy bag (the Career uses menu screens) and its look editor (Critterweight fighters have fixed
+  art).
+- Tests: test_career_state, test_career_progression, test_career_build, test_career_fights,
+  test_career_ui.

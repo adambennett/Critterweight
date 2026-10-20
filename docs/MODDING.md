@@ -146,6 +146,15 @@ rules value again when it applies it (rules may come from a mod, an imported fil
 | `max_health_add` 0–200, `stamina_add` 0–100, `poise_add` 0–100, `parry_window_add` 0–0.3, `dodge_iframes_add` 0–0.3, `wakeup_invuln_add` 0–1, `grab_hold_add` 0–2, `grab_escape_add` 0–10, `splat_damage_add` 0–20, `splat_poise_add` 0–50, `zone_duration_add` 0–10 | added |
 | `no_grabs no_juice no_abilities auto_charge all_moves_elemental` | `true`/`false` |
 
+**Scoring and referee** (standard mode, Duel format; v0.9.16): `"scoring": "hp" | "ten_point"`
+(default `hp`) and `"referee": true | false` (default `false`). A preset without them is HP scoring
+without a referee, so every older preset and save keeps its behaviour; an unknown `scoring` value is
+read as `hp`. The validator rejects `ten_point` outside a Duel, without a round timer or with a
+score win, and a referee outside a Duel. The simulation applies them only to a two-fighter standard
+match (anything else runs plain HP rules). Results then carry `scoring` (method, three judges'
+cards and totals, per-round tallies) and/or `referee` (stoppages). The built-in `cage_rules` preset
+is `duel` plus both. Details: docs/design/MODES.md, DECISIONS D-044..D-047.
+
 **Hooks** are the one behaviour language shared by kits, statuses, techniques, supplements,
 modes and mods (`game/src/sim/hooks.gd`):
 

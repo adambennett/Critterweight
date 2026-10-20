@@ -27,6 +27,17 @@ Standard formats first, then four bonus modes that change the objective or const
 | Arena | base, layout, hazard timers (×), hazards on/off, gravity ×, ring-outs on/off |
 | Meta | Gym Bonuses (Fight Camp meta upgrades) on/off — visible tag; techniques/supplements loadouts allowed in custom (visible tag) |
 
+### Scoring and referee (standard 1v1, v0.9.16)
+
+Two independent options of the standard mode, Duel format only (DECISIONS D-044, D-046):
+
+| Option | Values | What it does |
+|---|---|---|
+| Scoring | **Health** (default) / **10-point must** | Health: today's rules (KO wins the round, at time the healthier fighter wins it, best of N). 10-point must: fighters cannot be knocked out by damage (HP stays full and the bars are hidden); every round is fought; three judges (Even card, Volume, Impact) score each round 10-9 (10-10 too close to call, 10-8 dominant) from damage, clean strikes, knockdowns, throws, ring-outs, parries and guard breaks; the cards decide (Unanimous/Majority/Split Decision or Draw). A drawn decision goes to sudden death when Sudden death is on, otherwise it is a draw. |
+| Referee | off (default) / on | No hits land on a downed fighter; the referee counts strike knockdowns and waves the fighter up after 4 s (getting up earlier is allowed; staying down recovers stamina faster); bots back off; five strike knockdowns in one round stop it (10-point: T.K.O. ends the fight; Health: ends the round). Jeremy's Cage Rules referee walks the cage, holds the attacker off, waves fights off and raises the winner's arm (view only). |
+
+The built-in **Cage Rules** preset is the Standard Duel with 10-point scoring and the referee on (D-047).
+
 ## 2. Bonus modes
 
 ### 2.1 SPOTLIGHT HOG — `mode_spotlight_hog` (objective control)

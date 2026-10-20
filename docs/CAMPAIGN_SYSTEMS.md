@@ -1,6 +1,7 @@
 # Campaign systems
 
-How the fight card (Off the Street, Fight Camp, co-op parties and The Bookie's Table) is built.
+How the fight card (Off the Street, Fight Camp, co-op parties and The Bookie's Table) and the
+persistent Career are built.
 Design intent lives in `docs/design/CAMPAIGN.md`, `HUB.md`, `ENEMIES_BOSSES.md` and `ROSTER.md`;
 this document describes the implementation, the data formats a modder writes, and the contracts
 other subsystems plug into.
@@ -565,6 +566,70 @@ filters such as `-- --test test_campaign_generation` run one file.
 
 Match outcomes are asserted structurally or statistically (several fights), not bit-exactly;
 generation and content logic are asserted seed-deterministic.
+
+## Career (v0.9.16)
+
+One persistent fighter, recreated from Cage Rules' career (DECISIONS D-048). It is not a run: it
+does not use RunState, RunController or RunStore. Code: `game/src/campaign/career/`; screens:
+`game/src/campaign/ui/career_*_screen.gd`; data: the `career` block of
+`content/core/ladder/campaign_rules.json` deep-merged over `CareerDefaults.rules()` (nested objects
+merge key by key, arrays such as `orgs`, `facilities` and name lists are replaced whole, so a missing
+or partial block stays playable).
+
+```
+CareerController (one save = one JSON-safe Dictionary, CareerState VERSION 1)
+   |  CareerOffers   seeded offers per (career seed, week, re-roll): RunRng "career/offers/w<week>/r<roll>"
+   |  CareerBuild    six stats + carried injuries -> one apply block -> BuildApplier.compose
+   |  CareerFight    Cage Rules bout config (presented or headless), seed RunRng.derive(seed, "fight/<offer>")
+   |  CareerStore    Saves kind "career": careers/<profile slug>/slot_<1..3>.json (+ .tmp/.bak)
+   v
+CareerFlow (UI glue: FIGHT -> begin_fight -> App.start_match -> apply_result -> career_result)
+```
+
+* **Week loop.** `train(stat)` or `rest()` advances one week. Gain per week =
+  `0.026 × (1 + 0.3 × room level) × (1 + 0.12 × coach level) × ((1 − s)^1.2 + 0.1) ×
+  max(0.35, 1 − injury total / 260)`, stats capped at 0.99. Healing per region per week =
+  `(10 + 4 × recovery level) × (2.5 when resting)`. An unbooked week costs 0.6 popularity and rolls
+  new offers; a camp week counts down the booked fight.
+* **Offers.** Two (40%) or three (60%) per week from the open promotions of your top tier and the
+  one below (Cage Rules weights); slot 0 is the title fight at popularity 92 (or a defence for the
+  champion). Nine promotions in four tiers (Regional, National, Major, The Big League) with Cage
+  Rules' gates, purses and opponent levels; tier caps 42/66/88/100; the Grand Circuit holds the only
+  belt. Purse = level-scaled range × short-notice premium (title × 2.5); win bonus 60% of the purse
+  (100% in the top tier).
+* **Opponents.** A playable creature with stats `level + (shape − 0.66) × 0.55 ± 0.04`, a generated
+  record, an original ring name, nickname and home town, and a bot tier from its level (< 0.33
+  Punching Bag, < 0.48 Journeyman, < 0.63 Contender, else Headliner; Easy −1 / Hard +1 tier, and only
+  Hard reaches Hall-of-Famer). The danger tag compares ratings (≤ −8 FAVOURED, ≤ 6 EVEN, ≤ 16
+  UNDERDOG, else LONG SHOT).
+* **Stats → fighter.** `CareerBuild.MAP` (coefficients in `career.build`, scaled by s − 0.5, mul
+  values clamped to 0.5–1.6): Stamina → `stamina_add`, `stamina_regen`; Chin → `poise_add`,
+  `getup_speed`; Speed → `speed`, `move_speed`; Power → `damage` and patch `moves.*.poise`; Clinch →
+  `grab_hold_add`, `grab_escape_add`, `throw_distance`, `splat_damage_add`, `held_time_mult`;
+  Defence → `guard_absorb_mult`, `parry_window_add`, `dodge_iframes_add`, `dodge_cost`. Never
+  `defense` or the `poise` multiplier. Half of each region's injury is a fight-start handicap: head
+  → `poise_add` −0.3 per point (max −15), body → `stamina_regen` × (1 − carried/160), legs → `speed`
+  × (1 − carried/200), floor × 0.7. The block is applied only in career bouts (state variant
+  `career`), never to versus, online or Fight Camp builds.
+* **Bouts.** Rules = the `cage_rules` preset (10-point judges + referee) with 3 rounds (5 for a
+  title), the preset's 99 s rounds and sudden death off; arena from the career arena list; `no_record`
+  and `context.career`. `begin_fight()` saves `booked.in_fight` before launch: a crash re-fights the
+  identical bout; quitting from the pause menu is a withdrawal (popularity −4, week + 1, no purse).
+* **Results** (`apply_result`, idempotent per fight id): reads `result.scoring` (method, cards,
+  per-team tallies) or derives the outcome from `winner_team`. Popularity as Cage Rules (tier
+  multipliers 1/1.4/1.8/2.4; finish bonus by rounds left; split × 0.75; title +6/−3; streak +1.5;
+  fight-of-the-night +1.5 above 44 combined strikes landed per round; losses −(3 + 1.5 × tier mult),
+  −2 more for a round-one stoppage loss; draw +0.5; gains capped by the tier cap). Pay = purse (+ bonus
+  on a win). Record buckets W/L/D with T.K.O. and decision wins. Injuries out = damage taken by part
+  (% of max HP) × 0.07 + 2 head per knockdown suffered + 10 head when stopped (D-045). Titles: a title
+  win crowns you, a champion's title win is a defence, only a title loss takes the belt.
+* **Persistence and reliability.** Autosave after every action and before a bout; three slots per
+  profile; load never deletes (damaged, newer and missing-content saves are reported and kept);
+  `CareerState.check` reports missing fighters/arenas; stale offers re-roll on load; a booked fight
+  whose content disappeared can be cancelled without penalty; Retire moves `.json`, `.tmp` and `.bak`
+  to `careers/<profile>/retired/` so a backup can never bring it back.
+* **Standing.** Tier name, popularity label (Unknown … Superstar), a contender number #15 … #1 between
+  popularity 74 and 92 in the top tier, and Champion.
 
 ## Known gaps
 
