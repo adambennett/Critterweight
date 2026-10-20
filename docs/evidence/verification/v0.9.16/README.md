@@ -84,4 +84,14 @@ inaccuracies, all corrected.
 
 ## Published release
 
-Tagged-release evidence (tag, asset hashes) is added after publication below.
+GitHub pre-release **[v0.9.16](https://github.com/adambennett/Critterweight/releases/tag/v0.9.16)**,
+published 2026-10-20T04:39:46Z, tag `v0.9.16` → `a5af0d1` (the release-documentation commit on top of
+the suite-verified `9d0a29c`), notes from [docs/releases/v0.9.16.md](../../../releases/v0.9.16.md).
+
+- Tagged build: [manifest](tagged-build-manifest.json) (`a5af0d1`, clean, tag `v0.9.16`);
+  `Critterweight-0.9.16-windows-x64.exe` 299,587,760 bytes, sha256 `766bb927…9518`.
+- Release smoke on the tagged build: [script check](packaged-script-check.log) 437 scripts, 0 failures;
+  boot to the title in **4.3 s** ([boot report](packaged-boot.json)); rendered playtest regressions
+  **20/20**, no skips ([results](packaged-rendered-tests.json)).
+- All **seven** release assets match their local files in size and SHA-256 and GitHub's own digests
+  ([asset verification](release-assets.json), [SHA256SUMS](release-SHA256SUMS.txt)).

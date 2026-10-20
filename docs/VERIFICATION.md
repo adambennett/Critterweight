@@ -22,7 +22,7 @@ dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`
 
 | Version | Commit | Source suite before release | Packaged checks |
 |---|---|---|---|
-| 0.9.16 | `v0.9.16` (see RELEASES.md) | 862 run: 861 passed, 0 failed, 1 graphical-only skip | PACKAGED |
+| 0.9.16 | `a5af0d1` (`v0.9.16`; suite on `9d0a29c`, docs-only after) | 862 run: 861 passed, 0 failed, 1 graphical-only skip | PACKAGED |
 | 0.9.15 | `f8e4bbb` (`v0.9.15`) | 775 run: 774 passed, 0 failed, 1 graphical-only skip (combined build `8f9baff`) | combined preview package 72 checks: 70 passed, 2 source-only skips; release smoke: 406 scripts, title boot 4.3 s (no rendered filter) |
 | 0.9.14 | `95c857a` (`v0.9.14`) | focused audio suite 20/20 (full suite not rerun for the menu-audio mix) | Tagged Windows: 394 scripts, title in 5.7 s, 20/20 rendered; packaged audio 18 passed, 2 source-only skips |
 | 0.9.13 | `cdacbcf` (`v0.9.13`) | 718 run: 717 passed, 0 failed, 1 graphical-only skip; fighter selection 24/24, AI Lab picker 8/8, source audio 10/10 | Tagged Windows: 394 scripts, title in 4.5 s, 20/20 rendered; packaged audio 8 passed, 0 failed, 2 source-only skips; four targets built; seven uploaded asset digests verified; [report](evidence/verification/v0.9.13/README.md) |
