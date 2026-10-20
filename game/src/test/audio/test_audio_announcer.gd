@@ -33,24 +33,33 @@ func test_all_lines_have_ids_subtitles_and_triggers() -> void:
 		check(str(l.get("text", "")) != "", "%s has text" % id)
 		check(str(l.get("trigger", "")) != "", "%s has a trigger" % id)
 		check(l.has("priority"), "%s has a priority" % id)
+		check(not l.has("retired"), "%s: retired lines are never loaded" % id)
 		match str(l.get("speaker", "")):
 			"barnaby":
 				if str(id).begins_with("ann_exp_"):
 					expansion_barnaby += 1
-				else:
+				elif str(id).begins_with("ann_"):
 					standard_barnaby += 1
 				check(str(l["text"]).length() <= 90, "%s subtitle <= 90 chars (%d)" % [id, str(l["text"]).length()])
 			"kendall":
-				expansion_kendall += 1
+				if str(id).begins_with("ann_exp_"):
+					expansion_kendall += 1
 				check(str(l["text"]).length() <= 90, "%s subtitle <= 90 chars (%d)" % [id, str(l["text"]).length()])
 			"granny":
 				granny += 1
 			_:
 				fail("%s has an unknown speaker" % id)
-	check_eq(standard_barnaby, 163, "standard Barnaby line count")
-	check_eq(expansion_barnaby, 515, "expanded Devon/Barnaby line count")
-	check_eq(expansion_kendall, 339, "Kendall line count")
+	# v0.9.17 (docs/audio/COMMENTARY.md §5): 59 lines that assert something the game does not have
+	# (feints, ropes, a corner crew, 'Devon' on air) or get a fact wrong are retired
+	check_eq(standard_barnaby, 162, "standard Barnaby line count (ann_round_03 retired)")
+	check_eq(expansion_barnaby, 480, "expanded Devon/Barnaby line count after retirements")
+	check_eq(expansion_kendall, 318, "Kendall line count after retirements")
 	check(granny >= 36, "Granny tutorial lines present (%d)" % granny)
+	# the colour bug: situational lines are no longer lull chatter
+	for id in Audio.trigger_line_ids("color"):
+		var l2 := Audio.line(id)
+		check(str(l2.get("situation", "generic")) == "generic" or not (l2.get("when", {}) as Dictionary).is_empty(),
+			"%s in the lull pool is generic or gated to its situation (%s)" % [id, l2.get("situation", "")])
 
 
 func test_varga_and_knell_ability_uses_get_specific_announcer_calls() -> void:
@@ -132,37 +141,46 @@ func test_announce_emits_subtitle_and_substitutes_names() -> void:
 	check(not Audio.announce("no_such_line"), "unknown line id is rejected without crashing")
 
 
-func test_trigger_picks_most_specific_line_and_rotates() -> void:
+func test_trigger_picks_specific_fresh_lines_deterministically() -> void:
+	Audio.use_memory_history()
 	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_dredge", "name": "DREDGE", "team": 0}, {"index": 1, "creature": "f_stoke", "name": "STOKE", "team": 1}], "seed": 3})
-	check_eq(Audio.pick_line("juice", {"creature": "f_dredge"}).begins_with("ann_juice_dredge"), true, "JUICE line is per fighter")
-	check_eq(Audio.pick_line("big_hit", {"kind": ["counter"]}), "ann_big_09", "counter big hit")
-	check_eq(Audio.pick_line("big_hit", {"kind": ["wall"]}), "ann_big_06", "wall splat big hit")
-	var ko := Audio.pick_line("ko", {"kind": ["heavy", "fast"], "target": "opponent"})
-	check(ko == "ann_ko_03" or ko == "ann_ko_09", "KO picks among the equally specific heavy/fast lines (got %s)" % ko)
-	Audio._ann_rotation.clear()
-	check_eq(Audio.pick_line("ko", {"kind": ["heavy", "fast"], "target": "opponent"}), ko, "selection is deterministic for a seed")
+	var juice := Audio.pick_line("juice", {"creature": "f_dredge"})
+	check_eq(str(Audio.line(juice).get("when", {}).get("creature", "")), "f_dredge", "JUICE line is per fighter (%s)" % juice)
+	var counter := Audio.pick_line("big_hit", {"kind": ["counter"]})
+	check_eq(str(Audio.line(counter).get("when", {}).get("kind", "")), "counter", "counter big hit (%s)" % counter)
+	var wall := Audio.pick_line("big_hit", {"kind": ["wall"]})
+	check_eq(str(Audio.line(wall).get("when", {}).get("kind", "")), "wall", "wall splat big hit (%s)" % wall)
+	var ko := Audio.pick_line("ko", {"kind": ["heavy", "fast"], "target": "opponent", "ends": "fight"})
+	check(str(Audio.line(ko).get("when", {}).get("kind", "")) in ["heavy", "fast"], "KO picks a heavy/fast line (got %s)" % ko)
+	Audio.use_memory_history()
+	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_dredge", "name": "DREDGE", "team": 0}, {"index": 1, "creature": "f_stoke", "name": "STOKE", "team": 1}], "seed": 3})
+	var juice2 := Audio.pick_line("juice", {"creature": "f_dredge"})
+	check_eq(juice2, juice, "selection is deterministic for a seed and history")
 	check(Audio.pick_line("ko", {"kind": ["zone"]}) == "ann_ko_06", "zone KO line")
 	check_eq(Audio.pick_line("boss_phase2", {"boss": "b_conduit"}), "ann_boss_conduit_p2", "boss phase line")
 	check_eq(Audio.pick_line("tutorial", {"exercise": 7, "phase": "success"}), "coach_tut_07_success", "coach line by exercise/phase")
-	# generic pool rotates and does not repeat inside a match
+	# a pool never repeats inside a match while fresh lines remain
 	var seen := {}
 	for i in 5:
 		var id := Audio.pick_line("idle", {})
 		check(not seen.has(id), "idle line %s not repeated" % id)
 		seen[id] = true
-		Audio._ann_used[id] = true
+		Audio.commentary_history().note_play(id, Audio.line(id).get("families", []))
 	check_eq(Audio.pick_line("nothing_here", {}), "", "unknown trigger yields no line")
 
 
 func test_priority_interrupt_and_queue_rules() -> void:
 	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_jitters", "name": "JITTERS", "team": 0}], "seed": 1})
 	check(Audio.announce("ann_low_01"), "low-priority line starts when idle")
-	check(not Audio.announce("ann_combo_01"), "combo (40) is dropped while a line plays")
-	check(Audio.announce("ann_kd_01"), "knockdown (80) is queued while a line plays")
+	check(Audio.announce("ann_combo_01"), "a combo call (40) waits briefly instead of being dropped")
+	check_eq(Audio.announcer_queue().size(), 1, "it is queued with an expiry")
 	check_eq(_subs.size(), 1, "queued line has not spoken yet")
+	check(Audio.announce("ann_kd_01"), "a knockdown (80) cuts into low-priority talk")
+	check_eq(str(Audio._ann_current.get("id", "")), "ann_kd_01", "the knockdown is on air")
 	check(Audio.announce("ann_ko_01"), "KO (100) interrupts")
-	check_eq(_subs.size(), 2, "KO spoke immediately")
-	check_eq(str(_subs[1]["text"]), "IT'S OVER! Goodnight, good luck, and good grief!", "KO text")
+	check_eq(str(_subs[-1]["text"]), "IT'S OVER! Goodnight, good luck, and good grief!", "KO text")
+	check(Audio.announcer_queue().is_empty(), "the KO made the waiting combo call stale")
+	check(not Audio.announce("ann_idle_01", {}, {"priority": 10}), "color-level chatter is never queued behind a line")
 	Audio.announcer_mode = "reduced"
 	check(not Audio.announce("ann_parry_01"), "reduced mode keeps only KO/round/JUICE-class triggers")
 	Audio.announcer_mode = "off"
@@ -202,11 +220,13 @@ func test_sim_event_mapping() -> void:
 	check(acts.has("proj_launch_brine"), "projectile launch by element")
 	acts = Audio.on_sim_event({"type": "ko", "fighter": 1})
 	check(acts.has("ko"), "KO sound")
+	# v0.9.17: the KO call waits for the same tick's round_end, which says whether it ends the bout
+	var ends := Audio.on_sim_event({"type": "round_end", "winner": 0, "round": 1, "decided": true})
 	var ko_line := false
-	for a2 in acts:
-		if str(a2).begins_with("line:ann_ko_"):
+	for a2 in ends:
+		if str(a2).begins_with("line:") and str(Audio.line(str(a2).trim_prefix("line:")).get("trigger", "")) == "ko":
 			ko_line = true
-	check(ko_line, "KO line (%s)" % str(acts))
+	check(ko_line, "KO line once the KO is known to end the bout (%s)" % str(ends))
 	acts = Audio.on_sim_event({"type": "unknown_event_type", "fighter": 0})
 	check(acts.is_empty(), "unknown events are ignored safely")
 	check_eq(Audio.sfx("hit_light", p), -1, "headless: sfx() is a no-op returning -1")
@@ -227,10 +247,20 @@ func test_ten_point_and_referee_event_mapping() -> void:
 	check((lines.call(acts) as Array).is_empty(), "no decision line at a 10-point bell (%s)" % str(acts))
 	acts = Audio.on_sim_event({"type": "round_scored", "round": 1, "teams": [0, 1], "judges": [[10, 9], [10, 9], [10, 9]], "winner": 0})
 	check(acts.has("ui_card_flip"), "the scorecard turns over (%s)" % str(acts))
-	# Health scoring keeps the old decision call at time
+	# Health scoring keeps the old decision call at time (a match is judged one way throughout)
+	Audio.end_match()
+	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_stoke", "name": "STOKE", "team": 0},
+		{"index": 1, "creature": "f_dredge", "name": "DREDGE", "team": 1}], "arena": "the_gullet", "seed": 13})
 	acts = Audio.on_sim_event({"type": "timeout"})
-	check(acts.has("ann_bell") and acts.has("line:ann_time_02"), "HP timeout still goes to the cards (%s)" % str(acts))
+	var hp_call := ""
+	for a0 in acts:
+		if str(a0).begins_with("line:"):
+			hp_call = str(a0).trim_prefix("line:")
+	check(acts.has("ann_bell") and str(Audio.line(hp_call).get("when", {}).get("kind", "")) == "decision", "HP timeout still goes to the cards (%s)" % str(acts))
 	Audio.stop_announcer()
+	Audio.end_match()
+	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_stoke", "name": "STOKE", "team": 0},
+		{"index": 1, "creature": "f_dredge", "name": "DREDGE", "team": 1}], "arena": "the_gullet", "seed": 14, "ten_point": true})
 	_subs.clear()
 	# the decision names the winner (DREDGE), not the local player
 	acts = Audio.on_sim_event({"type": "judges_decision", "winner": 1, "method": "Split Decision", "totals": [[29, 28], [28, 29], [28, 29]],
@@ -264,10 +294,16 @@ func test_ten_point_and_referee_event_mapping() -> void:
 	Audio.on_sim_event({"type": "hit", "fighter": 0, "target": 1, "damage": 6.0, "point": Vector3.ZERO, "normal": Vector3.UP, "blocked": false,
 		"parried": false, "counter": false, "part": "head", "element": "", "quality": 0.5, "move": "l1", "slot": "l1", "knockdown": false, "otg": false})
 	Audio.stop_announcer()
-	acts = Audio.on_sim_event({"type": "knockdown", "fighter": 1, "reason": "move", "by": 0})
-	check(acts.has("line:ann_kd_04"), "without a referee the player's knockdown quip is the pick (%s)" % str(acts))
+	# without a referee the player's "I'm not the ref!" quip is an eligible knockdown call ...
+	check_eq(CommentarySelector.matched_keys(Audio.line("ann_kd_04").get("when", {}), {"who": "player"}), 1, "the quip matches a player's knockdown")
+	# ... and with one counting it never plays
+	Audio.end_match()
+	Audio.use_memory_history()
+	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_stoke", "name": "STOKE", "team": 0},
+		{"index": 1, "creature": "f_dredge", "name": "DREDGE", "team": 1}], "arena": "the_gullet", "seed": 15, "referee": true})
+	Audio.on_sim_event({"type": "hit", "fighter": 0, "target": 1, "damage": 6.0, "point": Vector3.ZERO, "normal": Vector3.UP, "blocked": false,
+		"parried": false, "counter": false, "part": "head", "element": "", "quality": 0.5, "move": "l1", "slot": "l1", "knockdown": false, "otg": false})
 	Audio.stop_announcer()
-	Audio._ann_used.clear()
 	acts = Audio.on_sim_event({"type": "knockdown", "fighter": 1, "reason": "move", "by": 0}, Vector3.ZERO, {"referee": true})
 	check(acts.has("knockdown") and not acts.has("line:ann_kd_04"), "no 'I'm not the ref!' under a referee (%s)" % str(acts))
 	check(not (lines.call(acts) as Array).is_empty(), "another knockdown call instead (%s)" % str(acts))
@@ -277,15 +313,15 @@ func test_ten_point_and_referee_event_mapping() -> void:
 	check((lines.call(acts) as Array).is_empty(), "wave-up has no announcer line (%s)" % str(acts))
 	Audio.stop_announcer()
 	# the stopping knockdown's call is still queued behind another line when the referee waves it off
-	check(Audio.announce("ann_low_01"), "a line is playing")
-	check(Audio.announce("ann_kd_01") and not Audio._ann_pending.is_empty(), "a knockdown call is queued")
+	check(Audio.announce("ann_combo_01"), "a line is playing")
+	check(Audio.announce("ann_kd_01", {}, {"priority": 60}) and not Audio.announcer_queue().is_empty(), "a knockdown call is queued")
 	acts = Audio.on_sim_event({"type": "ref_stoppage", "fighter": 1, "by": 0, "reason": "knockdowns", "round": 2})
 	check(acts.has("ann_bell_triple") and acts.has("ko"), "stoppage bell + KO sound (%s)" % str(acts))
-	check(Audio._ann_pending.is_empty(), "the stale knockdown call never follows the T.K.O. call")
-	var ko_line := false
+	check(Audio.announcer_queue().filter(func(e: Dictionary) -> bool: return str(e["id"]) == "ann_kd_01").is_empty(),
+		"the stale knockdown call never follows the T.K.O. call")
 	for a2 in acts:
-		ko_line = ko_line or str(a2).begins_with("line:ann_ko_")
-	check(ko_line, "an existing KO call for the stoppage (%s)" % str(acts))
+		if str(a2).begins_with("line:"):
+			check_eq(str(Audio.line(str(a2).trim_prefix("line:")).get("trigger", "")), "stoppage", "a stoppage is called as a stoppage, never 'KNOCKED OUT' (%s)" % a2)
 	# the campaign's own "decision" (party / enemy HP) is untouched: no mapping
 	Audio.stop_announcer()
 	acts = Audio.on_sim_event({"type": "decision", "party": 0.5, "enemy": 0.4})

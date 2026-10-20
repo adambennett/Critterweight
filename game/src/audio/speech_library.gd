@@ -153,19 +153,32 @@ func _token(voice: String, token: String, value: String, context: Dictionary) ->
 static func spoken_name(normalized: String, vocabulary: Dictionary, context: Dictionary) -> String:
 	if vocabulary.has(normalized):
 		return normalized
-	var stripped := normalized.replace("(bot)", "").strip_edges()
 	var re := RegEx.create_from_string("\\s+\\d+$")
-	stripped = re.sub(stripped, "").strip_edges()
+	var stripped := re.sub(normalized.replace("(bot)", "").strip_edges(), "").strip_edges()
+	var fighters: Array = context.get("fighters", [])
+	var candidate := ""
 	if vocabulary.has(stripped):
-		return stripped
-	for fighter in context.get("fighters", []):
-		if str(fighter.get("name", "")).to_lower() != normalized:
+		candidate = stripped
+	else:
+		for fighter in fighters:
+			if str(fighter.get("name", "")).to_lower() == normalized:
+				var creature_name := str(fighter.get("creature", "")).trim_prefix("f_").replace("_", " ")
+				if vocabulary.has(creature_name):
+					candidate = creature_name
+				break
+	if candidate == "":
+		return ""
+	# only when it names nobody else in the match (a mirror match keeps "Player N")
+	var others := 0
+	for fighter in fighters:
+		var nm := str(fighter.get("name", "")).to_lower()
+		var cn := str(fighter.get("creature", "")).trim_prefix("f_").replace("_", " ")
+		var sn := re.sub(nm.replace("(bot)", "").strip_edges(), "").strip_edges()
+		if nm == normalized:
 			continue
-		var cid := str(fighter.get("creature", ""))
-		var creature_name := cid.trim_prefix("f_").replace("_", " ")
-		if vocabulary.has(creature_name):
-			return creature_name
-	return ""
+		if sn == candidate or (not vocabulary.has(sn) and cn == candidate):
+			others += 1
+	return candidate if others == 0 else ""
 
 
 static func _number(value: int) -> Array:

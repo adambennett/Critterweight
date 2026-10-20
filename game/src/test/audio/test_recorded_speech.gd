@@ -48,7 +48,16 @@ func test_custom_names_use_slot_audio_while_subtitles_keep_the_name() -> void:
 	var entry := Audio.line("ann_first_03")
 	var plan := library.resolve("ann_first_03", "barnaby", str(entry["text"]), "", {"p": "HaloFan"}, ctx)
 	var player_four := str(library.catalog["tokens"]["devon"]["player 4"])
-	check(plan.get("ids", []).has(player_four), "custom player uses actual slot 4")
+	# v0.9.17: an unrecorded custom name is voiced by its fighter's recorded name when that names
+	# nobody else in the match ("Dozer lands first!"), the subtitle keeps the custom name
+	check(plan.get("ids", []).has(str(library.catalog["tokens"]["devon"]["dozer"])), "custom player is voiced by its fighter's name")
+	var mirror := {"player_index": 3, "seed": 4, "fighters": [{"index": 3, "creature": "f_dozer", "name": "HaloFan", "team": 0},
+		{"index": 6, "creature": "f_dozer", "name": "Dozer", "team": 1}]}
+	var mirrored := library.resolve("ann_first_03", "barnaby", str(entry["text"]), "", {"p": "HaloFan"}, mirror)
+	check(mirrored.get("ids", []).has(player_four), "in a mirror match the custom player keeps the slot name (Player 4)")
+	var bot := library.resolve("ann_first_03", "barnaby", str(entry["text"]), "", {"p": "Dredge (bot)"},
+		{"player_index": 0, "fighters": [{"index": 0, "creature": "f_stoke", "name": "Rookie"}, {"index": 1, "creature": "f_dredge", "name": "Dredge (bot)"}]})
+	check(bot.get("ids", []).has(str(library.catalog["tokens"]["devon"]["dredge"])), "a bot's '(bot)' decoration is not read as Player 2")
 	Audio.begin_match(ctx)
 	check(Audio.announce("ann_first_03"), "recorded custom-name line starts")
 	check(bool(Audio._ann_current.get("recorded", false)), "audio dispatcher selected recording")
@@ -78,11 +87,13 @@ func test_dynamic_recaps_and_first_lesson_compositions_resolve() -> void:
 
 func test_recorded_priority_queue_stop_and_unknown_mod_fallback() -> void:
 	check(Audio.announce("ann_low_01"), "recording starts")
-	check(Audio.announce("ann_kd_01"), "high priority recording queues")
+	check(Audio.announce("ann_combo_01"), "a play-by-play recording waits behind it")
+	check_eq(Audio.announcer_queue().size(), 1, "one recording waits")
 	check(Audio.announce("ann_ko_01"), "KO interrupts")
 	check_eq(str(Audio._ann_current.get("id", "")), "ann_ko_01", "KO owns current recording")
+	check(Audio.announcer_queue().is_empty(), "the KO made the waiting call stale")
 	Audio._finish_line()
-	check_eq(str(Audio._ann_current.get("id", "")), "ann_kd_01", "queued recording starts after completion")
+	check(str(Audio._ann_current.get("id", "")) != "ann_combo_01", "a stale call never follows the KO")
 	Audio.stop_announcer()
 	check(not Audio.announcer_busy() and Audio._speech_clips.is_empty(), "stop clears playback and queue")
 	check(library.resolve("ann_low_01", "barnaby", "A mod replaced this text.", "A mod replaced this text.", {}, {}).is_empty(), "overridden content never plays stale built-in speech")

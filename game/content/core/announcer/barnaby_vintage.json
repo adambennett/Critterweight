@@ -1,33 +1,429 @@
 {
   "_doc": "Vintage Bellows line pack: Barnaby, 1973 edition (unlocked by the Cannery's booth tape, secret #5; turned on at Barnaby's desk in the hub). Same format as barnaby.json plus \"pack\": while a pack is active its lines are preferred for every trigger they cover (Audio.pick_line), and pack lines are never used otherwise.",
   "items": [
-    {"id": "ann_v73_intro_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "intro", "when": {}, "priority": 85, "text": "Ladies, gentlemen and assorted critters, in this corner, a fine young scrapper: {p}!"},
-    {"id": "ann_v73_intro_02", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "intro", "when": {}, "priority": 85, "text": "Live from the waterfront, brought to you by Glandco tonic: {p}!"},
-    {"id": "ann_v73_intro_03", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "intro", "when": {}, "priority": 85, "text": "Tune those dials, folks! Stepping in, with a full head of steam: {p}!"},
-    {"id": "ann_v73_round_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "round_start", "when": {}, "priority": 86, "text": "And they're OFF! Mind your manners and your molars!"},
-    {"id": "ann_v73_round_02", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "round_start", "when": {"round": "2plus"}, "priority": 86, "text": "Round {n}, and the smoke in this cannery could stand up on its own!"},
-    {"id": "ann_v73_round_03", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "round_start", "when": {"round": "final"}, "priority": 86, "text": "The final round! Somebody fetch the good microphone!"},
-    {"id": "ann_v73_first_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "first_hit", "when": {}, "priority": 35, "text": "First blood to the boards, and the gallery approves!"},
-    {"id": "ann_v73_big_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "big_hit", "when": {}, "priority": 60, "text": "Heavens to Betsy! That one rattled the rafters!"},
-    {"id": "ann_v73_big_02", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "big_hit", "when": {"kind": "wall"}, "priority": 60, "text": "Into the boards like a crate off the morning boat!"},
-    {"id": "ann_v73_combo_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "combo", "when": {}, "priority": 40, "text": "One-two-three, like a waltz with knuckles!"},
-    {"id": "ann_v73_parry_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "parry", "when": {}, "priority": 50, "text": "Turned aside, smooth as a dockside card sharp!"},
-    {"id": "ann_v73_down_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "knockdown", "when": {}, "priority": 80, "text": "DOWN goes the contender! Somebody count, I've lost my glasses!"},
-    {"id": "ann_v73_down_02", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "knockdown", "when": {"kind": "throw"}, "priority": 80, "text": "Tossed like a sack of the Tuesday catch!"},
-    {"id": "ann_v73_comeback_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "comeback", "when": {}, "priority": 45, "text": "Hold the presses! This scrapper is NOT finished!"},
-    {"id": "ann_v73_juice_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "juice", "when": {}, "priority": 90, "text": "The tonic kicks in! I'm told it's mostly vitamins!"},
-    {"id": "ann_v73_low_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "low_health", "when": {}, "priority": 30, "text": "Hanging on by a whisker and a prayer, folks!"},
-    {"id": "ann_v73_time_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "time", "when": {"kind": "ten_seconds"}, "priority": 75, "text": "Ten seconds on the big clock! The big clock is slow, but still!"},
-    {"id": "ann_v73_time_02", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "time", "when": {"kind": "decision"}, "priority": 92, "text": "To the scorecards! And the scorecards favour {p}!"},
-    {"id": "ann_v73_time_03", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "time", "when": {"kind": "sudden_death"}, "priority": 92, "text": "Sudden death! One clean shot takes the purse!"},
-    {"id": "ann_v73_ko_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "ko", "when": {}, "priority": 100, "text": "It's OVER! The house lights go up on a brand-new legend!"},
-    {"id": "ann_v73_ko_02", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "ko", "when": {"kind": "ringout"}, "priority": 100, "text": "Clean off the edge! That one's going home by the long way!"},
-    {"id": "ann_v73_ringout_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "ringout", "when": {}, "priority": 80, "text": "Over the ropes and into the night air!"},
-    {"id": "ann_v73_win_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "win", "when": {}, "priority": 95, "text": "Your WINNER, and still champion of my heart: {p}!"},
-    {"id": "ann_v73_win_02", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "win", "when": {}, "priority": 95, "text": "{p} takes it! Somebody wire the newspapers!"},
-    {"id": "ann_v73_draw_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "draw", "when": {}, "priority": 95, "text": "A draw! The bookmakers are weeping into their visors!"},
-    {"id": "ann_v73_taunt_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "taunt", "when": {}, "priority": 20, "text": "A bit of showmanship! The ladies in the front row are swooning!"},
-    {"id": "ann_v73_idle_01", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "idle", "when": {}, "priority": 10, "text": "In my day the cage was rope and the rope was mostly rumour."},
-    {"id": "ann_v73_idle_02", "pack": "vintage_bellows", "speaker": "barnaby", "trigger": "idle", "when": {}, "priority": 10, "text": "This broadcast is reaching homes as far away as the next street!"}
+    {
+      "id": "ann_v73_intro_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {},
+      "priority": 85,
+      "text": "Ladies, gentlemen and assorted critters, in this corner, a fine young scrapper: {p}!",
+      "families": [
+        "crowd",
+        "corner"
+      ],
+      "energy": "high",
+      "situation": "opening"
+    },
+    {
+      "id": "ann_v73_intro_02",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {},
+      "priority": 85,
+      "text": "Live from the waterfront, brought to you by Glandco tonic: {p}!",
+      "families": [
+        "glandco",
+        "tide"
+      ],
+      "energy": "high",
+      "situation": "opening"
+    },
+    {
+      "id": "ann_v73_intro_03",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {},
+      "priority": 85,
+      "text": "Tune those dials, folks! Stepping in, with a full head of steam: {p}!",
+      "families": [
+        "camera"
+      ],
+      "energy": "high",
+      "situation": "opening"
+    },
+    {
+      "id": "ann_v73_round_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {},
+      "priority": 86,
+      "text": "And they're OFF! Mind your manners and your molars!",
+      "families": [
+        "manners",
+        "body"
+      ],
+      "energy": "high",
+      "situation": "opening"
+    },
+    {
+      "id": "ann_v73_round_02",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {
+        "round": "2plus"
+      },
+      "priority": 86,
+      "text": "Round {n}, and the smoke in this cannery could stand up on its own!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "opening"
+    },
+    {
+      "id": "ann_v73_round_03",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {
+        "round": "final"
+      },
+      "priority": 86,
+      "text": "The final round! Somebody fetch the good microphone!",
+      "families": [
+        "booth"
+      ],
+      "energy": "high",
+      "situation": "late"
+    },
+    {
+      "id": "ann_v73_first_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "first_hit",
+      "when": {},
+      "priority": 35,
+      "text": "First blood to the boards, and the gallery approves!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "opening",
+      "retired": "'first blood' (no blood in the game)"
+    },
+    {
+      "id": "ann_v73_big_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "big_hit",
+      "when": {},
+      "priority": 60,
+      "text": "Heavens to Betsy! That one rattled the rafters!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "big_hit"
+    },
+    {
+      "id": "ann_v73_big_02",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "big_hit",
+      "when": {
+        "kind": "wall"
+      },
+      "priority": 60,
+      "text": "Into the boards like a crate off the morning boat!",
+      "families": [
+        "tide",
+        "crate"
+      ],
+      "energy": "high",
+      "situation": "wall"
+    },
+    {
+      "id": "ann_v73_combo_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "combo",
+      "when": {},
+      "priority": 40,
+      "text": "One-two-three, like a waltz with knuckles!",
+      "families": [
+        "rhythm"
+      ],
+      "energy": "high",
+      "situation": "combo"
+    },
+    {
+      "id": "ann_v73_parry_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "parry",
+      "when": {},
+      "priority": 50,
+      "text": "Turned aside, smooth as a dockside card sharp!",
+      "families": [
+        "tide",
+        "bookie"
+      ],
+      "energy": "high",
+      "situation": "parry"
+    },
+    {
+      "id": "ann_v73_down_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "knockdown",
+      "when": {},
+      "priority": 80,
+      "text": "DOWN goes the contender! Somebody count, I've lost my glasses!",
+      "families": [
+        "officials",
+        "clothes"
+      ],
+      "energy": "high",
+      "situation": "knockdown"
+    },
+    {
+      "id": "ann_v73_down_02",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "knockdown",
+      "when": {
+        "kind": "throw"
+      },
+      "priority": 80,
+      "text": "Tossed like a sack of the Tuesday catch!",
+      "families": [
+        "tide"
+      ],
+      "energy": "high",
+      "situation": "grab_throw"
+    },
+    {
+      "id": "ann_v73_comeback_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "comeback",
+      "when": {},
+      "priority": 45,
+      "text": "Hold the presses! This scrapper is NOT finished!",
+      "families": [
+        "paperwork",
+        "not_done"
+      ],
+      "energy": "high",
+      "situation": "reversal"
+    },
+    {
+      "id": "ann_v73_juice_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {},
+      "priority": 90,
+      "text": "The tonic kicks in! I'm told it's mostly vitamins!",
+      "families": [
+        "glandco"
+      ],
+      "energy": "high",
+      "situation": "ability"
+    },
+    {
+      "id": "ann_v73_low_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "low_health",
+      "when": {},
+      "priority": 30,
+      "text": "Hanging on by a whisker and a prayer, folks!",
+      "families": [
+        "animals"
+      ],
+      "energy": "high",
+      "situation": "hurt"
+    },
+    {
+      "id": "ann_v73_time_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "time",
+      "when": {
+        "kind": "ten_seconds"
+      },
+      "priority": 75,
+      "text": "Ten seconds on the big clock! The big clock is slow, but still!",
+      "families": [
+        "time"
+      ],
+      "energy": "high",
+      "situation": "late"
+    },
+    {
+      "id": "ann_v73_time_02",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "time",
+      "when": {
+        "kind": "decision",
+        "scoring": "ten_point"
+      },
+      "priority": 92,
+      "text": "To the scorecards! And the scorecards favour {p}!",
+      "families": [
+        "scorekeeping",
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "result"
+    },
+    {
+      "id": "ann_v73_time_03",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "time",
+      "when": {
+        "kind": "sudden_death"
+      },
+      "priority": 92,
+      "text": "Sudden death! One clean shot takes the purse!",
+      "families": [
+        "sudden_death",
+        "money"
+      ],
+      "energy": "high",
+      "situation": "late"
+    },
+    {
+      "id": "ann_v73_ko_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {},
+      "priority": 100,
+      "text": "It's OVER! The house lights go up on a brand-new legend!",
+      "families": [
+        "venue",
+        "story"
+      ],
+      "energy": "high",
+      "situation": "result"
+    },
+    {
+      "id": "ann_v73_ko_02",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "kind": "ringout"
+      },
+      "priority": 100,
+      "text": "Clean off the edge! That one's going home by the long way!",
+      "families": [
+        "geography"
+      ],
+      "energy": "high",
+      "situation": "edge"
+    },
+    {
+      "id": "ann_v73_ringout_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "ringout",
+      "when": {},
+      "priority": 80,
+      "text": "Over the ropes and into the night air!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "edge",
+      "retired": "no ropes"
+    },
+    {
+      "id": "ann_v73_win_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {},
+      "priority": 95,
+      "text": "Your WINNER, and still champion of my heart: {p}!",
+      "families": [
+        "booth"
+      ],
+      "energy": "high",
+      "situation": "result"
+    },
+    {
+      "id": "ann_v73_win_02",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {},
+      "priority": 95,
+      "text": "{p} takes it! Somebody wire the newspapers!",
+      "families": [
+        "paperwork"
+      ],
+      "energy": "high",
+      "situation": "result"
+    },
+    {
+      "id": "ann_v73_draw_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "draw",
+      "when": {},
+      "priority": 95,
+      "text": "A draw! The bookmakers are weeping into their visors!",
+      "families": [
+        "bookie",
+        "clothes"
+      ],
+      "energy": "high",
+      "situation": "result"
+    },
+    {
+      "id": "ann_v73_taunt_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "taunt",
+      "when": {},
+      "priority": 20,
+      "text": "A bit of showmanship! The ladies in the front row are swooning!",
+      "families": [
+        "showmanship",
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "ability"
+    },
+    {
+      "id": "ann_v73_idle_01",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "idle",
+      "when": {},
+      "priority": 10,
+      "text": "In my day the cage was rope and the rope was mostly rumour.",
+      "families": [
+        "venue",
+        "old_days"
+      ],
+      "energy": "medium",
+      "situation": "generic"
+    },
+    {
+      "id": "ann_v73_idle_02",
+      "pack": "vintage_bellows",
+      "speaker": "barnaby",
+      "trigger": "idle",
+      "when": {},
+      "priority": 10,
+      "text": "This broadcast is reaching homes as far away as the next street!",
+      "families": [
+        "camera"
+      ],
+      "energy": "high",
+      "situation": "generic"
+    }
   ]
 }

@@ -99,7 +99,12 @@ func _physics_process(dt: float) -> void:
 		var time_left := -1.0
 		if mode2 != null and mode2.get("round_timer") != null and float(sim.get("rules").get("round_time", 99.0)) > 0.0:
 			time_left = float(mode2.get("round_timer"))
-		Audio.on_match_tick(health, time_left, _tick_accum, _edge_info(fighters))
+		var tick_info := _edge_info(fighters)
+		var stamina: Array = []
+		for f in fighters:
+			stamina.append((f as Fighter).stamina / maxf(1.0, (f as Fighter).max_stamina))
+		tick_info["stamina"] = stamina
+		Audio.on_match_tick(health, time_left, _tick_accum, tick_info)
 		# music intensity: lead layer when any fighter is below 50 % HP
 		var lowest := 1.0
 		for h in health:

@@ -39,13 +39,13 @@ const REQUEST_FALLBACK := {
 	"career_intro": [["intro", {}]],
 	"career_result": [["win", {}]],
 	"decision": [["time", {"kind": "decision"}]],
-	"comeback": [["reversal", {}]],
-	"hurt": [["low_health", {}]],
 	"ability_hit": [["ability", {}]],
 	"element": [["element_color", {}]],
 	"fighter_color": [["color", {}]],
 	"matchup_color": [["color", {}]],
 	"element_color": [["color", {}]],
+	"taunt_punished": [["taunt", {"kind": "punished"}]],
+	"hurt": [["low_health", {}]],
 }
 
 var enabled := false                  ## false when headless / dedicated server / lab worker
@@ -104,6 +104,7 @@ var _history: CommentaryHistory = null
 var _history_in_memory := false
 var _selector: CommentarySelector = null
 var _director: CommentaryDirector = null   ## present between begin_match and end_match
+var _booth_ctx := {}                  ## standing facts every request is matched against (booth_context)
 var _ann_last_trigger_time := {}      ## reduced mode frequency limiting
 var _ann_conversation_groups := {}    ## conversation id -> ordered Array[Dictionary]
 var _ann_conversation_queue: Array = []
@@ -855,8 +856,8 @@ func _load_lines() -> void:
 	_ann_conversation_groups.clear()
 	for id in Content.ids("announcer"):
 		var e := Content.get_entry("announcer", id)
-		if str(e.get("text", "")) == "":
-			continue
+		if str(e.get("text", "")) == "" or e.has("retired"):
+			continue     # retired: asserts something the game does not have (docs/audio/COMMENTARY.md §5)
 		var pk := str(e.get("pack", ""))
 		var triggers: Array = [str(e.get("trigger", ""))]
 		for extra in e.get("also", []):
@@ -986,6 +987,7 @@ func stop_announcer() -> void:
 	_stop_speech()
 	_ann_current = {}
 	_ann_queue.clear()
+	_ann_last_end = -100.0      # an explicit silence: the next line may start at once
 	_ann_conversation_queue.clear()
 	_ann_active_conversation = ""
 	if _babble:
@@ -1028,12 +1030,16 @@ func _say_line(id: String, speaker: String, text: String, priority: int, vars: D
 			_log_commentary("dropped", {"id": id, "why": "reduced_rate"})
 			return false
 		_ann_last_trigger_time[trigger] = now
+	if priority >= 100:
+		invalidate_queued(100)     # a result call: everything less urgent that was waiting is stale
 	var ttl := float(opts.get("ttl", default_ttl(priority)))
 	var entry := {"id": id, "speaker": speaker, "text": _substitute(text, vars), "priority": priority, "mood": mood, "vars": vars, "source": text,
 		"expires": now + ttl, "tag": str(opts.get("tag", "")), "queued_at": now, "trigger": trigger, "follow": opts.get("follow", {})}
 	if _ann_current.is_empty():
 		# breathing room: low-priority talk waits a beat after the last line
 		var gap := LINE_GAP_LOW if priority < 50 else (LINE_GAP_MEDIUM if priority < 80 else 0.0)
+		if bool(opts.get("turn", false)):
+			gap = 0.0       # the next turn of an exchange keeps the exchange's own timing
 		if now - _ann_last_end >= gap:
 			_start_line(entry)
 			return true
@@ -1121,7 +1127,8 @@ func _start_line(entry: Dictionary) -> void:
 	if seconds <= 0.0:
 		seconds = clampf(float(text.length()) * 0.055, 1.2, 4.0)
 	_ann_current = {"id": entry["id"], "priority": entry["priority"], "until": _now() + seconds + 0.15, "speaker": speaker,
-		"recorded": not recording.is_empty(), "follow": entry.get("follow", {}), "trigger": str(entry.get("trigger", ""))}
+		"recorded": not recording.is_empty(), "follow": entry.get("follow", {}), "trigger": str(entry.get("trigger", "")),
+		"follow_id": str(line(str(entry["id"])).get("follow_id", "")), "vars": entry.get("vars", {})}
 	var fams: Array = line(str(entry["id"])).get("families", [])
 	if speaker in ["barnaby", "kendall"]:
 		_ensure_commentary()
@@ -1188,6 +1195,8 @@ func _finish_line() -> void:
 		return
 	var id := str(_ann_current["id"])
 	var follow: Dictionary = _ann_current.get("follow", {})
+	var follow_id := str(_ann_current.get("follow_id", ""))
+	var follow_vars: Dictionary = _ann_current.get("vars", {})
 	_stop_speech()
 	_ann_current = {}
 	_ann_last_end = _now()
@@ -1195,7 +1204,10 @@ func _finish_line() -> void:
 		_director.note_line_finished(_director.t)
 	_log_commentary("finished", {"id": id})
 	line_finished.emit(id)
-	if not follow.is_empty() and _director != null and announcer_mode == "full":
+	if follow_id != "" and announcer_mode == "full" and not line(follow_id).is_empty():
+		# the answer to this line (Barnaby asks, Kendall answers): spoken right after, never late
+		announce(follow_id, follow_vars, {"priority": 45, "ttl": 2.5, "tag": "follow", "turn": true})
+	elif not follow.is_empty() and _director != null and announcer_mode == "full":
 		var r := follow.duplicate()
 		r["ctx"] = (r.get("ctx", {}) as Dictionary)
 		r["priority"] = int(CommentaryDirector.CLASS_PRIORITY.get(str(r.get("class", "color")), 15))
@@ -1226,7 +1238,7 @@ func _continue_color_conversation(conversation_id: String) -> void:
 		_duck_target["Crowd"] = 0.0
 		return
 	var next_line: Dictionary = _ann_conversation_queue.pop_front()
-	if not announce(str(next_line.get("id", ""))):
+	if not announce(str(next_line.get("id", "")), {}, {"turn": true}):
 		_ann_conversation_queue.clear()
 		_ann_active_conversation = ""
 
@@ -1245,7 +1257,9 @@ func announce_trigger(trigger: String, ctx := {}, vars := {}) -> String:
 ## Returns the line id spoken or queued ("" when nothing fits or it was dropped).
 func _do_request(r: Dictionary) -> String:
 	var trigger := str(r.get("trigger", ""))
-	var ctx: Dictionary = r.get("ctx", {})
+	# the match's standing facts (venue, officials, scoring, body plans) under the request's own
+	var ctx: Dictionary = _booth_ctx.duplicate()
+	ctx.merge(r.get("ctx", {}), true)
 	var priority := int(r.get("priority", CommentaryDirector.CLASS_PRIORITY.get(str(r.get("class", "low")), 40)))
 	if priority >= 100 and str(r.get("tag", "")) in ["result", "final"]:
 		invalidate_queued(100)
@@ -1353,6 +1367,10 @@ func _color_context() -> Dictionary:
 ## (Vintage Bellows) answers first for the triggers it covers.
 func pick_line(trigger: String, ctx := {}, opts := {}) -> String:
 	_ensure_commentary()
+	if not _booth_ctx.is_empty():
+		var full := _booth_ctx.duplicate()
+		full.merge(ctx, true)
+		ctx = full
 	if announcer_pack != "":
 		var pack_ids: Array = (_pack_by_trigger.get(announcer_pack, {}) as Dictionary).get(trigger, [])
 		var pid := _selector.pick(pack_ids, _pack_lines, ctx, opts)
@@ -1545,8 +1563,13 @@ func begin_match(ctx: Dictionary) -> void:
 	var dfs: Array = []
 	for f in ctx.get("fighters", []):
 		var fd: Dictionary = (f as Dictionary).duplicate()
-		fd["element"] = str(Content.creature_entry(str(fd.get("creature", ""))).get("element", ""))
+		var entry: Dictionary = Content.creature_entry(str(fd.get("creature", "")))
+		fd["element"] = str(entry.get("element", ""))
+		fd["plan"] = str(creature_audio(str(fd.get("creature", ""))).get("plan", "biped"))
+		fd["height"] = float((entry.get("body", {}) as Dictionary).get("height", 1.0)) if typeof(entry.get("body", {})) == TYPE_DICTIONARY else 1.0
+		fd["speed"] = float((entry.get("stats", {}) as Dictionary).get("walk_speed", 3.0)) if typeof(entry.get("stats", {})) == TYPE_DICTIONARY else 3.0
 		dfs.append(fd)
+	_booth_ctx = booth_context(ctx, dfs)
 	_director = CommentaryDirector.new()
 	_director.begin({"fighters": dfs, "player_index": pi, "context": str(ctx.get("context", "versus")), "seed": _ann_seed,
 		"career": ctx.get("career", {}), "ten_point": bool(ctx.get("ten_point", false)), "referee": bool(ctx.get("referee", false)),
@@ -1555,6 +1578,41 @@ func begin_match(ctx: Dictionary) -> void:
 	if enabled:
 		crowd_start()
 		set_arena(str(ctx.get("arena", "")), str(ctx.get("arena_base", "")))
+
+
+## The standing facts of a match that lines can be gated on (docs/audio/COMMENTARY.md §5):
+## venue (gullet | crusher | drydock | rooftop), outdoor, fence (a cage), open_edges (ring-outs),
+## night, hazards, props, referee, scoring (ten_point | hp), context, format, objective,
+## special_rules, hands (every fighter has hands), size_gap, quick, rounds_multi.
+static func booth_context(ctx: Dictionary, fighters: Array) -> Dictionary:
+	var base := str(ctx.get("arena_base", "")).to_lower()
+	var aid := str(ctx.get("arena", "")).to_lower()
+	var venue := "gullet"
+	for v in ["crusher", "drydock", "rooftop"]:
+		if base.contains(v) or aid.contains(v):
+			venue = v
+	var out := {"venue": venue, "outdoor": venue != "gullet", "fence": venue == "gullet", "open_edges": venue == "rooftop",
+		"night": venue == "rooftop", "hazards": bool(ctx.get("hazards", venue != "gullet")), "props": bool(ctx.get("props", false)),
+		"referee": bool(ctx.get("referee", false)), "scoring": "ten_point" if bool(ctx.get("ten_point", false)) else "hp",
+		"context": str(ctx.get("context", "versus")), "format": str(ctx.get("format", "duel")),
+		"objective": str(ctx.get("mode", "")) in ["chumball", "spotlight_hog"],
+		"special_rules": str(ctx.get("mode", "standard")) not in ["standard", ""] or bool(ctx.get("custom", false)),
+		"rounds_multi": int(ctx.get("rounds", 1)) > 1}
+	var hands := true
+	var lo := INF
+	var hi := 0.0
+	var quick := false
+	for f in fighters:
+		if str(f.get("plan", "biped")) != "biped":
+			hands = false
+		var h := float(f.get("height", 1.0))
+		lo = minf(lo, h)
+		hi = maxf(hi, h)
+		quick = quick or float(f.get("speed", 0.0)) >= 3.8
+	out["hands"] = hands and not fighters.is_empty()
+	out["size_gap"] = lo < INF and hi > lo * 1.35
+	out["quick"] = quick
+	return out
 
 
 ## Ends the match audio. `owner_sim`: the simulation of the scene that is leaving. A scene swap
@@ -1570,6 +1628,7 @@ func end_match(owner_sim: Node = null) -> void:
 	stop_announcer()
 	_match = {}
 	_director = null
+	_booth_ctx = {}
 	if _history:
 		_history.save_file()
 	detach_match()
@@ -1593,7 +1652,14 @@ func attach_match(sim: Node, player_index: int, ctx := {}) -> Node:
 	if not c.has("seed"):
 		c["seed"] = int(sim.get("seed_value"))
 	var rules = sim.get("rules")
+	var arena_nodes = sim.get("arena_nodes")
+	if typeof(arena_nodes) == TYPE_DICTIONARY:
+		c["props"] = not ((arena_nodes as Dictionary).get("props", []) as Array).is_empty()
+	var mode = sim.get("mode")
+	if mode != null and mode.has_method("id"):
+		c["mode"] = str(mode.call("id"))
 	if typeof(rules) == TYPE_DICTIONARY:
+		c["format"] = str((rules as Dictionary).get("format", "duel"))
 		c["rounds"] = int((rules as Dictionary).get("rounds", 1))
 		c["ten_point"] = str((rules as Dictionary).get("scoring", "")) == "ten_point"
 		c["referee"] = bool((rules as Dictionary).get("referee", false))

@@ -55,6 +55,12 @@ var _rng := RandomNumberGenerator.new()
 var _color_next_at := 14.0      ## the first color line is never right at the bell
 var _conversation_done := false
 var _pending_ko := {}           ## a KO call waiting for its round_end (does it end the bout or a round?)
+var _round_wins := {}           ## team -> rounds won (best-of formats: match point)
+var _taunted_at := {}           ## fighter -> time of its last taunt (a punished taunt)
+var _stamina_low := {}          ## fighter -> already called
+var _sudden_death := false
+var _last_round_end := ""       ## "ko" | "time" (round-break talk after a bell, not after a KO)
+var _finish := ""               ## how the bout ended: stopped | time | decision | ringout
 var finished := false
 
 
@@ -78,6 +84,12 @@ func begin(ctx: Dictionary) -> void:
 	_color_next_at = _rng.randf_range(12.0, 18.0)
 	_conversation_done = false
 	finished = false
+	_round_wins.clear()
+	_taunted_at.clear()
+	_stamina_low.clear()
+	_sudden_death = false
+	_last_round_end = ""
+	_finish = ""
 	_st = _new_round_state()
 	_st["match_knockdowns"] = 0
 	_st["parries"] = 0
@@ -142,6 +154,31 @@ func _team(i: int) -> int:
 		if int(f.get("index", -1)) == i:
 			return int(f.get("team", -1))
 	return -1
+
+
+func _plan(i: int) -> String:
+	for f in fighters:
+		if int(f.get("index", -1)) == i:
+			return str(f.get("plan", "biped"))
+	return "biped"
+
+
+## Whether an ability deals damage (a miss is only worth calling for an attack).
+func _ability_damages(i: int, aid: String) -> bool:
+	var entry: Dictionary = Content.creature_entry(_creature(i))
+	var abs_ = entry.get("abilities", {})
+	if typeof(abs_) != TYPE_DICTIONARY:
+		return false
+	for slot in abs_:
+		var a: Dictionary = abs_[slot]
+		if str(a.get("id", "")) != aid:
+			continue
+		if float(a.get("damage", 0.0)) > 0.0:
+			return true
+		for e in a.get("effects", []):
+			if typeof(e) == TYPE_DICTIONARY and float((e as Dictionary).get("damage", 0.0)) > 0.0:
+				return true
+	return false
 
 
 func _is_player(i: int) -> bool:
@@ -240,6 +277,12 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 				cr["context"] = context
 			if context == "career" and bool(career.get("title", false)):
 				cr["title"] = true
+			var need := int(ceil(float(rounds) / 2.0))
+			for team in _round_wins:
+				if int(_round_wins[team]) == need - 1 and rounds > 1 and not ten_point:
+					cr["match_point"] = true
+			if _sudden_death:
+				cr["sudden_death"] = true
 			out.append(_req("round_start", cr, "high", {"n": round_no}, {"ttl": 2.5, "energy": "high"}))
 		"hit":
 			out.append_array(_on_hit(ev, info))
@@ -263,6 +306,10 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 			var slot := str(ev.get("slot", ""))
 			if slot in ["heavy", "heavy_charged", "finisher", "dash_attack"] or slot.begins_with("rh_") or slot.begins_with("rl_"):
 				_pending.append({"at": t + WHIFF_WINDOW, "kind": "whiff", "fighter": fi, "slot": slot, "since": t})
+			if slot in ["heavy", "heavy_charged"] and _ready("windup") and t - last_line_end_t > 1.0:
+				# fighter-specific wind-up calls (Knell's Anchor Fist); nothing plays without one
+				_cool_for("windup", 25.0)
+				out.append(_req("windup", {"creature": _creature(fi), "slot": slot}, "low", _vars(fi, -1), {"ttl": 0.9}))
 		"glance":
 			_touched(fi)
 		"knockdown":
@@ -282,6 +329,7 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 				out.append(_req("referee", {"kind": "wave_up"}, "medium", _vars(fi, -1), {"ttl": 2.0, "tag": "round"}))
 		"ref_stoppage":
 			finished = true
+			_finish = "stopped"
 			_action(t)
 			var by := int(ev.get("by", -1))
 			var cs := _who(by, fi)
@@ -293,7 +341,8 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 			_pending_ko = _on_ko(ev, info)
 		"juice":
 			_action(t)
-			out.append(_req("juice", {"creature": _creature(fi)}, "high", _vars(fi, -1), {"ttl": 2.5, "energy": "high"}))
+			out.append(_req("juice", {"creature": _creature(fi)}, "high", _vars(fi, -1), {"ttl": 2.5, "energy": "high",
+				"follow": {"trigger": "juice_follow", "ctx": {"creature": _creature(fi)}, "class": "color", "ttl": 3.0}}))
 		"ability":
 			out.append_array(_on_ability(ev))
 		"reaction":
@@ -339,6 +388,7 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 				_cool_for("guard_break", 12.0)
 				out.append(_req("guard_break", _who(-1, fi), "medium", _vars(-1, fi), {"energy": "high"}))
 		"taunt":
+			_taunted_at[fi] = t
 			var ct := {"creature": _creature(fi)}
 			if fi >= 0 and fi < _health.size() and float(_health[fi]) < 0.2:
 				ct["kind"] = "low"
@@ -349,7 +399,29 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 			if not ten_point:
 				out.append(_req("time", {"kind": "decision"}, "critical", {}, {"tag": "result"}))
 		"sudden_death":
+			_sudden_death = true
 			out.append(_req("time", {"kind": "sudden_death"}, "high", {}, {"energy": "high"}))
+		"arena_hazard":
+			if str(ev.get("phase", "")) == "active" and _ready("hazard"):
+				_cool_for("hazard", 28.0)
+				out.append(_req("hazard", {"hazard": str(ev.get("kind", ""))}, "low", {}, {"ttl": 2.0}))
+		"arena_pickup":
+			if _ready("pickup"):
+				_cool_for("pickup", 30.0)
+				out.append(_req("pickup", {"kind": str(ev.get("kind", ""))}, "low", _vars(fi, -1), {"ttl": 1.6}))
+		"arena_pickup_respawn":
+			if _ready("pickup_available"):
+				_cool_for("pickup_available", 45.0)
+				out.append(_req("pickup_available", {}, "color", {}, {"ttl": 3.0}))
+		"spring":
+			if _ready("spring"):
+				_cool_for("spring", 20.0)
+				out.append(_req("spring", {}, "low", _vars(fi, -1), {"ttl": 1.4}))
+		"tag":
+			_action(t)
+			if _ready("tag"):
+				_cool_for("tag", 14.0)
+				out.append(_req("tag", {}, "low", _vars(fi, -1), {"ttl": 1.6}))
 		"round_end":
 			out.append_array(_on_round_end(ev))
 		"round_scored":
@@ -394,7 +466,8 @@ func _intro_requests() -> Array:
 			cc["kind"] = "debut"
 		out.append(_req("career_intro", cc, "high", _vars(player_index, subject), {"ttl": 4.0, "energy": "high"}))
 	else:
-		out.append(_req("intro", {"creature": cid}, "high", _vars(subject, -1), {"ttl": 4.0, "energy": "high"}))
+		out.append(_req("intro", {"creature": cid}, "high", _vars(subject, -1), {"ttl": 4.0, "energy": "high",
+			"follow": {"trigger": "intro_follow", "ctx": {"creature": cid}, "class": "color", "ttl": 2.0}}))
 	return out
 
 
@@ -445,7 +518,15 @@ func _on_hit(ev: Dictionary, info: Dictionary) -> Array:
 	(_st["combo"] as Dictionary)[fi] = cc
 	var n := int(cc["n"])
 	var who := _who(fi, ti)
+	who["creature"] = _creature(fi)
+	who["slot"] = slot
+	who["move"] = move
 	var names := _vars(fi, ti)
+	# a taunt answered with a hit
+	if t - float(_taunted_at.get(ti, -100.0)) < 2.5 and _ready("taunt_punished"):
+		_taunted_at.erase(ti)
+		_cool_for("taunt_punished", 20.0)
+		return [_req("taunt_punished", {"kind": "punished"}, "medium", _vars(fi, ti), {"ttl": 1.6, "energy": "high"})]
 	# 1. first damaging touch of the round
 	if not bool(_st["first_hit"]):
 		_st["first_hit"] = true
@@ -538,6 +619,8 @@ func _on_knockdown(ev: Dictionary, info: Dictionary) -> Array:
 		ck.erase("who")       # "Let him up or don't, I'm not the ref!" never plays under a referee
 	if ten_point:
 		ck["scoring"] = "ten_point"
+	ck["legs"] = not (_plan(fi) in ["serpent", "hopper"])
+	ck["final_round"] = round_no >= rounds
 	# a throw's own call is replaced by the knockdown it caused
 	for p in _pending:
 		if str(p["kind"]) == "throw" and int(p.get("victim", -1)) == fi:
@@ -589,13 +672,13 @@ func _on_ability(ev: Dictionary) -> Array:
 	var fi := int(ev.get("fighter", -1))
 	var aid := str(ev.get("id", ""))
 	_action(t)
-	_pending.append({"at": t + 2.6, "kind": "ability", "fighter": fi, "id": aid})
+	_pending.append({"at": t + 2.6, "kind": "ability", "fighter": fi, "id": aid, "damaging": _ability_damages(fi, aid)})
 	# the cast itself is called now and then (every ability fires every few seconds)
 	if _ready("ability:" + aid) and _ready("ability_any"):
 		_cool_for("ability:" + aid, 28.0)
 		_cool_for("ability_any", 7.0)
 		out.append(_req("ability", {"creature": _creature(fi), "slot": str(ev.get("slot", "")), "id": aid}, "low", _vars(fi, -1),
-			{"ttl": 1.5}))
+			{"ttl": 1.5, "follow": {"trigger": "ability_follow", "ctx": {"creature": _creature(fi), "id": aid}, "class": "color", "ttl": 3.0}}))
 	return out
 
 
@@ -603,9 +686,17 @@ func _on_round_end(ev: Dictionary) -> Array:
 	var out: Array = []
 	var winner_team := int(ev.get("winner", -1))
 	var decided := bool(ev.get("decided", false))
+	if winner_team >= 0:
+		_round_wins[winner_team] = int(_round_wins.get(winner_team, 0)) + 1
 	if not _pending_ko.is_empty():
 		# a knockout ended this round: its call says it all
+		_last_round_end = "ko"
+		if decided or rounds <= 1:
+			_finish = "stopped"
 		return _release_ko("fight" if decided or rounds <= 1 else "round")
+	_last_round_end = "time"
+	if decided and not ten_point:
+		_finish = "time"
 	if decided:
 		finished = true
 	if ten_point or rounds <= 1 or decided:
@@ -620,7 +711,8 @@ func _on_round_end(ev: Dictionary) -> Array:
 		c["who"] = "player"
 	elif wf >= 0:
 		c["who"] = "opponent"
-	out.append(_req("round_end", c, "high", _vars(wf, -1), {"ttl": 3.0, "follow": {"trigger": "round_break", "class": "color", "ttl": 3.0}}))
+	out.append(_req("round_end", c, "high", _vars(wf, -1), {"ttl": 3.0, "follow": {"trigger": "round_break", "ctx": {"round_end": "time"},
+		"class": "color", "ttl": 3.0}}))
 	return out
 
 
@@ -675,6 +767,7 @@ func _on_decision(ev: Dictionary, info: Dictionary) -> Array:
 			_st["draw_announced"] = true
 			out.append(_req("draw", {"kind": "decision"}, "critical", {}, {"tag": "result"}))
 		return out
+	_finish = "decision"
 	var kind := "unanimous"
 	var lower := method.to_lower()
 	if lower.contains("split"):
@@ -716,7 +809,16 @@ func _on_match_end(ev: Dictionary, _info: Dictionary) -> Array:
 		c["kind"] = "title" if bool(career.get("title", false)) else "win"
 		c["who"] = "player" if wf >= 0 and _is_player(wf) else "opponent"
 	var names := _team_names(w)
-	out.append(_req(trig, c, "critical", names, {"tag": "final", "follow": {"trigger": "result", "class": "color", "ttl": 4.0, "speaker_pref": "kendall"}}))
+	var rc := {"finish": _finish if _finish != "" else "stopped"}
+	if _health.size() >= 2:
+		var lo := 1.0
+		var hi := 0.0
+		for h in _health:
+			lo = minf(lo, float(h))
+			hi = maxf(hi, float(h))
+		rc["close"] = hi - lo < 0.15 and _finish in ["time", "decision"]
+	out.append(_req(trig, c, "critical", names, {"tag": "final", "follow": {"trigger": "result", "ctx": rc, "class": "color", "ttl": 4.0,
+		"speaker_pref": "kendall"}}))
 	return out
 
 
@@ -747,7 +849,16 @@ func on_tick(health: Array, time_left: float, dt: float, info := {}) -> Array:
 				# a dodge that took nothing (no damage since) and came while an attack was out
 				if _hp(int(p["fighter"])) >= float(p["hp"]) - 0.001 and t - last_action_t < 1.5 and _ready("evade"):
 					_cool_for("evade", 16.0)
-					out.append(_req("evade", _who(int(p["fighter"]), -1), "low", _vars(int(p["fighter"]), -1), {"ttl": 1.2}))
+					var ce := _who(int(p["fighter"]), -1)
+					ce["creature"] = _creature(int(p["fighter"]))
+					if round_no >= 2:
+						ce["round"] = "2plus"
+					out.append(_req("evade", ce, "low", _vars(int(p["fighter"]), -1), {"ttl": 1.2}))
+			"ability":
+				if bool(p.get("damaging", false)) and _ready("ability_miss") and t - last_line_end_t > 1.0:
+					_cool_for("ability_miss", 30.0)
+					out.append(_req("ability_miss", {"creature": _creature(int(p["fighter"])), "id": str(p["id"])}, "low",
+						_vars(int(p["fighter"]), -1), {"ttl": 1.4}))
 			"throw":
 				if _ready("grab_throw"):
 					_cool_for("grab_throw", 14.0)
@@ -758,6 +869,15 @@ func on_tick(health: Array, time_left: float, dt: float, info := {}) -> Array:
 		return out
 	out.append_array(_watch_health(health))
 	out.append_array(_watch_momentum(health))
+	var stamina: Array = info.get("stamina", [])
+	for i in stamina.size():
+		var sv := float(stamina[i])
+		if sv < 0.12 and not bool(_stamina_low.get(i, false)) and _ready("stamina") and _hp(i) > 0.0:
+			_stamina_low[i] = true
+			_cool_for("stamina", 40.0)
+			out.append(_req("stamina", _who(-1, i), "low", _vars(i, -1), {"ttl": 2.0}))
+		elif sv > 0.5:
+			_stamina_low[i] = false
 	if time_left > 0.0 and time_left <= 10.0 and not bool(_st.get("ten_warned", false)):
 		_st["ten_warned"] = true
 		out.append(_req("time", {"kind": "ten_seconds"}, "medium", {}, {"ttl": 2.0}))
@@ -860,8 +980,19 @@ func _observation(health: Array, time_left: float, info: Dictionary) -> Dictiona
 				if float(health[i]) == lo:
 					who = i
 			cands.append(_req("hurt", _who(-1, who), "low", _vars(who, -1), {"ttl": 3.0}))
-	if time_left > 0.0 and time_left < 30.0:
-		cands.append(_req("late", {"round": "final" if round_no >= rounds and rounds > 1 else "any"}, "low", {}, {"ttl": 3.0}))
+	if (time_left > 0.0 and time_left < 30.0) or _sudden_death:
+		var cl := {"round": "final" if round_no >= rounds and rounds > 1 else "any", "sudden_death": _sudden_death}
+		if health.size() >= 2:
+			var top := 0.0
+			var second := 0.0
+			for h in health:
+				if float(h) > top:
+					second = top
+					top = float(h)
+				elif float(h) > second:
+					second = float(h)
+			cl["leader"] = top - second > 0.15
+		cands.append(_req("late", cl, "low", {}, {"ttl": 3.0}))
 	if round_no == 1 and t - float(_st.get("round_started_at", 0.0)) < 20.0:
 		cands.append(_req("opening", {}, "low", {}, {"ttl": 3.0}))
 	var edge := int(info.get("edge_fighter", -1))
