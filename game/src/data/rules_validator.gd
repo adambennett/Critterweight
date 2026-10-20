@@ -26,7 +26,7 @@ const FIELDS := {
 	"description": {"group": "General", "label": "Description", "type": "text", "def": "", "max": 200,
 		"help": "One or two sentences for the lobby and playlist screens."},
 	"rounds": {"group": "Rounds & winning", "label": "Rounds", "type": "int", "def": 3, "min": 1, "max": 9,
-		"help": "Best of this many rounds. Odd numbers avoid ties."},
+		"help": "Best of this many rounds. Odd numbers avoid ties. With 10-point scoring every round is fought and judged."},
 	"round_time": {"group": "Rounds & winning", "label": "Round time (s)", "type": "float", "def": 99.0, "min": 0.0, "max": 600.0, "step": 10.0,
 		"help": "0 = no timer. When time runs out the round goes to score, then remaining health."},
 	"win": {"group": "Rounds & winning", "label": "Win condition", "type": "enum", "def": "ko", "options": WIN,
@@ -36,7 +36,13 @@ const FIELDS := {
 	"ko_points": {"group": "Rounds & winning", "label": "Points per KO", "type": "int", "def": 1, "min": 0, "max": 10,
 		"help": "Score awarded for knocking someone out (score modes)."},
 	"sudden_death": {"group": "Rounds & winning", "label": "Sudden death", "type": "bool", "def": true,
-		"help": "A tied round is settled by the next clean hit instead of a draw."},
+		"help": "A tied round (with 10-point scoring: drawn cards) is settled by the next clean hit instead of a draw."},
+	# standard 1v1 only (MCH-07/08); rules without these keys play Health scoring with no referee
+	"scoring": {"group": "Rounds & winning", "label": "Scoring", "type": "enum", "def": "hp", "options": ["hp", "ten_point"],
+		"modes": ["standard"],
+		"help": "Health: at time the healthier fighter wins the round. 10-point must: fighters can't be knocked out by damage; three judges score every round and the cards decide unless the referee stops it."},
+	"referee": {"group": "Rounds & winning", "label": "Referee", "type": "bool", "def": false, "modes": ["standard"],
+		"help": "A referee counts knockdowns, keeps the attacker off a downed fighter (no hits while down) and waves it off after 5 knockdowns in one round: with 10-point scoring that ends the fight (T.K.O.), with Health scoring it ends the round."},
 	"health_mult": {"group": "Fighters", "label": "Health", "type": "float", "def": 1.0, "min": 0.25, "max": 4.0, "step": 0.05,
 		"help": "Multiplies every fighter's health."},
 	"damage_mult": {"group": "Fighters", "label": "Damage", "type": "float", "def": 1.0, "min": 0.25, "max": 4.0, "step": 0.05,
@@ -386,7 +392,20 @@ static func validate(rules: Dictionary) -> Array:
 		err.call("ko_points", "With 0 points per KO nobody can score in Standard.")
 	if mode in ["chum_rush", "practice"] and int(rules.get("rounds", 1)) != 1:
 		err.call("rounds", "%s is played as a single round." % mode.capitalize())
-	if int(rules.get("rounds", 1)) % 2 == 0:
+	# 10-point scoring and the referee: standard 1v1 only (the sim also checks, MatchMode)
+	var ten_point := mode == "standard" and str(rules.get("scoring", "hp")) == "ten_point"
+	if ten_point:
+		if fmt != "duel":
+			err.call("scoring", "10-point scoring judges a 1v1: set the format to Duel.")
+		if float(rules.get("round_time", 99.0)) <= 0.0:
+			err.call("round_time", "10-point scoring needs a round timer: the judges score each round at the bell.")
+		if win != "ko":
+			err.call("win", "With 10-point scoring the judges' cards decide: set the win condition to Last standing (KO).")
+		if bool(rules.get("ringout_eliminates", false)):
+			warn.call("ringout_eliminates", "With 10-point scoring a ring-out is only a short absence (nobody is knocked out).")
+	if mode == "standard" and bool(rules.get("referee", false)) and fmt != "duel":
+		err.call("referee", "The referee officiates a 1v1: set the format to Duel.")
+	if int(rules.get("rounds", 1)) % 2 == 0 and not ten_point:
 		warn.call("rounds", "An even number of rounds can end in a tie (sudden death settles it if enabled).")
 	var unlimited := float(rules.get("round_time", 99.0)) <= 0.0
 	var respawn := bool(rules.get("respawn", false))
@@ -437,4 +456,9 @@ static func describe(rules: Dictionary) -> String:
 	for k in ["health_mult", "damage_mult", "gravity_mult"]:
 		if absf(float(rules.get(k, 1.0)) - 1.0) > 0.01:
 			bits.append("%s ×%.2f" % [str(FIELDS[k]["label"]).to_lower(), float(rules[k])])
+	if str(rules.get("mode", "standard")) == "standard":
+		if str(rules.get("scoring", "hp")) == "ten_point":
+			bits.append("10-point")
+		if bool(rules.get("referee", false)):
+			bits.append("referee")
 	return " · ".join(bits)

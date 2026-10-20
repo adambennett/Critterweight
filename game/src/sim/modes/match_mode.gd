@@ -7,11 +7,24 @@ extends RefCounted
 ##
 ## Hooks for subclasses: tick_fight, on_depleted, on_elimination, on_ringout, choose_respawn,
 ## focus_point, on_grab_pressed, bot_objective, hud_status, hud_state, view_state, build_result.
+## Hooks Fighter/Combat query: hit_allowed, auto_getup_time, down_regen_mult, unlimited_health,
+## intercept_knockdown, intercept_actions.
+##
+## Officials (standard mode only, MCH-07/08): rules "scoring": "ten_point" adds a RoundJudge
+## (three judges, 10-point must, effectively unlimited HP: every round is fought and the cards
+## decide) and rules "referee": true a RefereeRules (knockdown count, no hits on a downed fighter,
+## stoppage after RefereeRules.REF_KD_LIMIT knockdowns in a round). Both exist only for the
+## standard mode (id() == "standard") and a two-sided duel (_setup_officials); otherwise both stay
+## null and every path below is exactly the plain HP rules. Rules without the keys = HP, no
+## referee. Under ten_point the round closes only at the bell or by a referee stoppage, through
+## _ten_point_close (the one closing procedure), and end_round never derives the match winner
+## from round wins.
 
 enum Phase { INTRO, FIGHT, ROUND_END, MATCH_END }
 
 const INTRO_TIME := 2.2
 const ROUND_END_TIME := 3.0
+const DECISION_TIME := 6.0     ## ROUND_END that ends a judged / refereed match (decision reveal, wave-off, hand raise)
 const REVIVE_TIME := 2.0
 const REVIVE_RANGE := 1.4
 
@@ -30,6 +43,10 @@ var _respawns: Array = []      ## [{fighter, at, pos(optional)}]
 var _revive := {}              ## downed fighter index -> {progress, by}
 var _downed_at := {}           ## fighter index -> time downed
 var result := {}
+var judge: RoundJudge = null    ## 10-point scoring (null = HP rules)
+var referee: RefereeRules = null
+var decision := {}              ## 10-point: the last judges_decision ({} until the cards decide)
+var _sd_after_draw := false     ## 10-point: sudden death follows a drawn decision
 
 
 func id() -> String:
@@ -48,7 +65,45 @@ func setup(match_sim) -> void:
 		round_wins[f.team] = 0
 		scores[f.team] = 0.0
 		f.lives = initial_lives()
+	_setup_officials()
 	_begin_intro()
+
+
+## Judges / referee from the rules, only for the standard mode and exactly two non-despawned
+## fighters on two teams (rules are not validated for local play, so the sim checks itself).
+func _setup_officials() -> void:
+	if id() != "standard":
+		return
+	var ten := str(rules.get("scoring", "hp")) == "ten_point"
+	var ref := bool(rules.get("referee", false))
+	if not ten and not ref:
+		return
+	var teams_seen: Array[int] = []
+	var n := 0
+	for f: Fighter in sim.fighters:
+		if f.despawned:
+			continue
+		n += 1
+		if not teams_seen.has(f.team):
+			teams_seen.append(f.team)
+	var duel := n == 2 and teams_seen.size() == 2
+	if ten and duel and float(rules.get("round_time", 99.0)) > 0.0:
+		judge = RoundJudge.new(sim, teams_seen)
+	if ref and duel:
+		referee = RefereeRules.new(sim)
+		if judge != null:
+			judge.referee_on = true
+	if (ten and judge == null) or (ref and referee == null):
+		Log.w("sim", "10-point scoring / referee need a timed 1v1 duel (%d fighters, %d teams): playing plain HP rules" % [n, teams_seen.size()])
+
+
+## True while 10-point scoring runs: damage never depletes (Fighter.receive_hit, on_depleted).
+func unlimited_health() -> bool:
+	return judge != null
+
+
+func has_referee() -> bool:
+	return referee != null
 
 
 ## Lives each fighter starts a round with. -1 = unlimited: score modes with respawn, presets that
@@ -76,6 +131,8 @@ func _begin_intro() -> void:
 
 func tick(dt: float) -> void:
 	phase_time += dt
+	if judge != null:
+		_hold_full_health()
 	match phase:
 		Phase.INTRO:
 			if phase_time >= float(rules.get("intro_time", INTRO_TIME)):
@@ -87,19 +144,36 @@ func tick(dt: float) -> void:
 				for f in sim.fighters:
 					if not f.despawned:
 						f.hooks.fire("round_start", {})
+				if judge != null:
+					judge.begin_round()
+				if referee != null:
+					referee.begin_round(round_index + 1)
 		Phase.FIGHT:
+			# order: respawns, revives, mode logic, judges, sudden death, referee, timer (a
+			# sudden-death clean hit wins before any stoppage is considered)
 			_tick_respawns(dt)
 			_tick_revives(dt)
 			tick_fight(dt)
+			if judge != null:
+				judge.scan()
 			if sudden_death:
 				tick_sudden_death()
-			if float(rules.get("round_time", 99.0)) > 0.0 and not sudden_death:
+			if referee != null and phase == Phase.FIGHT:
+				var stop := referee.tick(phase_time)
+				if not stop.is_empty():
+					referee_stoppage(stop)
+			# (with officials, a round the referee just stopped never also times out)
+			var live := phase == Phase.FIGHT or (judge == null and referee == null)
+			if live and float(rules.get("round_time", 99.0)) > 0.0 and not sudden_death:
 				round_timer -= dt
 				if round_timer <= 0.0:
 					round_timer = 0.0
 					on_timeout()
 		Phase.ROUND_END:
-			if phase_time >= ROUND_END_TIME:
+			var wait := ROUND_END_TIME
+			if winner_team != -2 and (judge != null or referee != null):
+				wait = DECISION_TIME
+			if phase_time >= wait:
 				if winner_team != -2:
 					phase = Phase.MATCH_END
 					phase_time = 0.0
@@ -119,8 +193,20 @@ func tick_fight(_dt: float) -> void:
 	pass
 
 
+## 10-point scoring: HP never visibly or mechanically drops (no low-HP hooks, AI or announcer).
+func _hold_full_health() -> void:
+	for f: Fighter in sim.fighters:
+		if not f.despawned and f.health < f.max_health:
+			f.health = f.max_health
+
+
 ## Called when a fighter's health is depleted: KO, downed (revivable) or respawn.
 func on_depleted(f: Fighter, attacker: Fighter, hit: Dictionary) -> void:
+	if judge != null:
+		# 10-point scoring: nobody is knocked out by damage (DoT, self damage, ring-outs land here)
+		f.health = f.max_health
+		sim.emit_event({"type": "unlimited_refill", "fighter": f.index})
+		return
 	# a fighter who fell off the arena is never left "downed" out there (nobody could reach them)
 	if bool(rules.get("revive", false)) and not bool(hit.get("ringout", false)) and _team_has_standing_ally(f):
 		f.set_downed()
@@ -134,6 +220,8 @@ func on_depleted(f: Fighter, attacker: Fighter, hit: Dictionary) -> void:
 func eliminate(f: Fighter, attacker: Fighter) -> void:
 	if f.state != Fighter.State.KO:
 		f.knock_out(attacker)
+	if referee != null and phase == Phase.FIGHT:
+		referee.note_ko(f)   # a KO under a referee is waved off like a stoppage (presentation)
 	if attacker and attacker != f:
 		attacker.stats_record["kos"] += 1
 	sim.emit_event({"type": "elimination", "fighter": f.index, "by": attacker.index if attacker else -1})
@@ -151,6 +239,8 @@ func queue_respawn(f: Fighter, delay: float, at = null) -> void:
 
 ## Ring-out default (ARENAS.md §1): 8% max HP, out for 2.5 s, respawn near the fall point.
 func on_ringout(f: Fighter, attacker: Fighter) -> void:
+	if judge != null and phase == Phase.FIGHT:
+		judge.note_ringout(f, attacker)
 	var dmg := f.max_health * float(rules.get("ringout_damage", 0.08))
 	if bool(rules.get("ringout_eliminates", false)) or f.health - dmg <= 0.0:
 		f.health = 0.0
@@ -180,6 +270,8 @@ func on_elimination(_f: Fighter, attacker: Fighter) -> void:
 
 
 func on_round_reset() -> void:
+	if referee != null:
+		referee.on_round_reset()
 	_respawns.clear()
 	_revive.clear()
 	_downed_at.clear()
@@ -294,6 +386,8 @@ func _pending_respawn(f: Fighter) -> bool:
 func check_round_over() -> void:
 	if phase != Phase.FIGHT:
 		return
+	if judge != null:
+		return   # 10-point: nobody is knocked out; the bell or the referee ends a round
 	if str(rules.get("win", "ko")) == "score":
 		var target := float(rules.get("score_target", 5))
 		for t in scores:
@@ -306,6 +400,9 @@ func check_round_over() -> void:
 
 
 func on_timeout() -> void:
+	if judge != null:
+		_ten_point_close({})
+		return
 	# decision: score first (score modes), then remaining health fraction per team
 	var totals := {}
 	for f: Fighter in sim.fighters:
@@ -332,12 +429,13 @@ func on_timeout() -> void:
 	end_round(-1 if tie else best)
 
 
-## Tie-breaker: the next clean hit wins (standard); bonus modes override.
+## Tie-breaker: the next clean hit wins (standard); bonus modes override. After drawn cards
+## (10-point) every fighter takes part, including one away after a ring-out.
 func start_sudden_death() -> void:
 	sudden_death = true
 	sim.emit_event({"type": "sudden_death"})
 	for f: Fighter in sim.fighters:
-		if not f.despawned and not f.is_out():
+		if not f.despawned and (not f.is_out() or judge != null):
 			f.hooks.add({"on": "hit_dealt", "do": [{"type": "set_flag", "flag": "sudden_death_winner", "seconds": 999.0}]}, "sudden_death")
 
 
@@ -348,13 +446,21 @@ func tick_sudden_death() -> void:
 func tick_sudden_death_standard() -> void:
 	for f: Fighter in sim.fighters:
 		if f.has_flag("sudden_death_winner"):
-			end_round(f.team)
+			if judge != null and _sd_after_draw:
+				_ten_point_sudden_death_won(f.team)
+			else:
+				end_round(f.team)
 			return
 
 
 func end_round(team: int) -> void:
 	if phase != Phase.FIGHT:
 		return
+	if judge != null:
+		_close_round(team, team)
+		return
+	if referee != null:
+		referee.close_round()
 	phase = Phase.ROUND_END
 	phase_time = 0.0
 	round_winner = team
@@ -389,6 +495,145 @@ func _most_round_wins() -> int:
 	return -1 if tie else best
 
 
+# =====================================================================================
+# 10-point scoring and the referee (judge / referee are null for every other match)
+# =====================================================================================
+
+## ROUND_END without any best-of logic (10-point): `team` celebrates and is the round_end winner,
+## `credit` gets the round win on the cards (round_wins is display-only under 10-point).
+func _close_round(team: int, credit: int) -> void:
+	if phase != Phase.FIGHT:
+		return
+	if referee != null:
+		referee.close_round()
+	phase = Phase.ROUND_END
+	phase_time = 0.0
+	round_winner = team
+	sim.input_enabled = false
+	for f in sim.fighters:
+		if not f.despawned:
+			f.hooks.remove_source("sudden_death")
+	if credit >= 0:
+		round_wins[credit] = int(round_wins.get(credit, 0)) + 1
+	if team >= 0:
+		for f: Fighter in sim.fighters:
+			if f.team == team and not f.despawned:
+				f.celebrate()
+	sim.emit_event({"type": "round_end", "winner": team, "round": round_index + 1})
+
+
+## The one closing procedure of a judged round, at the bell (stoppage {}) or on a referee
+## stoppage: score the round, then end the match (stoppage, last round with a winner or a draw
+## without sudden death), start sudden death (drawn cards with sudden_death on: no round_end, the
+## phase stays FIGHT with the timer at 0) or move on to the next round.
+func _ten_point_close(stoppage: Dictionary) -> void:
+	if phase != Phase.FIGHT or judge == null or not judge.counting:
+		return
+	if referee != null:
+		referee.close_round()
+	var card := judge.score_round(round_index + 1, stoppage)
+	if stoppage.is_empty():
+		sim.emit_event({"type": "timeout"})
+	var ev := card.duplicate(true)
+	ev["type"] = "round_scored"
+	ev["totals"] = judge.totals()
+	sim.emit_event(ev)
+	var credit := int(card["winner"])
+	if not stoppage.is_empty():
+		var by := int(stoppage.get("by", -1))
+		var wt: int = sim.fighters[by].team if by >= 0 and by < sim.fighters.size() else -1
+		winner_team = wt
+		_emit_decision(wt, "TKO", judge.judges_leaning(), stoppage)
+		_close_round(wt, credit)
+		return
+	if round_index + 1 >= int(rules.get("rounds", 3)):
+		var d := judge.decide()
+		var w := int(d["winner"])
+		if w >= 0:
+			winner_team = w
+			_emit_decision(w, str(d["method"]), d["judges"], {})
+			_close_round(w, credit)
+		elif bool(rules.get("sudden_death", true)):
+			_emit_decision(-1, str(d["method"]), d["judges"], {})
+			_sd_after_draw = true
+			if credit >= 0:
+				round_wins[credit] = int(round_wins.get(credit, 0)) + 1
+			start_sudden_death()
+		else:
+			winner_team = -1
+			_emit_decision(-1, str(d["method"]), d["judges"], {})
+			_close_round(-1, credit)
+		return
+	_close_round(credit, credit)
+
+
+## The sudden death after drawn cards was won by `team` (its clean hit).
+func _ten_point_sudden_death_won(team: int) -> void:
+	winner_team = team
+	_emit_decision(team, "Sudden Death (after a %s)" % str(decision.get("method", "Draw")), decision.get("judges", [-1, -1, -1]), {})
+	_close_round(team, -1)
+
+
+## A judges_decision event (and `decision`): {winner (team | -1), method, totals [[A,B] x3],
+## judges [team | -1 x3], teams [ta, tb]}.
+func _emit_decision(winner: int, method: String, judges_view: Array, stoppage: Dictionary) -> void:
+	decision = {"winner": winner, "method": method, "totals": judge.totals(), "judges": judges_view.duplicate(),
+		"teams": [judge.teams[0], judge.teams[1]], "stoppage": stoppage.duplicate()}
+	var ev := decision.duplicate(true)
+	ev.erase("stoppage")
+	ev["type"] = "judges_decision"
+	sim.emit_event(ev)
+
+
+## The referee stopped the fight (RefereeRules.tick): 10-point ends the match with the partial
+## round scored (T.K.O.); Health scoring ends the round like a KO and best-of continues.
+func referee_stoppage(stop: Dictionary) -> void:
+	if phase != Phase.FIGHT:
+		return
+	if judge != null:
+		_ten_point_close(stop)
+		return
+	var by := int(stop.get("by", -1))
+	end_round(sim.fighters[by].team if by >= 0 and by < sim.fighters.size() else -1)
+
+
+## Whether an opponent's hit on `b` may land (Combat.deliver / apply_simple_damage). The referee
+## keeps every opponent hit off a downed fighter, in every phase.
+func hit_allowed(a: Fighter, b: Fighter, _h: Dictionary) -> bool:
+	if referee != null:
+		return referee.hit_allowed(a, b)
+	return true
+
+
+## Seconds a fighter in DOWN waits before the automatic get-up (Fighter._st_down). A referee's
+## count waits RefereeRules.REF_KD_STAY while the round is live.
+func auto_getup_time(f: Fighter) -> float:
+	var normal := Tuning.v("knockdown_auto_getup") / f.getup_speed_mult()
+	if referee != null and phase == Phase.FIGHT:
+		return referee.auto_getup_time(f, normal)
+	return normal
+
+
+## Stamina regeneration multiplier while a fighter stays DOWN (Fighter._update_timers).
+func down_regen_mult(f: Fighter) -> float:
+	if referee != null and phase == Phase.FIGHT:
+		return referee.down_regen_mult(f)
+	return 1.0
+
+
+## Plain-data 10-point result block (see build_result), {} without a judge.
+func scoring_result() -> Dictionary:
+	if judge == null:
+		return {}
+	var stop: Dictionary = decision.get("stoppage", {})
+	var method := str(decision.get("method", ""))
+	if method == "":
+		method = "No decision"
+	return {"mode": "ten_point", "method": method, "winner": int(decision.get("winner", -1)),
+		"teams": [judge.teams[0], judge.teams[1]], "cards": judge.cards.duplicate(true), "totals": judge.totals(),
+		"judges": RoundJudge.JUDGE_NAMES.duplicate(), "stoppage": stop.duplicate(true), "sudden_death": _sd_after_draw}
+
+
 func build_result() -> Dictionary:
 	var per := []
 	for f: Fighter in sim.fighters:
@@ -398,6 +643,10 @@ func build_result() -> Dictionary:
 			"stats": f.stats_record.duplicate(), "health": f.health, "out": f.is_out(), "kind": f.controller_kind})
 	result = {"mode": id(), "winner_team": winner_team, "round_wins": round_wins.duplicate(), "scores": scores.duplicate(),
 		"rounds": round_index + 1, "fighters": per, "time": sim.time}
+	if judge != null:
+		result["scoring"] = scoring_result()
+	if referee != null:
+		result["referee"] = {"stoppages": referee.stoppages.duplicate(true)}
 	return result
 
 
@@ -425,26 +674,47 @@ func hud_status() -> String:
 
 
 ## HUD: structured score rows [{label, value, team, highlight}] for the scoreboard widget.
+## 10-point adds "cards": {"n": rounds scored, "t": judges' running totals [[A,B] x3]} (teams
+## ascending) and "sd": true while a sudden death follows drawn cards, and leaves out the
+## duplicate "status" (hud_status() has it): duel snapshots stay < 400 B.
 func hud_state() -> Dictionary:
 	var rows := []
 	if str(rules.get("win", "ko")) == "score":
 		for t in scores:
 			rows.append({"label": TeamColors.name(int(t)), "value": int(scores[t]), "team": int(t)})
-	return {"rows": rows, "status": hud_status()}
+	var hs := {"rows": rows, "status": hud_status()}
+	if judge != null:
+		# the status text already travels once per snapshot (NetHudMirror puts it back here)
+		hs.erase("status")
+		hs["cards"] = {"n": judge.cards.size(), "t": judge.totals()}
+		if sudden_death and _sd_after_draw:
+			hs["sd"] = true
+	return hs
 
 
 ## Presentation state for ModeView (positions of lights, balls, gates...). Must be plain data
-## so it can be replicated to network clients.
+## so it can be replicated to network clients. With a referee, "referee" is present only while
+## something is happening: {"count": {fighter, n, left}, "stop": loser index, "wave_off": true}.
 func view_state() -> Dictionary:
 	var downed := []
 	for idx in _downed_at:
 		var f := sim.fighters[idx]
 		downed.append({"fighter": idx, "left": downed_time_left(f), "revive": revive_progress(f)})
-	return {"mode": id(), "downed": downed}
+	var v := {"mode": id(), "downed": downed}
+	if referee != null:
+		var rv := referee.view()
+		if not rv.is_empty():
+			v["referee"] = rv
+	return v
 
 
 ## Bot helper: where should this fighter go / what should it prioritise (empty = just fight).
 func bot_objective(_f: Fighter) -> Dictionary:
+	# a referee wants the attacker off a downed opponent: step back and wait
+	if referee != null:
+		var back := referee.back_off_objective(_f)
+		if not back.is_empty():
+			return back
 	# revive downed allies when nobody else is
 	for idx in _downed_at:
 		var d := sim.fighters[idx]

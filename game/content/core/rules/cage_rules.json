@@ -1,0 +1,20 @@
+{
+  "id": "cage_rules",
+  "name": "Cage Rules",
+  "mode": "standard",
+  "format": "duel",
+  "teams": 2,
+  "players": [
+    2,
+    2
+  ],
+  "rounds": 3,
+  "round_time": 99,
+  "win": "ko",
+  "lives": 1,
+  "sudden_death": true,
+  "scoring": "ten_point",
+  "referee": true,
+  "description": "Three 99-second rounds scored 10-point must by three judges; no knockouts, the cards decide. The referee counts knockdowns and stops it after five in a round. Drawn cards go to sudden death.",
+  "version": 1
+}

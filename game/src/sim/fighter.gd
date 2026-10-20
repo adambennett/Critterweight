@@ -410,6 +410,8 @@ func _update_timers(dt: float) -> void:
 		var regen := eff("stamina_regen") * float(mods["stamina_regen"]) * statuses.stamina_regen_mult()
 		if state == State.GUARD:
 			regen *= 0.5
+		elif state == State.DOWN and sim and sim.mode:
+			regen *= sim.mode.down_regen_mult(self)   # staying down on a referee's count clears the head
 		if time < crash_until:
 			regen *= 0.5
 		stamina = minf(max_stamina, stamina + regen * dt)
@@ -877,7 +879,9 @@ func knock_down(reason := "hit", by: Fighter = null) -> void:
 	if by:
 		by.hooks.fire("knockdown_dealt", {"other": self})
 		by.gain_hype(6.0)
-	_emit({"type": "knockdown", "reason": reason})
+	# "by": who caused it (-1: hazards, self) — judges and the referee only count strike
+	# knockdowns by an opponent (RoundJudge.is_strike_knockdown)
+	_emit({"type": "knockdown", "reason": reason, "by": by.index if by else -1})
 
 
 func _st_knockdown(_dt: float) -> void:
@@ -890,13 +894,17 @@ func _st_knockdown(_dt: float) -> void:
 func _st_down(_dt: float) -> void:
 	rig.desired_vel = Vector3.ZERO
 	var wants := input.move.length() > 0.5 or not _buffer.is_empty()
-	if (state_time > 0.15 and wants) or state_time > Tuning.v("knockdown_auto_getup") / getup_speed_mult():
+	# the mode decides how long a fighter may stay down (a referee's count waits longer)
+	var auto_t: float = sim.mode.auto_getup_time(self) if sim and sim.mode else Tuning.v("knockdown_auto_getup") / getup_speed_mult()
+	var chose := state_time > 0.15 and wants
+	if chose or state_time > auto_t:
 		_buffer.clear()
 		_set_state(State.GETUP)
 		rig.hover_enabled = true
 		rig.upright_strength = 0.0
 		invuln_until = time + Tuning.v("getup_time") + Tuning.v("wakeup_invuln") + float(mods.get("wakeup_invuln_add", 0.0))
-		_emit({"type": "getup"})
+		# forced: the automatic get-up fired (under a referee: waved back up)
+		_emit({"type": "getup", "forced": not chose})
 
 
 func _st_getup(dt: float) -> void:
@@ -1424,7 +1432,11 @@ func receive_hit(h: Dictionary) -> void:
 	if local_imp != Vector3.ZERO and not armored:
 		rig.apply_impulse_at(seg_i, local_imp, h["point"])
 	stagger(seg_i, clampf(dmg / 18.0, 0.2, 1.0) * (0.3 if armored else 1.0))
-	if health <= 0.0:
+	if sim and sim.mode and sim.mode.unlimited_health():
+		# 10-point scoring: damage is counted (stats, hit events, judges) but never depletes, and
+		# the blow's poise / knockdown / stun reaction below still happens
+		health = max_health
+	elif health <= 0.0:
 		if sim:
 			sim.on_fighter_depleted(self, attacker, h)
 		else:
