@@ -163,21 +163,36 @@ func _plan(i: int) -> String:
 	return "biped"
 
 
+## The ability in a fighter's slot, from its content entry ({} when unknown).
+func _ability_def(i: int, slot: String) -> Dictionary:
+	var abs_ = Content.creature_entry(_creature(i)).get("abilities", {})
+	if typeof(abs_) != TYPE_DICTIONARY or not (abs_ as Dictionary).has(slot):
+		return {}
+	return (abs_ as Dictionary)[slot]
+
+
+## A stable key for the booth: the ability's name in snake case ("Ghost Light" -> ghost_light).
+## The simulation's own ids ("f_knell.ability1") name the slot, not the move.
+static func ability_key(name_: String, fallback: String) -> String:
+	var k := name_.to_lower().strip_edges()
+	if k == "":
+		return fallback.get_slice(".", 1) if fallback.contains(".") else fallback
+	var out := ""
+	for ch in k:
+		out += ch if (ch >= "a" and ch <= "z") or (ch >= "0" and ch <= "9") else "_"
+	while out.contains("__"):
+		out = out.replace("__", "_")
+	return out.strip_edges().trim_prefix("_").trim_suffix("_")
+
+
 ## Whether an ability deals damage (a miss is only worth calling for an attack).
-func _ability_damages(i: int, aid: String) -> bool:
-	var entry: Dictionary = Content.creature_entry(_creature(i))
-	var abs_ = entry.get("abilities", {})
-	if typeof(abs_) != TYPE_DICTIONARY:
-		return false
-	for slot in abs_:
-		var a: Dictionary = abs_[slot]
-		if str(a.get("id", "")) != aid:
-			continue
-		if float(a.get("damage", 0.0)) > 0.0:
+func _ability_damages(i: int, slot: String) -> bool:
+	var a := _ability_def(i, slot)
+	if float(a.get("damage", 0.0)) > 0.0:
+		return true
+	for e in a.get("effects", []):
+		if typeof(e) == TYPE_DICTIONARY and float((e as Dictionary).get("damage", 0.0)) > 0.0:
 			return true
-		for e in a.get("effects", []):
-			if typeof(e) == TYPE_DICTIONARY and float((e as Dictionary).get("damage", 0.0)) > 0.0:
-				return true
 	return false
 
 
@@ -334,7 +349,10 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 			var by := int(ev.get("by", -1))
 			var cs := _who(by, fi)
 			cs["kind"] = ["stoppage"]
-			out.append(_req("stoppage", cs, "critical", _vars(by, fi), {"tag": "result", "energy": "high"}))
+			var sv := _vars(by, fi)
+			if sv.has("p"):
+				sv["w"] = sv["p"]
+			out.append(_req("stoppage", cs, "critical", sv, {"tag": "result", "energy": "high"}))
 		"ko":
 			_action(t)
 			# held until the same tick's round_end says whether it decides the bout
@@ -535,8 +553,8 @@ func _on_hit(ev: Dictionary, info: Dictionary) -> Array:
 			c1["kind"] = "heavy"
 		out.append(_req("first_hit", c1, "medium", names, {"ttl": 2.0}))
 		return out
-	# 2. the ability that landed
-	if slot.begins_with("ability"):
+	# 2. the ability that landed (melee abilities hit with their slot, projectiles and areas as "effect")
+	if slot.begins_with("ability") or slot == "effect":
 		for p in _pending:
 			if str(p["kind"]) == "ability" and int(p["fighter"]) == fi:
 				p["cancel"] = true
@@ -670,9 +688,10 @@ func _release_ko(ends: String) -> Array:
 func _on_ability(ev: Dictionary) -> Array:
 	var out: Array = []
 	var fi := int(ev.get("fighter", -1))
-	var aid := str(ev.get("id", ""))
+	var slot := str(ev.get("slot", ""))
+	var aid := ability_key(str(_ability_def(fi, slot).get("name", "")), str(ev.get("id", "")))
 	_action(t)
-	_pending.append({"at": t + 2.6, "kind": "ability", "fighter": fi, "id": aid, "damaging": _ability_damages(fi, aid)})
+	_pending.append({"at": t + 2.6, "kind": "ability", "fighter": fi, "id": aid, "damaging": _ability_damages(fi, slot)})
 	# the cast itself is called now and then (every ability fires every few seconds)
 	if _ready("ability:" + aid) and _ready("ability_any"):
 		_cool_for("ability:" + aid, 28.0)
@@ -711,7 +730,10 @@ func _on_round_end(ev: Dictionary) -> Array:
 		c["who"] = "player"
 	elif wf >= 0:
 		c["who"] = "opponent"
-	out.append(_req("round_end", c, "high", _vars(wf, -1), {"ttl": 3.0, "follow": {"trigger": "round_break", "ctx": {"round_end": "time"},
+	var rv := _vars(wf, -1)
+	if rv.has("p"):
+		rv["w"] = rv["p"]
+	out.append(_req("round_end", c, "high", rv, {"ttl": 3.0, "follow": {"trigger": "round_break", "ctx": {"round_end": "time"},
 		"class": "color", "ttl": 3.0}}))
 	return out
 
@@ -786,7 +808,7 @@ func _team_names(team: int) -> Dictionary:
 	for f in fighters:
 		if int(f.get("team", -9)) == team and str(f.get("name", "")) != "":
 			ns.append(str(f.get("name", "")))
-	return {"p": " & ".join(ns)} if not ns.is_empty() else {}
+	return {"p": " & ".join(ns), "w": " & ".join(ns)} if not ns.is_empty() else {}
 
 
 func _on_match_end(ev: Dictionary, _info: Dictionary) -> Array:

@@ -20,6 +20,11 @@ const SPEC_CAP := 3
 const HEARD_THIS_MATCH := -40.0
 const UNHEARD_BONUS := 1.0
 const JITTER := 0.8
+const BORROWED := -1.2           ## a line registered for this trigger through "also" ranks below its own lines
+## Standing facts of the match (Audio.booth_context): they decide whether a line is TRUE here, not how
+## relevant it is to this moment, so they never add specificity.
+const STANDING := ["venue", "outdoor", "fence", "open_edges", "night", "hazards", "props", "referee", "scoring", "context",
+	"format", "objective", "special_rules", "rounds_multi", "hands", "size_gap", "quick"]
 
 var history: CommentaryHistory
 var rng := RandomNumberGenerator.new()
@@ -53,7 +58,13 @@ func pick(ids: Array, table: Dictionary, ctx: Dictionary, opts := {}) -> String:
 		var spec := matched_keys(l.get("when", {}), ctx)
 		if spec < 0:
 			continue
+		for k in l.get("when", {}):
+			if STANDING.has(k):
+				spec -= 1
 		var terms := score_terms(str(id), l, spec, opts)
+		var own := str(opts.get("trigger", ""))
+		if own != "" and str(l.get("trigger", own)) != own:
+			terms["borrowed"] = BORROWED
 		var s := 0.0
 		for k in terms:
 			s += float(terms[k])

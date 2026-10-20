@@ -133,10 +133,10 @@ const PLACE = {
   // taunts
   ann_exp_0333: ['taunt_punished', {}], ann_exp_0361: ['taunt_punished', {}],
   // Varga: move-specific calls, stance switches
-  ann_exp_0764: ['hit_clean', { creature: 'f_varga', move: ['rl_lkick', 'll_lkick', 'rl_lkick@southpaw', 'll_lkick@southpaw'] }],
-  ann_exp_0768: ['hit_clean', { creature: 'f_varga', move: ['rl_bkick', 'll_bkick', 'rl_bkick@southpaw', 'll_bkick@southpaw'] }],
-  ann_exp_0775: ['hit_clean', { creature: 'f_varga', move: ['rh_overhand', 'lh_overhand', 'rh_overhand@southpaw', 'lh_overhand@southpaw'] }],
-  ann_exp_0774: ['hit_clean', { creature: 'f_varga', move: ['rl_knee', 'll_knee', 'rl_knee@southpaw', 'll_knee@southpaw'] }],
+  ann_exp_0764: ['hit_clean', { creature: 'f_varga', slot: ['rl_lkick', 'll_lkick', 'rl_lkick@southpaw', 'll_lkick@southpaw'] }],
+  ann_exp_0768: ['hit_clean', { creature: 'f_varga', slot: ['rl_bkick', 'll_bkick', 'rl_bkick@southpaw', 'll_bkick@southpaw'] }],
+  ann_exp_0775: ['hit_clean', { creature: 'f_varga', slot: ['rh_overhand', 'lh_overhand', 'rh_overhand@southpaw', 'lh_overhand@southpaw'] }],
+  ann_exp_0774: ['hit_clean', { creature: 'f_varga', slot: ['rl_knee', 'll_knee', 'rl_knee@southpaw', 'll_knee@southpaw'] }],
   ann_exp_0760: ['stance', { creature: 'f_varga' }], ann_exp_0767: ['stance', { creature: 'f_varga' }],
   ann_exp_0773: ['stance', { creature: 'f_varga' }], ann_exp_0781: ['stance', { creature: 'f_varga' }],
   ann_exp_0777: ['evade', { creature: 'f_varga' }],
@@ -201,6 +201,7 @@ function main() {
         const [trig, when] = PLACE[e.id];
         e.trigger = trig;
         e.when = Object.assign({}, e.when || {}, when);
+        if (when.slot) delete e.when.move;      // a slot gate replaces an older move-id gate
         report.gated += 1;
       }
       if (RETIRE[e.id]) {

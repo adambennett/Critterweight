@@ -107,7 +107,8 @@ func test_recorded_player_uses_full_clips_and_completion_signals() -> void:
 	player.finished.connect(Audio._advance_speech)
 	Audio._speech_player = player
 	Audio.enabled = true
-	check(Audio.announce("ann_first_03", {"p": "Rookie"}), "recorded playback starts")
+	# a name with no whole-sentence take is composed: name clip + sentence clip(s)
+	check(Audio.announce("ann_first_03", {"p": "Player 3"}), "recorded playback starts")
 	var count := 0
 	while Audio.announcer_busy() and count < 16:
 		check(player.stream is AudioStreamWAV, "each phrase uses an imported WAV")
@@ -116,6 +117,9 @@ func test_recorded_player_uses_full_clips_and_completion_signals() -> void:
 		player.finished.emit()
 		count += 1
 	check(count > 1 and count < 16, "name and sentence clips advance to completion")
+	# Rookie (the default name) has a whole-sentence take: one clip, no join
+	var whole := library.resolve("ann_first_03", "barnaby", str(Audio.line("ann_first_03")["text"]), "Rookie lands first! The crowd approves, loudly, with cans!", {"p": "Rookie"}, {})
+	check_eq((whole.get("ids", []) as Array).size(), 1, "the whole-sentence recording plays instead of a joined name")
 	check(not Audio.announcer_busy(), "last clip releases the dialogue channel")
 	Audio.announce("ann_low_01")
 	Audio.stop_announcer()

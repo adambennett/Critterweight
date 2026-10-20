@@ -1371,6 +1371,8 @@ func pick_line(trigger: String, ctx := {}, opts := {}) -> String:
 		var full := _booth_ctx.duplicate()
 		full.merge(ctx, true)
 		ctx = full
+	opts = opts.duplicate()
+	opts["trigger"] = trigger
 	if announcer_pack != "":
 		var pack_ids: Array = (_pack_by_trigger.get(announcer_pack, {}) as Dictionary).get(trigger, [])
 		var pid := _selector.pick(pack_ids, _pack_lines, ctx, opts)
@@ -1869,9 +1871,15 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 			elif ms in ["l1", "l2", "l3", "dash_attack"]:
 				play.call("whoosh_light")
 		"ability":
-			var aid := str(ev.get("id", ""))
+			# the ability's signature sound by its name ("Steam Vent" -> ab_steam_vent); the event id
+			# names the slot ("f_stoke.ability1"), so it is only the fallback
+			var adef = Content.creature_entry(_fighter_creature(fi)).get("abilities", {})
+			var aname := ""
+			if typeof(adef) == TYPE_DICTIONARY and (adef as Dictionary).has(str(ev.get("slot", ""))):
+				aname = str(((adef as Dictionary)[str(ev.get("slot", ""))] as Dictionary).get("name", ""))
+			var aid := CommentaryDirector.ability_key(aname, str(ev.get("id", "")))
 			var cand := "ab_" + aid
-			var alias_map := {"ab_stoke_the_fire": "ab_stoke_fire", "ab_bulldoze": "ab_bulldoze_start", "ab_spring_pad": "ab_spring_pad_place", "ab_drain_dive": "blink_down"}
+			var alias_map := {"ab_stoke_the_fire": "ab_stoke_fire", "ab_bulldoze": "ab_bulldoze_start", "ab_bulldoze_landslide": "ab_bulldoze_start", "ab_spring_pad": "ab_spring_pad_place", "ab_drain_dive": "blink_down"}
 			if alias_map.has(cand):
 				cand = str(alias_map[cand])
 			play.call(cand if _sfx_entries.has(cand) else "ab_generic")

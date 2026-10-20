@@ -4,13 +4,16 @@ extends RefCounted
 ## roster names, Player 1-8 fallbacks and device-independent action names. No network access.
 const PATH := "res://assets/audio/speech/catalog.json"
 const EXPANSION_PATH := "res://assets/audio/speech/announcer_expansion/catalog.json"
+## v0.9.17 commentary: new lines, retakes (same line id, loaded last so they replace the old clip),
+## whole-sentence name variants and ceremonial winner names ({w}).
+const V0917_PATH := "res://assets/audio/speech/v0917/catalog.json"
 var catalog: Dictionary = {}
 var _ids: Dictionary = {}
 var _exact: Dictionary = {}
 var _patterns: Array = []
 
 func _init() -> void:
-	for path in [PATH, EXPANSION_PATH]:
+	for path in [PATH, EXPANSION_PATH, V0917_PATH]:
 		if not FileAccess.file_exists(path):
 			continue
 		var data = JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -20,7 +23,14 @@ func _init() -> void:
 			var incoming = data.get(key, {})
 			if incoming is Dictionary:
 				var merged: Dictionary = catalog.get(key, {})
-				merged.merge(incoming, true)
+				if key == "tokens":
+					# vocabularies merge word by word: a later catalog adds names to a voice
+					for voice in incoming:
+						var vocab: Dictionary = merged.get(voice, {})
+						vocab.merge(incoming[voice], true)
+						merged[voice] = vocab
+				else:
+					merged.merge(incoming, true)
 				catalog[key] = merged
 		var incoming_lines = data.get("lines", [])
 		if incoming_lines is Array:
@@ -40,7 +50,7 @@ func _init() -> void:
 		for found in token_re.search_all(source):
 			var token := found.get_string(1)
 			var capture := "([0-9]+)" if token in ["n", "act", "kos", "parts", "dose"] else "([^\\n.!?]{1,160}?)"
-			if token in ["p", "o", "player"]:
+			if token in ["p", "o", "player", "w"]:
 				capture = "([^\\n]{1,160}?)" # Custom profile names can contain punctuation.
 			expression += _escape(source.substr(cursor, found.get_start() - cursor)) + capture
 			tokens.append(found.get_string(1))
@@ -58,7 +68,11 @@ static func _escape(value: String) -> String:
 
 func resolve(id: String, speaker: String, source: String, text: String, vars: Dictionary, context: Dictionary) -> Dictionary:
 	var parts: Array = []
-	if _ids.has(id) and str(_ids[id]["template"]) == source and str(_ids[id]["speaker"]) == speaker:
+	var exact_key := speaker + "\n" + text.strip_edges()
+	if text.strip_edges() != source.strip_edges() and _exact.has(exact_key):
+		# a whole-sentence recording of exactly this text (the name inside the take: no join)
+		parts = _expand(_exact[exact_key], {}, context)
+	elif _ids.has(id) and str(_ids[id]["template"]) == source and str(_ids[id]["speaker"]) == speaker:
 		parts = _expand(_ids[id], vars, context)
 	else:
 		var remaining := text.strip_edges()
@@ -119,9 +133,14 @@ func _expand(line: Dictionary, vars: Dictionary, context: Dictionary) -> Array:
 
 func _token(voice: String, token: String, value: String, context: Dictionary) -> Array:
 	var vocabulary: Dictionary = catalog.get("tokens", {}).get(voice, {})
+	if token == "w":
+		# the winner's name at the climax of a result call, in its ceremonial take when recorded
+		var ceremony: Dictionary = catalog.get("tokens", {}).get(voice + "_ceremony", {})
+		if not ceremony.is_empty():
+			vocabulary = ceremony
 	var normalized := value.strip_edges().to_lower()
 	var words: Array = []
-	if token in ["p", "o", "player"]:
+	if token in ["p", "o", "player", "w"]:
 		var spoken := spoken_name(normalized, vocabulary, context)
 		if spoken != "":
 			words = [spoken]

@@ -236,6 +236,7 @@ func _process(dt: float) -> void:
 		cv.snap_transforms(xf)
 		cv.juice_amount = 1.0 if flags & NetSnapshot.F_JUICED else 0.0
 		cv.status_color = _status_color(fd["statuses"])
+		cv.fx_mood = CreatureView.mood_for_state(int(fd.get("state", 0)), float(fd.get("health", 1.0)) / maxf(0.1, float(fd.get("max_health", 1.0))))
 		cv.render(1.0)
 	for p in _sample["props"]:
 		arena_view.set_prop_transform(int(p["index"]), Transform3D(Basis(p["rot"] as Quaternion), p["pos"]))

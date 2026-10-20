@@ -19,6 +19,20 @@ extends Node3D
 
 const MAX_BRUISES := 8
 const DEFAULT_JUICE := Color(1.0, 0.55, 0.1)
+## Varga's two skins (v0.9.17): the upgraded default and the original Cage Rules model kept byte for
+## byte (tools/cage_rules). Same skeleton, same body: the choice is the local "Legacy Varga skin"
+## setting and never reaches the simulation, the network or another player's screen.
+const VARGA_MODEL := "res://assets/models/creatures/f_varga.glb"
+const VARGA_LEGACY_MODEL := "res://assets/models/creatures/f_varga_legacy.glb"
+const LEGACY_VARGA_SETTING := "cosmetic.legacy_varga"
+## v0.9.17 finish: surfaces are shaded by material class (creature.gdshader material_kind) chosen from
+## the model's material names; glowing surfaces animate by glow mode (the model's extras.look, else
+## this table: the fighter's "Hype feature" character).
+const MATERIAL_KINDS := {"skin": 0, "hide": 0, "cloth": 1, "team": 1, "wrap": 1, "metal": 2, "iron": 2, "brass": 2, "eye": 3,
+	"jelly": 4, "shell": 5, "lacquer": 5, "chitin": 5, "enamel": 5, "glass": 5, "ghost": 6, "spectral": 6, "ember": 0, "lamp": 5, "coil": 4}
+const GLOW_MODES := {"steady": 0, "flicker": 1, "pulse": 2, "shimmer": 3, "lamp": 4}
+const CREATURE_GLOW := {"f_stoke": 1, "f_dredge": 2, "f_gusto": 2, "f_dozer": 4, "f_slurry": 2, "f_jitters": 2, "f_knell": 3, "f_varga": 2}
+const MATERIAL_GLOW := {"ember": 1, "ghost": 3, "spectral": 3, "lamp": 4, "coil": 2}
 
 var creature: CreatureDef
 var body: BodyDef
@@ -58,6 +72,13 @@ var _vis_points := {}                      ## segment index -> PackedVector3Arra
 ## Model meshes whose vertices the cosmetic anchors are fitted to, read on first need (reading a
 ## mesh back costs ~20-30 ms per fighter, so only a dressed view pays it, once).
 var _point_sources: Array = []             ## [[MeshInstance3D, model root Node]]
+var _cosmetic_items: Array = []            ## the dress last applied (re-fitted after a model swap)
+var _fx: CreatureFxRig = null              ## expressions/secondary motion when the model has fx_* bones
+var _look := {}                            ## the model's extras (look: glow mode, fx parameters)
+var _finish := 1.0                         ## 0: the model keeps the pre-v0.9.17 shading (legacy skins)
+## Set by the match scenes each frame (view only): the fighter's expression and what it looks at.
+var fx_mood := "neutral"
+var fx_look := Vector3.INF
 
 
 func setup(c: CreatureDef, tint := Color.WHITE) -> void:
@@ -65,14 +86,66 @@ func setup(c: CreatureDef, tint := Color.WHITE) -> void:
 	body = c.body
 	team_color = tint
 	name = "View_" + c.id
-	var model_path := str(c.art.get("model", ""))
+	var model_path := model_path_for(c)
 	if model_path != "" and _try_load_model(model_path):
 		pass
 	else:
 		_build_fallback()
+	if model_path_for(c, false) != model_path_for(c, true) and not Settings.changed.is_connected(_on_setting_changed):
+		Settings.changed.connect(_on_setting_changed)
 	_prev.resize(body.segments.size())
 	_curr.resize(body.segments.size())
 	_seg_global.resize(body.segments.size())
+
+
+## The model this player sees for a creature. legacy: null = the current setting.
+static func model_path_for(c: CreatureDef, legacy = null) -> String:
+	var path := str(c.art.get("model", ""))
+	var use_legacy: bool = bool(Settings.get_value(LEGACY_VARGA_SETTING)) if legacy == null else bool(legacy)
+	if c.id == "f_varga" and path == VARGA_MODEL and use_legacy and ResourceLoader.exists(VARGA_LEGACY_MODEL):
+		return VARGA_LEGACY_MODEL
+	return path
+
+
+func _on_setting_changed(key: String, _v) -> void:
+	if key == LEGACY_VARGA_SETTING and creature != null:
+		reload_model()
+
+
+## Swaps the drawn model in place (the Legacy Varga skin toggled mid-match): same bones, so the
+## pose, cosmetics and effects carry over from the next rendered frame.
+func reload_model() -> void:
+	for child in get_children():
+		if child is Node3D and child.has_meta("creature_model"):
+			child.queue_free()
+	for n in _seg_nodes:
+		if is_instance_valid(n):
+			n.queue_free()
+	_seg_nodes.clear()
+	_skeleton = null
+	_materials.clear()
+	_glow_materials.clear()
+	_gore_mesh = null
+	_point_sources.clear()
+	_vis_points.clear()
+	var model_path := model_path_for(creature)
+	if model_path == "" or not _try_load_model(model_path):
+		_build_fallback()
+	set_juice_style(juice_color, glow_color)
+	if not _cosmetic_items.is_empty():
+		set_cosmetics(_cosmetic_items)
+
+
+func _exit_tree() -> void:
+	if Settings.changed.is_connected(_on_setting_changed):
+		Settings.changed.disconnect(_on_setting_changed)
+
+
+func _look_glow_mode() -> int:
+	var lk = _look.get("look", {})
+	if typeof(lk) == TYPE_DICTIONARY and (lk as Dictionary).has("glow_mode"):
+		return int(GLOW_MODES.get(str((lk as Dictionary)["glow_mode"]), 0))
+	return int(CREATURE_GLOW.get(creature.id if creature else "", 0))
 
 
 func _palette(key: String, fallback: Color) -> Color:
@@ -82,9 +155,13 @@ func _palette(key: String, fallback: Color) -> Color:
 	return fallback
 
 
-func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := false, outlined := true) -> ShaderMaterial:
+func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := false, outlined := true, mat_name := "") -> ShaderMaterial:
 	var m := Materials.creature_material()
 	m.set_shader_parameter("tint", color)
+	var key := mat_name.trim_prefix("detail_").get_slice("_", 0)
+	m.set_shader_parameter("material_kind", int(MATERIAL_KINDS.get(key, 0)) if _finish > 0.0 else 0)
+	m.set_shader_parameter("glow_mode", int(MATERIAL_GLOW.get(key, _look_glow_mode())))
+	m.set_shader_parameter("finish", _finish)
 	m.set_shader_parameter("roughness_v", float(creature.art.get("roughness", 0.65)) if roughness < 0.0 else roughness)
 	m.set_shader_parameter("metallic_v", metallic)
 	m.set_shader_parameter("vertex_glow", 1.0 if glow else 0.0)
@@ -111,6 +188,14 @@ func _try_load_model(path: String) -> bool:
 	if scene == null:
 		return false
 	var inst := scene.instantiate()
+	inst.set_meta("creature_model", path)
+	_finish = 0.0 if path == VARGA_LEGACY_MODEL else 1.0
+	_look = {}
+	for c0 in inst.get_children():
+		if c0.has_meta("extras") and typeof(c0.get_meta("extras")) == TYPE_DICTIONARY:
+			_look = c0.get_meta("extras")
+	if inst.has_meta("extras") and typeof(inst.get_meta("extras")) == TYPE_DICTIONARY:
+		_look = inst.get_meta("extras")
 	add_child(inst)
 	_skeleton = _find_skeleton(inst)
 	if _skeleton == null:
@@ -130,6 +215,9 @@ func _try_load_model(path: String) -> bool:
 			missing += 1
 	if missing > 0:
 		push_warning("%s: model %s is missing %d segment bone(s)" % [creature.id, path, missing])
+	_fx = CreatureFxRig.new(_skeleton, _look, hash(creature.id) + get_instance_id())
+	if not _fx.has_bones():
+		_fx = null
 	# parents-first bone order so hierarchical skeletons (any importer layout) pose correctly
 	_bone_order = PackedInt32Array()
 	_bone_global.resize(nb)
@@ -163,7 +251,7 @@ func _try_load_model(path: String) -> bool:
 				outlined = not bm.resource_name.begins_with("detail_")
 				if bm.resource_name == "team":
 					tint = team_color
-			mi.set_surface_override_material(si, _make_material(tint, rough, metal, glow, outlined))
+			mi.set_surface_override_material(si, _make_material(tint, rough, metal, glow, outlined, src.resource_name if src else ""))
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	return true
 
@@ -367,6 +455,8 @@ func render(alpha: float) -> void:
 		# (the skeleton sits at the world origin). Converted to parent-relative poses parents-first,
 		# so both flat and nested bone layouts end up with the same world placement.
 		for bi in _bone_order:
+			if _fx != null and _fx.is_fx_bone(bi):
+				continue      # placed below, after the segment bones it hangs from
 			var si := _seg_of_bone[bi]
 			var parent := _skeleton.get_bone_parent(bi)
 			var parent_global := _bone_global[parent] if parent >= 0 else Transform3D.IDENTITY
@@ -383,6 +473,20 @@ func render(alpha: float) -> void:
 			var local := parent_global.affine_inverse() * global
 			_skeleton.set_bone_pose_position(bi, local.origin)
 			_skeleton.set_bone_pose_rotation(bi, local.basis.get_rotation_quaternion())
+		if _fx != null:
+			_fx.mood = fx_mood
+			_fx.look_target = fx_look
+			_fx.update(get_process_delta_time(), _bone_global_of)
+			for bi2 in _bone_order:
+				if not _fx.is_fx_bone(bi2):
+					continue
+				var parent2 := _skeleton.get_bone_parent(bi2)
+				var pg := _bone_global[parent2] if parent2 >= 0 else Transform3D.IDENTITY
+				var fx_local: Transform3D = (_fx.rest[bi2] as Transform3D) * (_fx.local[bi2] as Transform3D)
+				_bone_global[bi2] = pg * fx_local
+				_skeleton.set_bone_pose_position(bi2, fx_local.origin)
+				_skeleton.set_bone_pose_rotation(bi2, fx_local.basis.get_rotation_quaternion())
+				_skeleton.set_bone_pose_scale(bi2, fx_local.basis.get_scale())     # lids squash and stretch
 	else:
 		for i in n:
 			var a := _prev[i]
@@ -395,6 +499,30 @@ func render(alpha: float) -> void:
 	_update_materials()
 
 
+## The expression a fighter's state calls for (Fighter.State values; works from snapshots too).
+static func mood_for_state(state: int, health_frac: float) -> String:
+	match state:
+		Fighter.State.ATTACK, Fighter.State.ABILITY, Fighter.State.GRABBING:
+			return "attack"
+		Fighter.State.HITSTUN, Fighter.State.GUARD_BREAK, Fighter.State.HELD:
+			return "hurt"
+		Fighter.State.KNOCKDOWN, Fighter.State.DOWN:
+			return "surprised"
+		Fighter.State.KO, Fighter.State.DOWNED:
+			return "ko"
+		Fighter.State.GUARD:
+			return "guard"
+		Fighter.State.TAUNT:
+			return "taunt"
+		Fighter.State.CELEBRATE:
+			return "happy"
+	return "tired" if health_frac > 0.0 and health_frac < 0.25 else "neutral"
+
+
+func _bone_global_of(b: int) -> Transform3D:
+	return _bone_global[b] if b >= 0 and b < _bone_global.size() else Transform3D.IDENTITY
+
+
 func segment_world(i: int) -> Transform3D:
 	return _curr[i] if i < _curr.size() else Transform3D()
 
@@ -404,6 +532,7 @@ func segment_world(i: int) -> Transform3D:
 ## items: [{kind: tooth|lid|belt|scarf, color, accent, id}] (FighterCosmetics.attachments). Replaces
 ## whatever was attached; kinds this body has no place for are skipped.
 func set_cosmetics(items: Array) -> void:
+	_cosmetic_items = items.duplicate(true)
 	for a in _attachments:
 		var old: Node3D = a["node"]
 		if is_instance_valid(old):

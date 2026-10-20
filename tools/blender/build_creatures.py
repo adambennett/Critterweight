@@ -9,6 +9,7 @@ from export_creature import export
 from fighters import jitters, dredge, slurry, gusto, dozer
 from bosses import bilge, conduit, snappington
 from minions import scrapling, blister, lamprey
+import fighters_v17
 
 
 def stoke(s):
@@ -70,11 +71,19 @@ def stoke(s):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser()
-    parser.add_argument('id',choices=['f_stoke','f_jitters','f_dredge','f_slurry','f_gusto','f_dozer','boss_bilge','boss_conduit','boss_snappington','npc_scrapling','npc_blister','npc_kid_lamprey'])
+    parser.add_argument('id',choices=['f_stoke','f_jitters','f_dredge','f_slurry','f_gusto','f_dozer','f_varga','f_knell','boss_bilge','boss_conduit','boss_snappington','npc_scrapling','npc_blister','npc_kid_lamprey'])
     parser.add_argument('--reference-root',required=True)
     parser.add_argument('--out-source')
+    parser.add_argument('--out-glb', help='export here instead of the shipped model path (scratch builds)')
+    parser.add_argument('--v16', action='store_true', help='build the v0.9.10-v0.9.16 art (comparison only)')
     args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
     s=Studio(args.id,pathlib.Path(args.reference_root)/'creatures'/f'{args.id}.glb')
-    {'f_stoke':stoke,'f_jitters':jitters,'f_dredge':dredge,'f_slurry':slurry,'f_gusto':gusto,'f_dozer':dozer,'boss_bilge':bilge,'boss_conduit':conduit,'boss_snappington':snappington,'npc_scrapling':scrapling,'npc_blister':blister,'npc_kid_lamprey':lamprey}[args.id](s)
+    builders={'f_stoke':stoke,'f_jitters':jitters,'f_dredge':dredge,'f_slurry':slurry,'f_gusto':gusto,'f_dozer':dozer,'boss_bilge':bilge,'boss_conduit':conduit,'boss_snappington':snappington,'npc_scrapling':scrapling,'npc_blister':blister,'npc_kid_lamprey':lamprey}
+    if not args.v16:
+        builders.update(fighters_v17.BUILDERS)   # v0.9.17 roster art (docs/ART_REVAMP.md)
+    builders[args.id](s)
     s.save(args.out_source or ROOT/'tools/blender'/f'{args.id}.blend')
-    export(ROOT/'game/assets/models'/s.entry['out'],ROOT.parent/'tmp')
+    out=pathlib.Path(args.out_glb) if args.out_glb else ROOT/'game/assets/models'/s.entry['out']
+    if out.name.endswith('_legacy.glb'):
+        raise SystemExit('refusing to export over a legacy skin: '+str(out))
+    export(out,ROOT.parent/'tmp')

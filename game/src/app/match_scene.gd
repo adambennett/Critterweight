@@ -275,6 +275,8 @@ func _process(delta: float) -> void:
 		cv.cosmetic_combat = live and f.state != Fighter.State.CELEBRATE
 		cv.status_color = _status_color(f)
 		cv.visible = not f.has_flag("submerged")
+		cv.fx_mood = CreatureView.mood_for_state(f.state, f.health_frac())
+		cv.fx_look = _head_of(f.target.index) if f.target != null and f.target.index < views.size() and views[f.target.index] != null else Vector3.INF
 		cv.render(alpha)
 	if sim.mode:
 		mode_view.update_state(sim.mode.view_state(), _dt)

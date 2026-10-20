@@ -1,0 +1,5106 @@
+{
+  "_doc": "v0.9.17 commentary (docs/audio/COMMENTARY.md); recordings in docs/audio/breeze/v0.9.17.",
+  "items": [
+    {
+      "id": "cmt17_0001",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "The referee waves it off! That's a stoppage, folks, and a merciful one!",
+      "families": [
+        "officials",
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0002",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "STOPPED! The referee has seen enough, and frankly, so have I!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0003",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "The referee steps in! It's a T.K.O., and nobody in this building is arguing!",
+      "families": [
+        "officials",
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0004",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "That's the stoppage! The referee jumped in faster than my lunch break!",
+      "families": [
+        "snacks",
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0005",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "It's over by stoppage! Somebody bring the loser a very comfortable chair!",
+      "families": [
+        "booth"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0006",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "The referee says no more! Technical knockout, folks, technically wonderful!",
+      "families": [
+        "officials",
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0007",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "Stoppage! The referee has both arms wrapped around the problem!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0008",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "And the referee stops it! That's enough trips to the canvas for one night!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0009",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "Waved off by the referee! Your winner by T.K.O.: {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0010",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {},
+      "priority": 100,
+      "text": "T.K.O.! The referee calls it, and your winner is {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0011",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {
+        "who": "player"
+      },
+      "priority": 100,
+      "text": "You did it, kid! The referee stops it and the night is yours!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "stoppage",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0012",
+      "speaker": "barnaby",
+      "trigger": "stoppage",
+      "when": {
+        "target": "player"
+      },
+      "priority": 100,
+      "text": "The referee's done the kind thing, kid. Rest up. We'll see you back here.",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "stoppage",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0013",
+      "speaker": "barnaby",
+      "trigger": "referee",
+      "when": {
+        "kind": "count"
+      },
+      "priority": 60,
+      "text": "The referee's counting! Get up, get up, the count won't wait!",
+      "families": [
+        "officials",
+        "science"
+      ],
+      "energy": "high",
+      "situation": "referee",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0014",
+      "speaker": "barnaby",
+      "trigger": "referee",
+      "when": {
+        "kind": "count"
+      },
+      "priority": 60,
+      "text": "There's the count! The whole crowd is counting along with the referee!",
+      "families": [
+        "officials",
+        "crowd",
+        "science"
+      ],
+      "energy": "high",
+      "situation": "referee",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0015",
+      "speaker": "kendall",
+      "trigger": "referee",
+      "when": {
+        "kind": "count"
+      },
+      "priority": 60,
+      "text": "I'm counting along with the referee. I'm already two numbers behind.",
+      "families": [
+        "officials"
+      ],
+      "energy": "low",
+      "situation": "referee",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0016",
+      "speaker": "barnaby",
+      "trigger": "referee",
+      "when": {
+        "kind": "wave_up"
+      },
+      "priority": 60,
+      "text": "Waved back in! The referee says fight on!",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "referee",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0017",
+      "speaker": "barnaby",
+      "trigger": "referee",
+      "when": {
+        "kind": "wave_up"
+      },
+      "priority": 60,
+      "text": "Up and waved back in! That's a fighter who heard every number!",
+      "families": [],
+      "energy": "medium",
+      "situation": "referee",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0018",
+      "speaker": "barnaby",
+      "trigger": "referee",
+      "when": {
+        "kind": "wave_up"
+      },
+      "priority": 60,
+      "text": "The referee checks the eyes, likes the eyes, and away we go!",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "referee",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0019",
+      "speaker": "barnaby",
+      "trigger": "referee",
+      "when": {
+        "kind": "wave_up"
+      },
+      "priority": 60,
+      "text": "Back on the feet and back in the fight! The referee steps away!",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "referee",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0020",
+      "speaker": "kendall",
+      "trigger": "referee",
+      "when": {
+        "kind": "wave_up"
+      },
+      "priority": 60,
+      "text": "The referee waved them back in. I waved too. Nobody waved back.",
+      "families": [
+        "officials"
+      ],
+      "energy": "low",
+      "situation": "referee",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0021",
+      "speaker": "kendall",
+      "trigger": "referee",
+      "when": {
+        "kind": "wave_up"
+      },
+      "priority": 60,
+      "text": "Back up already? I was still writing \"oh no\" in my notes.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "referee",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0022",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "clear"
+      },
+      "priority": 72,
+      "text": "That round's in the books: a clear ten-nine on the cards!",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "judges_round",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0023",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "clear"
+      },
+      "priority": 72,
+      "text": "The judges agree on that one, folks! Ten-nine across the board!",
+      "families": [
+        "officials",
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "judges_round",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0024",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "clear"
+      },
+      "priority": 72,
+      "text": "Clean work in that round, and the scorecards are going to show it!",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "judges_round",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0025",
+      "speaker": "kendall",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "clear"
+      },
+      "priority": 72,
+      "text": "All three judges' pencils moved the same way. Mine moved in a circle.",
+      "families": [
+        "officials"
+      ],
+      "energy": "low",
+      "situation": "judges_round",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0026",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "ten_eight"
+      },
+      "priority": 72,
+      "text": "A ten-eight round! That knockdown did the judges' math for them!",
+      "families": [
+        "officials",
+        "science"
+      ],
+      "energy": "high",
+      "situation": "judges_round",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0027",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "ten_eight"
+      },
+      "priority": 72,
+      "text": "Ten-eight on the cards! Put somebody down and the judges notice!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "judges_round",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0028",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "ten_eight"
+      },
+      "priority": 72,
+      "text": "That's a ten-eight round, folks! A big swing on every scorecard!",
+      "families": [
+        "officials",
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "judges_round",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0029",
+      "speaker": "kendall",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "ten_eight"
+      },
+      "priority": 72,
+      "text": "Ten-eight. I wrote it as \"big round, very big\". Close enough.",
+      "families": [
+        "notes",
+        "officials"
+      ],
+      "energy": "low",
+      "situation": "judges_round",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0030",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "split"
+      },
+      "priority": 72,
+      "text": "The judges split on that round! Somebody's watching a different fight!",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "judges_round",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0031",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "split"
+      },
+      "priority": 72,
+      "text": "A split round! One judge saw it differently, and that judge may need glasses!",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "judges_round",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0032",
+      "speaker": "kendall",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "split"
+      },
+      "priority": 72,
+      "text": "One judge disagreed. I respect a judge with opinions.",
+      "families": [
+        "officials"
+      ],
+      "energy": "low",
+      "situation": "judges_round",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0033",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "even"
+      },
+      "priority": 72,
+      "text": "Ten-ten! Dead even on the cards, and the judges look very pleased about it!",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "judges_round",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0034",
+      "speaker": "barnaby",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "even"
+      },
+      "priority": 72,
+      "text": "An even round! Nobody earned it, nobody lost it, everybody's sweaty!",
+      "families": [],
+      "energy": "medium",
+      "situation": "judges_round",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0035",
+      "speaker": "kendall",
+      "trigger": "judges_round",
+      "when": {
+        "kind": "even"
+      },
+      "priority": 72,
+      "text": "Ten-ten. I like a round that refuses to pick favourites.",
+      "families": [
+        "officials"
+      ],
+      "energy": "low",
+      "situation": "judges_round",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0036",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "kind": "unanimous"
+      },
+      "priority": 100,
+      "text": "The judges are unanimous! Your winner by unanimous decision: {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0037",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "kind": "unanimous"
+      },
+      "priority": 100,
+      "text": "All three cards agree! By unanimous decision, your winner is {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0038",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "kind": "unanimous"
+      },
+      "priority": 100,
+      "text": "Three judges, one opinion! The unanimous decision goes to {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0039",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "kind": "unanimous"
+      },
+      "priority": 100,
+      "text": "No arguments from the judges tonight! Unanimous decision for {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0040",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "kind": "split"
+      },
+      "priority": 100,
+      "text": "A split decision! Two cards to one, and your winner is {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0041",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "kind": "split"
+      },
+      "priority": 100,
+      "text": "The judges couldn't all agree, but two of them could! Split decision: {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0042",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "kind": "split"
+      },
+      "priority": 100,
+      "text": "Split decision, folks! Somebody's arguing in the parking lot already. It's {w}!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0043",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "kind": "majority"
+      },
+      "priority": 100,
+      "text": "A majority decision! Two judges say yes, one says even. Your winner: {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0044",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "kind": "majority"
+      },
+      "priority": 100,
+      "text": "Majority decision, folks! One judge saw a draw; the other two saw {w}!",
+      "families": [
+        "officials",
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0045",
+      "speaker": "barnaby",
+      "trigger": "decision",
+      "when": {
+        "who": "player"
+      },
+      "priority": 100,
+      "text": "The cards are read, and they're kind to you tonight! Decision win for {w}!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "decision",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0046",
+      "speaker": "barnaby",
+      "trigger": "draw",
+      "when": {
+        "kind": "decision"
+      },
+      "priority": 100,
+      "text": "The cards are level! It's a draw, and the judges are leaving through the back!",
+      "families": [
+        "officials"
+      ],
+      "energy": "medium",
+      "situation": "draw",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0047",
+      "speaker": "barnaby",
+      "trigger": "draw",
+      "when": {
+        "kind": "decision"
+      },
+      "priority": 100,
+      "text": "A draw on the scorecards! Everybody fought, nobody won, everybody's invoiced!",
+      "families": [
+        "officials",
+        "money"
+      ],
+      "energy": "medium",
+      "situation": "draw",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0048",
+      "speaker": "kendall",
+      "trigger": "result",
+      "when": {
+        "finish": "decision"
+      },
+      "priority": 30,
+      "text": "The judges have spoken. I nodded like I agreed, and I did agree.",
+      "families": [
+        "officials"
+      ],
+      "energy": "low",
+      "situation": "result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0049",
+      "speaker": "kendall",
+      "trigger": "result",
+      "when": {
+        "finish": "decision"
+      },
+      "priority": 30,
+      "text": "I had it closer than that, but I had it on a napkin.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0050",
+      "speaker": "kendall",
+      "trigger": "result",
+      "when": {
+        "finish": "decision"
+      },
+      "priority": 30,
+      "text": "A decision. I love a fight that needs paperwork at the end.",
+      "families": [],
+      "energy": "low",
+      "situation": "result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0051",
+      "speaker": "barnaby",
+      "trigger": "round_end",
+      "when": {
+        "kind": "won"
+      },
+      "priority": 75,
+      "text": "Bell! That round goes to {w}!",
+      "families": [],
+      "energy": "medium",
+      "situation": "round_end",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0052",
+      "speaker": "barnaby",
+      "trigger": "round_end",
+      "when": {
+        "kind": "won"
+      },
+      "priority": 75,
+      "text": "There's the bell, and that round belongs to {w}!",
+      "families": [],
+      "energy": "medium",
+      "situation": "round_end",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0053",
+      "speaker": "barnaby",
+      "trigger": "round_end",
+      "when": {
+        "kind": "won",
+        "who": "player"
+      },
+      "priority": 75,
+      "text": "That round's yours, kid! Bank it and breathe!",
+      "families": [],
+      "energy": "medium",
+      "situation": "round_end",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0054",
+      "speaker": "barnaby",
+      "trigger": "round_end",
+      "when": {
+        "kind": "won",
+        "who": "player"
+      },
+      "priority": 75,
+      "text": "Round in the bag, kid! Do that again and we're done here!",
+      "families": [],
+      "energy": "medium",
+      "situation": "round_end",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0055",
+      "speaker": "barnaby",
+      "trigger": "round_end",
+      "when": {
+        "kind": "won",
+        "who": "opponent"
+      },
+      "priority": 75,
+      "text": "That round got away from you, kid. Shake it off, the next bell's coming.",
+      "families": [],
+      "energy": "medium",
+      "situation": "round_end",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0056",
+      "speaker": "barnaby",
+      "trigger": "round_end",
+      "when": {
+        "kind": "even"
+      },
+      "priority": 75,
+      "text": "Time on the round, and I couldn't split them with a crowbar!",
+      "families": [],
+      "energy": "medium",
+      "situation": "round_end",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0057",
+      "speaker": "kendall",
+      "trigger": "round_break",
+      "when": {},
+      "priority": 30,
+      "text": "Quick breather. I'm using mine to find my pencil.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "round_break",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0058",
+      "speaker": "kendall",
+      "trigger": "round_break",
+      "when": {},
+      "priority": 30,
+      "text": "Round's over. My notes say \"excellent\" and then there's a drawing of a fish.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "round_break",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0059",
+      "speaker": "barnaby",
+      "trigger": "round_break",
+      "when": {},
+      "priority": 30,
+      "text": "A few seconds to reset, folks. Chins up, here we go again!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "round_break",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0060",
+      "speaker": "kendall",
+      "trigger": "round_break",
+      "when": {},
+      "priority": 30,
+      "text": "That round had a beginning, a middle, and an end. Strong structure.",
+      "families": [],
+      "energy": "low",
+      "situation": "round_break",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0061",
+      "speaker": "kendall",
+      "trigger": "round_break",
+      "when": {
+        "round_end": "time"
+      },
+      "priority": 30,
+      "text": "The bell rang right on time. I appreciate punctuality.",
+      "families": [],
+      "energy": "low",
+      "situation": "round_break",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0062",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "round"
+      },
+      "priority": 100,
+      "text": "DOWN and OUT for the round! That's one round in the bank!",
+      "families": [],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0063",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "round"
+      },
+      "priority": 100,
+      "text": "Knocked out! That takes the round, folks, but the night isn't over!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0064",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "round"
+      },
+      "priority": 100,
+      "text": "That's a knockout, and that's a round! Reset the bell, we go again!",
+      "families": [],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0065",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "round"
+      },
+      "priority": 100,
+      "text": "OUT for this round! The match isn't finished, but that round sure is!",
+      "families": [],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0066",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "round",
+        "who": "player"
+      },
+      "priority": 100,
+      "text": "You took that round the loud way, kid! Now do it again!",
+      "families": [],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0067",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "round",
+        "target": "player"
+      },
+      "priority": 100,
+      "text": "You got caught, kid. That's one round. Shake it off and win the next.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ko",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0068",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "none"
+      },
+      "priority": 100,
+      "text": "One down! The rest of the cage just got a little roomier!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0069",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "none"
+      },
+      "priority": 100,
+      "text": "Eliminated! That fighter's done; everybody else, keep swinging!",
+      "families": [],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0070",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "none"
+      },
+      "priority": 100,
+      "text": "Out goes one! The crowd counts the survivors, and so do I!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0071",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "none"
+      },
+      "priority": 100,
+      "text": "That's an elimination! One fewer critter in the cage!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "ko",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0072",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "fight"
+      },
+      "priority": 100,
+      "text": "THAT'S THE FIGHT! Down and out, folks, and the whole place is ringing!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0073",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "fight"
+      },
+      "priority": 100,
+      "text": "KNOCKOUT! That's the end, that's the night, that's the headline!",
+      "families": [],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0074",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "fight"
+      },
+      "priority": 100,
+      "text": "It's all over! That shot ended the argument and the evening!",
+      "families": [],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0075",
+      "speaker": "barnaby",
+      "trigger": "ko",
+      "when": {
+        "ends": "fight"
+      },
+      "priority": 100,
+      "text": "GOODNIGHT! A clean knockout, folks, and nobody's getting up from that!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "ko",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0076",
+      "speaker": "kendall",
+      "trigger": "result",
+      "when": {
+        "finish": "stopped"
+      },
+      "priority": 30,
+      "text": "That ended suddenly. I had a whole paragraph prepared.",
+      "families": [],
+      "energy": "medium",
+      "situation": "result",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt17_0077",
+      "speaker": "kendall",
+      "trigger": "result",
+      "when": {
+        "finish": "stopped"
+      },
+      "priority": 30,
+      "text": "A finish. I'll underline it, which is my highest honour.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0078",
+      "speaker": "kendall",
+      "trigger": "result",
+      "when": {
+        "finish": "stopped"
+      },
+      "priority": 30,
+      "text": "I didn't even have time to sharpen my pencil for the second half.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0079",
+      "speaker": "kendall",
+      "trigger": "result",
+      "when": {
+        "finish": "time"
+      },
+      "priority": 30,
+      "text": "All the way to the bell. Both of them have earned a sandwich.",
+      "families": [
+        "snacks"
+      ],
+      "energy": "low",
+      "situation": "result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0080",
+      "speaker": "kendall",
+      "trigger": "result",
+      "when": {
+        "finish": "time"
+      },
+      "priority": 30,
+      "text": "They went the distance. I went the distance too, in this chair.",
+      "families": [
+        "booth"
+      ],
+      "energy": "low",
+      "situation": "result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0081",
+      "speaker": "kendall",
+      "trigger": "result",
+      "when": {},
+      "priority": 30,
+      "text": "Great fight. I'm putting it in my favourites, which is a sticky note.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0082",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {
+        "kind": "debut"
+      },
+      "priority": 85,
+      "text": "A career begins tonight, folks! First walk to the cage, first lights, first everything!",
+      "families": [
+        "crowd",
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0083",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {
+        "kind": "debut"
+      },
+      "priority": 85,
+      "text": "Remember this one! A brand-new career makes its debut tonight!",
+      "families": [],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0084",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {
+        "kind": "debut"
+      },
+      "priority": 85,
+      "text": "Professional debut! The nerves are real, the cage is real, let's see what's real!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0085",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {
+        "kind": "title"
+      },
+      "priority": 85,
+      "text": "This one's for the BELT, folks! Five rounds, one title, no refunds!",
+      "families": [
+        "crowd",
+        "money"
+      ],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0086",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {
+        "kind": "title"
+      },
+      "priority": 85,
+      "text": "Championship night! The belt is on the table and both fighters can smell it!",
+      "families": [],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0087",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {
+        "kind": "title"
+      },
+      "priority": 85,
+      "text": "It's a TITLE FIGHT! Somebody polish the gold, somebody hold my jacket!",
+      "families": [],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0088",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {
+        "kind": "defend"
+      },
+      "priority": 85,
+      "text": "The champ is defending! Everybody wants that belt, and only one fighter has it!",
+      "families": [],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0089",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {},
+      "priority": 85,
+      "text": "Career night in the cage! The record's on the line and the promoter is watching!",
+      "families": [
+        "money",
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0090",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {},
+      "priority": 85,
+      "text": "Another step up the card, folks! Win here and the phone starts ringing!",
+      "families": [
+        "officials",
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0091",
+      "speaker": "barnaby",
+      "trigger": "career_intro",
+      "when": {},
+      "priority": 85,
+      "text": "Our career fighter makes the walk! Purse on the line, pride on the line!",
+      "families": [
+        "money"
+      ],
+      "energy": "high",
+      "situation": "career_intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0092",
+      "speaker": "kendall",
+      "trigger": "career_intro",
+      "when": {},
+      "priority": 85,
+      "text": "Career fights have contracts. I have a contract too. It mentions snacks.",
+      "families": [
+        "money"
+      ],
+      "energy": "low",
+      "situation": "career_intro",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0093",
+      "speaker": "kendall",
+      "trigger": "career_intro",
+      "when": {},
+      "priority": 85,
+      "text": "I hear the promoter is watching. I'm sitting up straighter.",
+      "families": [
+        "money"
+      ],
+      "energy": "low",
+      "situation": "career_intro",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0094",
+      "speaker": "barnaby",
+      "trigger": "career_result",
+      "when": {
+        "kind": "win",
+        "who": "player"
+      },
+      "priority": 95,
+      "text": "Another one for the record book! The career keeps climbing!",
+      "families": [],
+      "energy": "high",
+      "situation": "career_result",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0095",
+      "speaker": "barnaby",
+      "trigger": "career_result",
+      "when": {
+        "kind": "win",
+        "who": "player"
+      },
+      "priority": 95,
+      "text": "That's a career win, folks! The purse is earned and the phone is ringing!",
+      "families": [
+        "crowd",
+        "money"
+      ],
+      "energy": "high",
+      "situation": "career_result",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0096",
+      "speaker": "barnaby",
+      "trigger": "career_result",
+      "when": {
+        "kind": "win",
+        "who": "player"
+      },
+      "priority": 95,
+      "text": "Another win! I've lost count, which means it's a lot!",
+      "families": [
+        "science"
+      ],
+      "energy": "high",
+      "situation": "career_result",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0097",
+      "speaker": "barnaby",
+      "trigger": "career_result",
+      "when": {
+        "kind": "title",
+        "who": "player"
+      },
+      "priority": 95,
+      "text": "NEW CHAMPION! Somebody bring the belt, and bring the big microphone!",
+      "families": [],
+      "energy": "high",
+      "situation": "career_result",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0098",
+      "speaker": "barnaby",
+      "trigger": "career_result",
+      "when": {
+        "kind": "title",
+        "who": "player"
+      },
+      "priority": 95,
+      "text": "The belt changes hands! A career just became a championship career!",
+      "families": [],
+      "energy": "high",
+      "situation": "career_result",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0099",
+      "speaker": "barnaby",
+      "trigger": "career_result",
+      "when": {
+        "kind": "win",
+        "who": "opponent"
+      },
+      "priority": 95,
+      "text": "A tough night for the career, kid. Heal up. The gym's open tomorrow.",
+      "families": [],
+      "energy": "medium",
+      "situation": "career_result",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0100",
+      "speaker": "barnaby",
+      "trigger": "career_result",
+      "when": {
+        "kind": "win",
+        "who": "opponent"
+      },
+      "priority": 95,
+      "text": "That one goes in the loss column. Every champion has a few of those.",
+      "families": [],
+      "energy": "medium",
+      "situation": "career_result",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0101",
+      "speaker": "barnaby",
+      "trigger": "career_result",
+      "when": {
+        "kind": "title",
+        "who": "opponent"
+      },
+      "priority": 95,
+      "text": "So close to the gold, kid. The belt will still be there next time.",
+      "families": [],
+      "energy": "medium",
+      "situation": "career_result",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0102",
+      "speaker": "kendall",
+      "trigger": "career_result",
+      "when": {
+        "who": "player"
+      },
+      "priority": 95,
+      "text": "A career win. I'll add it to my scrapbook, which is also a napkin.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "career_result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0103",
+      "speaker": "kendall",
+      "trigger": "career_result",
+      "when": {
+        "who": "opponent"
+      },
+      "priority": 95,
+      "text": "Losses build character. I have a great deal of character.",
+      "families": [],
+      "energy": "low",
+      "situation": "career_result",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0104",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Steam Vent! Stoke opens the pressure valve and the front row gets a facial!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0105",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "There's the Steam Vent! A scalding cone right in front of the newt!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0106",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "Stoke the Fire! He's feeding the furnace, and the furnace is hungry!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0107",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "He just stoked his own fire. I can't even keep a candle lit.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0108",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Tide Spit! A glob of harbour water, lobbed with intent!",
+      "families": [
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0109",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Dredge spat. I'm told that's legal and also a technique.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0110",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "Anchor Drop! Dredge plants the claws and dares anybody to swing!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0111",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "He's dropped anchor! Hit him now and he'll hit you right back!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0112",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Gust Bomb! A ball of wind with a very bad attitude!",
+      "families": [
+        "weather"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0113",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Gusto flaps one out! That Gust Bomb is looking for a face!",
+      "families": [
+        "weather"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0114",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "Hang Time! Gusto takes to the air and takes his time about it!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0115",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "He's hovering. I'd like to hover. My chair has other plans.",
+      "families": [
+        "booth"
+      ],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0116",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "BULLDOZE! Here comes Dozer, and he does not have brakes!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0117",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Dozer puts his head down and goes! Somebody move the furniture!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0118",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "Dust Bowl! Dozer kicks up a cloud and everybody starts coughing!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0119",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "That dust cloud got into my notes. Now they're archaeology.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0120",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Sludge Lob! A gooey arc, and wherever it lands, the floor gets worse!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0121",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Slurry lobs the sludge! Watch your footing, folks, watch everybody's footing!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0122",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "Drain Dive! Slurry slips under the floor and pops up somewhere rude!",
+      "families": [
+        "tide",
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0123",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "It went into the drain. I have so many questions about the plumbing.",
+      "families": [
+        "tide"
+      ],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0124",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_jitters",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Arc Lash! A little ball of lightning goes hunting!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0125",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_jitters",
+        "slot": "ability1"
+      },
+      "priority": 45,
+      "text": "Jitters lets an Arc Lash loose! That spark knows where you live!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0126",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_jitters",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "Spring Pad down! Somebody's about to get launched, maybe on purpose!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0127",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_jitters",
+        "slot": "ability2"
+      },
+      "priority": 45,
+      "text": "He put a trampoline in a cage fight. I support it completely.",
+      "families": [
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0128",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "steam_vent"
+      },
+      "priority": 50,
+      "text": "Right in the steam! That vent cooked the whole front of the target!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0129",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "tide_spit"
+      },
+      "priority": 50,
+      "text": "Tide Spit lands! That's a faceful of cold harbour water!",
+      "families": [
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0130",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "tide_spit"
+      },
+      "priority": 50,
+      "text": "Direct hit with spit. The crowd is torn between cheering and washing.",
+      "families": [
+        "crowd"
+      ],
+      "energy": "low",
+      "situation": "ability_hit",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0131",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "gust_bomb"
+      },
+      "priority": 50,
+      "text": "The Gust Bomb hits home! Blown back by a stiff breeze with opinions!",
+      "families": [
+        "weather"
+      ],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0132",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "gust_bomb"
+      },
+      "priority": 50,
+      "text": "That wind hit harder than my umbrella ever survived.",
+      "families": [
+        "weather"
+      ],
+      "energy": "low",
+      "situation": "ability_hit",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0133",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "bulldoze"
+      },
+      "priority": 50,
+      "text": "Bulldoze connects! Dozer just went through somebody like a front door!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0134",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "bulldoze"
+      },
+      "priority": 50,
+      "text": "Caught by the Bulldoze! That's a lot of Shovelsnout moving very fast!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0135",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "sludge_lob"
+      },
+      "priority": 50,
+      "text": "Sludge Lob splashes down on target! That's going to be sticky for a while!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0136",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "arc_lash"
+      },
+      "priority": 50,
+      "text": "Arc Lash finds its mark! Zap, crackle, and a very surprised opponent!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0137",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "ghost_light"
+      },
+      "priority": 50,
+      "text": "Ghost Light catches up! That lantern never stops following!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0138",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "ghost_light"
+      },
+      "priority": 50,
+      "text": "The lantern caught them. I did say not to run in straight lines.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_hit",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0139",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "id": "through_the_veil"
+      },
+      "priority": 50,
+      "text": "Out of the veil and into the target! Knell rings them on arrival!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0140",
+      "speaker": "barnaby",
+      "trigger": "ability_miss",
+      "when": {},
+      "priority": 35,
+      "text": "The ability misses! Wasted on fresh air, and the cooldown starts anyway!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_miss",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0141",
+      "speaker": "barnaby",
+      "trigger": "ability_miss",
+      "when": {},
+      "priority": 35,
+      "text": "Whiffed the special! That's a long wait for the next one!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_miss",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0142",
+      "speaker": "kendall",
+      "trigger": "ability_miss",
+      "when": {},
+      "priority": 35,
+      "text": "That ability missed. It looked very confident about it, though.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_miss",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0143",
+      "speaker": "barnaby",
+      "trigger": "ability_miss",
+      "when": {
+        "id": "ghost_light"
+      },
+      "priority": 35,
+      "text": "The Ghost Light fizzles out! The lantern lost the scent!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_miss",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0144",
+      "speaker": "barnaby",
+      "trigger": "ability_miss",
+      "when": {
+        "id": "tide_spit"
+      },
+      "priority": 35,
+      "text": "Tide Spit splashes the floor instead! At least the floor is wet now!",
+      "families": [
+        "tide",
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "ability_miss",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0145",
+      "speaker": "kendall",
+      "trigger": "ability_follow",
+      "when": {
+        "id": "steam_vent"
+      },
+      "priority": 25,
+      "text": "Steam in the cage. My glasses fogged up, and I don't wear glasses.",
+      "families": [
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "ability_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0146",
+      "speaker": "kendall",
+      "trigger": "ability_follow",
+      "when": {
+        "id": "tide_spit"
+      },
+      "priority": 25,
+      "text": "That spit left a puddle. The puddle is part of the fight now.",
+      "families": [
+        "tide"
+      ],
+      "energy": "low",
+      "situation": "ability_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0147",
+      "speaker": "kendall",
+      "trigger": "ability_follow",
+      "when": {
+        "id": "gust_bomb"
+      },
+      "priority": 25,
+      "text": "The Gust Bomb blew my notes into next week.",
+      "families": [
+        "notes",
+        "weather"
+      ],
+      "energy": "low",
+      "situation": "ability_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0148",
+      "speaker": "kendall",
+      "trigger": "ability_follow",
+      "when": {
+        "id": "bulldoze"
+      },
+      "priority": 25,
+      "text": "Dozer charged. The cage held. I held my breath.",
+      "families": [
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "ability_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0149",
+      "speaker": "kendall",
+      "trigger": "ability_follow",
+      "when": {
+        "id": "sludge_lob"
+      },
+      "priority": 25,
+      "text": "There's sludge on the floor now. I'm told that's the plan.",
+      "families": [
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "ability_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0150",
+      "speaker": "kendall",
+      "trigger": "ability_follow",
+      "when": {
+        "id": "arc_lash"
+      },
+      "priority": 25,
+      "text": "The spark followed them around. Sparks are very persistent.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0151",
+      "speaker": "kendall",
+      "trigger": "ability_follow",
+      "when": {
+        "id": "cut_the_angle"
+      },
+      "priority": 25,
+      "text": "Varga cut the angle. I cut my sandwich into angles. Similar energy.",
+      "families": [
+        "snacks"
+      ],
+      "energy": "low",
+      "situation": "ability_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0152",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 86,
+      "text": "MELTDOWN! Stoke's boiler blows its top and everything nearby gets toasted!",
+      "families": [],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0153",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 86,
+      "text": "The furnace door is OPEN! That's Meltdown, folks, and it is HOT!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0154",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 86,
+      "text": "HIGH TIDE! The harbour comes over the wall and Dredge rides the wave!",
+      "families": [
+        "tide"
+      ],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0155",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 86,
+      "text": "Dredge calls in the tide! Everybody's ankle deep and the crab is smiling!",
+      "families": [
+        "tide"
+      ],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0156",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 86,
+      "text": "HURRICANE STRUT! Gusto whips up a storm and struts right through it!",
+      "families": [
+        "weather"
+      ],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0157",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 86,
+      "text": "The wind's at Gusto's back now! Hurricane Strut, and the crowd's hair is ruined!",
+      "families": [
+        "weather",
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0158",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 86,
+      "text": "LANDSLIDE! Dozer brings the whole hillside with him!",
+      "families": [],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0159",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 86,
+      "text": "Here comes the Landslide! Rocks, dust, and one very determined Shovelsnout!",
+      "families": [],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0160",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 86,
+      "text": "OVERFLOW! The drains back up and Slurry surfs right out of them!",
+      "families": [],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0161",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 86,
+      "text": "Slurry hits Overflow! A wave of sludge, and the floor is now a swamp!",
+      "families": [
+        "tide",
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0162",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 86,
+      "text": "OVERCHARGE! Jitters lights up like the whole cannery's fuse box!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0163",
+      "speaker": "barnaby",
+      "trigger": "juice",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 86,
+      "text": "Jitters goes into Overcharge! Every hair in the building is standing up!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "juice",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0164",
+      "speaker": "kendall",
+      "trigger": "juice_follow",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 25,
+      "text": "I can feel the heat from up here. My notes are toasted.",
+      "families": [
+        "notes"
+      ],
+      "energy": "medium",
+      "situation": "juice_follow",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt17_0165",
+      "speaker": "kendall",
+      "trigger": "juice_follow",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 25,
+      "text": "My shoes are wet. I'm in the booth. How are my shoes wet?",
+      "families": [
+        "booth",
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "juice_follow",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt17_0166",
+      "speaker": "kendall",
+      "trigger": "juice_follow",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 25,
+      "text": "That's the windiest thing I've seen since the last time Gusto fought.",
+      "families": [],
+      "energy": "low",
+      "situation": "juice_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0167",
+      "speaker": "kendall",
+      "trigger": "juice_follow",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 25,
+      "text": "I'm told that's a landslide. I'm told to stay in my seat.",
+      "families": [
+        "booth"
+      ],
+      "energy": "low",
+      "situation": "juice_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0168",
+      "speaker": "kendall",
+      "trigger": "juice_follow",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 25,
+      "text": "The floor is sludge now. I'm keeping my feet up on the desk.",
+      "families": [
+        "booth",
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "juice_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0169",
+      "speaker": "kendall",
+      "trigger": "juice_follow",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 25,
+      "text": "The lights flickered. I hope that was him and not the building.",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "juice_follow",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt17_0170",
+      "speaker": "kendall",
+      "trigger": "juice_follow",
+      "when": {
+        "creature": "f_varga"
+      },
+      "priority": 25,
+      "text": "Championship Rounds. He just got faster in the middle of a fight. Rude.",
+      "families": [],
+      "energy": "low",
+      "situation": "juice_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0171",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 85,
+      "text": "Born in a boiler room and raised on coal smoke: STOKE!",
+      "families": [],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0172",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 85,
+      "text": "The newt with a furnace and a grudge! Turn up the heat for STOKE!",
+      "families": [],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0173",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 85,
+      "text": "Hauled up from the harbour floor with a claw for every argument: DREDGE!",
+      "families": [
+        "tide",
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0174",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 85,
+      "text": "He's patient, he's armoured, and he's never late for the tide: DREDGE!",
+      "families": [
+        "tide"
+      ],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0175",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 85,
+      "text": "He styles his crest before every fight and after every hit: GUSTO!",
+      "families": [],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0176",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 85,
+      "text": "Quick wings, loud mouth, perfect hair: the Showboat Tern, GUSTO!",
+      "families": [],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0177",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 85,
+      "text": "Shovel first, questions never! Make some room for DOZER!",
+      "families": [],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0178",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 85,
+      "text": "He dug through three walls to get here tonight: it's DOZER!",
+      "families": [],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0179",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 85,
+      "text": "Straight out of the storm drain, slick and smiling: SLURRY!",
+      "families": [
+        "tide",
+        "weather"
+      ],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0180",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 85,
+      "text": "Mind the puddles, folks, they're probably Slurry. Here comes SLURRY!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0181",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 85,
+      "text": "One part jellyfish, three parts battery, all nerves: JITTERS!",
+      "families": [],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0182",
+      "speaker": "barnaby",
+      "trigger": "intro",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 85,
+      "text": "He's buzzing, he's blinking, he's somehow already moving: JITTERS!",
+      "families": [],
+      "energy": "high",
+      "situation": "intro",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0183",
+      "speaker": "kendall",
+      "trigger": "intro_follow",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 25,
+      "text": "Every time Stoke walks out, the booth gets two degrees warmer.",
+      "families": [
+        "booth"
+      ],
+      "energy": "low",
+      "situation": "intro_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0184",
+      "speaker": "kendall",
+      "trigger": "intro_follow",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 25,
+      "text": "Dredge waved at me once. It took four seconds. Very thorough.",
+      "families": [],
+      "energy": "low",
+      "situation": "intro_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0185",
+      "speaker": "kendall",
+      "trigger": "intro_follow",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 25,
+      "text": "Gusto signed my notebook before I could ask him not to.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "intro_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0186",
+      "speaker": "kendall",
+      "trigger": "intro_follow",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 25,
+      "text": "Dozer bumped the door frame on the way in. The door frame lost.",
+      "families": [],
+      "energy": "low",
+      "situation": "intro_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0187",
+      "speaker": "kendall",
+      "trigger": "intro_follow",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 25,
+      "text": "Slurry left a trail on the way in. I'm not stepping in it.",
+      "families": [],
+      "energy": "low",
+      "situation": "intro_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0188",
+      "speaker": "kendall",
+      "trigger": "intro_follow",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 25,
+      "text": "Jitters is vibrating. I think that's excitement. I hope that's excitement.",
+      "families": [],
+      "energy": "low",
+      "situation": "intro_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0189",
+      "speaker": "kendall",
+      "trigger": "intro_follow",
+      "when": {
+        "creature": "f_varga"
+      },
+      "priority": 25,
+      "text": "Varga warmed up with forty kicks. I warmed up with forty crackers.",
+      "families": [
+        "snacks"
+      ],
+      "energy": "low",
+      "situation": "intro_follow",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0190",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {
+        "creature": "f_varga"
+      },
+      "priority": 95,
+      "text": "VARGA wins! The Cage Rules guest goes home with his house rules intact!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0191",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {
+        "creature": "f_varga"
+      },
+      "priority": 95,
+      "text": "Your winner, by technique and very sore shins: VARGA!",
+      "families": [],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0192",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {
+        "creature": "f_varga"
+      },
+      "priority": 95,
+      "text": "Varga takes it! Four limbs, one plan, and the plan worked!",
+      "families": [],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0193",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {
+        "creature": "f_knell"
+      },
+      "priority": 95,
+      "text": "KNELL wins! The Hollow Diver rings the last bell of the night!",
+      "families": [],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0194",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {
+        "creature": "f_knell"
+      },
+      "priority": 95,
+      "text": "Your winner, from the bottom of the harbour: KNELL!",
+      "families": [
+        "tide"
+      ],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0195",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {
+        "creature": "f_knell"
+      },
+      "priority": 95,
+      "text": "Knell takes it! Nobody's home in that helmet, and it still won!",
+      "families": [],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0196",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {},
+      "priority": 95,
+      "text": "And that's your winner, folks! Raise the arm and raise the roof!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0197",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {},
+      "priority": 95,
+      "text": "Winner, winner, cannery dinner! What a performance!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0198",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {},
+      "priority": 95,
+      "text": "There's your winner! Somebody start the victory music, the good one!",
+      "families": [],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0199",
+      "speaker": "barnaby",
+      "trigger": "win",
+      "when": {},
+      "priority": 95,
+      "text": "The fight is won! Bring out the trophy, or at least a trophy-shaped crate!",
+      "families": [],
+      "energy": "high",
+      "situation": "win",
+      "delivery": "D:ceremony"
+    },
+    {
+      "id": "cmt17_0200",
+      "speaker": "barnaby",
+      "trigger": "first_hit",
+      "when": {},
+      "priority": 45,
+      "text": "First touch of the night! Somebody's warmed up and somebody's not!",
+      "families": [],
+      "energy": "medium",
+      "situation": "first_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0201",
+      "speaker": "barnaby",
+      "trigger": "first_hit",
+      "when": {},
+      "priority": 45,
+      "text": "And the first clean shot lands! The book is open, folks!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "first_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0202",
+      "speaker": "barnaby",
+      "trigger": "first_hit",
+      "when": {},
+      "priority": 45,
+      "text": "First bruise of the fight! Glandco reminds you that bruises are temporary!",
+      "families": [
+        "glandco"
+      ],
+      "energy": "medium",
+      "situation": "first_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0203",
+      "speaker": "kendall",
+      "trigger": "first_hit",
+      "when": {},
+      "priority": 45,
+      "text": "First hit. I've written \"one\". This is going very well.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "first_hit",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0204",
+      "speaker": "barnaby",
+      "trigger": "first_hit",
+      "when": {
+        "who": "player"
+      },
+      "priority": 45,
+      "text": "You landed first, kid! Now don't get comfortable!",
+      "families": [],
+      "energy": "medium",
+      "situation": "first_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0205",
+      "speaker": "barnaby",
+      "trigger": "first_hit",
+      "when": {
+        "who": "opponent"
+      },
+      "priority": 45,
+      "text": "They got there first, kid. That's information, not a verdict.",
+      "families": [],
+      "energy": "medium",
+      "situation": "first_hit",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0206",
+      "speaker": "barnaby",
+      "trigger": "guard_break",
+      "when": {},
+      "priority": 60,
+      "text": "GUARD BREAK! The shell cracks and the door is wide open!",
+      "families": [],
+      "energy": "high",
+      "situation": "guard_break",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0207",
+      "speaker": "barnaby",
+      "trigger": "guard_break",
+      "when": {},
+      "priority": 60,
+      "text": "That guard just gave out! Stamina's gone and so is the defence!",
+      "families": [],
+      "energy": "high",
+      "situation": "guard_break",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0208",
+      "speaker": "barnaby",
+      "trigger": "guard_break",
+      "when": {},
+      "priority": 60,
+      "text": "The guard is broken! Somebody's standing there with nothing but hope!",
+      "families": [],
+      "energy": "high",
+      "situation": "guard_break",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0209",
+      "speaker": "kendall",
+      "trigger": "guard_break",
+      "when": {},
+      "priority": 60,
+      "text": "The guard broke. I could hear it from here. It sounded expensive.",
+      "families": [],
+      "energy": "medium",
+      "situation": "guard_break",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt17_0210",
+      "speaker": "kendall",
+      "trigger": "guard_break",
+      "when": {},
+      "priority": 60,
+      "text": "Their arms said \"no more blocking\". Their arms were right.",
+      "families": [],
+      "energy": "low",
+      "situation": "guard_break",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0211",
+      "speaker": "barnaby",
+      "trigger": "guard_break",
+      "when": {
+        "target": "player"
+      },
+      "priority": 60,
+      "text": "Your guard's gone, kid! Get out of there!",
+      "families": [],
+      "energy": "high",
+      "situation": "guard_break",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0212",
+      "speaker": "barnaby",
+      "trigger": "grab_throw",
+      "when": {},
+      "priority": 40,
+      "text": "Grabbed and thrown! Somebody just took the express route across the cage!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "grab_throw",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0213",
+      "speaker": "barnaby",
+      "trigger": "grab_throw",
+      "when": {},
+      "priority": 40,
+      "text": "THROWN! A handful of fighter, flung like a sack of fish!",
+      "families": [],
+      "energy": "high",
+      "situation": "grab_throw",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0214",
+      "speaker": "barnaby",
+      "trigger": "grab_throw",
+      "when": {},
+      "priority": 40,
+      "text": "Snatched up and tossed! Guarding doesn't help when they just pick you up!",
+      "families": [],
+      "energy": "medium",
+      "situation": "grab_throw",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0215",
+      "speaker": "barnaby",
+      "trigger": "grab_throw",
+      "when": {},
+      "priority": 40,
+      "text": "Up and over! That throw had a destination in mind!",
+      "families": [],
+      "energy": "medium",
+      "situation": "grab_throw",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0216",
+      "speaker": "kendall",
+      "trigger": "grab_throw",
+      "when": {},
+      "priority": 25,
+      "text": "That was a throw. I wrote it down in throwing letters.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "grab_throw",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0217",
+      "speaker": "barnaby",
+      "trigger": "combo",
+      "when": {},
+      "priority": 45,
+      "text": "Three clean in a row! That's a string, folks, that's a real string!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "combo",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0218",
+      "speaker": "barnaby",
+      "trigger": "combo",
+      "when": {},
+      "priority": 45,
+      "text": "Bang, bang, BANG! The whole set lands!",
+      "families": [],
+      "energy": "high",
+      "situation": "combo",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0219",
+      "speaker": "barnaby",
+      "trigger": "combo",
+      "when": {},
+      "priority": 45,
+      "text": "Four hits, no reply! Somebody call a timeout! We don't have timeouts!",
+      "families": [],
+      "energy": "high",
+      "situation": "combo",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0220",
+      "speaker": "kendall",
+      "trigger": "combo",
+      "when": {},
+      "priority": 45,
+      "text": "That combination had more steps than my morning routine.",
+      "families": [],
+      "energy": "low",
+      "situation": "combo",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0221",
+      "speaker": "kendall",
+      "trigger": "combo",
+      "when": {},
+      "priority": 45,
+      "text": "I counted the hits. I'm going to need a bigger number.",
+      "families": [],
+      "energy": "low",
+      "situation": "combo",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0222",
+      "speaker": "barnaby",
+      "trigger": "combo",
+      "when": {
+        "kind": "finisher"
+      },
+      "priority": 45,
+      "text": "And the finisher lands on the end of it! Beautiful, brutal arithmetic!",
+      "families": [
+        "science"
+      ],
+      "energy": "high",
+      "situation": "combo",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0223",
+      "speaker": "barnaby",
+      "trigger": "parry",
+      "when": {},
+      "priority": 50,
+      "text": "PARRIED! Slapped away at the very last moment!",
+      "families": [],
+      "energy": "high",
+      "situation": "parry",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0224",
+      "speaker": "barnaby",
+      "trigger": "parry",
+      "when": {},
+      "priority": 50,
+      "text": "What a parry! That attack bounced off like it hit a church door!",
+      "families": [],
+      "energy": "high",
+      "situation": "parry",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0225",
+      "speaker": "kendall",
+      "trigger": "parry",
+      "when": {},
+      "priority": 50,
+      "text": "A parry. I tried that once with a pigeon. The pigeon won.",
+      "families": [],
+      "energy": "low",
+      "situation": "parry",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0226",
+      "speaker": "barnaby",
+      "trigger": "parry",
+      "when": {
+        "kind": "third"
+      },
+      "priority": 50,
+      "text": "Another parry! They're reading everything tonight!",
+      "families": [],
+      "energy": "medium",
+      "situation": "parry",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0227",
+      "speaker": "barnaby",
+      "trigger": "knockdown",
+      "when": {
+        "scoring": "ten_point"
+      },
+      "priority": 80,
+      "text": "DOWN! That's a knockdown, and it's going straight onto the scorecards!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "knockdown",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0228",
+      "speaker": "barnaby",
+      "trigger": "knockdown",
+      "when": {
+        "scoring": "ten_point"
+      },
+      "priority": 80,
+      "text": "Knocked DOWN! The judges are writing that one in capital letters!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "knockdown",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0229",
+      "speaker": "barnaby",
+      "trigger": "knockdown",
+      "when": {
+        "referee": true
+      },
+      "priority": 80,
+      "text": "DOWN they go! The referee's on it, folks, here comes the count!",
+      "families": [
+        "officials",
+        "crowd",
+        "science"
+      ],
+      "energy": "high",
+      "situation": "knockdown",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0230",
+      "speaker": "barnaby",
+      "trigger": "knockdown",
+      "when": {
+        "referee": true
+      },
+      "priority": 80,
+      "text": "Off the feet! That's a knockdown, and the referee is right there!",
+      "families": [
+        "officials"
+      ],
+      "energy": "high",
+      "situation": "knockdown",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0231",
+      "speaker": "barnaby",
+      "trigger": "knockdown",
+      "when": {},
+      "priority": 80,
+      "text": "Flat on the canvas! Get up, get up, it's not over!",
+      "families": [],
+      "energy": "high",
+      "situation": "knockdown",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0232",
+      "speaker": "barnaby",
+      "trigger": "knockdown",
+      "when": {
+        "kind": "repeat"
+      },
+      "priority": 80,
+      "text": "Down AGAIN! That's not a stumble anymore, that's a pattern!",
+      "families": [],
+      "energy": "high",
+      "situation": "knockdown",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0233",
+      "speaker": "barnaby",
+      "trigger": "low_health",
+      "when": {},
+      "priority": 45,
+      "text": "The health bar's flashing, folks! One more good shot and that's it!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "low_health",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0234",
+      "speaker": "kendall",
+      "trigger": "low_health",
+      "when": {},
+      "priority": 45,
+      "text": "Somebody's running low. I'm also running low, on pencils.",
+      "families": [],
+      "energy": "low",
+      "situation": "low_health",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0235",
+      "speaker": "barnaby",
+      "trigger": "low_health",
+      "when": {
+        "who": "player"
+      },
+      "priority": 45,
+      "text": "You're in the red, kid! Guard up and pick your moment!",
+      "families": [],
+      "energy": "high",
+      "situation": "low_health",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0236",
+      "speaker": "barnaby",
+      "trigger": "low_health",
+      "when": {
+        "who": "opponent"
+      },
+      "priority": 45,
+      "text": "They're nearly done, kid! Don't rush it, finish it!",
+      "families": [],
+      "energy": "high",
+      "situation": "low_health",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0237",
+      "speaker": "barnaby",
+      "trigger": "low_health",
+      "when": {
+        "who": "both"
+      },
+      "priority": 45,
+      "text": "Both of them on the edge! The next clean hit wins it!",
+      "families": [],
+      "energy": "high",
+      "situation": "low_health",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0238",
+      "speaker": "barnaby",
+      "trigger": "time",
+      "when": {
+        "kind": "ten_seconds"
+      },
+      "priority": 70,
+      "text": "Ten seconds! Throw what you've got, the clock isn't waiting!",
+      "families": [],
+      "energy": "high",
+      "situation": "time",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0239",
+      "speaker": "barnaby",
+      "trigger": "time",
+      "when": {
+        "kind": "ten_seconds"
+      },
+      "priority": 70,
+      "text": "Ten seconds left in the round! Make it count, make it loud!",
+      "families": [
+        "science"
+      ],
+      "energy": "high",
+      "situation": "time",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0240",
+      "speaker": "barnaby",
+      "trigger": "time",
+      "when": {
+        "kind": "ten_seconds"
+      },
+      "priority": 70,
+      "text": "Here comes the ten-second warning! Last chance to leave a mark!",
+      "families": [],
+      "energy": "high",
+      "situation": "time",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0241",
+      "speaker": "kendall",
+      "trigger": "time",
+      "when": {
+        "kind": "ten_seconds"
+      },
+      "priority": 70,
+      "text": "Ten seconds. Just enough time for one more bad decision.",
+      "families": [],
+      "energy": "low",
+      "situation": "time",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0242",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {
+        "round": "2plus"
+      },
+      "priority": 75,
+      "text": "Next round! Fresh bell, same fighters, brand-new problems!",
+      "families": [],
+      "energy": "high",
+      "situation": "round_start",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0243",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {
+        "round": "2plus"
+      },
+      "priority": 75,
+      "text": "Here we go again! The bell rings, the critters swing!",
+      "families": [],
+      "energy": "high",
+      "situation": "round_start",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0244",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {
+        "round": "final"
+      },
+      "priority": 75,
+      "text": "Final round! Everything they've got left goes on the table now!",
+      "families": [],
+      "energy": "high",
+      "situation": "round_start",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0245",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {
+        "round": "final"
+      },
+      "priority": 75,
+      "text": "This is the last round, folks! No more saving it for later!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "round_start",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0246",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {},
+      "priority": 75,
+      "text": "And we're underway! Touch gloves and get to work!",
+      "families": [],
+      "energy": "high",
+      "situation": "round_start",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0247",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {
+        "fence": true
+      },
+      "priority": 75,
+      "text": "FIGHT! The bell's rung, the crowd's up, and the cage door is shut!",
+      "families": [
+        "crowd",
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "round_start",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0248",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {
+        "title": true
+      },
+      "priority": 75,
+      "text": "It's a championship fight, folks! Every round tonight is worth gold!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "round_start",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0249",
+      "speaker": "barnaby",
+      "trigger": "round_start",
+      "when": {
+        "match_point": true
+      },
+      "priority": 75,
+      "text": "Match point, folks! One more round win and somebody takes the fight!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "round_start",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0250",
+      "speaker": "barnaby",
+      "trigger": "taunt",
+      "when": {},
+      "priority": 40,
+      "text": "A TAUNT! Bold choice, folks, very bold, possibly unwise!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "taunt",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0251",
+      "speaker": "barnaby",
+      "trigger": "taunt",
+      "when": {},
+      "priority": 40,
+      "text": "Showboating in the middle of a fight! The crowd loves it, the opponent doesn't!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "taunt",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0252",
+      "speaker": "kendall",
+      "trigger": "taunt",
+      "when": {},
+      "priority": 25,
+      "text": "A taunt. I taunt my kettle sometimes. It boils anyway.",
+      "families": [
+        "snacks"
+      ],
+      "energy": "low",
+      "situation": "taunt",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0253",
+      "speaker": "barnaby",
+      "trigger": "taunt_punished",
+      "when": {},
+      "priority": 40,
+      "text": "Taunt, meet fist! That's what happens when you show off!",
+      "families": [],
+      "energy": "high",
+      "situation": "taunt_punished",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0254",
+      "speaker": "barnaby",
+      "trigger": "windup",
+      "when": {},
+      "priority": 40,
+      "text": "Big wind-up! Everything's going into this one!",
+      "families": [
+        "weather"
+      ],
+      "energy": "medium",
+      "situation": "windup",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0255",
+      "speaker": "barnaby",
+      "trigger": "windup",
+      "when": {},
+      "priority": 40,
+      "text": "Here comes the heavy! The whole body is loading up!",
+      "families": [],
+      "energy": "medium",
+      "situation": "windup",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0256",
+      "speaker": "barnaby",
+      "trigger": "stamina",
+      "when": {},
+      "priority": 40,
+      "text": "Stamina's running dry! Every swing from here is on credit!",
+      "families": [],
+      "energy": "high",
+      "situation": "stamina",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt17_0257",
+      "speaker": "kendall",
+      "trigger": "stamina",
+      "when": {},
+      "priority": 25,
+      "text": "They're out of breath. I'm out of breath just narrating it.",
+      "families": [],
+      "energy": "low",
+      "situation": "stamina",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0258",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 40,
+      "text": "Stoke fights like a boiler with the safety valve removed: all pressure, all the time.",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0259",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 40,
+      "text": "Watch the Furnace Haymaker. Stoke winds it up long, and it lands longer!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0260",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 40,
+      "text": "Jab, cross, hook: Stoke throws them in that order every time, and it still works!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0261",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 40,
+      "text": "That chimney on Stoke's head puffs harder the angrier he gets. It's puffing now!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0262",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 25,
+      "text": "Stoke's furnace is glowing. I keep wanting to roast something on it.",
+      "families": [
+        "snacks"
+      ],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0263",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_stoke"
+      },
+      "priority": 25,
+      "text": "Stoke's tail is short. His temper is shorter. I've measured both.",
+      "families": [],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0264",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 40,
+      "text": "Dredge is slow on the feet but fast with the claws. Don't stand in front of him!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0265",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 40,
+      "text": "That big crusher claw does the talking. The little claw does the paperwork!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0266",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 40,
+      "text": "Hitting Dredge on the shell is like knocking on a bank vault!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0267",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 40,
+      "text": "Dredge loves a long fight. The longer it goes, the more the tide comes in!",
+      "families": [
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0268",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 25,
+      "text": "Dredge's eyes are on stalks. He can watch the fight and the snack stand at once.",
+      "families": [
+        "snacks"
+      ],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0269",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dredge"
+      },
+      "priority": 25,
+      "text": "The barnacles on Dredge are glowing. I hope that's normal for barnacles.",
+      "families": [],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0270",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 40,
+      "text": "Gusto's quick on the wing and quicker with the mouth. The kicks are fast too!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0271",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 40,
+      "text": "Gusto hates getting pinned down. Keep him moving and he's dangerous!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0272",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 40,
+      "text": "Those long legs are pure reach. Gusto kicks from a different postcode!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0273",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 40,
+      "text": "Light frame, big heart, bigger ego: that's Gusto in a nutshell!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0274",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 25,
+      "text": "Gusto checked his watch in the middle of the round. He doesn't have a watch.",
+      "families": [],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0275",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_gusto"
+      },
+      "priority": 25,
+      "text": "Gusto's crest hasn't moved all fight. I think it's lacquered.",
+      "families": [],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0276",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 40,
+      "text": "Dozer doesn't do angles. Dozer does straight lines through whatever's there!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0277",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 40,
+      "text": "Get Dozer turning and he's slow. Let him charge and he's a freight train!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0278",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 40,
+      "text": "That shovel snout isn't decoration. Dozer digs opponents out of position!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0279",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 40,
+      "text": "The heaviest hitter on the card, folks, and he knows exactly one direction!",
+      "families": [
+        "officials",
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0280",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 25,
+      "text": "Dozer's headlamp is on. I don't know who it's for, but I appreciate it.",
+      "families": [],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0281",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_dozer"
+      },
+      "priority": 25,
+      "text": "Dozer snuffled the floor. I believe he's looking for truffles.",
+      "families": [
+        "snacks",
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0282",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 40,
+      "text": "Slurry's whole body is a weapon: head, tail, fangs, and the floor it leaves behind!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0283",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 40,
+      "text": "That head butt reaches farther than it looks. Slurry lives on it!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0284",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 40,
+      "text": "Slurry wants you standing in the sludge. Every puddle is a plan!",
+      "families": [
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0285",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 40,
+      "text": "Slurry stays low and sneaky. Good luck finding a clean target on that wyrm!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0286",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 25,
+      "text": "Slurry sways when it's thinking. Slurry is always thinking.",
+      "families": [],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0287",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_slurry"
+      },
+      "priority": 25,
+      "text": "I tried to describe Slurry's shape. I wrote \"long\" and stopped there.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0288",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 40,
+      "text": "Jitters is small, jumpy and loaded with volts. Every touch comes with a buzz!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0289",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 40,
+      "text": "Don't let Jitters get underneath you. That little jelly hits harder than he looks!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0290",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 40,
+      "text": "The coil inside Jitters is glowing brighter. That's a jelly with a charge!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0291",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 40,
+      "text": "Slap, double slap, headbonk! Jitters' whole offence sounds like a cartoon!",
+      "families": [],
+      "energy": "medium",
+      "situation": "fighter_color",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt17_0292",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 25,
+      "text": "Jitters hasn't stopped bouncing since the bell. I'm tired just watching.",
+      "families": [],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0293",
+      "speaker": "kendall",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_jitters"
+      },
+      "priority": 25,
+      "text": "Jitters has antennae. They're for balance, or for receiving radio. Maybe both.",
+      "families": [],
+      "energy": "low",
+      "situation": "fighter_color",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0294",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "sizzle"
+      },
+      "priority": 40,
+      "text": "Sizzle! That's a burn that ticks away and slows the stamina too!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0295",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "sizzle"
+      },
+      "priority": 40,
+      "text": "Somebody's Sizzling! Five seconds of burn and a very short temper!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0296",
+      "speaker": "kendall",
+      "trigger": "element",
+      "when": {
+        "status": "sizzle"
+      },
+      "priority": 25,
+      "text": "Sizzle. I can smell it from here. It smells like breakfast.",
+      "families": [
+        "snacks"
+      ],
+      "energy": "low",
+      "situation": "element",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0297",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "soaked"
+      },
+      "priority": 40,
+      "text": "Soaked! Slower feet, shorter dodges, and they'll fly farther when hit!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0298",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "soaked"
+      },
+      "priority": 40,
+      "text": "That fighter's Soaked through! And water plus volts is a bad combination!",
+      "families": [
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0299",
+      "speaker": "kendall",
+      "trigger": "element",
+      "when": {
+        "status": "soaked"
+      },
+      "priority": 25,
+      "text": "Soaked. I'd offer a towel, but I'm using mine as a napkin.",
+      "families": [
+        "notes"
+      ],
+      "energy": "low",
+      "situation": "element",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0300",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "jolted"
+      },
+      "priority": 40,
+      "text": "Jolted! Little shocks every second, and those cooldowns crawl!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0301",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "jolted"
+      },
+      "priority": 40,
+      "text": "They're Jolted! Every pulse locks them up for a heartbeat!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0302",
+      "speaker": "kendall",
+      "trigger": "element",
+      "when": {
+        "status": "jolted"
+      },
+      "priority": 25,
+      "text": "Jolted. I touched the booth railing once. I understand completely.",
+      "families": [
+        "booth"
+      ],
+      "energy": "low",
+      "situation": "element",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0303",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "gunked"
+      },
+      "priority": 40,
+      "text": "Gunked! Sludge that burns, a guard that costs more, healing that barely works!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0304",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "gunked"
+      },
+      "priority": 40,
+      "text": "That's Gunked! The guard just got expensive and the medicine stopped working!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0305",
+      "speaker": "kendall",
+      "trigger": "element",
+      "when": {
+        "status": "gunked"
+      },
+      "priority": 25,
+      "text": "Gunked. That fighter now looks like my kitchen sink.",
+      "families": [],
+      "energy": "low",
+      "situation": "element",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0306",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "caked"
+      },
+      "priority": 40,
+      "text": "Caked in grit! Less poise, slower recovery, and dodging costs a fortune!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0307",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "caked"
+      },
+      "priority": 40,
+      "text": "Caked! That mud makes every heavy hit stagger them harder!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0308",
+      "speaker": "kendall",
+      "trigger": "element",
+      "when": {
+        "status": "caked"
+      },
+      "priority": 25,
+      "text": "Caked. I don't recommend it as a skincare routine.",
+      "families": [],
+      "energy": "low",
+      "situation": "element",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0309",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "winded"
+      },
+      "priority": 40,
+      "text": "Winded! No stamina coming back, and every dodge costs double!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0310",
+      "speaker": "barnaby",
+      "trigger": "element",
+      "when": {
+        "status": "winded"
+      },
+      "priority": 40,
+      "text": "They're Winded! Easy to shove, easy to knock around, hard to escape!",
+      "families": [],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0311",
+      "speaker": "kendall",
+      "trigger": "element",
+      "when": {
+        "status": "winded"
+      },
+      "priority": 25,
+      "text": "Winded. I get winded on the stairs up to this booth.",
+      "families": [
+        "booth"
+      ],
+      "energy": "low",
+      "situation": "element",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0312",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {},
+      "priority": 55,
+      "text": "ELEMENTAL REACTION! Two elements meet and nobody's happy about it!",
+      "families": [],
+      "energy": "high",
+      "situation": "reaction",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0313",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {},
+      "priority": 55,
+      "text": "Whoa, a reaction! The elements just picked a fight of their own!",
+      "families": [],
+      "energy": "high",
+      "situation": "reaction",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0314",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "steam_burst"
+      },
+      "priority": 55,
+      "text": "STEAM BURST! Fire meets water and the whole cage turns into a kettle!",
+      "families": [
+        "snacks",
+        "tide",
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "reaction",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0315",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "backdraft"
+      },
+      "priority": 55,
+      "text": "BACKDRAFT! The wind feeds the flames and the flames say thank you!",
+      "families": [
+        "weather"
+      ],
+      "energy": "high",
+      "situation": "reaction",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0316",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "mudbound"
+      },
+      "priority": 55,
+      "text": "MUDBOUND! Brine and grit make mud, and mud makes everybody slow!",
+      "families": [],
+      "energy": "medium",
+      "situation": "reaction",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0317",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "dilute"
+      },
+      "priority": 55,
+      "text": "DILUTE! The water washes the sludge out in one big splash!",
+      "families": [
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "reaction",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0318",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "catalyze"
+      },
+      "priority": 55,
+      "text": "CATALYZE! The volts cook the sludge faster! That stings twice!",
+      "families": [],
+      "energy": "medium",
+      "situation": "reaction",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0319",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "crust"
+      },
+      "priority": 55,
+      "text": "CRUST! Sludge and grit set hard, and nobody's dodging out of that shell!",
+      "families": [],
+      "energy": "medium",
+      "situation": "reaction",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0320",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "spray"
+      },
+      "priority": 55,
+      "text": "SPRAY! The wind flings the sludge everywhere! Everywhere, folks!",
+      "families": [
+        "weather",
+        "crowd"
+      ],
+      "energy": "medium",
+      "situation": "reaction",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0321",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "sandblast"
+      },
+      "priority": 55,
+      "text": "SANDBLAST! A face full of grit, and the guard is wide open!",
+      "families": [],
+      "energy": "high",
+      "situation": "reaction",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0322",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "bell_ringer"
+      },
+      "priority": 55,
+      "text": "BELL RINGER! Scrap meets spectral and the whole head rings!",
+      "families": [],
+      "energy": "high",
+      "situation": "reaction",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0323",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "grave_chill"
+      },
+      "priority": 55,
+      "text": "GRAVE CHILL! Spectral cold in harbour water, right down to the bones!",
+      "families": [
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "reaction",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0324",
+      "speaker": "barnaby",
+      "trigger": "reaction",
+      "when": {
+        "reaction": "crack_guard"
+      },
+      "priority": 55,
+      "text": "CRACK GUARD! Scrap into grit, and that guard just split down the middle!",
+      "families": [],
+      "energy": "high",
+      "situation": "reaction",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt17_0325",
+      "speaker": "barnaby",
+      "trigger": "hazard",
+      "when": {},
+      "priority": 40,
+      "text": "The arena joins the fight! Watch your feet, folks, the floor has opinions!",
+      "families": [
+        "crowd",
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "hazard",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0326",
+      "speaker": "barnaby",
+      "trigger": "hazard",
+      "when": {},
+      "priority": 40,
+      "text": "Hazard's live! Somebody's about to get a very rude surprise!",
+      "families": [],
+      "energy": "medium",
+      "situation": "hazard",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0327",
+      "speaker": "kendall",
+      "trigger": "hazard",
+      "when": {},
+      "priority": 25,
+      "text": "The arena moved again. I've stopped trusting the furniture.",
+      "families": [
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "hazard",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0328",
+      "speaker": "barnaby",
+      "trigger": "hazard",
+      "when": {
+        "hazard": "wind_gust"
+      },
+      "priority": 40,
+      "text": "Here comes the gust! Hold on to something that isn't the edge!",
+      "families": [
+        "weather"
+      ],
+      "energy": "medium",
+      "situation": "hazard",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0329",
+      "speaker": "barnaby",
+      "trigger": "hazard",
+      "when": {
+        "hazard": "plate_grid"
+      },
+      "priority": 40,
+      "text": "The plate is live! Stay on the rubber mats, kids, the steel is cooking!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "hazard",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0330",
+      "speaker": "barnaby",
+      "trigger": "hazard",
+      "when": {
+        "hazard": "tidal_gutter"
+      },
+      "priority": 40,
+      "text": "The tide's in the gutter! Everybody's ankles, consider yourselves warned!",
+      "families": [
+        "tide",
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "hazard",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0331",
+      "speaker": "barnaby",
+      "trigger": "pickup",
+      "when": {},
+      "priority": 40,
+      "text": "Somebody scooped up the pickup! Free stuff always tastes better!",
+      "families": [],
+      "energy": "medium",
+      "situation": "pickup",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0332",
+      "speaker": "barnaby",
+      "trigger": "pickup",
+      "when": {
+        "kind": "health"
+      },
+      "priority": 40,
+      "text": "Health pickup grabbed! That's a second wind, straight off the floor!",
+      "families": [
+        "weather",
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "pickup",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0333",
+      "speaker": "barnaby",
+      "trigger": "spring",
+      "when": {},
+      "priority": 40,
+      "text": "Boing! Off the Spring Pad and straight up!",
+      "families": [],
+      "energy": "medium",
+      "situation": "spring",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0334",
+      "speaker": "kendall",
+      "trigger": "spring",
+      "when": {},
+      "priority": 25,
+      "text": "Someone just used the trampoline. Respect.",
+      "families": [],
+      "energy": "low",
+      "situation": "spring",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_0335",
+      "speaker": "barnaby",
+      "trigger": "tag",
+      "when": {},
+      "priority": 40,
+      "text": "Tag! Fresh legs come into the cage!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "tag",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0336",
+      "speaker": "barnaby",
+      "trigger": "tag",
+      "when": {},
+      "priority": 40,
+      "text": "The tag is made! In comes the partner, swinging!",
+      "families": [],
+      "energy": "medium",
+      "situation": "tag",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt17_0337",
+      "speaker": "kendall",
+      "trigger": "tag",
+      "when": {},
+      "priority": 25,
+      "text": "They tagged out. I'd like to tag out of this booth for a sandwich.",
+      "families": [
+        "snacks",
+        "booth"
+      ],
+      "energy": "low",
+      "situation": "tag",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt17_x001",
+      "speaker": "kendall",
+      "trigger": "big_hit",
+      "when": {
+        "kind": "wall"
+      },
+      "priority": 22,
+      "text": "I think the cage just moved. Barnaby says it was only the camera.",
+      "families": [
+        "camera",
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "wall",
+      "delivery": "K:dry",
+      "replaces": "ann_exp_0086"
+    },
+    {
+      "id": "cmt17_x002",
+      "speaker": "kendall",
+      "trigger": "element",
+      "when": {
+        "element": "brine"
+      },
+      "priority": 22,
+      "text": "I thought Brine was a drink. Barnaby says it is not a drink.",
+      "families": [
+        "tide",
+        "booth"
+      ],
+      "energy": "low",
+      "situation": "element",
+      "delivery": "K:dry",
+      "replaces": "ann_exp_0206"
+    },
+    {
+      "id": "cmt17_x003",
+      "speaker": "kendall",
+      "trigger": "element",
+      "when": {},
+      "priority": 22,
+      "text": "If the floor starts talking, Barnaby, I am letting you answer it.",
+      "families": [
+        "floor",
+        "booth",
+        "conversation"
+      ],
+      "energy": "low",
+      "situation": "element",
+      "delivery": "K:dry",
+      "replaces": "ann_exp_0225"
+    },
+    {
+      "id": "cmt17_x004",
+      "speaker": "barnaby",
+      "trigger": "element_color",
+      "when": {
+        "element": "spectral"
+      },
+      "priority": 25,
+      "text": "Haunted lasts five seconds: cooldowns recover slower and healing is twenty percent weaker.",
+      "families": [
+        "haunted"
+      ],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:warm",
+      "replaces": "ann_exp_0829"
+    },
+    {
+      "id": "cmt17_x005",
+      "speaker": "barnaby",
+      "trigger": "element_color",
+      "when": {
+        "element": "spectral"
+      },
+      "priority": 25,
+      "text": "Haunted slows cooldown recovery by a quarter and cuts received healing by a fifth.",
+      "families": [
+        "haunted"
+      ],
+      "energy": "medium",
+      "situation": "element",
+      "delivery": "D:warm",
+      "replaces": "ann_exp_0830"
+    },
+    {
+      "id": "cmt17_x006",
+      "speaker": "kendall",
+      "trigger": "element_color",
+      "when": {
+        "element": "spectral"
+      },
+      "priority": 25,
+      "text": "Haunted slows your cooldowns down. Mine are slow already.",
+      "families": [
+        "haunted"
+      ],
+      "energy": "low",
+      "situation": "element",
+      "delivery": "K:dry",
+      "replaces": "ann_exp_0837"
+    },
+    {
+      "id": "cmt17_x007",
+      "speaker": "barnaby",
+      "trigger": "fighter_color",
+      "when": {
+        "creature": "f_knell"
+      },
+      "priority": 25,
+      "text": "Port Hook! Knell's quick light hook keeps the opponent turning.",
+      "families": [
+        "strikes"
+      ],
+      "energy": "high",
+      "situation": "fighter",
+      "delivery": "D:call",
+      "replaces": "ann_exp_0799"
+    }
+  ]
+}

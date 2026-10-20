@@ -12069,7 +12069,7 @@
       "trigger": "hit_clean",
       "when": {
         "creature": "f_varga",
-        "move": [
+        "slot": [
           "rl_lkick",
           "ll_lkick",
           "rl_lkick@southpaw",
@@ -12135,7 +12135,7 @@
       "trigger": "hit_clean",
       "when": {
         "creature": "f_varga",
-        "move": [
+        "slot": [
           "rl_bkick",
           "ll_bkick",
           "rl_bkick@southpaw",
@@ -12235,7 +12235,7 @@
       "trigger": "hit_clean",
       "when": {
         "creature": "f_varga",
-        "move": [
+        "slot": [
           "rl_knee",
           "ll_knee",
           "rl_knee@southpaw",
@@ -12256,7 +12256,7 @@
       "trigger": "hit_clean",
       "when": {
         "creature": "f_varga",
-        "move": [
+        "slot": [
           "rh_overhand",
           "lh_overhand",
           "rh_overhand@southpaw",

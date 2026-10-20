@@ -101,6 +101,8 @@ def export(out_path, scratch=None):
                    mesh=extract(body, bone_ids, True), gore=dict(mesh=extract(gore, [], False)),
                    extras=dict(author='Critterweight original art', body_sha256=digest, source='tools/blender/'+scene['cw_id']+'.blend',
                                pipeline='Blender editable meshes; deterministic forge GLB writer'))
+    if scene.get('cw_look'):
+        payload['extras']['look'] = json.loads(scene['cw_look'])
     for mesh in [payload['mesh'], payload['gore']['mesh']]:
         for group in mesh['groups']:
             if any(mesh['colors'][i*4+3] > .001 for i in group['indices']):

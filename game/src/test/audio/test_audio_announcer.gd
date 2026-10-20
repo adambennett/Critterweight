@@ -148,10 +148,14 @@ func test_trigger_picks_specific_fresh_lines_deterministically() -> void:
 	check_eq(str(Audio.line(juice).get("when", {}).get("creature", "")), "f_dredge", "JUICE line is per fighter (%s)" % juice)
 	var counter := Audio.pick_line("big_hit", {"kind": ["counter"]})
 	check_eq(str(Audio.line(counter).get("when", {}).get("kind", "")), "counter", "counter big hit (%s)" % counter)
+	check(Audio.pick_line("big_hit", {"kind": ["wall"]}) != "", "wall lines are reachable")
 	var wall := Audio.pick_line("big_hit", {"kind": ["wall"]})
 	check_eq(str(Audio.line(wall).get("when", {}).get("kind", "")), "wall", "wall splat big hit (%s)" % wall)
 	var ko := Audio.pick_line("ko", {"kind": ["heavy", "fast"], "target": "opponent", "ends": "fight"})
-	check(str(Audio.line(ko).get("when", {}).get("kind", "")) in ["heavy", "fast"], "KO picks a heavy/fast line (got %s)" % ko)
+	var ko_when: Dictionary = Audio.line(ko).get("when", {})
+	check(str(ko_when.get("kind", "")) in ["heavy", "fast"] or str(ko_when.get("ends", "")) == "fight", "KO picks a heavy/fast or fight-ending line (got %s)" % ko)
+	var round_ko := Audio.pick_line("ko", {"kind": [], "target": "opponent", "ends": "round"})
+	check(not str(Audio.line(round_ko).get("text", "")).contains("OVER"), "a KO that takes a round never says it's over (%s)" % round_ko)
 	Audio.use_memory_history()
 	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_dredge", "name": "DREDGE", "team": 0}, {"index": 1, "creature": "f_stoke", "name": "STOKE", "team": 1}], "seed": 3})
 	var juice2 := Audio.pick_line("juice", {"creature": "f_dredge"})
@@ -197,7 +201,7 @@ func test_sim_event_mapping() -> void:
 	check(acts.has("el_hit_scorch"), "Scorch hit layer")
 	var first := false
 	for a in acts:
-		if str(a).begins_with("line:ann_first_"):
+		if str(a).begins_with("line:") and str(Audio.line(str(a).trim_prefix("line:")).get("trigger", "")) == "first_hit":
 			first = true
 	check(first, "first hit announces first blood (%s)" % str(acts))
 	acts = Audio.on_sim_event({"type": "hit", "fighter": 1, "target": 0, "damage": 16.0, "point": p, "normal": Vector3.UP, "blocked": false, "parried": false, "counter": true, "part": "core", "element": "", "quality": 1.0, "move": "heavy", "slot": "heavy", "knockdown": false, "otg": false})
@@ -214,8 +218,10 @@ func test_sim_event_mapping() -> void:
 	check(acts.has("react_short_out"), "reaction sound")
 	acts = Audio.on_sim_event({"type": "ability", "fighter": 0, "slot": "ability1", "id": "steam_vent"})
 	check(acts.has("ab_steam_vent"), "ability signature by move id")
-	acts = Audio.on_sim_event({"type": "ability", "fighter": 0, "slot": "ability2", "id": "unknown_move_xyz"})
-	check(acts.has("ab_generic"), "unknown ability falls back to the generic sound")
+	acts = Audio.on_sim_event({"type": "ability", "fighter": 0, "slot": "ability2", "id": "f_stoke.ability2"})
+	check(acts.has("ab_stoke_fire"), "the ability's own sound comes from its name, not the slot id (%s)" % str(acts))
+	acts = Audio.on_sim_event({"type": "ability", "fighter": 0, "slot": "ability9", "id": "unknown_move_xyz"})
+	check(acts.has("ab_generic"), "an unknown ability falls back to the generic sound")
 	acts = Audio.on_sim_event({"type": "effect", "fighter": 0, "effect": "projectile", "pos": p, "element": "brine", "vfx": "orb"})
 	check(acts.has("proj_launch_brine"), "projectile launch by element")
 	acts = Audio.on_sim_event({"type": "ko", "fighter": 1})
@@ -265,7 +271,12 @@ func test_ten_point_and_referee_event_mapping() -> void:
 	# the decision names the winner (DREDGE), not the local player
 	acts = Audio.on_sim_event({"type": "judges_decision", "winner": 1, "method": "Split Decision", "totals": [[29, 28], [28, 29], [28, 29]],
 		"judges": [0, 1, 1], "teams": [0, 1]}, Vector3.ZERO, {"ten_point": true})
-	check(acts.has("ann_sting") and acts.has("line:ann_time_02"), "decision call (%s)" % str(acts))
+	var dec := ""
+	for a3 in acts:
+		if str(a3).begins_with("line:"):
+			dec = str(a3).trim_prefix("line:")
+	check(acts.has("ann_sting") and str(Audio.line(dec).get("trigger", "")) == "decision", "a decision call (%s)" % str(acts))
+	check(str(Audio.line(dec).get("when", {}).get("kind", "split")) == "split", "a split decision is called as one (%s)" % dec)
 	check(not _subs.is_empty() and str(_subs[-1]["text"]).contains("DREDGE") and not str(_subs[-1]["text"]).contains("STOKE"),
 		"the winner's name is read: %s" % str(_subs))
 	Audio.stop_announcer()
@@ -284,8 +295,8 @@ func test_ten_point_and_referee_event_mapping() -> void:
 	acts = Audio.on_sim_event({"type": "judges_decision", "winner": -1, "method": "Majority Draw", "teams": [0, 1]}, Vector3.ZERO, {"ten_point": true})
 	var drew := false
 	for a in acts:
-		drew = drew or str(a).begins_with("line:ann_draw_")
-	check(drew, "drawn decision uses the draw line (%s)" % str(acts))
+		drew = drew or (str(a).begins_with("line:") and str(Audio.line(str(a).trim_prefix("line:")).get("trigger", "")) == "draw")
+	check(drew, "drawn decision uses a draw line (%s)" % str(acts))
 	Audio.stop_announcer()
 	acts = Audio.on_sim_event({"type": "match_end", "winner": -1})
 	check((lines.call(acts) as Array).is_empty(), "the draw is not announced twice (%s)" % str(acts))
@@ -310,7 +321,8 @@ func test_ten_point_and_referee_event_mapping() -> void:
 	acts = Audio.on_sim_event({"type": "ref_count", "fighter": 1, "n": 2})
 	check(acts.has("ui_timer_tick"), "count tick (%s)" % str(acts))
 	acts = Audio.on_sim_event({"type": "ref_wave_up", "fighter": 1})
-	check((lines.call(acts) as Array).is_empty(), "wave-up has no announcer line (%s)" % str(acts))
+	for a4 in lines.call(acts):
+		check_eq(str(Audio.line(str(a4).trim_prefix("line:")).get("when", {}).get("kind", "")), "wave_up", "a wave-up is called as one (%s)" % a4)
 	Audio.stop_announcer()
 	# the stopping knockdown's call is still queued behind another line when the referee waves it off
 	check(Audio.announce("ann_combo_01"), "a line is playing")

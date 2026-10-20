@@ -1,0 +1,639 @@
+# Critterweight v0.9.17 commentary recording script (docs/audio/COMMENTARY.md §6)
+# Parsed by tools/audio/breeze/prepare_commentary_v0917.py.
+#   @trigger {when}         sets the trigger and its context gate for the lines that follow
+#   S:delivery | text        a new take; S = D (Devon as Barnaby) or K (Kendall); delivery = a preset
+#   R S:delivery | <line id> a retake of an existing line's exact text with a new delivery
+#   X <old id> S:delivery | text   a corrected replacement: the old line retires, the new one takes its place
+#   T voice | word           a name token clip for the speech library
+#   V <line id> | p=Name,Name ; o=Name,Name   whole-sentence recordings of a composed line
+# Rules: subtitles <= 90 characters; names only at sentence edges; no feints, ropes, corner crews,
+# blood or high/low targeting; facts checked against content (abilities, statuses, reactions, rules).
+
+## Referee stoppages (T.K.O.)
+@stoppage {}
+D:hype | The referee waves it off! That's a stoppage, folks, and a merciful one!
+D:hype | STOPPED! The referee has seen enough, and frankly, so have I!
+D:hype | The referee steps in! It's a T.K.O., and nobody in this building is arguing!
+D:hype | That's the stoppage! The referee jumped in faster than my lunch break!
+D:hype | It's over by stoppage! Somebody bring the loser a very comfortable chair!
+D:hype | The referee says no more! Technical knockout, folks, technically wonderful!
+D:hype | Stoppage! The referee has both arms wrapped around the problem!
+D:hype | And the referee stops it! That's enough trips to the canvas for one night!
+D:ceremony | Waved off by the referee! Your winner by T.K.O.: {w}!
+D:ceremony | T.K.O.! The referee calls it, and your winner is {w}!
+@stoppage {"who": "player"}
+D:hype | You did it, kid! The referee stops it and the night is yours!
+@stoppage {"target": "player"}
+D:warm | The referee's done the kind thing, kid. Rest up. We'll see you back here.
+
+## The referee's count and wave-ups
+@referee {"kind": "count"}
+D:tense | The referee's counting! Get up, get up, the count won't wait!
+D:tense | There's the count! The whole crowd is counting along with the referee!
+K:dry | I'm counting along with the referee. I'm already two numbers behind.
+@referee {"kind": "wave_up"}
+D:call | Waved back in! The referee says fight on!
+D:call | Up and waved back in! That's a fighter who heard every number!
+D:call | The referee checks the eyes, likes the eyes, and away we go!
+D:call | Back on the feet and back in the fight! The referee steps away!
+K:dry | The referee waved them back in. I waved too. Nobody waved back.
+K:dry | Back up already? I was still writing "oh no" in my notes.
+
+## The judges, round by round (10-point scoring)
+@judges_round {"kind": "clear"}
+D:warm | That round's in the books: a clear ten-nine on the cards!
+D:warm | The judges agree on that one, folks! Ten-nine across the board!
+D:warm | Clean work in that round, and the scorecards are going to show it!
+K:dry | All three judges' pencils moved the same way. Mine moved in a circle.
+@judges_round {"kind": "ten_eight"}
+D:hype | A ten-eight round! That knockdown did the judges' math for them!
+D:hype | Ten-eight on the cards! Put somebody down and the judges notice!
+D:hype | That's a ten-eight round, folks! A big swing on every scorecard!
+K:dry | Ten-eight. I wrote it as "big round, very big". Close enough.
+@judges_round {"kind": "split"}
+D:warm | The judges split on that round! Somebody's watching a different fight!
+D:warm | A split round! One judge saw it differently, and that judge may need glasses!
+K:dry | One judge disagreed. I respect a judge with opinions.
+@judges_round {"kind": "even"}
+D:warm | Ten-ten! Dead even on the cards, and the judges look very pleased about it!
+D:warm | An even round! Nobody earned it, nobody lost it, everybody's sweaty!
+K:dry | Ten-ten. I like a round that refuses to pick favourites.
+
+## Decisions (10-point scoring): the winner's name at the end
+@decision {"kind": "unanimous"}
+D:ceremony | The judges are unanimous! Your winner by unanimous decision: {w}!
+D:ceremony | All three cards agree! By unanimous decision, your winner is {w}!
+D:ceremony | Three judges, one opinion! The unanimous decision goes to {w}!
+D:ceremony | No arguments from the judges tonight! Unanimous decision for {w}!
+@decision {"kind": "split"}
+D:ceremony | A split decision! Two cards to one, and your winner is {w}!
+D:ceremony | The judges couldn't all agree, but two of them could! Split decision: {w}!
+D:ceremony | Split decision, folks! Somebody's arguing in the parking lot already. It's {w}!
+@decision {"kind": "majority"}
+D:ceremony | A majority decision! Two judges say yes, one says even. Your winner: {w}!
+D:ceremony | Majority decision, folks! One judge saw a draw; the other two saw {w}!
+@decision {"who": "player"}
+D:ceremony | The cards are read, and they're kind to you tonight! Decision win for {w}!
+@draw {"kind": "decision"}
+D:warm | The cards are level! It's a draw, and the judges are leaving through the back!
+D:warm | A draw on the scorecards! Everybody fought, nobody won, everybody's invoiced!
+@result {"finish": "decision"}
+K:dry | The judges have spoken. I nodded like I agreed, and I did agree.
+K:dry | I had it closer than that, but I had it on a napkin.
+K:dry | A decision. I love a fight that needs paperwork at the end.
+
+## Rounds in best-of matches (health scoring)
+@round_end {"kind": "won"}
+D:call | Bell! That round goes to {w}!
+D:call | There's the bell, and that round belongs to {w}!
+@round_end {"kind": "won", "who": "player"}
+D:warm | That round's yours, kid! Bank it and breathe!
+D:warm | Round in the bag, kid! Do that again and we're done here!
+@round_end {"kind": "won", "who": "opponent"}
+D:warm | That round got away from you, kid. Shake it off, the next bell's coming.
+@round_end {"kind": "even"}
+D:call | Time on the round, and I couldn't split them with a crowbar!
+@round_break {}
+K:dry | Quick breather. I'm using mine to find my pencil.
+K:dry | Round's over. My notes say "excellent" and then there's a drawing of a fish.
+D:warm | A few seconds to reset, folks. Chins up, here we go again!
+K:dry | That round had a beginning, a middle, and an end. Strong structure.
+@round_break {"round_end": "time"}
+K:dry | The bell rang right on time. I appreciate punctuality.
+
+## Knockouts that take a round, and eliminations
+@ko {"ends": "round"}
+D:hype | DOWN and OUT for the round! That's one round in the bank!
+D:hype | Knocked out! That takes the round, folks, but the night isn't over!
+D:hype | That's a knockout, and that's a round! Reset the bell, we go again!
+D:hype | OUT for this round! The match isn't finished, but that round sure is!
+@ko {"ends": "round", "who": "player"}
+D:hype | You took that round the loud way, kid! Now do it again!
+@ko {"ends": "round", "target": "player"}
+D:warm | You got caught, kid. That's one round. Shake it off and win the next.
+@ko {"ends": "none"}
+D:hype | One down! The rest of the cage just got a little roomier!
+D:hype | Eliminated! That fighter's done; everybody else, keep swinging!
+D:hype | Out goes one! The crowd counts the survivors, and so do I!
+D:call | That's an elimination! One fewer critter in the cage!
+@ko {"ends": "fight"}
+D:hype | THAT'S THE FIGHT! Down and out, folks, and the whole place is ringing!
+D:hype | KNOCKOUT! That's the end, that's the night, that's the headline!
+D:hype | It's all over! That shot ended the argument and the evening!
+D:hype | GOODNIGHT! A clean knockout, folks, and nobody's getting up from that!
+@result {"finish": "stopped"}
+K:react | That ended suddenly. I had a whole paragraph prepared.
+K:dry | A finish. I'll underline it, which is my highest honour.
+K:dry | I didn't even have time to sharpen my pencil for the second half.
+@result {"finish": "time"}
+K:dry | All the way to the bell. Both of them have earned a sandwich.
+K:dry | They went the distance. I went the distance too, in this chair.
+@result {}
+K:dry | Great fight. I'm putting it in my favourites, which is a sticky note.
+
+## Career bouts
+@career_intro {"kind": "debut"}
+D:hype | A career begins tonight, folks! First walk to the cage, first lights, first everything!
+D:hype | Remember this one! A brand-new career makes its debut tonight!
+D:hype | Professional debut! The nerves are real, the cage is real, let's see what's real!
+@career_intro {"kind": "title"}
+D:hype | This one's for the BELT, folks! Five rounds, one title, no refunds!
+D:hype | Championship night! The belt is on the table and both fighters can smell it!
+D:hype | It's a TITLE FIGHT! Somebody polish the gold, somebody hold my jacket!
+@career_intro {"kind": "defend"}
+D:hype | The champ is defending! Everybody wants that belt, and only one fighter has it!
+@career_intro {}
+D:hype | Career night in the cage! The record's on the line and the promoter is watching!
+D:hype | Another step up the card, folks! Win here and the phone starts ringing!
+D:hype | Our career fighter makes the walk! Purse on the line, pride on the line!
+K:dry | Career fights have contracts. I have a contract too. It mentions snacks.
+K:dry | I hear the promoter is watching. I'm sitting up straighter.
+@career_result {"kind": "win", "who": "player"}
+D:hype | Another one for the record book! The career keeps climbing!
+D:hype | That's a career win, folks! The purse is earned and the phone is ringing!
+D:hype | Another win! I've lost count, which means it's a lot!
+@career_result {"kind": "title", "who": "player"}
+D:hype | NEW CHAMPION! Somebody bring the belt, and bring the big microphone!
+D:hype | The belt changes hands! A career just became a championship career!
+@career_result {"kind": "win", "who": "opponent"}
+D:warm | A tough night for the career, kid. Heal up. The gym's open tomorrow.
+D:warm | That one goes in the loss column. Every champion has a few of those.
+@career_result {"kind": "title", "who": "opponent"}
+D:warm | So close to the gold, kid. The belt will still be there next time.
+@career_result {"who": "player"}
+K:dry | A career win. I'll add it to my scrapbook, which is also a napkin.
+@career_result {"who": "opponent"}
+K:dry | Losses build character. I have a great deal of character.
+
+## Ability casts (the original six; Varga and Knell already have theirs)
+@ability {"creature": "f_stoke", "slot": "ability1"}
+D:call | Steam Vent! Stoke opens the pressure valve and the front row gets a facial!
+D:call | There's the Steam Vent! A scalding cone right in front of the newt!
+@ability {"creature": "f_stoke", "slot": "ability2"}
+D:call | Stoke the Fire! He's feeding the furnace, and the furnace is hungry!
+K:dry | He just stoked his own fire. I can't even keep a candle lit.
+@ability {"creature": "f_dredge", "slot": "ability1"}
+D:call | Tide Spit! A glob of harbour water, lobbed with intent!
+K:dry | Dredge spat. I'm told that's legal and also a technique.
+@ability {"creature": "f_dredge", "slot": "ability2"}
+D:call | Anchor Drop! Dredge plants the claws and dares anybody to swing!
+D:call | He's dropped anchor! Hit him now and he'll hit you right back!
+@ability {"creature": "f_gusto", "slot": "ability1"}
+D:call | Gust Bomb! A ball of wind with a very bad attitude!
+D:call | Gusto flaps one out! That Gust Bomb is looking for a face!
+@ability {"creature": "f_gusto", "slot": "ability2"}
+D:call | Hang Time! Gusto takes to the air and takes his time about it!
+K:dry | He's hovering. I'd like to hover. My chair has other plans.
+@ability {"creature": "f_dozer", "slot": "ability1"}
+D:hype | BULLDOZE! Here comes Dozer, and he does not have brakes!
+D:hype | Dozer puts his head down and goes! Somebody move the furniture!
+@ability {"creature": "f_dozer", "slot": "ability2"}
+D:call | Dust Bowl! Dozer kicks up a cloud and everybody starts coughing!
+K:dry | That dust cloud got into my notes. Now they're archaeology.
+@ability {"creature": "f_slurry", "slot": "ability1"}
+D:call | Sludge Lob! A gooey arc, and wherever it lands, the floor gets worse!
+D:call | Slurry lobs the sludge! Watch your footing, folks, watch everybody's footing!
+@ability {"creature": "f_slurry", "slot": "ability2"}
+D:call | Drain Dive! Slurry slips under the floor and pops up somewhere rude!
+K:dry | It went into the drain. I have so many questions about the plumbing.
+@ability {"creature": "f_jitters", "slot": "ability1"}
+D:call | Arc Lash! A little ball of lightning goes hunting!
+D:call | Jitters lets an Arc Lash loose! That spark knows where you live!
+@ability {"creature": "f_jitters", "slot": "ability2"}
+D:call | Spring Pad down! Somebody's about to get launched, maybe on purpose!
+K:dry | He put a trampoline in a cage fight. I support it completely.
+
+## Abilities that land
+@ability_hit {"id": "steam_vent"}
+D:hype | Right in the steam! That vent cooked the whole front of the target!
+@ability_hit {"id": "tide_spit"}
+D:call | Tide Spit lands! That's a faceful of cold harbour water!
+K:dry | Direct hit with spit. The crowd is torn between cheering and washing.
+@ability_hit {"id": "gust_bomb"}
+D:call | The Gust Bomb hits home! Blown back by a stiff breeze with opinions!
+K:dry | That wind hit harder than my umbrella ever survived.
+@ability_hit {"id": "bulldoze"}
+D:hype | Bulldoze connects! Dozer just went through somebody like a front door!
+D:hype | Caught by the Bulldoze! That's a lot of Shovelsnout moving very fast!
+@ability_hit {"id": "sludge_lob"}
+D:call | Sludge Lob splashes down on target! That's going to be sticky for a while!
+@ability_hit {"id": "arc_lash"}
+D:call | Arc Lash finds its mark! Zap, crackle, and a very surprised opponent!
+@ability_hit {"id": "ghost_light"}
+D:call | Ghost Light catches up! That lantern never stops following!
+K:dry | The lantern caught them. I did say not to run in straight lines.
+@ability_hit {"id": "through_the_veil"}
+D:call | Out of the veil and into the target! Knell rings them on arrival!
+@ability_miss {}
+D:call | The ability misses! Wasted on fresh air, and the cooldown starts anyway!
+D:call | Whiffed the special! That's a long wait for the next one!
+K:dry | That ability missed. It looked very confident about it, though.
+@ability_miss {"id": "ghost_light"}
+D:call | The Ghost Light fizzles out! The lantern lost the scent!
+@ability_miss {"id": "tide_spit"}
+D:call | Tide Spit splashes the floor instead! At least the floor is wet now!
+@ability_follow {"id": "steam_vent"}
+K:dry | Steam in the cage. My glasses fogged up, and I don't wear glasses.
+@ability_follow {"id": "tide_spit"}
+K:dry | That spit left a puddle. The puddle is part of the fight now.
+@ability_follow {"id": "gust_bomb"}
+K:dry | The Gust Bomb blew my notes into next week.
+@ability_follow {"id": "bulldoze"}
+K:dry | Dozer charged. The cage held. I held my breath.
+@ability_follow {"id": "sludge_lob"}
+K:dry | There's sludge on the floor now. I'm told that's the plan.
+@ability_follow {"id": "arc_lash"}
+K:dry | The spark followed them around. Sparks are very persistent.
+@ability_follow {"id": "cut_the_angle"}
+K:dry | Varga cut the angle. I cut my sandwich into angles. Similar energy.
+
+## JUICE (two more for each of the original six) and Kendall's reactions
+@juice {"creature": "f_stoke"}
+D:hype | MELTDOWN! Stoke's boiler blows its top and everything nearby gets toasted!
+D:hype | The furnace door is OPEN! That's Meltdown, folks, and it is HOT!
+@juice {"creature": "f_dredge"}
+D:hype | HIGH TIDE! The harbour comes over the wall and Dredge rides the wave!
+D:hype | Dredge calls in the tide! Everybody's ankle deep and the crab is smiling!
+@juice {"creature": "f_gusto"}
+D:hype | HURRICANE STRUT! Gusto whips up a storm and struts right through it!
+D:hype | The wind's at Gusto's back now! Hurricane Strut, and the crowd's hair is ruined!
+@juice {"creature": "f_dozer"}
+D:hype | LANDSLIDE! Dozer brings the whole hillside with him!
+D:hype | Here comes the Landslide! Rocks, dust, and one very determined Shovelsnout!
+@juice {"creature": "f_slurry"}
+D:hype | OVERFLOW! The drains back up and Slurry surfs right out of them!
+D:hype | Slurry hits Overflow! A wave of sludge, and the floor is now a swamp!
+@juice {"creature": "f_jitters"}
+D:hype | OVERCHARGE! Jitters lights up like the whole cannery's fuse box!
+D:hype | Jitters goes into Overcharge! Every hair in the building is standing up!
+@juice_follow {"creature": "f_stoke"}
+K:react | I can feel the heat from up here. My notes are toasted.
+@juice_follow {"creature": "f_dredge"}
+K:react | My shoes are wet. I'm in the booth. How are my shoes wet?
+@juice_follow {"creature": "f_gusto"}
+K:dry | That's the windiest thing I've seen since the last time Gusto fought.
+@juice_follow {"creature": "f_dozer"}
+K:dry | I'm told that's a landslide. I'm told to stay in my seat.
+@juice_follow {"creature": "f_slurry"}
+K:dry | The floor is sludge now. I'm keeping my feet up on the desk.
+@juice_follow {"creature": "f_jitters"}
+K:react | The lights flickered. I hope that was him and not the building.
+@juice_follow {"creature": "f_varga"}
+K:dry | Championship Rounds. He just got faster in the middle of a fight. Rude.
+
+## Walk-ins (two more for each of the original six) and Kendall's first impressions
+@intro {"creature": "f_stoke"}
+D:hype | Born in a boiler room and raised on coal smoke: STOKE!
+D:hype | The newt with a furnace and a grudge! Turn up the heat for STOKE!
+@intro {"creature": "f_dredge"}
+D:hype | Hauled up from the harbour floor with a claw for every argument: DREDGE!
+D:hype | He's patient, he's armoured, and he's never late for the tide: DREDGE!
+@intro {"creature": "f_gusto"}
+D:hype | He styles his crest before every fight and after every hit: GUSTO!
+D:hype | Quick wings, loud mouth, perfect hair: the Showboat Tern, GUSTO!
+@intro {"creature": "f_dozer"}
+D:hype | Shovel first, questions never! Make some room for DOZER!
+D:hype | He dug through three walls to get here tonight: it's DOZER!
+@intro {"creature": "f_slurry"}
+D:hype | Straight out of the storm drain, slick and smiling: SLURRY!
+D:hype | Mind the puddles, folks, they're probably Slurry. Here comes SLURRY!
+@intro {"creature": "f_jitters"}
+D:hype | One part jellyfish, three parts battery, all nerves: JITTERS!
+D:hype | He's buzzing, he's blinking, he's somehow already moving: JITTERS!
+@intro_follow {"creature": "f_stoke"}
+K:dry | Every time Stoke walks out, the booth gets two degrees warmer.
+@intro_follow {"creature": "f_dredge"}
+K:dry | Dredge waved at me once. It took four seconds. Very thorough.
+@intro_follow {"creature": "f_gusto"}
+K:dry | Gusto signed my notebook before I could ask him not to.
+@intro_follow {"creature": "f_dozer"}
+K:dry | Dozer bumped the door frame on the way in. The door frame lost.
+@intro_follow {"creature": "f_slurry"}
+K:dry | Slurry left a trail on the way in. I'm not stepping in it.
+@intro_follow {"creature": "f_jitters"}
+K:dry | Jitters is vibrating. I think that's excitement. I hope that's excitement.
+@intro_follow {"creature": "f_varga"}
+K:dry | Varga warmed up with forty kicks. I warmed up with forty crackers.
+
+## Winners: Varga, Knell, and anyone
+@win {"creature": "f_varga"}
+D:ceremony | VARGA wins! The Cage Rules guest goes home with his house rules intact!
+D:ceremony | Your winner, by technique and very sore shins: VARGA!
+D:ceremony | Varga takes it! Four limbs, one plan, and the plan worked!
+@win {"creature": "f_knell"}
+D:ceremony | KNELL wins! The Hollow Diver rings the last bell of the night!
+D:ceremony | Your winner, from the bottom of the harbour: KNELL!
+D:ceremony | Knell takes it! Nobody's home in that helmet, and it still won!
+@win {}
+D:ceremony | And that's your winner, folks! Raise the arm and raise the roof!
+D:ceremony | Winner, winner, cannery dinner! What a performance!
+D:ceremony | There's your winner! Somebody start the victory music, the good one!
+D:ceremony | The fight is won! Bring out the trophy, or at least a trophy-shaped crate!
+
+## Play-by-play where the bank was thin
+@first_hit {}
+D:call | First touch of the night! Somebody's warmed up and somebody's not!
+D:call | And the first clean shot lands! The book is open, folks!
+D:call | First bruise of the fight! Glandco reminds you that bruises are temporary!
+K:dry | First hit. I've written "one". This is going very well.
+@first_hit {"who": "player"}
+D:call | You landed first, kid! Now don't get comfortable!
+@first_hit {"who": "opponent"}
+D:warm | They got there first, kid. That's information, not a verdict.
+@guard_break {}
+D:hype | GUARD BREAK! The shell cracks and the door is wide open!
+D:hype | That guard just gave out! Stamina's gone and so is the defence!
+D:hype | The guard is broken! Somebody's standing there with nothing but hope!
+K:react | The guard broke. I could hear it from here. It sounded expensive.
+K:dry | Their arms said "no more blocking". Their arms were right.
+@guard_break {"target": "player"}
+D:tense | Your guard's gone, kid! Get out of there!
+@grab_throw {}
+D:call | Grabbed and thrown! Somebody just took the express route across the cage!
+D:hype | THROWN! A handful of fighter, flung like a sack of fish!
+D:call | Snatched up and tossed! Guarding doesn't help when they just pick you up!
+D:call | Up and over! That throw had a destination in mind!
+K:dry | That was a throw. I wrote it down in throwing letters.
+@combo {}
+D:call | Three clean in a row! That's a string, folks, that's a real string!
+D:hype | Bang, bang, BANG! The whole set lands!
+D:hype | Four hits, no reply! Somebody call a timeout! We don't have timeouts!
+K:dry | That combination had more steps than my morning routine.
+K:dry | I counted the hits. I'm going to need a bigger number.
+@combo {"kind": "finisher"}
+D:hype | And the finisher lands on the end of it! Beautiful, brutal arithmetic!
+@parry {}
+D:hype | PARRIED! Slapped away at the very last moment!
+D:hype | What a parry! That attack bounced off like it hit a church door!
+K:dry | A parry. I tried that once with a pigeon. The pigeon won.
+@parry {"kind": "third"}
+D:call | Another parry! They're reading everything tonight!
+@knockdown {"scoring": "ten_point"}
+D:hype | DOWN! That's a knockdown, and it's going straight onto the scorecards!
+D:hype | Knocked DOWN! The judges are writing that one in capital letters!
+@knockdown {"referee": true}
+D:hype | DOWN they go! The referee's on it, folks, here comes the count!
+D:hype | Off the feet! That's a knockdown, and the referee is right there!
+@knockdown {}
+D:hype | Flat on the canvas! Get up, get up, it's not over!
+@knockdown {"kind": "repeat"}
+D:hype | Down AGAIN! That's not a stumble anymore, that's a pattern!
+@low_health {}
+D:tense | The health bar's flashing, folks! One more good shot and that's it!
+K:dry | Somebody's running low. I'm also running low, on pencils.
+@low_health {"who": "player"}
+D:tense | You're in the red, kid! Guard up and pick your moment!
+@low_health {"who": "opponent"}
+D:tense | They're nearly done, kid! Don't rush it, finish it!
+@low_health {"who": "both"}
+D:tense | Both of them on the edge! The next clean hit wins it!
+@time {"kind": "ten_seconds"}
+D:tense | Ten seconds! Throw what you've got, the clock isn't waiting!
+D:tense | Ten seconds left in the round! Make it count, make it loud!
+D:tense | Here comes the ten-second warning! Last chance to leave a mark!
+K:dry | Ten seconds. Just enough time for one more bad decision.
+@round_start {"round": "2plus"}
+D:hype | Next round! Fresh bell, same fighters, brand-new problems!
+D:hype | Here we go again! The bell rings, the critters swing!
+@round_start {"round": "final"}
+D:hype | Final round! Everything they've got left goes on the table now!
+D:hype | This is the last round, folks! No more saving it for later!
+@round_start {}
+D:hype | And we're underway! Touch gloves and get to work!
+@round_start {"fence": true}
+D:hype | FIGHT! The bell's rung, the crowd's up, and the cage door is shut!
+@round_start {"title": true}
+D:hype | It's a championship fight, folks! Every round tonight is worth gold!
+@round_start {"match_point": true}
+D:hype | Match point, folks! One more round win and somebody takes the fight!
+@taunt {}
+D:call | A TAUNT! Bold choice, folks, very bold, possibly unwise!
+D:call | Showboating in the middle of a fight! The crowd loves it, the opponent doesn't!
+K:dry | A taunt. I taunt my kettle sometimes. It boils anyway.
+@taunt_punished {}
+D:hype | Taunt, meet fist! That's what happens when you show off!
+@windup {}
+D:call | Big wind-up! Everything's going into this one!
+D:call | Here comes the heavy! The whole body is loading up!
+@stamina {}
+D:tense | Stamina's running dry! Every swing from here is on credit!
+K:dry | They're out of breath. I'm out of breath just narrating it.
+
+## Fighter colour for the original six
+@fighter_color {"creature": "f_stoke"}
+D:warm | Stoke fights like a boiler with the safety valve removed: all pressure, all the time.
+D:warm | Watch the Furnace Haymaker. Stoke winds it up long, and it lands longer!
+D:warm | Jab, cross, hook: Stoke throws them in that order every time, and it still works!
+D:warm | That chimney on Stoke's head puffs harder the angrier he gets. It's puffing now!
+K:dry | Stoke's furnace is glowing. I keep wanting to roast something on it.
+K:dry | Stoke's tail is short. His temper is shorter. I've measured both.
+@fighter_color {"creature": "f_dredge"}
+D:warm | Dredge is slow on the feet but fast with the claws. Don't stand in front of him!
+D:warm | That big crusher claw does the talking. The little claw does the paperwork!
+D:warm | Hitting Dredge on the shell is like knocking on a bank vault!
+D:warm | Dredge loves a long fight. The longer it goes, the more the tide comes in!
+K:dry | Dredge's eyes are on stalks. He can watch the fight and the snack stand at once.
+K:dry | The barnacles on Dredge are glowing. I hope that's normal for barnacles.
+@fighter_color {"creature": "f_gusto"}
+D:warm | Gusto's quick on the wing and quicker with the mouth. The kicks are fast too!
+D:warm | Gusto hates getting pinned down. Keep him moving and he's dangerous!
+D:warm | Those long legs are pure reach. Gusto kicks from a different postcode!
+D:warm | Light frame, big heart, bigger ego: that's Gusto in a nutshell!
+K:dry | Gusto checked his watch in the middle of the round. He doesn't have a watch.
+K:dry | Gusto's crest hasn't moved all fight. I think it's lacquered.
+@fighter_color {"creature": "f_dozer"}
+D:warm | Dozer doesn't do angles. Dozer does straight lines through whatever's there!
+D:warm | Get Dozer turning and he's slow. Let him charge and he's a freight train!
+D:warm | That shovel snout isn't decoration. Dozer digs opponents out of position!
+D:warm | The heaviest hitter on the card, folks, and he knows exactly one direction!
+K:dry | Dozer's headlamp is on. I don't know who it's for, but I appreciate it.
+K:dry | Dozer snuffled the floor. I believe he's looking for truffles.
+@fighter_color {"creature": "f_slurry"}
+D:warm | Slurry's whole body is a weapon: head, tail, fangs, and the floor it leaves behind!
+D:warm | That head butt reaches farther than it looks. Slurry lives on it!
+D:warm | Slurry wants you standing in the sludge. Every puddle is a plan!
+D:warm | Slurry stays low and sneaky. Good luck finding a clean target on that wyrm!
+K:dry | Slurry sways when it's thinking. Slurry is always thinking.
+K:dry | I tried to describe Slurry's shape. I wrote "long" and stopped there.
+@fighter_color {"creature": "f_jitters"}
+D:warm | Jitters is small, jumpy and loaded with volts. Every touch comes with a buzz!
+D:warm | Don't let Jitters get underneath you. That little jelly hits harder than he looks!
+D:warm | The coil inside Jitters is glowing brighter. That's a jelly with a charge!
+D:warm | Slap, double slap, headbonk! Jitters' whole offence sounds like a cartoon!
+K:dry | Jitters hasn't stopped bouncing since the bell. I'm tired just watching.
+K:dry | Jitters has antennae. They're for balance, or for receiving radio. Maybe both.
+
+## Statuses as they take hold, and reactions
+@element {"status": "sizzle"}
+D:call | Sizzle! That's a burn that ticks away and slows the stamina too!
+D:call | Somebody's Sizzling! Five seconds of burn and a very short temper!
+K:dry | Sizzle. I can smell it from here. It smells like breakfast.
+@element {"status": "soaked"}
+D:call | Soaked! Slower feet, shorter dodges, and they'll fly farther when hit!
+D:call | That fighter's Soaked through! And water plus volts is a bad combination!
+K:dry | Soaked. I'd offer a towel, but I'm using mine as a napkin.
+@element {"status": "jolted"}
+D:call | Jolted! Little shocks every second, and those cooldowns crawl!
+D:call | They're Jolted! Every pulse locks them up for a heartbeat!
+K:dry | Jolted. I touched the booth railing once. I understand completely.
+@element {"status": "gunked"}
+D:call | Gunked! Sludge that burns, a guard that costs more, healing that barely works!
+D:call | That's Gunked! The guard just got expensive and the medicine stopped working!
+K:dry | Gunked. That fighter now looks like my kitchen sink.
+@element {"status": "caked"}
+D:call | Caked in grit! Less poise, slower recovery, and dodging costs a fortune!
+D:call | Caked! That mud makes every heavy hit stagger them harder!
+K:dry | Caked. I don't recommend it as a skincare routine.
+@element {"status": "winded"}
+D:call | Winded! No stamina coming back, and every dodge costs double!
+D:call | They're Winded! Easy to shove, easy to knock around, hard to escape!
+K:dry | Winded. I get winded on the stairs up to this booth.
+@reaction {}
+D:hype | ELEMENTAL REACTION! Two elements meet and nobody's happy about it!
+D:hype | Whoa, a reaction! The elements just picked a fight of their own!
+@reaction {"reaction": "steam_burst"}
+D:hype | STEAM BURST! Fire meets water and the whole cage turns into a kettle!
+@reaction {"reaction": "backdraft"}
+D:hype | BACKDRAFT! The wind feeds the flames and the flames say thank you!
+@reaction {"reaction": "mudbound"}
+D:call | MUDBOUND! Brine and grit make mud, and mud makes everybody slow!
+@reaction {"reaction": "dilute"}
+D:call | DILUTE! The water washes the sludge out in one big splash!
+@reaction {"reaction": "catalyze"}
+D:call | CATALYZE! The volts cook the sludge faster! That stings twice!
+@reaction {"reaction": "crust"}
+D:call | CRUST! Sludge and grit set hard, and nobody's dodging out of that shell!
+@reaction {"reaction": "spray"}
+D:call | SPRAY! The wind flings the sludge everywhere! Everywhere, folks!
+@reaction {"reaction": "sandblast"}
+D:hype | SANDBLAST! A face full of grit, and the guard is wide open!
+@reaction {"reaction": "bell_ringer"}
+D:hype | BELL RINGER! Scrap meets spectral and the whole head rings!
+@reaction {"reaction": "grave_chill"}
+D:call | GRAVE CHILL! Spectral cold in harbour water, right down to the bones!
+@reaction {"reaction": "crack_guard"}
+D:hype | CRACK GUARD! Scrap into grit, and that guard just split down the middle!
+
+## The arena itself
+@hazard {}
+D:call | The arena joins the fight! Watch your feet, folks, the floor has opinions!
+D:call | Hazard's live! Somebody's about to get a very rude surprise!
+K:dry | The arena moved again. I've stopped trusting the furniture.
+@hazard {"hazard": "wind_gust"}
+D:call | Here comes the gust! Hold on to something that isn't the edge!
+@hazard {"hazard": "plate_grid"}
+D:call | The plate is live! Stay on the rubber mats, kids, the steel is cooking!
+@hazard {"hazard": "tidal_gutter"}
+D:call | The tide's in the gutter! Everybody's ankles, consider yourselves warned!
+@pickup {}
+D:call | Somebody scooped up the pickup! Free stuff always tastes better!
+@pickup {"kind": "health"}
+D:call | Health pickup grabbed! That's a second wind, straight off the floor!
+@spring {}
+D:call | Boing! Off the Spring Pad and straight up!
+K:dry | Someone just used the trampoline. Respect.
+@tag {}
+D:call | Tag! Fresh legs come into the cage!
+D:call | The tag is made! In comes the partner, swinging!
+K:dry | They tagged out. I'd like to tag out of this booth for a sandwich.
+
+## Corrected lines (the old takes retire)
+X ann_exp_0086 K:dry | I think the cage just moved. Barnaby says it was only the camera.
+X ann_exp_0206 K:dry | I thought Brine was a drink. Barnaby says it is not a drink.
+X ann_exp_0225 K:dry | If the floor starts talking, Barnaby, I am letting you answer it.
+X ann_exp_0829 D:warm | Haunted lasts five seconds: cooldowns recover slower and healing is twenty percent weaker.
+X ann_exp_0830 D:warm | Haunted slows cooldown recovery by a quarter and cuts received healing by a fifth.
+X ann_exp_0837 K:dry | Haunted slows your cooldowns down. Mine are slow already.
+X ann_exp_0799 D:call | Port Hook! Knell's quick light hook keeps the opponent turning.
+
+## Retakes with the delivery the moment needs (exact text kept)
+R D:hype | ann_ko_01
+R D:hype | ann_ko_02
+R D:hype | ann_ko_03
+R D:hype | ann_ko_04
+R D:hype | ann_ko_05
+R D:hype | ann_ko_06
+R D:hype | ann_ko_08
+R D:hype | ann_ko_09
+R D:hype | ann_ko_10
+R D:hype | ann_kd_01
+R D:hype | ann_kd_02
+R D:hype | ann_kd_03
+R D:hype | ann_kd_06
+R D:hype | ann_kd_07
+R D:hype | ann_kd_08
+R D:hype | ann_juice_stoke_01
+R D:hype | ann_juice_dredge_01
+R D:hype | ann_juice_gusto_01
+R D:hype | ann_juice_dozer_01
+R D:hype | ann_juice_slurry_01
+R D:hype | ann_juice_jitters_01
+R D:hype | ann_big_01
+R D:hype | ann_big_02
+R D:hype | ann_big_04
+R D:hype | ann_big_05
+R D:hype | ann_big_06
+R D:hype | ann_big_07
+R D:hype | ann_big_09
+R D:hype | ann_big_10
+R D:hype | ann_combo_01
+R D:hype | ann_combo_02
+R D:hype | ann_combo_03
+R D:hype | ann_parry_01
+R D:hype | ann_parry_04
+R D:hype | ann_round_01
+R D:hype | ann_round_05
+R D:hype | ann_time_03
+R D:hype | ann_time_04
+R D:hype | ann_ringout_01
+R D:hype | ann_ringout_03
+R D:hype | ann_ringout_04
+R D:ceremony | ann_win_stoke_01
+R D:ceremony | ann_win_dredge_01
+R D:ceremony | ann_win_gusto_01
+R D:ceremony | ann_win_dozer_01
+R D:ceremony | ann_win_slurry_01
+R D:ceremony | ann_win_jitters_01
+R D:call | ann_exp_0005
+R D:call | ann_exp_0103
+R D:warm | ann_exp_0374
+
+## Name tokens: every voice lacked the two guests (Varga and Knell were read as "Player N")
+T devon | varga
+T devon | knell
+T kendall | varga
+T kendall | knell
+T coach_buck | varga
+T coach_buck | knell
+## Ceremonial winner names ({w}): the climax of a decision or stoppage call
+W devon | rookie
+W devon | stoke
+W devon | dredge
+W devon | gusto
+W devon | dozer
+W devon | slurry
+W devon | jitters
+W devon | varga
+W devon | knell
+W devon | player 1
+W devon | player 2
+W devon | player 3
+W devon | player 4
+W devon | player 5
+W devon | player 6
+W devon | player 7
+W devon | player 8
+
+## Whole sentences for the composed lines whose joins measured worst (speech_audit.json)
+V ann_first_03 | p=Rookie,Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell
+V ann_combo_04 | p=Rookie,Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell
+V ann_parry_03 | p=Rookie,Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell
+V ann_kd_04 | p=Rookie,Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell
+V ann_kd_05 | p=Rookie,Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell
+V ann_comeback_03 | p=Rookie,Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell
+V ann_ko_07 | p=Rookie,Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell
+V ann_low_02 | p=Rookie,Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell
+V ann_first_04 | o=Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell ; p=Rookie
+V ann_parry_05 | o=Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell ; p=Rookie
+V ann_comeback_04 | o=Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell ; p=Rookie
+V ann_low_03 | o=Stoke,Dredge,Gusto,Dozer,Slurry,Jitters,Varga,Knell

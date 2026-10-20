@@ -64,7 +64,9 @@ class Studio:
         self.rig.show_in_front=True
         self.rig.select_set(False)
         self.materials={}
-        for name,rough,metal in [('skin',.86,0),('cloth',.95,0),('metal',.68,.35),('eye',.6,0),('team',.9,0)]:
+        # v0.9.17 adds material classes the creature shader shades differently (CreatureView.MATERIAL_KINDS)
+        for name,rough,metal in [('skin',.86,0),('cloth',.95,0),('metal',.68,.35),('eye',.6,0),('team',.9,0),
+                                 ('shell',.32,0),('brass',.38,.8),('ember',.5,0),('jelly',.18,0),('ghost',.4,0),('glass',.12,0),('lamp',.2,0)]:
             mat=bpy.data.materials.new('CW '+name)
             mat['cw_material']=name
             mat.diffuse_color=(.8,.8,.8,1)
@@ -233,6 +235,73 @@ class Studio:
         self.ellipsoid(name+' iris',(x-w*.10,y-h*.03,z+d*1.25),(w*.68,h*.76,d*.44),bone,iris,'eye',n=16,m=8)
         self.ellipsoid(name+' pupil',(x-w*.11,y-h*.02,z+d*1.61),(w*.49,h*.60,d*.23),bone,'212331','eye',n=14,m=8)
         self.ellipsoid(name+' glint',(x-w*.22,y+h*.22,z+d*1.79),(w*.12,h*.12,d*.15),bone,'FFFFFF','eye',n=8,m=4)
+
+    # ---- v0.9.17 toolkit: rigged faces, patterns, contact shading, look metadata ----------------
+    def rig_eye(self,name,c,scale,bone,side,iris='FFD23F',lid_color=None,pupil='212331',lid_depth=1.5):
+        """An eye whose iris/pupil/glint ride fx_eye_<side> (they slide toward what the fighter looks at)
+        and an upper lid on fx_lid_<side>: modelled CLOSED below its bone at the top of the eye; the game
+        squashes it to a rim when open, stretches it to blink, squint or shut (CreatureFxRig)."""
+        x,y,z=c; w,h,d=scale
+        eye_bone=self.view_bone('fx_eye_'+side,bone,(x,y,z))
+        lid_bone=self.view_bone('fx_lid_'+side,bone,(x,y+h*1.12,z))
+        self.ellipsoid(name+' socket',(x,y,z),(w*1.08,h*1.08,d*.9),bone,'342B31',n=18,m=9)
+        self.ellipsoid(name+' sclera',(x,y,z+d*.35),(w,h,d),bone,'FFF6DE','eye',n=22,m=11)
+        self.ellipsoid(name+' iris',(x-w*.05,y-h*.03,z+d*1.25),(w*.64,h*.72,d*.44),eye_bone,iris,'eye',n=18,m=8)
+        self.ellipsoid(name+' pupil',(x-w*.06,y-h*.02,z+d*1.61),(w*.42,h*.52,d*.23),eye_bone,pupil,'eye',n=14,m=8)
+        self.ellipsoid(name+' glint',(x-w*.24,y+h*.25,z+d*1.82),(w*.13,h*.13,d*.15),eye_bone,'FFFFFF','eye',n=8,m=4)
+        if lid_color:
+            # closed lid: an ellipsoid shell slightly larger than the eye, in front of the iris
+            self.ellipsoid('Detail lid '+name,(x,y,z+d*.55),(w*1.1,h*1.1,d*lid_depth),lid_bone,lid_color,'skin',n=20,m=10)
+        return eye_bone,lid_bone
+
+    def paint(self,obj,fn):
+        """Recolour an object's vertices: fn(fighter_pos, fighter_normal, (r,g,b,a) linear) -> (r,g,b,a)."""
+        attr=obj.data.color_attributes['Color']
+        for v in obj.data.vertices:
+            p=Vector((v.co.x,v.co.z,-v.co.y)); n=Vector((v.normal.x,v.normal.z,-v.normal.y))
+            c=tuple(attr.data[v.index].color)
+            attr.data[v.index].color=fn(p,n,c)
+
+    def bake_ao(self,rays=16,distance=.14,strength=.5,skip_prefix=('Detail ','Eye ','Detail lid')):
+        """Contact shading baked into the vertex colours: each vertex casts a fixed hemisphere of rays
+        against every body mesh (rest pose); occluded vertices darken. Deterministic; no textures."""
+        from mathutils.bvhtree import BVHTree
+        bodies=[o for o in self.collection.objects if o.type=='MESH' and o.get('cw_role')=='body']
+        # small parts (crests, gills, fronds, details) never cast contact shading: they would streak
+        occluders=[o for o in bodies if not o.name.startswith(skip_prefix+('Dorsal crest','Tail crest','Gill','Toe','Spine','Fin','Feather','Tentacle','Frond'))]
+        verts=[];polys=[]
+        for o in occluders:
+            base=len(verts)
+            mw=o.matrix_world
+            verts.extend([mw@v.co for v in o.data.vertices])
+            polys.extend([[base+i for i in p.vertices] for p in o.data.polygons])
+        tree=BVHTree.FromPolygons(verts,polys,all_triangles=False)
+        golden=math.pi*(3-math.sqrt(5))
+        dirs=[]
+        for i in range(rays):
+            zz=1-(i+.5)/rays; r=math.sqrt(max(0,1-zz*zz)); a=golden*i
+            dirs.append(Vector((r*math.cos(a),r*math.sin(a),zz)))
+        for o in bodies:
+            if o.name.startswith(skip_prefix):
+                continue
+            attr=o.data.color_attributes['Color']; mw=o.matrix_world; nm=mw.to_3x3().inverted().transposed()
+            for v in o.data.vertices:
+                n=(nm@v.normal).normalized(); p=mw@v.co+n*.003
+                t=n.orthogonal().normalized(); b=n.cross(t)
+                occ=0.;tot=0.
+                for dv in dirs:
+                    d=(t*dv.x+b*dv.y+n*dv.z).normalized(); wgt=dv.z
+                    hit=tree.ray_cast(p,d,distance)
+                    if hit[0] is not None:
+                        occ+=wgt*(1-hit[3]/distance)
+                    tot+=wgt
+                ao=1-strength*min(1,occ/max(tot,1e-6)*1.6)
+                c=attr.data[v.index].color
+                attr.data[v.index].color=(c[0]*ao,c[1]*ao,c[2]*ao,c[3])
+
+    def set_look(self,look):
+        """View-only presentation data exported into the GLB root extras (CreatureView reads 'look')."""
+        bpy.context.scene['cw_look']=json.dumps(look,sort_keys=True)
 
     def fit(self,obj,bones,center,padding=.012):
         """Fit only authored torso surfaces to the locked collision envelope.

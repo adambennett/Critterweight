@@ -45,6 +45,16 @@
     "out": "creatures/f_stoke.glb"
   },
   {
+    "id": "f_varga",
+    "creature": "game/content/core/creatures/f_varga.json",
+    "out": "creatures/f_varga.glb"
+  },
+  {
+    "id": "f_knell",
+    "creature": "game/content/core/creatures/f_knell.json",
+    "out": "creatures/f_knell.glb"
+  },
+  {
     "id": "npc_blister",
     "creature": "game/content/core/minions/npc_blister.json",
     "out": "creatures/npc_blister.glb"

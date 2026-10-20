@@ -135,7 +135,20 @@ writeGlb(path.join(root,'game/assets/models',rel),{name:id,bones,materials,mesh:
  joints:Uint8Array.from(out.joints),weights:Float32Array.from(out.weights),groups:out.groups},generator});
 return out.positions.length/3;
 }
-const vargaVerts=exportGlb(model,'f_varga','creatures/f_varga.glb','Cage Rules original procedural fighter, adapted by tools/cage_rules/import.js');
+// v0.9.17: this adapter's Varga is the LEGACY skin ("Legacy Varga skin" in Settings). It is written to
+// f_varga_legacy.glb only (f_varga.glb is the upgraded Blender-owned default) and must stay byte-identical to the
+// v0.9.16 original: a different result is refused (restored) unless --allow-legacy-change is passed deliberately.
+const LEGACY_SHA256='4fa78a8a66cb46739b793bc095501e3957a5aed27bafe1901141ba4c90d460fc';
+const legacyPath=path.join(root,'game/assets/models/creatures/f_varga_legacy.glb');
+const legacyBefore=fs.existsSync(legacyPath)?fs.readFileSync(legacyPath):null;
+const vargaVerts=exportGlb(model,'f_varga','creatures/f_varga_legacy.glb','Cage Rules original procedural fighter, adapted by tools/cage_rules/import.js');
+{
+ const got=require('crypto').createHash('sha256').update(fs.readFileSync(legacyPath)).digest('hex');
+ if(got!==LEGACY_SHA256&&!process.argv.includes('--allow-legacy-change')){
+  if(legacyBefore)fs.writeFileSync(legacyPath,legacyBefore);
+  throw new Error('f_varga_legacy.glb would change ('+got+' != '+LEGACY_SHA256+'); restored. Pass --allow-legacy-change only to replace the legacy skin on purpose.');
+ }
+}
 
 // ---- The original referee (render.js class Referee). He is the same procedural body and bind skeleton as the
 // fighter (body width 1, short hair), dressed by opts.ref (shirt, slacks, shoes, open nitrile hands), built with

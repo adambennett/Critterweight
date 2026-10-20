@@ -26,6 +26,8 @@ const SCHEMA := [
 	{"key": "graphics.effects", "cat": "graphics", "t": "enum", "def": 2, "opts": [0, 1, 2], "opt_labels": ["Low", "Medium", "High"], "label": "Effects", "help": "Particles, glow and fog. Combat cues stay readable on Low."},
 	{"key": "graphics.antialiasing", "cat": "graphics", "t": "enum", "def": "msaa2", "opts": ["off", "fxaa", "msaa2", "msaa4", "taa"], "label": "Anti-aliasing", "help": "Edge smoothing."},
 	{"key": "graphics.crowd", "cat": "graphics", "t": "enum", "def": 2, "opts": [0, 1, 2], "opt_labels": ["Sparse", "Normal", "Packed"], "label": "Crowd density", "help": "Number of animated spectators."},
+	## v0.9.17: a local look only (key outside "graphics." so it never turns the quality preset into Custom)
+	{"key": "cosmetic.legacy_varga", "cat": "graphics", "t": "bool", "def": false, "label": "Legacy Varga skin", "help": "Shows Varga with his original look from before v0.9.17. Only on this screen: other players see their own choice, and Varga fights exactly the same."},
 	{"key": "audio.master", "cat": "audio", "t": "int", "def": 80, "min": 0, "max": 100, "step": 5, "label": "Master volume", "help": ""},
 	{"key": "audio.music", "cat": "audio", "t": "int", "def": 65, "min": 0, "max": 100, "step": 5, "label": "Music", "help": ""},
 	{"key": "audio.sfx", "cat": "audio", "t": "int", "def": 85, "min": 0, "max": 100, "step": 5, "label": "Effects", "help": "Impacts, abilities, creatures."},
