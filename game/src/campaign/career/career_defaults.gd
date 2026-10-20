@@ -126,9 +126,10 @@ static func rules() -> Dictionary:
 		"popularity": {"win": 4.0, "finish": 3.0, "finish_per_round_left": 2.5, "split_mult": 0.75,
 			"title_win": 6.0, "streak_min": 2, "streak_bonus": 1.5, "draw": 0.5, "loss": 3.0, "loss_per_mult": 1.5,
 			"r1_finish_loss": 2.0, "title_loss": 3.0, "action_bonus": 1.5,
-			# PLACEHOLDER: fight-of-the-night pace = combined clean strikes landed per round. Cage Rules
-			# uses 45 for 180 s rounds; WP1 measures the 85th percentile in even bot fights (D6).
-			"action_landed_per_round": 25.0},
+			# fight-of-the-night pace = combined clean strikes landed per round. Cage Rules uses 45 for
+			# its 180 s rounds; 44 is the 85th percentile measured in same-tier 10-point bot duels with
+			# 99 s rounds (DECISIONS D-045, design contract D6).
+			"action_landed_per_round": 44.0},
 		"pop_labels": [{"min": 92, "label": "Superstar"}, {"min": 74, "label": "Household name"},
 			{"min": 50, "label": "Rising contender"}, {"min": 24, "label": "Regional champion material"},
 			{"min": 8, "label": "Local draw"}, {"min": 0, "label": "Unknown"}],
@@ -139,14 +140,16 @@ static func rules() -> Dictionary:
 		"danger": [{"max": -8, "tag": "FAVOURED"}, {"max": 6, "tag": "EVEN"}, {"max": 16, "tag": "UNDERDOG"}],
 		"danger_else": "LONG SHOT",
 		# design contract D2 "injuries in": `carry` of each region's injury becomes a fight-start
-		# handicap (HP is unlimited under 10-point scoring). PLACEHOLDER scales, calibrate after WP1.
+		# handicap (HP is unlimited under 10-point scoring).
 		"injury_in": {"carry": 0.5, "head_poise_per_point": 0.3, "head_poise_max": 15.0,
 			"body_regen_div": 160.0, "legs_speed_div": 200.0, "min_mult": 0.7},
 		# injuries out of a fight (Cage Rules: 55% of the damage taken per region, +10 head on a
 		# finish loss). From the judges' tally: damage taken by part as % of max HP x per_hp_pct,
 		# + per_knockdown head per knockdown suffered, + stoppage_loss_head when stopped.
-		# PLACEHOLDER constants (target: a hard loss ~25-40 total, a clean win ~5-15).
-		"injury_out": {"per_hp_pct": 0.04, "per_knockdown": 2.0, "stoppage_loss_head": 10.0,
+		# Calibrated on 52 same-tier 10-point bot duels (DECISIONS D-045): about 28 total after a
+		# decision win, 46 after a decision loss, 53 after a stoppage loss, 13 after a stoppage win,
+		# which keeps Cage Rules' scale (a hard fight costs a few weeks of healing).
+		"injury_out": {"per_hp_pct": 0.07, "per_knockdown": 2.0, "stoppage_loss_head": 10.0,
 			"region_cap": 100.0, "fallback_split": {"head": 0.4, "body": 0.4, "legs": 0.2}},
 		"condition": {"injured": 40.0, "sore": 10.0, "hurt_total": 30.0},
 		# design contract D2: fixed stat -> Fighter mod mapping (CareerBuild.MAP), these are the

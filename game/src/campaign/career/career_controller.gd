@@ -531,7 +531,7 @@ func apply_result(result: Dictionary, fight_id := "") -> Dictionary:
 			d_pop -= float(pp.get("title_loss", 3.0))
 	# a fight-of-the-night pace sells too (combined clean strikes per scored round)
 	var action := float(int(oc["landed"][0]) + int(oc["landed"][1])) / float(maxi(1, int(oc["rounds_scored"])))
-	var action_bonus := action > float(pp.get("action_landed_per_round", 25.0))
+	var action_bonus := action > float(pp.get("action_landed_per_round", 44.0))
 	if action_bonus:
 		d_pop += float(pp.get("action_bonus", 1.5))
 	d_pop = snappedf(d_pop, 0.1)
@@ -556,7 +556,7 @@ func apply_result(result: Dictionary, fight_id := "") -> Dictionary:
 	else:
 		rec["l"] = int(rec["l"]) + 1
 		state["streak"] = mini(-1, int(state["streak"]) - 1)
-	# injuries carried out of the fight (PLACEHOLDER scales: CareerDefaults injury_out)
+	# injuries carried out of the fight (CareerDefaults injury_out)
 	var inj := injury_out(oc, won, draw)
 	var cap := float((rules.get("injury_out", {}) as Dictionary).get("region_cap", 100.0))
 	for r in CareerDefaults.REGIONS:
@@ -615,7 +615,7 @@ func apply_result(result: Dictionary, fight_id := "") -> Dictionary:
 	return sum_d
 
 
-## Injuries out of a bout (design contract §5.2 "injuries out"; PLACEHOLDER constants): damage
+## Injuries out of a bout (design contract §5.2 "injuries out"; calibrated, D-045): damage
 ## taken by part as % of max HP x per_hp_pct, + per_knockdown head per knockdown suffered,
 ## + stoppage_loss_head when stopped. {head, body, legs} (whole numbers).
 func injury_out(oc: Dictionary, won: bool, draw: bool) -> Dictionary:
@@ -632,7 +632,7 @@ func injury_out(oc: Dictionary, won: bool, draw: bool) -> Dictionary:
 		taken = {}
 		for r2 in CareerDefaults.REGIONS:
 			taken[r2] = float(oc["damage_taken"]) * float(split.get(r2, 0.0))
-	var per := float(io.get("per_hp_pct", 0.04))
+	var per := float(io.get("per_hp_pct", 0.07))
 	var out := {}
 	for r3 in CareerDefaults.REGIONS:
 		out[r3] = float(roundi(float(taken.get(r3, 0.0)) / max_hp * 100.0 * per))

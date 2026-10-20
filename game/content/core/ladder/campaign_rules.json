@@ -97,7 +97,7 @@
   "bot_tier_order": ["punching_bag", "journeyman", "contender", "headliner", "hall_of_famer"],
   "history_keep": 60,
   "career": {
-    "_doc": "Persistent Career (CMP-08): the Cage Rules career translated to Critterweight (src/campaign/career/, CareerDefaults mirrors these values). Mods may override any key with \"override\": true; nested objects merge key by key, arrays (orgs, facilities, names...) are replaced whole. The six stats map to fighter modifiers through CareerBuild (fixed keys, coefficients in \"build\"). Values marked PLACEHOLDER in CareerDefaults await calibration.",
+    "_doc": "Persistent Career (CMP-08): the Cage Rules career translated to Critterweight (src/campaign/career/, CareerDefaults mirrors these values). Mods may override any key with \"override\": true; nested objects merge key by key, arrays (orgs, facilities, names...) are replaced whole. The six stats map to fighter modifiers through CareerBuild (fixed keys, coefficients in \"build\").",
     "start": {"money": 2000, "pop": 2.0, "week": 1},
     "name_max": 14,
     "nick_max": 16,
@@ -233,7 +233,7 @@
       "r1_finish_loss": 2.0,
       "title_loss": 3.0,
       "action_bonus": 1.5,
-      "action_landed_per_round": 25.0
+      "action_landed_per_round": 44.0
     },
     "pop_labels": [
       {"min": 92, "label": "Superstar"},
@@ -256,7 +256,7 @@
       "min_mult": 0.7
     },
     "injury_out": {
-      "per_hp_pct": 0.04,
+      "per_hp_pct": 0.07,
       "per_knockdown": 2.0,
       "stoppage_loss_head": 10.0,
       "region_cap": 100.0,
