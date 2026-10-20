@@ -45,6 +45,86 @@ func test_invalid_combinations_are_explained() -> void:
 	check(w.any(func(p): return p["field"] == "respawn" and p["severity"] == "warning"), "useless respawn warns")
 
 
+## MCH-07/08/09: Scoring and Referee fields (standard only, defaults = the old behaviour), their
+## validation, and the built-in Cage Rules preset (= the Standard Duel + 10-point + referee).
+func test_scoring_and_referee_fields_validate_and_default_to_the_old_rules() -> void:
+	var std := RulesValidator.fields_for("standard")
+	check(std.has("scoring") and std.has("referee"), "standard shows Scoring and Referee")
+	for m in RulesValidator.EDITABLE_MODES:
+		if m != "standard":
+			check(not RulesValidator.fields_for(m).has("scoring") and not RulesValidator.fields_for(m).has("referee"), "%s has no Scoring / Referee rows" % m)
+			check(not RulesValidator.defaults_for(m).has("scoring"), "%s defaults lack the keys" % m)
+	var d := RulesValidator.defaults_for("standard")
+	check_eq(str(d["scoring"]), "hp", "default Health scoring")
+	check_eq(d["referee"], false, "default no referee")
+	var old := Content.get_entry("rules", "duel")
+	check(not old.has("scoring") and not old.has("referee"), "the shipped duel has no new keys")
+	var n := RulesValidator.normalize(old)
+	check(str(n["scoring"]) == "hp" and n["referee"] == false, "an old preset normalizes to Health scoring, no referee")
+	check_eq(str(RulesValidator.normalize({"mode": "standard", "scoring": "eleven_point"})["scoring"]), "hp", "unknown scoring -> Health")
+	var duel := {"name": "t", "mode": "standard", "format": "duel", "teams": 2, "players": [2, 2], "rounds": 3, "round_time": 99.0, "win": "ko"}
+	var bad := [
+		[{"format": "ffa", "teams": 0, "players": [2, 8], "scoring": "ten_point"}, "scoring"],
+		[{"scoring": "ten_point", "round_time": 0.0}, "round_time"],
+		[{"scoring": "ten_point", "win": "score", "score_target": 5}, "win"],
+		[{"format": "teams", "players": [4, 8], "referee": true}, "referee"],
+	]
+	for c in bad:
+		var r := duel.duplicate(true)
+		r.merge(c[0], true)
+		var probs := RulesValidator.validate(r)
+		var hit := probs.filter(func(p): return p["field"] == c[1] and p["severity"] == "error")
+		check(not hit.is_empty(), "%s flags '%s': %s" % [str(c[0]), c[1], str(probs)])
+		for p in hit:
+			check(str(p["text"]).length() > 12, "explanation is a sentence: %s" % p["text"])
+	var ok := duel.duplicate(true)
+	ok.merge({"scoring": "ten_point", "referee": true, "ringout_eliminates": true, "rounds": 2}, true)
+	var pr := RulesValidator.validate(ok)
+	check(not RulesValidator.has_errors(pr), "10-point + referee duel is valid: %s" % str(pr))
+	check(pr.any(func(p): return p["field"] == "ringout_eliminates" and p["severity"] == "warning"), "ring-out elimination warns under 10-point")
+	check(not pr.any(func(p): return p["field"] == "rounds"), "no even-rounds warning under 10-point (every round is judged)")
+	var hp2 := duel.duplicate(true)
+	hp2.merge({"rounds": 2, "referee": true}, true)
+	var pr2 := RulesValidator.validate(hp2)
+	check(not RulesValidator.has_errors(pr2), "Health scoring with a referee is valid")
+	check(pr2.any(func(p): return p["field"] == "rounds" and p["severity"] == "warning"), "even rounds still warn under Health scoring")
+	var tag := {"name": "t", "mode": "tag_team", "format": "tag", "teams": 2, "players": [4, 4], "scoring": "ten_point", "referee": true}
+	check(not RulesValidator.validate(tag).any(func(p): return p["field"] in ["scoring", "referee"]), "other modes ignore the keys")
+	check(RulesValidator.describe(ok).contains("10-point") and RulesValidator.describe(ok).contains("referee"), "describe: %s" % RulesValidator.describe(ok))
+	check(not RulesValidator.describe(duel).contains("10-point") and not RulesValidator.describe(duel).contains("referee"), "describe unchanged without the keys")
+	check(str(RulesValidator.field("referee")["help"]).contains("%d knockdowns" % RefereeRules.REF_KD_LIMIT), "referee help names the knockdown limit")
+	var editor: GDScript = load("res://src/ui/screens/rules_editor_screen.gd")
+	var labels: Dictionary = editor.get_script_constant_map()["VALUE_LABELS"]
+	check(str(labels.get("hp", "")) == "Health" and str(labels.get("ten_point", "")) == "10-point must", "editor value labels")
+
+
+func test_cage_rules_preset_is_the_standard_duel_with_officials() -> void:
+	var cage := Content.get_entry("rules", "cage_rules")
+	var duel := Content.get_entry("rules", "duel")
+	check(not cage.is_empty(), "Cage Rules is a built-in preset")
+	check_eq(Content.origin_of("rules", "cage_rules"), "core")
+	check_eq(str(cage.get("name", "")), "Cage Rules")
+	check_eq(str(cage.get("scoring", "")), "ten_point")
+	check_eq(cage.get("referee", false), true)
+	var probs := RulesValidator.validate(RulesValidator.normalize(cage))
+	check(not RulesValidator.has_errors(probs), "valid: %s" % str(probs))
+	var own := ["id", "name", "description", "scoring", "referee", "_package", "_file"]
+	for k in duel:
+		if not k in own:
+			check(cage.has(k) and cage[k] == duel[k], "'%s' inherited from the duel (%s vs %s)" % [k, str(cage.get(k)), str(duel[k])])
+	for k in cage:
+		if not k in own:
+			check(duel.has(k), "'%s' is a duel key" % k)
+	check(str(cage["description"]) != str(duel["description"]) and str(cage["description"]).length() <= 200, "own description")
+	# a user copy keeps the officials through save / load
+	var dup := RulePresets.duplicate_preset("cage_rules")
+	check(dup["ok"], "copy saved")
+	var copy := Content.get_entry("rules", str(dup["id"]))
+	check(str(copy.get("scoring", "")) == "ten_point" and copy.get("referee", false) == true, "the copy keeps 10-point + referee")
+	var listed := RulePresets.list().filter(func(r): return str(r["id"]) == str(dup["id"]))
+	check(not listed.is_empty() and str(listed[0].get("scoring", "")) == "ten_point", "reads back from disk")
+
+
 func test_normalize_clamps_and_keeps_unknown_keys() -> void:
 	var n := RulesValidator.normalize({"mode": "standard", "damage_mult": 99.0, "rounds": -3, "players": [9, 1], "my_mod_key": 7})
 	check_near(float(n["damage_mult"]), 4.0, 0.001, "clamped damage")

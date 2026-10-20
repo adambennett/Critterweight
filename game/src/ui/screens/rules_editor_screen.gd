@@ -12,7 +12,7 @@ const VALUE_LABELS := {"standard": "Standard", "spotlight_hog": "Spotlight Hog",
 	"duel": "Duel (1v1)", "ffa": "Free-for-all", "teams": "Teams", "tag": "Tag team", "coop": "Co-op",
 	"ko": "Last standing (KO)", "score": "Score", "survive": "Survive", "strict": "Strict", "split": "Split",
 	"punching_bag": "Punching Bag", "journeyman": "Journeyman", "contender": "Contender",
-	"headliner": "Headliner", "hall_of_famer": "Hall-of-Famer"}
+	"headliner": "Headliner", "hall_of_famer": "Hall-of-Famer", "hp": "Health", "ten_point": "10-point must"}
 
 var _view := "list"
 var _frame := {}

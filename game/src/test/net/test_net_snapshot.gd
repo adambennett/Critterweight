@@ -54,6 +54,32 @@ func test_snapshot_sizes_fit_one_packet() -> void:
 	print("    snapshot sizes (dev_biped, 13 segments): 2 fighters %d B, 8 fighters %d B" % [b2, b8])
 	check(b2 < 400, "duel snapshot < 400 B (%d)" % b2)
 	check(b8 < 1200, "8-fighter snapshot stays under one MTU (%d)" % b8)
+	# MCH-07/08 worst case: a Cage Rules duel in sudden death after drawn cards (status text twice,
+	# hud_state cards + sd) with a referee count running (view_state.referee)
+	var cage: Dictionary = Content.get_entry("rules", "cage_rules").duplicate(true)
+	cage["round_time"] = 1.0
+	cage["intro_time"] = 0.2
+	var simc := make_sim("the_gullet", cage, [{"creature": "dev_biped", "team": 0, "source": null}, {"creature": "dev_biped", "team": 1, "source": null}], 5)
+	var t := 0.0
+	while not simc.mode.sudden_death and t < 30.0:
+		await step_sim(simc, 0.5)
+		t += 0.5
+	check(simc.mode.sudden_death, "drawn cards went to sudden death")
+	simc.mode.referee.begin_round(3)   # force a live count on top (cannot coexist in play: a knockdown is a clean hit)
+	simc.fighters[1].knock_down("poise", simc.fighters[0])
+	await step_sim(simc, 1.2)
+	var vs: Dictionary = simc.mode.view_state()
+	var hs: Dictionary = simc.mode.hud_state()
+	check(vs.has("referee") and (vs["referee"] as Dictionary).has("count"), "a referee count is replicated: %s" % str(vs))
+	check(hs.has("cards") and bool(hs.get("sd", false)), "hud_state carries cards + sd: %s" % str(hs))
+	check(simc.mode.hud_status().to_utf8_buffer().size() <= 36, "sudden-death status stays <= 36 bytes")
+	var body := NetSnapshot.encode_body(simc, _gens(simc))
+	var bc := body.size() + 9
+	print("    cage rules duel (sudden death, cards, referee count): %d B" % bc)
+	check(bc < 400, "cage rules duel snapshot < 400 B (%d)" % bc)
+	var dm: Dictionary = NetSnapshot.decode_body(NetReader.new(body))["mode"]
+	check_eq(str(dm["status"]), simc.mode.hud_status(), "status text replicated")
+	check(dm["hud"].has("cards") and dm["view"].has("referee"), "cards and referee view replicated")
 
 
 func test_roster_codec_and_generations() -> void:
