@@ -4,7 +4,7 @@ extends Node
 ## is how paths with spaces and non-ASCII characters are verified (SAV-04).
 
 const SUBDIRS := ["profiles", "mods", "arenas", "presets", "policies", "playlists", "runs", "logs",
-	"lab", "captures", "replays", "server", "packages", "downloads"]
+	"lab", "captures", "replays", "server", "packages", "downloads", "careers"]
 
 var root := ""
 
