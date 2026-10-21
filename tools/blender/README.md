@@ -72,7 +72,7 @@ This project is an active-ragdoll brawler. A fighter's motion comes from physics
 - Keep a material named `team`. Emissive material hints enable the runtime glow mask. `detail_` materials still receive all creature effects but omit the inflated outline pass, which otherwise overwhelms small eyes and mouth details.
 - Use at most four normalized influences per vertex; the delivered models use at most two. Broad surfaces stay rigid to their segment, with soft blending only around joints.
 - Apply geometry modifiers before saving an export source. The exporter rejects non-armature modifiers and shape keys; it does not silently bake them or export expressions. Adding either export feature requires deliberate pipeline and view support.
-- Count **body plus gore** triangles: fighters 6–12k, bosses at most 25k, minions at most 2k. These sources use no textures. If adding textures later, revisit the runtime shader/import contract and the one-1024-atlas fighter limit.
+- Count **body plus gore** triangles: fighters 6–30k (raised from 12k for the v0.9.17 roster pass), bosses at most 25k, minions at most 2k. These sources use no textures. If adding textures later, revisit the runtime shader/import contract and the one-1024-atlas fighter limit.
 
 Use [export_creature.py](export_creature.py), not an arbitrary File > Export preset, for these assets. It extracts rest geometry and vertex colours and delegates GLB writing to the project's deterministic writer. The saved sources are the normal rebuild inputs; the source-generation scripts are a reproducible starting point and reference for construction.
 

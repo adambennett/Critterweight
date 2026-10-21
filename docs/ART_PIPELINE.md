@@ -80,7 +80,7 @@ files with the same shape. Files whose name starts with `_` are ignored. Fields:
 | `bones` | static models only: `[{id, pivot}]`; default one `root` bone at the origin |
 | `out` | output path under `game/assets/models/` (default `creatures/<id>.glb`) |
 | `resolution` | voxel size in metres (fighters 0.008–0.012, bosses 0.015–0.02, crowd 0.014) |
-| `target_tris` | triangle budget after decimation (ART_DIRECTION §11: fighters 6–12k, minions ≤ 2k, bosses ≤ 25k) |
+| `target_tris` | triangle budget after decimation (ART_DIRECTION §11: fighters 6–30k since v0.9.17, minions ≤ 2k, bosses ≤ 25k) |
 | `blend` | default smooth-union radius (m) |
 | `skin_soft` | default skin falloff sigma (m, default 0.035) |
 | `scale` | uniform scale applied to all parts (bosses that reuse a plan) |
@@ -170,6 +170,27 @@ status tint, bruises, `vertex_glow` for the Hype feature) carrying the glb's rou
 hints, tints the `team` surface, hides the `gore_piece` node and uses its mesh for `detach_piece`.
 Without a model it falls back to the segment-shape primitives.
 
+### 5b. v0.9.17 additions (view only)
+
+* **Shader v2** (`creature.gdshader`): every surface gets a material class from its glb material name
+  (`CreatureView.MATERIAL_KINDS`: hide, cloth/team/wrap, metal/brass/iron, eye, jelly, lacquer/shell,
+  ghost/spectral) with its own response (cloth sheen, metal specular, wet eye highlight, jelly
+  translucency, spectral fresnel), and the Hype glow animates per fighter (`glow_mode`: steady,
+  flicker, pulse, shimmer, lamp). `finish` 0 keeps the exact pre-v0.9.17 shading; the legacy Varga
+  model uses it.
+* **Face and secondary motion** (`creature_fx_rig.gd`, `CreatureFxRig`): models may carry view-only
+  bones under the segment bones: `fx_eye_l/r` (pupils follow the opponent), `fx_lid_l/r` (blinks,
+  squash by scale), `fx_brow_l/r`, `fx_jaw` (mood: neutral, attack, hurt, surprised, KO, guard, taunt,
+  happy, tired) and chains `fx_spring_<name>_<n>` (damped springs: crests, fins, chains, tails,
+  drips). The rig only poses those bones after the segment bones are placed; it never moves a segment
+  bone or anything the simulation reads. Parameters come from the glb's node extras
+  (`look`: `glow_mode`, `fx.pupil_reach`, `jaw_deg`, `brow_drop`, `lid_rest`, `spring_gain`,
+  `spring_stiffness`), written by `Studio.set_look()`.
+* **Legacy Varga skin**: `CreatureView.model_path_for()` serves `f_varga_legacy.glb` (the v0.9.16
+  model, byte for byte, sha256 `4fa78a8a…0460fc`) when Settings › Graphics › "Legacy Varga skin" is
+  on, in every view (fighter previews, matches, practice, Career, spectating, online, hub), and swaps
+  live when the setting changes. Both models bind the same body; gameplay data is identical.
+
 ## 6. Tools
 
 | Tool | Purpose |
@@ -224,9 +245,31 @@ mask. `team` remains a separate tintable material. `detail_` materials use the s
 and effects with the inflated outline pass omitted, keeping eyes, mouth marks and thin wraps clear.
 The shared toon ramp, hit flash, JUICE, status tint and bruise shader are unchanged.
 
+### 7b. v0.9.17 fighter builders
+
+The upgraded roster is built by `tools/blender/fighters_v17.py` (shared helpers and Stoke) and one
+module per fighter, `fighters_v17_<id>.py`, each defining `build(s)` on the `Studio` API
+(`mesh_tools.py`: `rig_eye`, `view_bone`, `paint`, `bake_ao`, `set_look`, material classes). Rebuild
+one fighter's source and model:
+
+```powershell
+. .	oolslenderrt_env.ps1 -ArtRoot B:\Critterweight-workrt; Set-ArtRuntimePaths
+& B:\Blenderlender.exe -b -t 2 --python-exit-code 1 --python tools/blender/build_creatures.py -- f_dredge --reference-root B:\Critterweight-workrt
+ef --out-source tools/blender/f_dredge.blend --out-glb game/assets/models/creatures/f_dredge.glb
+```
+
+`--v16` builds the previous generation instead. `export_creature.py` validates view bones (names,
+parents under segment bones) and writes the `look` extras. Guards against overwriting the original
+Varga: `build_creatures.py` refuses any `*_legacy.glb` output, and `tools/cage_rules/import.js`
+writes only `f_varga_legacy.glb` (never the upgraded `f_varga.glb`), and a regeneration that would
+produce different bytes from the v0.9.16 original is refused and the previous file restored, unless
+`--allow-legacy-change` is passed deliberately.
+
 `audit_models.js` counts **body plus detachable gore triangles**, checks the skeleton/binds/weights,
-colour/normal data, team/gore/glow contracts and texture/animation absence. Distances outside collision
-shapes are reported for review; they are not a claim that an entire mesh is visually registered in motion.
+colour/normal data, team/gore/glow contracts and texture/animation absence. View-only `fx_*` bones
+are accepted under segment bones (their vertices count toward the segment they hang from); fighters
+may use up to 30k triangles. Distances outside collision shapes are reported for review; they are not
+a claim that an entire mesh is visually registered in motion.
 
 ### Machine paths and coordination
 

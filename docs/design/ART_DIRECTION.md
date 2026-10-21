@@ -154,7 +154,7 @@ Readability: hit flashes are white (not element color) so a hit always reads the
 
 | Item | Target |
 |---|---|
-| Fighter mesh | 6–12k triangles including the KO piece; at most one 1024² atlas if needed, VRAM-compressed on import (revamp uses none); exact body-segment bones, ≤ 4 influences per vertex (revamp uses at most 2) |
+| Fighter mesh | 6–30k triangles including the KO piece (12k until v0.9.17; the v0.9.17 roster pass uses up to 30k, checked in the 8-fighter performance benches); at most one 1024² atlas if needed, VRAM-compressed on import (revamp uses none); exact body-segment bones, ≤ 4 influences per vertex (revamp uses at most 2) |
 | Minion mesh | ≤ 2k triangles including the KO piece; revamp uses vertex colours, no texture |
 | Boss mesh | ≤ 25k triangles including the KO piece; revamp uses vertex colours, no texture |
 | Arena | ≤ 150k triangles total scene, props ≤ 3k each, crowd as billboarded silhouettes (3 rows, 2 anim frames) |

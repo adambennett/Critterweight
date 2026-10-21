@@ -1,0 +1,99 @@
+# Ability VFX (v0.9.17)
+
+Every fighter's abilities, JUICE, charged heavies, projectiles, ground effects, elemental hits and
+reactions are drawn by one view-only system shared by local matches, online clients and the hub.
+This page is the design and the maintenance guide. Evidence (before/after captures, contact sheets,
+performance) lives under `docs/evidence/v0.9.17/`.
+
+## 1. Architecture
+
+| Piece | File | Role |
+|---|---|---|
+| `AbilityVfx` | `game/src/view/fx/ability_vfx.gd` | The director: reads simulation **events** (`move_start`, `effect`, `hit`, `reaction`, `juice`, `submerge`, `hover`, `counter`, `carry`, `arc`, `spring`, ...), the replicated **entity list** (projectiles, zones, props, delayed strikes) and per-fighter **view state** (ground, yaw, state, JUICE, hidden, heavy-charge level). Never writes back. |
+| `FxKit` | `game/src/view/fx/fx_kit.gd` | Shared shaders, materials, palettes (paint / glow / stain per element) and procedural meshes (hex grit chunks, ring walls, spirals, crests). |
+| `fx_area.gdshader` | `game/src/view/shaders/` | The **true footprint** of an area or zone, computed per pixel from the effect's own numbers, in the element's floor pattern. |
+| `fx_flow.gdshader` | | Animated surfaces: shockwave and tidal walls, vortex spirals, crests, jets, ribbons (trails, wind streaks, lightning). |
+| `fx_debris.gdshader` / `fx_puff.gdshader` | | GPU particle programs: solid pieces that fly, tumble, bounce and settle (grit, drops, gobs, shards, cinders, sparks, feathers) and soft volumes that grow, drift and swirl (steam, smoke, dust, flames, mist, wisps, wind). |
+| `fx_puff_draw.gdshader` | | How one puff looks: cloud, flame tongue, mote/bubble, wisp, droplet, four-point glint. |
+
+Scenes: `MatchScene` (local play, practice, Career, spectating, AI Lab presentations),
+`NetMatchScene` (online clients: same events through `NetEventCodec`, entities through
+`NetSnapshot`) and `HubScene` (the player's own fighter). The old generic area ring, reaction burst
+and JUICE burst in those scenes were removed; hit sparks, words ("PARRY!", reaction names), KO stars
+and the rest of `Vfx` are unchanged.
+
+## 2. Truthful timing and areas
+
+* **Preparation** runs from the move's start (`move_start`) to its first effect time, read from the
+  move definition (`first_effect_t`), so the build-up always ends exactly when the simulation fires.
+* **Contact** is drawn when the simulation emits the `effect` event, never earlier.
+* **Areas** are drawn from the numbers the simulation used. `EffectsSystem.fire` now adds the rest
+  of the footprint to the (presentation-only) effect event: `cone_deg`, `length`, `width`, `inner`,
+  `duration`, `distance`, `delay`, `speed`, and `origin` for cones and lines (they start at the
+  fighter's feet, see `EffectsSystem.area`). Nothing reads these back; the authoritative outcome,
+  state hashes and event counts are unchanged. Unknown keys already travel online
+  (`NetEventCodec`), so clients draw the same footprints.
+* Preparation telegraphs that show an area before contact (Meltdown, Landslide, Overcharge) use the
+  move definition's own numbers, so they match the real area exactly.
+* Projectiles, zones and props follow the replicated entities frame by frame; when an entity
+  disappears its visual dissipates (streams stop, decals fade) instead of popping.
+
+## 3. Identity per fighter
+
+| Fighter | Language | Abilities |
+|---|---|---|
+| Stoke (scorch) | furnace pressure and ignition | **Steam Vent**: the boiler glows and the stacks hiss while hot motes rush into the firebox; at contact a flat steam jet and scalding clouds fill the true 60° cone, cinders fly, the floor is scorched in the cone. **Stoke the Fire**: ignition roars out of both back stacks, a flame ring kicks off his feet, the stacks keep burning and his fists shed cinders while Stoked lasts. **Meltdown** (JUICE): white-hot core, the blast footprint spreading under him, then a fire wall rolls out to exactly 3 m with flame tongues on the rim, a scorched circle and cinder rain. JUICE aura: stack flames, cinders. Charged heavy: an ember glow builds on the striking fist, flash on release, a fire trail through the swing. |
+| Dredge (brine) | tidal force | **Tide Spit**: water gathers at the mouth; a wobbling ball of seawater sheds drops and spray in flight; it lands in a splash crown and a rippling puddle. **Anchor Drop**: a whirlpool turns on the floor around him for the whole stance; the counter crashes a wave onto the attacker. **High Tide** (JUICE): a rising water column, then a breaking crest rolls out to the 5 m ring with spray, and the 11 m flood covers the cage in rippling water. Crusher Slam: a wave rolls along its 3.5 × 1 m line. |
+| Gusto (gale) | vortices | **Gust Bomb**: wind spirals into the beak; the bomb is a knot of crossed spinning swirls trailing wind; it bursts in a radial gust. **Hang Time**: downdraft rings pulse onto the floor under him while he hovers. **Hurricane Strut** (JUICE): a vortex winds up around him, then curling streaks sweep through the 90° cone carrying feathers and dust; JUICE dodges leave small turning tornadoes (Gale Vortex zones). Crosswind, Downdraft and Tailspin get a slash, a pressed-down ring and a spinning ring. |
+| Dozer (grit) | crushing debris | **Bulldoze**: hooves scrape and spray grit; the charge drags a heavy dust plume, kicks gravel, sparks off the horn and tears the floor along its path; scooping a victim or hitting a wall bursts into chunks. **Dust Bowl**: a turning wall of dust follows him. **Landslide** (JUICE): the 6 × 2 m line cracks into hex cells and rock spires burst out of the floor one after another along it, then crumble. Gravel Toss sprays gravel through its cone. |
+| Slurry (sludge) | viscous sludge | **Sludge Lob**: goo drips from the fang; the lob is a lumpy glossy gob shedding drips; it splats into a bubbling puddle. **Drain Dive**: the floor opens into a sludge pool, bubbles trace the path under the floor, a second pool swells where he will rise, and he erupts in a gooey ring. **Overflow** (JUICE): a sludge surge rolls along the 4 × 1.6 m line throwing gobs, the puddles bubble. |
+| Jitters (static) | electrical discharge | **Arc Lash**: sparks snap between the antennae; the orb is a crackling ball snapping arcs, ending in a forked pulse. **Spring Pad**: a riveted, charged coil pad springs out of the floor and crackles; it compresses and sparks when it launches someone. **Overcharge** (JUICE): arcs crawl over the body, then lightning forks out to exactly 3 m with a charged ring; while juiced he keeps crackling. Squash landings and Static Cling discharge in sparks and forks; chain arcs are bolts between the fighters. |
+| Varga (scrap) | precise martial impact | **Cut the Angle**: crisp speed lines off the chest and fists along the dash. **Second Wind**: a clean breath ring, rising focus motes, glints on the fists. **Championship Rounds** (JUICE): a tight gold shock ring and a star-burst exactly on the 1.3 m area. His landed strikes add a four-point glint with short impact lines (struck-metal sparks on the big ones); his heavies leave a gold arc. |
+| Knell (spectral) | spectral motion | **Ghost Light**: a lantern flame kindles where it will leave his hand; it drifts as a violet lantern flame shedding grave-light wisps. **Through the Veil**: he comes apart into grave-mist, a wisp streaks to the destination and he gathers again; the arrival burst is a spectral ring. **Last Bell** (JUICE): a ghostly bell hangs over him and swings with each toll; each toll is a ring of sound rolling out to exactly its reach (2, 2.7, 3.4 m). |
+
+Every elemental hit adds that element's small burst (scorch tongues and cinders, brine drops, gale
+wisps, grit pebbles and dust, sludge gobs, static sparks and forks, scrap sparks and shards,
+spectral wisps); status triggers add the medium burst and a short wrap around the body; every
+reaction combines both parents' shapes and then its own large effect (steam cloud, flare-up
+fireball, backdraft fire vortex, short-out forks over water, mud, dilute splash, catalyze fizz,
+stormfront funnel and the delayed sky bolt, crust shell, sludge spray, sandblast, bell-ringer rings,
+grave chill, crack guard shards).
+
+## 4. Readability on any floor
+
+The cage canvas is bright, so purely additive glows wash out to white. Every effect material is
+premultiplied: a saturated **paint** colour covers (`cover`), a darker **stain** marks footprints
+(scorch, wet floor, goo, dust) and an HDR **glow** colour is added on top (`glow_k`), which the
+arena's glow pass blooms on dark floors. Palettes per element are in `FxKit.PAINT/GLOW/STAIN`.
+Gale paints in its outline teal rather than its near-white body colour.
+
+## 5. Settings and budget
+
+| Effects quality | Particles | Light flashes | Trails, auras, zone particles |
+|---|---|---|---|
+| Low (0) | 35 % | none | off (footprints, walls and key bursts stay: combat cues readable) |
+| Medium (1) | 65 % | up to 3 | on |
+| High (2) | 100 % | up to 6 | on |
+
+With more than four fighters every amount is scaled by a further 0.7. **Reduce flashing** dims
+light flashes to 35 %, halves the travelling front of footprints, slows lightning re-forking to a
+steady flicker and thins bright motes and glints. One-shot emitters are pooled (10 per preset);
+continuous emitters free themselves after their particles die; one weapon trail per fighter
+(ART_DIRECTION §10). Materials and particle programs are built during the match intro (warm-up).
+
+## 6. Verifying and capturing
+
+* Focused tests: `game/src/test/vfx/test_ability_vfx.gd` (true footprints in the simulation's
+  events and in the drawn decals, every fighter's events and entities drawn and cleaned up, JUICE
+  auras follow JUICE, quality and Reduce flashing, online round trip of the new event fields).
+* Before/after evidence: `game/src/test/vfx/test_vfx_showcase.gd` makes every fighter perform its
+  abilities, JUICE, charged heavy and one elemental reaction against a still mirror dummy and saves
+  the real rendered frame at fixed simulation times (prep, contact, motion, after, linger). It uses
+  only APIs that existed in v0.9.16, so the same file captures the "before" frames from the v0.9.16
+  checkout:
+
+  ```
+  godot --path game --resolution 1600x900 -- --user-root <tmp> --test test_vfx_showcase --vfx-showcase <out dir> [--vfx-fighters f_stoke,f_dredge] [--vfx-shots ability1,juice]
+  powershell -ExecutionPolicy Bypass -File tools/vfx/contact_sheet.ps1 -Before <before dir> -After <after dir> -Out <sheets dir>
+  ```
+* Performance: `--bench busy` (see `docs/VERIFICATION.md`) with simultaneous abilities.

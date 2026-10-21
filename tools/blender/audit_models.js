@@ -39,7 +39,18 @@ function audit(e) {
   const creature=JSON.parse(fs.readFileSync(path.join(root,e.creature),'utf8'));
   const segments=creature.body.segments, skin=gltf.skins[0], boneNames=skin.joints.map(i=>gltf.nodes[i].name);
   check(gltf.skins.length===1,'Expected one skin');
-  check(boneNames.length===segments.length && segments.every(s=>boneNames.includes(s.id)),'Bone set differs from body segments');
+  // v0.9.17: besides one bone per body segment, a model may carry view-only "fx_*" bones (eyes, lids,
+  // brows, jaw, springs) parented under a segment bone; they never affect gameplay
+  const parentOf={};
+  gltf.nodes.forEach((n,i)=>(n.children||[]).forEach(c=>{parentOf[c]=i;}));
+  const segOf=name=>{
+    let i=gltf.nodes.findIndex(n=>n.name===name);
+    while(i!==undefined&&i>=0){const nm=gltf.nodes[i].name;if(segments.some(s=>s.id===nm))return nm;i=parentOf[i];}
+    return null;
+  };
+  const extra=boneNames.filter(b=>!segments.some(s=>s.id===b));
+  check(segments.every(s=>boneNames.includes(s.id)),'Bone set lacks body segments');
+  check(extra.every(b=>b.startsWith('fx_')&&segOf(b)!==null),'Unexpected bones: '+extra.filter(b=>!b.startsWith('fx_')||segOf(b)===null).join(','));
   const inverse=read(skin.inverseBindMatrices);
   for(let b=0;b<boneNames.length;b++) {
     const seg=segments.find(s=>s.id===boneNames[b]),node=gltf.nodes[skin.joints[b]];
@@ -76,7 +87,7 @@ function audit(e) {
       maxWeights=Math.max(maxWeights,active);
       check(active>0&&active<=4&&Math.abs(weights[i].reduce((a,b)=>a+b,0)-1)<1e-5,'Invalid normalized weights');
       check(joints[i].every(j=>j<boneNames.length),'Joint outside skin');
-      const k=weights[i].indexOf(Math.max(...weights[i])),name=boneNames[joints[i][k]];
+      const k=weights[i].indexOf(Math.max(...weights[i])),name=segOf(boneNames[joints[i][k]]);
       const seg=segments.find(s=>s.id===name);
       const d=Math.min(...seg.shapes.map(s=>distance(positions[i],s)));
       const all=Math.min(...segments.flatMap(s=>s.shapes).map(s=>distance(positions[i],s)));
@@ -89,7 +100,8 @@ function audit(e) {
       if(glowing)check((material.emissiveFactor||[]).some(v=>v>0),'Glow alpha lacks emissive material hint');
     }
   }
-  const triangles=bodyTriangles+goreTriangles,budget=e.id.startsWith('f_')?12000:e.id.startsWith('boss_')?25000:2000;
+  // fighters: 30k since the v0.9.17 art pass (docs/ART_PIPELINE.md §3); bosses 25k; minions 2k
+  const triangles=bodyTriangles+goreTriangles,budget=e.id.startsWith('f_')?30000:e.id.startsWith('boss_')?25000:2000;
   check(triangles<=budget,`Triangle budget ${triangles} > ${budget}`);
   if(e.id.startsWith('f_'))check(bodyTriangles>=6000,'Fighter below the agreed 6k target');
   outside.sort((a,b)=>a-b);

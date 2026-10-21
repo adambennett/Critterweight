@@ -697,7 +697,7 @@
       "template": "Time on the round, and I couldn't split them with a crowbar!",
       "parts": [
         {
-          "clip": "cmt17_0056"
+          "clip": "cmt17_0056_r1"
         }
       ],
       "voice": "devon"
@@ -1071,7 +1071,7 @@
       "template": "Another step up the card, folks! Win here and the phone starts ringing!",
       "parts": [
         {
-          "clip": "cmt17_0090"
+          "clip": "cmt17_0090_r1"
         }
       ],
       "voice": "devon"
@@ -1159,7 +1159,7 @@
       "template": "The belt changes hands! A career just became a championship career!",
       "parts": [
         {
-          "clip": "cmt17_0098"
+          "clip": "cmt17_0098_r1"
         }
       ],
       "voice": "devon"
@@ -1467,7 +1467,7 @@
       "template": "Spring Pad down! Somebody's about to get launched, maybe on purpose!",
       "parts": [
         {
-          "clip": "cmt17_0126"
+          "clip": "cmt17_0126_r2"
         }
       ],
       "voice": "devon"
@@ -2171,7 +2171,7 @@
       "template": "VARGA wins! The Cage Rules guest goes home with his house rules intact!",
       "parts": [
         {
-          "clip": "cmt17_0190"
+          "clip": "cmt17_0190_r1"
         }
       ],
       "voice": "devon"
@@ -2281,7 +2281,7 @@
       "template": "First touch of the night! Somebody's warmed up and somebody's not!",
       "parts": [
         {
-          "clip": "cmt17_0200"
+          "clip": "cmt17_0200_r1"
         }
       ],
       "voice": "devon"
@@ -2325,7 +2325,7 @@
       "template": "You landed first, kid! Now don't get comfortable!",
       "parts": [
         {
-          "clip": "cmt17_0204"
+          "clip": "cmt17_0204_r1"
         }
       ],
       "voice": "devon"
@@ -2402,7 +2402,7 @@
       "template": "Your guard's gone, kid! Get out of there!",
       "parts": [
         {
-          "clip": "cmt17_0211"
+          "clip": "cmt17_0211_r1"
         }
       ],
       "voice": "devon"
@@ -2600,7 +2600,7 @@
       "template": "DOWN they go! The referee's on it, folks, here comes the count!",
       "parts": [
         {
-          "clip": "cmt17_0229"
+          "clip": "cmt17_0229_r1"
         }
       ],
       "voice": "devon"
@@ -2666,7 +2666,7 @@
       "template": "You're in the red, kid! Guard up and pick your moment!",
       "parts": [
         {
-          "clip": "cmt17_0235"
+          "clip": "cmt17_0235_r1"
         }
       ],
       "voice": "devon"
@@ -2842,7 +2842,7 @@
       "template": "Showboating in the middle of a fight! The crowd loves it, the opponent doesn't!",
       "parts": [
         {
-          "clip": "cmt17_0251"
+          "clip": "cmt17_0251_r1"
         }
       ],
       "voice": "devon"
@@ -3150,7 +3150,7 @@
       "template": "The heaviest hitter on the card, folks, and he knows exactly one direction!",
       "parts": [
         {
-          "clip": "cmt17_0279"
+          "clip": "cmt17_0279_r1"
         }
       ],
       "voice": "devon"
@@ -3777,7 +3777,7 @@
       "template": "The tag is made! In comes the partner, swinging!",
       "parts": [
         {
-          "clip": "cmt17_0336"
+          "clip": "cmt17_0336_r1"
         }
       ],
       "voice": "devon"
@@ -3865,7 +3865,7 @@
       "template": "Port Hook! Knell's quick light hook keeps the opponent turning.",
       "parts": [
         {
-          "clip": "cmt17_x007"
+          "clip": "cmt17_x007_r1"
         }
       ],
       "voice": "devon"
@@ -3997,7 +3997,7 @@
       "template": "Legs said no! The rest of him agreed!",
       "parts": [
         {
-          "clip": "cmt17_rt_ann_kd_03"
+          "clip": "cmt17_rt_ann_kd_03_r1"
         }
       ],
       "voice": "devon"
@@ -4510,7 +4510,7 @@
       "template": "Varga lands first! The crowd approves, loudly, with cans!",
       "parts": [
         {
-          "clip": "cmt17_v_first_03_varga"
+          "clip": "cmt17_v_first_03_varga_r1"
         }
       ],
       "voice": "devon",
@@ -5026,7 +5026,7 @@
       "template": "Slurry is BACK in it! Crowd's on its feet! The seats are on their feet!",
       "parts": [
         {
-          "clip": "cmt17_v_comeback_03_slurry"
+          "clip": "cmt17_v_comeback_03_slurry_r1"
         }
       ],
       "voice": "devon",
@@ -5446,7 +5446,7 @@
       "template": "Jitters read you like a sponsor card, Rookie. Mix it up!",
       "parts": [
         {
-          "clip": "cmt17_v_parry_05_jitters_rookie"
+          "clip": "cmt17_v_parry_05_jitters_rookie_r1"
         }
       ],
       "voice": "devon",
@@ -5626,7 +5626,7 @@
       "template": "Slurry is one good shot from the wall of fame! The sad part of the wall!",
       "parts": [
         {
-          "clip": "cmt17_v_low_03_slurry"
+          "clip": "cmt17_v_low_03_slurry_r1"
         }
       ],
       "voice": "devon",
@@ -6000,12 +6000,6 @@
       "sha256": "ee9c79ceb94a27f646fa6d49abd73a0b76a3674c9c46da63568afd7c84411674",
       "voice": "devon"
     },
-    "cmt17_0056": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0056.wav",
-      "seconds": 2.255,
-      "sha256": "793c20bffc810752d131a6a79224e8b366d6c638596fc377d03e4a92e2587697",
-      "voice": "devon"
-    },
     "cmt17_0057": {
       "path": "res://assets/audio/speech/v0917/cmt17_0057.wav",
       "seconds": 2.8,
@@ -6204,12 +6198,6 @@
       "sha256": "0f0902b6716b9471f556e7da6e4d8be516e3ecf65135335949a211e5da3d391b",
       "voice": "devon"
     },
-    "cmt17_0090": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0090.wav",
-      "seconds": 8.72,
-      "sha256": "87e6933c9ba7c91b4af32eb4e8b536f1d5dbd020375416ac0220d201090d05c9",
-      "voice": "devon"
-    },
     "cmt17_0091": {
       "path": "res://assets/audio/speech/v0917/cmt17_0091.wav",
       "seconds": 6.4,
@@ -6250,12 +6238,6 @@
       "path": "res://assets/audio/speech/v0917/cmt17_0097.wav",
       "seconds": 5.28,
       "sha256": "396bf68b427a444b4833d170c8177ab975d85e3979148eb068cd5c86bc012201",
-      "voice": "devon"
-    },
-    "cmt17_0098": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0098.wav",
-      "seconds": 6.24,
-      "sha256": "6bea2d3f6d9a58f1633cef6135587fe73b627441af608ca282d67955cc72297c",
       "voice": "devon"
     },
     "cmt17_0099": {
@@ -6418,12 +6400,6 @@
       "path": "res://assets/audio/speech/v0917/cmt17_0125.wav",
       "seconds": 3.335,
       "sha256": "4e638a7eec4faf3901f9a0967218f898b28244ebba764e2eda377df2d5e9f4c3",
-      "voice": "devon"
-    },
-    "cmt17_0126": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0126.wav",
-      "seconds": 3.195,
-      "sha256": "f91c2cd05b10eb50a6a2d26adb9015809c87afc305218f5057aa246f49b7cf13",
       "voice": "devon"
     },
     "cmt17_0127": {
@@ -6804,12 +6780,6 @@
       "sha256": "3988addca91ec1c6a9efc4d5bd33171f91d17d1e7c133c96770886fa771e38fb",
       "voice": "kendall"
     },
-    "cmt17_0190": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0190.wav",
-      "seconds": 5.36,
-      "sha256": "188e873ec1f52c272e75a4487f5eeb70df27abae057778c3ebf7636a7481fa7a",
-      "voice": "devon"
-    },
     "cmt17_0191": {
       "path": "res://assets/audio/speech/v0917/cmt17_0191.wav",
       "seconds": 4.625,
@@ -6864,12 +6834,6 @@
       "sha256": "775caca6597f05c96ea3a52bdaa013458af5742b35701490cc6e3ead171adb56",
       "voice": "devon"
     },
-    "cmt17_0200": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0200.wav",
-      "seconds": 3.52,
-      "sha256": "e0e9acbae0c4b709a092c659147102cf2c8d166d95f4540dfefda28881c65c50",
-      "voice": "devon"
-    },
     "cmt17_0201": {
       "path": "res://assets/audio/speech/v0917/cmt17_0201.wav",
       "seconds": 2.865,
@@ -6887,12 +6851,6 @@
       "seconds": 3.335,
       "sha256": "44e9b43e4cc05fe4d4cc499efdeab6b1cf6e0a6bebc2cad69f97d7950a43f808",
       "voice": "kendall"
-    },
-    "cmt17_0204": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0204.wav",
-      "seconds": 1.795,
-      "sha256": "10db5485f1b71d41824e32780beb9614f0bdf96d1dd408571946e55126f2aa15",
-      "voice": "devon"
     },
     "cmt17_0205": {
       "path": "res://assets/audio/speech/v0917/cmt17_0205.wav",
@@ -6929,12 +6887,6 @@
       "seconds": 3.415,
       "sha256": "2537cf9db0cb1e690f31094cc2f45c6123d6f9b6e10b89b4601bf539899c4466",
       "voice": "kendall"
-    },
-    "cmt17_0211": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0211.wav",
-      "seconds": 1.855,
-      "sha256": "0b34c74d324c318deb4045118b51c4784f5e8bf3a41dc05e4e9128a75ad6da66",
-      "voice": "devon"
     },
     "cmt17_0212": {
       "path": "res://assets/audio/speech/v0917/cmt17_0212.wav",
@@ -7038,12 +6990,6 @@
       "sha256": "9088c288990c9f1e92c246b3d30f3382b891d3463b69dfd15848093656b1a148",
       "voice": "devon"
     },
-    "cmt17_0229": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0229.wav",
-      "seconds": 3.085,
-      "sha256": "8cc4be5df49b6d25524b1e71812c77075d91031942787df0a75b3b5b2e85866b",
-      "voice": "devon"
-    },
     "cmt17_0230": {
       "path": "res://assets/audio/speech/v0917/cmt17_0230.wav",
       "seconds": 3.655,
@@ -7073,12 +7019,6 @@
       "seconds": 4.24,
       "sha256": "3d5f0f40c8a1faf867da2559a7597239841f6e47a45caf0b6ae59d5b76a3c7d3",
       "voice": "kendall"
-    },
-    "cmt17_0235": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0235.wav",
-      "seconds": 2.855,
-      "sha256": "1443fed986b013d57cd8b2805adcd070e85044fd499db82365ec572253fe656f",
-      "voice": "devon"
     },
     "cmt17_0236": {
       "path": "res://assets/audio/speech/v0917/cmt17_0236.wav",
@@ -7168,12 +7108,6 @@
       "path": "res://assets/audio/speech/v0917/cmt17_0250.wav",
       "seconds": 3.2,
       "sha256": "819126da6e8241db4ecd0fdb9e0a625c3bc42744f9d277e27fbfe7cdb033b58a",
-      "voice": "devon"
-    },
-    "cmt17_0251": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0251.wav",
-      "seconds": 3.125,
-      "sha256": "421f4ca3b00575c5580f6790cd58e6770dd68dd82da64513a833686ba78de782",
       "voice": "devon"
     },
     "cmt17_0252": {
@@ -7336,12 +7270,6 @@
       "path": "res://assets/audio/speech/v0917/cmt17_0278.wav",
       "seconds": 4.32,
       "sha256": "6a25339fa75e9a57e009ba3b6d04be57e331d6b2724804685465f7c67465627a",
-      "voice": "devon"
-    },
-    "cmt17_0279": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0279.wav",
-      "seconds": 4.165,
-      "sha256": "8d29a19752b607e33b42191256b2d7a2f032d779cf5562fad87034ec0848bc1c",
       "voice": "devon"
     },
     "cmt17_0280": {
@@ -7680,12 +7608,6 @@
       "sha256": "7013151db4a8bf72e19bd96cf426f87fd27ebcd926aa0a99da028f18626fdc1a",
       "voice": "devon"
     },
-    "cmt17_0336": {
-      "path": "res://assets/audio/speech/v0917/cmt17_0336.wav",
-      "seconds": 3.435,
-      "sha256": "e6b5bdcc0ec688264dafebb546506e6f82b2a8a518b6852b76e6f7394bc577f2",
-      "voice": "devon"
-    },
     "cmt17_0337": {
       "path": "res://assets/audio/speech/v0917/cmt17_0337.wav",
       "seconds": 4.155,
@@ -7727,12 +7649,6 @@
       "seconds": 3.255,
       "sha256": "a01878f8bcffe537522277b0df15f61487b7123f7cc702d491055dea97ea5bf8",
       "voice": "kendall"
-    },
-    "cmt17_x007": {
-      "path": "res://assets/audio/speech/v0917/cmt17_x007.wav",
-      "seconds": 2.96,
-      "sha256": "1b408cef37629c6f69b0c5a29a77ca166e1979d73bb3cd81f49b61997824b848",
-      "voice": "devon"
     },
     "cmt17_rt_ann_ko_01": {
       "path": "res://assets/audio/speech/v0917/cmt17_rt_ann_ko_01.wav",
@@ -7798,12 +7714,6 @@
       "path": "res://assets/audio/speech/v0917/cmt17_rt_ann_kd_02.wav",
       "seconds": 2.865,
       "sha256": "1db6c93072253c83c0b8fd76116f7b43ae75e6204eaae7d26f096ae783c2bb78",
-      "voice": "devon"
-    },
-    "cmt17_rt_ann_kd_03": {
-      "path": "res://assets/audio/speech/v0917/cmt17_rt_ann_kd_03.wav",
-      "seconds": 3.12,
-      "sha256": "c27556b5e6da35133e4be55250dfc153aa2e97ae6d922e024bbc3b3b85fcfff3",
       "voice": "devon"
     },
     "cmt17_rt_ann_kd_06": {
@@ -8214,12 +8124,6 @@
       "sha256": "5884f208e9cfe94e9f335c64885a5b8219c348f4ad7f1dbbcd34c19eccf9f67c",
       "voice": "devon"
     },
-    "cmt17_v_first_03_varga": {
-      "path": "res://assets/audio/speech/v0917/cmt17_v_first_03_varga.wav",
-      "seconds": 2.945,
-      "sha256": "fe59bb165049228846e4b2236326f4a7ce459ec0c9f0776e377334beaec1ceeb",
-      "voice": "devon"
-    },
     "cmt17_v_first_03_knell": {
       "path": "res://assets/audio/speech/v0917/cmt17_v_first_03_knell.wav",
       "seconds": 3.105,
@@ -8472,12 +8376,6 @@
       "sha256": "e92de61ec47d3044d79fa70ada45b949268ce69785692bb2ef24b63c8190214a",
       "voice": "devon"
     },
-    "cmt17_v_comeback_03_slurry": {
-      "path": "res://assets/audio/speech/v0917/cmt17_v_comeback_03_slurry.wav",
-      "seconds": 4.32,
-      "sha256": "657949b0b56980ba5238c4eb5f78197218914b28f88fdc0b8c1f8e263dd0190d",
-      "voice": "devon"
-    },
     "cmt17_v_comeback_03_jitters": {
       "path": "res://assets/audio/speech/v0917/cmt17_v_comeback_03_jitters.wav",
       "seconds": 4.405,
@@ -8682,12 +8580,6 @@
       "sha256": "ef9de5d107b8c5552a3863e65de2d947cfe16c50d33956b3a61ffa596d2b3b14",
       "voice": "devon"
     },
-    "cmt17_v_parry_05_jitters_rookie": {
-      "path": "res://assets/audio/speech/v0917/cmt17_v_parry_05_jitters_rookie.wav",
-      "seconds": 2.495,
-      "sha256": "91b54775932aa8619021368f9c921d833daf2d2841a62dcfde6243f781b3ccaf",
-      "voice": "devon"
-    },
     "cmt17_v_parry_05_varga_rookie": {
       "path": "res://assets/audio/speech/v0917/cmt17_v_parry_05_varga_rookie.wav",
       "seconds": 3.445,
@@ -8772,12 +8664,6 @@
       "sha256": "4198584f283fd4228de9b5f9a4d34591a82d6fa33e7f2de439afb92a5b4a0904",
       "voice": "devon"
     },
-    "cmt17_v_low_03_slurry": {
-      "path": "res://assets/audio/speech/v0917/cmt17_v_low_03_slurry.wav",
-      "seconds": 2.905,
-      "sha256": "c431dde8b93cfa99b6751c4b1cb91ad30be168b7758efdf44425a6036353d19e",
-      "voice": "devon"
-    },
     "cmt17_v_low_03_jitters": {
       "path": "res://assets/audio/speech/v0917/cmt17_v_low_03_jitters.wav",
       "seconds": 3.68,
@@ -8794,6 +8680,120 @@
       "path": "res://assets/audio/speech/v0917/cmt17_v_low_03_knell.wav",
       "seconds": 3.555,
       "sha256": "18ffb0cd49172d643a1bf9a9053d4c810fc1c8d4bc437fd51d200f8fda84fbf7",
+      "voice": "devon"
+    },
+    "cmt17_0056_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0056_r1.wav",
+      "seconds": 3.985,
+      "sha256": "617040140b436db077d6de70e0df19d3163cbbad516a0cada2d6e7a68fe29f13",
+      "voice": "devon"
+    },
+    "cmt17_0090_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0090_r1.wav",
+      "seconds": 4.465,
+      "sha256": "3b03b6d897b20d9685ac15118c14437a9043566e042e1c3a3f1345c39cb74b86",
+      "voice": "devon"
+    },
+    "cmt17_0098_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0098_r1.wav",
+      "seconds": 5.305,
+      "sha256": "16a70056e84f64a540bbe659be5fae056ca09392a0907ff9be2f51622e28104a",
+      "voice": "devon"
+    },
+    "cmt17_0126_r2": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0126_r2.wav",
+      "seconds": 4.355,
+      "sha256": "7f752f65d5846a56c75de9a3020baba07b3fee82462d0d5e5bb38bc4dac91ee1",
+      "voice": "devon"
+    },
+    "cmt17_0190_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0190_r1.wav",
+      "seconds": 6.005,
+      "sha256": "fa94988a5c9ba8cbdb8a2d4e87506975052ec8e071870c2e1a00d886e905d2de",
+      "voice": "devon"
+    },
+    "cmt17_0200_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0200_r1.wav",
+      "seconds": 4.735,
+      "sha256": "fa5fb01d5c3e06310670a0845a8f2fcb527058f129230445ccc70b0e8f9404db",
+      "voice": "devon"
+    },
+    "cmt17_0204_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0204_r1.wav",
+      "seconds": 2.975,
+      "sha256": "d770527f5fa26fa13120451d7fd1e2d7dfab1b826348ee5f149b57635b24e40b",
+      "voice": "devon"
+    },
+    "cmt17_0211_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0211_r1.wav",
+      "seconds": 2.065,
+      "sha256": "7801f569d445c23563d0a64130b768afc76eaf650e5be468308d84645c39b8e5",
+      "voice": "devon"
+    },
+    "cmt17_0229_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0229_r1.wav",
+      "seconds": 3.635,
+      "sha256": "722a7c30c5104f610b1d31f9977e1c935dadfdc9b6ddcfe44d3ba20edd304e15",
+      "voice": "devon"
+    },
+    "cmt17_0235_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0235_r1.wav",
+      "seconds": 3.255,
+      "sha256": "e11da496070018047b5aebba86744eaf8b61bfd3ee4c4caf3da77c796df23051",
+      "voice": "devon"
+    },
+    "cmt17_0251_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0251_r1.wav",
+      "seconds": 4.455,
+      "sha256": "809ec63e71299dc439009f000e34300c7340de66dc66b8d1e7f1f9f241646ca7",
+      "voice": "devon"
+    },
+    "cmt17_0279_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0279_r1.wav",
+      "seconds": 3.925,
+      "sha256": "38739ed45cf25d9c5c17a1583ef7fac2be26f32732affca7a29257a09614ab28",
+      "voice": "devon"
+    },
+    "cmt17_0336_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_0336_r1.wav",
+      "seconds": 2.505,
+      "sha256": "59008838b6fe103fad9fb77dd46595b8ba23654f88c8f040667d95d01dbacd23",
+      "voice": "devon"
+    },
+    "cmt17_rt_ann_kd_03_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_rt_ann_kd_03_r1.wav",
+      "seconds": 2.835,
+      "sha256": "2ab41f35b014a1476ebff891be762d817fd1930c8b6a9545f543d3a6239c3ebe",
+      "voice": "devon"
+    },
+    "cmt17_v_comeback_03_slurry_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_v_comeback_03_slurry_r1.wav",
+      "seconds": 4.445,
+      "sha256": "65b9054f5f71763a9e75e69f064ed661670a199e061edd4c9dc89801b57e7823",
+      "voice": "devon"
+    },
+    "cmt17_v_first_03_varga_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_v_first_03_varga_r1.wav",
+      "seconds": 4.055,
+      "sha256": "d39058b71cdfc3081424eebe7c686156bda75119c8298f56a5713025da4da116",
+      "voice": "devon"
+    },
+    "cmt17_v_low_03_slurry_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_v_low_03_slurry_r1.wav",
+      "seconds": 5.335,
+      "sha256": "c92cff83643193e76576f2868c14288d5737d6c3c1322a39f86f935bbc4cc00a",
+      "voice": "devon"
+    },
+    "cmt17_v_parry_05_jitters_rookie_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_v_parry_05_jitters_rookie_r1.wav",
+      "seconds": 3.915,
+      "sha256": "274b016b206edad820a8289ac9739406aca7c71639f7abd1d56873d2db3919d9",
+      "voice": "devon"
+    },
+    "cmt17_x007_r1": {
+      "path": "res://assets/audio/speech/v0917/cmt17_x007_r1.wav",
+      "seconds": 4.175,
+      "sha256": "2398040b621a12c2cdf0d7d1d7b75b5950c6a029fd6c62d36d183cf222fc8591",
       "voice": "devon"
     }
   }

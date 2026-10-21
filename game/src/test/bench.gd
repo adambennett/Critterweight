@@ -4,6 +4,8 @@ extends Node
 ##   -- --bench busy   [--n 8] [--duration 30] [--warmup 5] [--preset high] [--out file.json]
 ##        rendered match with N pro bots (FFA, lives) in the primary cage: frame-time
 ##        distribution, physics/process time, draw calls, memory, match load time
+##        [--abilities-every s]: every s seconds all fighters use an ability at once (cycling
+##        ability 1, ability 2, JUICE; cooldowns and hype refilled) for crowded-effects captures
 ##   -- --bench duel   same with 2 fighters
 ##   -- --bench sim    [--n 8] [--duration 60]: headless authoritative simulation cost per tick
 ##        (dedicated-server capacity), no rendering
@@ -102,7 +104,17 @@ func _rendered(n: int) -> void:
 	var mem_start := Performance.get_monitor(Performance.MEMORY_STATIC)
 	var t_end := Time.get_ticks_msec() + int(dur * 1000.0)
 	var last := Time.get_ticks_usec()
+	var every := float(_arg("--abilities-every", "0"))
+	report["abilities_every_s"] = every
+	var next_burst := Time.get_ticks_msec()
+	var burst_k := 0
+	var bursts := 0
 	while Time.get_ticks_msec() < t_end:
+		if every > 0.0 and Time.get_ticks_msec() >= next_burst:
+			next_burst += int(every * 1000.0)
+			_all_use_ability(scene.sim, burst_k)
+			burst_k += 1
+			bursts += 1
 		await get_tree().process_frame
 		var now := Time.get_ticks_usec()
 		frames.append((now - last) / 1000.0)
@@ -130,7 +142,24 @@ func _rendered(n: int) -> void:
 	report["objects"] = Performance.get_monitor(Performance.OBJECT_COUNT)
 	report["process_rss_mb"] = OS.get_static_memory_usage() / 1048576.0
 	report["alive_fighters_end"] = scene.sim.fighters.filter(func(f): return not f.is_out()).size()
+	report["ability_bursts"] = bursts
 	report["hits"] = scene.sim.events.filter(func(e): return e["type"] == "hit").size()
+
+
+## Crowded-effects load: every fighter presses the same ability at once (cycle k: ability 1,
+## ability 2, JUICE), with cooldowns, charges, stamina and hype refilled so the press fires.
+static func _all_use_ability(sim: MatchSim, k: int) -> void:
+	var button: int = [FighterInput.AB1, FighterInput.AB2, FighterInput.JUICE][k % 3]
+	for f in sim.fighters:
+		if f.is_out():
+			continue
+		f.cooldown_left.clear()
+		for slot in f.creature.abilities:
+			f.charges_left[slot] = int(f.creature.ability_charges.get(slot, 1))
+		f.stamina = f.max_stamina
+		if button == FighterInput.JUICE:
+			f.hype = 100.0
+		f.input.press(button)
 
 
 func _sim_cost(n: int) -> void:

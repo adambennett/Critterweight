@@ -1,0 +1,29 @@
+{
+  "chosen": {
+    "cmt17_0056": "cmt17_0056_r1",
+    "cmt17_0090": "cmt17_0090_r1",
+    "cmt17_0098": "cmt17_0098_r1",
+    "cmt17_0126": "cmt17_0126_r2",
+    "cmt17_0190": "cmt17_0190_r1",
+    "cmt17_0200": "cmt17_0200_r1",
+    "cmt17_0204": "cmt17_0204_r1",
+    "cmt17_0211": "cmt17_0211_r1",
+    "cmt17_0229": "cmt17_0229_r1",
+    "cmt17_0235": "cmt17_0235_r1",
+    "cmt17_0251": "cmt17_0251_r1",
+    "cmt17_0279": "cmt17_0279_r1",
+    "cmt17_0336": "cmt17_0336_r1",
+    "cmt17_rt_ann_kd_03": "cmt17_rt_ann_kd_03_r1",
+    "cmt17_v_comeback_03_slurry": "cmt17_v_comeback_03_slurry_r1",
+    "cmt17_v_first_03_varga": "cmt17_v_first_03_varga_r1",
+    "cmt17_v_low_03_slurry": "cmt17_v_low_03_slurry_r1",
+    "cmt17_v_parry_05_jitters_rookie": "cmt17_v_parry_05_jitters_rookie_r1",
+    "cmt17_x007": "cmt17_x007_r1"
+  },
+  "rejected": [
+    "cmt17_0126_r1"
+  ],
+  "processing": {
+    "cmt17_0229_r1": "stray sound after 0.3 s of digital silence trimmed at the end"
+  }
+}

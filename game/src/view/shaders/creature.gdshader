@@ -158,8 +158,11 @@ void light() {
 			band = smoothstep(0.55, 0.6, pow(ndh, 260.0));
 			strength = mix(strength, 1.4, finish);
 		} else if (material_kind == 5) {
-			band = max(band * 0.5, smoothstep(0.52, 0.58, pow(ndh, 110.0)));
-			strength = mix(strength, 0.75, finish);
+			// clearcoat: a soft, roughness-aware highlight (a crisp 110-power toon dot turned the
+			// arena's four spotlights into polka dots on big shells)
+			float coat = pow(ndh, mix(24.0, 90.0, 1.0 - roughness_v));
+			band = max(band * 0.5, smoothstep(0.3, 0.8, coat) * 0.85);
+			strength = mix(strength, 0.5, finish);
 		} else if (material_kind == 4) {
 			band = smoothstep(0.42, 0.5, pow(ndh, 70.0));
 			strength = mix(strength, 0.7, finish);

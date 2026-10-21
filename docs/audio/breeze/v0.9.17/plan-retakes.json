@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "release": "0.9.17",
+  "model_id": "breeze-tts-2",
+  "voices": {
+    "devon": "voc_g53htd8kmjsj",
+    "kendall": "voc_j66xnnsxfeet",
+    "coach_buck": "voc_b36c5rxpfuzb"
+  },
+  "cast": {
+    "barnaby": "devon",
+    "kendall": "kendall",
+    "granny": "coach_buck"
+  },
+  "purpose": "v0.9.17 retakes of clips flagged by the technical speech audit (see RETAKES in prepare_retakes_v0917.py)",
+  "authorized_credits": 10000,
+  "clips": {
+    "cmt17_0098_r1": {
+      "text": "The belt changes hands! A career just became a championship career!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 6.7,
+      "retake_of": "cmt17_0098",
+      "retake_reason": "ending"
+    },
+    "cmt17_0190_r1": {
+      "text": "VARGA wins! The Cage Rules guest goes home with his house rules intact!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A ring announcer reading the official result: a theatrical build-up, then a proud, ringing, celebratory delivery of the final words. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 7.1,
+      "retake_of": "cmt17_0190",
+      "retake_reason": "ending"
+    },
+    "cmt17_rt_ann_kd_03_r1": {
+      "text": "Legs said no! The rest of him agreed!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 3.7,
+      "retake_of": "cmt17_rt_ann_kd_03",
+      "retake_reason": "ending"
+    },
+    "cmt17_v_comeback_03_slurry_r1": {
+      "text": "Slurry is BACK in it! Crowd's on its feet! The seats are on their feet!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 7.1,
+      "retake_of": "cmt17_v_comeback_03_slurry",
+      "retake_reason": "ending"
+    },
+    "cmt17_0126_r1": {
+      "text": "Spring Pad down! Somebody's about to get launched, maybe on purpose!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. This is a big live moment: lift the energy and let the pitch rise and fall with real excitement; never monotone.",
+      "estimated_credits": 6.8,
+      "retake_of": "cmt17_0126",
+      "retake_reason": "flat"
+    },
+    "cmt17_0229_r1": {
+      "text": "DOWN they go! The referee's on it, folks, here comes the count!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted. This is a big live moment: lift the energy and let the pitch rise and fall with real excitement; never monotone.",
+      "estimated_credits": 6.3,
+      "retake_of": "cmt17_0229",
+      "retake_reason": "flat"
+    },
+    "cmt17_v_first_03_varga_r1": {
+      "text": "Varga lands first! The crowd approves, loudly, with cans!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. This is a big live moment: lift the energy and let the pitch rise and fall with real excitement; never monotone.",
+      "estimated_credits": 5.7,
+      "retake_of": "cmt17_v_first_03_varga",
+      "retake_reason": "flat"
+    },
+    "cmt17_v_parry_05_jitters_rookie_r1": {
+      "text": "Jitters read you like a sponsor card, Rookie. Mix it up!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A warm, knowledgeable fight announcer giving a quick read on the fight between exchanges: conversational and confident, medium energy, a smile in the voice. This is a big live moment: lift the energy and let the pitch rise and fall with real excitement; never monotone.",
+      "estimated_credits": 5.6,
+      "retake_of": "cmt17_v_parry_05_jitters_rookie",
+      "retake_reason": "flat"
+    },
+    "cmt17_0090_r1": {
+      "text": "Another step up the card, folks! Win here and the phone starts ringing!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted. Keep it flowing as one continuous live call: no long pauses in the middle of the line.",
+      "estimated_credits": 7.1,
+      "retake_of": "cmt17_0090",
+      "retake_reason": "pause"
+    },
+    "cmt17_0336_r1": {
+      "text": "The tag is made! In comes the partner, swinging!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Keep it flowing as one continuous live call: no long pauses in the middle of the line.",
+      "estimated_credits": 4.8,
+      "retake_of": "cmt17_0336",
+      "retake_reason": "pause"
+    },
+    "cmt17_0279_r1": {
+      "text": "The heaviest hitter on the card, folks, and he knows exactly one direction!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A warm, knowledgeable fight announcer giving a quick read on the fight between exchanges: conversational and confident, medium energy, a smile in the voice. Keep it flowing as one continuous live call: no long pauses in the middle of the line.",
+      "estimated_credits": 7.5,
+      "retake_of": "cmt17_0279",
+      "retake_reason": "pause"
+    },
+    "cmt17_0235_r1": {
+      "text": "You're in the red, kid! Guard up and pick your moment!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 5.4,
+      "retake_of": "cmt17_0235",
+      "retake_reason": "pace"
+    },
+    "cmt17_0204_r1": {
+      "text": "You landed first, kid! Now don't get comfortable!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 4.9,
+      "retake_of": "cmt17_0204",
+      "retake_reason": "pace"
+    },
+    "cmt17_0251_r1": {
+      "text": "Showboating in the middle of a fight! The crowd loves it, the opponent doesn't!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 7.9,
+      "retake_of": "cmt17_0251",
+      "retake_reason": "pace"
+    },
+    "cmt17_x007_r1": {
+      "text": "Port Hook! Knell's quick light hook keeps the opponent turning.",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 6.3,
+      "retake_of": "cmt17_x007",
+      "retake_reason": "pace"
+    },
+    "cmt17_0056_r1": {
+      "text": "Time on the round, and I couldn't split them with a crowbar!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 6.0,
+      "retake_of": "cmt17_0056",
+      "retake_reason": "pace"
+    },
+    "cmt17_v_low_03_slurry_r1": {
+      "text": "Slurry is one good shot from the wall of fame! The sad part of the wall!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 7.2,
+      "retake_of": "cmt17_v_low_03_slurry",
+      "retake_reason": "pace"
+    },
+    "cmt17_0200_r1": {
+      "text": "First touch of the night! Somebody's warmed up and somebody's not!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 6.6,
+      "retake_of": "cmt17_0200",
+      "retake_reason": "pace"
+    },
+    "cmt17_0211_r1": {
+      "text": "Your guard's gone, kid! Get out of there!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 4.1,
+      "retake_of": "cmt17_0211",
+      "retake_reason": "pace"
+    },
+    "cmt17_0126_r2": {
+      "text": "Spring Pad down! Somebody's about to get launched, maybe on purpose!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. This is a big live moment: lift the energy and let the pitch rise and fall with real excitement; never monotone. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 6.8,
+      "retake_of": "cmt17_0126",
+      "retake_reason": "flat+ending"
+    }
+  },
+  "estimated_characters": 1236
+}
