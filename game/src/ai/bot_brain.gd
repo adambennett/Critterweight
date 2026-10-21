@@ -1350,7 +1350,8 @@ func _toward(from: Vector3, to: Vector3) -> Vector3:
 #       (`apart`: never while an ally within that many metres performs the same ability)
 #       an ability with a hint is used only by its hint (replaces the generic reach test). `when` is a
 #       list of alternatives (any may hold; absent = always); each is a dict whose keys must all hold:
-#       min / max (distance), self_poise_below, self_health_below (fractions), target_status (id or
+#       min / max (distance), self_poise_below, self_health_below (fractions), self_status (id, element
+#       or "any": any elemental status or build-up), target_status (id or
 #       element), target_heavy (perceived Heavy / Charged Heavy windup), target_winding (any windup),
 #       target_ranged (the target has a projectile ability), wall_behind_target (an arena wall
 #       within this many metres beyond the target, on the line from this fighter), target_down,
@@ -1462,6 +1463,14 @@ func _kit_when(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Diction
 					return false
 			"target_status":
 				if tgt == null or not (tgt.statuses.has(str(v)) or tgt.statuses.has_element(str(v))):
+					return false
+			"self_status":
+				# a status this fighter carries (an id or an element); "any": any elemental status or
+				# build-up (a cleanse is worth it)
+				if str(v) == "any":
+					if not (f.statuses.active.any(func(s: Dictionary) -> bool: return str(s.get("element", "")) != "") or not f.statuses.buildup.is_empty()):
+						return false
+				elif not (f.statuses.has(str(v)) or f.statuses.has_element(str(v))):
 					return false
 			"target_heavy":
 				if (p_winding and str(per.get("slot", "")).begins_with("heavy")) != bool(v):

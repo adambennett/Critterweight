@@ -237,8 +237,8 @@ under either rule.
   seconds, draining `drain` stamina per second). `aim.turn_rate` (rad/s) lets the stick steer it.
 - `cooldown`, `charges`, `cost` (stamina) apply per equipped move. `air: true` lets a move be used
   while hovering without ending the hover (Gusto's Hang Time).
-- Effects may repeat inside a move: `"every": 0.12, "until": "release"` (or seconds, or a
-  `"count"`). Hits from repeating effects are throttled (30% hype, no stamina refund, at most one
+- Effects may repeat inside a move: `"every": 0.12, "until": "release"` (or seconds, or a number
+  of firings, `"repeats"`; a projectile's own `count` is how many fly each time). Hits from repeating effects are throttled (30% hype, no stamina refund, at most one
   stun per 0.5 s per target, no hit pause), so a stream cannot stun-lock. New effect type
   `recoil` {`speed`, `up`} pushes the user back; projectiles take `intercept` (they stop enemy
   projectiles) and `on_expire` (a list of effects fired where they land or burst).

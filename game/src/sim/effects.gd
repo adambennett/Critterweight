@@ -80,16 +80,27 @@ func tick_move(f: Fighter, m: MoveDef, t: float, _dt: float) -> void:
 
 
 ## Whether a repeating effect fires again now: "release" = while the move is sustained (the input
-## held), a number = seconds after its first firing; `count` caps the total.
+## held), a number = seconds after its first firing; `repeats` caps the firings.
 func _repeat_on(f: Fighter, e: Dictionary, r: Dictionary) -> bool:
-	if e.has("count") and int(r["n"]) >= int(e["count"]):
+	var cap := _repeat_cap(e)
+	if cap >= 0 and int(r["n"]) >= cap:
 		return false
 	var until = e.get("until", null)
 	if typeof(until) == TYPE_STRING and str(until) == "release":
 		return f.sustaining
 	if typeof(until) == TYPE_FLOAT or typeof(until) == TYPE_INT:
 		return f.move_clock - float(r["first"]) <= float(until) + 1e-4
-	return e.has("count")
+	return cap >= 0
+
+
+## The most firings of a repeating effect (-1: no cap): `repeats`; `count` is read as the cap only on
+## effects that have no count of their own (a projectile's `count` is how many fly each firing).
+static func _repeat_cap(e: Dictionary) -> int:
+	if e.has("repeats"):
+		return int(e["repeats"])
+	if e.has("count") and str(e.get("type", "")) != "projectile":
+		return int(e["count"])
+	return -1
 
 
 func end_move(f: Fighter, _m: MoveDef) -> void:
