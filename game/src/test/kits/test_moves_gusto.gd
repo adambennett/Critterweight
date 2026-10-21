@@ -216,6 +216,14 @@ func test_classic_moves_carry_over() -> void:
 	check_eq(g.move_slot, "l1@hovering", "Wing Snap from the hover is the Dive Peck")
 	g.input.set_held(FighterInput.LIGHT, false)
 	await step_sim(sky, 1.0)
+	# Skyhook's air moves fire from the hover and keep it ("hover and shoot")
+	var sky2 := duel("f_gusto", SKYHOOK, "f_dredge", 4.0)
+	await step_sim(sky2, 0.4)
+	var g2 := sky2.fighters[0]
+	await use_slot(sky2, 0, 3, 0.0, 0.3)
+	check(g2.has_flag("hovering"), "Hang Time hovers")
+	await use_slot(sky2, 0, 1, 0.0, 0.1)      # Air Slash
+	check(g2.has_flag("hovering"), "Air Slash fired from the hover keeps Gusto up")
 	# Crosswind Slash charges into the Downdraft
 	var cw := duel("f_gusto", ["wing_snap", "crosswind_slash"], "f_dredge", 2.0)
 	await step_sim(cw, 0.4)

@@ -213,6 +213,6 @@ streamlined, forward-leaning crouch (he can keep walking while casting).
   he casts it, or wait it out (4 s, 12 s cooldown).
 * Gusto's moves build Winded fast: a Winded fighter regains no stamina and is pushed twice as far,
   so the Scissor Kick launch and Skid Kick trip follow. Cleanse it or get out of range.
-* Any move but the string and the heavy drops Gusto out of Hang Time (the engine has hovering
-  variants for the Classic slots only): from the hover, Air Slash and Feather Darts fire while he
-  drops.
+* Air Slash and Feather Darts are air moves (`"air": true`): from Hang Time he shoots without
+  dropping, which is what Skyhook is built on. His other moves end the hover (the string and the
+  heavy become the Dive Peck and the Downdraft).
