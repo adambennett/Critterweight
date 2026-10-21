@@ -2,7 +2,8 @@
 
 **Release 0.9.16, 2026-10-20.** [The v0.9.16 report](evidence/verification/v0.9.16/README.md): Career,
 10-point scoring, the referee and the Cage Rules preset. 437 scripts; full source suite on the release
-commit 862 run, 861 passed, 0 failed, 1 graphical-audio skip. PACKAGED
+commit 862 run, 861 passed, 0 failed, 1 graphical-audio skip. Packaged: boot to the title in 4.4 s,
+rendered playtest regressions 20/20, new-feature suites 96 headless + 26 rendered, 0 failed, 0 skipped.
 
 **Local v0.9.15 fighters preview, 2026-10-18.** [Fighter build report](releases/v0.9.15-fighters-preview.md): Varga (Scrap) and Knell (Spectral), 406 scripts compile, 130 focused source tests and 62 packaged tests pass with zero failures/skips. The Windows export includes the concurrent announcer expansion. The earlier changing-source full run is diagnostic only; physical controller, visual presentation and balance await the owner. No graphical launch or release publication.
 
@@ -22,7 +23,7 @@ dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`
 
 | Version | Commit | Source suite before release | Packaged checks |
 |---|---|---|---|
-| 0.9.16 | `a5af0d1` (`v0.9.16`; suite on `9d0a29c`, docs-only after) | 862 run: 861 passed, 0 failed, 1 graphical-only skip | PACKAGED |
+| 0.9.16 | `a5af0d1` (`v0.9.16`; suite on `9d0a29c`, docs-only after) | 862 run: 861 passed, 0 failed, 1 graphical-only skip | Windows export of `9d0a29c`: title in 4.4 s, rendered playtests 20/20, new-feature suites 96 headless + 26 rendered, 0 failed, 0 skipped |
 | 0.9.15 | `f8e4bbb` (`v0.9.15`) | 775 run: 774 passed, 0 failed, 1 graphical-only skip (combined build `8f9baff`) | combined preview package 72 checks: 70 passed, 2 source-only skips; release smoke: 406 scripts, title boot 4.3 s (no rendered filter) |
 | 0.9.14 | `95c857a` (`v0.9.14`) | focused audio suite 20/20 (full suite not rerun for the menu-audio mix) | Tagged Windows: 394 scripts, title in 5.7 s, 20/20 rendered; packaged audio 18 passed, 2 source-only skips |
 | 0.9.13 | `cdacbcf` (`v0.9.13`) | 718 run: 717 passed, 0 failed, 1 graphical-only skip; fighter selection 24/24, AI Lab picker 8/8, source audio 10/10 | Tagged Windows: 394 scripts, title in 4.5 s, 20/20 rendered; packaged audio 8 passed, 0 failed, 2 source-only skips; four targets built; seven uploaded asset digests verified; [report](evidence/verification/v0.9.13/README.md) |
