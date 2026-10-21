@@ -213,5 +213,166 @@
     "outline": 0.011,
     "hype_feature": "coil glow",
     "gore_piece": {"segment": "body", "offset": [0, 0.38, 0], "size": 0.06, "shape": "cap", "color": "#3C4650"}
-  }
+  },
+  "movepool": {
+    "slap": {"name": "Slap", "category": "strike", "role": "basic", "string": ["l1", "l2", "l3", "finisher"], "dash": "dash_attack",
+      "short": "Slap, Double Slap, Headbonk, then the Static Cling",
+      "desc": "Jitters' quick hopping string: two stubby slaps, a Headbonk that bounces it back out of reach, and the Static Cling discharge on the fourth press, worth extra Hype when it sets Jolted off. Every hit builds Jolted. Out of a dodge it is the Pinball spin, which banks off the cage wall back at its target. The slaps are short: a guard stops the string, and the Static Cling's press-in is easy to step away from.",
+      "styles": {
+        "static_hands": {"name": "Static Hands", "desc": "Every slap, the Headbonk and the Static Cling build half again as much Jolted.", "patch": [
+          {"op": "mul", "path": "moves.l1.buildup", "value": 1.5}, {"op": "mul", "path": "moves.l2.buildup", "value": 1.5}, {"op": "mul", "path": "moves.l3.buildup", "value": 1.5},
+          {"op": "mul", "path": "moves.finisher.effects[type=area].buildup", "value": 1.5}]},
+        "pinball_wizard": {"name": "Pinball Wizard", "desc": "The Pinball dash strike banks off the cage wall twice instead of once.", "patch": [
+          {"op": "set", "path": "moves.dash_attack.effects[type=charge].bounce", "value": 2}]}},
+      "ai": {"range": [0.0, 1.1]}},
+    "squash": {"name": "Squash", "category": "strike", "role": "heavy", "use": "heavy", "charged": "heavy_charged", "hold": "charge",
+      "short": "A body-slam leap; hold to load the Super Squash",
+      "desc": "Jitters hops onto its target and lands with a static thump that also catches anyone near the landing spot; a slam on the head bonks for extra damage. Hold the button to coil up and release into the Super Squash: a higher, longer leap that crushes guards and knocks its target up. Both leave Jitters in the air for a long moment, so a sidestep or a quick hit on the landing beats them.",
+      "styles": {
+        "hair_trigger": {"name": "Hair Trigger", "desc": "Charges in half the time, but the Super Squash leaps shorter (2.4 metres instead of 3).", "patch": [
+          {"op": "mul", "path": "moves.heavy.charge_time", "value": 0.5},
+          {"op": "set", "path": "moves.heavy_charged.effects[type=leap].distance", "value": 2.4}]},
+        "aftershock": {"name": "Aftershock", "desc": "The Super Squash's landing leaves a crackling static field (1.4 metres, 2.5 seconds) that flinches anyone who steps in.", "patch": [
+          {"op": "append", "path": "moves.heavy_charged.effects[type=leap].on_land", "value": {"type": "zone", "kind": "static_field", "radius": 1.4, "duration": 2.5,
+            "owner_immune": true, "vfx": "jitters_static_field"}}]}},
+      "ai": {"range": [0.8, 2.4], "hold": [0.3, 0.9]}},
+    "arc_lash": {"name": "Arc Lash", "category": "projectile", "use": "ability1",
+      "short": "A slow homing orb that pulses if it times out",
+      "desc": "Jitters flicks a crackling orb off its antenna that drifts after its target, turning to follow a sidestep, and builds a lot of Jolted when it lands. If it runs out of time instead, it bursts in a small static pulse. It is slow: outpace it, guard it, or send it back with a reflect.",
+      "styles": {
+        "twin_lash": {"name": "Twin Lash", "desc": "Two orbs in a 40° fork, each with 60% of the damage and build-up: harder to walk around.", "patch": [
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].count", "value": 2},
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].spread_deg", "value": 40},
+          {"op": "mul", "path": "abilities.ability1.effects[type=projectile].damage", "value": 0.6},
+          {"op": "mul", "path": "abilities.ability1.effects[type=projectile].buildup", "value": 0.6}]},
+        "ricochet": {"name": "Ricochet", "desc": "The orb banks off the cage wall once and lives a second longer.", "patch": [
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].bounce", "value": 1},
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].life", "value": 2.5}]}},
+      "ai": {"range": [2.2, 7.0]}},
+    "spring_pad": {"name": "Spring Pad", "category": "utility", "use": "ability2",
+      "short": "Plants a launch pad ahead: Jitters bounces, foes land stunned",
+      "desc": "Jitters plants a spring pad two metres ahead for ten seconds (two at most). Anyone who steps on it is thrown into the air: an opponent lands stunned, while Jitters' own bounce makes its next Squash free and doubles its Pinball. The pads sit in plain sight: walk around them.",
+      "styles": {
+        "springboard": {"name": "Springboard", "desc": "The pad lands right under Jitters and fires at once: a leap straight at the foe with a free Squash, though anyone beside the pad is thrown too.", "patch": [
+          {"op": "set", "path": "abilities.ability2.effects[type=prop].at", "value": "self"}]},
+        "long_spring": {"name": "Long Spring", "desc": "A flatter, longer launch (five metres forward instead of three) that carries across the cage.", "patch": [
+          {"op": "set", "path": "abilities.ability2.effects[type=prop].launch_forward", "value": 5.0},
+          {"op": "set", "path": "abilities.ability2.effects[type=prop].launch_up", "value": 2.0}]}},
+      "ai": {"range": [1.8, 4.2]}},
+    "thunder_jolt": {"name": "Thunder Jolt", "category": "projectile", "cooldown": 4, "cost": 7,
+      "short": "A very fast bolt off the cap: little damage, lots of Jolted",
+      "desc": "Jitters crouches with its antennae crackling, then pops up, flicks a bolt of lightning off its cap that crosses the cage almost before it can be seen, and bounces back a step. It does little damage but builds Jolted fast, and it is quick enough to catch a long wind-up from across the cage. It flies straight at the locked target: sidestep the flick, or tap guard as it arrives to parry it.",
+      "move": {"duration": 0.44, "stamina": 7, "move_mult": 0.25, "turn_rate": 10.0, "speed": 1.6, "element": "static",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.07, "height": -0.1, "lean": [-6, 0, 0], "joints": {"arm_l": [0, 20, -10], "arm_r": [0, -20, 10], "antenna_l": [-28, 0, -18], "antenna_r": [-28, 0, 18]}},
+          {"t": 0.12, "height": -0.12, "lean": [-8, 0, 0], "joints": {"arm_l": [0, 24, -14], "arm_r": [0, -24, 14], "antenna_l": [-36, 0, -24], "antenna_r": [-36, 0, 24]}},
+          {"t": 0.16, "height": 0.06, "lean": [14, 0, 0], "joints": {"arm_l": [0, 32, 34], "arm_r": [0, -32, -34], "antenna_l": [40, 0, 6], "antenna_r": [40, 0, -6]}},
+          {"t": 0.26, "height": 0.02, "lean": [10, 0, 0], "joints": {"arm_l": [0, 20, 20], "arm_r": [0, -20, -20], "antenna_l": [26, 0, 0], "antenna_r": [26, 0, 0]}},
+          {"t": 0.44}],
+        "effects": [
+          {"t": 0.14, "type": "projectile", "id": "thunder_jolt", "from": "cap", "aim": "target", "speed": 24.0, "life": 0.45, "radius": 0.16,
+           "damage": 4, "knockback": 1.8, "stun": 0.22, "poise": 6, "element": "static", "buildup": 30, "parryable": true, "vfx": "jitters_thunder_jolt"},
+          {"t": 0.14, "type": "recoil", "speed": 2.8, "up": 1.6}]},
+      "styles": {
+        "double_jolt": {"name": "Double Jolt", "desc": "A second bolt follows 0.1 seconds after the first, each with 60% of the damage and build-up: a dodge timed for the first runs into the second.", "patch": [
+          {"op": "set", "path": "movepool.thunder_jolt.move.effects[type=projectile].every", "value": 0.1},
+          {"op": "set", "path": "movepool.thunder_jolt.move.effects[type=projectile].until", "value": 0.15},
+          {"op": "mul", "path": "movepool.thunder_jolt.move.effects[type=projectile].damage", "value": 0.6},
+          {"op": "mul", "path": "movepool.thunder_jolt.move.effects[type=projectile].buildup", "value": 0.6}]},
+        "numbing_jolt": {"name": "Numbing Jolt", "desc": "The bolt numbs: whoever it hits moves 20% slower and pays more for dodges for 1.5 seconds, but it builds half the Jolted.", "patch": [
+          {"op": "set", "path": "movepool.thunder_jolt.move.effects[type=projectile].status", "value": {"id": "jitters_numbed", "name": "Numbed", "duration": 1.5, "speed": 0.8, "dodge_cost": 1.4}},
+          {"op": "mul", "path": "movepool.thunder_jolt.move.effects[type=projectile].buildup", "value": 0.5}]}},
+      "ai": {"range": [1.6, 8.5], "reactive": true, "when": [{"target_winding": true}, {"target_ranged": true}, {"chance": 0.5}]}},
+    "discharge": {"name": "Discharge", "category": "blast", "cooldown": 9, "cost": 13,
+      "short": "Squashes down and bursts: a ring of lightning around Jitters",
+      "desc": "Jitters squashes flat while its coil charges, shrugging off light hits, then springs open in a burst of lightning that hurls back anyone close and leaves a ring crackling 1.1 to 2.5 metres out for a moment. It is the answer to being crowded. The squash is a clear tell: back off before it springs, or punish the long sag after it.",
+      "move": {"duration": 0.96, "stamina": 13, "move_mult": 0.0, "turn_rate": 4.0, "speed": 1.5, "element": "static", "armor": [[0.04, 0.38]], "armor_level": "lights",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.12, "height": -0.16, "lean": [4, 0, 0], "joints": {"arm_l": [0, -14, -30], "arm_r": [0, 14, 30], "antenna_l": [-30, 0, 16], "antenna_r": [-30, 0, -16]}},
+          {"t": 0.34, "height": -0.22, "lean": [6, 0, 0], "joints": {"arm_l": [0, -8, -40], "arm_r": [0, 8, 40], "antenna_l": [-40, 0, 22], "antenna_r": [-40, 0, -22]}},
+          {"t": 0.4, "height": 0.12, "lean": [-6, 0, 0], "joints": {"arm_l": [0, 16, 66], "arm_r": [0, -16, -66], "antenna_l": [12, 0, -42], "antenna_r": [12, 0, 42]}},
+          {"t": 0.58, "height": 0.06, "lean": [-4, 0, 0], "joints": {"arm_l": [0, 12, 60], "arm_r": [0, -12, -60], "antenna_l": [8, 0, -36], "antenna_r": [8, 0, 36]}},
+          {"t": 0.78, "height": -0.06, "lean": [4, 0, 0], "joints": {"arm_l": [0, -18, -8], "arm_r": [0, 18, 8], "antenna_l": [-6, 0, 0], "antenna_r": [-6, 0, 0]}},
+          {"t": 0.96}],
+        "effects": [
+          {"t": 0.38, "type": "area", "id": "discharge", "radius": 1.3, "damage": 5, "knockback": 5.0, "stun": 0.35, "poise": 16,
+           "element": "static", "buildup": 25, "vfx": "jitters_discharge_core"},
+          {"t": 0.46, "type": "area", "id": "discharge_ring", "shape": "ring", "inner": 1.1, "radius": 2.5, "damage": 1.6, "knockback": 2.4, "stun": 0.25, "poise": 5,
+           "element": "static", "buildup": 10, "every": 0.12, "count": 3, "vfx": "jitters_discharge_ring"}]},
+      "styles": {
+        "capacitor": {"name": "Capacitor", "desc": "Hold the button to keep the coil charging (up to 0.9 seconds, still shrugging off light hits): at full charge the burst and the ring reach a third further and hit half again as hard.", "patch": [
+          {"op": "set", "path": "movepool.discharge.hold", "value": "charge"},
+          {"op": "set", "path": "movepool.discharge.move.charge_time", "value": 0.9},
+          {"op": "set", "path": "movepool.discharge.move.charge_at", "value": 0.2},
+          {"op": "set", "path": "movepool.discharge.move.effects[type=area].charge_scale", "value": {"radius": 1.35, "damage": 1.5, "knockback": 1.3}}]},
+        "lightning_rod": {"name": "Lightning Rod", "desc": "The burst also burns incoming projectiles out of the air within 2.6 metres for a moment, but every hit deals 30% less damage.", "patch": [
+          {"op": "append", "path": "movepool.discharge.move.effects", "value": {"t": 0.38, "type": "destroy_projectiles", "radius": 2.6, "every": 0.06, "count": 5}},
+          {"op": "mul", "path": "movepool.discharge.move.effects[type=area].damage", "value": 0.7}]}},
+      "ai": {"range": [0.0, 2.2], "when": [{"target_winding": true, "max": 2.0}, {"target_closing": true}, {"self_poise_below": 0.5, "max": 2.0}, {"chance": 0.3}]}},
+    "chain_lightning": {"name": "Chain Lightning", "category": "projectile", "cooldown": 8, "cost": 11,
+      "short": "A thrown ball of lightning that jumps to a second foe",
+      "desc": "Jitters winds its arm back while a ball of lightning crackles in its hand, then hurls it at its target, curving a little to follow. When it strikes, the charge jumps to the nearest other opponent within 3 metres, or 4.5 metres from a Soaked target. A guard earths it: a blocked ball does not jump. Spread out against it, and step off its line during the long wind-up.",
+      "move": {"duration": 0.66, "stamina": 11, "move_mult": 0.15, "turn_rate": 8.0, "speed": 1.6, "element": "static",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.1, "height": -0.02, "lean": [-6, -22, 0], "joints": {"arm_r": [0, -55, -48], "arm_l": [0, -40, 18], "antenna_l": [-8, 0, -24], "antenna_r": [-8, 0, 24]}},
+          {"t": 0.3, "height": -0.05, "lean": [-8, -32, 0], "joints": {"arm_r": [0, -72, -62], "arm_l": [0, -46, 26], "antenna_l": [-14, 0, -30], "antenna_r": [-14, 0, 30]}},
+          {"t": 0.36, "height": 0.04, "lean": [16, 20, 0], "joints": {"arm_r": [0, 88, -18], "arm_l": [0, 28, 8], "antenna_l": [24, 0, -10], "antenna_r": [24, 0, 10]}},
+          {"t": 0.46, "height": 0.02, "lean": [14, 26, 0], "joints": {"arm_r": [0, 96, -4], "arm_l": [0, 30, 4], "antenna_l": [16, 0, -4], "antenna_r": [16, 0, 4]}},
+          {"t": 0.66}],
+        "effects": [
+          {"t": 0.33, "type": "projectile", "id": "chain_lightning", "from": "slap_r", "aim": "target", "speed": 15.0, "homing_deg": 40, "life": 0.8, "radius": 0.24,
+           "damage": 6, "knockback": 2.6, "stun": 0.3, "poise": 10, "element": "static", "buildup": 28, "vfx": "jitters_chain_bolt",
+           "status": {"id": "jitters_arc_charge", "name": "Arc Charge", "duration": 0.3, "hooks": [
+             {"on": "hit_taken", "max_uses": 1, "if": {"not": {"self_status": "brine"}}, "do": [
+               {"type": "chain_arc", "source": "other", "id": "chain_lightning_arc", "range": 3.0, "radius": 3.0, "damage": 4, "knockback": 2.0, "stun": 0.3, "poise": 8,
+                "element": "static", "buildup": 30, "pool": "chain_lightning", "cat": "projectile", "vfx": "jitters_chain_arc"}]},
+             {"on": "hit_taken", "max_uses": 1, "if": {"self_status": "brine"}, "do": [
+               {"type": "chain_arc", "source": "other", "id": "chain_lightning_arc", "range": 4.5, "radius": 4.5, "damage": 4, "knockback": 2.0, "stun": 0.3, "poise": 8,
+                "element": "static", "buildup": 30, "pool": "chain_lightning", "cat": "projectile", "vfx": "jitters_chain_arc"}]}]}}]},
+      "styles": {
+        "ground_current": {"name": "Ground Current", "desc": "Wherever the ball bursts it leaves a small static field (1.1 metres, 2.5 seconds) that flinches anyone stepping in and electrifies puddles.", "patch": [
+          {"op": "set", "path": "movepool.chain_lightning.move.effects[type=projectile].on_expire", "value": [{"type": "zone", "kind": "static_field", "radius": 1.1, "duration": 2.5,
+            "owner_immune": true, "vfx": "jitters_chain_field"}]}]},
+        "lightning_strike": {"name": "Lightning Strike", "desc": "No ball: after a longer wind-up the bolt strikes instantly along a 6.5-metre line, hitting, and jumping from, everyone on it.", "patch": [
+          {"op": "time_scale", "path": "movepool.chain_lightning.move", "value": 1.25, "phase": "startup"},
+          {"op": "set", "path": "movepool.chain_lightning.move.effects[type=projectile].shape", "value": "line"},
+          {"op": "set", "path": "movepool.chain_lightning.move.effects[type=projectile].length", "value": 6.5},
+          {"op": "set", "path": "movepool.chain_lightning.move.effects[type=projectile].width", "value": 0.7},
+          {"op": "set", "path": "movepool.chain_lightning.move.effects[type=projectile].vfx", "value": "jitters_chain_beam"},
+          {"op": "set", "path": "movepool.chain_lightning.move.effects[type=projectile].type", "value": "area"}]}},
+      "ai": {"range": [2.0, 8.0], "when": [{"target_status": "brine"}, {"chance": 0.6}]}},
+    "static_field": {"name": "Static Field", "category": "control", "cooldown": 11, "cost": 12,
+      "short": "A crackling floor field ahead that flinches whoever steps in",
+      "desc": "Jitters hops and slaps both palms on the floor, and a static field four metres wide spreads in front of it for five seconds. Anyone who steps in flinches, losing a charging attack, a hold or a hover, keeps twitching while inside and builds Jolted; Jitters itself is immune. Do not fight on it: walk around it or wait it out.",
+      "move": {"duration": 0.8, "stamina": 12, "move_mult": 0.0, "turn_rate": 6.0, "speed": 1.5, "element": "static",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.12, "height": 0.14, "lean": [-8, 0, 0], "joints": {"arm_l": [0, -26, 56], "arm_r": [0, 26, -56], "antenna_l": [-16, 0, -10], "antenna_r": [-16, 0, 10]}},
+          {"t": 0.22, "height": -0.12, "lean": [18, 0, 0], "joints": {"arm_l": [0, -56, -36], "arm_r": [0, 56, 36], "antenna_l": [30, 0, -12], "antenna_r": [30, 0, 12]}},
+          {"t": 0.38, "height": -0.15, "lean": [22, 0, 0], "joints": {"arm_l": [0, -60, -42], "arm_r": [0, 60, 42], "antenna_l": [22, 0, -18], "antenna_r": [22, 0, 18]}},
+          {"t": 0.58, "height": -0.04, "lean": [8, 0, 0], "joints": {"arm_l": [0, -34, -12], "arm_r": [0, 34, 12], "antenna_l": [6, 0, -6], "antenna_r": [6, 0, 6]}},
+          {"t": 0.8}],
+        "effects": [
+          {"t": 0.24, "type": "zone", "id": "static_field", "kind": "static_field", "at": "forward:1.3", "radius": 2.0, "duration": 5.0, "tick": 0.5,
+           "tick_damage": 0.6, "buildup": 12, "flinch_on_entry": 0.35, "flinch_on_tick": 0.12, "owner_immune": true, "element": "static", "vfx": "jitters_static_field"}]},
+      "styles": {
+        "tesla_aura": {"name": "Tesla Aura", "desc": "The field forms around Jitters and moves with it, flinching whoever it touches; it is smaller (1.6 metres) and lasts four seconds.", "patch": [
+          {"op": "set", "path": "movepool.static_field.move.effects[type=zone].at", "value": "self"},
+          {"op": "set", "path": "movepool.static_field.move.effects[type=zone].follow_owner", "value": true},
+          {"op": "set", "path": "movepool.static_field.move.effects[type=zone].radius", "value": 1.6},
+          {"op": "set", "path": "movepool.static_field.move.effects[type=zone].duration", "value": 4.0}]},
+        "storm_cell": {"name": "Storm Cell", "desc": "Lightning strikes a random spot inside the field every 0.8 seconds; the field lasts four seconds.", "patch": [
+          {"op": "set", "path": "movepool.static_field.move.effects[type=zone].random_bolt", "value": {"damage": 5, "poise": 10, "radius": 0.8, "buildup": {"static": 20}}},
+          {"op": "set", "path": "movepool.static_field.move.effects[type=zone].tick", "value": 0.8},
+          {"op": "set", "path": "movepool.static_field.move.effects[type=zone].duration", "value": 4.0}]}},
+      "ai": {"range": [0.6, 3.2], "reactive": true, "when": [{"target_heavy": true, "max": 3.2}, {"target_closing": true}, {"chance": 0.35}]}}
+  },
+  "loadouts": {
+    "live_wire": {"name": "Live Wire", "moves": ["slap", "thunder_jolt", "arc_lash", "spring_pad"]},
+    "overload": {"name": "Overload", "moves": ["slap", "discharge", "chain_lightning", "static_field"]}
+  },
+  "default_loadout": "live_wire"
 }

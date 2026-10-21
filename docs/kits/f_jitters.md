@@ -51,6 +51,83 @@ Passives: **static_cling_window** (Finisher start → 0.4 s flag), **static_clin
 status applied while flagged → +10 Hype), **pad_pinball** (Dash Attack while `pad_launched` →
 damage ×2).
 
+## Movesets (v0.9.18)
+
+In Movesets (the default combat style, `docs/design/MOVESET_COMBAT.md`) Jitters fights with four of
+the eight moves in its pool (`movepool` in `f_jitters.json`). Classic Jitters is the kit above,
+unchanged. The basic string, Squash and the two abilities *are* the Classic moves (`string` / `use`),
+so techniques and upgrades written for those slots still reach them; the four new moves are inline
+static moves. Damage below is before power ×1.25.
+
+| Move | Cat. | Input | S / A / R | Numbers | What it does, what it is for |
+|---|---|---|---|---|---|
+| **Slap** (basic) ★A★B | strike | tap, again to continue | as Classic | Slap 4, Double Slap 4, Headbonk 7, Static Cling 9; Pinball 6 | the Classic string with **Static Cling as the fourth press**; out of a dodge it is the Pinball. No cooldown: the move Jitters always has |
+| **Squash** | strike (heavy) | hold to charge | as Classic | 12 + landing 4; Super Squash 16 + landing 6 | the body-slam leap; held past ~0.35 charge it becomes the Super Squash (guard crush, knock-up). Free after a Spring Pad bounce |
+| **Arc Lash** ★A | projectile | tap | 0.18 / flight / 0.30 | 6, Jolted 45; 6 s, 9 stamina | the v0.9.17 slow homing orb (expiry pulse) |
+| **Spring Pad** ★A | utility | tap | 0.20 / – / 0.25 | pad 10 s, max 2; 7 s, 8 stamina | the v0.9.17 launch pad: mobility, landing stuns on foes, Pinball ×2 for Jitters |
+| **Thunder Jolt** ★A | projectile | tap | 0.14 / flight / 0.30 | 4, Jolted 30, 24 m/s, parryable; recoil 2.8 back, 1.6 up; **4 s, 7 stamina** | crouch, antennae crackle, a bolt flicked off the cap that crosses a 5 m gap in under 0.3 s, and the pop bounces Jitters back a step. The poke that builds Jolted and breaks long wind-ups from range |
+| **Discharge** ★B | blast | tap | 0.38 / 0.38–0.70 / 0.26 | burst r 1.3: 5, KB 5.0, Jolted 25; ring 1.1–2.5 m, 3 pulses 0.12 s apart: 1.6 + KB 2.4 each; **9 s, 13 stamina** | squash (armour against Lights from 0.04 s) and spring open: the burst hurls back anyone close, the crackling ring catches whoever is (or lands) 1.1–2.5 m out. The answer to being crowded |
+| **Chain Lightning** ★B | projectile | tap | 0.33 / flight / 0.33 | ball 6, Jolted 28, 15 m/s, homing 40°/s; jump 4, Jolted 30 within **3 m (4.5 m from a Soaked target)**; **8 s, 11 stamina** | a ball of lightning thrown from the right hand; when it strikes, the charge leaps to the nearest other foe. A guarded ball earths: no jump. Crowd damage for teams and free-for-alls |
+| **Static Field** ★B | control | tap | 0.24 / field 5 s / 0.56 | r 2.0 centred 1.3 m ahead; flinch 0.35 s on entry, 0.12 s every 0.5 s inside, 0.6 per tick, Jolted 12 per tick; owner immune; **11 s, 12 stamina** | hop and palm-slap: a field that flinches whoever steps in (losing a charge, hold or hover) and keeps them twitching. Area denial; Jitters fights from inside it |
+
+Every new move is a static ability-class move with its own pose: Thunder Jolt crouches with the
+antennae swept back and pops up flicking them forward (the arms fling back as recoil); Chain
+Lightning twists back with the right arm drawn over the cap and whips it through; Discharge
+squashes flat with arms and antennae folded in, then springs open with everything flung wide and
+sags back down; Static Field rises on tiptoe with both arms up and slams both palms on the floor.
+
+**Loadouts**
+
+- **A "Live Wire"** (default): Slap, Thunder Jolt, Arc Lash, Spring Pad. Bounce and zap: the fast
+  bolt and the homing orb keep Jolted building from range, pads give the jumps and the landing
+  stuns, the slaps and a pad-boosted Pinball finish up close. Best against slow, committal
+  fighters (Dozer, Dredge's charged cannon): every long wind-up eats a Thunder Jolt.
+- **B "Overload"**: Slap, Discharge, Chain Lightning, Static Field. Crowd control: a field that
+  punishes approaches and charges, a burst for when they get through anyway, and a ball that
+  arcs between foes. Best in team and free-for-all fights and against rushers (Stoke's Flare
+  Rush, Dozer's Bulldoze run into the field and the burst).
+
+**Styles** (drills; two per move, each a change in how it plays)
+
+| Move | Style 1 | Style 2 |
+|---|---|---|
+| Slap | **Static Hands**: every slap, the Headbonk and the Static Cling build ×1.5 Jolted | **Pinball Wizard**: Pinball banks off the wall twice |
+| Squash | **Hair Trigger**: charges in half the time; the Super Squash leaps 2.4 m instead of 3 | **Aftershock**: the Super Squash landing leaves a static field (1.4 m, 2.5 s) |
+| Arc Lash | **Twin Lash**: two orbs in a 40° fork, 60% each | **Ricochet**: banks off the wall once, lives 2.5 s |
+| Spring Pad | **Springboard**: the pad lands under Jitters and fires at once (a leap at the foe) | **Long Spring**: a flatter 5 m launch |
+| Thunder Jolt | **Double Jolt**: a second bolt 0.1 s later, 60% each (beats a dodge timed for the first) | **Numbing Jolt**: the bolt slows (×0.8 speed, ×1.4 dodge cost, 1.5 s) but builds half the Jolted |
+| Discharge | **Capacitor**: hold to charge (≤ 0.9 s, armoured against Lights): +35% reach, ×1.5 damage at full charge | **Lightning Rod**: also destroys projectiles within 2.6 m for a quarter second from the burst; −30% damage |
+| Chain Lightning | **Ground Current**: the ball leaves a small static field (1.1 m, 2.5 s) where it bursts | **Lightning Strike**: no ball; after a 25% longer wind-up an instant 6.5 m line strikes (and jumps from) everyone on it |
+| Static Field | **Tesla Aura**: the field forms around Jitters and moves with it (1.6 m, 4 s) | **Storm Cell**: lightning strikes a random spot inside every 0.8 s (4 s field) |
+
+**Tips and counters**
+
+- Thunder Jolt stuns: fire it into a charged heavy or a long ability wind-up from across the cage.
+  Against it, sidestep the flick or tap guard as it arrives (it is a bolt: parryable, and a parry
+  stuns Jitters).
+- Discharge only armours against Lights: heavies and grabs go straight through the squash, and the
+  sag after the last pulse is a free punish. Keep out of 2.5 m when Jitters squashes.
+- Do not charge, hover or stand still on a Static Field. Against Overload in team fights, spread
+  out (the ball jumps 3 m, 4.5 m off a Soaked fighter) and guard the ball: a blocked ball does not
+  jump.
+
+**How it is built** (all existing engine capabilities): Chain Lightning's jump is a 0.3 s "Arc
+Charge" status the ball puts on whoever it hits (unblocked hits only); its two `hit_taken` hooks
+fire a `chain_arc` on the thrower's behalf (`"source": "other"`, attributed to the pool move) with
+range 3.0, or 4.5 when the struck fighter is Soaked (`self_status: brine`). Discharge's ring is one
+`ring` area repeating with `every 0.12, count 3` (throttled tick hits); Static Field is the
+`static_field` zone kind with `flinch_on_entry`, `flinch_on_tick` and `owner_immune`. Effects:
+`game/src/view/fx/moves/f_jitters.gd` (vfx names `jitters_*`): build-ups that hold until each
+move's first effect (antenna arcs and a cap charge; a lightning ball swelling in the hand; the coil
+glowing through the squash with the ring's band spreading on the floor; fizzing hands and the
+field's circle where it will land), a zigzag bolt, a crackling ball with arcs snapping off it, the
+jump drawn between the two bodies, the burst and its jagged ring of lightning, and a field with a
+crackling floor, a low fence of current and a zap at anyone who walks in. Bot hints (`ai` per
+move): Thunder Jolt at 1.6–8.5 m, also as a reaction to a wind-up; Discharge within 2.2 m against
+a wind-up, an approach or when its poise is low; Chain Lightning at 2–8 m, readily at a Soaked
+target; Static Field at 0.6–3.2 m against an approach or a charging heavy. Tests:
+`game/src/test/kits/test_moves_jitters.gd`.
+
 ## How the ROSTER properties are implemented
 
 | ROSTER property | Implementation |
