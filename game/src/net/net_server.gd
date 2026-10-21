@@ -1755,7 +1755,7 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 			policy_list.append({"fighter": idx, "id": pid, "name": str(e2["name"]), "hash": _policy_hash(pol) if usable else ""})
 		if dedicated:
 			if pid != "":
-				e2["source"] = PolicyInputSource.for_match(e2, seed_v * 31 + idx, idx, "classic" if str(rules.get("combat", "moves")) == "classic" else "moves")
+				e2["source"] = PolicyInputSource.for_match(e2, seed_v * 31 + idx, idx, "classic" if str(rules.get("combat", MatchSim.default_combat)) == "classic" else "moves")
 			else:
 				var bb := BotBrain.new(bot_difficulty, seed_v * 31 + idx)
 				bb.set_personality(cdef.ai)

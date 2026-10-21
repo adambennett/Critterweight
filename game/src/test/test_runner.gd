@@ -8,6 +8,8 @@ var _results: Array = []
 
 
 func run(filter: String) -> void:
+	# suites written for the v0.9.17 combat keep testing it; Movesets tests name "combat": "moves"
+	MatchSim.default_combat = "classic"
 	var files := _collect("res://src/test")
 	files.sort()
 	var total := 0

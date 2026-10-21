@@ -70,7 +70,7 @@ func start(cfg: Dictionary) -> void:
 			"policy":
 				# AI Lab policy: e.policy_id (falls back to a scripted bot if missing/incompatible)
 				var rules_d = cfg.get("rules", {})
-				var style := "classic" if typeof(rules_d) == TYPE_DICTIONARY and str((rules_d as Dictionary).get("combat", "moves")) == "classic" else "moves"
+				var style := "classic" if typeof(rules_d) == TYPE_DICTIONARY and str((rules_d as Dictionary).get("combat", MatchSim.default_combat)) == "classic" else "moves"
 				entry["source"] = PolicyInputSource.for_match(e, int(cfg.get("seed", 1)) * 31 + idx, idx, style)
 			"bot":
 				var bb := BotBrain.new(str(e.get("difficulty", "regular")), int(cfg.get("seed", 1)) * 31 + idx)

@@ -109,9 +109,15 @@ func _create_fighter(idx: int, e: Dictionary, pos: Vector3, yaw: float) -> Fight
 	return f
 
 
+## The combat style of rules that name none (docs/design/MOVESET_COMBAT.md §1): Movesets in the game.
+## The test runner sets "classic", so suites written for the v0.9.17 combat keep testing it; Movesets
+## tests name the style in their rules.
+static var default_combat := "moves"
+
+
 ## The match's combat style: "moves" (the default) or "classic" (rules `combat`).
 func combat_style() -> String:
-	return "classic" if str(rules.get("combat", "moves")) == "classic" else "moves"
+	return "classic" if str(rules.get("combat", default_combat)) == "classic" else "moves"
 
 
 ## Rules multipliers are clamped to RulesValidator's ranges here as well: rules may come from mods,
