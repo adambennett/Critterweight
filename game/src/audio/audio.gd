@@ -1034,12 +1034,11 @@ func _say_line(id: String, speaker: String, text: String, priority: int, vars: D
 		invalidate_queued(100)     # a result call: everything less urgent that was waiting is stale
 	var ttl := float(opts.get("ttl", default_ttl(priority)))
 	var entry := {"id": id, "speaker": speaker, "text": _substitute(text, vars), "priority": priority, "mood": mood, "vars": vars, "source": text,
-		"expires": now + ttl, "tag": str(opts.get("tag", "")), "queued_at": now, "trigger": trigger, "follow": opts.get("follow", {})}
+		"expires": now + ttl, "tag": str(opts.get("tag", "")), "queued_at": now, "trigger": trigger, "follow": opts.get("follow", {}),
+		"turn": bool(opts.get("turn", false))}
 	if _ann_current.is_empty():
 		# breathing room: low-priority talk waits a beat after the last line
-		var gap := LINE_GAP_LOW if priority < 50 else (LINE_GAP_MEDIUM if priority < 80 else 0.0)
-		if bool(opts.get("turn", false)):
-			gap = 0.0       # the next turn of an exchange keeps the exchange's own timing
+		var gap := _breathing_gap(entry)
 		if now - _ann_last_end >= gap:
 			_start_line(entry)
 			return true
@@ -1083,7 +1082,17 @@ func invalidate_queued(below: int, tag := "") -> void:
 	_ann_queue = keep
 
 
-## The next waiting line that is still fresh, or {} (expired ones are dropped and logged).
+## Seconds of silence a line needs after the last one: low-priority talk waits a beat, medium a
+## breath, big calls and the turns of an exchange none (an exchange keeps its own timing).
+func _breathing_gap(entry: Dictionary) -> float:
+	if bool(entry.get("turn", false)):
+		return 0.0
+	var p := int(entry.get("priority", 0))
+	return LINE_GAP_LOW if p < 50 else (LINE_GAP_MEDIUM if p < 80 else 0.0)
+
+
+## The next waiting line that is still fresh and whose breathing room has passed, or {} (expired
+## ones are dropped and logged). A line queued while another was playing waits its gap too.
 func _next_queued(now: float) -> Dictionary:
 	while not _ann_queue.is_empty():
 		var e: Dictionary = _ann_queue[0]
@@ -1091,7 +1100,7 @@ func _next_queued(now: float) -> Dictionary:
 			_ann_queue.pop_front()
 			_log_commentary("expired", {"id": str(e["id"]), "waited": now - float(e["queued_at"])})
 			continue
-		if now < float(e.get("not_before", 0.0)):
+		if now < float(e.get("not_before", 0.0)) or now - _ann_last_end < _breathing_gap(e):
 			return {}
 		_ann_queue.pop_front()
 		return e

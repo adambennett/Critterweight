@@ -1,0 +1,655 @@
+{
+	"format": "critterweight",
+	"kind": "career",
+	"version": 1,
+	"game_version": "0.9.16",
+	"saved_at": 1792545753.289,
+	"seq": 4,
+	"checksum": "22f0e35d760dc3993f66c9d4bb9fb4fb9dd769dc954409923d2fdf433af8465d",
+	"data": {
+		"booked": {
+
+		},
+		"career_id": "car_0000000044J_1",
+		"champion": false,
+		"claims": [
+			"w1r0o0"
+		],
+		"content_hash": "",
+		"created_at": 1,
+		"difficulty": "normal",
+		"fighter": "f_varga",
+		"gym": {
+			"chin": 0,
+			"clinch": 0,
+			"coach": 0,
+			"defence": 0,
+			"power": 0,
+			"recovery": 0,
+			"speed": 0,
+			"stamina": 0
+		},
+		"history": [
+			{
+				"arena": "arena_drydock",
+				"d_pop": 4,
+				"draw": false,
+				"fight_id": "w1r0o0",
+				"inj": {
+					"body": 2,
+					"head": 2,
+					"legs": 1
+				},
+				"knockdowns": [
+					0,
+					0
+				],
+				"landed": [
+					15,
+					15
+				],
+				"method": "decision",
+				"opp": "Clem Scuttleby",
+				"opp_fighter": "f_slurry",
+				"opp_nick": "Puddle Jumper",
+				"opp_rating": 26,
+				"org": "bait_shop",
+				"org_name": "Bait Shop Bash",
+				"pay": 800,
+				"pop": 6,
+				"result": "win",
+				"round": 3,
+				"rounds": 3,
+				"tier": 0,
+				"time": 0,
+				"title": false,
+				"title_note": "",
+				"totals": [
+					[
+						30,
+						27
+					],
+					[
+						29,
+						28
+					],
+					[
+						29,
+						28
+					]
+				],
+				"week": 1,
+				"won": true
+			}
+		],
+		"injury": {
+			"body": 2,
+			"head": 2,
+			"legs": 1
+		},
+		"last_fight": {
+			"action": 10,
+			"action_bonus": false,
+			"arena": "arena_drydock",
+			"bonus": 300,
+			"champion": false,
+			"d_pop": 4,
+			"draw": false,
+			"duplicate": false,
+			"error": "",
+			"fight_id": "w1r0o0",
+			"finish": false,
+			"history_entry": {
+				"arena": "arena_drydock",
+				"d_pop": 4,
+				"draw": false,
+				"fight_id": "w1r0o0",
+				"inj": {
+					"body": 2,
+					"head": 2,
+					"legs": 1
+				},
+				"knockdowns": [
+					0,
+					0
+				],
+				"landed": [
+					15,
+					15
+				],
+				"method": "decision",
+				"opp": "Clem Scuttleby",
+				"opp_fighter": "f_slurry",
+				"opp_nick": "Puddle Jumper",
+				"opp_rating": 26,
+				"org": "bait_shop",
+				"org_name": "Bait Shop Bash",
+				"pay": 800,
+				"pop": 6,
+				"result": "win",
+				"round": 3,
+				"rounds": 3,
+				"tier": 0,
+				"time": 0,
+				"title": false,
+				"title_note": "",
+				"totals": [
+					[
+						30,
+						27
+					],
+					[
+						29,
+						28
+					],
+					[
+						29,
+						28
+					]
+				],
+				"week": 1,
+				"won": true
+			},
+			"inj": {
+				"body": 2,
+				"head": 2,
+				"legs": 1
+			},
+			"injury": {
+				"body": 2,
+				"head": 2,
+				"legs": 1
+			},
+			"injury_added": {
+				"body": 2,
+				"head": 2,
+				"legs": 1
+			},
+			"knockdowns": [
+				0,
+				0
+			],
+			"landed": [
+				15,
+				15
+			],
+			"method": "decision",
+			"news": "Beat Clem Scuttleby (decision) at Bait Shop Bash. $800, popularity +4.",
+			"ok": true,
+			"opp": {
+				"bot_tier": "punching_bag",
+				"fighter": "f_slurry",
+				"fighter_name": "Slurry",
+				"from": "Old Cannery",
+				"level": 0.27030000000000004,
+				"name": "Clem Scuttleby",
+				"nick": "Puddle Jumper",
+				"rating": 26,
+				"record": {
+					"l": 5,
+					"w": 6
+				},
+				"stats": {
+					"chin": 0.20999999999999999,
+					"clinch": 0.35000000000000003,
+					"defence": 0.27000000000000002,
+					"power": 0.22,
+					"speed": 0.20999999999999999,
+					"stamina": 0.31
+				}
+			},
+			"opp_fighter": "f_slurry",
+			"opp_info": {
+				"bot_tier": "punching_bag",
+				"fighter": "f_slurry",
+				"fighter_name": "Slurry",
+				"from": "Old Cannery",
+				"level": 0.27030000000000004,
+				"name": "Clem Scuttleby",
+				"nick": "Puddle Jumper",
+				"rating": 26,
+				"record": {
+					"l": 5,
+					"w": 6
+				},
+				"stats": {
+					"chin": 0.20999999999999999,
+					"clinch": 0.35000000000000003,
+					"defence": 0.27000000000000002,
+					"power": 0.22,
+					"speed": 0.20999999999999999,
+					"stamina": 0.31
+				}
+			},
+			"opp_nick": "Puddle Jumper",
+			"opp_rating": 26,
+			"org": "bait_shop",
+			"org_name": "Bait Shop Bash",
+			"pay": 800,
+			"pop": 6,
+			"pop_before": 2,
+			"pop_label": "Unknown",
+			"profile_history": {
+				"career_id": "car_0000000044J_1",
+				"fighter": "f_varga",
+				"kind": "career",
+				"method": "decision",
+				"name": "Tester",
+				"opp": "Clem Scuttleby",
+				"org": "Bait Shop Bash",
+				"pop": 6,
+				"record": "1-0",
+				"result": "win",
+				"slot": 1,
+				"title": false,
+				"week": 1
+			},
+			"purse": 500,
+			"record": {
+				"d": 0,
+				"dec": 1,
+				"l": 0,
+				"tko": 0,
+				"w": 1
+			},
+			"record_text": "1-0",
+			"result": "win",
+			"round": 3,
+			"rounds": 3,
+			"scoring": {
+				"cards": [
+					{
+						"judges": [
+							[
+								10,
+								9
+							],
+							[
+								10,
+								9
+							],
+							[
+								10,
+								9
+							]
+						],
+						"round": 1,
+						"scores": [
+							[
+								9,
+								6
+							],
+							[
+								9,
+								6
+							],
+							[
+								9,
+								6
+							]
+						],
+						"stoppage": false,
+						"tally": [
+							{
+								"blocked": 1,
+								"damage": 20,
+								"dmg_pts": 5,
+								"guard_breaks": 0,
+								"knockdowns": 0,
+								"landed": 5,
+								"parries": 0,
+								"ringouts": 0,
+								"taken_body": 10,
+								"taken_head": 10,
+								"taken_legs": 5,
+								"thrown": 9,
+								"throws": 0
+							},
+							{
+								"blocked": 1,
+								"damage": 25,
+								"dmg_pts": 4,
+								"guard_breaks": 0,
+								"knockdowns": 0,
+								"landed": 5,
+								"parries": 0,
+								"ringouts": 0,
+								"taken_body": 8,
+								"taken_head": 8,
+								"taken_legs": 4,
+								"thrown": 9,
+								"throws": 0
+							}
+						],
+						"teams": [
+							0,
+							1
+						],
+						"winner": 0
+					},
+					{
+						"judges": [
+							[
+								10,
+								9
+							],
+							[
+								10,
+								9
+							],
+							[
+								10,
+								9
+							]
+						],
+						"round": 2,
+						"scores": [
+							[
+								9,
+								6
+							],
+							[
+								9,
+								6
+							],
+							[
+								9,
+								6
+							]
+						],
+						"stoppage": false,
+						"tally": [
+							{
+								"blocked": 1,
+								"damage": 20,
+								"dmg_pts": 5,
+								"guard_breaks": 0,
+								"knockdowns": 0,
+								"landed": 5,
+								"parries": 0,
+								"ringouts": 0,
+								"taken_body": 10,
+								"taken_head": 10,
+								"taken_legs": 5,
+								"thrown": 9,
+								"throws": 0
+							},
+							{
+								"blocked": 1,
+								"damage": 25,
+								"dmg_pts": 4,
+								"guard_breaks": 0,
+								"knockdowns": 0,
+								"landed": 5,
+								"parries": 0,
+								"ringouts": 0,
+								"taken_body": 8,
+								"taken_head": 8,
+								"taken_legs": 4,
+								"thrown": 9,
+								"throws": 0
+							}
+						],
+						"teams": [
+							0,
+							1
+						],
+						"winner": 0
+					},
+					{
+						"judges": [
+							[
+								10,
+								9
+							],
+							[
+								10,
+								9
+							],
+							[
+								10,
+								9
+							]
+						],
+						"round": 3,
+						"scores": [
+							[
+								9,
+								6
+							],
+							[
+								9,
+								6
+							],
+							[
+								9,
+								6
+							]
+						],
+						"stoppage": false,
+						"tally": [
+							{
+								"blocked": 1,
+								"damage": 20,
+								"dmg_pts": 5,
+								"guard_breaks": 0,
+								"knockdowns": 0,
+								"landed": 5,
+								"parries": 0,
+								"ringouts": 0,
+								"taken_body": 10,
+								"taken_head": 10,
+								"taken_legs": 5,
+								"thrown": 9,
+								"throws": 0
+							},
+							{
+								"blocked": 1,
+								"damage": 25,
+								"dmg_pts": 4,
+								"guard_breaks": 0,
+								"knockdowns": 0,
+								"landed": 5,
+								"parries": 0,
+								"ringouts": 0,
+								"taken_body": 8,
+								"taken_head": 8,
+								"taken_legs": 4,
+								"thrown": 9,
+								"throws": 0
+							}
+						],
+						"teams": [
+							0,
+							1
+						],
+						"winner": 0
+					}
+				],
+				"judges": [
+					"Even card",
+					"Volume",
+					"Impact"
+				],
+				"method": "decision",
+				"mode": "ten_point",
+				"stoppage": {
+
+				},
+				"sudden_death": false,
+				"teams": [
+					0,
+					1
+				],
+				"totals": [
+					[
+						30,
+						27
+					],
+					[
+						29,
+						28
+					],
+					[
+						29,
+						28
+					]
+				],
+				"winner": 0
+			},
+			"standing": "Regional · Unknown",
+			"streak": 1,
+			"tier": 0,
+			"tier_name": "Regional",
+			"time": 0,
+			"title": false,
+			"title_defences": 0,
+			"title_note": "",
+			"totals": [
+				[
+					30,
+					27
+				],
+				[
+					29,
+					28
+				],
+				[
+					29,
+					28
+				]
+			],
+			"week": 1,
+			"week_label": "Year 1 · Week 1",
+			"won": true
+		},
+		"last_train": {
+
+		},
+		"log": [
+			{
+				"text": "Career started out of a Fathom Reach boiler-room gym. Regional promoters are calling.",
+				"week": 1
+			},
+			{
+				"text": "Signed to fight Clem Scuttleby for Bait Shop Bash in 5 weeks.",
+				"week": 1
+			},
+			{
+				"text": "Beat Clem Scuttleby (decision) at Bait Shop Bash. $800, popularity +4.",
+				"week": 1
+			}
+		],
+		"money": 2800,
+		"name": "Tester",
+		"nick": "The Test",
+		"offer_roll": 0,
+		"offers": [
+			{
+				"arena": "arena_drydock",
+				"arena_key": "drydock",
+				"arena_name": "Drydock",
+				"arena_variant": "",
+				"bonus": 550,
+				"defence": false,
+				"id": "w2r0o0",
+				"note": "",
+				"opp": {
+					"bot_tier": "journeyman",
+					"fighter": "f_knell",
+					"fighter_name": "Knell",
+					"from": "Rivet Row",
+					"level": 0.34710000000000002,
+					"name": "Clem Sludgeworth",
+					"nick": "",
+					"rating": 35,
+					"record": {
+						"l": 5,
+						"w": 11
+					},
+					"stats": {
+						"chin": 0.37,
+						"clinch": 0.28000000000000003,
+						"defence": 0.40000000000000002,
+						"power": 0.35000000000000003,
+						"speed": 0.26000000000000001,
+						"stamina": 0.40999999999999998
+					}
+				},
+				"org": "rust_bucket",
+				"org_name": "Rust Bucket Fight Series",
+				"purse": 900,
+				"round_time": 99,
+				"rounds": 3,
+				"tier": 0,
+				"title": false,
+				"weeks": 6
+			},
+			{
+				"arena": "arena_drydock",
+				"arena_key": "drydock",
+				"arena_name": "Drydock",
+				"arena_variant": "",
+				"bonus": 400,
+				"defence": false,
+				"id": "w2r0o1",
+				"note": "",
+				"opp": {
+					"bot_tier": "journeyman",
+					"fighter": "f_gusto",
+					"fighter_name": "Gusto",
+					"from": "Tin Town",
+					"level": 0.36230000000000001,
+					"name": "Dross Cogsworth",
+					"nick": "",
+					"rating": 35,
+					"record": {
+						"l": 6,
+						"w": 7
+					},
+					"stats": {
+						"chin": 0.23000000000000001,
+						"clinch": 0.23999999999999999,
+						"defence": 0.40999999999999998,
+						"power": 0.27000000000000002,
+						"speed": 0.47999999999999998,
+						"stamina": 0.44
+					}
+				},
+				"org": "bait_shop",
+				"org_name": "Bait Shop Bash",
+				"purse": 700,
+				"round_time": 99,
+				"rounds": 3,
+				"tier": 0,
+				"title": false,
+				"weeks": 6
+			}
+		],
+		"pop": 6,
+		"profile_id": "tester",
+		"record": {
+			"d": 0,
+			"dec": 1,
+			"l": 0,
+			"tko": 0,
+			"w": 1
+		},
+		"saved_at": 1792545753,
+		"seed": 4242,
+		"seed_text": "0000-0000-44J",
+		"slot": 1,
+		"stats": {
+			"chin": 0.40999999999999998,
+			"clinch": 0.33000000000000002,
+			"defence": 0.34000000000000002,
+			"power": 0.47999999999999998,
+			"speed": 0.45000000000000001,
+			"stamina": 0.38
+		},
+		"streak": 1,
+		"title_defences": 0,
+		"version": 1,
+		"week": 2
+	}
+}

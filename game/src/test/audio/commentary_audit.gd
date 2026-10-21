@@ -189,7 +189,7 @@ func _duel_script() -> Array:
 	s.append([62.5, {"type": "getup", "fighter": 0}, {}])
 	hit.call(70.0, 0, 1, 18.0, "heavy_charged", {"move": "heavy_charged"})
 	s.append([70.1, {"type": "ko", "fighter": 1, "by": 0}, {}])
-	s.append([70.2, {"type": "round_end", "winner": 0, "round": 1}, {}])
+	s.append([70.2, {"type": "round_end", "winner": 0, "round": 1, "decided": false}, {}])
 	s.append([74.0, {"type": "round_intro", "round": 2}, {}])
 	s.append([77.0, {"type": "round_start", "round": 2}, {"final_round": false}])
 	hit.call(80.0, 1, 0, 7.0, "l1")
@@ -201,7 +201,7 @@ func _duel_script() -> Array:
 	hit.call(108.0, 0, 1, 10.0, "heavy")
 	hit.call(118.0, 1, 0, 20.0, "heavy_charged", {"move": "heavy_charged"})
 	s.append([118.1, {"type": "ko", "fighter": 0, "by": 1}, {}])
-	s.append([118.2, {"type": "round_end", "winner": 1, "round": 2}, {}])
+	s.append([118.2, {"type": "round_end", "winner": 1, "round": 2, "decided": false}, {}])
 	s.append([122.0, {"type": "round_intro", "round": 3}, {}])
 	s.append([125.0, {"type": "round_start", "round": 3}, {"final_round": true}])
 	hit.call(128.0, 0, 1, 6.0, "l1")
@@ -213,7 +213,7 @@ func _duel_script() -> Array:
 	hit.call(150.0, 0, 1, 8.0, "heavy")
 	hit.call(158.0, 0, 1, 15.0, "heavy")
 	s.append([158.1, {"type": "ko", "fighter": 1, "by": 0}, {}])
-	s.append([158.2, {"type": "round_end", "winner": 0, "round": 3}, {}])
+	s.append([158.2, {"type": "round_end", "winner": 0, "round": 3, "decided": true}, {}])
 	s.append([158.3, {"type": "match_end", "winner": 0}, {}])
 	# health: [stoke, dredge] fractions over time (low-health watcher)
 	for row in [[0, 1, 1], [12, 1, 0.8], [22, 0.75, 0.8], [33, 0.75, 0.55], [42, 0.75, 0.42], [53, 0.66, 0.42], [61, 0.58, 0.42],
@@ -245,7 +245,7 @@ func _ten_point_script() -> Array:
 	hit.call(30.0, 0, 1, 7.0, "lh_hook")
 	s.append([33.0, {"type": "timeout"}, {"ten_point": true}])
 	s.append([33.1, {"type": "round_scored", "round": 1}, {}])
-	s.append([33.2, {"type": "round_end", "winner": 0, "round": 1}, {}])
+	s.append([33.2, {"type": "round_end", "winner": 0, "round": 1, "decided": false}, {}])
 	s.append([37.0, {"type": "round_intro", "round": 2}, {}])
 	s.append([40.0, {"type": "round_start", "round": 2}, {"final_round": false}])
 	s.append([43.0, {"type": "juice", "fighter": 1, "id": "last_bell"}, {}])
@@ -261,7 +261,7 @@ func _ten_point_script() -> Array:
 	s.append([60.1, {"type": "knockdown", "fighter": 1, "reason": "hit", "by": 0}, {"referee": true}])
 	s.append([61.0, {"type": "ref_count", "fighter": 1, "n": 1}, {}])
 	s.append([62.0, {"type": "ref_stoppage", "fighter": 1, "by": 0}, {}])
-	s.append([62.1, {"type": "round_end", "winner": 0, "round": 2}, {}])
+	s.append([62.1, {"type": "round_end", "winner": 0, "round": 2, "decided": true}, {}])
 	s.append([64.0, {"type": "judges_decision", "winner": 0, "method": "TKO"}, {"ten_point": true, "sudden_death_follows": false}])
 	s.append([68.0, {"type": "match_end", "winner": 0}, {}])
 	for row in [[0, 1, 1], [6, 1, 0.95], [8, 0.95, 0.95], [12, 0.95, 0.85], [22, 0.87, 0.85], [31, 0.87, 0.79], [40, 1, 1], [45, 0.9, 1],
@@ -274,8 +274,11 @@ func _run_sequence(name_: String, script: Array, creatures: Array, opts: Diction
 	var fighters: Array = []
 	for i in creatures.size():
 		fighters.append({"index": i, "creature": creatures[i], "name": NAMES.get(creatures[i], creatures[i]), "team": i})
+	# the same context a real match gives (Audio.attach_match: rules rounds, scoring, referee); the
+	# round_end events carry "decided" as MatchMode emits it
+	var ten := bool(opts.get("ten_point", false))
 	Audio.begin_match({"player_index": 0, "fighters": fighters, "arena": "the_gullet", "arena_name": "The Gullet", "seed": 1701,
-		"context": "versus"})
+		"context": "versus", "rounds": 3, "ten_point": ten, "referee": ten, "format": "duel"})
 	_begin_segment(name_, {"kind": "sequence", "creatures": creatures, "ten_point": bool(opts.get("ten_point", false))})
 	var rows: Array = []
 	var health_rows: Array = []

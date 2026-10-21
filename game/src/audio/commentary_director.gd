@@ -323,7 +323,7 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 				_pending.append({"at": t + WHIFF_WINDOW, "kind": "whiff", "fighter": fi, "slot": slot, "since": t})
 			if slot in ["heavy", "heavy_charged"] and _ready("windup") and t - last_line_end_t > 1.0:
 				# fighter-specific wind-up calls (Knell's Anchor Fist); nothing plays without one
-				_cool_for("windup", 25.0)
+				_cool_for("windup", 45.0)      # only two generic wind-up calls: keep them rare
 				out.append(_req("windup", {"creature": _creature(fi), "slot": slot}, "low", _vars(fi, -1), {"ttl": 0.9}))
 		"glance":
 			_touched(fi)
@@ -449,7 +449,9 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 		"match_end":
 			finished = true
 			out.append_array(_on_match_end(ev, info))
-	return out
+	# observations and booth colour yield to the talk budget and breathing room (play-by-play,
+	# results and big moments always get through)
+	return out.filter(func(r: Dictionary) -> bool: return _room_for(str(r.get("class", "medium"))))
 
 
 func _hp(i: int) -> float:

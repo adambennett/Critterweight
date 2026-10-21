@@ -1,0 +1,1642 @@
+{
+	"format": "critterweight",
+	"kind": "campaign_run",
+	"version": 1,
+	"game_version": "0.9.16",
+	"saved_at": 1792545753.2179999,
+	"seq": 1,
+	"checksum": "c3f7f889d2dd6a3dc0eb534f6af060cfdb764226ea806cf1443ca17257b6b4ec",
+	"data": {
+		"act": 1,
+		"acts": [
+			{
+				"act": 1,
+				"attempt": 0,
+				"boss": "a1boss",
+				"nodes": {
+					"a1boss": {
+						"act": 1,
+						"edges": [],
+						"encounter": "boss_a1",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1boss",
+						"lane": 0,
+						"row": 7,
+						"treasure": false,
+						"type": "boss",
+						"x": 0.5
+					},
+					"a1r1l0": {
+						"act": 1,
+						"edges": [
+							"a1r2l0"
+						],
+						"encounter": "enc_a1_low_tide",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r1l0",
+						"lane": 0,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a1r1l1": {
+						"act": 1,
+						"edges": [
+							"a1r2l1"
+						],
+						"encounter": "enc_a1_hot_pipes",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r1l1",
+						"lane": 1,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.5
+					},
+					"a1r1l2": {
+						"act": 1,
+						"edges": [
+							"a1r2l1",
+							"a1r2l2",
+							"a1r2l3"
+						],
+						"encounter": "enc_a1_tag_tryout",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r1l2",
+						"lane": 2,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a1r2l0": {
+						"act": 1,
+						"edges": [
+							"a1r3l0",
+							"a1r3l1",
+							"a1r3l2"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r2l0",
+						"lane": 0,
+						"row": 2,
+						"treasure": false,
+						"type": "rest",
+						"x": 0
+					},
+					"a1r2l1": {
+						"act": 1,
+						"edges": [
+							"a1r3l3"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r2l1",
+						"lane": 1,
+						"row": 2,
+						"treasure": false,
+						"type": "rest",
+						"x": 0.33333333333333331
+					},
+					"a1r2l2": {
+						"act": 1,
+						"edges": [
+							"a1r3l3"
+						],
+						"encounter": "",
+						"event": "evt_the_bookie",
+						"hidden": {
+
+						},
+						"id": "a1r2l2",
+						"lane": 2,
+						"row": 2,
+						"treasure": false,
+						"type": "event",
+						"x": 0.66666666666666663
+					},
+					"a1r2l3": {
+						"act": 1,
+						"edges": [
+							"a1r3l3"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+							"event": "evt_vending_machine",
+							"type": "event"
+						},
+						"id": "a1r2l3",
+						"lane": 3,
+						"row": 2,
+						"treasure": false,
+						"type": "mystery",
+						"x": 1
+					},
+					"a1r3l0": {
+						"act": 1,
+						"edges": [
+							"a1r4l0"
+						],
+						"encounter": "enc_a1_wet_floor",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r3l0",
+						"lane": 0,
+						"row": 3,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a1r3l1": {
+						"act": 1,
+						"edges": [
+							"a1r4l0",
+							"a1r4l1"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r3l1",
+						"lane": 1,
+						"row": 3,
+						"treasure": false,
+						"type": "shop",
+						"x": 0.33333333333333331
+					},
+					"a1r3l2": {
+						"act": 1,
+						"edges": [
+							"a1r4l2"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r3l2",
+						"lane": 2,
+						"row": 3,
+						"treasure": false,
+						"type": "rest",
+						"x": 0.66666666666666663
+					},
+					"a1r3l3": {
+						"act": 1,
+						"edges": [
+							"a1r4l2",
+							"a1r4l3"
+						],
+						"encounter": "enc_a1_dock_rats",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r3l3",
+						"lane": 3,
+						"row": 3,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a1r4l0": {
+						"act": 1,
+						"edges": [
+							"a1r5l0",
+							"a1r5l1",
+							"a1r5l2"
+						],
+						"encounter": "enc_a1_open_tryout",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r4l0",
+						"lane": 0,
+						"row": 4,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a1r4l1": {
+						"act": 1,
+						"edges": [
+							"a1r5l3"
+						],
+						"encounter": "elite_a1_showboat",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r4l1",
+						"lane": 1,
+						"row": 4,
+						"treasure": false,
+						"type": "elite",
+						"x": 0.33333333333333331
+					},
+					"a1r4l2": {
+						"act": 1,
+						"edges": [
+							"a1r5l3"
+						],
+						"encounter": "enc_a1_blister_pack",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r4l2",
+						"lane": 2,
+						"row": 4,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.66666666666666663
+					},
+					"a1r4l3": {
+						"act": 1,
+						"edges": [
+							"a1r5l3"
+						],
+						"encounter": "enc_a1_timed_scrap",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r4l3",
+						"lane": 3,
+						"row": 4,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a1r5l0": {
+						"act": 1,
+						"edges": [
+							"a1r6l0"
+						],
+						"encounter": "enc_a1_two_for_one",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r5l0",
+						"lane": 0,
+						"row": 5,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a1r5l1": {
+						"act": 1,
+						"edges": [
+							"a1r6l1",
+							"a1r6l2"
+						],
+						"encounter": "enc_a1_pelter_gallery",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r5l1",
+						"lane": 1,
+						"row": 5,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.33333333333333331
+					},
+					"a1r5l2": {
+						"act": 1,
+						"edges": [
+							"a1r6l2"
+						],
+						"encounter": "enc_a1_pelter_gallery",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r5l2",
+						"lane": 2,
+						"row": 5,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.66666666666666663
+					},
+					"a1r5l3": {
+						"act": 1,
+						"edges": [
+							"a1r6l3"
+						],
+						"encounter": "enc_a1_hot_pipes",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r5l3",
+						"lane": 3,
+						"row": 5,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a1r6l0": {
+						"act": 1,
+						"edges": [
+							"a1boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r6l0",
+						"lane": 0,
+						"row": 6,
+						"treasure": false,
+						"type": "rest",
+						"x": 0
+					},
+					"a1r6l1": {
+						"act": 1,
+						"edges": [
+							"a1boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r6l1",
+						"lane": 1,
+						"row": 6,
+						"treasure": false,
+						"type": "shop",
+						"x": 0.33333333333333331
+					},
+					"a1r6l2": {
+						"act": 1,
+						"edges": [
+							"a1boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r6l2",
+						"lane": 2,
+						"row": 6,
+						"treasure": false,
+						"type": "shop",
+						"x": 0.66666666666666663
+					},
+					"a1r6l3": {
+						"act": 1,
+						"edges": [
+							"a1boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a1r6l3",
+						"lane": 3,
+						"row": 6,
+						"treasure": false,
+						"type": "shop",
+						"x": 1
+					}
+				},
+				"rows": [
+					[
+						"a1r1l0",
+						"a1r1l1",
+						"a1r1l2"
+					],
+					[
+						"a1r2l0",
+						"a1r2l1",
+						"a1r2l2",
+						"a1r2l3"
+					],
+					[
+						"a1r3l0",
+						"a1r3l1",
+						"a1r3l2",
+						"a1r3l3"
+					],
+					[
+						"a1r4l0",
+						"a1r4l1",
+						"a1r4l2",
+						"a1r4l3"
+					],
+					[
+						"a1r5l0",
+						"a1r5l1",
+						"a1r5l2",
+						"a1r5l3"
+					],
+					[
+						"a1r6l0",
+						"a1r6l1",
+						"a1r6l2",
+						"a1r6l3"
+					],
+					[
+						"a1boss"
+					]
+				]
+			},
+			{
+				"act": 2,
+				"attempt": 0,
+				"boss": "a2boss",
+				"nodes": {
+					"a2boss": {
+						"act": 2,
+						"edges": [],
+						"encounter": "boss_a2",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2boss",
+						"lane": 0,
+						"row": 7,
+						"treasure": false,
+						"type": "boss",
+						"x": 0.5
+					},
+					"a2r1l0": {
+						"act": 2,
+						"edges": [
+							"a2r2l0",
+							"a2r2l1"
+						],
+						"encounter": "enc_a2_scrapyard_gang",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r1l0",
+						"lane": 0,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a2r1l1": {
+						"act": 2,
+						"edges": [
+							"a2r2l1",
+							"a2r2l2"
+						],
+						"encounter": "enc_a2_low_gravity",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r1l1",
+						"lane": 1,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.33333333333333331
+					},
+					"a2r1l2": {
+						"act": 2,
+						"edges": [
+							"a2r2l3"
+						],
+						"encounter": "enc_a2_three_way",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r1l2",
+						"lane": 2,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.66666666666666663
+					},
+					"a2r1l3": {
+						"act": 2,
+						"edges": [
+							"a2r2l3"
+						],
+						"encounter": "enc_a2_handicap",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r1l3",
+						"lane": 3,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a2r2l0": {
+						"act": 2,
+						"edges": [
+							"a2r3l0"
+						],
+						"encounter": "enc_a2_live_wire_lite",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r2l0",
+						"lane": 0,
+						"row": 2,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a2r2l1": {
+						"act": 2,
+						"edges": [
+							"a2r3l0",
+							"a2r3l1",
+							"a2r3l2"
+						],
+						"encounter": "enc_a2_sludge_pit",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r2l1",
+						"lane": 1,
+						"row": 2,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.33333333333333331
+					},
+					"a2r2l2": {
+						"act": 2,
+						"edges": [
+							"a2r3l2",
+							"a2r3l3"
+						],
+						"encounter": "enc_a2_sudden_death",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r2l2",
+						"lane": 2,
+						"row": 2,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.66666666666666663
+					},
+					"a2r2l3": {
+						"act": 2,
+						"edges": [
+							"a2r3l3"
+						],
+						"encounter": "enc_a2_rooftop_brawl",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r2l3",
+						"lane": 3,
+						"row": 2,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a2r3l0": {
+						"act": 2,
+						"edges": [
+							"a2r4l0",
+							"a2r4l1"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r3l0",
+						"lane": 0,
+						"row": 3,
+						"treasure": false,
+						"type": "rest",
+						"x": 0
+					},
+					"a2r3l1": {
+						"act": 2,
+						"edges": [
+							"a2r4l2"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r3l1",
+						"lane": 1,
+						"row": 3,
+						"treasure": false,
+						"type": "shop",
+						"x": 0.33333333333333331
+					},
+					"a2r3l2": {
+						"act": 2,
+						"edges": [
+							"a2r4l2"
+						],
+						"encounter": "",
+						"event": "evt_crowd_favor",
+						"hidden": {
+
+						},
+						"id": "a2r3l2",
+						"lane": 2,
+						"row": 3,
+						"treasure": false,
+						"type": "event",
+						"x": 0.66666666666666663
+					},
+					"a2r3l3": {
+						"act": 2,
+						"edges": [
+							"a2r4l2"
+						],
+						"encounter": "",
+						"event": "evt_juice_crate",
+						"hidden": {
+
+						},
+						"id": "a2r3l3",
+						"lane": 3,
+						"row": 3,
+						"treasure": false,
+						"type": "event",
+						"x": 1
+					},
+					"a2r4l0": {
+						"act": 2,
+						"edges": [
+							"a2r5l0",
+							"a2r5l1",
+							"a2r5l2"
+						],
+						"encounter": "elite_a2_crusher_crew",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r4l0",
+						"lane": 0,
+						"row": 4,
+						"treasure": false,
+						"type": "elite",
+						"x": 0
+					},
+					"a2r4l1": {
+						"act": 2,
+						"edges": [
+							"a2r5l2"
+						],
+						"encounter": "enc_a2_tag_bout",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r4l1",
+						"lane": 1,
+						"row": 4,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.5
+					},
+					"a2r4l2": {
+						"act": 2,
+						"edges": [
+							"a2r5l2"
+						],
+						"encounter": "enc_a2_bomb_squad",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r4l2",
+						"lane": 2,
+						"row": 4,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a2r5l0": {
+						"act": 2,
+						"edges": [
+							"a2r6l0"
+						],
+						"encounter": "enc_a2_three_way",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r5l0",
+						"lane": 0,
+						"row": 5,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a2r5l1": {
+						"act": 2,
+						"edges": [
+							"a2r6l1"
+						],
+						"encounter": "enc_a2_tag_bout",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r5l1",
+						"lane": 1,
+						"row": 5,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.5
+					},
+					"a2r5l2": {
+						"act": 2,
+						"edges": [
+							"a2r6l1",
+							"a2r6l2"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+							"type": "treasure"
+						},
+						"id": "a2r5l2",
+						"lane": 2,
+						"row": 5,
+						"treasure": true,
+						"type": "mystery",
+						"x": 1
+					},
+					"a2r6l0": {
+						"act": 2,
+						"edges": [
+							"a2boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r6l0",
+						"lane": 0,
+						"row": 6,
+						"treasure": false,
+						"type": "shop",
+						"x": 0
+					},
+					"a2r6l1": {
+						"act": 2,
+						"edges": [
+							"a2boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r6l1",
+						"lane": 1,
+						"row": 6,
+						"treasure": false,
+						"type": "rest",
+						"x": 0.5
+					},
+					"a2r6l2": {
+						"act": 2,
+						"edges": [
+							"a2boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a2r6l2",
+						"lane": 2,
+						"row": 6,
+						"treasure": false,
+						"type": "shop",
+						"x": 1
+					}
+				},
+				"rows": [
+					[
+						"a2r1l0",
+						"a2r1l1",
+						"a2r1l2",
+						"a2r1l3"
+					],
+					[
+						"a2r2l0",
+						"a2r2l1",
+						"a2r2l2",
+						"a2r2l3"
+					],
+					[
+						"a2r3l0",
+						"a2r3l1",
+						"a2r3l2",
+						"a2r3l3"
+					],
+					[
+						"a2r4l0",
+						"a2r4l1",
+						"a2r4l2"
+					],
+					[
+						"a2r5l0",
+						"a2r5l1",
+						"a2r5l2"
+					],
+					[
+						"a2r6l0",
+						"a2r6l1",
+						"a2r6l2"
+					],
+					[
+						"a2boss"
+					]
+				]
+			},
+			{
+				"act": 3,
+				"attempt": 0,
+				"boss": "a3boss",
+				"nodes": {
+					"a3boss": {
+						"act": 3,
+						"edges": [],
+						"encounter": "boss_a3",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3boss",
+						"lane": 0,
+						"row": 7,
+						"treasure": false,
+						"type": "boss",
+						"x": 0.5
+					},
+					"a3r1l0": {
+						"act": 3,
+						"edges": [
+							"a3r2l0"
+						],
+						"encounter": "enc_a3_swarm_night",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r1l0",
+						"lane": 0,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a3r1l1": {
+						"act": 3,
+						"edges": [
+							"a3r2l0"
+						],
+						"encounter": "enc_a3_timed_rush",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r1l1",
+						"lane": 1,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.33333333333333331
+					},
+					"a3r1l2": {
+						"act": 3,
+						"edges": [
+							"a3r2l0",
+							"a3r2l1"
+						],
+						"encounter": "enc_a3_zero_g",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r1l2",
+						"lane": 2,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.66666666666666663
+					},
+					"a3r1l3": {
+						"act": 3,
+						"edges": [
+							"a3r2l2"
+						],
+						"encounter": "enc_a3_rooftop_royale",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r1l3",
+						"lane": 3,
+						"row": 1,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a3r2l0": {
+						"act": 3,
+						"edges": [
+							"a3r3l0",
+							"a3r3l1"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+							"type": "treasure"
+						},
+						"id": "a3r2l0",
+						"lane": 0,
+						"row": 2,
+						"treasure": true,
+						"type": "mystery",
+						"x": 0
+					},
+					"a3r2l1": {
+						"act": 3,
+						"edges": [
+							"a3r3l1",
+							"a3r3l2",
+							"a3r3l3"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+							"encounter": "enc_a3_hazard_hell",
+							"type": "fight"
+						},
+						"id": "a3r2l1",
+						"lane": 1,
+						"row": 2,
+						"treasure": false,
+						"type": "mystery",
+						"x": 0.5
+					},
+					"a3r2l2": {
+						"act": 3,
+						"edges": [
+							"a3r3l3"
+						],
+						"encounter": "enc_a3_tag_title",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r2l2",
+						"lane": 2,
+						"row": 2,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a3r3l0": {
+						"act": 3,
+						"edges": [
+							"a3r4l0"
+						],
+						"encounter": "enc_a3_iron_man",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r3l0",
+						"lane": 0,
+						"row": 3,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a3r3l1": {
+						"act": 3,
+						"edges": [
+							"a3r4l1"
+						],
+						"encounter": "enc_a3_juice_night",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r3l1",
+						"lane": 1,
+						"row": 3,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.33333333333333331
+					},
+					"a3r3l2": {
+						"act": 3,
+						"edges": [
+							"a3r4l2"
+						],
+						"encounter": "enc_a3_main_event",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r3l2",
+						"lane": 2,
+						"row": 3,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.66666666666666663
+					},
+					"a3r3l3": {
+						"act": 3,
+						"edges": [
+							"a3r4l2"
+						],
+						"encounter": "",
+						"event": "evt_cut_woman",
+						"hidden": {
+
+						},
+						"id": "a3r3l3",
+						"lane": 3,
+						"row": 3,
+						"treasure": false,
+						"type": "event",
+						"x": 1
+					},
+					"a3r4l0": {
+						"act": 3,
+						"edges": [
+							"a3r5l0",
+							"a3r5l1",
+							"a3r5l2"
+						],
+						"encounter": "enc_a3_hazard_hell",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r4l0",
+						"lane": 0,
+						"row": 4,
+						"treasure": false,
+						"type": "fight",
+						"x": 0
+					},
+					"a3r4l1": {
+						"act": 3,
+						"edges": [
+							"a3r5l2"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r4l1",
+						"lane": 1,
+						"row": 4,
+						"treasure": false,
+						"type": "rest",
+						"x": 0.5
+					},
+					"a3r4l2": {
+						"act": 3,
+						"edges": [
+							"a3r5l3"
+						],
+						"encounter": "enc_a3_gatekeepers",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r4l2",
+						"lane": 2,
+						"row": 4,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a3r5l0": {
+						"act": 3,
+						"edges": [
+							"a3r6l0"
+						],
+						"encounter": "elite_a3_contender",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r5l0",
+						"lane": 0,
+						"row": 5,
+						"treasure": false,
+						"type": "elite",
+						"x": 0
+					},
+					"a3r5l1": {
+						"act": 3,
+						"edges": [
+							"a3r6l0",
+							"a3r6l1"
+						],
+						"encounter": "",
+						"event": "evt_needles_sample",
+						"hidden": {
+
+						},
+						"id": "a3r5l1",
+						"lane": 1,
+						"row": 5,
+						"treasure": false,
+						"type": "event",
+						"x": 0.33333333333333331
+					},
+					"a3r5l2": {
+						"act": 3,
+						"edges": [
+							"a3r6l2"
+						],
+						"encounter": "enc_a3_swarm_night",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r5l2",
+						"lane": 2,
+						"row": 5,
+						"treasure": false,
+						"type": "fight",
+						"x": 0.66666666666666663
+					},
+					"a3r5l3": {
+						"act": 3,
+						"edges": [
+							"a3r6l2"
+						],
+						"encounter": "enc_a3_juice_night",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r5l3",
+						"lane": 3,
+						"row": 5,
+						"treasure": false,
+						"type": "fight",
+						"x": 1
+					},
+					"a3r6l0": {
+						"act": 3,
+						"edges": [
+							"a3boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r6l0",
+						"lane": 0,
+						"row": 6,
+						"treasure": false,
+						"type": "rest",
+						"x": 0
+					},
+					"a3r6l1": {
+						"act": 3,
+						"edges": [
+							"a3boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r6l1",
+						"lane": 1,
+						"row": 6,
+						"treasure": false,
+						"type": "rest",
+						"x": 0.5
+					},
+					"a3r6l2": {
+						"act": 3,
+						"edges": [
+							"a3boss"
+						],
+						"encounter": "",
+						"event": "",
+						"hidden": {
+
+						},
+						"id": "a3r6l2",
+						"lane": 2,
+						"row": 6,
+						"treasure": false,
+						"type": "shop",
+						"x": 1
+					}
+				},
+				"rows": [
+					[
+						"a3r1l0",
+						"a3r1l1",
+						"a3r1l2",
+						"a3r1l3"
+					],
+					[
+						"a3r2l0",
+						"a3r2l1",
+						"a3r2l2"
+					],
+					[
+						"a3r3l0",
+						"a3r3l1",
+						"a3r3l2",
+						"a3r3l3"
+					],
+					[
+						"a3r4l0",
+						"a3r4l1",
+						"a3r4l2"
+					],
+					[
+						"a3r5l0",
+						"a3r5l1",
+						"a3r5l2",
+						"a3r5l3"
+					],
+					[
+						"a3r6l0",
+						"a3r6l1",
+						"a3r6l2"
+					],
+					[
+						"a3boss"
+					]
+				]
+			}
+		],
+		"claims": {
+			"a1r1l0": {
+				"_run": [
+					"_fight0"
+				],
+				"p0": [
+					"sup0"
+				]
+			},
+			"a1r2l0": {
+				"p0": [
+					"rest"
+				]
+			},
+			"a1r3l0": {
+				"_run": [
+					"_fight0"
+				],
+				"p0": [
+					"sup0"
+				]
+			},
+			"a1r4l0": {
+				"_run": [
+					"_fight0"
+				],
+				"p0": [
+					"sup0"
+				]
+			}
+		},
+		"content_hash": "",
+		"coop_format": "simultaneous",
+		"created_at": 1,
+		"custom": false,
+		"custom_reasons": [],
+		"difficulty": "amateur",
+		"dose": 0,
+		"elapsed": 180,
+		"flags": {
+			"boss_mods": {
+
+			},
+			"film_study": {
+
+			},
+			"revealed": {
+
+			}
+		},
+		"gen_cfg": {
+			"classes": [
+				"scrapper"
+			],
+			"difficulty": "amateur",
+			"dose": 0,
+			"elements": [
+				"scorch"
+			],
+			"fighters": [
+				"f_stoke"
+			],
+			"party_size": 1,
+			"seed": 606,
+			"variant": "off_the_street"
+		},
+		"log": [
+			{
+				"d": {
+
+				},
+				"k": "start",
+				"p": ""
+			},
+			{
+				"d": {
+					"node": "a1r1l0"
+				},
+				"k": "choose",
+				"p": "p0"
+			},
+			{
+				"d": {
+					"result": {
+						"players": {
+							"p0": {
+								"biggest_hit": 9,
+								"damage_dealt": 30,
+								"damage_taken": 10,
+								"downs": 0,
+								"hit_by_boss": true,
+								"hp": 88,
+								"hype": 40,
+								"knockdowns": 0,
+								"kos": 1,
+								"minion_kos": 0,
+								"out": false,
+								"taunts": 1
+							}
+						},
+						"time": 60,
+						"won": true
+					}
+				},
+				"k": "fight",
+				"p": ""
+			},
+			{
+				"d": {
+					"choice": "sup_rest_easy",
+					"rid": "sup0"
+				},
+				"k": "claim",
+				"p": "p0"
+			},
+			{
+				"d": {
+					"node": "a1r2l0"
+				},
+				"k": "choose",
+				"p": "p0"
+			},
+			{
+				"d": {
+					"option": "patch_up"
+				},
+				"k": "rest",
+				"p": "p0"
+			},
+			{
+				"d": {
+					"node": "a1r3l0"
+				},
+				"k": "choose",
+				"p": "p0"
+			},
+			{
+				"d": {
+					"result": {
+						"players": {
+							"p0": {
+								"biggest_hit": 9,
+								"damage_dealt": 30,
+								"damage_taken": 10,
+								"downs": 0,
+								"hit_by_boss": true,
+								"hp": 88,
+								"hype": 40,
+								"knockdowns": 0,
+								"kos": 1,
+								"minion_kos": 0,
+								"out": false,
+								"taunts": 1
+							}
+						},
+						"time": 60,
+						"won": true
+					}
+				},
+				"k": "fight",
+				"p": ""
+			},
+			{
+				"d": {
+					"choice": "sup_blood_money",
+					"rid": "sup0"
+				},
+				"k": "claim",
+				"p": "p0"
+			},
+			{
+				"d": {
+					"node": "a1r4l0"
+				},
+				"k": "choose",
+				"p": "p0"
+			},
+			{
+				"d": {
+					"result": {
+						"players": {
+							"p0": {
+								"biggest_hit": 9,
+								"damage_dealt": 30,
+								"damage_taken": 10,
+								"downs": 0,
+								"hit_by_boss": true,
+								"hp": 88,
+								"hype": 40,
+								"knockdowns": 0,
+								"kos": 1,
+								"minion_kos": 0,
+								"out": false,
+								"taunts": 1
+							}
+						},
+						"time": 60,
+						"won": true
+					}
+				},
+				"k": "fight",
+				"p": ""
+			},
+			{
+				"d": {
+					"choice": "sup_elite_bounty",
+					"rid": "sup0"
+				},
+				"k": "claim",
+				"p": "p0"
+			}
+		],
+		"mode": "campaign",
+		"node": {
+
+		},
+		"path": [
+			"a1r1l0",
+			"a1r2l0",
+			"a1r3l0",
+			"a1r4l0"
+		],
+		"phase": "map",
+		"players": [
+			{
+				"bot": false,
+				"clout": 30,
+				"connected": true,
+				"consumables": {
+
+				},
+				"cosmetics": [],
+				"coupon": 0,
+				"fighter": "f_stoke",
+				"hp": 88,
+				"hype_carry": 20,
+				"id": "p0",
+				"meta": {
+
+				},
+				"name": "Tester",
+				"next_fights": [],
+				"out": false,
+				"profile_id": "test",
+				"rerolls_free": 0,
+				"run_effects": [],
+				"scrip": 272,
+				"side_effects": [],
+				"stats": {
+					"biggest_hit": 9,
+					"boss_no_hit": [],
+					"damage_dealt": 90,
+					"damage_taken": 30,
+					"downs": 0,
+					"fights": 3,
+					"knockdowns_taken": 0,
+					"kos": 3,
+					"minion_kos": 0,
+					"scrip_earned": 172,
+					"taunts": 3,
+					"wins": 0
+				},
+				"supplements": [
+					{
+						"id": "sup_rest_easy",
+						"stacks": 1
+					},
+					{
+						"id": "sup_blood_money",
+						"stacks": 1
+					},
+					{
+						"id": "sup_elite_bounty",
+						"stacks": 1
+					}
+				],
+				"techniques": [],
+				"triggers": []
+			}
+		],
+		"position": "a1r4l0",
+		"result": {
+
+		},
+		"run_id": "run_000000000JY_1",
+		"seed": 606,
+		"seed_text": "0000-0000-0JY",
+		"seeded": false,
+		"start_cfg": {
+			"created_at": 1,
+			"difficulty": "amateur",
+			"dose": 0,
+			"players": [
+				{
+					"fighter": "f_stoke",
+					"id": "p0",
+					"name": "Tester",
+					"profile_id": "test"
+				}
+			],
+			"seed": 606,
+			"variant": "off_the_street"
+		},
+		"stats": {
+			"biggest_hit": 9,
+			"fights": 3,
+			"fights_won": 3,
+			"knockdowns_taken": 0,
+			"kos": 3,
+			"nodes": 4,
+			"taunts": 3
+		},
+		"variant": "off_the_street",
+		"version": 1
+	}
+}

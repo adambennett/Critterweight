@@ -1,0 +1,18 @@
+{
+	"format": "critterweight",
+	"kind": "profile_index",
+	"version": 1,
+	"game_version": "0.9.16",
+	"saved_at": 1792545750.822,
+	"seq": 2,
+	"checksum": "8a3796229f2aae5c31cfb032a4f038a59d7ef6a7cb02e6f65fb3e1ebd5d7f9cb",
+	"data": {
+		"active": "rookie",
+		"profiles": [
+			{
+				"id": "rookie",
+				"name": "Rookie"
+			}
+		]
+	}
+}
