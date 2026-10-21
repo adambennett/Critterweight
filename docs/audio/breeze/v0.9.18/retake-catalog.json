@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "voices": {
+    "devon": "voc_g53htd8kmjsj",
+    "kendall": "voc_j66xnnsxfeet",
+    "coach_buck": "voc_b36c5rxpfuzb"
+  },
+  "cast": {
+    "barnaby": "devon",
+    "kendall": "kendall",
+    "granny": "coach_buck"
+  },
+  "clips": {
+    "cmt18_0111_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0111_r1.wav",
+      "seconds": 3.855,
+      "sha256": "2998a4168687f0fd53c2b720b87c6fc706b4ddaea85ee666af2059e833e9679c",
+      "voice": "devon"
+    },
+    "cmt18_0119_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0119_r1.wav",
+      "seconds": 4.56,
+      "sha256": "a1834ffd38a10163e0a4e585269a0d7ae2d7bd4467cb74766c8f08bea1a0fcd3",
+      "voice": "devon"
+    },
+    "cmt18_0073_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0073_r1.wav",
+      "seconds": 3.11,
+      "sha256": "e25d1a25ecd18cffad400685107249c67f540999ef1c0bc65aa101f05c744597",
+      "voice": "devon"
+    },
+    "cmt18_0123_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0123_r1.wav",
+      "seconds": 3.975,
+      "sha256": "046f13bb052a839232cbf4c7f6fc67a8051384e6c0a195f447d336b698a28c4c",
+      "voice": "devon"
+    },
+    "cmt18_0001_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0001_r1.wav",
+      "seconds": 3.305,
+      "sha256": "833620eb3bbb7a173217fbd0e54eaa574c0a855715714b6593fb84aff17b0485",
+      "voice": "devon"
+    },
+    "cmt18_0026_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0026_r1.wav",
+      "seconds": 6.205,
+      "sha256": "145aad23cf5d94b9364cb49255cdba3b7421f85ebb2f5d5c4b451c55accfe07e",
+      "voice": "devon"
+    },
+    "cmt18_0064_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0064_r1.wav",
+      "seconds": 4.695,
+      "sha256": "4bdaaac2fdddf1d2cd22b6312d4f260b1977d6a7038ebc4308f68fa324dcf5ac",
+      "voice": "devon"
+    },
+    "cmt18_0080_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0080_r1.wav",
+      "seconds": 2.965,
+      "sha256": "809ae5584003002ed369c78ab31f72274c50961cf5907ff8ea1e2728b06cd6fc",
+      "voice": "devon"
+    },
+    "cmt18_0020_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0020_r1.wav",
+      "seconds": 4.4,
+      "sha256": "22f943b562664d0c1d2c8ce81c81077b6c874ab62c8a2c937882a7045089f7dc",
+      "voice": "devon"
+    },
+    "cmt18_0002_r1": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0002_r1.wav",
+      "seconds": 4.16,
+      "sha256": "eca740dae5e4f60c8c242b460db6636b443338cb0558ed54dcecd3952d0917ee",
+      "voice": "devon"
+    },
+    "cmt18_0119_r2": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0119_r2.wav",
+      "seconds": 3.795,
+      "sha256": "323c0a6006aa7ef8d932004113fe1aec580c896c9be82872e3f131dbbddbc1e1",
+      "voice": "devon"
+    },
+    "cmt18_0002_r2": {
+      "path": "res://assets/audio/speech/v0918/cmt18_0002_r2.wav",
+      "seconds": 3.885,
+      "sha256": "0a48782c8b75c8af5f08d3d666cc23b1f6eb3618e13fc0e06436a8574624429b",
+      "voice": "devon"
+    }
+  }
+}

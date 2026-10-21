@@ -1,0 +1,2531 @@
+{
+ "version": 1,
+ "release": "0.9.18",
+ "model_id": "breeze-tts-2",
+ "authorized_credits": 10000,
+ "voices": {
+  "devon": "voc_g53htd8kmjsj",
+  "kendall": "voc_j66xnnsxfeet",
+  "coach_buck": "voc_b36c5rxpfuzb"
+ },
+ "cast": {
+  "barnaby": "devon",
+  "kendall": "kendall",
+  "granny": "coach_buck"
+ },
+ "tokens": {},
+ "lines": [
+  {
+   "id": "cmt18_0001",
+   "speaker": "barnaby",
+   "template": "And here comes the stream! Hold the button, hold the line!",
+   "parts": [
+    {
+     "clip": "cmt18_0001"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0002",
+   "speaker": "barnaby",
+   "template": "They're pouring it on now! Steer it, keep it on them!",
+   "parts": [
+    {
+     "clip": "cmt18_0002"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0003",
+   "speaker": "kendall",
+   "template": "A sustained attack. My favourite kind. It lasts as long as my attention.",
+   "parts": [
+    {
+     "clip": "cmt18_0003"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0004",
+   "speaker": "barnaby",
+   "template": "Caught in the stream! There's no getting out of that by standing still!",
+   "parts": [
+    {
+     "clip": "cmt18_0004"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0005",
+   "speaker": "barnaby",
+   "template": "It's soaking right through the guard! Move, move, move!",
+   "parts": [
+    {
+     "clip": "cmt18_0005"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0006",
+   "speaker": "kendall",
+   "template": "All that pressure, and it painted the floor. Lovely floor.",
+   "parts": [
+    {
+     "clip": "cmt18_0006"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0007",
+   "speaker": "barnaby",
+   "template": "Shot away! Lined up and let go!",
+   "parts": [
+    {
+     "clip": "cmt18_0007"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0008",
+   "speaker": "barnaby",
+   "template": "Here comes the projectile! Sidestep or swallow it!",
+   "parts": [
+    {
+     "clip": "cmt18_0008"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0009",
+   "speaker": "barnaby",
+   "template": "Right on target! Thread the needle and it lands clean!",
+   "parts": [
+    {
+     "clip": "cmt18_0009"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0010",
+   "speaker": "kendall",
+   "template": "Oh, that found them. From that far? Rude.",
+   "parts": [
+    {
+     "clip": "cmt18_0010"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0011",
+   "speaker": "barnaby",
+   "template": "Wide! That shot sails past and keeps on going!",
+   "parts": [
+    {
+     "clip": "cmt18_0011"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0012",
+   "speaker": "barnaby",
+   "template": "A spread of shots! Something in there is going to land!",
+   "parts": [
+    {
+     "clip": "cmt18_0012"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0013",
+   "speaker": "kendall",
+   "template": "One shot is a statement. Several shots is a strategy.",
+   "parts": [
+    {
+     "clip": "cmt18_0013"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0014",
+   "speaker": "barnaby",
+   "template": "The volley connects! Count them later, they all hurt now!",
+   "parts": [
+    {
+     "clip": "cmt18_0014"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0015",
+   "speaker": "kendall",
+   "template": "That was a lot of shots for no hits. Statistically impressive.",
+   "parts": [
+    {
+     "clip": "cmt18_0015"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0016",
+   "speaker": "barnaby",
+   "template": "Charging it up! You can feel the pressure building from here!",
+   "parts": [
+    {
+     "clip": "cmt18_0016"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0017",
+   "speaker": "barnaby",
+   "template": "Here comes the big one! Let it rip!",
+   "parts": [
+    {
+     "clip": "cmt18_0017"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0018",
+   "speaker": "barnaby",
+   "template": "BOOM! Full blast, full force, full marks!",
+   "parts": [
+    {
+     "clip": "cmt18_0018"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0019",
+   "speaker": "barnaby",
+   "template": "That blast sends them flying! What a release!",
+   "parts": [
+    {
+     "clip": "cmt18_0019"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0020",
+   "speaker": "barnaby",
+   "template": "All that charge, and it hits nothing! Now they're wide open!",
+   "parts": [
+    {
+     "clip": "cmt18_0020"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0021",
+   "speaker": "kendall",
+   "template": "A huge blast at nothing. Very dramatic for an empty corner.",
+   "parts": [
+    {
+     "clip": "cmt18_0021"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0022",
+   "speaker": "barnaby",
+   "template": "And they're off like a shot! Straight at them!",
+   "parts": [
+    {
+     "clip": "cmt18_0022"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0023",
+   "speaker": "barnaby",
+   "template": "Full speed ahead! That's a rush with bad intentions!",
+   "parts": [
+    {
+     "clip": "cmt18_0023"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0024",
+   "speaker": "barnaby",
+   "template": "Run through! Didn't stop, didn't slow down, didn't apologise!",
+   "parts": [
+    {
+     "clip": "cmt18_0024"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0025",
+   "speaker": "barnaby",
+   "template": "Overcommitted! They rushed right past and the door is open!",
+   "parts": [
+    {
+     "clip": "cmt18_0025"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0026",
+   "speaker": "barnaby",
+   "template": "They're waiting for it! Swing now and you're walking into the counter!",
+   "parts": [
+    {
+     "clip": "cmt18_0026"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0027",
+   "speaker": "kendall",
+   "template": "A counter stance. The polite way of saying \"go on, try it\".",
+   "parts": [
+    {
+     "clip": "cmt18_0027"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0028",
+   "speaker": "barnaby",
+   "template": "Counter! Read it, caught it, sent it right back!",
+   "parts": [
+    {
+     "clip": "cmt18_0028"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0029",
+   "speaker": "barnaby",
+   "template": "Owning the floor! That space belongs to one fighter now!",
+   "parts": [
+    {
+     "clip": "cmt18_0029"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0030",
+   "speaker": "kendall",
+   "template": "Area control. Like owning real estate, but it hurts to visit.",
+   "parts": [
+    {
+     "clip": "cmt18_0030"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0031",
+   "speaker": "barnaby",
+   "template": "Caught in the zone! Get out of there before it gets worse!",
+   "parts": [
+    {
+     "clip": "cmt18_0031"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0032",
+   "speaker": "barnaby",
+   "template": "A smart reset there, buying a little advantage for the next exchange.",
+   "parts": [
+    {
+     "clip": "cmt18_0032"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0033",
+   "speaker": "kendall",
+   "template": "A support move. Somebody's playing the long game tonight.",
+   "parts": [
+    {
+     "clip": "cmt18_0033"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0034",
+   "speaker": "barnaby",
+   "template": "Repositioning! That fighter is going somewhere better!",
+   "parts": [
+    {
+     "clip": "cmt18_0034"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0035",
+   "speaker": "kendall",
+   "template": "Not an attack, exactly. More of a relocation with menace.",
+   "parts": [
+    {
+     "clip": "cmt18_0035"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0036",
+   "speaker": "barnaby",
+   "template": "Stoke opens the stovepipe! It's a flamethrower, folks!",
+   "parts": [
+    {
+     "clip": "cmt18_0036"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0037",
+   "speaker": "barnaby",
+   "template": "Fire from the furnace! Stoke's sweeping the cage with flame!",
+   "parts": [
+    {
+     "clip": "cmt18_0037"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0038",
+   "speaker": "kendall",
+   "template": "Oh, he just breathes fire now. That's new. That's very new.",
+   "parts": [
+    {
+     "clip": "cmt18_0038"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0039",
+   "speaker": "barnaby",
+   "template": "Still pouring it on! That flame is following them around!",
+   "parts": [
+    {
+     "clip": "cmt18_0039"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0040",
+   "speaker": "barnaby",
+   "template": "Caught in the flamethrower! That's Sizzle stacking up fast!",
+   "parts": [
+    {
+     "clip": "cmt18_0040"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0041",
+   "speaker": "kendall",
+   "template": "That's not a tan. That's the flamethrower.",
+   "parts": [
+    {
+     "clip": "cmt18_0041"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0042",
+   "speaker": "barnaby",
+   "template": "Up and over goes a hot coal! Where it lands, it burns!",
+   "parts": [
+    {
+     "clip": "cmt18_0042"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0043",
+   "speaker": "kendall",
+   "template": "He threw a piece of his own furnace. That seems like a heating problem.",
+   "parts": [
+    {
+     "clip": "cmt18_0043"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0044",
+   "speaker": "barnaby",
+   "template": "Stoke scoops a coal and lobs it! Look out below!",
+   "parts": [
+    {
+     "clip": "cmt18_0044"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0045",
+   "speaker": "barnaby",
+   "template": "Right on top of them! The coal bursts and the ground starts burning!",
+   "parts": [
+    {
+     "clip": "cmt18_0045"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0046",
+   "speaker": "barnaby",
+   "template": "The cinder lands on target! And the floor's on fire now too!",
+   "parts": [
+    {
+     "clip": "cmt18_0046"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0047",
+   "speaker": "barnaby",
+   "template": "Here comes Stoke, all four stacks blazing behind him!",
+   "parts": [
+    {
+     "clip": "cmt18_0047"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0048",
+   "speaker": "kendall",
+   "template": "He just left at speed. I felt that from here.",
+   "parts": [
+    {
+     "clip": "cmt18_0048"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0049",
+   "speaker": "barnaby",
+   "template": "The stacks fire and Stoke launches! Flare Rush!",
+   "parts": [
+    {
+     "clip": "cmt18_0049"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0050",
+   "speaker": "barnaby",
+   "template": "Boom! The punch explodes and sends both of them flying apart!",
+   "parts": [
+    {
+     "clip": "cmt18_0050"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0051",
+   "speaker": "barnaby",
+   "template": "Flare Rush connects and it EXPLODES! Both of them go flying!",
+   "parts": [
+    {
+     "clip": "cmt18_0051"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0052",
+   "speaker": "barnaby",
+   "template": "A ring of flame around the furnace! Step inside at your own risk!",
+   "parts": [
+    {
+     "clip": "cmt18_0052"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0053",
+   "speaker": "barnaby",
+   "template": "Stoke spins up a ring of fire! Nobody's getting close now!",
+   "parts": [
+    {
+     "clip": "cmt18_0053"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0054",
+   "speaker": "barnaby",
+   "template": "Burned on the way in! The fire ring does its job!",
+   "parts": [
+    {
+     "clip": "cmt18_0054"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0055",
+   "speaker": "kendall",
+   "template": "He is blowing bubbles at a professional fighter. And it is working.",
+   "parts": [
+    {
+     "clip": "cmt18_0055"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0056",
+   "speaker": "barnaby",
+   "template": "Dredge blows a stream of bubbles! Pretty, soggy and right in the way!",
+   "parts": [
+    {
+     "clip": "cmt18_0056"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0057",
+   "speaker": "kendall",
+   "template": "Bubbles. In a cage fight. I'm charmed and a little worried.",
+   "parts": [
+    {
+     "clip": "cmt18_0057"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0058",
+   "speaker": "barnaby",
+   "template": "The bubbles pop on contact! Stay in that and you will be soaked through!",
+   "parts": [
+    {
+     "clip": "cmt18_0058"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0059",
+   "speaker": "barnaby",
+   "template": "The claw is filling up! That cannon is going to go off any second!",
+   "parts": [
+    {
+     "clip": "cmt18_0059"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0060",
+   "speaker": "barnaby",
+   "template": "Dredge braces and charges the hydro cannon! Get out of the line!",
+   "parts": [
+    {
+     "clip": "cmt18_0060"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0061",
+   "speaker": "barnaby",
+   "template": "Hydro Cannon! The whole harbour in one shot!",
+   "parts": [
+    {
+     "clip": "cmt18_0061"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0062",
+   "speaker": "barnaby",
+   "template": "Blasted clean across the cage! That's the hydro cannon, folks!",
+   "parts": [
+    {
+     "clip": "cmt18_0062"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0063",
+   "speaker": "kendall",
+   "template": "And the recoil sent Dredge back too. Everyone's moving tonight.",
+   "parts": [
+    {
+     "clip": "cmt18_0063"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0064",
+   "speaker": "barnaby",
+   "template": "A whirlpool opens up! It's pulling everything toward the middle!",
+   "parts": [
+    {
+     "clip": "cmt18_0064"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0065",
+   "speaker": "kendall",
+   "template": "Swimming lessons, now included with the ticket price.",
+   "parts": [
+    {
+     "clip": "cmt18_0065"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0066",
+   "speaker": "barnaby",
+   "template": "Dragged into the whirlpool! Swim against it or go under!",
+   "parts": [
+    {
+     "clip": "cmt18_0066"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0067",
+   "speaker": "barnaby",
+   "template": "Dredge tucks into his shell. Hits land soft and barely move him now.",
+   "parts": [
+    {
+     "clip": "cmt18_0067"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0068",
+   "speaker": "barnaby",
+   "template": "A flick of the wing and the wind cuts straight down the line!",
+   "parts": [
+    {
+     "clip": "cmt18_0068"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0069",
+   "speaker": "kendall",
+   "template": "He cut the air in half. The air did not see it coming.",
+   "parts": [
+    {
+     "clip": "cmt18_0069"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0070",
+   "speaker": "barnaby",
+   "template": "Air Slash! A crescent of wind cutting straight across!",
+   "parts": [
+    {
+     "clip": "cmt18_0070"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0071",
+   "speaker": "barnaby",
+   "template": "Sliced from range! That crescent went straight through!",
+   "parts": [
+    {
+     "clip": "cmt18_0071"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0072",
+   "speaker": "barnaby",
+   "template": "The Air Slash slices right through! Precision from range!",
+   "parts": [
+    {
+     "clip": "cmt18_0072"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0073",
+   "speaker": "barnaby",
+   "template": "Feathers in a fan! Five of them, all heading the same way!",
+   "parts": [
+    {
+     "clip": "cmt18_0073"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0074",
+   "speaker": "barnaby",
+   "template": "A fan of feather darts! Gusto's filling the air!",
+   "parts": [
+    {
+     "clip": "cmt18_0074"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0075",
+   "speaker": "kendall",
+   "template": "Those are real feathers. I hope he grows them back.",
+   "parts": [
+    {
+     "clip": "cmt18_0075"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0076",
+   "speaker": "barnaby",
+   "template": "The feathers stick! That's a few too many darts to dodge!",
+   "parts": [
+    {
+     "clip": "cmt18_0076"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0077",
+   "speaker": "barnaby",
+   "template": "Gusto whips up a twister! It's travelling and it's hungry!",
+   "parts": [
+    {
+     "clip": "cmt18_0077"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0078",
+   "speaker": "barnaby",
+   "template": "Swept up in the twister! Around and around and out!",
+   "parts": [
+    {
+     "clip": "cmt18_0078"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0079",
+   "speaker": "barnaby",
+   "template": "Tailwind! Gusto's quicker than ever for the next few seconds.",
+   "parts": [
+    {
+     "clip": "cmt18_0079"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0080",
+   "speaker": "barnaby",
+   "template": "Dozer splits the floor! Rocks are coming up in a line!",
+   "parts": [
+    {
+     "clip": "cmt18_0080"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0081",
+   "speaker": "kendall",
+   "template": "He is redecorating. Mostly with rocks.",
+   "parts": [
+    {
+     "clip": "cmt18_0081"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0082",
+   "speaker": "barnaby",
+   "template": "Rock Slide! The floor tears open in a straight line!",
+   "parts": [
+    {
+     "clip": "cmt18_0082"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0083",
+   "speaker": "barnaby",
+   "template": "Caught by the rock slide! And those rocks are staying put!",
+   "parts": [
+    {
+     "clip": "cmt18_0083"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0084",
+   "speaker": "kendall",
+   "template": "He dug that boulder up with his face. I have so many questions.",
+   "parts": [
+    {
+     "clip": "cmt18_0084"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0085",
+   "speaker": "barnaby",
+   "template": "Dozer heaves a boulder! That's a lot of rock in the air!",
+   "parts": [
+    {
+     "clip": "cmt18_0085"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0086",
+   "speaker": "barnaby",
+   "template": "The boulder lands on them! Flattened!",
+   "parts": [
+    {
+     "clip": "cmt18_0086"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0087",
+   "speaker": "barnaby",
+   "template": "Quake Stomp! The whole cage jumps!",
+   "parts": [
+    {
+     "clip": "cmt18_0087"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0088",
+   "speaker": "barnaby",
+   "template": "Down they go! You cannot stand on a floor that is jumping!",
+   "parts": [
+    {
+     "clip": "cmt18_0088"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0089",
+   "speaker": "barnaby",
+   "template": "Tripped by the quake! Feet off the floor, rear on the floor!",
+   "parts": [
+    {
+     "clip": "cmt18_0089"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0090",
+   "speaker": "barnaby",
+   "template": "Iron Hide. Little shots are going to bounce right off Dozer now.",
+   "parts": [
+    {
+     "clip": "cmt18_0090"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0091",
+   "speaker": "barnaby",
+   "template": "Spit, spit, spit! Three darts on the way!",
+   "parts": [
+    {
+     "clip": "cmt18_0091"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0092",
+   "speaker": "barnaby",
+   "template": "Poison darts! Three quick shots, all of them nasty!",
+   "parts": [
+    {
+     "clip": "cmt18_0092"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0093",
+   "speaker": "barnaby",
+   "template": "The darts stick! That poison is going to work for a while!",
+   "parts": [
+    {
+     "clip": "cmt18_0093"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0094",
+   "speaker": "kendall",
+   "template": "Darts. Venom darts. I'd like to see the inside of that mouth less.",
+   "parts": [
+    {
+     "clip": "cmt18_0094"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0095",
+   "speaker": "barnaby",
+   "template": "The acid is pouring! Stand in that and the guard melts away!",
+   "parts": [
+    {
+     "clip": "cmt18_0095"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0096",
+   "speaker": "barnaby",
+   "template": "Slurry sprays acid! Wide, wet and wicked!",
+   "parts": [
+    {
+     "clip": "cmt18_0096"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0097",
+   "speaker": "barnaby",
+   "template": "Doused in acid! That Gunk is piling on!",
+   "parts": [
+    {
+     "clip": "cmt18_0097"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0098",
+   "speaker": "barnaby",
+   "template": "Slurry wraps up and squeezes! There's no guard against a coil!",
+   "parts": [
+    {
+     "clip": "cmt18_0098"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0099",
+   "speaker": "kendall",
+   "template": "That is a hug. A very bad hug.",
+   "parts": [
+    {
+     "clip": "cmt18_0099"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0100",
+   "speaker": "barnaby",
+   "template": "Coil Crush! Squeezed and slammed!",
+   "parts": [
+    {
+     "clip": "cmt18_0100"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0101",
+   "speaker": "barnaby",
+   "template": "Slurry sheds the skin and everything stuck to it. Clean start.",
+   "parts": [
+    {
+     "clip": "cmt18_0101"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0102",
+   "speaker": "barnaby",
+   "template": "Thunder Jolt! That bolt is quicker than your eyes!",
+   "parts": [
+    {
+     "clip": "cmt18_0102"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0103",
+   "speaker": "barnaby",
+   "template": "The bolt lands before they can even flinch! That jolt is building fast!",
+   "parts": [
+    {
+     "clip": "cmt18_0103"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0104",
+   "speaker": "barnaby",
+   "template": "Discharge! Lightning in every direction!",
+   "parts": [
+    {
+     "clip": "cmt18_0104"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0105",
+   "speaker": "barnaby",
+   "template": "Caught in the discharge! Anyone too close just got zapped!",
+   "parts": [
+    {
+     "clip": "cmt18_0105"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0106",
+   "speaker": "barnaby",
+   "template": "Chain Lightning! Watch it jump!",
+   "parts": [
+    {
+     "clip": "cmt18_0106"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0107",
+   "speaker": "barnaby",
+   "template": "Chain Lightning connects! And it is looking for someone else to bite!",
+   "parts": [
+    {
+     "clip": "cmt18_0107"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0108",
+   "speaker": "kendall",
+   "template": "Wet fighters conduct. I'm writing that down for safety reasons.",
+   "parts": [
+    {
+     "clip": "cmt18_0108"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0109",
+   "speaker": "barnaby",
+   "template": "A static field crackles to life! Step in there and you'll flinch!",
+   "parts": [
+    {
+     "clip": "cmt18_0109"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0110",
+   "speaker": "barnaby",
+   "template": "A cold beam from the porthole! Everything it touches slows to a crawl!",
+   "parts": [
+    {
+     "clip": "cmt18_0110"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0111",
+   "speaker": "barnaby",
+   "template": "The helmet light becomes a beam! Night Shade, and it is cold!",
+   "parts": [
+    {
+     "clip": "cmt18_0111"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0112",
+   "speaker": "barnaby",
+   "template": "Caught in the ghostly beam! Haunted, and slowing down!",
+   "parts": [
+    {
+     "clip": "cmt18_0112"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0113",
+   "speaker": "barnaby",
+   "template": "The chain flies out of the dark! Anything it catches comes back with it!",
+   "parts": [
+    {
+     "clip": "cmt18_0113"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0114",
+   "speaker": "barnaby",
+   "template": "A spectral chain! Knell's reeling somebody in!",
+   "parts": [
+    {
+     "clip": "cmt18_0114"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0115",
+   "speaker": "barnaby",
+   "template": "Chained! Slowed and dragged right back to the diver!",
+   "parts": [
+    {
+     "clip": "cmt18_0115"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0116",
+   "speaker": "kendall",
+   "template": "Three tiny lanterns. Adorable. Terrifying. Mostly terrifying.",
+   "parts": [
+    {
+     "clip": "cmt18_0116"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0117",
+   "speaker": "barnaby",
+   "template": "Lantern Swarm! Three little lights, all of them hunting!",
+   "parts": [
+    {
+     "clip": "cmt18_0117"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0118",
+   "speaker": "barnaby",
+   "template": "The wisps find their mark! You can't outrun a ghost light!",
+   "parts": [
+    {
+     "clip": "cmt18_0118"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0119",
+   "speaker": "barnaby",
+   "template": "He rings the helmet like a bell! Careful, swinging into that answers back!",
+   "parts": [
+    {
+     "clip": "cmt18_0119"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0120",
+   "speaker": "barnaby",
+   "template": "The bell tolls! Hit Knell now and you'll hear it twice!",
+   "parts": [
+    {
+     "clip": "cmt18_0120"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0121",
+   "speaker": "barnaby",
+   "template": "Comet Hook! The gold arc keeps travelling and clips whoever's next!",
+   "parts": [
+    {
+     "clip": "cmt18_0121"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0122",
+   "speaker": "barnaby",
+   "template": "The hook lands and the shockwave trails right behind it!",
+   "parts": [
+    {
+     "clip": "cmt18_0122"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0123",
+   "speaker": "barnaby",
+   "template": "Spiral Hook! The aura spins them around and drags them back in!",
+   "parts": [
+    {
+     "clip": "cmt18_0123"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0124",
+   "speaker": "kendall",
+   "template": "He punched them into a spin. I didn't know punches could do laps.",
+   "parts": [
+    {
+     "clip": "cmt18_0124"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0125",
+   "speaker": "barnaby",
+   "template": "Pressure Palm! The aura leaves his hand and flies across the cage!",
+   "parts": [
+    {
+     "clip": "cmt18_0125"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0126",
+   "speaker": "barnaby",
+   "template": "Force Palm, point blank! That guard simply stopped existing!",
+   "parts": [
+    {
+     "clip": "cmt18_0126"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0127",
+   "speaker": "barnaby",
+   "template": "Meteor Hammer! The floor cracks right under that overhead!",
+   "parts": [
+    {
+     "clip": "cmt18_0127"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0128",
+   "speaker": "barnaby",
+   "template": "Thunder Chop! Quick over the top, and the spark freezes them!",
+   "parts": [
+    {
+     "clip": "cmt18_0128"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0129",
+   "speaker": "barnaby",
+   "template": "The kick throws a shockwave! He's hitting from outside his own reach!",
+   "parts": [
+    {
+     "clip": "cmt18_0129"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0130",
+   "speaker": "kendall",
+   "template": "His kicks travel further than his legs do. Physics has filed a complaint.",
+   "parts": [
+    {
+     "clip": "cmt18_0130"
+    }
+   ],
+   "voice": "kendall"
+  },
+  {
+   "id": "cmt18_0131",
+   "speaker": "barnaby",
+   "template": "Iron Shins! He kicks straight through whatever's coming at him!",
+   "parts": [
+    {
+     "clip": "cmt18_0131"
+    }
+   ],
+   "voice": "devon"
+  },
+  {
+   "id": "cmt18_0132",
+   "speaker": "kendall",
+   "template": "Shins of iron. That explains why he walks so loudly.",
+   "parts": [
+    {
+     "clip": "cmt18_0132"
+    }
+   ],
+   "voice": "kendall"
+  }
+ ],
+ "clips": {
+  "cmt18_0001": {
+   "id": "cmt18_0001",
+   "text": "And here comes the stream! Hold the button, hold the line!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0002": {
+   "id": "cmt18_0002",
+   "text": "They're pouring it on now! Steer it, keep it on them!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.3
+  },
+  "cmt18_0003": {
+   "id": "cmt18_0003",
+   "text": "A sustained attack. My favourite kind. It lasts as long as my attention.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 7.2
+  },
+  "cmt18_0004": {
+   "id": "cmt18_0004",
+   "text": "Caught in the stream! There's no getting out of that by standing still!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 7.1
+  },
+  "cmt18_0005": {
+   "id": "cmt18_0005",
+   "text": "It's soaking right through the guard! Move, move, move!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.5
+  },
+  "cmt18_0006": {
+   "id": "cmt18_0006",
+   "text": "All that pressure, and it painted the floor. Lovely floor.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0007": {
+   "id": "cmt18_0007",
+   "text": "Shot away! Lined up and let go!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 3.1
+  },
+  "cmt18_0008": {
+   "id": "cmt18_0008",
+   "text": "Here comes the projectile! Sidestep or swallow it!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.0
+  },
+  "cmt18_0009": {
+   "id": "cmt18_0009",
+   "text": "Right on target! Thread the needle and it lands clean!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.4
+  },
+  "cmt18_0010": {
+   "id": "cmt18_0010",
+   "text": "Oh, that found them. From that far? Rude.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan co-commentator genuinely startled by a big moment: a quick, surprised reaction that settles into dry humour.",
+   "estimated_credits": 4.1
+  },
+  "cmt18_0011": {
+   "id": "cmt18_0011",
+   "text": "Wide! That shot sails past and keeps on going!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 4.6
+  },
+  "cmt18_0012": {
+   "id": "cmt18_0012",
+   "text": "A spread of shots! Something in there is going to land!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.5
+  },
+  "cmt18_0013": {
+   "id": "cmt18_0013",
+   "text": "One shot is a statement. Several shots is a strategy.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.3
+  },
+  "cmt18_0014": {
+   "id": "cmt18_0014",
+   "text": "The volley connects! Count them later, they all hurt now!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.7
+  },
+  "cmt18_0015": {
+   "id": "cmt18_0015",
+   "text": "That was a lot of shots for no hits. Statistically impressive.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 6.2
+  },
+  "cmt18_0016": {
+   "id": "cmt18_0016",
+   "text": "Charging it up! You can feel the pressure building from here!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment.",
+   "estimated_credits": 6.1
+  },
+  "cmt18_0017": {
+   "id": "cmt18_0017",
+   "text": "Here comes the big one! Let it rip!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 3.5
+  },
+  "cmt18_0018": {
+   "id": "cmt18_0018",
+   "text": "BOOM! Full blast, full force, full marks!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 4.1
+  },
+  "cmt18_0019": {
+   "id": "cmt18_0019",
+   "text": "That blast sends them flying! What a release!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 4.5
+  },
+  "cmt18_0020": {
+   "id": "cmt18_0020",
+   "text": "All that charge, and it hits nothing! Now they're wide open!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.0
+  },
+  "cmt18_0021": {
+   "id": "cmt18_0021",
+   "text": "A huge blast at nothing. Very dramatic for an empty corner.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.9
+  },
+  "cmt18_0022": {
+   "id": "cmt18_0022",
+   "text": "And they're off like a shot! Straight at them!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 4.6
+  },
+  "cmt18_0023": {
+   "id": "cmt18_0023",
+   "text": "Full speed ahead! That's a rush with bad intentions!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.2
+  },
+  "cmt18_0024": {
+   "id": "cmt18_0024",
+   "text": "Run through! Didn't stop, didn't slow down, didn't apologise!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.1
+  },
+  "cmt18_0025": {
+   "id": "cmt18_0025",
+   "text": "Overcommitted! They rushed right past and the door is open!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.9
+  },
+  "cmt18_0026": {
+   "id": "cmt18_0026",
+   "text": "They're waiting for it! Swing now and you're walking into the counter!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment.",
+   "estimated_credits": 7.0
+  },
+  "cmt18_0027": {
+   "id": "cmt18_0027",
+   "text": "A counter stance. The polite way of saying \"go on, try it\".",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.9
+  },
+  "cmt18_0028": {
+   "id": "cmt18_0028",
+   "text": "Counter! Read it, caught it, sent it right back!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 4.8
+  },
+  "cmt18_0029": {
+   "id": "cmt18_0029",
+   "text": "Owning the floor! That space belongs to one fighter now!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.6
+  },
+  "cmt18_0030": {
+   "id": "cmt18_0030",
+   "text": "Area control. Like owning real estate, but it hurts to visit.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 6.1
+  },
+  "cmt18_0031": {
+   "id": "cmt18_0031",
+   "text": "Caught in the zone! Get out of there before it gets worse!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0032": {
+   "id": "cmt18_0032",
+   "text": "A smart reset there, buying a little advantage for the next exchange.",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A warm, knowledgeable fight announcer giving a quick read on the fight between exchanges: conversational and confident, medium energy, a smile in the voice.",
+   "estimated_credits": 6.9
+  },
+  "cmt18_0033": {
+   "id": "cmt18_0033",
+   "text": "A support move. Somebody's playing the long game tonight.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.7
+  },
+  "cmt18_0034": {
+   "id": "cmt18_0034",
+   "text": "Repositioning! That fighter is going somewhere better!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.4
+  },
+  "cmt18_0035": {
+   "id": "cmt18_0035",
+   "text": "Not an attack, exactly. More of a relocation with menace.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.7
+  },
+  "cmt18_0036": {
+   "id": "cmt18_0036",
+   "text": "Stoke opens the stovepipe! It's a flamethrower, folks!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.4
+  },
+  "cmt18_0037": {
+   "id": "cmt18_0037",
+   "text": "Fire from the furnace! Stoke's sweeping the cage with flame!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.0
+  },
+  "cmt18_0038": {
+   "id": "cmt18_0038",
+   "text": "Oh, he just breathes fire now. That's new. That's very new.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan co-commentator genuinely startled by a big moment: a quick, surprised reaction that settles into dry humour.",
+   "estimated_credits": 5.9
+  },
+  "cmt18_0039": {
+   "id": "cmt18_0039",
+   "text": "Still pouring it on! That flame is following them around!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.7
+  },
+  "cmt18_0040": {
+   "id": "cmt18_0040",
+   "text": "Caught in the flamethrower! That's Sizzle stacking up fast!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.9
+  },
+  "cmt18_0041": {
+   "id": "cmt18_0041",
+   "text": "That's not a tan. That's the flamethrower.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 4.2
+  },
+  "cmt18_0042": {
+   "id": "cmt18_0042",
+   "text": "Up and over goes a hot coal! Where it lands, it burns!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.4
+  },
+  "cmt18_0043": {
+   "id": "cmt18_0043",
+   "text": "He threw a piece of his own furnace. That seems like a heating problem.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 7.1
+  },
+  "cmt18_0044": {
+   "id": "cmt18_0044",
+   "text": "Stoke scoops a coal and lobs it! Look out below!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 4.8
+  },
+  "cmt18_0045": {
+   "id": "cmt18_0045",
+   "text": "Right on top of them! The coal bursts and the ground starts burning!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.8
+  },
+  "cmt18_0046": {
+   "id": "cmt18_0046",
+   "text": "The cinder lands on target! And the floor's on fire now too!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.0
+  },
+  "cmt18_0047": {
+   "id": "cmt18_0047",
+   "text": "Here comes Stoke, all four stacks blazing behind him!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.3
+  },
+  "cmt18_0048": {
+   "id": "cmt18_0048",
+   "text": "He just left at speed. I felt that from here.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan co-commentator genuinely startled by a big moment: a quick, surprised reaction that settles into dry humour.",
+   "estimated_credits": 4.5
+  },
+  "cmt18_0049": {
+   "id": "cmt18_0049",
+   "text": "The stacks fire and Stoke launches! Flare Rush!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 4.7
+  },
+  "cmt18_0050": {
+   "id": "cmt18_0050",
+   "text": "Boom! The punch explodes and sends both of them flying apart!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.1
+  },
+  "cmt18_0051": {
+   "id": "cmt18_0051",
+   "text": "Flare Rush connects and it EXPLODES! Both of them go flying!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.0
+  },
+  "cmt18_0052": {
+   "id": "cmt18_0052",
+   "text": "A ring of flame around the furnace! Step inside at your own risk!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.5
+  },
+  "cmt18_0053": {
+   "id": "cmt18_0053",
+   "text": "Stoke spins up a ring of fire! Nobody's getting close now!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0054": {
+   "id": "cmt18_0054",
+   "text": "Burned on the way in! The fire ring does its job!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 4.9
+  },
+  "cmt18_0055": {
+   "id": "cmt18_0055",
+   "text": "He is blowing bubbles at a professional fighter. And it is working.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 6.7
+  },
+  "cmt18_0056": {
+   "id": "cmt18_0056",
+   "text": "Dredge blows a stream of bubbles! Pretty, soggy and right in the way!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.9
+  },
+  "cmt18_0057": {
+   "id": "cmt18_0057",
+   "text": "Bubbles. In a cage fight. I'm charmed and a little worried.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.9
+  },
+  "cmt18_0058": {
+   "id": "cmt18_0058",
+   "text": "The bubbles pop on contact! Stay in that and you will be soaked through!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 7.2
+  },
+  "cmt18_0059": {
+   "id": "cmt18_0059",
+   "text": "The claw is filling up! That cannon is going to go off any second!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment.",
+   "estimated_credits": 6.6
+  },
+  "cmt18_0060": {
+   "id": "cmt18_0060",
+   "text": "Dredge braces and charges the hydro cannon! Get out of the line!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment.",
+   "estimated_credits": 6.4
+  },
+  "cmt18_0061": {
+   "id": "cmt18_0061",
+   "text": "Hydro Cannon! The whole harbour in one shot!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 4.4
+  },
+  "cmt18_0062": {
+   "id": "cmt18_0062",
+   "text": "Blasted clean across the cage! That's the hydro cannon, folks!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.2
+  },
+  "cmt18_0063": {
+   "id": "cmt18_0063",
+   "text": "And the recoil sent Dredge back too. Everyone's moving tonight.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan co-commentator genuinely startled by a big moment: a quick, surprised reaction that settles into dry humour.",
+   "estimated_credits": 6.3
+  },
+  "cmt18_0064": {
+   "id": "cmt18_0064",
+   "text": "A whirlpool opens up! It's pulling everything toward the middle!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.4
+  },
+  "cmt18_0065": {
+   "id": "cmt18_0065",
+   "text": "Swimming lessons, now included with the ticket price.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.3
+  },
+  "cmt18_0066": {
+   "id": "cmt18_0066",
+   "text": "Dragged into the whirlpool! Swim against it or go under!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.6
+  },
+  "cmt18_0067": {
+   "id": "cmt18_0067",
+   "text": "Dredge tucks into his shell. Hits land soft and barely move him now.",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A warm, knowledgeable fight announcer giving a quick read on the fight between exchanges: conversational and confident, medium energy, a smile in the voice.",
+   "estimated_credits": 6.8
+  },
+  "cmt18_0068": {
+   "id": "cmt18_0068",
+   "text": "A flick of the wing and the wind cuts straight down the line!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.1
+  },
+  "cmt18_0069": {
+   "id": "cmt18_0069",
+   "text": "He cut the air in half. The air did not see it coming.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.4
+  },
+  "cmt18_0070": {
+   "id": "cmt18_0070",
+   "text": "Air Slash! A crescent of wind cutting straight across!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.4
+  },
+  "cmt18_0071": {
+   "id": "cmt18_0071",
+   "text": "Sliced from range! That crescent went straight through!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.5
+  },
+  "cmt18_0072": {
+   "id": "cmt18_0072",
+   "text": "The Air Slash slices right through! Precision from range!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.7
+  },
+  "cmt18_0073": {
+   "id": "cmt18_0073",
+   "text": "Feathers in a fan! Five of them, all heading the same way!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0074": {
+   "id": "cmt18_0074",
+   "text": "A fan of feather darts! Gusto's filling the air!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 4.8
+  },
+  "cmt18_0075": {
+   "id": "cmt18_0075",
+   "text": "Those are real feathers. I hope he grows them back.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan co-commentator genuinely startled by a big moment: a quick, surprised reaction that settles into dry humour.",
+   "estimated_credits": 5.1
+  },
+  "cmt18_0076": {
+   "id": "cmt18_0076",
+   "text": "The feathers stick! That's a few too many darts to dodge!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.7
+  },
+  "cmt18_0077": {
+   "id": "cmt18_0077",
+   "text": "Gusto whips up a twister! It's travelling and it's hungry!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0078": {
+   "id": "cmt18_0078",
+   "text": "Swept up in the twister! Around and around and out!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.1
+  },
+  "cmt18_0079": {
+   "id": "cmt18_0079",
+   "text": "Tailwind! Gusto's quicker than ever for the next few seconds.",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A warm, knowledgeable fight announcer giving a quick read on the fight between exchanges: conversational and confident, medium energy, a smile in the voice.",
+   "estimated_credits": 6.1
+  },
+  "cmt18_0080": {
+   "id": "cmt18_0080",
+   "text": "Dozer splits the floor! Rocks are coming up in a line!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.4
+  },
+  "cmt18_0081": {
+   "id": "cmt18_0081",
+   "text": "He is redecorating. Mostly with rocks.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 3.8
+  },
+  "cmt18_0082": {
+   "id": "cmt18_0082",
+   "text": "Rock Slide! The floor tears open in a straight line!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.2
+  },
+  "cmt18_0083": {
+   "id": "cmt18_0083",
+   "text": "Caught by the rock slide! And those rocks are staying put!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0084": {
+   "id": "cmt18_0084",
+   "text": "He dug that boulder up with his face. I have so many questions.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan co-commentator genuinely startled by a big moment: a quick, surprised reaction that settles into dry humour.",
+   "estimated_credits": 6.3
+  },
+  "cmt18_0085": {
+   "id": "cmt18_0085",
+   "text": "Dozer heaves a boulder! That's a lot of rock in the air!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.6
+  },
+  "cmt18_0086": {
+   "id": "cmt18_0086",
+   "text": "The boulder lands on them! Flattened!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 3.7
+  },
+  "cmt18_0087": {
+   "id": "cmt18_0087",
+   "text": "Quake Stomp! The whole cage jumps!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 3.4
+  },
+  "cmt18_0088": {
+   "id": "cmt18_0088",
+   "text": "Down they go! You cannot stand on a floor that is jumping!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0089": {
+   "id": "cmt18_0089",
+   "text": "Tripped by the quake! Feet off the floor, rear on the floor!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.0
+  },
+  "cmt18_0090": {
+   "id": "cmt18_0090",
+   "text": "Iron Hide. Little shots are going to bounce right off Dozer now.",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A warm, knowledgeable fight announcer giving a quick read on the fight between exchanges: conversational and confident, medium energy, a smile in the voice.",
+   "estimated_credits": 6.4
+  },
+  "cmt18_0091": {
+   "id": "cmt18_0091",
+   "text": "Spit, spit, spit! Three darts on the way!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 4.1
+  },
+  "cmt18_0092": {
+   "id": "cmt18_0092",
+   "text": "Poison darts! Three quick shots, all of them nasty!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.1
+  },
+  "cmt18_0093": {
+   "id": "cmt18_0093",
+   "text": "The darts stick! That poison is going to work for a while!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0094": {
+   "id": "cmt18_0094",
+   "text": "Darts. Venom darts. I'd like to see the inside of that mouth less.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 6.6
+  },
+  "cmt18_0095": {
+   "id": "cmt18_0095",
+   "text": "The acid is pouring! Stand in that and the guard melts away!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment.",
+   "estimated_credits": 6.0
+  },
+  "cmt18_0096": {
+   "id": "cmt18_0096",
+   "text": "Slurry sprays acid! Wide, wet and wicked!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 4.1
+  },
+  "cmt18_0097": {
+   "id": "cmt18_0097",
+   "text": "Doused in acid! That Gunk is piling on!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 3.9
+  },
+  "cmt18_0098": {
+   "id": "cmt18_0098",
+   "text": "Slurry wraps up and squeezes! There's no guard against a coil!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment.",
+   "estimated_credits": 6.2
+  },
+  "cmt18_0099": {
+   "id": "cmt18_0099",
+   "text": "That is a hug. A very bad hug.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 3.0
+  },
+  "cmt18_0100": {
+   "id": "cmt18_0100",
+   "text": "Coil Crush! Squeezed and slammed!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 3.3
+  },
+  "cmt18_0101": {
+   "id": "cmt18_0101",
+   "text": "Slurry sheds the skin and everything stuck to it. Clean start.",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A warm, knowledgeable fight announcer giving a quick read on the fight between exchanges: conversational and confident, medium energy, a smile in the voice.",
+   "estimated_credits": 6.2
+  },
+  "cmt18_0102": {
+   "id": "cmt18_0102",
+   "text": "Thunder Jolt! That bolt is quicker than your eyes!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.0
+  },
+  "cmt18_0103": {
+   "id": "cmt18_0103",
+   "text": "The bolt lands before they can even flinch! That jolt is building fast!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 7.1
+  },
+  "cmt18_0104": {
+   "id": "cmt18_0104",
+   "text": "Discharge! Lightning in every direction!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 4.0
+  },
+  "cmt18_0105": {
+   "id": "cmt18_0105",
+   "text": "Caught in the discharge! Anyone too close just got zapped!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0106": {
+   "id": "cmt18_0106",
+   "text": "Chain Lightning! Watch it jump!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 3.1
+  },
+  "cmt18_0107": {
+   "id": "cmt18_0107",
+   "text": "Chain Lightning connects! And it is looking for someone else to bite!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.9
+  },
+  "cmt18_0108": {
+   "id": "cmt18_0108",
+   "text": "Wet fighters conduct. I'm writing that down for safety reasons.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan co-commentator genuinely startled by a big moment: a quick, surprised reaction that settles into dry humour.",
+   "estimated_credits": 6.3
+  },
+  "cmt18_0109": {
+   "id": "cmt18_0109",
+   "text": "A static field crackles to life! Step in there and you'll flinch!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.5
+  },
+  "cmt18_0110": {
+   "id": "cmt18_0110",
+   "text": "A cold beam from the porthole! Everything it touches slows to a crawl!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment.",
+   "estimated_credits": 7.0
+  },
+  "cmt18_0111": {
+   "id": "cmt18_0111",
+   "text": "The helmet light becomes a beam! Night Shade, and it is cold!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.1
+  },
+  "cmt18_0112": {
+   "id": "cmt18_0112",
+   "text": "Caught in the ghostly beam! Haunted, and slowing down!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.4
+  },
+  "cmt18_0113": {
+   "id": "cmt18_0113",
+   "text": "The chain flies out of the dark! Anything it catches comes back with it!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 7.2
+  },
+  "cmt18_0114": {
+   "id": "cmt18_0114",
+   "text": "A spectral chain! Knell's reeling somebody in!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment.",
+   "estimated_credits": 4.6
+  },
+  "cmt18_0115": {
+   "id": "cmt18_0115",
+   "text": "Chained! Slowed and dragged right back to the diver!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.2
+  },
+  "cmt18_0116": {
+   "id": "cmt18_0116",
+   "text": "Three tiny lanterns. Adorable. Terrifying. Mostly terrifying.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 6.1
+  },
+  "cmt18_0117": {
+   "id": "cmt18_0117",
+   "text": "Lantern Swarm! Three little lights, all of them hunting!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.6
+  },
+  "cmt18_0118": {
+   "id": "cmt18_0118",
+   "text": "The wisps find their mark! You can't outrun a ghost light!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0119": {
+   "id": "cmt18_0119",
+   "text": "He rings the helmet like a bell! Careful, swinging into that answers back!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 7.4
+  },
+  "cmt18_0120": {
+   "id": "cmt18_0120",
+   "text": "The bell tolls! Hit Knell now and you'll hear it twice!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment.",
+   "estimated_credits": 5.5
+  },
+  "cmt18_0121": {
+   "id": "cmt18_0121",
+   "text": "Comet Hook! The gold arc keeps travelling and clips whoever's next!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.7
+  },
+  "cmt18_0122": {
+   "id": "cmt18_0122",
+   "text": "The hook lands and the shockwave trails right behind it!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 5.6
+  },
+  "cmt18_0123": {
+   "id": "cmt18_0123",
+   "text": "Spiral Hook! The aura spins them around and drags them back in!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.3
+  },
+  "cmt18_0124": {
+   "id": "cmt18_0124",
+   "text": "He punched them into a spin. I didn't know punches could do laps.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan co-commentator genuinely startled by a big moment: a quick, surprised reaction that settles into dry humour.",
+   "estimated_credits": 6.5
+  },
+  "cmt18_0125": {
+   "id": "cmt18_0125",
+   "text": "Pressure Palm! The aura leaves his hand and flies across the cage!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.6
+  },
+  "cmt18_0126": {
+   "id": "cmt18_0126",
+   "text": "Force Palm, point blank! That guard simply stopped existing!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.0
+  },
+  "cmt18_0127": {
+   "id": "cmt18_0127",
+   "text": "Meteor Hammer! The floor cracks right under that overhead!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 5.8
+  },
+  "cmt18_0128": {
+   "id": "cmt18_0128",
+   "text": "Thunder Chop! Quick over the top, and the spark freezes them!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.1
+  },
+  "cmt18_0129": {
+   "id": "cmt18_0129",
+   "text": "The kick throws a shockwave! He's hitting from outside his own reach!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A veteran ringside fight announcer calling a huge moment live at a rowdy waterfront cage fight: explosive, rising excitement with a big punch on the key words and the finish. Loud and thrilled, but clear and never distorted.",
+   "estimated_credits": 6.9
+  },
+  "cmt18_0130": {
+   "id": "cmt18_0130",
+   "text": "His kicks travel further than his legs do. Physics has filed a complaint.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 7.3
+  },
+  "cmt18_0131": {
+   "id": "cmt18_0131",
+   "text": "Iron Shins! He kicks straight through whatever's coming at him!",
+   "voice": "devon",
+   "voice_id": "voc_g53htd8kmjsj",
+   "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live.",
+   "estimated_credits": 6.3
+  },
+  "cmt18_0132": {
+   "id": "cmt18_0132",
+   "text": "Shins of iron. That explains why he walks so loudly.",
+   "voice": "kendall",
+   "voice_id": "voc_j66xnnsxfeet",
+   "instructions": "A deadpan comedic co-commentator at a cage fight: dry, understated, slightly bemused timing; relaxed and natural. Let the joke land quietly.",
+   "estimated_credits": 5.2
+  }
+ },
+ "estimated_characters": 7442,
+ "estimated_credits": 744.2
+}

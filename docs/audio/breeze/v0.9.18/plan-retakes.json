@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "release": "0.9.18",
+  "model_id": "breeze-tts-2",
+  "voices": {
+    "devon": "voc_g53htd8kmjsj",
+    "kendall": "voc_j66xnnsxfeet",
+    "coach_buck": "voc_b36c5rxpfuzb"
+  },
+  "cast": {
+    "barnaby": "devon",
+    "kendall": "kendall",
+    "granny": "coach_buck"
+  },
+  "purpose": "v0.9.18 retakes of clips flagged by the technical speech audit (see RETAKES in prepare_retakes_v0918.py)",
+  "authorized_credits": 10000,
+  "clips": {
+    "cmt18_0111_r1": {
+      "text": "The helmet light becomes a beam! Night Shade, and it is cold!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 6.1,
+      "retake_of": "cmt18_0111",
+      "retake_reason": "ending"
+    },
+    "cmt18_0119_r1": {
+      "text": "He rings the helmet like a bell! Careful, swinging into that answers back!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 7.4,
+      "retake_of": "cmt18_0119",
+      "retake_reason": "ending"
+    },
+    "cmt18_0073_r1": {
+      "text": "Feathers in a fan! Five of them, all heading the same way!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. This is a big live moment: lift the energy and let the pitch rise and fall with real excitement; never monotone.",
+      "estimated_credits": 5.8,
+      "retake_of": "cmt18_0073",
+      "retake_reason": "flat"
+    },
+    "cmt18_0123_r1": {
+      "text": "Spiral Hook! The aura spins them around and drags them back in!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. This is a big live moment: lift the energy and let the pitch rise and fall with real excitement; never monotone.",
+      "estimated_credits": 6.3,
+      "retake_of": "cmt18_0123",
+      "retake_reason": "flat"
+    },
+    "cmt18_0001_r1": {
+      "text": "And here comes the stream! Hold the button, hold the line!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 5.8,
+      "retake_of": "cmt18_0001",
+      "retake_reason": "pace"
+    },
+    "cmt18_0026_r1": {
+      "text": "They're waiting for it! Swing now and you're walking into the counter!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A ringside announcer as the pressure builds: urgent, fast and focused, controlled intensity that leans forward into the next moment. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 7.0,
+      "retake_of": "cmt18_0026",
+      "retake_reason": "pace"
+    },
+    "cmt18_0064_r1": {
+      "text": "A whirlpool opens up! It's pulling everything toward the middle!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 6.4,
+      "retake_of": "cmt18_0064",
+      "retake_reason": "pace"
+    },
+    "cmt18_0080_r1": {
+      "text": "Dozer splits the floor! Rocks are coming up in a line!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 5.4,
+      "retake_of": "cmt18_0080",
+      "retake_reason": "pace"
+    },
+    "cmt18_0020_r1": {
+      "text": "All that charge, and it hits nothing! Now they're wide open!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 6.0,
+      "retake_of": "cmt18_0020",
+      "retake_reason": "pace"
+    },
+    "cmt18_0002_r1": {
+      "text": "They're pouring it on now! Steer it, keep it on them!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 5.3,
+      "retake_of": "cmt18_0002",
+      "retake_reason": "pace"
+    },
+    "cmt18_0119_r2": {
+      "text": "He rings the helmet like a bell! Careful, swinging into that answers back!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 7.4,
+      "retake_of": "cmt18_0119",
+      "retake_reason": "ending"
+    },
+    "cmt18_0002_r2": {
+      "text": "They're pouring it on now! Steer it, keep it on them!",
+      "voice": "devon",
+      "voice_id": "voc_g53htd8kmjsj",
+      "instructions": "A quick, engaged ringside play-by-play announcer calling the action the instant it happens: crisp, energetic, natural pace, clearly watching it live. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment. Keep it flowing as one continuous live call: no long pauses in the middle of the line. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 5.3,
+      "retake_of": "cmt18_0002",
+      "retake_reason": "pace+pause+ending"
+    }
+  },
+  "estimated_characters": 742
+}

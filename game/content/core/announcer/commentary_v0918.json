@@ -1,0 +1,1995 @@
+{
+  "_doc": "v0.9.18 Movesets commentary (docs/audio/COMMENTARY.md); recordings in docs/audio/breeze/v0.9.18.",
+  "items": [
+    {
+      "id": "cmt18_0001",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "stream"
+      },
+      "priority": 45,
+      "text": "And here comes the stream! Hold the button, hold the line!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0002",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "stream"
+      },
+      "priority": 45,
+      "text": "They're pouring it on now! Steer it, keep it on them!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0003",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "cat": "stream"
+      },
+      "priority": 45,
+      "text": "A sustained attack. My favourite kind. It lasts as long as my attention.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0004",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "stream"
+      },
+      "priority": 50,
+      "text": "Caught in the stream! There's no getting out of that by standing still!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0005",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "stream"
+      },
+      "priority": 50,
+      "text": "It's soaking right through the guard! Move, move, move!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0006",
+      "speaker": "kendall",
+      "trigger": "ability_miss",
+      "when": {
+        "cat": "stream"
+      },
+      "priority": 35,
+      "text": "All that pressure, and it painted the floor. Lovely floor.",
+      "families": [
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "ability_miss",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0007",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "projectile"
+      },
+      "priority": 45,
+      "text": "Shot away! Lined up and let go!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0008",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "projectile"
+      },
+      "priority": 45,
+      "text": "Here comes the projectile! Sidestep or swallow it!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0009",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "projectile"
+      },
+      "priority": 50,
+      "text": "Right on target! Thread the needle and it lands clean!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0010",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "projectile"
+      },
+      "priority": 50,
+      "text": "Oh, that found them. From that far? Rude.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt18_0011",
+      "speaker": "barnaby",
+      "trigger": "ability_miss",
+      "when": {
+        "cat": "projectile"
+      },
+      "priority": 35,
+      "text": "Wide! That shot sails past and keeps on going!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_miss",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0012",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "volley"
+      },
+      "priority": 45,
+      "text": "A spread of shots! Something in there is going to land!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0013",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "cat": "volley"
+      },
+      "priority": 45,
+      "text": "One shot is a statement. Several shots is a strategy.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0014",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "volley"
+      },
+      "priority": 50,
+      "text": "The volley connects! Count them later, they all hurt now!",
+      "families": [
+        "science"
+      ],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0015",
+      "speaker": "kendall",
+      "trigger": "ability_miss",
+      "when": {
+        "cat": "volley"
+      },
+      "priority": 35,
+      "text": "That was a lot of shots for no hits. Statistically impressive.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_miss",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0016",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "blast"
+      },
+      "priority": 45,
+      "text": "Charging it up! You can feel the pressure building from here!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt18_0017",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "blast"
+      },
+      "priority": 45,
+      "text": "Here comes the big one! Let it rip!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0018",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "blast"
+      },
+      "priority": 50,
+      "text": "BOOM! Full blast, full force, full marks!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0019",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "blast"
+      },
+      "priority": 50,
+      "text": "That blast sends them flying! What a release!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0020",
+      "speaker": "barnaby",
+      "trigger": "ability_miss",
+      "when": {
+        "cat": "blast"
+      },
+      "priority": 35,
+      "text": "All that charge, and it hits nothing! Now they're wide open!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_miss",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0021",
+      "speaker": "kendall",
+      "trigger": "ability_miss",
+      "when": {
+        "cat": "blast"
+      },
+      "priority": 35,
+      "text": "A huge blast at nothing. Very dramatic for an empty corner.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_miss",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0022",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "rush"
+      },
+      "priority": 45,
+      "text": "And they're off like a shot! Straight at them!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0023",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "rush"
+      },
+      "priority": 45,
+      "text": "Full speed ahead! That's a rush with bad intentions!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0024",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "rush"
+      },
+      "priority": 50,
+      "text": "Run through! Didn't stop, didn't slow down, didn't apologise!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0025",
+      "speaker": "barnaby",
+      "trigger": "ability_miss",
+      "when": {
+        "cat": "rush"
+      },
+      "priority": 35,
+      "text": "Overcommitted! They rushed right past and the door is open!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_miss",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0026",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "counter"
+      },
+      "priority": 45,
+      "text": "They're waiting for it! Swing now and you're walking into the counter!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt18_0027",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "cat": "counter"
+      },
+      "priority": 45,
+      "text": "A counter stance. The polite way of saying \"go on, try it\".",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0028",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "counter"
+      },
+      "priority": 50,
+      "text": "Counter! Read it, caught it, sent it right back!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0029",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "control"
+      },
+      "priority": 45,
+      "text": "Owning the floor! That space belongs to one fighter now!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0030",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "cat": "control"
+      },
+      "priority": 45,
+      "text": "Area control. Like owning real estate, but it hurts to visit.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0031",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "cat": "control"
+      },
+      "priority": 50,
+      "text": "Caught in the zone! Get out of there before it gets worse!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0032",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "support"
+      },
+      "priority": 45,
+      "text": "A smart reset there, buying a little advantage for the next exchange.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt18_0033",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "cat": "support"
+      },
+      "priority": 45,
+      "text": "A support move. Somebody's playing the long game tonight.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0034",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "cat": "utility"
+      },
+      "priority": 45,
+      "text": "Repositioning! That fighter is going somewhere better!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0035",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "cat": "utility"
+      },
+      "priority": 45,
+      "text": "Not an attack, exactly. More of a relocation with menace.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0036",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flamethrower"
+      },
+      "priority": 45,
+      "text": "Stoke opens the stovepipe! It's a flamethrower, folks!",
+      "families": [
+        "crowd"
+      ],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0037",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flamethrower"
+      },
+      "priority": 45,
+      "text": "Fire from the furnace! Stoke's sweeping the cage with flame!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0038",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flamethrower"
+      },
+      "priority": 45,
+      "text": "Oh, he just breathes fire now. That's new. That's very new.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt18_0039",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flamethrower"
+      },
+      "priority": 50,
+      "text": "Still pouring it on! That flame is following them around!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0040",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flamethrower"
+      },
+      "priority": 50,
+      "text": "Caught in the flamethrower! That's Sizzle stacking up fast!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0041",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flamethrower"
+      },
+      "priority": 50,
+      "text": "That's not a tan. That's the flamethrower.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_hit",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0042",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "cinder_shot"
+      },
+      "priority": 45,
+      "text": "Up and over goes a hot coal! Where it lands, it burns!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0043",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "cinder_shot"
+      },
+      "priority": 45,
+      "text": "He threw a piece of his own furnace. That seems like a heating problem.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0044",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "cinder_shot"
+      },
+      "priority": 45,
+      "text": "Stoke scoops a coal and lobs it! Look out below!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0045",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_stoke",
+        "id": "cinder_shot"
+      },
+      "priority": 50,
+      "text": "Right on top of them! The coal bursts and the ground starts burning!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0046",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_stoke",
+        "id": "cinder_shot"
+      },
+      "priority": 50,
+      "text": "The cinder lands on target! And the floor's on fire now too!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0047",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flare_rush"
+      },
+      "priority": 45,
+      "text": "Here comes Stoke, all four stacks blazing behind him!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0048",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flare_rush"
+      },
+      "priority": 45,
+      "text": "He just left at speed. I felt that from here.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt18_0049",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flare_rush"
+      },
+      "priority": 45,
+      "text": "The stacks fire and Stoke launches! Flare Rush!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0050",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flare_rush"
+      },
+      "priority": 50,
+      "text": "Boom! The punch explodes and sends both of them flying apart!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0051",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_stoke",
+        "id": "flare_rush"
+      },
+      "priority": 50,
+      "text": "Flare Rush connects and it EXPLODES! Both of them go flying!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0052",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "fire_spin"
+      },
+      "priority": 45,
+      "text": "A ring of flame around the furnace! Step inside at your own risk!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0053",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_stoke",
+        "id": "fire_spin"
+      },
+      "priority": 45,
+      "text": "Stoke spins up a ring of fire! Nobody's getting close now!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0054",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_stoke",
+        "id": "fire_spin"
+      },
+      "priority": 50,
+      "text": "Burned on the way in! The fire ring does its job!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0055",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "id": "bubble_stream"
+      },
+      "priority": 45,
+      "text": "He is blowing bubbles at a professional fighter. And it is working.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0056",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "id": "bubble_stream"
+      },
+      "priority": 45,
+      "text": "Dredge blows a stream of bubbles! Pretty, soggy and right in the way!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0057",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "id": "bubble_stream"
+      },
+      "priority": 45,
+      "text": "Bubbles. In a cage fight. I'm charmed and a little worried.",
+      "families": [
+        "venue"
+      ],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0058",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_dredge",
+        "id": "bubble_stream"
+      },
+      "priority": 50,
+      "text": "The bubbles pop on contact! Stay in that and you will be soaked through!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0059",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "id": "hydro_cannon"
+      },
+      "priority": 45,
+      "text": "The claw is filling up! That cannon is going to go off any second!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt18_0060",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "id": "hydro_cannon"
+      },
+      "priority": 45,
+      "text": "Dredge braces and charges the hydro cannon! Get out of the line!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt18_0061",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "id": "hydro_cannon"
+      },
+      "priority": 45,
+      "text": "Hydro Cannon! The whole harbour in one shot!",
+      "families": [
+        "tide"
+      ],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0062",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_dredge",
+        "id": "hydro_cannon"
+      },
+      "priority": 50,
+      "text": "Blasted clean across the cage! That's the hydro cannon, folks!",
+      "families": [
+        "crowd",
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0063",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_dredge",
+        "id": "hydro_cannon"
+      },
+      "priority": 50,
+      "text": "And the recoil sent Dredge back too. Everyone's moving tonight.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt18_0064",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "id": "whirlpool"
+      },
+      "priority": 45,
+      "text": "A whirlpool opens up! It's pulling everything toward the middle!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0065",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_dredge",
+        "id": "whirlpool"
+      },
+      "priority": 50,
+      "text": "Swimming lessons, now included with the ticket price.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_hit",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0066",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_dredge",
+        "id": "whirlpool"
+      },
+      "priority": 50,
+      "text": "Dragged into the whirlpool! Swim against it or go under!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0067",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dredge",
+        "id": "shell_brace"
+      },
+      "priority": 45,
+      "text": "Dredge tucks into his shell. Hits land soft and barely move him now.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt18_0068",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "id": "air_slash"
+      },
+      "priority": 45,
+      "text": "A flick of the wing and the wind cuts straight down the line!",
+      "families": [
+        "weather"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0069",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "id": "air_slash"
+      },
+      "priority": 45,
+      "text": "He cut the air in half. The air did not see it coming.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0070",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "id": "air_slash"
+      },
+      "priority": 45,
+      "text": "Air Slash! A crescent of wind cutting straight across!",
+      "families": [
+        "weather"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0071",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_gusto",
+        "id": "air_slash"
+      },
+      "priority": 50,
+      "text": "Sliced from range! That crescent went straight through!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0072",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_gusto",
+        "id": "air_slash"
+      },
+      "priority": 50,
+      "text": "The Air Slash slices right through! Precision from range!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0073",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "id": "feather_darts"
+      },
+      "priority": 45,
+      "text": "Feathers in a fan! Five of them, all heading the same way!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0074",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "id": "feather_darts"
+      },
+      "priority": 45,
+      "text": "A fan of feather darts! Gusto's filling the air!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0075",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_gusto",
+        "id": "feather_darts"
+      },
+      "priority": 50,
+      "text": "Those are real feathers. I hope he grows them back.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt18_0076",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_gusto",
+        "id": "feather_darts"
+      },
+      "priority": 50,
+      "text": "The feathers stick! That's a few too many darts to dodge!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0077",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "id": "twister"
+      },
+      "priority": 45,
+      "text": "Gusto whips up a twister! It's travelling and it's hungry!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0078",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_gusto",
+        "id": "twister"
+      },
+      "priority": 50,
+      "text": "Swept up in the twister! Around and around and out!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0079",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_gusto",
+        "id": "tailwind"
+      },
+      "priority": 45,
+      "text": "Tailwind! Gusto's quicker than ever for the next few seconds.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt18_0080",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "id": "rock_slide"
+      },
+      "priority": 45,
+      "text": "Dozer splits the floor! Rocks are coming up in a line!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0081",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "id": "rock_slide"
+      },
+      "priority": 45,
+      "text": "He is redecorating. Mostly with rocks.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0082",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "id": "rock_slide"
+      },
+      "priority": 45,
+      "text": "Rock Slide! The floor tears open in a straight line!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0083",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_dozer",
+        "id": "rock_slide"
+      },
+      "priority": 50,
+      "text": "Caught by the rock slide! And those rocks are staying put!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0084",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "id": "boulder_toss"
+      },
+      "priority": 45,
+      "text": "He dug that boulder up with his face. I have so many questions.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt18_0085",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "id": "boulder_toss"
+      },
+      "priority": 45,
+      "text": "Dozer heaves a boulder! That's a lot of rock in the air!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0086",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_dozer",
+        "id": "boulder_toss"
+      },
+      "priority": 50,
+      "text": "The boulder lands on them! Flattened!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0087",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "id": "quake_stomp"
+      },
+      "priority": 45,
+      "text": "Quake Stomp! The whole cage jumps!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0088",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_dozer",
+        "id": "quake_stomp"
+      },
+      "priority": 50,
+      "text": "Down they go! You cannot stand on a floor that is jumping!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0089",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_dozer",
+        "id": "quake_stomp"
+      },
+      "priority": 50,
+      "text": "Tripped by the quake! Feet off the floor, rear on the floor!",
+      "families": [
+        "venue"
+      ],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0090",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_dozer",
+        "id": "iron_hide"
+      },
+      "priority": 45,
+      "text": "Iron Hide. Little shots are going to bounce right off Dozer now.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt18_0091",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "id": "poison_darts"
+      },
+      "priority": 45,
+      "text": "Spit, spit, spit! Three darts on the way!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0092",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "id": "poison_darts"
+      },
+      "priority": 45,
+      "text": "Poison darts! Three quick shots, all of them nasty!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0093",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_slurry",
+        "id": "poison_darts"
+      },
+      "priority": 50,
+      "text": "The darts stick! That poison is going to work for a while!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0094",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_slurry",
+        "id": "poison_darts"
+      },
+      "priority": 50,
+      "text": "Darts. Venom darts. I'd like to see the inside of that mouth less.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_hit",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0095",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "id": "acid_spray"
+      },
+      "priority": 45,
+      "text": "The acid is pouring! Stand in that and the guard melts away!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt18_0096",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "id": "acid_spray"
+      },
+      "priority": 45,
+      "text": "Slurry sprays acid! Wide, wet and wicked!",
+      "families": [
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0097",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_slurry",
+        "id": "acid_spray"
+      },
+      "priority": 50,
+      "text": "Doused in acid! That Gunk is piling on!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0098",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "id": "coil_crush"
+      },
+      "priority": 45,
+      "text": "Slurry wraps up and squeezes! There's no guard against a coil!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt18_0099",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_slurry",
+        "id": "coil_crush"
+      },
+      "priority": 50,
+      "text": "That is a hug. A very bad hug.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_hit",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0100",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_slurry",
+        "id": "coil_crush"
+      },
+      "priority": 50,
+      "text": "Coil Crush! Squeezed and slammed!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0101",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_slurry",
+        "id": "shed_skin"
+      },
+      "priority": 45,
+      "text": "Slurry sheds the skin and everything stuck to it. Clean start.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:warm"
+    },
+    {
+      "id": "cmt18_0102",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_jitters",
+        "id": "thunder_jolt"
+      },
+      "priority": 45,
+      "text": "Thunder Jolt! That bolt is quicker than your eyes!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0103",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_jitters",
+        "id": "thunder_jolt"
+      },
+      "priority": 50,
+      "text": "The bolt lands before they can even flinch! That jolt is building fast!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0104",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_jitters",
+        "id": "discharge"
+      },
+      "priority": 45,
+      "text": "Discharge! Lightning in every direction!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0105",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_jitters",
+        "id": "discharge"
+      },
+      "priority": 50,
+      "text": "Caught in the discharge! Anyone too close just got zapped!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0106",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_jitters",
+        "id": "chain_lightning"
+      },
+      "priority": 45,
+      "text": "Chain Lightning! Watch it jump!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0107",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_jitters",
+        "id": "chain_lightning"
+      },
+      "priority": 50,
+      "text": "Chain Lightning connects! And it is looking for someone else to bite!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0108",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_jitters",
+        "id": "chain_lightning"
+      },
+      "priority": 50,
+      "text": "Wet fighters conduct. I'm writing that down for safety reasons.",
+      "families": [
+        "tide"
+      ],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt18_0109",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_jitters",
+        "id": "static_field"
+      },
+      "priority": 45,
+      "text": "A static field crackles to life! Step in there and you'll flinch!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0110",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_knell",
+        "id": "night_shade"
+      },
+      "priority": 45,
+      "text": "A cold beam from the porthole! Everything it touches slows to a crawl!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt18_0111",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_knell",
+        "id": "night_shade"
+      },
+      "priority": 45,
+      "text": "The helmet light becomes a beam! Night Shade, and it is cold!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0112",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_knell",
+        "id": "night_shade"
+      },
+      "priority": 50,
+      "text": "Caught in the ghostly beam! Haunted, and slowing down!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0113",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_knell",
+        "id": "hex_chain"
+      },
+      "priority": 45,
+      "text": "The chain flies out of the dark! Anything it catches comes back with it!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0114",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_knell",
+        "id": "hex_chain"
+      },
+      "priority": 45,
+      "text": "A spectral chain! Knell's reeling somebody in!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt18_0115",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_knell",
+        "id": "hex_chain"
+      },
+      "priority": 50,
+      "text": "Chained! Slowed and dragged right back to the diver!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0116",
+      "speaker": "kendall",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_knell",
+        "id": "lantern_swarm"
+      },
+      "priority": 45,
+      "text": "Three tiny lanterns. Adorable. Terrifying. Mostly terrifying.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0117",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_knell",
+        "id": "lantern_swarm"
+      },
+      "priority": 45,
+      "text": "Lantern Swarm! Three little lights, all of them hunting!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0118",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_knell",
+        "id": "lantern_swarm"
+      },
+      "priority": 50,
+      "text": "The wisps find their mark! You can't outrun a ghost light!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0119",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_knell",
+        "id": "toll"
+      },
+      "priority": 45,
+      "text": "He rings the helmet like a bell! Careful, swinging into that answers back!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0120",
+      "speaker": "barnaby",
+      "trigger": "ability",
+      "when": {
+        "creature": "f_knell",
+        "id": "toll"
+      },
+      "priority": 45,
+      "text": "The bell tolls! Hit Knell now and you'll hear it twice!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability",
+      "delivery": "D:tense"
+    },
+    {
+      "id": "cmt18_0121",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "comet_hook"
+      },
+      "priority": 50,
+      "text": "Comet Hook! The gold arc keeps travelling and clips whoever's next!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0122",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "comet_hook"
+      },
+      "priority": 50,
+      "text": "The hook lands and the shockwave trails right behind it!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0123",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "spiral_hook"
+      },
+      "priority": 50,
+      "text": "Spiral Hook! The aura spins them around and drags them back in!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0124",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "spiral_hook"
+      },
+      "priority": 50,
+      "text": "He punched them into a spin. I didn't know punches could do laps.",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "K:react"
+    },
+    {
+      "id": "cmt18_0125",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "pressure_palm"
+      },
+      "priority": 50,
+      "text": "Pressure Palm! The aura leaves his hand and flies across the cage!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0126",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "force_palm"
+      },
+      "priority": 50,
+      "text": "Force Palm, point blank! That guard simply stopped existing!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0127",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "meteor_hammer"
+      },
+      "priority": 50,
+      "text": "Meteor Hammer! The floor cracks right under that overhead!",
+      "families": [
+        "venue"
+      ],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0128",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "thunder_chop"
+      },
+      "priority": 50,
+      "text": "Thunder Chop! Quick over the top, and the spark freezes them!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0129",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "shockwave_kicks"
+      },
+      "priority": 50,
+      "text": "The kick throws a shockwave! He's hitting from outside his own reach!",
+      "families": [],
+      "energy": "high",
+      "situation": "ability_hit",
+      "delivery": "D:hype"
+    },
+    {
+      "id": "cmt18_0130",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "shockwave_kicks"
+      },
+      "priority": 50,
+      "text": "His kicks travel further than his legs do. Physics has filed a complaint.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_hit",
+      "delivery": "K:dry"
+    },
+    {
+      "id": "cmt18_0131",
+      "speaker": "barnaby",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "iron_shins"
+      },
+      "priority": 50,
+      "text": "Iron Shins! He kicks straight through whatever's coming at him!",
+      "families": [],
+      "energy": "medium",
+      "situation": "ability_hit",
+      "delivery": "D:call"
+    },
+    {
+      "id": "cmt18_0132",
+      "speaker": "kendall",
+      "trigger": "ability_hit",
+      "when": {
+        "creature": "f_varga",
+        "id": "iron_shins"
+      },
+      "priority": 50,
+      "text": "Shins of iron. That explains why he walks so loudly.",
+      "families": [],
+      "energy": "low",
+      "situation": "ability_hit",
+      "delivery": "K:dry"
+    }
+  ]
+}
