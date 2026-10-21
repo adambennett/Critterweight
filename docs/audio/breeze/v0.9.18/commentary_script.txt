@@ -180,7 +180,7 @@ D:warm | Slurry sheds the skin and everything stuck to it. Clean start.
 @ability {"creature": "f_jitters", "id": "thunder_jolt"}
 D:call | Thunder Jolt! That bolt is quicker than your eyes!
 @ability_hit {"creature": "f_jitters", "id": "thunder_jolt"}
-D:hype | Jolted! The bolt lands before they can even flinch!
+D:hype | The bolt lands before they can even flinch! That jolt is building fast!
 @ability {"creature": "f_jitters", "id": "discharge"}
 D:hype | Discharge! Lightning in every direction!
 @ability_hit {"creature": "f_jitters", "id": "discharge"}
@@ -188,7 +188,7 @@ D:call | Caught in the discharge! Anyone too close just got zapped!
 @ability {"creature": "f_jitters", "id": "chain_lightning"}
 D:call | Chain Lightning! Watch it jump!
 @ability_hit {"creature": "f_jitters", "id": "chain_lightning"}
-D:hype | It jumps! The lightning finds a second target!
+D:hype | Chain Lightning connects! And it is looking for someone else to bite!
 K:react | Wet fighters conduct. I'm writing that down for safety reasons.
 @ability {"creature": "f_jitters", "id": "static_field"}
 D:call | A static field crackles to life! Step in there and you'll flinch!
