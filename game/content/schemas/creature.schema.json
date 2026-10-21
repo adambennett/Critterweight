@@ -21,9 +21,27 @@
     "art": {"type": "object"},
     "audio": {"type": "object"},
     "ai": {"type": "object"},
-    "techniques": {"type": "array", "items": {"type": "string"}}
+    "techniques": {"type": "array", "items": {"type": "string"}},
+    "movepool": {"type": "object", "description": "v0.9.18 Movesets: the fighter's move pool (docs/design/MOVESET_COMBAT.md)", "additionalProperties": {"$ref": "#/$defs/pool_move"}},
+    "loadouts": {"type": "object", "additionalProperties": {"type": "object", "required": ["moves"],
+      "properties": {"name": {"type": "string", "maxLength": 40}, "moves": {"type": "array", "items": {"type": "string"}}}}},
+    "default_loadout": {"type": "string", "maxLength": 40}
   },
   "$defs": {
+    "pool_move": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string", "maxLength": 40}, "short": {"type": "string", "maxLength": 120}, "desc": {"type": "string", "maxLength": 600},
+        "category": {"enum": ["strike", "projectile", "volley", "stream", "blast", "rush", "counter", "control", "support", "utility"]},
+        "role": {"enum": ["basic", "heavy", "special", "support"]}, "hold": {"enum": ["", "charge", "sustain"]},
+        "use": {"type": "string"}, "charged": {"type": "string"}, "string": {"type": "array", "items": {"type": "string"}}, "dash": {"type": "string"},
+        "move": {"$ref": "#/$defs/move"}, "charged_move": {"$ref": "#/$defs/move"},
+        "cooldown": {"type": "number", "minimum": 0, "maximum": 120}, "charges": {"type": "number", "minimum": 1, "maximum": 9},
+        "cost": {"type": "number", "minimum": 0, "maximum": 100}, "drain": {"type": "number", "minimum": 0, "maximum": 100},
+        "max_hold": {"type": "number", "minimum": 0, "maximum": 10}, "element": {"type": "string"},
+        "aim": {"type": "object"}, "styles": {"type": "object"}, "ai": {"type": "object"}, "martial": {"type": "object"}
+      }
+    },
     "move": {
       "type": "object",
       "properties": {

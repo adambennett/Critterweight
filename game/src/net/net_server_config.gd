@@ -42,6 +42,9 @@ const SCHEMA := {
 	"match.vote_candidates": {"t": "int", "def": 3, "min": 1, "max": 5},
 	"match.bot_policy": {"t": "string", "def": "", "max_len": 1024},
 	"match.player_assist": {"t": "bool", "def": true},
+	# v0.9.18: "playlist" = each entry's own style (every built-in preset plays Movesets); "moves" or
+	# "classic" forces one style for every match this server starts
+	"match.combat": {"t": "enum", "def": "playlist", "opts": ["playlist", "moves", "classic"]},
 	"admin.console": {"t": "bool", "def": true},
 	"admin.port": {"t": "int", "def": 0, "min": 0, "max": 65535},
 	"admin.token": {"t": "string", "def": "", "max_len": 128},
@@ -59,7 +62,7 @@ const FLAT := {
 	"match.playlist": "playlist", "match.bots": "bots", "match.bot_difficulty": "bot_difficulty",
 	"match.lobby_time": "lobby_time", "match.results_time": "results_time",
 	"match.empty_behavior": "empty_behavior", "match.vote_candidates": "vote_candidates",
-	"match.bot_policy": "bot_policy", "match.player_assist": "player_assist",
+	"match.bot_policy": "bot_policy", "match.player_assist": "player_assist", "match.combat": "combat",
 	"admin.console": "admin_console", "admin.port": "admin_port", "admin.token": "admin_token",
 }
 
@@ -68,7 +71,7 @@ const CLI := {"--port": "server.port", "--name": "server.name", "--password": "s
 	"--admin-port": "admin.port", "--admin-token": "admin.token", "--bind": "server.bind",
 	"--discovery-port": "server.discovery_port", "--lobby-time": "match.lobby_time",
 	"--results-time": "match.results_time", "--empty": "match.empty_behavior", "--mods": "server.mods",
-	"--mods-dir": "server.mods_dir"}
+	"--mods-dir": "server.mods_dir", "--combat": "match.combat"}
 
 
 ## Flat config with every default.

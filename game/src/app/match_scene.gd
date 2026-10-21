@@ -69,7 +69,9 @@ func start(cfg: Dictionary) -> void:
 				entry["mods"] = m
 			"policy":
 				# AI Lab policy: e.policy_id (falls back to a scripted bot if missing/incompatible)
-				entry["source"] = PolicyInputSource.for_match(e, int(cfg.get("seed", 1)) * 31 + idx, idx)
+				var rules_d = cfg.get("rules", {})
+				var style := "classic" if typeof(rules_d) == TYPE_DICTIONARY and str((rules_d as Dictionary).get("combat", "moves")) == "classic" else "moves"
+				entry["source"] = PolicyInputSource.for_match(e, int(cfg.get("seed", 1)) * 31 + idx, idx, style)
 			"bot":
 				var bb := BotBrain.new(str(e.get("difficulty", "regular")), int(cfg.get("seed", 1)) * 31 + idx)
 				bb.set_personality((e["creature"] as CreatureDef).ai)

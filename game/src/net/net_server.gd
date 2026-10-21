@@ -1608,7 +1608,10 @@ func _close_vote_and_start() -> void:
 	var policies: Array = entry.get("bot_policy", [])
 	if policies.is_empty():
 		policies = NetServerConfig.policy_ids(cfg)
-	var err := start_match(str(entry["rules"]), playlist.rules_for(entry), str(entry["arena"]), lim.x, lim.y, bots_allowed,
+	var entry_rules := playlist.rules_for(entry)
+	if str(cfg.get("combat", "playlist")) in ["moves", "classic"]:
+		entry_rules["combat"] = str(cfg["combat"])      # the server config forces one combat style
+	var err := start_match(str(entry["rules"]), entry_rules, str(entry["arena"]), lim.x, lim.y, bots_allowed,
 		str(cfg["bot_difficulty"]), playlist.describe_entry(entry), 0, policies)
 	if err != "":
 		Log.w("net", "cannot start '%s': %s" % [entry["key"], err])
@@ -1731,7 +1734,7 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 			policy_list.append({"fighter": idx, "id": pid, "name": str(e2["name"]), "hash": _policy_hash(pol) if usable else ""})
 		if dedicated:
 			if pid != "":
-				e2["source"] = PolicyInputSource.for_match(e2, seed_v * 31 + idx, idx)
+				e2["source"] = PolicyInputSource.for_match(e2, seed_v * 31 + idx, idx, "classic" if str(rules.get("combat", "moves")) == "classic" else "moves")
 			else:
 				var bb := BotBrain.new(bot_difficulty, seed_v * 31 + idx)
 				bb.set_personality(cdef.ai)

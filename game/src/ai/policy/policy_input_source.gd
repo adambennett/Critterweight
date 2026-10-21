@@ -129,11 +129,16 @@ func mean_decision_usec() -> float:
 ## MatchScene / server hook: an InputSource for a fighter entry {creature: CreatureDef,
 ## policy_id, difficulty}. Falls back to a scripted bot (and logs why) when the policy is
 ## missing, invalid or made for another fighter, so a match never fails to start.
-static func for_match(entry: Dictionary, seed_value: int, index: int) -> InputSource:
+## combat: the match's combat style. Policies (act_v1 / obs_v1) were learned on Classic inputs:
+## in a Movesets match the fighter is played by the scripted bot instead (v0.9.18,
+## docs/design/MOVESET_COMBAT.md §9), and the log says so.
+static func for_match(entry: Dictionary, seed_value: int, index: int, combat := "classic") -> InputSource:
 	var pid := str(entry.get("policy_id", ""))
 	var c: CreatureDef = entry.get("creature") as CreatureDef
 	var pol := PolicyLibrary.get_policy(pid)
 	var why := PolicyLibrary.last_error(pid) if pol == null else PolicyLibrary.compatibility(pol, c.id if c != null else "")
+	if why == "" and combat == "moves":
+		why = "Lab policies play Classic combat; this match uses Movesets"
 	if pol != null and why == "":
 		var src := PolicyInputSource.create(pol, seed_value, index)
 		src.apply_creature_mask(c)

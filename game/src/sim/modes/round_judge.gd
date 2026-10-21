@@ -24,6 +24,11 @@ extends RefCounted
 ## started), knockdowns (strike knockdowns: reason poise|move|hit by an enemy), throws, ringouts,
 ## parries, guard_breaks (the opponent's guard broken), taken_head / taken_body / taken_legs.
 ## With a referee, damage dealt to a fighter who was already down is never credited.
+## Movesets (v0.9.18, hits and move starts carry the pool move and its category): a projectile,
+## volley, blast or rush hit lands like a strike; a stream's repeating ticks land once per
+## TICK_CREDIT_S of contact per target (not per tick); zones count as damage only; "thrown" counts
+## the starts of offensive moves (strike, projectile, volley, stream, blast, rush). Classic matches
+## keep the v0.9.16 counting (melee strikes only).
 ##
 ## Round score P = dmg_pts + W_LANDED*landed + W_KD*knockdowns + W_THROW*throws
 ##   + W_RINGOUT*ringouts + W_PARRY*parries + W_GUARD_BREAK*guard_breaks
@@ -54,9 +59,12 @@ const TALLY_KEYS := ["damage", "dmg_pts", "landed", "blocked", "thrown", "knockd
 	"parries", "guard_breaks", "taken_head", "taken_body", "taken_legs"]
 const FLOAT_KEYS := ["damage", "dmg_pts", "taken_head", "taken_body", "taken_legs"]
 const STRIKE_SLOT_CLASSES := ["light", "heavy"]
+const OFFENSIVE_CATEGORIES := ["strike", "projectile", "volley", "stream", "blast", "rush"]
+const TICK_CREDIT_S := 1.0
 
 var sim: MatchSim
 var referee_on := false          ## set by MatchMode: a referee protects downed fighters
+var _tick_credit := {}           ## "side|target" -> sim time a repeating hit was last credited as landed
 var teams: Array[int] = []       ## [ta, tb], ascending
 var cards: Array = []            ## every scored round (plain data, see score_round)
 var decision := {}               ## the last decision ({} until the cards are complete)
@@ -108,6 +116,7 @@ func _slot_of_fighter(i: int) -> int:
 ## The round starts (MatchMode, at round_start): a fresh tally from the current event.
 func begin_round() -> void:
 	_tally = [empty_tally(), empty_tally()]
+	_tick_credit.clear()
 	_cursor = sim.event_seq
 	counting = true
 
@@ -158,7 +167,10 @@ func _take(ev: Dictionary) -> void:
 				_add(1 - s, "guard_breaks", 1)
 		"move_start":
 			var slot := str(ev.get("slot", "")).split("@")[0]
-			if slot != "pummel" and Combat.move_class(slot) in STRIKE_SLOT_CLASSES:
+			if ev.has("pool"):
+				if slot != "pummel" and str(ev.get("cat", "")) in OFFENSIVE_CATEGORIES:
+					_add(_slot_of_fighter(int(ev.get("fighter", -1))), "thrown", 1)
+			elif slot != "pummel" and Combat.move_class(slot) in STRIKE_SLOT_CLASSES:
 				_add(_slot_of_fighter(int(ev.get("fighter", -1))), "thrown", 1)
 
 
@@ -177,11 +189,21 @@ func _take_damage(by: int, target: int, dmg: float, part: String, ev: Dictionary
 		return
 	if bool(ev.get("was_down", false)) and referee_on:
 		return   # the referee keeps it off a downed fighter: nothing to credit
-	if str(ev.get("type", "")) == "hit" and bool(ev.get("melee", false)):
+	var pooled := str(ev.get("pool", "")) != ""
+	if str(ev.get("type", "")) == "hit" and (bool(ev.get("melee", false)) or pooled):
+		var tick := bool(ev.get("tick", false))
 		if bool(ev.get("blocked", false)):
-			_add(s, "blocked", 1)
+			if not tick:
+				_add(s, "blocked", 1)
 		elif not bool(ev.get("parried", false)) and dmg > 0.0:
-			_add(s, "landed", 1)
+			if tick:
+				# a stream lands once per second of contact, however often it ticks
+				var key := "%d|%d" % [s, target]
+				if sim.time - float(_tick_credit.get(key, -99.0)) >= TICK_CREDIT_S:
+					_tick_credit[key] = sim.time
+					_add(s, "landed", 1)
+			else:
+				_add(s, "landed", 1)
 	if dmg <= 0.0:
 		return
 	var mh := maxf(1.0, sim.fighters[target].max_health)
