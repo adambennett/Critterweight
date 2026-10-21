@@ -1435,15 +1435,30 @@ func _varga_dash(fi: int, ev: Dictionary) -> void:
 		"color": Color(0.95, 0.62, 0.22), "color2": Color(1.0, 0.92, 0.65)}, 0.6, dur)
 	if quality >= 1:
 		var side := fwd.cross(Vector3.UP).normalized()
-		for k in 5:
-			var off := side * lerpf(-0.35, 0.35, float(k) / 4.0) + Vector3.UP * (0.45 + 0.25 * float(k % 3))
-			var rib := ribbon(Color(1.0, 0.78, 0.4), Color(1.0, 0.97, 0.85), true)
-			var st := g + off - fwd * 0.3
-			animate(rib, dur + 0.18, func(k2: float, t: float) -> void:
+		for k in 7:
+			var off := side * lerpf(-0.4, 0.4, float(k) / 6.0) + Vector3.UP * (0.35 + 0.22 * float(k % 4))
+			var rib := ribbon(Color(1.0, 0.72, 0.3), Color(1.0, 0.97, 0.85), true)
+			var st := g + off - fwd * 0.5
+			animate(rib, dur + 0.22, func(k2: float, t: float) -> void:
 				var head := clampf(t / dur, 0.0, 1.0)
-				var a := st + fwd * dist * maxf(0.0, head - 0.55)
-				var b := st + fwd * dist * head
-				draw_ribbon(rib, [a, b], [0.0, 0.035], [0.0, (1.0 - smoothstep(0.6, 1.0, k2))]))
+				var a := st + fwd * (dist + 0.5) * maxf(0.0, head - 0.7)
+				var b := st + fwd * (dist + 0.5) * head
+				draw_ribbon(rib, [a, a.lerp(b, 0.5), b], [0.0, 0.05, 0.075], [0.0, 0.8 * (1.0 - smoothstep(0.6, 1.0, k2)), (1.0 - smoothstep(0.6, 1.0, k2))]))
+		# the cut itself: a crisp crescent where the dash ends
+		var end_p := g + fwd * dist + Vector3.UP * 0.9
+		var cres := ribbon(Color(1.0, 0.75, 0.35), Color(1.0, 1.0, 0.9), true)
+		_later(dur * 0.8, func():
+			animate(cres, 0.22, func(k3: float, _t: float) -> void:
+				var pts := []
+				var w := []
+				var al := []
+				for i in 9:
+					var u := float(i) / 8.0
+					var a3 := yaw + lerpf(-1.1, 1.1, u)
+					pts.append(end_p + Vector3(sin(a3), 0.0, cos(a3)) * 0.55 + Vector3.UP * lerpf(-0.25, 0.25, u))
+					w.append(0.12 * sin(u * PI))
+					al.append((1.0 - k3) * sin(u * PI))
+				draw_ribbon(cres, pts, w, al)))
 	burst("dust", g, -fwd + Vector3.UP * 0.2, Color(0.8, 0.72, 0.6, 0.45), null, {"amount": 0.5, "speed": 0.7})
 	burst("glints", g + Vector3.UP * 0.1, Vector3.UP, Color(1.0, 0.8, 0.45), null, {"amount": 0.4, "speed": 0.5})
 
@@ -2154,7 +2169,8 @@ func _make_zone(e: Dictionary) -> Dictionary:
 		"mud":
 			o = {"fill": 0.75, "color": Color(0.38, 0.27, 0.16, 0.85), "color2": Color(0.55, 0.42, 0.28), "style": 5, "additive": 0.0}
 		"dust_bowl":
-			o = {"fill": 0.4, "color": Color(0.72, 0.6, 0.44, 0.6), "color2": Color(0.85, 0.75, 0.6), "style": 3, "additive": 0.0, "speed": 2.0}
+			o = {"fill": 0.55, "color": Color(0.6, 0.47, 0.32, 0.85), "color2": Color(0.85, 0.75, 0.6), "style": 3, "additive": 0.0, "speed": 2.0,
+				"stain": Color(0.52, 0.42, 0.3), "stain_a": 0.42}
 		"steam":
 			o = {"fill": 0.3, "color": Color(0.92, 0.92, 0.95, 0.4), "color2": Color(1, 1, 1), "style": 2, "additive": 0.0}
 		"live_puddle":
@@ -2162,8 +2178,10 @@ func _make_zone(e: Dictionary) -> Dictionary:
 		"fizzing_puddle":
 			o = {"fill": 0.65, "color": Color(0.5, 0.75, 0.15, 0.85), "color2": Color(1.0, 0.95, 0.5)}
 	o["pulse"] = 1.0
-	if fel in ["brine", "sludge"] and not o.has("stain_a"):
-		o["stain_a"] = 0.5          # puddles read as wet / gooey floor, not just a ring
+	if not o.has("stain_a"):
+		# zones are floor decals that must read at a glance (ART_DIRECTION §10): puddles as wet or
+		# gooey floor, the rest as a clear tint of their element
+		o["stain_a"] = 0.5 if fel in ["brine", "sludge"] else 0.34
 	var fp := footprint(fel if fel != "" else "brine", "circle", Vector3.ZERO, 0.0, r, o, INF)
 	fp.reparent(root)
 	fp.position = Vector3.UP * (0.02 + _rng.randf() * 0.01)
@@ -2209,7 +2227,7 @@ func _make_zone(e: Dictionary) -> Dictionary:
 	elif vfx == "dust_bowl":
 		extra = MeshInstance3D.new()
 		extra.mesh = FxKit.wall_mesh(40, 1.15)
-		extra.material_override = FxKit.flow_material(Color(0.72, 0.6, 0.44, 0.75), Color(0.88, 0.8, 0.65), {"additive": 0.0, "scroll": Vector2(-0.35, 0.2), "noise_scale": Vector2(10.0, 2.0), "edge_v": 0.45, "core": 0.3, "core_width": 0.3, "alpha": 0.55})
+		extra.material_override = FxKit.flow_material(Color(0.58, 0.46, 0.32, 0.9), Color(0.85, 0.76, 0.6), {"additive": 0.0, "scroll": Vector2(-0.35, 0.2), "noise_scale": Vector2(10.0, 2.0), "edge_v": 0.4, "core": 0.3, "core_width": 0.3, "alpha": 0.85})
 		extra.scale = Vector3(r, 0.9, r)
 	if extra != null:
 		extra.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
