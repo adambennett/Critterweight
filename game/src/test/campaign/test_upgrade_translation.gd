@@ -165,6 +165,49 @@ func test_hook_slot_conditions_match_pool_moves() -> void:
 	check(bad.is_empty(), "%d hook conditions match nothing:\n%s" % [bad.size(), "\n".join(PackedStringArray(bad))])
 
 
+## Translated patches never break a fighter: every fighter with ALL its techniques, every patching
+## supplement, side effect, Cannery upgrade and event patch at once still composes into a valid
+## creature in each recommended loadout (BuildApplier would otherwise fall back to the bare kit).
+func test_translated_builds_stay_valid_fighters() -> void:
+	var bad := []
+	for fid in _fighters():
+		var inf := RunMoves.info(cat(), fid)
+		var sups := []
+		var ses := []
+		var meta := {}
+		var effects := []
+		for u in _upgrades_for(fid):
+			var ap: Dictionary = u["apply"]
+			if (ap.get("patches", []) as Array).is_empty() and typeof(ap.get("movesets")) != TYPE_DICTIONARY:
+				continue
+			match str(u["kind"]):
+				"supplement":
+					sups.append({"id": u["id"], "stacks": 1})
+				"side_effect":
+					ses.append(u["id"])
+				"meta":
+					meta[u["id"]] = 1
+				"event":
+					effects.append({"source": u["id"], "apply": ap})
+		var los: Array = []
+		for lk in inf["loadout_order"]:
+			los.append((inf["loadouts"][lk] as Dictionary)["moves"])
+		for combat in ["moves", "classic"]:
+			for lo in (los if combat == "moves" else [[]]):
+				var p := {"id": "p0", "fighter": fid, "techniques": cat().technique_ids_for(fid), "supplements": sups.duplicate(true),
+					"side_effects": ses.duplicate(), "run_effects": effects.duplicate(true), "meta": meta.duplicate(),
+					"moves": {"learned": (inf["order"] as Array).duplicate(), "equipped": (lo as Array).duplicate(), "drilled": {}}}
+				var st := {"variant": "fight_camp", "dose": 0, "combat": combat, "players": [p]}
+				var b := BuildApplier.compose(cat(), st, p, {"party": "solo"})
+				var c: CreatureDef = b["creature"]
+				var broken := c == null or not c.is_valid()
+				for w in b["warnings"]:
+					broken = broken or str(w).contains("invalid creature")
+				if broken:
+					bad.append("%s (%s %s): %s" % [fid, combat, str(lo), "; ".join(PackedStringArray(b["warnings"]))])
+	check(bad.is_empty(), "%d builds broke a fighter:\n%s" % [bad.size(), "\n".join(PackedStringArray(bad))])
+
+
 # ---------------------------------------------------------------------------------------------
 # The translation rules on real and synthetic kits
 # ---------------------------------------------------------------------------------------------

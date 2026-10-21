@@ -23,7 +23,10 @@ extends RefCounted
 ##      (`every`) becomes the multiplier (base + value) / base relative to the Classic slot's current
 ##      value, so +1 damage never becomes +1 per stream tick. A leaf changes at most once per
 ##      upgrade and op (ctx.seen): moves.* and abilities.* both reach special moves, and a leaf the
-##      upgrade patches directly is not patched again by the heavy fallback.
+##      upgrade patches directly is not patched again by the heavy fallback. Edits of a move's own
+##      timing (keys, hit windows, duration, cancel, armor, invuln, sustain; lunges except their
+##      multipliers) stay with the Classic move they were written for: another move has another
+##      animation, and a broken move would make BuildApplier fall back to the bare kit.
 ##   3. `string` (the Classic light string): a basic pool move whose own string starts with it gets
 ##      the new beginning (Lead Hand Learner's double jab reaches Ember Jab).
 ##   4. Movesets compositions only (ctx.movesets): with no heavy-role move in the loadout, lone
@@ -50,6 +53,8 @@ const ENTRY_KEYS := ["cooldown", "charges", "cost", "max_hold", "drain"]
 const NESTED_EFFECT_LISTS := ["on_expire", "on_emerge", "on_land"]
 const STRUCTURE_OPS := ["append", "merge", "remove", "time_scale"]
 const LEAF_OPS := ["set", "add", "mul", "min", "max"]
+## a move's own animation timing: not carried to another move (lunge multipliers are speeds)
+const TIMING_FIELDS := ["keys", "hit", "duration", "cancel", "armor", "invuln", "sustain", "lunge"]
 
 
 ## The translation context for a composition. combat "moves": the full Movesets composition (heavy
@@ -178,8 +183,9 @@ static func _classic_base(d: Dictionary, head: String, slot: String, rest: Strin
 	return null
 
 
-## Applies the rest of a translated path inside one move dict (see the header).
-static func _apply_in_move(m: Dictionary, rest: String, p: Dictionary, base, seen: Array) -> int:
+## Applies the rest of a translated path inside one move dict (see the header). `own`: the patch
+## was written for this very move (a `pool.` path), so its timing edits apply too.
+static func _apply_in_move(m: Dictionary, rest: String, p: Dictionary, base, seen: Array, own := false) -> int:
 	var op := str(p.get("op", ""))
 	if rest == "":
 		# the whole move: only time_scale transfers (a set/merge of a Classic move would replace it)
@@ -190,6 +196,9 @@ static func _apply_in_move(m: Dictionary, rest: String, p: Dictionary, base, see
 		return 1
 	if HIT_FIELDS.has(rest):
 		return _apply_hit_field(m, rest, p, base, seen)
+	var first := rest.split(".")[0].split("[")[0]
+	if not own and TIMING_FIELDS.has(first) and not (first == "lunge" and op in ["mul", "min", "max"]):
+		return 0
 	if STRUCTURE_OPS.has(op):
 		if _was_seen(seen, m, rest, op):
 			return 0
@@ -383,7 +392,7 @@ static func apply_pool_patch(d: Dictionary, p: Dictionary, ctx: Dictionary) -> i
 		if mv.is_empty():
 			continue
 		for t in _pool_dicts(d, mv, ENTRY_KEYS.has(entry_key) and rest.split(".").size() == 1 and entry_key == rest):
-			hits += _apply_in_move(t, rest, p, null, seen)
+			hits += _apply_in_move(t, rest, p, null, seen, true)
 	return hits
 
 

@@ -752,3 +752,11 @@ CareerFlow (UI glue: FIGHT -> begin_fight -> App.start_match -> apply_result -> 
   Counter Clock as a move-speed buff, Slippery Customer on any parry, Sidewinder as a general dash
   buff, grab reach via lunge); the arena hazard positions use defaults until arenas provide
   `hazard_<kind>` markers.
+* Moves in runs (v0.9.18): only Stoke's move pool was final when the run progression landed; the
+  other fighters run on pools derived from their Classic kits until theirs land, and
+  `test_upgrade_translation.gd` then decides whether an ability-specific upgrade (Undertow, Long
+  Wick, Bouncy Castle...) still reaches each of their recommended loadouts or needs a `movesets`
+  effect. In the engine, `Hooks._slot_matches` answers a Classic slot name through the pool move
+  even when the move reports that very slot, so in Movesets a hook naming `heavy_charged` also
+  fires on the uncharged Furnace Haymaker and one naming `dash_attack` or `l1` on every step of a
+  basic string.

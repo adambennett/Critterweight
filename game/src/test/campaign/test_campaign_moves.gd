@@ -300,6 +300,18 @@ func test_the_rest_stop_event_teaches_a_move() -> void:
 	check(classic.choose_event("p0", "shadowbox"), "Classic run: shadowbox")
 	check_eq(int(classic.player("p0")["scrip"]), s0 + 25, "a Classic run gets 25 Scrip instead")
 	check(classic.pending_for("p0").is_empty(), "and no move pick")
+	# {move: id}: a fighter-specific event can teach one move outright
+	var c2 := cat()
+	c2.events["evt_test_teacher"] = {"id": "evt_test_teacher", "type": "event", "title": "Old Stoker", "text": "Watch the hips.",
+		"choices": [{"id": "watch", "label": "Watch", "outcomes": [{"effects": [{"op": "learn_move", "move": "fire_spin"}]}]}]}
+	var t := new_run({"seed": 48})
+	t.state["phase"] = "event"
+	t.state["position"] = "ev"
+	t.state["node"] = {"id": "ev", "type": "event", "pending": {"p0": []}, "fights": 0, "event": EventRunner.begin(t, "ev", "evt_test_teacher")}
+	check(t.choose_event("p0", "watch"), "watch: %s" % t.last_error)
+	check((_moves(t)["learned"] as Array).has("fire_spin"), "Fire Spin learned from the event")
+	check(t.pending_for("p0").is_empty(), "without a pick")
+	check(t.last_texts.has("Learned Fire Spin"), "and the result says so (%s)" % str(t.last_texts))
 
 
 # =============================================================================================
