@@ -103,7 +103,15 @@ const c={id:'f_varga',name:'Varga',title:'the Cage Rules Guest',element:'scrap',
  juice:{name:'Championship Rounds',duration:.7,stamina:0,keys:clone(moves.taunt.keys),effects:[{t:.15,type:'buff',status:{id:'championship',name:'Championship Rounds',duration:7,move_speed:1.2,damage_dealt:1.2,stamina_regen:1.5}},{t:.15,type:'area',radius:1.3,damage:3,knockback:3,element:'scrap',buildup:35}]}
  },juice:{duration:7},throws:{throw_fwd:{distance:2,damage:10,up:1.4,knockdown:true,buildup:25},throw_side:{distance:2.5,damage:9,up:1.2,knockdown:true},throw_back:{distance:2,damage:11,up:1.5,knockdown:true}},
  art:{model:'res://assets/models/creatures/f_varga.glb',outline:.007,roughness:.7},ai:{aggression:.1,attack_range:1.2,reach:{l1:1.15,heavy:1.45,grab:1.15},abilities:{ability1:{chance:3,when:[{max:2,chance:.3}]},ability2:{chance:3,when:[{self_health_below:.65,chance:.6}]}}}};
-fs.writeFileSync(path.join(root,'game/content/core/creatures/f_varga.json'),JSON.stringify(c,null,2)+'\n');
+// v0.9.18 Movesets: Varga's techniques live beside the imported data (movepool, loadouts and the
+// technique moves the pool names); an import keeps them instead of overwriting them
+const vargaPath=path.join(root,'game/content/core/creatures/f_varga.json');
+if(fs.existsSync(vargaPath)){
+ const prev=JSON.parse(fs.readFileSync(vargaPath,'utf8'));
+ for(const k of ['movepool','loadouts','default_loadout'])if(prev[k]!==undefined)c[k]=prev[k];
+ for(const id of Object.keys(prev.moves||{}))if(c.moves[id]===undefined)c.moves[id]=prev.moves[id];
+}
+fs.writeFileSync(vargaPath,JSON.stringify(c,null,2)+'\n');
 // Flatten the original continuous skinned mesh AND the original face/gloves into the game's segment rig.
 const bones=names.map(n=>({id:n,pivot:pivots[n]})), sourceBones=names.concat(['lFoot','rFoot']);
 function exportGlb(model,id,rel,generator,doubleSided){
