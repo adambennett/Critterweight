@@ -105,3 +105,30 @@ func test_lab_policies_give_way_to_bots_in_movesets() -> void:
 	check(classic is PolicyInputSource, "a Classic match: the policy fights")
 	var moves := PolicyInputSource.for_match(entry, 3, 0, "moves")
 	check(moves is BotBrain, "a Movesets match: a scripted bot takes the policy's place")
+
+
+func test_mode_buttons_come_before_moves() -> void:
+	# Chumball under its built-in preset (Movesets): the carrier's move buttons throw the ball, as the
+	# attack buttons did in Classic, and Grapple still picks it up
+	var rules: Dictionary = Content.get_entry("rules", "chumball").duplicate(true)
+	var sim := MatchSim.new()
+	sim.running = false
+	fresh_world().add_child(sim)
+	var entries := []
+	for i in 4:
+		entries.append({"creature": Content.creature("f_stoke"), "team": i % 2, "source": null, "kind": "bot"})
+	sim.setup({"arena": Content.arena("the_gullet"), "rules": rules, "seed": 5, "fighters": entries, "mode": ModeRegistry.create("chumball")})
+	await step_sim(sim, 1.0)
+	var mode: ChumballMode = sim.mode
+	var f := sim.fighters[0]
+	check_eq(f.combat_style, "moves", "Chumball plays Movesets by default")
+	mode.ball.linear_velocity = Vector3.ZERO
+	mode.ball.global_position = f.pos() + f.forward() * 0.5 + Vector3.UP * 0.3
+	check(mode.on_grab_pressed(f), "Grapple picks the ball up")
+	var seq0 := sim.event_seq
+	f.input.press(FighterInput.LIGHT)          # move 1 (Ember Jab) while carrying
+	await step_sim(sim, 0.1)
+	var thrown := sim.events.any(func(e: Dictionary) -> bool: return int(e["seq"]) > seq0 and str(e["type"]) == "ball_throw")
+	var jabbed := sim.events.any(func(e: Dictionary) -> bool:
+		return int(e["seq"]) > seq0 and str(e["type"]) == "move_start" and int(e.get("fighter", -1)) == 0)
+	check(thrown and not jabbed, "the carrier's move button throws the ball instead of starting a move")
