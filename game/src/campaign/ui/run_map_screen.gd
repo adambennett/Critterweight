@@ -289,12 +289,14 @@ func _side_panel() -> Control:
 	build.add_child(CampaignUI.label("BUILD", 22, CampaignUI.INK, "900"))
 	for t in p.get("techniques", []):
 		build.add_child(CampaignUI.label("Technique: %s — %s" % [ctrl.catalog.item_name(str(t)), ctrl.catalog.item(str(t)).get("effect", "")], 17, CampaignUI.GOOD))
+		_improves_line(build, p, str(t))
 	for s in p.get("supplements", []):
 		var d: Dictionary = ctrl.catalog.supplements.get(str(s["id"]), {})
 		var stacks := int(s.get("stacks", 1))
 		var r := str(d.get("rarity", "otc"))
 		build.add_child(CampaignUI.label("%s%s (%s) — %s" % [d.get("name", s["id"]), (" x%d" % stacks) if stacks > 1 else "",
 			CampaignUI.rarity_text(r).capitalize(), d.get("effect", "")], 17, CampaignUI.RARITY_COLORS.get(r, CampaignUI.INK)))
+		_improves_line(build, p, str(s["id"]))
 	for se in p.get("side_effects", []):
 		build.add_child(CampaignUI.label("Side effect: %s — %s" % [ctrl.catalog.item_name(str(se)), ctrl.catalog.item(str(se)).get("effect", "")], 17, CampaignUI.DANGER))
 	if (p.get("supplements", []) as Array).is_empty() and (p.get("techniques", []) as Array).is_empty():
@@ -316,6 +318,13 @@ func _side_panel() -> Control:
 	box.add_child(ab)
 	_side_buttons.append(ab)
 	return box
+
+
+## Movesets: which moves an owned upgrade improves with the current loadout (muted, indented).
+func _improves_line(build: VBoxContainer, p: Dictionary, item_id: String) -> void:
+	var txt := RunMoves.improves_text(ctrl.catalog, ctrl.state, p, item_id)
+	if txt != "":
+		build.add_child(CampaignUI.label("    " + txt, 15, CampaignUI.MUTED))
 
 
 ## The equipped moves (slot, name, drilled style) and the CHANGE MOVES button.
