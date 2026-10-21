@@ -53,6 +53,7 @@ var _gore_mesh: Mesh = null
 var _bruises: Array = []                  ## [{seg, local: Vector3, s: float}]
 var _flash := 0.0
 const JOLT_TIME := 0.2           ## seconds a struck body shakes (real time)
+const SCREEN_HEIGHT_M := 1.6     ## a fighter's height for its on-screen size (spring level of detail)
 const JOLT_AMP := 0.05           ## metres at full strength
 var _jolt_dir := Vector3.ZERO
 var _jolt_amp := 0.0
@@ -82,6 +83,12 @@ var _look := {}                            ## the model's extras (look: glow mod
 var _finish := 0.0
 var _last_alpha := 1.0                     ## the interpolation the last render() used
 var _fx_frame := -1                        ## the process frame the face rig last stepped in
+# per-frame caches (the skeleton and materials of a loaded model do not change until the next load)
+var _bone_parent := PackedInt32Array()     ## bone -> parent bone
+var _bone_rest: Array[Transform3D] = []    ## bone -> rest pose
+var _fx_bone := PackedByteArray()          ## bone -> 1 when the face rig drives it
+var _fx_scaled := PackedByteArray()        ## face-rig bones whose pose scales (eyelids squash)
+var _mat_state: Array = []                 ## material values written last frame [flash, juice, status, bruised, glow]; [] = write all
 ## Set by the match scenes and the hub each frame (view only): the fighter's expression and what it
 ## looks at.
 var fx_mood := "neutral"
@@ -210,6 +217,7 @@ func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := fa
 	if outlined:
 		m.next_pass = Materials.outline_material(float(creature.art.get("outline", 0.012)))
 	_materials.append(m)
+	_mat_state = []
 	if glow:
 		_glow_materials.append(m)
 	return m
@@ -260,6 +268,21 @@ func _try_load_model(path: String) -> bool:
 	_fx = CreatureFxRig.new(_skeleton, _look, hash(creature.id) + get_instance_id())
 	if not _fx.has_bones():
 		_fx = null
+	_bone_parent.resize(nb)
+	_bone_rest.resize(nb)
+	_fx_bone.resize(nb)
+	_fx_bone.fill(0)
+	_fx_scaled.resize(nb)
+	_fx_scaled.fill(0)
+	for b0 in nb:
+		_bone_parent[b0] = _skeleton.get_bone_parent(b0)
+		_bone_rest[b0] = _skeleton.get_bone_rest(b0)
+		if _fx != null and _fx.is_fx_bone(b0):
+			_fx_bone[b0] = 1
+	if _fx != null:
+		for lb in _fx.bones.get("lid", []):
+			_fx_scaled[int(lb)] = 1
+	_mat_state = []
 	# parents-first bone order so hierarchical skeletons (any importer layout) pose correctly
 	_bone_order = PackedInt32Array()
 	_bone_global.clear()          # nothing carries over from a swapped-out model's bones
@@ -500,10 +523,10 @@ func render(alpha: float) -> void:
 		# (the skeleton sits at the world origin). Converted to parent-relative poses parents-first,
 		# so both flat and nested bone layouts end up with the same world placement.
 		for bi in _bone_order:
-			if _fx != null and _fx.is_fx_bone(bi):
+			if _fx_bone[bi] == 1:
 				continue      # placed below, after the segment bones it hangs from
 			var si := _seg_of_bone[bi]
-			var parent := _skeleton.get_bone_parent(bi)
+			var parent := _bone_parent[bi]
 			var parent_global := _bone_global[parent] if parent >= 0 else Transform3D.IDENTITY
 			var global: Transform3D
 			if si >= 0 and si < n:
@@ -511,7 +534,7 @@ func render(alpha: float) -> void:
 				var b := _curr[si]
 				global = Transform3D(Basis(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha)), a.origin.lerp(b.origin, alpha) + off)
 			else:
-				global = parent_global * _skeleton.get_bone_rest(bi)
+				global = parent_global * _bone_rest[bi]
 			_bone_global[bi] = global
 			if si >= 0 and si < n:
 				_seg_global[si] = global
@@ -520,6 +543,7 @@ func render(alpha: float) -> void:
 			_skeleton.set_bone_pose_rotation(bi, local.basis.get_rotation_quaternion())
 		if _fx != null:
 			_fx.mood = fx_mood
+			_fx.spring_every = _spring_every()
 			_fx.look_target = fx_look
 			# a second render in one frame (the model swapped mid-frame) poses the face without
 			# stepping it: the springs would read the repeat as a sudden stop
@@ -527,15 +551,16 @@ func render(alpha: float) -> void:
 			_fx.update(get_process_delta_time() if frame != _fx_frame else 0.0, _bone_global_of)
 			_fx_frame = frame
 			for bi2 in _bone_order:
-				if not _fx.is_fx_bone(bi2):
+				if _fx_bone[bi2] == 0:
 					continue
-				var parent2 := _skeleton.get_bone_parent(bi2)
+				var parent2 := _bone_parent[bi2]
 				var pg := _bone_global[parent2] if parent2 >= 0 else Transform3D.IDENTITY
 				var fx_local: Transform3D = (_fx.rest[bi2] as Transform3D) * (_fx.local[bi2] as Transform3D)
 				_bone_global[bi2] = pg * fx_local
 				_skeleton.set_bone_pose_position(bi2, fx_local.origin)
 				_skeleton.set_bone_pose_rotation(bi2, fx_local.basis.get_rotation_quaternion())
-				_skeleton.set_bone_pose_scale(bi2, fx_local.basis.get_scale())     # lids squash and stretch
+				if _fx_scaled[bi2] == 1:
+					_skeleton.set_bone_pose_scale(bi2, fx_local.basis.get_scale())     # lids squash and stretch
 	else:
 		for i in n:
 			var a := _prev[i]
@@ -546,6 +571,21 @@ func render(alpha: float) -> void:
 			_seg_global[i] = t
 	_update_attachments()
 	_update_materials()
+
+
+## How often the face rig's springs step: every frame on a fighter that fills a good part of the
+## screen, every second frame when it is small (a crowded brawl seen from afar), every fourth when
+## tiny, where a crest's swing cannot be seen (CreatureFxRig.spring_every).
+func _spring_every() -> int:
+	var vp := get_viewport() if is_inside_tree() else null
+	var cam := vp.get_camera_3d() if vp != null else null
+	if cam == null or _seg_global.is_empty():
+		return 1
+	var d := cam.global_position.distance_to(_seg_global[0].origin)
+	if d < 0.5 or cam.projection != Camera3D.PROJECTION_PERSPECTIVE:
+		return 1
+	var px := vp.get_visible_rect().size.y * SCREEN_HEIGHT_M * body.scale / (2.0 * d * tan(deg_to_rad(cam.fov) * 0.5))
+	return 1 if px >= 220.0 else (2 if px >= 110.0 else 4)
 
 
 ## Metres a body's REST pose reaches below its floor (y = 0 of fighter space), 0 when it does not.
@@ -673,24 +713,38 @@ func clear_bruises() -> void:
 func _update_materials() -> void:
 	var dt := get_process_delta_time()
 	_flash = maxf(0.0, _flash - dt * 6.0)
-	var arr: Array[Vector4] = []
-	arr.resize(MAX_BRUISES)
-	for i in MAX_BRUISES:
-		if i < _bruises.size() and gore_level > 0:
-			var b: Dictionary = _bruises[i]
-			var p: Vector3 = _curr[int(b["seg"])] * (b["local"] as Vector3)
-			arr[i] = Vector4(p.x, p.y, p.z, float(b["s"]))
-		else:
-			arr[i] = Vector4.ZERO
-	for m in _materials:
-		m.set_shader_parameter("flash", _flash)
-		m.set_shader_parameter("juice", juice_amount)
-		m.set_shader_parameter("status_color", status_color)
-		m.set_shader_parameter("bruises", arr)
 	# ART_DIRECTION §4: emissive accents run 0.3 at 0 Hype -> 1.0 at 100 Hype (full while juiced)
 	var glow := 0.3 + 0.7 * clampf(maxf(hype, juice_amount), 0.0, 1.0)
-	for g in _glow_materials:
-		g.set_shader_parameter("vertex_glow", glow)
+	var bruised := gore_level > 0 and not _bruises.is_empty()
+	# Only values that changed are written (every fighter has a dozen surfaces, and setting a shader
+	# parameter is not free); bruises follow the body, so they are rewritten every frame while there
+	# are any, and a cleared list once.
+	var all := _mat_state.is_empty()
+	if all or _flash != float(_mat_state[0]):
+		for m in _materials:
+			m.set_shader_parameter("flash", _flash)
+	if all or juice_amount != float(_mat_state[1]):
+		for m in _materials:
+			m.set_shader_parameter("juice", juice_amount)
+	if all or status_color != (_mat_state[2] as Color):
+		for m in _materials:
+			m.set_shader_parameter("status_color", status_color)
+	if all or bruised or bool(_mat_state[3]):
+		var arr: Array[Vector4] = []
+		arr.resize(MAX_BRUISES)
+		for i in MAX_BRUISES:
+			if i < _bruises.size() and gore_level > 0:
+				var b: Dictionary = _bruises[i]
+				var p: Vector3 = _curr[int(b["seg"])] * (b["local"] as Vector3)
+				arr[i] = Vector4(p.x, p.y, p.z, float(b["s"]))
+			else:
+				arr[i] = Vector4.ZERO
+		for m in _materials:
+			m.set_shader_parameter("bruises", arr)
+	if all or glow != float(_mat_state[4]):
+		for g in _glow_materials:
+			g.set_shader_parameter("vertex_glow", glow)
+	_mat_state = [_flash, juice_amount, status_color, bruised, glow]
 
 
 ## The cosmetic end-of-fight gag: a creature-specific piece pops off and bounces away.

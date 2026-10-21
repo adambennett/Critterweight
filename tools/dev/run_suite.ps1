@@ -23,7 +23,10 @@ param(
 	[string]$Godot = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe",
 	# refresh the import and script-class caches first (a fresh worktree has no .godot folder, and a
 	# new class_name is unknown until the editor has scanned); done automatically when .godot is missing
-	[switch]$Import
+	[switch]$Import,
+	# a filtered run that is part of a release (focused checks of the release build): it reserves the
+	# machine like a full suite instead of holding back for a reservation
+	[switch]$Release
 )
 $ErrorActionPreference = "Continue"
 try { (Get-Process -Id $PID).PriorityClass = 'BelowNormal' } catch {}
@@ -36,8 +39,9 @@ $announced = $false
 # wait for and hold the lock: filtered runs hold back while the reservation is fresh (< 6 h old), so
 # a stream of short runs cannot starve a long job
 $reserve = Join-Path $env:TEMP "critterweight_release.reserve"
-if ($Filter -eq "") {
-	Set-Content -LiteralPath $reserve -Value "full suite $PID"
+$reserving = ($Filter -eq "") -or $Release
+if ($reserving) {
+	Set-Content -LiteralPath $reserve -Value "release run $PID"
 } else {
 	$held = $false
 	while ((Test-Path $reserve) -and ((Get-Date) - (Get-Item $reserve).LastWriteTime).TotalHours -lt 6) {
@@ -50,7 +54,7 @@ while ($null -eq $lock) {
 	try { $lock = [System.IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') }
 	catch {
 		if (-not $announced) { Write-Host "waiting for the test lock (another checkout or agent is running Godot tests)"; $announced = $true }
-		if ($Filter -eq "") { Set-Content -LiteralPath $reserve -Value "full suite $PID" }   # keep the reservation while waiting
+		if ($reserving) { Set-Content -LiteralPath $reserve -Value "release run $PID" }   # keep the reservation while waiting
 		if ((Get-Date) -gt $deadline) { Write-Host "gave up waiting for the test lock"; exit 99 }
 		Start-Sleep -Seconds $(if ($Filter -eq "") { 15 } else { 3 })
 	}
@@ -79,6 +83,6 @@ try {
 	$code = $LASTEXITCODE
 } finally {
 	if ($null -ne $lock) { $lock.Close() }
-	if ($Filter -eq "") { Remove-Item -LiteralPath $reserve -ErrorAction SilentlyContinue }
+	if ($reserving) { Remove-Item -LiteralPath $reserve -ErrorAction SilentlyContinue }
 }
 exit $code

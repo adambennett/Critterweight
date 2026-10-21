@@ -28,6 +28,7 @@ const SPRING_DAMP := 9.0
 const SPRING_GAIN := 0.045         ## radians per m/s^2 of pseudo-force across the link
 const SPRING_MAX := 0.75
 const GRAVITY := 9.81              ## m/s^2 (the project's physics gravity), straight down in world space
+const SPRING_MIN_STEP := 0.034     ## longest wait between spring steps (s): never under ~30 Hz
 
 var skeleton: Skeleton3D
 var bones := {}            ## role -> Array[int] (lid, eye, brow, jaw, spring; springs parents first)
@@ -40,18 +41,46 @@ var _t := 0.0
 var _blink_at := 2.0
 var _blink_phase := -1.0
 var _rng := RandomNumberGenerator.new()
-var _springs := {}         ## bone -> {angle: Vector3 (rotation vector), vel: Vector3, prev: Vector3, prev_v: Vector3}
+# springs, one entry per link in parents-first order (packed: a frame touches every link)
+var _sp_bone := PackedInt32Array()      ## link -> bone
+var _sp_parent := PackedInt32Array()    ## link -> parent bone (a segment bone or an earlier fx bone)
+var _sp_rest: Array[Transform3D] = []   ## link -> rest pose
+var _sp_dir := PackedVector3Array()     ## link -> unit direction of the link at rest, in its own frame
+var _sp_down := PackedVector3Array()    ## link -> gravity in its own frame with the body upright at rest
+var _sp_gain := PackedFloat32Array()    ## link -> radians per m/s^2 (looser down the chain)
+var _sp_k := PackedFloat32Array()       ## link -> spring constant
+var _sp_angle := PackedVector3Array()   ## link -> current swing (rotation vector)
+var _sp_vel := PackedVector3Array()     ## link -> swing velocity
+var _sp_prev := PackedVector3Array()    ## link -> head position last frame
+var _sp_prev_v := PackedVector3Array()  ## link -> head velocity last frame
+var _sp_live := PackedByteArray()       ## link -> 1 once it has a previous frame
+var spring_every := 1                   ## springs step every Nth frame (CreatureView: 1 large on screen .. 4 tiny)
+var _sp_dt := 0.0                       ## seconds since the springs last stepped
+var _sp_tick := 0
+var _sp_phase := 0                      ## staggers fighters so their spring frames differ
 var _link_dir := {}        ## spring bone -> unit direction of its link at rest, in its own frame
 var _rest_down := {}       ## spring bone -> gravity in its own frame with the body upright at rest
 var _saccade := Vector2.ZERO
 var _saccade_at := 0.0
 var _mood_amount := {}     ## smoothed expression weights
+# constants of this model, read once (a frame only does arithmetic)
+var _lid_rotate := false
+var _lid_axis := Vector3.RIGHT
+var _lid_rest := 0.12
+var _jaw_axis := Vector3.RIGHT
+var _jaw_rad := 0.0
+var _brow_drop := 0.012
+var _reach := 0.01
+var _brow_side := {}       ## brow bone -> 1.0 left, -1.0 right
+var _parent := {}          ## fx bone -> parent bone
+var _glob := {}            ## fx bone -> world transform this frame (filled as the links are reached)
 
 
 func _init(sk: Skeleton3D, extras: Dictionary, seed_value: int) -> void:
 	skeleton = sk
 	params = (extras.get("look", {}) as Dictionary).get("fx", {}) if typeof(extras.get("look", {})) == TYPE_DICTIONARY else {}
 	_rng.seed = seed_value
+	_sp_phase = absi(seed_value) % 4
 	_blink_at = _rng.randf_range(0.6, 2.4)
 	for b in sk.get_bone_count():
 		var n := sk.get_bone_name(b)
@@ -69,6 +98,40 @@ func _init(sk: Skeleton3D, extras: Dictionary, seed_value: int) -> void:
 	for b in springs:
 		_link_dir[b] = _rest_direction(b)
 		_rest_down[b] = _rest_basis_from_segment(b).orthonormalized().inverse() * Vector3(0, -GRAVITY, 0)
+	_lid_rotate = str(params.get("lid_mode", "scale")) == "rotate"
+	_lid_axis = _vec(params.get("lid_axis", [1, 0, 0])).normalized()
+	_lid_rest = float(params.get("lid_rest", 0.12))
+	_jaw_axis = _vec(params.get("jaw_axis", [1, 0, 0])).normalized()
+	_jaw_rad = deg_to_rad(float(params.get("jaw_deg", 16.0)))
+	_brow_drop = float(params.get("brow_drop", 0.012))
+	_reach = float(params.get("pupil_reach", 0.01)) * PUPIL_TRAVEL / 0.35
+	for b in rest:
+		_parent[b] = sk.get_bone_parent(b)
+	for b in bones.get("brow", []):
+		_brow_side[b] = 1.0 if sk.get_bone_name(b).ends_with("_l") else -1.0
+	var sg := float(params.get("spring_gain", 1.0))
+	var ss := float(params.get("spring_stiffness", 1.0))
+	for b in springs:
+		var bn := sk.get_bone_name(b)
+		var last := bn.get_slice("_", bn.get_slice_count("_") - 1)
+		var link := int(last) if last.is_valid_int() else 0
+		_sp_bone.append(b)
+		_sp_parent.append(sk.get_bone_parent(b))
+		_sp_rest.append(rest[b])
+		_sp_dir.append(_link_dir[b])
+		_sp_down.append(_rest_down[b])
+		_sp_gain.append(SPRING_GAIN * (1.0 + 0.35 * link) * sg)
+		_sp_k.append(SPRING_K * ss / (1.0 + 0.3 * link))
+	var n := _sp_bone.size()
+	_sp_angle.resize(n)
+	_sp_vel.resize(n)
+	_sp_prev.resize(n)
+	_sp_prev_v.resize(n)
+	_sp_live.resize(n)
+	_sp_angle.fill(Vector3.ZERO)
+	_sp_vel.fill(Vector3.ZERO)
+	_sp_prev_v.fill(Vector3.ZERO)
+	_sp_live.fill(0)
 
 
 ## Number of fx bones above this one (0: it hangs straight off a segment bone).
@@ -119,6 +182,7 @@ func is_fx_bone(b: int) -> bool:
 ## CreatureView placed it this frame, before fx); dt: real seconds.
 func update(dt: float, bone_global: Callable) -> void:
 	_t += dt
+	_glob.clear()
 	_update_weights(dt)
 	var blink := _blink(dt)
 	var squint := 0.0
@@ -129,19 +193,17 @@ func update(dt: float, bone_global: Callable) -> void:
 	var closed := maxf(blink, float(_mood_amount.get("ko", 0.0)))
 	var lid := clampf(maxf(closed, squint), -0.25, 1.0)
 	for b in bones.get("lid", []):
-		if str(params.get("lid_mode", "scale")) == "rotate":
-			var axis := _vec(params.get("lid_axis", [1, 0, 0]))
-			local[b] = Transform3D(Basis(axis.normalized(), deg_to_rad(LID_CLOSE_DEG) * lid), Vector3.ZERO)
+		if _lid_rotate:
+			local[b] = Transform3D(Basis(_lid_axis, deg_to_rad(LID_CLOSE_DEG) * lid), Vector3.ZERO)
 		else:
 			# the lid is modelled CLOSED below its bone (at the top of the eye): open = squashed to a
 			# thin rim, closed = full height (never exactly zero: degenerate normals)
-			var open_rim := float(params.get("lid_rest", 0.12))
-			local[b] = Transform3D(Basis.from_scale(Vector3(1.0, clampf(lerpf(open_rim, 1.0, maxf(lid, 0.0)), 0.04, 1.0), 1.0)), Vector3.ZERO)
+			local[b] = Transform3D(Basis.from_scale(Vector3(1.0, clampf(lerpf(_lid_rest, 1.0, maxf(lid, 0.0)), 0.04, 1.0), 1.0)), Vector3.ZERO)
 	# eyes follow the opponent (pupil offset in the head's frame), with small saccades
 	if _t >= _saccade_at:
 		_saccade = Vector2(_rng.randf_range(-0.25, 0.25), _rng.randf_range(-0.15, 0.15))
 		_saccade_at = _t + _rng.randf_range(0.6, 1.8)
-	var reach := float(params.get("pupil_reach", 0.01)) * PUPIL_TRAVEL / 0.35
+	var reach := _reach
 	for b in bones.get("eye", []):
 		var g: Transform3D = bone_global.call(b)
 		var d := Vector2.ZERO
@@ -157,21 +219,29 @@ func update(dt: float, bone_global: Callable) -> void:
 		local[b] = Transform3D(Basis.IDENTITY, Vector3(d.x, d.y, 0.0) * reach)
 	# brows: knit (inner down) for effort, lift for pain/surprise
 	for b in bones.get("brow", []):
-		var side := 1.0 if skeleton.get_bone_name(b).ends_with("_l") else -1.0
+		var side: float = _brow_side[b]
 		var knit := 0.35 * float(_mood_amount.get("attack", 0.0)) + 0.2 * float(_mood_amount.get("guard", 0.0))
 		var lift := 0.5 * float(_mood_amount.get("hurt", 0.0)) + 0.6 * float(_mood_amount.get("surprised", 0.0)) + 0.3 * float(_mood_amount.get("happy", 0.0))
-		var drop := float(params.get("brow_drop", 0.012))
+		var drop := _brow_drop
 		local[b] = Transform3D(Basis(Vector3(0, 0, 1), side * 0.35 * (knit - lift * 0.6)), Vector3(0, drop * (lift - knit), 0))
 	# jaw: effort, pain, taunts, knockouts, a slow breath at rest
 	for b in bones.get("jaw", []):
 		var open := 0.08 + 0.06 * sin(_t * 2.4)
 		open += 0.5 * float(_mood_amount.get("attack", 0.0)) + 0.8 * float(_mood_amount.get("hurt", 0.0))
 		open += 0.9 * float(_mood_amount.get("taunt", 0.0)) + 1.0 * float(_mood_amount.get("ko", 0.0)) + 0.6 * float(_mood_amount.get("happy", 0.0))
-		var axis2 := _vec(params.get("jaw_axis", [1, 0, 0]))
-		local[b] = Transform3D(Basis(axis2.normalized(), deg_to_rad(float(params.get("jaw_deg", 16.0))) * clampf(open, 0.0, 1.0)), Vector3.ZERO)
+		local[b] = Transform3D(Basis(_jaw_axis, _jaw_rad * clampf(open, 0.0, 1.0)), Vector3.ZERO)
 	# springs
-	for b in bones.get("spring", []):
-		_spring(b, dt, bone_global)
+	if dt > 0.0 and not _sp_bone.is_empty():
+		# a link costs a few microseconds of script time: on a fighter small on screen the springs
+		# step every second or fourth frame (CreatureView sets spring_every), never under ~30 Hz,
+		# fighters staggered so their spring frames do not coincide
+		_sp_dt += dt
+		_sp_tick += 1
+		var every := clampi(spring_every, 1, maxi(1, int(SPRING_MIN_STEP / dt)))
+		if every <= 1 or (_sp_tick + _sp_phase) % every == 0:
+			for i in _sp_bone.size():
+				_spring(i, _sp_dt, bone_global)
+			_sp_dt = 0.0
 
 
 func _update_weights(dt: float) -> void:
@@ -200,42 +270,36 @@ func _blink(dt: float) -> float:
 ## A damped angular spring per link: the link tilts toward the pseudo-force it feels (it trails its
 ## head's acceleration and droops when the body tips away from upright), then settles. Chains get
 ## looser down the chain.
-func _spring(b: int, dt: float, bone_global: Callable) -> void:
-	if dt <= 0.0:
-		return
-	var pg := _pose_global(skeleton.get_bone_parent(b), bone_global)
-	var r: Transform3D = rest[b]
+func _spring(i: int, dt: float, bone_global: Callable) -> void:
+	var b := _sp_bone[i]
+	var pg := _pose_global(_sp_parent[i], bone_global)
+	var r := _sp_rest[i]
 	var here := (pg * r).origin
-	var s: Dictionary = _springs.get(b, {})
-	if s.is_empty():
-		s = {"angle": Vector3.ZERO, "vel": Vector3.ZERO, "prev": here, "prev_v": Vector3.ZERO}
-	var v: Vector3 = (here - (s["prev"] as Vector3)) / dt
-	var a: Vector3 = (v - (s["prev_v"] as Vector3)) / dt
-	s["prev"] = here
-	s["prev_v"] = v
+	if _sp_live[i] == 0:
+		_sp_live[i] = 1
+		_sp_prev[i] = here
+	var v: Vector3 = (here - _sp_prev[i]) / dt
+	var a: Vector3 = (v - _sp_prev_v[i]) / dt
+	_sp_prev[i] = here
+	_sp_prev_v[i] = v
 	if a.length() > 200.0:
 		a = Vector3.ZERO          # a teleport (respawn, ring-out return): do not whip
-	var bn := skeleton.get_bone_name(b)
-	var last := bn.get_slice("_", bn.get_slice_count("_") - 1)
-	var link := int(last) if last.is_valid_int() else 0
-	var gain := SPRING_GAIN * (1.0 + 0.35 * link) * float(params.get("spring_gain", 1.0))
 	# the pseudo-force in the bone's own frame (as placed this frame, before its own swing): inertia
 	# against the head's acceleration, plus how far gravity has turned from where it pulled at rest
-	var to_bone := (pg.basis * r.basis).orthonormalized().inverse()
-	var force: Vector3 = to_bone * (-a) + to_bone * Vector3(0, -GRAVITY, 0) - (_rest_down[b] as Vector3)
+	# (an orthonormal basis inverts by transposing)
+	var to_bone := (pg.basis * r.basis).orthonormalized().transposed()
+	var force: Vector3 = to_bone * (Vector3(0, -GRAVITY, 0) - a) - _sp_down[i]
 	# only the part across the link swings it: rotate the link toward that force (it lags behind)
-	var u: Vector3 = _link_dir[b]
-	var target := u.cross(force - u * u.dot(force)) * gain
-	var angle: Vector3 = s["angle"]
-	var vel: Vector3 = s["vel"]
-	var k := SPRING_K * float(params.get("spring_stiffness", 1.0)) / (1.0 + 0.3 * link)
-	var acc := (target - angle) * k - vel * SPRING_DAMP
+	var u := _sp_dir[i]
+	var target := u.cross(force - u * u.dot(force)) * _sp_gain[i]
+	var angle := _sp_angle[i]
+	var vel := _sp_vel[i]
+	var acc := (target - angle) * _sp_k[i] - vel * SPRING_DAMP
 	vel += acc * dt
 	angle += vel * dt
 	angle = angle.limit_length(SPRING_MAX)
-	s["angle"] = angle
-	s["vel"] = vel
-	_springs[b] = s
+	_sp_angle[i] = angle
+	_sp_vel[i] = vel
 	var turn := angle.length()
 	local[b] = Transform3D(Basis(angle / turn, turn) if turn > 1e-6 else Basis.IDENTITY, Vector3.ZERO)
 
@@ -249,7 +313,14 @@ func _pose_global(b: int, bone_global: Callable) -> Transform3D:
 	if not rest.has(b):
 		var g: Transform3D = bone_global.call(b)
 		return g
-	return _pose_global(skeleton.get_bone_parent(b), bone_global) * (rest[b] as Transform3D) * (local[b] as Transform3D)
+	# a link's world pose is final once its own local is set this frame (parents first), so each is
+	# composed once per frame instead of once per link below it
+	var cached = _glob.get(b)
+	if cached != null:
+		return cached
+	var out: Transform3D = _pose_global(int(_parent[b]), bone_global) * (rest[b] as Transform3D) * (local[b] as Transform3D)
+	_glob[b] = out
+	return out
 
 
 static func _vec(a) -> Vector3:
