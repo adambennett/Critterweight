@@ -70,28 +70,38 @@ D:hype | Stoke opens the stovepipe! It's a flamethrower, folks!
 D:call | Fire from the furnace! Stoke's sweeping the cage with flame!
 K:react | Oh, he just breathes fire now. That's new. That's very new.
 @ability_hit {"creature": "f_stoke", "id": "flamethrower"}
+D:call | Still pouring it on! That flame is following them around!
 D:hype | Caught in the flamethrower! That's Sizzle stacking up fast!
 K:dry | That's not a tan. That's the flamethrower.
 @ability {"creature": "f_stoke", "id": "cinder_shot"}
+D:call | Up and over goes a hot coal! Where it lands, it burns!
+K:dry | He threw a piece of his own furnace. That seems like a heating problem.
 D:call | Stoke scoops a coal and lobs it! Look out below!
 @ability_hit {"creature": "f_stoke", "id": "cinder_shot"}
+D:call | Right on top of them! The coal bursts and the ground starts burning!
 D:hype | The cinder lands on target! And the floor's on fire now too!
 @ability {"creature": "f_stoke", "id": "flare_rush"}
+D:call | Here comes Stoke, all four stacks blazing behind him!
+K:react | He just left at speed. I felt that from here.
 D:hype | The stacks fire and Stoke launches! Flare Rush!
 @ability_hit {"creature": "f_stoke", "id": "flare_rush"}
+D:hype | Boom! The punch explodes and sends both of them flying apart!
 D:hype | Flare Rush connects and it EXPLODES! Both of them go flying!
 @ability {"creature": "f_stoke", "id": "fire_spin"}
+D:call | A ring of flame around the furnace! Step inside at your own risk!
 D:call | Stoke spins up a ring of fire! Nobody's getting close now!
 @ability_hit {"creature": "f_stoke", "id": "fire_spin"}
 D:call | Burned on the way in! The fire ring does its job!
 
 ## ---- Dredge ----
 @ability {"creature": "f_dredge", "id": "bubble_stream"}
-D:call | Dredge blows a stream of bubbles! Pretty, slippery and in the way!
+K:dry | He is blowing bubbles at a professional fighter. And it is working.
+D:call | Dredge blows a stream of bubbles! Pretty, soggy and right in the way!
 K:dry | Bubbles. In a cage fight. I'm charmed and a little worried.
 @ability_hit {"creature": "f_dredge", "id": "bubble_stream"}
-D:call | The bubbles pop on contact! Soaked and slowed down!
+D:call | The bubbles pop on contact! Stay in that and you will be soaked through!
 @ability {"creature": "f_dredge", "id": "hydro_cannon"}
+D:tense | The claw is filling up! That cannon is going to go off any second!
 D:tense | Dredge braces and charges the hydro cannon! Get out of the line!
 D:hype | Hydro Cannon! The whole harbour in one shot!
 @ability_hit {"creature": "f_dredge", "id": "hydro_cannon"}
@@ -100,18 +110,24 @@ K:react | And the recoil sent Dredge back too. Everyone's moving tonight.
 @ability {"creature": "f_dredge", "id": "whirlpool"}
 D:call | A whirlpool opens up! It's pulling everything toward the middle!
 @ability_hit {"creature": "f_dredge", "id": "whirlpool"}
+K:dry | Swimming lessons, now included with the ticket price.
 D:call | Dragged into the whirlpool! Swim against it or go under!
 @ability {"creature": "f_dredge", "id": "shell_brace"}
-D:warm | Dredge braces the shell. Hit him now and you're hitting armour.
+D:warm | Dredge tucks into his shell. Hits land soft and barely move him now.
 
 ## ---- Gusto ----
 @ability {"creature": "f_gusto", "id": "air_slash"}
+D:call | A flick of the wing and the wind cuts straight down the line!
+K:dry | He cut the air in half. The air did not see it coming.
 D:call | Air Slash! A crescent of wind cutting straight across!
 @ability_hit {"creature": "f_gusto", "id": "air_slash"}
+D:hype | Sliced from range! That crescent went straight through!
 D:hype | The Air Slash slices right through! Precision from range!
 @ability {"creature": "f_gusto", "id": "feather_darts"}
+D:call | Feathers in a fan! Five of them, all heading the same way!
 D:call | A fan of feather darts! Gusto's filling the air!
 @ability_hit {"creature": "f_gusto", "id": "feather_darts"}
+K:react | Those are real feathers. I hope he grows them back.
 D:call | The feathers stick! That's a few too many darts to dodge!
 @ability {"creature": "f_gusto", "id": "twister"}
 D:call | Gusto whips up a twister! It's travelling and it's hungry!
@@ -122,33 +138,40 @@ D:warm | Tailwind! Gusto's quicker than ever for the next few seconds.
 
 ## ---- Dozer ----
 @ability {"creature": "f_dozer", "id": "rock_slide"}
+D:call | Dozer splits the floor! Rocks are coming up in a line!
+K:dry | He is redecorating. Mostly with rocks.
 D:hype | Rock Slide! The floor tears open in a straight line!
 @ability_hit {"creature": "f_dozer", "id": "rock_slide"}
 D:hype | Caught by the rock slide! And those rocks are staying put!
 @ability {"creature": "f_dozer", "id": "boulder_toss"}
+K:react | He dug that boulder up with his face. I have so many questions.
 D:call | Dozer heaves a boulder! That's a lot of rock in the air!
 @ability_hit {"creature": "f_dozer", "id": "boulder_toss"}
 D:hype | The boulder lands on them! Flattened!
 @ability {"creature": "f_dozer", "id": "quake_stomp"}
 D:hype | Quake Stomp! The whole cage jumps!
 @ability_hit {"creature": "f_dozer", "id": "quake_stomp"}
+D:hype | Down they go! You cannot stand on a floor that is jumping!
 D:call | Tripped by the quake! Feet off the floor, rear on the floor!
 @ability {"creature": "f_dozer", "id": "iron_hide"}
 D:warm | Iron Hide. Little shots are going to bounce right off Dozer now.
 
 ## ---- Slurry ----
 @ability {"creature": "f_slurry", "id": "poison_darts"}
+D:call | Spit, spit, spit! Three darts on the way!
 D:call | Poison darts! Three quick shots, all of them nasty!
 @ability_hit {"creature": "f_slurry", "id": "poison_darts"}
 D:call | The darts stick! That poison is going to work for a while!
 K:dry | Darts. Venom darts. I'd like to see the inside of that mouth less.
 @ability {"creature": "f_slurry", "id": "acid_spray"}
+D:tense | The acid is pouring! Stand in that and the guard melts away!
 D:call | Slurry sprays acid! Wide, wet and wicked!
 @ability_hit {"creature": "f_slurry", "id": "acid_spray"}
 D:call | Doused in acid! That Gunk is piling on!
 @ability {"creature": "f_slurry", "id": "coil_crush"}
 D:tense | Slurry wraps up and squeezes! There's no guard against a coil!
 @ability_hit {"creature": "f_slurry", "id": "coil_crush"}
+K:dry | That is a hug. A very bad hug.
 D:hype | Coil Crush! Squeezed and slammed!
 @ability {"creature": "f_slurry", "id": "shed_skin"}
 D:warm | Slurry sheds the skin and everything stuck to it. Clean start.
@@ -172,18 +195,22 @@ D:call | A static field crackles to life! Step in there and you'll flinch!
 
 ## ---- Knell ----
 @ability {"creature": "f_knell", "id": "night_shade"}
-D:call | Knell's lantern turns into a beam! Night Shade!
+D:tense | A cold beam from the porthole! Everything it touches slows to a crawl!
+D:call | The helmet light becomes a beam! Night Shade, and it is cold!
 @ability_hit {"creature": "f_knell", "id": "night_shade"}
 D:call | Caught in the ghostly beam! Haunted, and slowing down!
 @ability {"creature": "f_knell", "id": "hex_chain"}
+D:call | The chain flies out of the dark! Anything it catches comes back with it!
 D:tense | A spectral chain! Knell's reeling somebody in!
 @ability_hit {"creature": "f_knell", "id": "hex_chain"}
 D:hype | Chained! Slowed and dragged right back to the diver!
 @ability {"creature": "f_knell", "id": "lantern_swarm"}
+K:dry | Three tiny lanterns. Adorable. Terrifying. Mostly terrifying.
 D:call | Lantern Swarm! Three little lights, all of them hunting!
 @ability_hit {"creature": "f_knell", "id": "lantern_swarm"}
 D:call | The wisps find their mark! You can't outrun a ghost light!
 @ability {"creature": "f_knell", "id": "toll"}
+D:call | He rings the helmet like a bell! Careful, swinging into that answers back!
 D:tense | The bell tolls! Hit Knell now and you'll hear it twice!
 
 ## ---- Varga's techniques (called when one lands on his strikes) ----
