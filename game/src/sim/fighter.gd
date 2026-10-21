@@ -1459,7 +1459,11 @@ func _end_carry() -> void:
 ## Counter stance (e.g. Anchor Drop): {duration, counter: {damage, poise, buildup, element}}.
 func start_counter(e: Dictionary) -> void:
 	_counter_until = time + float(e.get("duration", 2.5))
-	_counter = e.get("counter", {})
+	_counter = (e.get("counter", {}) as Dictionary).duplicate()
+	# Movesets: the answer is credited to the move that set the stance (Anchor Drop, Toll)
+	if e.has("pool") and not _counter.has("pool"):
+		_counter["pool"] = e["pool"]
+		_counter["cat"] = e.get("cat", "")
 	armor_until = _counter_until
 	armor_level = "all"
 	statuses.add({"id": "anchored", "name": "Anchored", "duration": float(e.get("duration", 2.5)), "knockback_taken": float(e.get("knockback_taken", 0.5))})
