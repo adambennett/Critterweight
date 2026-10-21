@@ -116,8 +116,10 @@ func test_settings_and_rules_preset_from_v0916_load() -> void:
 	var files := DirAccess.get_files_at(pdir)
 	check(files.size() >= 1, "the user preset is there")
 	for f in files:
-		var rd := Saves.read_json(pdir.path_join(f), RulePresets.KIND, RulePresets.VERSION)
+		# read the way RulePresets reads user presets (v0.9.18 rules_preset v2 migrates older files)
+		var rd := Saves.read_json(pdir.path_join(f), RulePresets.KIND, RulePresets.VERSION, Callable(RulePresets, "_migrate"))
 		if check(bool(rd["ok"]), "%s reads: %s" % [f, str(rd.get("error", ""))]):
 			var data: Dictionary = rd["data"]
 			check_eq(str(data.get("name", "")), "Fixture Duel", "preset name kept")
+			check_eq(str(data.get("combat", "")), "moves", "the v1 preset now names Movesets, the new default")
 			check(not RulesValidator.has_errors(RulesValidator.validate(RulesValidator.normalize(data))), "the preset still validates")
