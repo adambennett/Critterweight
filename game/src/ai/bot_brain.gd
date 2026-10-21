@@ -129,6 +129,10 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 		return
 	for hand in [FighterInput.LIGHT, FighterInput.HEAVY]:
 		if before[hand] == f.input.press_count[hand]:
+			# no new press: a hand is let go once its hold is over (a hand left held would charge a
+			# hold technique, Pressure Palm, to the full every time)
+			if _t >= float(_mv_hold.get(hand, -1.0)):
+				f.input.set_held(hand, false)
 			continue
 		var gap := f.pos().distance_to(f.target.pos()) if f.target else 1.0
 		var limb: int = hand
@@ -145,6 +149,28 @@ func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 			f.input.press_count[hand] = before[hand]
 			f.input.set_held(hand, false)
 			f.input.press(limb)
+		else:
+			# a hold technique on this hand's group (Movesets) is held for its hint's time
+			var tech := _martial_hand_technique(f, mod)
+			var held_for := 0.0
+			if tech != null and tech.hold == "charge":
+				var hr = tech.ai.get("hold", [0.2, 0.7])
+				if typeof(hr) == TYPE_ARRAY and (hr as Array).size() >= 2:
+					held_for = rng.randf_range(float(hr[0]), float(hr[1]))
+			_mv_hold[hand] = _t + held_for
+
+
+## The equipped Movesets technique on a hand strike with this modifier (0 none, 1 hooks, 2 straights,
+## 3 overhands), or null (Classic, or nothing equipped for that group).
+func _martial_hand_technique(f: Fighter, mod: int) -> PoolMove:
+	if f.combat_style != "moves" or mod <= 0 or mod > 3:
+		return null
+	var group: String = ["hooks", "straights", "overhands"][mod - 1]
+	for id in f.loadout:
+		var pm: PoolMove = f.creature.pool.get(str(id))
+		if pm != null and str(pm.martial.get("group", "")) == group:
+			return pm
+	return null
 
 
 func _poll_standard(f: Fighter, sim: MatchSim, dt: float) -> void:
