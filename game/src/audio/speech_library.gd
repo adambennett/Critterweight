@@ -9,13 +9,15 @@ const EXPANSION_PATH := "res://assets/audio/speech/announcer_expansion/catalog.j
 const V0917_PATH := "res://assets/audio/speech/v0917/catalog.json"
 ## v0.9.18 Movesets: calls for pool moves (by move id and category).
 const V0918_PATH := "res://assets/audio/speech/v0918/catalog.json"
+## v0.9.18 Movesets tutorial: Granny's lessons for the equipped moves, and the move names.
+const V0918_TUTORIAL_PATH := "res://assets/audio/speech/v0918/tutorial_catalog.json"
 var catalog: Dictionary = {}
 var _ids: Dictionary = {}
 var _exact: Dictionary = {}
 var _patterns: Array = []
 
 func _init() -> void:
-	for path in [PATH, EXPANSION_PATH, V0917_PATH, V0918_PATH]:
+	for path in [PATH, EXPANSION_PATH, V0917_PATH, V0918_PATH, V0918_TUTORIAL_PATH]:
 		if not FileAccess.file_exists(path):
 			continue
 		var data = JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -160,6 +162,8 @@ func _token(voice: String, token: String, value: String, context: Dictionary) ->
 		words = [normalized if vocabulary.has(normalized) else "standard"]
 	elif token in ["fighter", "boss"]:
 		words = [normalized if vocabulary.has(normalized) else ("your fighter" if token == "fighter" else "the boss")]
+	elif token.ends_with("_name") and vocabulary.has(normalized):
+		words = [normalized]     # a move's recorded name ("Furnace Haymaker"); else the fixed words below
 	else:
 		words = [str(catalog.get("fixed_tokens", {}).get(token, "your ultimate")).to_lower()]
 	var out: Array = []

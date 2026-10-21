@@ -1,0 +1,1690 @@
+{
+ "version": 1,
+ "release": "0.9.18",
+ "model_id": "breeze-tts-2",
+ "authorized_credits": 10000,
+ "voices": {
+  "devon": "voc_g53htd8kmjsj",
+  "kendall": "voc_j66xnnsxfeet",
+  "coach_buck": "voc_b36c5rxpfuzb"
+ },
+ "cast": {
+  "granny": "coach_buck"
+ },
+ "fixed_tokens": {
+  "basic": "that button",
+  "charge": "that button",
+  "sustain": "that button",
+  "special": "that button",
+  "basic_name": "your basic strike",
+  "charge_name": "your charge move",
+  "sustain_name": "your held move",
+  "special_name": "your special",
+  "ultimate_name": "your ultimate"
+ },
+ "tokens": {
+  "coach_buck": {
+   "acid spray": "tut18_tok_acid_spray",
+   "air slash": "tut18_tok_air_slash",
+   "anchor drop": "tut18_tok_anchor_drop",
+   "anchor fist": "tut18_tok_anchor_fist",
+   "arc lash": "tut18_tok_arc_lash",
+   "boulder toss": "tut18_tok_boulder_toss",
+   "bubble stream": "tut18_tok_bubble_stream",
+   "bulldoze": "tut18_tok_bulldoze",
+   "chain lightning": "tut18_tok_chain_lightning",
+   "cinder shot": "tut18_tok_cinder_shot",
+   "claw snap": "tut18_tok_claw_snap",
+   "coil crush": "tut18_tok_coil_crush",
+   "crosswind slash": "tut18_tok_crosswind_slash",
+   "crusher slam": "tut18_tok_crusher_slam",
+   "discharge": "tut18_tok_discharge",
+   "drain dive": "tut18_tok_drain_dive",
+   "dust bowl": "tut18_tok_dust_bowl",
+   "ember jab": "tut18_tok_ember_jab",
+   "feather darts": "tut18_tok_feather_darts",
+   "fire spin": "tut18_tok_fire_spin",
+   "flamethrower": "tut18_tok_flamethrower",
+   "flare rush": "tut18_tok_flare_rush",
+   "furnace haymaker": "tut18_tok_furnace_haymaker",
+   "ghost light": "tut18_tok_ghost_light",
+   "gust bomb": "tut18_tok_gust_bomb",
+   "hang time": "tut18_tok_hang_time",
+   "hex chain": "tut18_tok_hex_chain",
+   "high tide": "tut18_tok_high_tide",
+   "horn lunge": "tut18_tok_horn_lunge",
+   "hurricane strut": "tut18_tok_hurricane_strut",
+   "hydro cannon": "tut18_tok_hydro_cannon",
+   "iron hide": "tut18_tok_iron_hide",
+   "landslide": "tut18_tok_landslide",
+   "lantern swarm": "tut18_tok_lantern_swarm",
+   "last bell": "tut18_tok_last_bell",
+   "meltdown": "tut18_tok_meltdown",
+   "night shade": "tut18_tok_night_shade",
+   "overcharge": "tut18_tok_overcharge",
+   "overflow": "tut18_tok_overflow",
+   "poison darts": "tut18_tok_poison_darts",
+   "quake stomp": "tut18_tok_quake_stomp",
+   "rock slide": "tut18_tok_rock_slide",
+   "shed skin": "tut18_tok_shed_skin",
+   "shell brace": "tut18_tok_shell_brace",
+   "slap": "tut18_tok_slap",
+   "sludge lob": "tut18_tok_sludge_lob",
+   "snout jab": "tut18_tok_snout_jab",
+   "sounding jab": "tut18_tok_sounding_jab",
+   "spring pad": "tut18_tok_spring_pad",
+   "squash": "tut18_tok_squash",
+   "static field": "tut18_tok_static_field",
+   "steam vent": "tut18_tok_steam_vent",
+   "stoke the fire": "tut18_tok_stoke_the_fire",
+   "tail sweep": "tut18_tok_tail_sweep",
+   "tailwind": "tut18_tok_tailwind",
+   "that button": "tut18_tok_that_button",
+   "through the veil": "tut18_tok_through_the_veil",
+   "thunder jolt": "tut18_tok_thunder_jolt",
+   "tide spit": "tut18_tok_tide_spit",
+   "toll": "tut18_tok_toll",
+   "twister": "tut18_tok_twister",
+   "venom fangs": "tut18_tok_venom_fangs",
+   "whirlpool": "tut18_tok_whirlpool",
+   "wing snap": "tut18_tok_wing_snap",
+   "your basic strike": "tut18_tok_your_basic_strike",
+   "your charge move": "tut18_tok_your_charge_move",
+   "your held move": "tut18_tok_your_held_move",
+   "your special": "tut18_tok_your_special"
+  }
+ },
+ "lines": [
+  {
+   "id": "tut18_tut_m_string_intro",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "{basic}: {basic_name}. Press again as each one lands. The last one's the finisher.",
+   "parts": [
+    {
+     "token": "basic"
+    },
+    {
+     "token": "basic_name"
+    },
+    {
+     "clip": "tut18_tut_m_string_intro_a"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_string_hint",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Plant your feet. Tap {basic}, let it land, tap again, all the way to the finisher.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_string_hint_a"
+    },
+    {
+     "token": "basic"
+    },
+    {
+     "clip": "tut18_tut_m_string_hint_b"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_string_rush",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Easy. Tap, let it land, tap again. Rush it and the next one cancels the last.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_string_rush"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_string_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "That's your string, finisher and all. When in doubt, do that.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_string_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_string_skip_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "No basic strike in your loadout. Moving on.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_string_skip_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_charge_intro",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "{charge}: {charge_name}. Tap it for the quick one. Hold it to wind up the big one.",
+   "parts": [
+    {
+     "token": "charge"
+    },
+    {
+     "token": "charge_name"
+    },
+    {
+     "clip": "tut18_tut_m_charge_intro_a"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_charge_hint",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Tap {charge} with him in front of you. Then hold it, and let go with him in range.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_charge_hint_a"
+    },
+    {
+     "token": "charge"
+    },
+    {
+     "clip": "tut18_tut_m_charge_hint_b"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_charge_stage",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Good. Now hold {charge} till you're wound up, and let go with him in range.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_charge_stage_a"
+    },
+    {
+     "token": "charge"
+    },
+    {
+     "clip": "tut18_tut_m_charge_stage_b"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_charge_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "That one ends arguments. It's also the one you'll miss most.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_charge_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_charge_skip_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "No hold-to-charge move in your loadout. Moving on.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_charge_skip_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_sustain_intro",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "{sustain}: {sustain_name}. It keeps going while you hold it. Steer it with the stick.",
+   "parts": [
+    {
+     "token": "sustain"
+    },
+    {
+     "token": "sustain_name"
+    },
+    {
+     "clip": "tut18_tut_m_sustain_intro_a"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_sustain_hint",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Get close and hold {sustain}. Push the stick at him as he walks. It turns slow.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_sustain_hint_a"
+    },
+    {
+     "token": "sustain"
+    },
+    {
+     "clip": "tut18_tut_m_sustain_hint_b"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_sustain_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "That's pressure. Mind your stamina: run it dry and you've got nothing.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_sustain_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_sustain_skip_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "No hold-and-aim move in your loadout. Moving on.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_sustain_skip_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_special_intro",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "{special}: {special_name}. Specials cost stamina and cool down. Watch its card.",
+   "parts": [
+    {
+     "token": "special"
+    },
+    {
+     "token": "special_name"
+    },
+    {
+     "clip": "tut18_tut_m_special_intro_a"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_special_hint",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Press {special} when he's in range. When its card lights up, it's ready again.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_special_hint_a"
+    },
+    {
+     "token": "special"
+    },
+    {
+     "clip": "tut18_tut_m_special_hint_b"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_special_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "That's what makes you you. Everything else, everyone's got.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_special_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_special_use_only_intro",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "{special}: {special_name}. It doesn't hit, it sets you up. Use it and watch its card.",
+   "parts": [
+    {
+     "token": "special"
+    },
+    {
+     "token": "special_name"
+    },
+    {
+     "clip": "tut18_tut_m_special_use_only_intro_a"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_special_use_only_hint",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Press {special}. That one works on you, not on him.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_special_use_only_hint_a"
+    },
+    {
+     "token": "special"
+    },
+    {
+     "clip": "tut18_tut_m_special_use_only_hint_b"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_special_use_only_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "That's your setup move. Use it before you need it.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_special_use_only_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_special_skip_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "No special in your loadout. Moving on.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_special_skip_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_dodge_intro",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "{dodge} plus a direction, and nothing can touch you. Press {basic} mid-dodge to strike.",
+   "parts": [
+    {
+     "token": "dodge"
+    },
+    {
+     "clip": "tut18_tut_m_dodge_intro_a"
+    },
+    {
+     "token": "basic"
+    },
+    {
+     "clip": "tut18_tut_m_dodge_intro_b"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_dodge_hint",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Wait for his big wind-up, then {dodge} sideways. Then {basic} while you slide.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_dodge_hint_a"
+    },
+    {
+     "token": "dodge"
+    },
+    {
+     "clip": "tut18_tut_m_dodge_hint_b"
+    },
+    {
+     "token": "basic"
+    },
+    {
+     "clip": "tut18_tut_m_dodge_hint_c"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_dodge_stage",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Nothing hits what isn't there. Now press {basic} while you're dodging.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_dodge_stage_a"
+    },
+    {
+     "token": "basic"
+    },
+    {
+     "clip": "tut18_tut_m_dodge_stage_b"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_dodge_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Nothing hits what isn't there. Come back swinging.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_dodge_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_dodge_no_dash_intro",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "{dodge} plus a direction, and nothing can touch you. That's the whole lesson.",
+   "parts": [
+    {
+     "token": "dodge"
+    },
+    {
+     "clip": "tut18_tut_m_dodge_no_dash_intro_a"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_dodge_no_dash_hint",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Wait for his big wind-up, then {dodge} sideways.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_dodge_no_dash_hint_a"
+    },
+    {
+     "token": "dodge"
+    },
+    {
+     "clip": "tut18_tut_m_dodge_no_dash_hint_b"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_dodge_no_dash_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Nothing hits what isn't there. Come back with your hands.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_dodge_no_dash_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_grapple_intro",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "He's guarding. Grapple beats guard. {grab} to grab, a direction and {grab} to throw.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_grapple_intro_a"
+    },
+    {
+     "token": "grab"
+    },
+    {
+     "clip": "tut18_tut_m_grapple_intro_b"
+    },
+    {
+     "token": "grab"
+    },
+    {
+     "clip": "tut18_tut_m_grapple_intro_c"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_grapple_hint",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Walk up while his guard's up and press {grab}. Push toward the wall, {grab} again.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_grapple_hint_a"
+    },
+    {
+     "token": "grab"
+    },
+    {
+     "clip": "tut18_tut_m_grapple_hint_b"
+    },
+    {
+     "token": "grab"
+    },
+    {
+     "clip": "tut18_tut_m_grapple_hint_c"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_grapple_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Strikes beat grapples, grapples beat guard, guard beats strikes. Your triangle.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_grapple_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_grapple_skip_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "No grapple in your kit. Work around his guard. Moving on.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_grapple_skip_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_ultimate_intro",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Hits fill Hype. So does taunting, {taunt}. Full meter, {juice}: your Ultimate.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_ultimate_intro_a"
+    },
+    {
+     "token": "taunt"
+    },
+    {
+     "clip": "tut18_tut_m_ultimate_intro_b"
+    },
+    {
+     "token": "juice"
+    },
+    {
+     "clip": "tut18_tut_m_ultimate_intro_c"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_ultimate_hint",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "Hit him, or taunt with {taunt} when he's far off. Full meter? Press {juice}.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_ultimate_hint_a"
+    },
+    {
+     "token": "taunt"
+    },
+    {
+     "clip": "tut18_tut_m_ultimate_hint_b"
+    },
+    {
+     "token": "juice"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_ultimate_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "That's the whole kit. Everything after this is timing.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_ultimate_success"
+    }
+   ]
+  },
+  {
+   "id": "tut18_tut_m_ultimate_skip_success",
+   "speaker": "granny",
+   "voice": "coach_buck",
+   "template": "No Ultimate in your kit. Moving on.",
+   "parts": [
+    {
+     "clip": "tut18_tut_m_ultimate_skip_success"
+    }
+   ]
+  }
+ ],
+ "clips": {
+  "tut18_tut_m_string_intro_a": {
+   "id": "tut18_tut_m_string_intro_a",
+   "text": ". Press again as each one lands. The last one's the finisher.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 6.1
+  },
+  "tut18_tut_m_string_hint_a": {
+   "id": "tut18_tut_m_string_hint_a",
+   "text": "Plant your feet. Tap",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 2.0
+  },
+  "tut18_tut_m_string_hint_b": {
+   "id": "tut18_tut_m_string_hint_b",
+   "text": ", let it land, tap again, all the way to the finisher.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 5.4
+  },
+  "tut18_tut_m_string_rush": {
+   "id": "tut18_tut_m_string_rush",
+   "text": "Easy. Tap, let it land, tap again. Rush it and the next one cancels the last.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 7.7
+  },
+  "tut18_tut_m_string_success": {
+   "id": "tut18_tut_m_string_success",
+   "text": "That's your string, finisher and all. When in doubt, do that.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 6.1
+  },
+  "tut18_tut_m_string_skip_success": {
+   "id": "tut18_tut_m_string_skip_success",
+   "text": "No basic strike in your loadout. Moving on.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 4.3
+  },
+  "tut18_tut_m_charge_intro_a": {
+   "id": "tut18_tut_m_charge_intro_a",
+   "text": ". Tap it for the quick one. Hold it to wind up the big one.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 5.9
+  },
+  "tut18_tut_m_charge_hint_a": {
+   "id": "tut18_tut_m_charge_hint_a",
+   "text": "Tap",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 0.3
+  },
+  "tut18_tut_m_charge_hint_b": {
+   "id": "tut18_tut_m_charge_hint_b",
+   "text": "with him in front of you. Then hold it, and let go with him in range.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 6.9
+  },
+  "tut18_tut_m_charge_stage_a": {
+   "id": "tut18_tut_m_charge_stage_a",
+   "text": "Good. Now hold",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 1.4
+  },
+  "tut18_tut_m_charge_stage_b": {
+   "id": "tut18_tut_m_charge_stage_b",
+   "text": "till you're wound up, and let go with him in range.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 5.1
+  },
+  "tut18_tut_m_charge_success": {
+   "id": "tut18_tut_m_charge_success",
+   "text": "That one ends arguments. It's also the one you'll miss most.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 6.0
+  },
+  "tut18_tut_m_charge_skip_success": {
+   "id": "tut18_tut_m_charge_skip_success",
+   "text": "No hold-to-charge move in your loadout. Moving on.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 5.0
+  },
+  "tut18_tut_m_sustain_intro_a": {
+   "id": "tut18_tut_m_sustain_intro_a",
+   "text": ". It keeps going while you hold it. Steer it with the stick.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 6.0
+  },
+  "tut18_tut_m_sustain_hint_a": {
+   "id": "tut18_tut_m_sustain_hint_a",
+   "text": "Get close and hold",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 1.8
+  },
+  "tut18_tut_m_sustain_hint_b": {
+   "id": "tut18_tut_m_sustain_hint_b",
+   "text": ". Push the stick at him as he walks. It turns slow.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 5.1
+  },
+  "tut18_tut_m_sustain_success": {
+   "id": "tut18_tut_m_sustain_success",
+   "text": "That's pressure. Mind your stamina: run it dry and you've got nothing.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 7.0
+  },
+  "tut18_tut_m_sustain_skip_success": {
+   "id": "tut18_tut_m_sustain_skip_success",
+   "text": "No hold-and-aim move in your loadout. Moving on.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 4.8
+  },
+  "tut18_tut_m_special_intro_a": {
+   "id": "tut18_tut_m_special_intro_a",
+   "text": ". Specials cost stamina and cool down. Watch its card.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 5.4
+  },
+  "tut18_tut_m_special_hint_a": {
+   "id": "tut18_tut_m_special_hint_a",
+   "text": "Press",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 0.5
+  },
+  "tut18_tut_m_special_hint_b": {
+   "id": "tut18_tut_m_special_hint_b",
+   "text": "when he's in range. When its card lights up, it's ready again.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 6.2
+  },
+  "tut18_tut_m_special_success": {
+   "id": "tut18_tut_m_special_success",
+   "text": "That's what makes you you. Everything else, everyone's got.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 5.9
+  },
+  "tut18_tut_m_special_use_only_intro_a": {
+   "id": "tut18_tut_m_special_use_only_intro_a",
+   "text": ". It doesn't hit, it sets you up. Use it and watch its card.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 6.0
+  },
+  "tut18_tut_m_special_use_only_hint_a": {
+   "id": "tut18_tut_m_special_use_only_hint_a",
+   "text": "Press",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 0.5
+  },
+  "tut18_tut_m_special_use_only_hint_b": {
+   "id": "tut18_tut_m_special_use_only_hint_b",
+   "text": ". That one works on you, not on him.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 3.6
+  },
+  "tut18_tut_m_special_use_only_success": {
+   "id": "tut18_tut_m_special_use_only_success",
+   "text": "That's your setup move. Use it before you need it.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 5.0
+  },
+  "tut18_tut_m_special_skip_success": {
+   "id": "tut18_tut_m_special_skip_success",
+   "text": "No special in your loadout. Moving on.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 3.8
+  },
+  "tut18_tut_m_dodge_intro_a": {
+   "id": "tut18_tut_m_dodge_intro_a",
+   "text": "plus a direction, and nothing can touch you. Press",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 5.0
+  },
+  "tut18_tut_m_dodge_intro_b": {
+   "id": "tut18_tut_m_dodge_intro_b",
+   "text": "mid-dodge to strike.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 2.0
+  },
+  "tut18_tut_m_dodge_hint_a": {
+   "id": "tut18_tut_m_dodge_hint_a",
+   "text": "Wait for his big wind-up, then",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 3.0
+  },
+  "tut18_tut_m_dodge_hint_b": {
+   "id": "tut18_tut_m_dodge_hint_b",
+   "text": "sideways. Then",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 1.4
+  },
+  "tut18_tut_m_dodge_hint_c": {
+   "id": "tut18_tut_m_dodge_hint_c",
+   "text": "while you slide.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 1.6
+  },
+  "tut18_tut_m_dodge_stage_a": {
+   "id": "tut18_tut_m_dodge_stage_a",
+   "text": "Nothing hits what isn't there. Now press",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 4.0
+  },
+  "tut18_tut_m_dodge_stage_b": {
+   "id": "tut18_tut_m_dodge_stage_b",
+   "text": "while you're dodging.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 2.1
+  },
+  "tut18_tut_m_dodge_success": {
+   "id": "tut18_tut_m_dodge_success",
+   "text": "Nothing hits what isn't there. Come back swinging.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 5.0
+  },
+  "tut18_tut_m_dodge_no_dash_intro_a": {
+   "id": "tut18_tut_m_dodge_no_dash_intro_a",
+   "text": "plus a direction, and nothing can touch you. That's the whole lesson.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 6.9
+  },
+  "tut18_tut_m_dodge_no_dash_hint_a": {
+   "id": "tut18_tut_m_dodge_no_dash_hint_a",
+   "text": "Wait for his big wind-up, then",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 3.0
+  },
+  "tut18_tut_m_dodge_no_dash_hint_b": {
+   "id": "tut18_tut_m_dodge_no_dash_hint_b",
+   "text": "sideways.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 0.9
+  },
+  "tut18_tut_m_dodge_no_dash_success": {
+   "id": "tut18_tut_m_dodge_no_dash_success",
+   "text": "Nothing hits what isn't there. Come back with your hands.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 5.7
+  },
+  "tut18_tut_m_grapple_intro_a": {
+   "id": "tut18_tut_m_grapple_intro_a",
+   "text": "He's guarding. Grapple beats guard.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 3.5
+  },
+  "tut18_tut_m_grapple_intro_b": {
+   "id": "tut18_tut_m_grapple_intro_b",
+   "text": "to grab, a direction and",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 2.4
+  },
+  "tut18_tut_m_grapple_intro_c": {
+   "id": "tut18_tut_m_grapple_intro_c",
+   "text": "to throw.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 0.9
+  },
+  "tut18_tut_m_grapple_hint_a": {
+   "id": "tut18_tut_m_grapple_hint_a",
+   "text": "Walk up while his guard's up and press",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 3.8
+  },
+  "tut18_tut_m_grapple_hint_b": {
+   "id": "tut18_tut_m_grapple_hint_b",
+   "text": ". Push toward the wall,",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 2.3
+  },
+  "tut18_tut_m_grapple_hint_c": {
+   "id": "tut18_tut_m_grapple_hint_c",
+   "text": "again.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 0.6
+  },
+  "tut18_tut_m_grapple_success": {
+   "id": "tut18_tut_m_grapple_success",
+   "text": "Strikes beat grapples, grapples beat guard, guard beats strikes. Your triangle.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 7.9
+  },
+  "tut18_tut_m_grapple_skip_success": {
+   "id": "tut18_tut_m_grapple_skip_success",
+   "text": "No grapple in your kit. Work around his guard. Moving on.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 5.7
+  },
+  "tut18_tut_m_ultimate_intro_a": {
+   "id": "tut18_tut_m_ultimate_intro_a",
+   "text": "Hits fill Hype. So does taunting,",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 3.3
+  },
+  "tut18_tut_m_ultimate_intro_b": {
+   "id": "tut18_tut_m_ultimate_intro_b",
+   "text": ". Full meter,",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 1.3
+  },
+  "tut18_tut_m_ultimate_intro_c": {
+   "id": "tut18_tut_m_ultimate_intro_c",
+   "text": ": your Ultimate.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 1.6
+  },
+  "tut18_tut_m_ultimate_hint_a": {
+   "id": "tut18_tut_m_ultimate_hint_a",
+   "text": "Hit him, or taunt with",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence.",
+   "estimated_credits": 2.2
+  },
+  "tut18_tut_m_ultimate_hint_b": {
+   "id": "tut18_tut_m_ultimate_hint_b",
+   "text": "when he's far off. Full meter? Press",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence. This phrase continues right after a word said just before it: start mid-flow, no pause before it.",
+   "estimated_credits": 3.6
+  },
+  "tut18_tut_m_ultimate_success": {
+   "id": "tut18_tut_m_ultimate_success",
+   "text": "That's the whole kit. Everything after this is timing.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 5.4
+  },
+  "tut18_tut_m_ultimate_skip_success": {
+   "id": "tut18_tut_m_ultimate_skip_success",
+   "text": "No Ultimate in your kit. Moving on.",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting.",
+   "estimated_credits": 3.5
+  },
+  "tut18_tok_acid_spray": {
+   "id": "tut18_tok_acid_spray",
+   "text": "Acid Spray",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_air_slash": {
+   "id": "tut18_tok_air_slash",
+   "text": "Air Slash",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_anchor_drop": {
+   "id": "tut18_tok_anchor_drop",
+   "text": "Anchor Drop",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.1,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_anchor_fist": {
+   "id": "tut18_tok_anchor_fist",
+   "text": "Anchor Fist",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.1,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_arc_lash": {
+   "id": "tut18_tok_arc_lash",
+   "text": "Arc Lash",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.8,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_boulder_toss": {
+   "id": "tut18_tok_boulder_toss",
+   "text": "Boulder Toss",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.2,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_bubble_stream": {
+   "id": "tut18_tok_bubble_stream",
+   "text": "Bubble Stream",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.3,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_bulldoze": {
+   "id": "tut18_tok_bulldoze",
+   "text": "Bulldoze",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.8,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_chain_lightning": {
+   "id": "tut18_tok_chain_lightning",
+   "text": "Chain Lightning",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.5,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_cinder_shot": {
+   "id": "tut18_tok_cinder_shot",
+   "text": "Cinder Shot",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.1,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_claw_snap": {
+   "id": "tut18_tok_claw_snap",
+   "text": "Claw Snap",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_coil_crush": {
+   "id": "tut18_tok_coil_crush",
+   "text": "Coil Crush",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_crosswind_slash": {
+   "id": "tut18_tok_crosswind_slash",
+   "text": "Crosswind Slash",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.5,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_crusher_slam": {
+   "id": "tut18_tok_crusher_slam",
+   "text": "Crusher Slam",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.2,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_discharge": {
+   "id": "tut18_tok_discharge",
+   "text": "Discharge",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_drain_dive": {
+   "id": "tut18_tok_drain_dive",
+   "text": "Drain Dive",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_dust_bowl": {
+   "id": "tut18_tok_dust_bowl",
+   "text": "Dust Bowl",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_ember_jab": {
+   "id": "tut18_tok_ember_jab",
+   "text": "Ember Jab",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_feather_darts": {
+   "id": "tut18_tok_feather_darts",
+   "text": "Feather Darts",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.3,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_fire_spin": {
+   "id": "tut18_tok_fire_spin",
+   "text": "Fire Spin",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_flamethrower": {
+   "id": "tut18_tok_flamethrower",
+   "text": "Flamethrower",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.2,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_flare_rush": {
+   "id": "tut18_tok_flare_rush",
+   "text": "Flare Rush",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_furnace_haymaker": {
+   "id": "tut18_tok_furnace_haymaker",
+   "text": "Furnace Haymaker",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.6,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_ghost_light": {
+   "id": "tut18_tok_ghost_light",
+   "text": "Ghost Light",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.1,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_gust_bomb": {
+   "id": "tut18_tok_gust_bomb",
+   "text": "Gust Bomb",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_hang_time": {
+   "id": "tut18_tok_hang_time",
+   "text": "Hang Time",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_hex_chain": {
+   "id": "tut18_tok_hex_chain",
+   "text": "Hex Chain",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_high_tide": {
+   "id": "tut18_tok_high_tide",
+   "text": "High Tide",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_horn_lunge": {
+   "id": "tut18_tok_horn_lunge",
+   "text": "Horn Lunge",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_hurricane_strut": {
+   "id": "tut18_tok_hurricane_strut",
+   "text": "Hurricane Strut",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.5,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_hydro_cannon": {
+   "id": "tut18_tok_hydro_cannon",
+   "text": "Hydro Cannon",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.2,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_iron_hide": {
+   "id": "tut18_tok_iron_hide",
+   "text": "Iron Hide",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_landslide": {
+   "id": "tut18_tok_landslide",
+   "text": "Landslide",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_lantern_swarm": {
+   "id": "tut18_tok_lantern_swarm",
+   "text": "Lantern Swarm",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.3,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_last_bell": {
+   "id": "tut18_tok_last_bell",
+   "text": "Last Bell",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_meltdown": {
+   "id": "tut18_tok_meltdown",
+   "text": "Meltdown",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.8,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_night_shade": {
+   "id": "tut18_tok_night_shade",
+   "text": "Night Shade",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.1,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_overcharge": {
+   "id": "tut18_tok_overcharge",
+   "text": "Overcharge",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_overflow": {
+   "id": "tut18_tok_overflow",
+   "text": "Overflow",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.8,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_poison_darts": {
+   "id": "tut18_tok_poison_darts",
+   "text": "Poison Darts",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.2,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_quake_stomp": {
+   "id": "tut18_tok_quake_stomp",
+   "text": "Quake Stomp",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.1,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_rock_slide": {
+   "id": "tut18_tok_rock_slide",
+   "text": "Rock Slide",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_shed_skin": {
+   "id": "tut18_tok_shed_skin",
+   "text": "Shed Skin",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_shell_brace": {
+   "id": "tut18_tok_shell_brace",
+   "text": "Shell Brace",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.1,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_slap": {
+   "id": "tut18_tok_slap",
+   "text": "Slap",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.4,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_sludge_lob": {
+   "id": "tut18_tok_sludge_lob",
+   "text": "Sludge Lob",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_snout_jab": {
+   "id": "tut18_tok_snout_jab",
+   "text": "Snout Jab",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_sounding_jab": {
+   "id": "tut18_tok_sounding_jab",
+   "text": "Sounding Jab",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.2,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_spring_pad": {
+   "id": "tut18_tok_spring_pad",
+   "text": "Spring Pad",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_squash": {
+   "id": "tut18_tok_squash",
+   "text": "Squash",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.6,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_static_field": {
+   "id": "tut18_tok_static_field",
+   "text": "Static Field",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.2,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_steam_vent": {
+   "id": "tut18_tok_steam_vent",
+   "text": "Steam Vent",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_stoke_the_fire": {
+   "id": "tut18_tok_stoke_the_fire",
+   "text": "Stoke the Fire",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.4,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_tail_sweep": {
+   "id": "tut18_tok_tail_sweep",
+   "text": "Tail Sweep",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.0,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_tailwind": {
+   "id": "tut18_tok_tailwind",
+   "text": "Tailwind",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.8,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_that_button": {
+   "id": "tut18_tok_that_button",
+   "text": "that button",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.1,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_through_the_veil": {
+   "id": "tut18_tok_through_the_veil",
+   "text": "Through the Veil",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.6,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_thunder_jolt": {
+   "id": "tut18_tok_thunder_jolt",
+   "text": "Thunder Jolt",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.2,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_tide_spit": {
+   "id": "tut18_tok_tide_spit",
+   "text": "Tide Spit",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_toll": {
+   "id": "tut18_tok_toll",
+   "text": "Toll",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.4,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_twister": {
+   "id": "tut18_tok_twister",
+   "text": "Twister",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.7,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_venom_fangs": {
+   "id": "tut18_tok_venom_fangs",
+   "text": "Venom Fangs",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.1,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_whirlpool": {
+   "id": "tut18_tok_whirlpool",
+   "text": "Whirlpool",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_wing_snap": {
+   "id": "tut18_tok_wing_snap",
+   "text": "Wing Snap",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 0.9,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_your_basic_strike": {
+   "id": "tut18_tok_your_basic_strike",
+   "text": "your basic strike",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.7,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_your_charge_move": {
+   "id": "tut18_tok_your_charge_move",
+   "text": "your charge move",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.6,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_your_held_move": {
+   "id": "tut18_tok_your_held_move",
+   "text": "your held move",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.4,
+   "vocabulary": "coach_buck"
+  },
+  "tut18_tok_your_special": {
+   "id": "tut18_tok_your_special",
+   "text": "your special",
+   "voice": "coach_buck",
+   "voice_id": "voc_b36c5rxpfuzb",
+   "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction.",
+   "estimated_credits": 1.2,
+   "vocabulary": "coach_buck"
+  }
+ },
+ "estimated_characters": 2841,
+ "estimated_credits": 284.1
+}
