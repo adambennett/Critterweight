@@ -54,7 +54,11 @@ try {
 		Write-Host "importing $GamePath (script classes and assets)"
 		& $Godot --headless --path $GamePath --import *> (Join-Path $UserRoot 'import.log')
 	}
-	$a = @("--headless", "--path", $GamePath, "--log-file", (Join-Path $UserRoot 'engine.log'), "--fixed-fps", "120", "--", "--user-root", $UserRoot, "--test")
+	$a = @("--headless", "--path", $GamePath, "--log-file", (Join-Path $UserRoot 'engine.log'), "--fixed-fps", "120")
+	# a filtered run that never finishes (a script that failed to parse leaves the runner idle) quits
+	# after 50 simulated minutes instead of holding the machine-wide lock forever
+	if ($Filter -ne "") { $a += @("--quit-after", "360000") }
+	$a += @("--", "--user-root", $UserRoot, "--test")
 	if ($Filter -ne "") { $a += $Filter }
 	if ($Log -ne "") { & $Godot @a *> $Log } else { & $Godot @a }
 	$code = $LASTEXITCODE
