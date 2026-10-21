@@ -872,13 +872,15 @@ static func _martial_text(kind: String, key: String) -> String:
 		"footwork":
 			text = "Forward moves toward your opponent; back opens distance. Left and right circle them. Visit the rings, then circle the Kid."
 		"light_string":
-			text = "Hold Straights {mma_mod2}: left hand {mma_lh}, then right hand {mma_rh}. Switch to Hooks {mma_mod1} and land left hand {mma_lh}. Let each hit land before the next."
+			text = "Hold Straights {mma_mod2}: left hand {mma_lh}, then right hand {mma_rh}. Switch to Hooks {mma_mod1} and land left hand {mma_lh}. Let each hit land before the next. In Movesets each modifier carries a technique (Pressure Palm, Comet Hook), and after two strikes that connect, a hand with no modifier unleashes the Thousand-Fist Flurry."
 		"heavy_then_charged":
-			text = "Hold Straights {mma_mod2} and press right leg {mma_rl} for a head kick. Land one clean kick. Varga's strikes do not charge."
+			text = "Hold Straights {mma_mod2} and press right leg {mma_rl} for a head kick. Land one clean kick. Varga's kicks do not charge; in Movesets his Pressure Palm does: hold the hand after Straights {mma_mod2} to gather its aura blast."
+		"dodge_then_dash":
+			text = "Slip {mma_dodge} the Kid's big swing so it never touches you. In Movesets, switch stance {mma_stance} as you slip and the slip becomes the Afterimage Rush, a gold dash that strikes back."
 		"ability_connect":
 			text = "Use Cut the Angle {ability1}, then land a strike within two seconds to use the damage bonus. The step itself does not deal damage."
 		"grab_throw":
 			text = "Step close and press {grab} to clinch. Aim a direction and press {grab} again to throw. Limb buttons pummel while holding."
 		"finisher_juice":
-			text = "Fill Hype with hits or {taunt}. Tap and release {juice} for Championship Rounds. Varga has independent strikes instead of the standard combo finisher."
+			text = "Fill Hype with hits or {taunt}. Tap and release {juice} for Championship Rounds. Varga has independent strikes instead of the standard combo finisher; in Movesets his finisher is the Thousand-Fist Flurry: connect with two strikes, then press a hand with no modifier."
 	return text if key in ["intro", "goal", "hint"] else ""
