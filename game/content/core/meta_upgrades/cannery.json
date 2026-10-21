@@ -56,6 +56,11 @@
      "effect": "Unlocks the AI Lab terminal's 'train vs my saved builds' scenarios", "per_level": {}, "flags": ["boiler_room_key"]},
     {"id": "meta_title_contender", "type": "meta_upgrade", "meta_bonus": true, "name": "Title Contender", "station": "office", "costs": [500],
      "effect": "Dose records from Fight Camp count toward the shared cosmetics track", "gate": {"dose_cleared": 3, "text": "Clear Dose 3 in Fight Camp"},
-     "per_level": {}, "flags": ["title_contender"]}
+     "per_level": {}, "flags": ["title_contender"]},
+    {"id": "meta_sparring_partner", "type": "meta_upgrade", "meta_bonus": true, "name": "Sparring Partner", "station": "loading_dock", "costs": [160],
+     "effect": "Start each run with one more move learned", "per_level": {"run": [{"key": "start_learned_moves", "add": 1}]}},
+    {"id": "meta_film_study", "type": "meta_upgrade", "meta_bonus": true, "name": "Film Study", "station": "office", "costs": [220],
+     "effect": "Start each run with one of your moves drilled", "gate": {"flag": "beat_act1", "text": "Beat Act 1 once"},
+     "per_level": {"run": [{"key": "start_drilled_moves", "add": 1}]}}
   ]
 }

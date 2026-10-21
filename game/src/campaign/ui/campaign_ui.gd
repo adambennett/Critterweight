@@ -181,6 +181,37 @@ static func describe_item(v: VBoxContainer, cat: CampaignCatalog, id: String, ex
 		v.add_child(fl)
 
 
+## Fills a card's VBox with a pool move (move tutor, training, move scroll, drill): a tag line, the
+## move's name, its facts and its one-line description. `style` (a drill option) adds the style's
+## name and what it changes.
+static func describe_move(v: VBoxContainer, cat: CampaignCatalog, fighter: String, id: String, tag_text: String, style := "", extra: Array = []) -> void:
+	var mv := RunMoves.move_info(cat, fighter, id)
+	var tag := HBoxContainer.new()
+	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tag.add_theme_constant_override("separation", 8)
+	tag.add_child(ShapeIcon.new("diamond", ACCENT))
+	var tl := _quiet(label(tag_text, 17, ACCENT, "700"))
+	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tag.add_child(tl)
+	v.add_child(tag)
+	v.add_child(_quiet(label(str(mv.get("name", id)), 30, INK, "900")))
+	if style != "":
+		var sd: Dictionary = (mv.get("styles", {}) as Dictionary).get(style, {})
+		v.add_child(_quiet(label(str(sd.get("name", style.capitalize())).to_upper(), 22, GOOD, "900")))
+		if str(sd.get("desc", "")) != "":
+			v.add_child(_quiet(label(str(sd["desc"]), 19, INK, "600")))
+	var facts := RunMoves.move_facts(cat, fighter, id)
+	if facts != "":
+		v.add_child(_quiet(label(facts, 17, MUTED, "700")))
+	if style == "" and str(mv.get("short", "")) != "":
+		v.add_child(_quiet(label(str(mv["short"]), 19, INK, "600")))
+	for line in extra:
+		if typeof(line) == TYPE_ARRAY:
+			v.add_child(_quiet(label(str(line[0]), 18, line[1] if (line as Array).size() > 1 else MUTED, "700")))
+		else:
+			v.add_child(_quiet(label(str(line), 18, MUTED, "600")))
+
+
 static func _quiet(c: Control) -> Control:
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return c

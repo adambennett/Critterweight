@@ -7,6 +7,9 @@ extends RefCounted
 ##   holds >= 2 items sharing a tag, items with that tag weigh +20% (max +40%).
 ## Offers are pure functions of (seed, stream key, player build) so resume/replay/co-op replicas
 ## see identical offers and a reroll is just the next key.
+## `prefer` ({id: multiplier}, RunMoves.offer_weight via RunController.offer_weights) favours
+## upgrades that improve the equipped moves; an id at 0 is never offered. Without it (decisions an
+## older build logged) the draws are exactly the v0.9.17 ones.
 
 
 static func rarity_index(r: String) -> int:
@@ -65,7 +68,7 @@ static func can_take(catalog: CampaignCatalog, player: Dictionary, id: String) -
 
 
 ## Supplement offer. opts: {source, n, min_rarity, banned_chance, rarity (forced for all slots),
-## exclude: [ids], act}
+## exclude: [ids], act, prefer: {id: weight multiplier}}
 static func supplement_offer(catalog: CampaignCatalog, state: Dictionary, player: Dictionary, key: String, opts: Dictionary) -> Array:
 	var rng := RunRng.stream(int(state.get("seed", 1)), key)
 	var source := str(opts.get("source", "fight"))
@@ -74,11 +77,13 @@ static func supplement_offer(catalog: CampaignCatalog, state: Dictionary, player
 	var weights := rarity_weights(catalog, source, act)
 	var counts := tag_counts(catalog, player)
 	var excluded: Array = opts.get("exclude", [])
+	var prefer: Dictionary = opts.get("prefer", {}) if typeof(opts.get("prefer")) == TYPE_DICTIONARY else {}
 	var by_rarity := {}
 	for r in CampaignCatalog.RARITIES:
 		var ids := []
 		for id in catalog.supplement_ids_of_rarity(r):
-			if can_take(catalog, player, id) and not excluded.has(id) and not bool(catalog.supplements[id].get("not_offered", false)):
+			if can_take(catalog, player, id) and not excluded.has(id) and not bool(catalog.supplements[id].get("not_offered", false)) \
+					and float(prefer.get(id, 1.0)) > 0.0:
 				ids.append(id)
 		by_rarity[r] = ids
 	var out := []
@@ -100,7 +105,7 @@ static func supplement_offer(catalog: CampaignCatalog, state: Dictionary, player
 				rarity = CampaignCatalog.RARITIES[maxi(0, rng.weighted_index(ws2))]
 			if slot == n - 1 and float(opts.get("banned_chance", 0.0)) > 0.0 and rng.chance(float(opts["banned_chance"])):
 				rarity = "banned"
-		var pick := _pick_of_rarity(catalog, by_rarity, rarity, out, counts, rng)
+		var pick := _pick_of_rarity(catalog, by_rarity, rarity, out, counts, rng, prefer)
 		if pick == "":
 			# nothing left at that rarity: nearest rarity first (never below a guarantee)
 			var floor_i := rarity_index(min_r) if slot == 0 and min_r != "" else 0
@@ -111,7 +116,7 @@ static func supplement_offer(catalog: CampaignCatalog, state: Dictionary, player
 					if cand >= floor_i and cand < CampaignCatalog.RARITIES.size():
 						order.append(CampaignCatalog.RARITIES[cand])
 			for r4 in order:
-				pick = _pick_of_rarity(catalog, by_rarity, r4, out, counts, rng)
+				pick = _pick_of_rarity(catalog, by_rarity, r4, out, counts, rng, prefer)
 				if pick != "":
 					break
 		if pick != "":
@@ -119,27 +124,27 @@ static func supplement_offer(catalog: CampaignCatalog, state: Dictionary, player
 	return out
 
 
-static func _pick_of_rarity(catalog: CampaignCatalog, by_rarity: Dictionary, rarity: String, taken: Array, counts: Dictionary, rng: RunRng) -> String:
+static func _pick_of_rarity(catalog: CampaignCatalog, by_rarity: Dictionary, rarity: String, taken: Array, counts: Dictionary, rng: RunRng, prefer: Dictionary = {}) -> String:
 	var cands := []
 	for id in by_rarity.get(rarity, []):
 		if not taken.has(id):
 			cands.append(id)
 	if cands.is_empty():
 		return ""
-	var picked = rng.pick(cands, func(id): return float(catalog.supplements[id].get("weight", 1.0)) * (1.0 + synergy_bonus(catalog, catalog.supplements[id].get("tags", []), counts)))
+	var picked = rng.pick(cands, func(id): return float(catalog.supplements[id].get("weight", 1.0)) * (1.0 + synergy_bonus(catalog, catalog.supplements[id].get("tags", []), counts)) * float(prefer.get(id, 1.0)))
 	return str(picked) if picked != null else ""
 
 
-## Up to n techniques of the player's fighter they do not own yet.
-static func technique_offer(catalog: CampaignCatalog, state: Dictionary, player: Dictionary, key: String, n: int) -> Array:
+## Up to n techniques of the player's fighter they do not own yet (`prefer`: see the header).
+static func technique_offer(catalog: CampaignCatalog, state: Dictionary, player: Dictionary, key: String, n: int, prefer: Dictionary = {}) -> Array:
 	var rng := RunRng.stream(int(state.get("seed", 1)), key)
 	var owned: Array = player.get("techniques", [])
 	var cands := []
 	for tid in catalog.technique_ids_for(str(player.get("fighter", ""))):
-		if not owned.has(tid):
+		if not owned.has(tid) and float(prefer.get(tid, 1.0)) > 0.0:
 			cands.append(tid)
 	var counts := tag_counts(catalog, player)
-	return rng.pick_distinct(cands, n, func(id): return 1.0 + synergy_bonus(catalog, catalog.techniques[id].get("tags", []), counts))
+	return rng.pick_distinct(cands, n, func(id): return (1.0 + synergy_bonus(catalog, catalog.techniques[id].get("tags", []), counts)) * float(prefer.get(id, 1.0)))
 
 
 ## Random side effect for Dose 7 / Needles' samples (deterministic per key). Avoids repeats.

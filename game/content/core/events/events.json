@@ -212,7 +212,9 @@
        {"id": "stretch", "label": "Stretch", "desc": "Max stamina +5 this run.", "risk": "safe",
         "outcomes": [{"text": "Something pops. Good pop.", "effects": [{"op": "run_mods", "mods": [{"key": "stamina_add", "add": 5}], "text": "Max stamina +5"}]}]},
        {"id": "graffiti", "label": "Read the graffiti", "desc": "Unlock an announcer idle quip.", "risk": "safe",
-        "outcomes": [{"text": "'BELLOWS WAS HERE'. Of course he was.", "effects": [{"op": "quip"}]}]}]},
+        "outcomes": [{"text": "'BELLOWS WAS HERE'. Of course he was.", "effects": [{"op": "quip"}]}]},
+       {"id": "shadowbox", "label": "Shadowbox", "desc": "Work on something new in the parking lot: learn a new move (1 of 2).", "risk": "safe",
+        "outcomes": [{"text": "A trucker honks. You take it as applause.", "effects": [{"op": "learn_move", "options": 2}]}]}]},
 
     {"id": "evt_the_belt", "type": "event", "title": "The Belt", "speaker": "",
      "text": "A replica title belt in a pawn shop window.", "group": true, "requires": {"act": [3]},
@@ -225,12 +227,14 @@
     {"id": "evt_boiler_inspector", "type": "event", "title": "Boiler Inspector", "speaker": "City inspector",
      "text": "A city inspector taps your belly with a wrench. \"That's not up to code.\"", "requires": {"fighters": ["f_stoke"]},
      "choices": [
-       {"id": "fix", "label": "Let him \"fix\" it", "desc": "Steam Vent cooldown 7 -> 5 s this run, max HP -6.", "risk": "costly",
+       {"id": "fix", "label": "Let him \"fix\" it", "desc": "Steam Vent cooldown 7 -> 5 s (and Flare Rush 6 -> 4.5 s) this run, max HP -6.", "risk": "costly",
         "outcomes": [{"text": "He hits it with the wrench until it sounds different.", "effects": [{"op": "max_hp", "amount": -6},
-          {"op": "run_patches", "patches": [{"op": "mul", "path": "abilities.ability1.cooldown", "value": 0.714}], "text": "Steam Vent cooldown -2 s"}]}]},
-       {"id": "bribe", "label": "Bribe", "desc": "Stoke the Fire no longer burns you this run.", "risk": "safe", "cost": {"scrip": 30},
+          {"op": "run_patches", "patches": [{"op": "mul", "path": "abilities.ability1.cooldown", "value": 0.714}],
+           "movesets": {"patches": [{"op": "mul", "path": "pool.flare_rush.cooldown", "value": 0.75}]}, "text": "Steam Vent cooldown -2 s, Flare Rush -1.5 s"}]}]},
+       {"id": "bribe", "label": "Bribe", "desc": "Stoke the Fire no longer burns you, and Flare Rush's backblast throws you 40% less far, this run.", "risk": "safe", "cost": {"scrip": 30},
         "outcomes": [{"text": "\"Everything's up to code.\" It is not.", "effects": [{"op": "run_patches", "patches": [
-          {"op": "remove", "path": "abilities.ability2.effects[type=self_damage]"}, {"op": "set", "path": "abilities.ability2.effects[type=buff].status.dps", "value": 0}], "text": "No more self-burn"}]}]},
+          {"op": "remove", "path": "abilities.ability2.effects[type=self_damage]"}, {"op": "set", "path": "abilities.ability2.effects[type=buff].status.dps", "value": 0}],
+          "movesets": {"patches": [{"op": "mul", "path": "pool.flare_rush.on_hit[*].do[type=recoil].speed", "value": 0.6}]}, "text": "No more self-burn, a tamer backblast"}]}]},
        {"id": "run", "label": "Run", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "He doesn't chase. He writes it down.", "effects": [{"op": "nothing"}]}]}]},
 
     {"id": "evt_molting", "type": "event", "title": "Molting Day", "speaker": "",

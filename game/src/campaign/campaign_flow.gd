@@ -240,6 +240,20 @@ func do_consume(item: String) -> bool:
 	return ctrl.use_consumable(me, item)
 
 
+## Moves (Movesets runs): learn from a pick ("pick:<rid>") or a shop scroll ("shop:<slot>"),
+## equip a loadout (free, between fights), drill a style from a pick.
+func do_learn(move: String, source: String) -> bool:
+	return ctrl.learn_move(me, move, source)
+
+
+func do_equip(loadout: Array) -> bool:
+	return ctrl.equip_moves(me, loadout)
+
+
+func do_drill(move: String, style: String, source: String) -> bool:
+	return ctrl.drill_move(me, move, style, source)
+
+
 func profile_id() -> String:
 	return profile_key()
 
@@ -384,6 +398,7 @@ func restart(same_seed: bool, dose_delta := 0) -> void:
 	cfg["dose"] = clampi(int(cfg.get("dose", 0)) + dose_delta, 0, 10)
 	cfg["created_at"] = int(Time.get_unix_time_from_system())
 	cfg.erase("run_id")
+	cfg.erase("legacy_log")        # a converted older run's marker: the new card is all today's rules
 	var old_reasons: Array = cfg.get("custom_reasons", [])
 	var fixed := []
 	for r in old_reasons:

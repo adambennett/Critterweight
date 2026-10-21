@@ -7,10 +7,16 @@ extends RefCounted
 ##   + techniques, supplements (x stacks), side effects, event run effects
 ##   + Dose player modifiers (e.g. Dose 3: max HP x0.9)
 ##   + next-fight effects (events) when building for an actual fight.
-## Every package is an "apply" block: {patches, mods, hooks, statuses, run}. Patches transform the
-## creature JSON (ContentPatch); mods become Fighter.mods; hooks are appended to the creature's
-## passives; statuses are applied by CampaignMatchMode at the bell; run entries are economy
-## modifiers handled by RunRules. The result is deterministic for a given build.
+## Every package is an "apply" block: {patches, mods, hooks, statuses, run, movesets}. Patches
+## transform the creature JSON (ContentPatch, through UpgradeTranslation so upgrades written for
+## the Classic slots also reach the Movesets pool moves); mods become Fighter.mods; hooks are
+## appended to the creature's passives; statuses are applied by CampaignMatchMode at the bell; run
+## entries are economy modifiers handled by RunRules. The result is deterministic for a given build.
+## Movesets compositions (ctx.combat or state.combat "moves"; docs/CAMPAIGN_SYSTEMS.md "Moves in
+## runs") first apply the player's drilled styles (player.moves.drilled: a style shapes its move,
+## upgrades then improve it), add each block's "movesets" block, and use the loadout (ctx.loadout,
+## else the player's equipped moves, else the fighter's default) for the heavy fallback. Anything
+## else (Classic runs, the AI Lab, callers that do not say) gets only the Classic-safe translation.
 
 const MAX_BUILD_HOOKS := 24       ## leave room under Hooks.MAX_HOOKS (32) for JUICE/status hooks
 
@@ -124,8 +130,21 @@ static func add_mods(mods: Dictionary, entries: Array, level: int, party: String
 			mods[key] = cur + float(e["add"]) * level
 
 
+## The translation context of a composition (UpgradeTranslation.context): Movesets only when the
+## caller or the run says so.
+static func translation_context(catalog: CampaignCatalog, state: Dictionary, player: Dictionary, ctx := {}) -> Dictionary:
+	var combat := str(ctx.get("combat", state.get("combat", "")))
+	if combat != "moves":
+		return UpgradeTranslation.context({}, combat, [])
+	var inf := RunMoves.info(catalog, str(player.get("fighter", "")))
+	var lo_v = ctx.get("loadout", [])
+	var lo: Array = lo_v if typeof(lo_v) == TYPE_ARRAY and not (lo_v as Array).is_empty() else RunMoves.fight_loadout(catalog, player)
+	return UpgradeTranslation.context(inf, "moves", lo)
+
+
 ## Composes the fighter for a fight. ctx: {party: solo|coop|tag, include_next_fight: bool,
-## gym_bonuses: bool}. Returns {creature, creature_dict, mods, statuses, max_hp, warnings, errors}.
+## gym_bonuses: bool, combat: "moves"|"classic" (default: state.combat), loadout: [pool ids]}.
+## Returns {creature, creature_dict, mods, statuses, max_hp, warnings, errors, sources}.
 static func compose(catalog: CampaignCatalog, state: Dictionary, player: Dictionary, ctx := {}) -> Dictionary:
 	var party := str(ctx.get("party", "solo"))
 	var res := {"creature": null, "creature_dict": {}, "mods": {}, "statuses": [], "max_hp": 0.0,
@@ -137,17 +156,47 @@ static func compose(catalog: CampaignCatalog, state: Dictionary, player: Diction
 	var passives: Array = d.get("passives", [])
 	var mods := {}
 	var statuses := []
+	var tctx := translation_context(catalog, state, player, ctx)
+	var movesets := bool(tctx.get("movesets", false))
+	if movesets:
+		# drilled styles shape their moves before any upgrade improves them
+		for dp in RunMoves.drill_packages(catalog, player):
+			for sp in dp["patches"]:
+				if typeof(sp) == TYPE_DICTIONARY and ContentPatch.apply(d, sp) == 0:
+					res["warnings"].append("%s: style patch '%s' matched nothing on %s" % [dp["source"], sp.get("path", ""), d.get("id", "")])
+			res["sources"].append(str(dp["source"]))
 	var pkgs := packages(catalog, state, player, bool(ctx.get("include_next_fight", false)), bool(ctx.get("gym_bonuses", false)), str(ctx.get("arena_key", "")))
 	for pkg in pkgs:
 		var ap: Dictionary = pkg.get("apply", {})
 		var level := int(pkg.get("level", 1))
-		for p in ap.get("patches", []):
-			if typeof(p) != TYPE_DICTIONARY or not _when_ok(p, party):
-				continue
-			var hits := ContentPatch.apply(d, scaled_patch(p, level))
-			if hits == 0:
-				res["warnings"].append("%s: patch '%s' matched nothing on %s" % [pkg["source"], p.get("path", ""), d.get("id", "")])
-		add_mods(mods, ap.get("mods", []), level, party)
+		var blocks: Array = [ap]
+		if movesets and typeof(ap.get("movesets")) == TYPE_DICTIONARY:
+			blocks.append(ap["movesets"])
+		tctx["seen"] = []          # a leaf changes once per upgrade (UpgradeTranslation)
+		for blk in blocks:
+			var b: Dictionary = blk
+			for p in b.get("patches", []):
+				if typeof(p) != TYPE_DICTIONARY or not _when_ok(p, party):
+					continue
+				var hits := UpgradeTranslation.apply_patch(d, scaled_patch(p, level), tctx)
+				if hits == 0:
+					res["warnings"].append("%s: patch '%s' matched nothing on %s" % [pkg["source"], p.get("path", ""), d.get("id", "")])
+			add_mods(mods, b.get("mods", []), level, party)
+			for h in b.get("hooks", []):
+				if typeof(h) != TYPE_DICTIONARY or not _when_ok(h, party):
+					continue
+				if passives.size() >= MAX_BUILD_HOOKS:
+					res["warnings"].append("%s: hook dropped (build hook limit %d)" % [pkg["source"], MAX_BUILD_HOOKS])
+					continue
+				var hc: Dictionary = UpgradeTranslation.translate_hook(h, tctx).duplicate(true)
+				hc.erase("when")
+				hc["source"] = str(pkg["source"])
+				passives.append(hc)
+			for st in b.get("statuses", []):
+				if typeof(st) == TYPE_DICTIONARY and _when_ok(st, party):
+					var sc: Dictionary = st.duplicate(true)
+					sc.erase("when")
+					statuses.append(sc)
 		for fr in ap.get("fight_rolls", []):
 			# per-fight random modifiers (e.g. Mood Swings), deterministic per node and player
 			if typeof(fr) != TYPE_DICTIONARY or not ctx.has("roll_seed"):
@@ -156,21 +205,6 @@ static func compose(catalog: CampaignCatalog, state: Dictionary, player: Diction
 			var frng := RunRng.stream(int(ctx["roll_seed"]), "%s/%s/%s" % [ctx.get("roll_key", "roll"), pkg["source"], fkey])
 			var fv := frng.range_f(float(fr.get("min", 1.0)), float(fr.get("max", 1.0)))
 			mods[fkey] = float(mods.get(fkey, CampaignCatalog.MOD_DEFAULTS.get(fkey, 1.0))) * fv
-		for h in ap.get("hooks", []):
-			if typeof(h) != TYPE_DICTIONARY or not _when_ok(h, party):
-				continue
-			if passives.size() >= MAX_BUILD_HOOKS:
-				res["warnings"].append("%s: hook dropped (build hook limit %d)" % [pkg["source"], MAX_BUILD_HOOKS])
-				continue
-			var hc: Dictionary = h.duplicate(true)
-			hc.erase("when")
-			hc["source"] = str(pkg["source"])
-			passives.append(hc)
-		for st in ap.get("statuses", []):
-			if typeof(st) == TYPE_DICTIONARY and _when_ok(st, party):
-				var sc: Dictionary = st.duplicate(true)
-				sc.erase("when")
-				statuses.append(sc)
 		res["sources"].append(str(pkg["source"]))
 	d["passives"] = passives
 	var errs := PackedStringArray()

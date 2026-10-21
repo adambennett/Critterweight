@@ -292,6 +292,18 @@ func do_consume(item: String) -> bool:
 	return _act("consume", {"item": item})
 
 
+func do_learn(move: String, source: String) -> bool:
+	return _act("learn", {"move": move, "source": source})
+
+
+func do_equip(loadout: Array) -> bool:
+	return _act("equip", {"loadout": loadout.duplicate()})
+
+
+func do_drill(move: String, style: String, source: String) -> bool:
+	return _act("drill", {"move": move, "style": style, "source": source})
+
+
 ## The map: a reachable stop is this player's VOTE (the party's majority decides, the Captain
 ## breaks ties - CoopSession). True once the vote is cast / sent.
 func choose_node(id: String) -> bool:

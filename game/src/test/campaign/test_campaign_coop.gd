@@ -497,3 +497,105 @@ func test_host_dose_clamped_to_own_ladder() -> void:
 	hub = LoopbackTransport.Hub.new()
 	var host := CoopSession.host_new(hub.join("p0"), cat(), party_cfg(2, {"dose": 7}), null, Profiles.default_profile("m0", "M0"))
 	check_eq(int(host.ctrl.state["dose"]), 0, "a closed Dosage deals the base card")
+
+
+# ---------------------------------------------------------------------------------------------
+# v0.9.18 moves: learn / equip / drill are member intents (docs/CAMPAIGN_SYSTEMS.md "Moves in runs")
+# ---------------------------------------------------------------------------------------------
+
+const MOVES_PARTY := [{"id": "p0", "name": "A", "profile_id": "m0", "fighter": "f_stoke"}, {"id": "p1", "name": "B", "profile_id": "m1", "fighter": "f_stoke"}]
+const BRAWLER := ["ember_jab", "furnace_haymaker", "flare_rush", "cinder_shot"]
+
+
+## The shortest route to the act's first `t` stop with no elite or boss on the way (an elite's
+## move tutor would teach the one move Stoke has left to learn).
+func _route_to(m: Dictionary, t: String) -> Array:
+	var best := []
+	for p in ActMap.all_paths(m):
+		var pa: Array = p
+		for i in pa.size():
+			var ty := str(ActMap.node(m, str(pa[i])).get("type", ""))
+			if ty == t:
+				if best.is_empty() or i + 1 < best.size():
+					best = pa.slice(0, i + 1)
+				break
+			if ty in ["elite", "boss"]:
+				break
+	return best
+
+
+func test_members_learn_equip_and_drill_through_the_host() -> void:
+	var seed_value := 0
+	for sd in range(1, 600):
+		var probe := run_cfg("f_stoke", {"seed": sd})
+		probe["players"] = MOVES_PARTY.duplicate(true)
+		if not _route_to(RunState.act_map(RunState.create(cat(), probe), 1), "rest").is_empty():
+			seed_value = sd
+			break
+	check(seed_value > 0, "precondition: a party card with a rest stop")
+	var cfg := run_cfg("f_stoke", {"seed": seed_value, "created_at": 9})
+	cfg["players"] = MOVES_PARTY.duplicate(true)
+	hub = LoopbackTransport.Hub.new()
+	var host := CoopSession.host_new(hub.join("p0"), cat(), cfg, null, Profiles.default_profile("m0", "M0"))
+	var mem := CoopSession.member_join(hub.join("p1"), cat(), "p0", null, Profiles.default_profile("m1", "M1"))
+	var s := [host, mem]
+	tick_all(s, 0.1, 2)
+	# equip at the map: the member's intent becomes the member's decision in the party's log
+	check(mem.act("equip", {"loadout": BRAWLER}), "the member sends an equip")
+	tick_all(s, 0.1, 3)
+	check_eq(RunMoves.moves_of(host.ctrl.player("p1"))["equipped"], BRAWLER, "the host applied it to the member's fighter")
+	check_eq(RunMoves.moves_of(host.ctrl.player("p0"))["equipped"], (RunMoves.info(cat(), "f_stoke")["loadouts"]["furnace"] as Dictionary)["moves"], "and only to theirs")
+	var eq := []
+	for e in host.ctrl.state["log"]:
+		if str(e["k"]) == "equip":
+			eq.append(e)
+	check(eq.size() == 1 and str(eq[0]["p"]) == "p1", "logged as the member's decision")
+	check_eq(int(mem.ticket.get("log_size", 0)), (host.ctrl.state["log"] as Array).size(), "the member accepted (verified) the checkpoint with it")
+	mem.act("equip", {"loadout": ["ember_jab", "fire_spin"]})       # not learned
+	tick_all(s, 0.1, 2)
+	check_eq(RunMoves.moves_of(host.ctrl.player("p1"))["equipped"], BRAWLER, "an invalid equip is refused by the host")
+	check(mem.last_error.contains("not learned"), "and the member is told why (%s)" % mem.last_error)
+	# the party votes its way to the rest stop
+	var path := _route_to(RunState.current_map(host.ctrl.state), "rest")
+	for j in path.size():
+		host.act("vote", {"node": str(path[j])})
+		mem.act("vote", {"node": str(path[j])})
+		tick_all(s, 0.1, 3)
+		if j == path.size() - 1:
+			break
+		var guard := 0
+		while host.ctrl.phase() != "map" and not host.ctrl.is_over() and guard < 20:
+			guard += 1
+			if host.ctrl.phase() == "fight":
+				host.complete_fight(fake_result(host.ctrl))
+			else:
+				settle_node(host.ctrl)          # first options, leave shops, patch up: nothing learned on the way
+				host._after_change("test")
+			tick_all(s, 0.1, 2)
+	check_eq(host.ctrl.phase(), "rest", "the party reached the rest stop")
+	if host.ctrl.phase() != "rest":
+		return
+	host.act("rest", {"option": "learn"})
+	mem.act("rest", {"option": "drill"})
+	tick_all(s, 0.1, 3)
+	var lp := host.ctrl.pending_for("p0")
+	var dp := host.ctrl.pending_for("p1")
+	check(lp.size() == 1 and dp.size() == 1, "a move pick for the host, a drill pick for the member")
+	if lp.is_empty() or dp.is_empty():
+		return
+	check(host.act("learn", {"move": str(lp[0]["options"][0]), "source": "pick:" + str(lp[0]["rid"])}), "the host learns: %s" % host.last_error)
+	var md := RunMoves.split_drill(str(dp[0]["options"][0]))
+	mem.act("drill", {"move": str(md[0]), "style": str(md[1]), "source": "pick:" + str(dp[0]["rid"])})
+	mem.act("drill", {"move": str(md[0]), "style": str(md[1]), "source": "pick:" + str(dp[0]["rid"])})    # resent
+	tick_all(s, 0.1, 3)
+	check((RunMoves.moves_of(host.ctrl.player("p0"))["learned"] as Array).has(str(lp[0]["options"][0])), "the host learned the move")
+	check_eq(str((RunMoves.moves_of(host.ctrl.player("p1"))["drilled"] as Dictionary).get(str(md[0]), "")), str(md[1]), "the member drilled the style")
+	var drills := 0
+	for e2 in host.ctrl.state["log"]:
+		if str(e2["k"]) == "drill":
+			drills += 1
+	check_eq(drills, 1, "once, though the intent was resent")
+	check_eq(host.ctrl.phase(), "map", "the rest stop is done")
+	check_eq(int(mem.ticket.get("log_size", 0)), (host.ctrl.state["log"] as Array).size(), "the member's replica verified learn, equip and drill")
+	check_eq(RunMoves.moves_of(mem.state()["players"][1])["drilled"], RunMoves.moves_of(host.ctrl.player("p1"))["drilled"], "and mirrors them")
+	check(bool(RunController.verify(cat(), RunStore.json_stable(host.ctrl.state))["ok"]), "the party run verifies as a whole")

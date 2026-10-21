@@ -133,6 +133,41 @@ static func apply(root: Dictionary, p: Dictionary) -> int:
 	return hits
 
 
+## The leaves a path addresses in `root`: [[container, key], ...] (what apply() would modify; for
+## a missing leaf of an existing parent the reference is returned too, so callers can apply ops
+## that create it). UpgradeTranslation uses it to treat each leaf on its own.
+static func targets(root: Dictionary, path: String, create := false) -> Array:
+	var segs := parse_path(path)
+	if segs.is_empty():
+		return []
+	var parents: Array = [root]
+	for i in segs.size() - 1:
+		parents = _descend(parents, segs[i], create)
+		if parents.is_empty():
+			return []
+	var last: Dictionary = segs[segs.size() - 1]
+	var refs := []
+	for parent in parents:
+		if typeof(parent) != TYPE_DICTIONARY:
+			continue
+		var pd: Dictionary = parent
+		var keys: Array = pd.keys() if str(last["key"]) == "*" else [str(last["key"])]
+		for k in keys:
+			var sels: Array = last["sels"]
+			if sels.is_empty():
+				refs.append([pd, k])
+			elif pd.has(k):
+				for ref in _select(pd[k], sels):
+					refs.append([ref["container"], ref["key"]])
+	return refs
+
+
+## Applies one patch's op to a single leaf (container[key]); the patch's path is not read.
+## Returns 1 when the leaf changed (see apply()).
+static func apply_at(container, key, p: Dictionary) -> int:
+	return _apply_leaf(container, key, str(p.get("op", "")), p)
+
+
 ## Applies a list of patches; returns {"hits": total, "unmatched": [paths with 0 hits]}.
 static func apply_all(root: Dictionary, patches: Array) -> Dictionary:
 	var total := 0
@@ -312,3 +347,10 @@ static func time_scale_move(m: Dictionary, f: float, phase := "all") -> void:
 				for i in mini(2, ra.size()):
 					if _num(ra[i]):
 						ra[i] = mapf.call(float(ra[i]))
+	# a Movesets move's sustain window [t0, t1] (the loop of a held stream) is move time too
+	var sw = m.get("sustain")
+	if typeof(sw) == TYPE_ARRAY:
+		var sa: Array = sw
+		for j in mini(2, sa.size()):
+			if _num(sa[j]):
+				sa[j] = mapf.call(float(sa[j]))

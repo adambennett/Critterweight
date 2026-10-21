@@ -1,7 +1,8 @@
 extends Screen
-## Rest stop (Doc Sutura's back room): the four options as cards — Patch up (heal %), Train
+## Rest stop (Doc Sutura's back room): the options as cards — Patch up (heal %), Train
 ## (learn a technique: opens a pick), Rub-down (clear side effects + small heal), Film study
-## (reveal the next act's elite/boss, + Hype carry). Unavailable options say why.
+## (reveal the next act's elite/boss, + Hype carry), and in Movesets runs Learn a move / Drill a
+## move (open a move pick). Unavailable options say why.
 ## Once this player has rested, the flow decides what is next (Train's pick, the map); this
 ## screen never hands back to a flow that would show it again (it waits for the party instead).
 
@@ -39,8 +40,10 @@ func _build() -> void:
 	row.add_theme_constant_override("separation", 22)
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(row)
-	for o in ctrl.rest_options(flow.me):
-		var parts := CampaignUI.card(360, 220, CampaignUI.NODE_COLORS["rest"])
+	var options := ctrl.rest_options(flow.me)
+	var card_w := 360.0 if options.size() <= 4 else 290.0
+	for o in options:
+		var parts := CampaignUI.card(card_w, 220, CampaignUI.NODE_COLORS["rest"])
 		var b: Button = parts[0]
 		var cv: VBoxContainer = parts[1]
 		var head := CampaignUI.label(str(o.get("label", "")).to_upper(), 34, CampaignUI.INK, "900")
@@ -56,7 +59,7 @@ func _build() -> void:
 			cv.add_child(hl)
 		var ok := bool(o.get("available", true))
 		if not ok:
-			var why := CampaignUI.label("Unavailable: you already know every technique.", 18, CampaignUI.DANGER, "700")
+			var why := CampaignUI.label("Unavailable: %s." % str(o.get("reason", "not now")), 18, CampaignUI.DANGER, "700")
 			why.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			cv.add_child(why)
 		b.disabled = not ok
@@ -82,6 +85,12 @@ func _hint(id: String, p: Dictionary, mh: float) -> String:
 			return "Clears %d side effect%s" % [n, "" if n == 1 else "s"]
 		"film_study":
 			return "Know who's waiting at the end of the next act."
+		"learn":
+			var n := RunMoves.learnable(ctrl.catalog, p).size()
+			return "%d move%s you don't know yet" % [n, "" if n == 1 else "s"]
+		"drill":
+			var n2 := RunMoves.drillable(ctrl.catalog, p).size()
+			return "%d move%s ready for a style" % [n2, "" if n2 == 1 else "s"]
 	return ""
 
 

@@ -44,12 +44,14 @@ const RUN_DEFAULTS := {
 	"player_max_hp_mult": 1.0, "normal_fight_extra_minions": 0.0, "enemy_start_hype": 0.0,
 	"enemy_extra_techniques": 0.0, "supplement_side_effects": 0.0, "boss_phase2_at": 0.5,
 	"hazards_always_on": 0.0, "bot_tier": "", "act3_elite": "", "rest_heal_override": 0.0,
+	# run start (Fight Camp: Sparring Partner, Film Study; docs/CAMPAIGN_SYSTEMS.md "Moves in runs")
+	"start_learned_moves": 0.0, "start_drilled_moves": 0.0,
 }
 ## Event outcome effect ops (EventRunner) — validated here.
 const EVENT_OPS := ["hp", "hp_pct", "max_hp", "scrip", "clout", "hype_carry", "hype_carry_set",
 	"grant_supplement", "side_effect", "remove_supplement", "remove_side_effects", "technique_pick",
 	"reward_pick", "run_mods", "run_patches", "run_hooks", "next_fight", "bet", "boss_mod", "fight",
-	"cosmetic", "coupon", "flag", "nothing", "consumable", "quip", "stat"]
+	"cosmetic", "coupon", "flag", "nothing", "consumable", "quip", "stat", "learn_move"]
 const REQUIRE_KEYS := ["act", "fighters", "element", "weight_class", "scrip", "has_banned", "no_banned",
 	"has_supplements", "roll_matches", "variant", "coop", "party_element"]
 
@@ -76,6 +78,7 @@ var bot_tiers := {}               ## id -> entry
 var rules := {}                   ## campaign rules (defaults merged with content)
 var errors := PackedStringArray() ## structural/semantic content errors (entries are still indexed)
 var warnings := PackedStringArray()  ## references to content owned by others that is not present
+var moves_cache := {}             ## RunMoves: parsed move pools and upgrade analyses (cleared on rebuild)
 
 
 func _init(content_src = null, stand_in := "") -> void:
@@ -131,6 +134,7 @@ func rebuild() -> void:
 		(d as Dictionary).clear()
 	errors.clear()
 	warnings.clear()
+	moves_cache.clear()
 	rules = CampaignDefaults.rules().duplicate(true)
 	var sup_t := _table("supplements")
 	for id in _sorted_keys(sup_t):
@@ -447,6 +451,12 @@ func _check_apply(id: String, ap) -> void:
 			_err(id, "fight roll needs a known modifier key")
 		elif float(fr.get("min", 1.0)) > float(fr.get("max", 1.0)):
 			_err(id, "fight roll min > max")
+	# Movesets-only effects (UpgradeTranslation): an apply block of its own, one level deep
+	if ap.has("movesets"):
+		if typeof(ap["movesets"]) != TYPE_DICTIONARY or (ap["movesets"] as Dictionary).has("movesets"):
+			_err(id, "'movesets' must be an apply block (without its own 'movesets')")
+		else:
+			_check_apply(id, ap["movesets"])
 
 
 func _check_mod_entry(id: String, m, allowed: Dictionary) -> void:
@@ -545,6 +555,13 @@ func _check_event_effect(id: String, eff) -> void:
 				var pe := ContentPatch.validate(p)
 				if pe != "":
 					_err(id, pe)
+			if eff.has("movesets"):
+				_check_apply(id, eff["movesets"])
+		"learn_move":
+			if eff.has("options") and int(eff["options"]) < 1:
+				_err(id, "learn_move offers at least one move")
+			if eff.has("move") and str(eff["move"]) == "":
+				_err(id, "learn_move names a pool move id")
 		"run_hooks":
 			for h in eff.get("hooks", []):
 				_check_hook(id, h)

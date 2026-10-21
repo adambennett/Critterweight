@@ -2,7 +2,8 @@ extends HubTestCase
 ## CMP-03/CMP-04 upgrade stations: the hub buys Cannery upgrades through HubServices (the one adapter
 ## to the campaign's FightCamp API), every station lists its upgrades, Clout and gates are
 ## enforced, purchases change the world (HubUpgradeProps: each upgrade visible, 12+ fixes the
-## lights, all 24 swap the cage banner), and Snappington's desk builds a real Fight Camp run.
+## lights, all 26 swap the cage banner), and Snappington's desk builds a real Fight Camp run.
+## v0.9.18 added Sparring Partner (Loading Dock) and Film Study (Office), the moves upgrades.
 
 
 class FakeBackend:
@@ -37,7 +38,7 @@ func test_every_station_lists_its_upgrades() -> void:
 	var sv := _services()
 	check(sv.available(), "the campaign services are installed")
 	var total := 0
-	var expect := {"gym_floor": 6, "med_bay": 3, "juice_bar": 4, "office": 6, "loading_dock": 3, "boiler_room": 2}
+	var expect := {"gym_floor": 6, "med_bay": 3, "juice_bar": 4, "office": 7, "loading_dock": 4, "boiler_room": 2}
 	for st in expect:
 		var rows := sv.list_upgrades(str(st))
 		check_eq(rows.size(), int(expect[st]), "%s sells %d upgrades" % [st, int(expect[st])])
@@ -48,7 +49,7 @@ func test_every_station_lists_its_upgrades() -> void:
 				check(d.has(k), "%s row has %s" % [d.get("id", "?"), k])
 			check(HubUpgradeProps.ALL_UPGRADES.has(str(d["id"])), "%s has a visible world change" % d["id"])
 			check(HubBoardStation.VISIBLE.has(str(d["id"])), "%s's board explains what changes" % d["id"])
-	check_eq(total, 24, "24 Cannery upgrades at six stations (HUB.md §4)")
+	check_eq(total, 26, "26 Cannery upgrades at six stations (HUB.md §4 + the v0.9.18 moves upgrades)")
 	var ids := []
 	for st2 in expect:
 		for r2 in sv.list_upgrades(str(st2)):
@@ -105,7 +106,7 @@ func test_purchases_change_the_world() -> void:
 	for id in HubUpgradeProps.ALL_UPGRADES:
 		state.camp()["upgrades"][id] = 1
 	up.refresh()
-	check(not view.dressing.cage_banner.visible, "all 24: the Glandco banner comes down")
+	check(not view.dressing.cage_banner.visible, "all 26: the Glandco banner comes down")
 	check(up.player_banner != null and up.player_banner.visible, "...and your fighter's banner goes up")
 	for id2 in HubUpgradeProps.ALL_UPGRADES:
 		check((up.nodes[id2 + ":1"] as Node3D).visible, "%s is visible in the world" % id2)

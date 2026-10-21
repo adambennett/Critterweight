@@ -3,14 +3,16 @@ extends Node3D
 ## Every Cannery upgrade is visible in the world (HUB.md §4): bags appear, bikes line up, the ice
 ## bath gains a lid, the Office gets a second filing cabinet, the Loading Dock gets a sound system...
 ## At 12+ owned upgrades the Main Floor's dead fluorescents are replaced with working ones; with all
-## 24 the Glandco banner over the practice cage becomes one with the player's fighter on it.
+## of them (26 since v0.9.18's Sparring Partner and Film Study) the Glandco banner over the practice
+## cage becomes one with the player's fighter on it.
 ## Purely visual: reads levels from HubState (written by FightCamp.buy_upgrade via HubServices).
 
 const LIGHTS_FIXED_AT := 12
 const ALL_UPGRADES := ["meta_heavy_bag", "meta_speed_bag", "meta_squat_rack", "meta_cardio_bikes", "meta_grappling_dummy", "meta_mat_room",
 	"meta_ice_bath", "meta_cut_corner", "meta_sutures", "meta_juice_bar_tab", "meta_needles_connect", "meta_label_reader", "meta_antidote_stash",
 	"meta_sponsorship", "meta_scouting_report", "meta_reroll_token", "meta_cornermans_eye", "meta_film_room", "meta_title_contender",
-	"meta_crowd_connection", "meta_walkout", "meta_second_skin", "meta_bookies_favor", "meta_boiler_room_key"]
+	"meta_crowd_connection", "meta_walkout", "meta_second_skin", "meta_bookies_favor", "meta_boiler_room_key",
+	"meta_sparring_partner", "meta_film_study"]
 
 var v: HubView
 var state: HubState
@@ -311,6 +313,15 @@ func _office() -> void:
 	k6.cyl(Vector3(11.8, y + 1.7, 13.78), Vector3(11.8, y + 1.7, 13.76), 0.2, Color("#c9a227"), 14)
 	var n6 := _node("meta_title_contender", 1, k6)
 	_sign(n6, "TITLE CONTENDER", Vector3(11.8, y + 2.25, 13.8), PI, Color("#c9a227"), 28)
+	# Film Study: a shelf of fight tapes next to the filing cabinets
+	var k7 := HubMeshKit.new()
+	k7.box(Vector3(6.5, y + 0.6, 12.6), Vector3(0.45, 1.2, 0.9), Color("#3a2c22"), HubMeshKit.PLANK)
+	var tape_cols := [Color("#23262e"), Color("#8c3b2b"), Color("#355d7f")]
+	for sh in 3:
+		for t in 5:
+			k7.box(Vector3(6.74, y + 0.2 + sh * 0.38, 12.25 + t * 0.17), Vector3(0.03, 0.2, 0.12), tape_cols[(sh + t) % 3])
+	var n7 := _node("meta_film_study", 1, k7)
+	_sign(n7, "FILM STUDY", Vector3(6.76, y + 1.35, 12.6), PI * 0.5, Color("#c9a227"), 24)
 
 
 # ---- Loading Dock ----------------------------------------------------------------------------------
@@ -352,6 +363,14 @@ func _dock() -> void:
 	k4.cyl(Vector3(-9.3, 0.9, -16.4), Vector3(-9.3, 1.55, -16.4), 0.24, Color("#8c3b2b"), 12, HubMeshKit.PLAIN, true, true, 0.3)
 	k4.box(Vector3(-9.3, 1.25, -16.15), Vector3(0.1, 0.3, 0.02), Color("#c9a227"))
 	_node("meta_second_skin", 1, k4)
+	# Sparring Partner: a pad rack with focus mitts by the workbench (Kid Lamprey's sparring corner)
+	var k5 := HubMeshKit.new()
+	k5.box(Vector3(-7.9, 0.75, -16.9), Vector3(0.9, 1.5, 0.08), Color("#5b6168"))
+	for m in 2:
+		k5.cyl(Vector3(-8.15 + m * 0.5, 1.15, -16.86), Vector3(-8.15 + m * 0.5, 1.15, -16.78), 0.14, Color("#8c3b2b"), 12)
+	k5.box(Vector3(-7.9, 0.45, -16.82), Vector3(0.7, 0.32, 0.12), Color("#2b2f3a"))
+	var n5 := _node("meta_sparring_partner", 1, k5)
+	_sign(n5, "SPARRING", Vector3(-7.9, 1.62, -16.84), 0.0, Color("#ffc43d"), 24)
 
 
 # ---- Boiler Room -----------------------------------------------------------------------------------
