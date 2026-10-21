@@ -706,9 +706,9 @@ func _update_projectile(ent: Dictionary, dt: float) -> void:
 				if not bool(ent["e"].get("intercept_survives", false)):
 					ent["life"] = 0.0
 					break
-	# blocking props
+	# blocking props (a spectral projectile drifts through cover: v0.9.18 type trait)
 	for pr in entities:
-		if pr["kind"] == "prop" and pr["body"] != null:
+		if pr["kind"] == "prop" and pr["body"] != null and str(ent["element"]) != "spectral":
 			if Vector2(p.x - pr["pos"].x, p.z - pr["pos"].z).length() < float(pr["radius"]) + float(ent["radius"]) and p.y < 1.0:
 				ent["life"] = 0.0
 				_damage_prop(pr, float(ent["e"].get("damage", 4.0)))
@@ -995,6 +995,26 @@ func trigger_reaction(r: Dictionary, victim: Fighter, source, el_a: String, el_b
 			for o: Fighter in enemies_in(null, p + back * 1.0, float(cb.get("radius", 2.0)), true):
 				if o != victim:
 					o.statuses.add_buildup("grit", float(cb.get("buildup", {}).get("grit", 30)), src)
+		# v0.9.18: these three applied nothing before (elements.json always described their effect)
+		"bell_ringer":
+			# a scrap strike on a Haunted target (or the reverse) rings it like a bell
+			victim.statuses.remove_element("scrap")
+			victim.statuses.remove_element("spectral")
+			var eb := {"damage": float(r.get("damage", 6)) * dmg_mult, "poise": float(r.get("poise", 22)), "stun": float(r.get("stun", 0.2)), "knockback": 1.5}
+			effect_hit(src, victim, eb, victim.pos() - victim.forward())
+		"grave_chill":
+			victim.statuses.remove_element("brine")
+			var stg: Dictionary = (r.get("status", {}) as Dictionary).duplicate(true)
+			if not stg.is_empty():
+				stg["source"] = src
+				victim.statuses.add(stg)
+		"crack_guard":
+			victim.statuses.remove_element("grit")
+			sim.combat.apply_simple_damage(src, victim, float(r.get("damage", 4)) * dmg_mult, "crack_guard")
+			var stc: Dictionary = (r.get("status", {}) as Dictionary).duplicate(true)
+			if not stc.is_empty():
+				stc["source"] = src
+				victim.statuses.add(stc)
 	sim.emit_event({"type": "reaction", "fighter": victim.index, "reaction": id, "name": str(r.get("name", id)), "a": el_a, "b": el_b, "pos": p, "by": src.index if src else -1})
 	if src:
 		src.hooks.fire("reaction", {"other": victim, "element": el_a, "status": id})
