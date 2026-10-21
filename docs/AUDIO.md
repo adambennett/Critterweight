@@ -111,8 +111,12 @@ keeps a sound 2D (UI, crowd, ambience). Variants render with `rng = Rng("<id>:<k
 ```
 
 `trigger` is the key passed to `Audio.announce_trigger`; `when` conditions must all match the trigger
-context (string equality, numbers, or membership when the context value is an array). The most specific
-matching lines win, rotate by match seed and are not repeated within a match. `{p}` `{o}` `{a}` `{n}` are
+context (string equality, numbers, or membership when the context value is an array). Since v0.9.17 the
+booth is driven by `CommentaryDirector` and lines are chosen by `CommentarySelector` from every accurate
+candidate (specific lines preferred, recent plays, recent joke families and borrowed lines penalised,
+lines never heard get a turn, history kept across matches and restarts); lines also carry `also`
+(extra triggers), `families`, `energy`, `situation`, `retired` and `follow_id`. See
+[COMMENTARY.md](audio/COMMENTARY.md). `{p}` `{o}` `{a}` `{n}` are
 substituted from the match context / `vars`. `mood: "pleased"` adds Granny's warble. Barnaby subtitles
 are ≤ 90 characters (tested); the babble itself is capped at 4 s.
 
@@ -175,7 +179,7 @@ a row, ±4 % pitch and ±1 dB level per play, per-id cooldowns (taunt lines 3 s,
 | `ui(id)`, `scrip(n)` | interface sounds; coin ping × n (capped at 5) |
 | `music(track, fade = 1, opts = {layers:{id:bool}, seed, intensity, section, pitch, diegetic})` | crossfade to a track; stems start sample-aligned |
 | `music_intensity(v)`, `music_layer(id, on)`, `music_jump(section)`, `music_bar()`, `music_bar_seconds()`, `music_position()`, `sting(track)`, `stop_music(fade)` | layers, bar-synced section jumps, stingers |
-| `announce(line_id, vars = {}) -> bool`, `announce_trigger(trigger, ctx, vars) -> id`, `pick_line(trigger, ctx)`, `say(speaker, text, priority, vars, mood)`, `stop_announcer()`, `announcer_busy()` | announcer/coach queue (priority ≥ 90 interrupts, ≥ 70 queues one line, lower is dropped while speaking; no repeats per match; `gameplay.announcer` full/reduced/off; `access.subtitles`) |
+| `announce(line_id, vars = {}) -> bool`, `announce_trigger(trigger, ctx, vars) -> id`, `pick_line(trigger, ctx)`, `say(speaker, text, priority, vars, mood)`, `stop_announcer()`, `announcer_busy()` | announcer/coach queue (v0.9.17: calls queue by priority and expire after their time-to-live, results invalidate older calls, big calls interrupt at a sentence boundary, low/medium calls keep 1.1 s / 0.3 s of breathing room; `gameplay.announcer` full/reduced/off; `access.subtitles`; docs/audio/COMMENTARY.md) |
 | `subtitle(speaker, text, seconds)` signal | emitted for every spoken line (connect `FightHud.subtitle`) |
 | `crowd_start()`, `crowd_stop(fade)`, `crowd(id)`, `add_heat(v)`, `crowd_heat` | three heat layers crossfaded by `crowd_heat` (decays 0.05/s), one-shots with cooldowns |
 | `ambience(id, fade)`, `set_arena(arena_id)`, `set_room(room)` | beds, arena crowd reverb preset, hub room radio EQ (juice_bar bright, dock bass-heavy, elsewhere "another room") |
