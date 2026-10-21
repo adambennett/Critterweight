@@ -1648,6 +1648,7 @@ func end_match(owner_sim: Node = null) -> void:
 			return
 	crowd_stop(1.5)
 	stop_announcer()
+	_stop_sustain_loops()
 	_match = {}
 	_director = null
 	_booth_ctx = {}
@@ -1789,7 +1790,39 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 	var play := func(id: String, p = null, vol: float = 0.0, pitch: float = 1.0) -> void:
 		sfx(id, p if p != null else pos, vol, pitch)
 		acts.append(id)
-	match type:
+	var sound_type := type
+	if bool(ev.get("tick", false)) and type in ["hit", "effect"]:
+		# Movesets: a stream or repeating effect ticks many times a second and its held loop carries
+		# the sound, so a touched target only gets a quiet hit now and then and only repeated
+		# launches (darts, bubbles) sound on their own
+		sound_type = ""
+		if type == "hit":
+			var tt := int(ev.get("target", -1))
+			st["last_attacker"][tt] = fi
+			st["last_slot"][tt] = str(ev.get("slot", ""))
+			var last_t: Dictionary = st.get("tick_sound", {})
+			var now_t := _now()
+			if now_t - float(last_t.get(tt, -10.0)) >= TICK_SOUND_GAP and float(ev.get("damage", 0.0)) > 0.0:
+				last_t[tt] = now_t
+				st["tick_sound"] = last_t
+				play.call("hit_guard" if bool(ev.get("blocked", false)) else "hit_light", pos, -7.0, 0.95 + randf() * 0.1)
+		else:
+			var tel := str(ev.get("element", ""))
+			if str(ev.get("effect", "")) == "projectile":
+				play.call("proj_launch_" + tel if _sfx_entries.has("proj_launch_" + tel) else "whoosh_light", pos, -5.0)
+			var h := int((st.get("sustain_loops", {}) as Dictionary).get(fi, 0))
+			if h != 0 and pos != null:
+				set_loop_pos(h, pos)
+	elif type == "ability" and str(ev.get("slot", "")).begins_with("mv."):
+		# a Movesets move of its own (moves built on a v0.9.17 ability keep that slot and its signature
+		# sound): its content "sfx" {"cast"}, else a sound for its kind
+		sound_type = ""
+		var cast_id := _pool_sound(fi, str(ev.get("pool", "")), "cast")
+		if cast_id == "":
+			cast_id = str(CAST_SOUND_OF.get(str(ev.get("cat", "")), ""))
+		if cast_id != "" and _sfx_entries.has(cast_id):
+			play.call(cast_id)
+	match sound_type:
 		"hit":
 			var ti := int(ev.get("target", -1))
 			var dmg := float(ev.get("damage", 0.0))
@@ -1958,6 +1991,23 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 			crowd("crowd_laugh")
 		"reflect":
 			play.call("proj_reflect")
+		"sustain":
+			# a Movesets stream is held: its loop (content "sfx" {"loop"}, else the element's zone
+			# loop) runs from the start of the pour to its end
+			var loops: Dictionary = st.get("sustain_loops", {})
+			var old := int(loops.get(fi, 0))
+			if old != 0:
+				stop_loop(old, 0.18)
+				loops.erase(fi)
+			if str(ev.get("phase", "")) == "start":
+				var lid := _pool_sound(fi, str(ev.get("pool", "")), "loop")
+				if lid == "":
+					var pel := _pool_element(fi, str(ev.get("pool", "")))
+					lid = "zone_" + pel if _sfx_entries.has("zone_" + pel) else "charge_loop"
+				if _sfx_entries.has(lid):
+					loops[fi] = sfx_loop(lid, pos, -2.0)
+					acts.append(lid)
+			st["sustain_loops"] = loops
 		"round_intro":
 			st["round"] = int(ev.get("round", 1))
 			play.call("ui_round_card", null)
@@ -2034,6 +2084,47 @@ func _state() -> Dictionary:
 	if not _match.has("state"):
 		_match["state"] = _default_state()
 	return _match["state"]
+
+
+## Seconds between the quiet hit sounds of one target touched by a stream's ticks.
+const TICK_SOUND_GAP := 0.3
+## A Movesets move's cast sound by its category when the content names none (projectiles, volleys,
+## areas, buffs and blinks already sound through their effect events).
+const CAST_SOUND_OF := {"stream": "whoosh_heavy", "blast": "charge_release", "rush": "dash_attack",
+	"counter": "counter", "control": "whoosh_spin", "strike": "whoosh_light"}
+
+
+## A pool move's own sound from content (movepool.<id>.sfx.<kind>), or "".
+func _pool_sound(fi: int, pool: String, kind: String) -> String:
+	if pool == "":
+		return ""
+	var mp = Content.creature_entry(_fighter_creature(fi)).get("movepool", {})
+	if typeof(mp) != TYPE_DICTIONARY or not (mp as Dictionary).has(pool):
+		return ""
+	var sx = ((mp as Dictionary)[pool] as Dictionary).get("sfx", {})
+	return str((sx as Dictionary).get(kind, "")) if typeof(sx) == TYPE_DICTIONARY else ""
+
+
+## A pool move's element (its own, its move's, else the fighter's).
+func _pool_element(fi: int, pool: String) -> String:
+	var entry: Dictionary = Content.creature_entry(_fighter_creature(fi))
+	var mp = entry.get("movepool", {})
+	if typeof(mp) == TYPE_DICTIONARY and (mp as Dictionary).has(pool):
+		var pm: Dictionary = (mp as Dictionary)[pool]
+		if str(pm.get("element", "")) != "":
+			return str(pm["element"])
+		if typeof(pm.get("move", null)) == TYPE_DICTIONARY and str((pm["move"] as Dictionary).get("element", "")) != "":
+			return str((pm["move"] as Dictionary)["element"])
+	return str(entry.get("element", ""))
+
+
+func _stop_sustain_loops() -> void:
+	if not _match.has("state"):
+		return
+	var loops: Dictionary = (_match["state"] as Dictionary).get("sustain_loops", {})
+	for k in loops:
+		stop_loop(int(loops[k]), 0.15)
+	loops.clear()
 
 
 ## The 4 Hz watchers (called by the bridge, or by NetMatchScene for replicated matches): the
