@@ -25,6 +25,7 @@ var arena_view: ArenaView = null
 var views: Array = []                ## slot -> CreatureView (null when empty/despawned)
 var _view_gen := {}                  ## slot -> roster generation the view was built for
 var vfx: Vfx = null
+var ability_fx: AbilityVfx = null    ## v0.9.17 ability effects (docs/art/VFX.md), shared with MatchScene
 var camera: FightCamera = null
 var hud: FightHud = null
 var hud_layer: CanvasLayer = null
@@ -75,6 +76,11 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	sync_roster()
 	vfx = Vfx.new()
 	add_child(vfx)
+	ability_fx = AbilityVfx.new()
+	ability_fx.view_of = _fx_view
+	ability_fx.info_of = _fx_info
+	ability_fx.fighter_count = func() -> int: return views.size()
+	add_child(ability_fx)
 	if ResourceLoader.exists(MODE_VIEW_SCRIPT):
 		var mv_script: Script = load(MODE_VIEW_SCRIPT)
 		mode_view = mv_script.new()
@@ -149,6 +155,7 @@ func _apply_presentation_settings() -> void:
 	camera.shake_scale = float(Settings.get_value("access.camera_shake"))
 	vfx.reduce_flashes = bool(Settings.get_value("access.reduce_flashing"))
 	vfx.quality = int(Settings.get_value("graphics.effects"))
+	ability_fx.configure(int(Settings.get_value("graphics.effects")), bool(Settings.get_value("access.reduce_flashing")))
 	arena_view.apply_quality(Settings.quality())
 
 
@@ -241,7 +248,7 @@ func _process(dt: float) -> void:
 	for p in _sample["props"]:
 		arena_view.set_prop_transform(int(p["index"]), Transform3D(Basis(p["rot"] as Quaternion), p["pos"]))
 	arena_view.fade_occluders(camera.global_position, CameraOccluders.points_for(camera, _camera_focus()))
-	vfx.sync_entities(_sample["entities"])
+	ability_fx.sync_entities(_sample["entities"])
 	mirror.update(_sample, dt)
 	if mode_view:
 		mode_view.call("update_state", _sample["mode"].get("view", {}), dt)
@@ -312,6 +319,25 @@ func head_pos(i: int) -> Vector3:
 func ground_pos(i: int) -> Vector3:
 	var p := root_pos(i)
 	return Vector3(p.x, 0.0, p.z)
+
+
+## The view of a slot for the ability effects (only while it shows the slot's current fighter).
+func _fx_view(i: int):
+	var fd := _slot(i)
+	if fd.is_empty() or i >= views.size() or views[i] == null or int(fd["gen"]) != int(_view_gen.get(i, -1)):
+		return null
+	return views[i]
+
+
+## What the ability effects need to know about a fighter, from the snapshot. The heavy-charge level
+## is not replicated: -2 lets the effects follow the charge by time.
+func _fx_info(i: int) -> Dictionary:
+	var fd := _slot(i)
+	if fd.is_empty():
+		return {}
+	var flags := int(fd["flags"])
+	return {"ground": ground_pos(i), "state": int(fd.get("state", 0)), "juiced": flags & NetSnapshot.F_JUICED != 0,
+		"hidden": flags & NetSnapshot.F_HIDDEN != 0, "charge": -2.0, "out": false}
 
 
 func _display_name(i: int) -> String:
@@ -522,6 +548,7 @@ func _seg_near(fi: int, p: Vector3) -> int:
 ## Presentation of replicated simulation events (kept in step with MatchScene._on_event).
 func _on_event(ev: Dictionary) -> void:
 	var fi := int(ev.get("fighter", -1))
+	ability_fx.on_event(ev)
 	match str(ev.get("type", "")):
 		"hit":
 			var ti := int(ev.get("target", -1))
@@ -576,13 +603,6 @@ func _on_event(ev: Dictionary) -> void:
 			vfx.ring(ground_pos(fi) + Vector3.UP * 0.05, 2.5, Color(1, 1, 1, 0.9), 0.35)
 		"juice":
 			vfx.word(head_pos(fi) + Vector3.UP * 0.4, "JUICED!", Color(1.0, 0.6, 0.1), 80)
-			vfx.emit("burst", root_pos(fi), Vector3.UP, Color(1.0, 0.6, 0.15), 1.5)
-		"effect":
-			var pe: Vector3 = ev.get("pos", Vector3.ZERO)
-			var el2 := str(ev.get("element", ""))
-			if str(ev.get("effect", "")) == "area":
-				vfx.ring(pe + Vector3.UP * 0.05, 2.2, (Elements.color(el2) if el2 != "" else Color(1, 0.9, 0.6)) * Color(1, 1, 1, 0.8), 0.35)
-				vfx.emit("dust", pe, Vector3.UP, Color(0.85, 0.8, 0.7, 0.6))
 		"elimination":
 			# achievements follow the server's events for this player's own fighter
 			if fi != my_index and int(ev.get("by", -1)) == my_index and my_index >= 0:
@@ -592,7 +612,6 @@ func _on_event(ev: Dictionary) -> void:
 		"reaction":
 			var pr: Vector3 = ev.get("pos", Vector3.ZERO)
 			vfx.word(pr + Vector3.UP * 1.6, str(ev.get("name", "REACTION")).to_upper() + "!", Color(1, 1, 1), 72)
-			vfx.emit("burst", pr + Vector3.UP * 0.8, Vector3.UP, Elements.color(str(ev.get("a", ""))), 1.4)
 		"slam":
 			camera.add_trauma(0.4)
 			vfx.word((ev.get("pos", root_pos(fi)) as Vector3) + Vector3.UP * 1.0, "CAGE SLAM!", Color(1.0, 0.8, 0.3))

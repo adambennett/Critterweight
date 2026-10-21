@@ -14,6 +14,7 @@ var sim: MatchSim
 var arena_view: ArenaView
 var views: Array = []           ## index -> CreatureView (null for despawned slots)
 var vfx: Vfx
+var ability_fx: AbilityVfx      ## v0.9.17 ability effects (docs/art/VFX.md)
 var mode_view: ModeView
 var _pick_panel: Control = null
 var _dt := 0.016
@@ -89,6 +90,11 @@ func start(cfg: Dictionary) -> void:
 		_make_view(f.index)
 	vfx = Vfx.new()
 	add_child(vfx)
+	ability_fx = AbilityVfx.new()
+	ability_fx.view_of = func(i: int): return views[i] if i >= 0 and i < views.size() else null
+	ability_fx.info_of = _fx_info
+	ability_fx.fighter_count = func() -> int: return sim.fighters.size() if sim else 0
+	add_child(ability_fx)
 	mode_view = ModeView.new()
 	add_child(mode_view)
 	mode_view.head_of = _head_of
@@ -215,6 +221,7 @@ func _apply_presentation_settings() -> void:
 	camera.shake_scale = float(Settings.get_value("access.camera_shake"))
 	vfx.reduce_flashes = bool(Settings.get_value("access.reduce_flashing"))
 	vfx.quality = int(Settings.get_value("graphics.effects"))
+	ability_fx.configure(int(Settings.get_value("graphics.effects")), bool(Settings.get_value("access.reduce_flashing")))
 	arena_view.apply_quality(Settings.quality())
 
 
@@ -290,7 +297,17 @@ func _process(delta: float) -> void:
 	for i in props.size():
 		arena_view.set_prop_transform(i, (props[i] as Node3D).global_transform)
 	arena_view.fade_occluders(camera.global_position, CameraOccluders.points_for(camera, _camera_focus()))
-	vfx.sync_entities(sim.effects.entities)
+	ability_fx.sync_entities(sim.effects.entities)
+
+
+## What the ability effects need to know about a fighter (view only).
+func _fx_info(i: int) -> Dictionary:
+	if sim == null or i < 0 or i >= sim.fighters.size():
+		return {}
+	var f := sim.fighters[i]
+	return {"ground": f.ground_pos(), "yaw": f.facing_yaw, "state": f.state, "juiced": f.time < f.juiced_until,
+		"hidden": f.has_flag("submerged"), "charge": f.move_charge if f._charging else -1.0,
+		"out": f.despawned or f.state == Fighter.State.INACTIVE or f.pos().y < -3.0}
 
 
 func _status_color(f: Fighter) -> Color:
@@ -314,6 +331,7 @@ func _process_events() -> void:
 
 
 func _on_event(ev: Dictionary) -> void:
+	ability_fx.on_event(ev)
 	match str(ev["type"]):
 		"hit":
 			var ti := int(ev["target"])
@@ -380,17 +398,10 @@ func _on_event(ev: Dictionary) -> void:
 			if ji < views.size() and views[ji] != null:
 				jc = (views[ji] as CreatureView).juice_color    # a cosmetic JUICE colour (Sizzle) shows here too
 			vfx.word(fj.head_pos() + Vector3.UP * 0.4, "JUICED!", jc, 80)
-			vfx.emit("burst", fj.pos(), Vector3.UP, jc, 1.5)
-		"effect":
-			var pe: Vector3 = ev["pos"]
-			var el2 := str(ev.get("element", ""))
-			if str(ev["effect"]) == "area":
-				vfx.ring(pe + Vector3.UP * 0.05, 2.2, (Elements.color(el2) if el2 != "" else Color(1, 0.9, 0.6)) * Color(1, 1, 1, 0.8), 0.35)
-				vfx.emit("dust", pe, Vector3.UP, Color(0.85, 0.8, 0.7, 0.45))
 		"reaction":
+			# the reaction's own effect is AbilityVfx's; the name pops here
 			var pr: Vector3 = ev["pos"]
 			vfx.word(pr + Vector3.UP * 1.6, str(ev.get("name", "REACTION")).to_upper() + "!", Color(1, 1, 1), 72)
-			vfx.emit("burst", pr + Vector3.UP * 0.8, Vector3.UP, Elements.color(str(ev["a"])), 1.4)
 		"elimination":
 			var by := int(ev.get("by", -1))
 			if by == player_index and _is_local_player() and by < sim.fighters.size() and sim.fighters[by].time < sim.fighters[by].juiced_until:

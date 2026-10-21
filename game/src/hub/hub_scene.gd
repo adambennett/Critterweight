@@ -20,6 +20,7 @@ var view: HubView
 var creature_view: CreatureView
 var camera: HubCamera
 var vfx: Vfx
+var ability_fx: AbilityVfx          ## v0.9.17 ability effects for the player's own fighter (docs/art/VFX.md)
 var hud_layer: CanvasLayer
 var hud: HubHud
 var fade: ColorRect
@@ -75,6 +76,16 @@ func start(p: Dictionary) -> void:
 	input.camera = camera
 	vfx = Vfx.new()
 	add_child(vfx)
+	ability_fx = AbilityVfx.new()
+	ability_fx.view_of = func(i: int): return creature_view if i == 0 else null
+	ability_fx.info_of = func(i: int) -> Dictionary:
+		if sim == null or i != 0:
+			return {}
+		var f := player()
+		return {"ground": f.ground_pos(), "yaw": f.facing_yaw, "state": f.state, "juiced": f.time < f.juiced_until or _qa_juice,
+			"hidden": f.has_flag("submerged"), "charge": f.move_charge if f._charging else -1.0, "out": false}
+	ability_fx.fighter_count = func() -> int: return 1
+	add_child(ability_fx)
 	hud_layer = CanvasLayer.new()
 	hud_layer.layer = 5
 	add_child(hud_layer)
@@ -195,6 +206,8 @@ func _apply_settings() -> void:
 	camera.shake_scale = float(Settings.get_value("access.camera_shake"))
 	vfx.reduce_flashes = bool(Settings.get_value("access.reduce_flashing"))
 	vfx.quality = int(Settings.get_value("graphics.effects"))
+	if ability_fx:
+		ability_fx.configure(int(Settings.get_value("graphics.effects")), bool(Settings.get_value("access.reduce_flashing")))
 
 
 func _on_setting_changed(key: String, _v) -> void:
@@ -235,6 +248,8 @@ func _process(dt: float) -> void:
 	_time += dt
 	creature_view.render(Engine.get_physics_interpolation_fraction())
 	creature_view.hype = player().hype / 100.0
+	if ability_fx:
+		ability_fx.sync_entities(sim.effects.entities)
 	if _qa_juice:
 		creature_view.juice_amount = 1.0       # QA captures: --hub-juice shows the JUICE glow (Sizzle)
 	camera.target = player().pos()
@@ -296,6 +311,8 @@ func _process_events() -> void:
 
 
 func _on_event(ev: Dictionary) -> void:
+	if ability_fx:
+		ability_fx.on_event(ev)
 	match str(ev["type"]):
 		"hub_interact":
 			_on_interact(ev)

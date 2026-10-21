@@ -147,9 +147,18 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 			f.hype = clampf(f.hype + float(e.get("amount", 10.0)), 0.0, 100.0)
 		"juice_state":
 			f.apply_juice_state(e)
-	sim.emit_event({"type": "effect", "fighter": f.index, "effect": t, "pos": p, "element": e.get("element", ""),
+	var ev := {"type": "effect", "fighter": f.index, "effect": t, "pos": p, "element": e.get("element", ""),
 		"vfx": e.get("vfx", t), "radius": float(e.get("radius", 0.0)), "shape": str(e.get("shape", "circle")),
-		"yaw": f.facing_yaw, "move": m.id if m else ""})
+		"yaw": f.facing_yaw, "move": m.id if m else ""}
+	# view-only: the rest of the footprint, so the VFX draw exactly the area that can hit
+	# (cones and lines start at the fighter's feet, see area()); presentation only, never read back
+	for k in ["cone_deg", "length", "width", "inner", "duration", "distance", "delay", "speed"]:
+		var v = e.get(k)
+		if typeof(v) == TYPE_FLOAT or typeof(v) == TYPE_INT:
+			ev[k] = float(v)
+	if t == "area" and str(e.get("shape", "circle")) in ["cone", "cone_back", "line"]:
+		ev["origin"] = f.ground_pos()
+	sim.emit_event(ev)
 
 
 ## Resolves where an effect happens.
