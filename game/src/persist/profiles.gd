@@ -1,8 +1,13 @@
 extends Node
 ## Autoload "Profiles": local player profiles (no login). Each profile stores statistics, records,
 ## The Dosage ladder progress per campaign variant, cosmetic unlocks, Fight Camp meta progression
-## (Clout, permanent upgrades, hub secrets/flags), tutorial state and recent run history.
+## (Clout, permanent upgrades, hub secrets/flags), tutorial state, recent run history and (v2,
+## v0.9.18 Movesets) `loadouts`: the player's custom versus loadout per fighter, {creature id:
+## [pool move ids]} (saved_loadout / save_loadout; VersusSetup falls back to the fighter's
+## recommended loadout when a stored one no longer validates).
 ## Persistent campaign power lives ONLY in `camp` and is never read by PvP/versus code (COOP-06).
+## Format versions: 1 (up to v0.9.17) -> 2 adds `loadouts` (empty; _migrate). Older builds refuse a
+## v2 profile instead of overwriting it (the Saves version guard).
 ## Files written by a NEWER game version are never rewritten or deleted: a newer profile list is
 ## replaced in memory by a scan of the profile folders (and not saved), a newer profile is
 ## skipped (another one, or a new one under an unused id, is used instead). `read_only_note` and
@@ -10,9 +15,12 @@ extends Node
 
 signal profile_changed()
 
-const VERSION := 1
+const VERSION := 2
 const INDEX_VERSION := 1
 const MAX_HISTORY := 60
+## Sanity bound on a stored loadout's length. The creature is the real check (CreatureDef
+## .loadout_problem: 1 to 4 moves, or a martial artist's technique per modifier group).
+const MAX_LOADOUT := 16
 
 var current := {}
 var _index := {"profiles": [], "active": ""}
@@ -61,6 +69,7 @@ static func default_profile(id: String, name_: String) -> Dictionary:
 		"camp": {"clout": 0, "clout_total": 0, "upgrades": {}, "secrets": [], "flags": {}, "hub_spot": "locker_room"},
 		"tutorial": {"completed": false, "times_offered": 0, "skipped": false},
 		"history": [],
+		"loadouts": {},
 	}
 
 
@@ -204,9 +213,71 @@ func save() -> void:
 		Log.e("profiles", last_error)
 
 
+## Profile format migrations, chained version by version (null rejects the file; it stays on disk).
+##   v1 -> v2 (v0.9.18): adds `loadouts` (custom versus loadouts per fighter), empty. A v1 file
+##   written by a v0.9.18 development build may already carry some: the well-formed ones are kept.
 func _migrate(data, from_version: int):
-	# v1 is the first format; future migrations chain here.
-	return data if from_version == VERSION else null
+	return migrate(data, from_version)
+
+
+static func migrate(data, from_version: int):
+	if typeof(data) != TYPE_DICTIONARY:
+		return null
+	if from_version == VERSION:
+		return data
+	if from_version < 1 or from_version > VERSION:
+		return null
+	var d: Dictionary = (data as Dictionary).duplicate(true)
+	if from_version == 1:
+		d["loadouts"] = clean_loadouts(d.get("loadouts", {}))
+	return d
+
+
+## Only well-formed saved loadouts: creature id -> 1..MAX_LOADOUT distinct move ids (strings).
+static func clean_loadouts(v) -> Dictionary:
+	var out := {}
+	if typeof(v) != TYPE_DICTIONARY:
+		return out
+	for k in v:
+		var lo := clean_loadout(v[k])
+		if typeof(k) == TYPE_STRING and str(k) != "" and not lo.is_empty():
+			out[str(k)] = lo
+	return out
+
+
+## A stored loadout as move ids, or [] when it is not a list of 1..MAX_LOADOUT distinct ids.
+static func clean_loadout(v) -> Array:
+	var out: Array = []
+	if typeof(v) != TYPE_ARRAY:
+		return out
+	for id in v:
+		if typeof(id) != TYPE_STRING or str(id) == "" or out.has(str(id)):
+			return []
+		out.append(str(id))
+	return out if out.size() <= MAX_LOADOUT else []
+
+
+## The player's saved custom loadout for a fighter ([] when none or malformed). Callers validate
+## it against the creature and fall back to its recommended loadout (VersusSetup.slot_loadout).
+func saved_loadout(creature_id: String, profile: Dictionary = {}) -> Array:
+	var p: Dictionary = current if profile.is_empty() else profile
+	var all = p.get("loadouts", {})
+	if typeof(all) != TYPE_DICTIONARY:
+		return []
+	return clean_loadout((all as Dictionary).get(creature_id, []))
+
+
+## Remembers the player's custom loadout for a fighter and saves the profile.
+func save_loadout(creature_id: String, ids: Array) -> void:
+	if current.is_empty() or creature_id == "":
+		return
+	var lo := clean_loadout(ids)
+	if lo.is_empty():
+		return
+	var all := clean_loadouts(current.get("loadouts", {}))
+	all[creature_id] = lo
+	current["loadouts"] = all
+	save()
 
 
 func id() -> String:
