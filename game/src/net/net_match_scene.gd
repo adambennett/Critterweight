@@ -333,15 +333,21 @@ func _fx_view(i: int):
 	return views[i]
 
 
-## What the ability effects need to know about a fighter, from the snapshot. The heavy-charge level
-## is not replicated: -2 lets the effects follow the charge by time.
+## What the ability effects need to know about a fighter, from the snapshot.
 func _fx_info(i: int) -> Dictionary:
 	var fd := _slot(i)
 	if fd.is_empty():
 		return {}
 	var flags := int(fd["flags"])
 	return {"ground": ground_pos(i), "state": int(fd.get("state", 0)), "juiced": flags & NetSnapshot.F_JUICED != 0,
-		"hidden": flags & NetSnapshot.F_HIDDEN != 0, "charge": -2.0, "out": false}
+		"hidden": flags & NetSnapshot.F_HIDDEN != 0, "charge": fx_charge(flags), "out": false}
+
+
+## The heavy-charge level for the ability effects. Only whether the fighter is holding a heavy is
+## replicated (F_CHARGING): -2 lets the effects follow that charge by time, -1 = not charging (a
+## tapped heavy shows no charge glow).
+static func fx_charge(flags: int) -> float:
+	return -2.0 if flags & NetSnapshot.F_CHARGING != 0 else -1.0
 
 
 func _display_name(i: int) -> String:

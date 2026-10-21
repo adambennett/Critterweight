@@ -82,6 +82,31 @@ func test_snapshot_sizes_fit_one_packet() -> void:
 	check(dm["hud"].has("cards") and dm["view"].has("referee"), "cards and referee view replicated")
 
 
+func test_charging_flag_rides_in_the_flags_byte() -> void:
+	# v0.9.17 charge glow: clients learn that a fighter is holding a heavy from a free flags bit
+	# (128), so a tapped heavy shows no glow; the snapshot stays the same size
+	var sim := _fighting_sim(2)
+	await step_sim(sim, 0.5)
+	var f := sim.fighters[0]
+	f._charging = false
+	var plain := NetSnapshot.encode_body(sim, _gens(sim))
+	f._charging = true
+	var held := NetSnapshot.encode_body(sim, _gens(sim))
+	f._charging = false
+	check_eq(held.size(), plain.size(), "the charging bit costs no bytes")
+	var d0 := NetSnapshot.decode_body(NetReader.new(plain))
+	var d1 := NetSnapshot.decode_body(NetReader.new(held))
+	check(int(d1["fighters"][0]["flags"]) & NetSnapshot.F_CHARGING != 0, "a fighter holding a heavy is flagged")
+	check(int(d1["fighters"][1]["flags"]) & NetSnapshot.F_CHARGING == 0, "the other one is not")
+	check(int(d0["fighters"][0]["flags"]) & NetSnapshot.F_CHARGING == 0, "nor is a fighter that let go")
+	for flag in [NetSnapshot.F_JUICED, NetSnapshot.F_EVADING, NetSnapshot.F_CRASH, NetSnapshot.F_GUARD, NetSnapshot.F_GROUNDED,
+			NetSnapshot.F_AI, NetSnapshot.F_HIDDEN]:
+		check(int(flag) & NetSnapshot.F_CHARGING == 0, "the bit was free (%d)" % flag)
+	# the client's effects: -2 = charging (follow it by time), -1 = not charging
+	check_eq(NetMatchScene.fx_charge(NetSnapshot.F_CHARGING | NetSnapshot.F_GROUNDED), -2.0, "charging")
+	check_eq(NetMatchScene.fx_charge(NetSnapshot.F_GROUNDED | NetSnapshot.F_JUICED), -1.0, "not charging")
+
+
 func test_roster_codec_and_generations() -> void:
 	var w := NetWriter.new()
 	NetSnapshot.encode_roster(w, [{"slot": 3, "gen": 7, "creature": "dev_biped", "scale": 1.6, "team": 1, "name": "Unit",

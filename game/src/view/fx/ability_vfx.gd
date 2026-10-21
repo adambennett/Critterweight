@@ -5,9 +5,10 @@ extends Node3D
 ## (MatchScene) and online clients (NetMatchScene). Driven only by simulation events, the
 ## replicated entity list and per-fighter view state: never by authority, never back into it.
 ##
-## Each effect has a purposeful preparation (from the move's start to its first effect time, read
-## from the move definition), motion, contact (exactly when the simulation fires the effect, in
-## exactly its footprint: cone angle, line length/width, ring radii) and dissipation. Shapes
+## Each effect has a purposeful preparation (from the move's start until its first effect fires:
+## the windup's real length depends on the fighter, so the move definition's time only shapes it),
+## motion, contact (exactly when the simulation fires the effect, in exactly its footprint: cone
+## angle, line length/width, ring radii, on the floor) and dissipation. Shapes
 ## follow the element language (docs/design/ART_DIRECTION.md §6, FxKit) and each fighter's own
 ## identity: Stoke's furnace pressure and ignition, Dredge's tidal force, Gusto's vortices,
 ## Dozer's crushing debris, Slurry's viscous sludge, Jitters' electrical discharge, Knell's
@@ -15,11 +16,15 @@ extends Node3D
 ##
 ## Budget (ART_DIRECTION §10): floor footprints are cheap decals; particles scale with the Effects
 ## quality (Low/Medium/High) and thin out in crowded fights; one trail per fighter; light flashes
-## are capped; "Reduce flashing" dims flashes and stops lightning flicker.
+## and build-up glows share one light cap; "Reduce flashing" dims flashes and slows lightning and
+## the static floor flicker.
 
 const Q_RATIO := [0.35, 0.65, 1.0]          ## particle amount per Effects quality
 const MAX_LIGHTS := [0, 3, 6]
 const POOL_CAP := 10                        ## pooled one-shot emitters per preset
+const PREP_CAP := 2.0                       ## a build-up's fallback life, x its move definition's time
+const FLICKER_HZ := 12.0                    ## static floor forks re-fork this often ...
+const FLICKER_HZ_REDUCED := 3.0             ## ... and this often under Reduce flashing
 const CORE_SEG := {"f_stoke": "chest", "f_dredge": "shell", "f_gusto": "torso", "f_dozer": "chest",
 	"f_slurry": "body1", "f_jitters": "body", "f_varga": "chest", "f_knell": "chest"}
 ## centre of the core segment's body relative to its joint pivot (rest space, metres)
@@ -86,6 +91,9 @@ var _ents := {}                  ## entity id -> {node, kind, pos, end: Callable
 var _auras := {}                 ## fighter -> {node, end: Callable}
 var _charges := {}               ## fighter -> {node, mat, glow}
 var _trails := {}                ## fighter -> {rib, pts: [[pos, t]], weapon, until, color}
+var _preps := {}                 ## fighter -> {id, move, until, seen}: the build-up of the move it prepares
+var _hovers := {}                ## fighter -> id of its running downdraft (Hang Time)
+var _serial := 0                 ## ids of build-ups and downdrafts (scheduled pieces check theirs)
 var _lights := 0
 var _clock := 0.0
 var _rng := RandomNumberGenerator.new()
@@ -309,8 +317,9 @@ func _configure(gp: GPUParticles3D, preset: String, dir: Vector3, ca: Color, cb:
 		m.set_shader_parameter("fade_in", float(o.get("fade_in", 0.08)))
 
 
-## One-shot particle burst. o: speed, spread, radius, box, scale, amount, life, floor, ring,
-## height, swirl, grow, gravity, drag, buoyancy.
+## One-shot particle burst. o: speed, spread, radius, box (half extents in the burst's own frame),
+## yaw (turns that frame: lines run along their yaw), scale, amount, life, floor, ring, height,
+## swirl, grow, gravity, drag, buoyancy.
 func burst(preset: String, pos: Vector3, dir: Vector3, ca: Color, cb = null, o := {}) -> void:
 	if not PRESETS.has(preset):
 		return
@@ -327,6 +336,9 @@ func burst(preset: String, pos: Vector3, dir: Vector3, ca: Color, cb = null, o :
 			amt *= 0.6
 	gp.amount_ratio = clampf(amt, 0.02, 1.0)
 	gp.global_position = pos
+	# the particle programs turn `emit_box` by the emitter's basis (EMISSION_TRANSFORM); a pooled
+	# emitter must not keep the previous burst's yaw
+	gp.global_basis = Basis(Vector3.UP, float(o["yaw"])) if o.has("yaw") else Basis.IDENTITY
 	gp.restart()
 	gp.emitting = true
 
@@ -374,15 +386,13 @@ func animate(node: Node, dur: float, fn: Callable, keep := false) -> void:
 func footprint(el: String, shape: String, origin: Vector3, yaw: float, radius: float, o := {}, life := 0.7, sweep := 0.12) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.mesh = FxKit.floor_quad()
-	var reach := maxf(radius, float(o.get("length", 0.0)))
-	var size := 2.0 * reach + 0.8
 	var mat := FxKit.area_material(el, shape, radius, o)
-	mat.set_shader_parameter("size_m", size)
 	if reduce_flashes:
 		mat.set_shader_parameter("front", float(o.get("front", 0.8)) * 0.5)
+	mat.set_shader_parameter("flicker_hz", FLICKER_HZ_REDUCED if reduce_flashes else FLICKER_HZ)
 	mi.material_override = mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	mi.custom_aabb = AABB(Vector3(-size * 0.5, -0.3, -size * 0.5), Vector3(size, 0.6, size))
+	_fit_footprint(mi, maxf(radius, float(o.get("length", 0.0))))
 	add_child(mi)
 	mi.global_position = origin + Vector3.UP * (0.025 + _rng.randf() * 0.01)
 	mi.rotation.y = yaw
@@ -398,6 +408,14 @@ func footprint(el: String, shape: String, origin: Vector3, yaw: float, radius: f
 		mat.set_shader_parameter("progress", 1.02)
 		mat.set_shader_parameter("fade", strength)
 	return mi
+
+
+## Sizes a footprint's quad (the shader grows the unit quad by `size_m`) and its culling box to
+## cover `reach` metres around its origin.
+static func _fit_footprint(mi: MeshInstance3D, reach: float) -> void:
+	var size := 2.0 * reach + 0.8
+	(mi.material_override as ShaderMaterial).set_shader_parameter("size_m", size)
+	mi.custom_aabb = AABB(Vector3(-size * 0.5, -0.3, -size * 0.5), Vector3(size, 0.6, size))
 
 
 ## An expanding ring wall (shockwave, tidal crest, toll) from r0 to r1 metres.
@@ -583,9 +601,11 @@ func flash_light(pos: Vector3, color: Color, energy: float, rng: float, dur: flo
 			_lights = maxi(0, _lights - 1))
 
 
-## Keeps `node` on a fighter's anchor for `dur` seconds; `end` runs when it lets go.
+## Keeps `node` on a fighter's anchor for `dur` seconds; `end` runs when it lets go. Setting the
+## follow's "turn" (`_follows[-1]["turn"] = true`) also keeps it on the fighter's facing; "tag"
+## names it for release().
 func follow(node: Node3D, fi: int, anchor_name: String, off: Vector3, dur: float, end: Callable = Callable()) -> void:
-	_follows.append({"node": node, "fi": fi, "anchor": anchor_name, "off": off, "until": _clock + dur, "end": end})
+	_follows.append({"node": node, "fi": fi, "anchor": anchor_name, "off": off, "until": _clock + dur, "end": end, "turn": false})
 	node.global_position = anchor(fi, anchor_name, off)
 
 
@@ -641,17 +661,23 @@ func _process(delta: float) -> void:
 				end.call()
 			continue
 		n.global_position = anchor(fi, str(f["anchor"]), f["off"])
+		if bool(f["turn"]):
+			n.rotation.y = _yaw(fi)
 		fk.append(f)
 	_follows = fk
 	_update_fighters()
 	_update_trails()
 
 
+func _alive(fi: int, inf: Dictionary) -> bool:
+	return not inf.is_empty() and not bool(inf.get("out", false)) and not bool(inf.get("hidden", false)) and _view(fi) != null
+
+
 func _update_fighters() -> void:
 	var n := int(fighter_count.call()) if fighter_count.is_valid() else 0
 	for fi in n:
 		var inf := _info(fi)
-		var alive := not inf.is_empty() and not bool(inf.get("out", false)) and not bool(inf.get("hidden", false)) and _view(fi) != null
+		var alive := _alive(fi, inf)
 		# JUICE aura
 		var juiced := alive and bool(inf.get("juiced", false))
 		if juiced and not _auras.has(fi):
@@ -662,6 +688,17 @@ func _update_fighters() -> void:
 			(au["end"] as Callable).call()
 		# heavy charge glow
 		_update_charge(fi, inf, alive)
+		if _hovers.has(fi) and not alive:
+			_hover_end(fi)
+	# a build-up also ends when its move is cut off before the effect (hit, grab, KO) or at its cap
+	for fi in _preps.keys():
+		var pr: Dictionary = _preps[fi]
+		var inf2 := _info(fi)
+		var st := int(inf2.get("state", -1))
+		if st == Fighter.State.ABILITY:
+			pr["seen"] = true      # online the sampled state can trail the move_start event a little
+		if not _alive(fi, inf2) or _clock >= float(pr["until"]) or (bool(pr["seen"]) and st != Fighter.State.ABILITY):
+			_end_prep(fi)
 
 
 # =====================================================================================
@@ -686,11 +723,16 @@ func on_event(ev: Dictionary) -> void:
 		"submerge":
 			_on_submerge(fi, ev)
 		"hover":
-			_on_hover(fi)
+			_on_hover(fi, ev)
 		"land":
-			release(fi, "hover")
+			_hover_end(fi)
 			if _cid(fi) == "f_gusto":
 				burst("wind", _ground(fi) + Vector3.UP * 0.1, Vector3.UP, Color(0.85, 0.97, 0.96, 0.4), null, {"ring": true, "radius": 0.4, "spread": 0.3, "speed": 0.6, "amount": 0.5})
+		"knockdown", "ko", "downed":
+			_hover_end(fi)          # a knockdown ends a hover; a KO'd or downed body drops out of it
+		"flinch":
+			if bool(ev.get("interrupted", false)):
+				_hover_end(fi)
 		"counter":
 			_on_counter(fi, ev)
 		"wall_bonk", "splat":
@@ -724,11 +766,17 @@ func on_event(ev: Dictionary) -> void:
 
 
 func _on_move_start(fi: int, ev: Dictionary) -> void:
+	var full_slot := str(ev.get("slot", ""))
+	# any move but a hover variant or JUICE ends a hover (Fighter._start_move), and every new move
+	# ends the last one's build-up
+	if not full_slot.ends_with("@hovering") and full_slot != "juice":
+		_hover_end(fi)
+	_end_prep(fi)
 	var id := str(ev.get("id", ""))
 	var m := _move_def(fi, id)
 	if m == null:
 		return
-	var slot := str(ev.get("slot", "")).split("@")[0]
+	var slot := full_slot.split("@")[0]
 	_end_charge(fi, slot == "heavy_charged")
 	var cid := _cid(fi)
 	if slot in ["ability1", "ability2", "juice"]:
@@ -743,25 +791,34 @@ func _on_move_start(fi: int, ev: Dictionary) -> void:
 # Preparation (move start .. first effect)
 # =====================================================================================
 
+## The build-up of an ability or JUICE. Its look is timed by the move definition (`lead`, the first
+## effect's time), but the windup's real length depends on the fighter (low stamina and speed
+## statuses slow it), so the pieces that last through it hold until the move's first effect event
+## arrives (_on_effect), the move is cut off (_update_fighters) or PREP_CAP x lead has passed.
+## Continuous pieces follow the fighter tagged "prep"; scheduled ones check _prep_live.
 func _prep(fi: int, cid: String, slot: String, m: MoveDef) -> void:
 	var lead := first_effect_t(m)
+	var cap := lead * PREP_CAP if not m.effects.is_empty() else lead
+	_serial += 1
+	var pid := _serial
+	_preps[fi] = {"id": pid, "move": m.id, "until": _clock + cap, "seen": false}
 	var el := m.element if m.element != "" else (str(effect_of(m, "area").get("element", "")) if not effect_of(m, "area").is_empty() else "")
 	match cid + ":" + slot:
 		"f_stoke:ability1":
 			# pressure builds: the boiler glows, vents hiss, hot motes rush into the firebox
 			_converge(fi, "belly", Vector3.ZERO, lead, Color(1.0, 0.55, 0.15), Color(1.0, 0.9, 0.5), 0.55)
-			_stacks_puff(fi, "steam", lead, 0.7)
-			_glow_at(fi, "belly", Vector3(0, 0, -0.02), lead + 0.05, Color(1.0, 0.5, 0.1), 0.35)
+			_stacks_puff(fi, "steam", cap, 0.7, "prep")
+			_glow_at(fi, "belly", Vector3(0, 0, -0.02), lead + 0.05, cap, Color(1.0, 0.5, 0.1), 0.35)
 		"f_stoke:ability2":
 			_converge(fi, "belly", Vector3.ZERO, lead, Color(1.0, 0.45, 0.1), Color(1.0, 0.85, 0.4), 0.7)
-			_stacks_puff(fi, "smoke", lead, 0.5)
+			_stacks_puff(fi, "smoke", cap, 0.5, "prep")
 		"f_stoke:juice":
 			# overheating: white-hot core, heat shimmer, the footprint of the blast spreading under him
-			_glow_at(fi, "core", Vector3(0, 0.0, 0.1), lead + 0.1, Color(1.0, 0.6, 0.2), 0.75, true)
+			_glow_at(fi, "core", Vector3(0, 0.0, 0.1), lead + 0.1, cap, Color(1.0, 0.6, 0.2), 0.75, true)
 			_converge(fi, "core", Vector3.ZERO, lead, Color(1.0, 0.6, 0.15), Color(1.0, 1.0, 0.8), 1.0)
-			_stacks_puff(fi, "flames", lead, 0.8)
+			_stacks_puff(fi, "flames", cap, 0.8, "prep")
 			var r := float(effect_of(m, "area").get("radius", 3.0))
-			footprint("scorch", "circle", _ground(fi), 0.0, r, {"fill": 0.12, "front": 0.4, "strength": 0.45}, lead + 0.05, lead)
+			_warn(fi, "scorch", "circle", r, {"fill": 0.12, "front": 0.4, "strength": 0.45}, lead, cap)
 		"f_dredge:ability1":
 			_converge(fi, "head", Vector3(0, 0.0, 0.18), lead, Color(0.5, 0.8, 1.0), Color(0.9, 0.98, 1.0), 0.5)
 			burst("drops", anchor(fi, "head", Vector3(0, 0, 0.15)), Vector3.DOWN, Color(0.55, 0.8, 1.0, 0.8), null, {"amount": 0.25, "speed": 0.3, "floor": _ground(fi).y})
@@ -770,16 +827,18 @@ func _prep(fi: int, cid: String, slot: String, m: MoveDef) -> void:
 		"f_dredge:juice":
 			# the tide rises around him before it breaks outward
 			var g := _ground(fi)
-			vortex(g, 1.1, 1.6, Color(0.25, 0.6, 0.95, 0.9), Color(0.85, 0.97, 1.0), lead + 0.12, {"turns": 2.0, "r0": 0.85, "spin": 5.0, "grow": 0.9})
+			var tide := vortex(g, 1.1, 1.6, Color(0.25, 0.6, 0.95, 0.9), Color(0.85, 0.97, 1.0), lead + 0.12, {"turns": 2.0, "r0": 0.85, "spin": 5.0, "grow": 0.9})
+			follow(tide, fi, "__ground", Vector3.ZERO, lead + 0.12)
 			burst("spray", g + Vector3.UP * 0.2, Vector3.UP, Color(0.35, 0.65, 0.95, 0.8), null, {"ring": true, "radius": 1.0, "spread": 0.4, "speed": 0.6, "life": 0.9})
-			footprint("brine", "circle", g, 0.0, 1.3, {"fill": 0.4, "strength": 0.8}, lead + 0.1, lead)
+			_warn(fi, "brine", "circle", 1.3, {"fill": 0.4, "strength": 0.8}, lead, cap)
 		"f_gusto:ability1":
 			_converge(fi, "beak", Vector3(0, 0, 0.05), lead, Color(0.4, 0.78, 0.8), Color(1, 1, 1), 0.45, "wisps")
 		"f_gusto:ability2":
 			burst("feathers", anchor(fi, "core"), Vector3.UP, Color(0.95, 0.93, 0.85), Color(0.75, 0.9, 0.9), {"amount": 0.5, "floor": _ground(fi).y})
 		"f_gusto:juice":
 			var gg := _ground(fi)
-			vortex(gg, 1.0, 1.5, Color(0.3, 0.72, 0.76, 0.85), Color(1, 1, 1), lead + 0.15, {"turns": 3.0, "r0": 0.4, "spin": 9.0, "grow": 0.8})
+			var wind := vortex(gg, 1.0, 1.5, Color(0.3, 0.72, 0.76, 0.85), Color(1, 1, 1), lead + 0.15, {"turns": 3.0, "r0": 0.4, "spin": 9.0, "grow": 0.8})
+			follow(wind, fi, "__ground", Vector3.ZERO, lead + 0.15)
 			burst("wind", gg + Vector3.UP * 0.4, Vector3.UP, Color(0.42, 0.78, 0.8, 0.55), null, {"ring": true, "radius": 1.2, "swirl": 6.0, "speed": 0.4})
 			burst("feathers", anchor(fi, "core"), Vector3.UP, Color(0.95, 0.93, 0.85), Color(0.75, 0.9, 0.9), {"amount": 0.6, "floor": gg.y})
 		"f_dozer:ability1":
@@ -791,33 +850,37 @@ func _prep(fi: int, cid: String, slot: String, m: MoveDef) -> void:
 		"f_dozer:ability2":
 			burst("dust", _ground(fi), Vector3.UP, Color(0.75, 0.62, 0.45, 0.55), null, {"ring": true, "radius": 0.6, "speed": 0.6})
 		"f_dozer:juice":
-			var lg := _ground(fi)
 			for k in 3:
 				_later(lead * (0.15 + 0.3 * k), func():
-					burst("pebbles", lg + Vector3.UP * 0.05, Vector3.UP, Color(0.6, 0.48, 0.34), Color(0.82, 0.7, 0.52), {"radius": 1.2, "amount": 0.4, "speed": 0.5, "floor": lg.y}))
+					if _prep_live(fi, pid):
+						var lg := _ground(fi)
+						burst("pebbles", lg + Vector3.UP * 0.05, Vector3.UP, Color(0.6, 0.48, 0.34), Color(0.82, 0.7, 0.52), {"radius": 1.2, "amount": 0.4, "speed": 0.5, "floor": lg.y}))
+			# the line turns and walks with him until it fires (Landslide is cast along his facing)
 			var la := effect_of(m, "area")
-			footprint("grit", "line", lg, _yaw(fi), 0.0, {"length": float(la.get("length", 6.0)), "width": float(la.get("width", 2.0)), "fill": 0.15, "front": 0.3, "strength": 0.5}, lead + 0.05, lead)
+			_warn(fi, "grit", "line", 0.0, {"length": float(la.get("length", 6.0)), "width": float(la.get("width", 2.0)), "fill": 0.15, "front": 0.3, "strength": 0.5}, lead, cap, true)
 		"f_slurry:ability1":
-			_drip(fi, "fang", lead + 0.1, 0.5)
+			_drip(fi, "fang", cap, 0.5)
 		"f_slurry:ability2":
 			burst("bubbles", _ground(fi) + Vector3.UP * 0.1, Vector3.UP, Color(0.55, 0.85, 0.2, 0.8), null, {"radius": 0.5, "amount": 0.6})
 		"f_slurry:juice":
-			_drip(fi, "head", lead + 0.2, 1.0)
-			_drip(fi, "body1", lead + 0.2, 0.8)
+			_drip(fi, "head", cap, 1.0)
+			_drip(fi, "body1", cap, 0.8)
 			burst("bubbles", _ground(fi) + Vector3.UP * 0.1, Vector3.UP, Color(0.55, 0.85, 0.2, 0.8), null, {"radius": 0.9, "amount": 1.0})
 		"f_jitters:ability1":
-			_antenna_sparks(fi, lead + 0.05, 0.6)
+			_antenna_sparks(fi, lead + 0.05, cap, 0.6, pid)
 		"f_jitters:ability2":
-			_antenna_sparks(fi, lead, 0.4)
+			_antenna_sparks(fi, lead, cap, 0.4, pid)
 		"f_jitters:juice":
-			_antenna_sparks(fi, lead + 0.05, 1.0)
+			_antenna_sparks(fi, lead + 0.05, cap, 1.0, pid)
 			for k in 4:
-				_later(lead * 0.2 * k, func(): _body_arcs(fi, 2, 0.16))
-			footprint("static", "circle", _ground(fi), 0.0, float(effect_of(m, "area").get("radius", 3.0)), {"fill": 0.1, "front": 0.3, "strength": 0.4}, lead + 0.05, lead)
+				_later(lead * 0.2 * k, func():
+					if _prep_live(fi, pid):
+						_body_arcs(fi, 2, 0.16))
+			_warn(fi, "static", "circle", float(effect_of(m, "area").get("radius", 3.0)), {"fill": 0.1, "front": 0.3, "strength": 0.4}, lead, cap)
 		"f_varga:ability2":
 			burst("mist", anchor(fi, "head", Vector3(0, -0.02, 0.12)), _fwd(fi) + Vector3.UP * 0.2, Color(0.95, 0.96, 1.0, 0.35), null, {"amount": 0.5, "speed": 0.4})
 		"f_varga:juice":
-			_glow_at(fi, "chest", Vector3(0, 0.05, 0.1), lead + 0.05, Color(1.0, 0.75, 0.4), 0.4)
+			_glow_at(fi, "chest", Vector3(0, 0.05, 0.1), lead + 0.05, cap, Color(1.0, 0.75, 0.4), 0.4)
 			burst("glints", anchor(fi, "chest"), Vector3.UP, Color(1.0, 0.85, 0.5), null, {"amount": 0.6, "speed": 0.5})
 		"f_knell:ability1":
 			# a lantern flame kindles where the Ghost Light will leave his hand
@@ -848,7 +911,43 @@ func _converge_point(p: Vector3, dur: float, ca: Color, cb: Color, amount: float
 		"spread": 0.05, "life": life / float(PRESETS[preset]["life"]), "amount": amount, "drag": 0.0, "buoyancy": 0.0, "fade_in": 0.3})
 
 
-func _glow_at(fi: int, anchor_name: String, off: Vector3, dur: float, c: Color, size: float, white_hot := false) -> void:
+## True while build-up `pid` is still running on the fighter (scheduled pieces check it).
+func _prep_live(fi: int, pid: int) -> bool:
+	return _preps.has(fi) and int((_preps[fi] as Dictionary)["id"]) == pid
+
+
+## Ends a fighter's build-up: its "prep" pieces stop, fade and free themselves.
+func _end_prep(fi: int) -> void:
+	if _preps.erase(fi):
+		release(fi, "prep")
+
+
+## A build-up telegraph: the area's true footprint spreading out under the fighter over `lead`
+## seconds. It stays on his feet (and with `turn` on his facing: he may still walk and turn while
+## winding up) until the build-up ends, then fades as the real footprint lands.
+func _warn(fi: int, el: String, shape: String, r: float, o: Dictionary, lead: float, cap: float, turn := false) -> void:
+	var mi := footprint(el, shape, _ground(fi), _yaw(fi) if turn else 0.0, r, o, INF)
+	var mat := mi.material_override as ShaderMaterial
+	var strength := float(o.get("strength", 1.0)) * (0.75 if reduce_flashes else 1.0)
+	var st := {"out": INF}          # when the build-up ended (the fade-out starts)
+	# keep footprint()'s small random lift: overlapping decals must not z-fight
+	follow(mi, fi, "__ground", Vector3.UP * (mi.global_position.y - _ground(fi).y), cap, func() -> void:
+		st["out"] = _clock)
+	_follows[-1]["tag"] = "prep"
+	_follows[-1]["turn"] = turn
+	animate(mi, cap + 0.3, func(_k: float, t: float) -> void:
+		var pr := clampf(t / maxf(lead, 0.001), 0.0, 1.0)
+		pr = 1.0 - (1.0 - pr) * (1.0 - pr)
+		var out := clampf((_clock - float(st["out"])) / 0.2, 0.0, 1.0)
+		mat.set_shader_parameter("progress", pr * 1.02)
+		mat.set_shader_parameter("fade", strength * (1.0 - out))
+		if out >= 1.0:
+			mi.queue_free())
+
+
+## A glow swelling on a fighter's anchor over `grow` seconds (pressure, gathering power); it holds
+## until the build-up ends (at most `cap`), then fades. Its light shares the flash cap (MAX_LIGHTS).
+func _glow_at(fi: int, anchor_name: String, off: Vector3, grow: float, cap: float, c: Color, size: float, white_hot := false) -> void:
 	var mi := MeshInstance3D.new()
 	var sm := SphereMesh.new()
 	sm.radius = 0.5
@@ -861,43 +960,63 @@ func _glow_at(fi: int, anchor_name: String, off: Vector3, dur: float, c: Color, 
 	mi.material_override = mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
-	follow(mi, fi, anchor_name, off, dur + 0.15)
-	animate(mi, dur + 0.15, func(k: float, _t: float) -> void:
-		var g := smoothstep(0.0, 0.85, k)
+	var st := {"out": INF}          # when the build-up ended (the fade-out starts)
+	follow(mi, fi, anchor_name, off, cap, func() -> void:
+		st["out"] = _clock)
+	_follows[-1]["tag"] = "prep"
+	animate(mi, cap + 0.25, func(_k: float, t: float) -> void:
+		var g := smoothstep(0.0, 0.85, t / maxf(grow, 0.001))
+		var out := clampf((_clock - float(st["out"])) / 0.15, 0.0, 1.0)
 		mi.scale = Vector3.ONE * size * (0.4 + 0.6 * g)
-		mat.set_shader_parameter("alpha", g * (1.0 - smoothstep(0.88, 1.0, k)) * (0.7 if reduce_flashes else 1.0)))
-	if quality >= 1:
-		var l := OmniLight3D.new()
-		l.light_color = c
-		l.omni_range = 2.2
-		l.shadow_enabled = false
-		add_child(l)
-		follow(l, fi, anchor_name, off, dur + 0.15)
-		var e0 := 1.6 * (0.4 if reduce_flashes else 1.0)
-		animate(l, dur + 0.15, func(k: float, _t: float) -> void:
-			l.light_energy = e0 * smoothstep(0.0, 0.85, k) * (1.0 - smoothstep(0.9, 1.0, k)))
+		mat.set_shader_parameter("alpha", g * (1.0 - out) * (0.7 if reduce_flashes else 1.0))
+		if out >= 1.0:
+			mi.queue_free())
+	if _lights >= int(MAX_LIGHTS[quality]):
+		return
+	var l := OmniLight3D.new()
+	l.light_color = c
+	l.omni_range = 2.2
+	l.shadow_enabled = false
+	add_child(l)
+	_lights += 1
+	follow(l, fi, anchor_name, off, cap)
+	_follows[-1]["tag"] = "prep"
+	var e0 := 1.6 * (0.4 if reduce_flashes else 1.0)
+	var counted := {"on": true}
+	animate(l, cap + 0.25, func(k: float, t: float) -> void:
+		var out := clampf((_clock - float(st["out"])) / 0.15, 0.0, 1.0)
+		l.light_energy = e0 * smoothstep(0.0, 0.85, t / maxf(grow, 0.001)) * (1.0 - out)
+		if (out >= 1.0 or k >= 1.0) and bool(counted["on"]):
+			counted["on"] = false
+			_lights = maxi(0, _lights - 1)
+			l.queue_free())
 
 
 ## Stoke's back stacks (two vents behind the shoulders).
-func _stacks_puff(fi: int, preset: String, dur: float, amount: float) -> void:
+func _stacks_puff(fi: int, preset: String, dur: float, amount: float, tag := "") -> void:
 	for off in STOKE_STACKS:
 		var c := Color(0.92, 0.92, 0.95, 0.5) if preset == "steam" else (Color(0.35, 0.33, 0.33, 0.5) if preset == "smoke" else Color(1.0, 0.55, 0.15, 0.9))
 		_stream_at(fi, "core", off, dur, preset, c, Color(1.0, 0.9, 0.5, 0.9) if preset == "flames" else null,
-			{"amount": amount * 0.45, "speed": 0.6, "spread": 0.2, "life": 0.55, "scale": 0.55, "grow": 1.8})
+			{"amount": amount * 0.45, "speed": 0.6, "spread": 0.2, "life": 0.55, "scale": 0.55, "grow": 1.8}, tag)
 
 
+## Slurry's goo dripping during a build-up (at most `dur`).
 func _drip(fi: int, anchor_name: String, dur: float, amount: float) -> void:
 	_stream_at(fi, anchor_name, Vector3.ZERO, dur, "gobs", Color(0.45, 0.72, 0.12), Color(0.62, 0.86, 0.2),
-		{"dir": Vector3.DOWN, "speed": 0.15, "spread": 0.6, "amount": amount * 0.6, "scale": 0.6, "floor": _ground(fi).y})
+		{"dir": Vector3.DOWN, "speed": 0.15, "spread": 0.6, "amount": amount * 0.6, "scale": 0.6, "floor": _ground(fi).y}, "prep")
 
 
-func _antenna_sparks(fi: int, dur: float, amount: float) -> void:
+## Jitters' antennae sparking during build-up `pid`: arcs snap between them every 0.09 s for about
+## `dur` seconds, the sparks stream for at most `cap`.
+func _antenna_sparks(fi: int, dur: float, cap: float, amount: float, pid: int) -> void:
 	for a in ["antenna_l", "antenna_r"]:
-		_stream_at(fi, a, Vector3.ZERO, dur, "sparks", Color(1.0, 0.95, 0.55), Color(1.0, 1.0, 0.9), {"amount": amount * 0.5, "speed": 0.4, "floor": _ground(fi).y})
+		_stream_at(fi, a, Vector3.ZERO, cap, "sparks", Color(1.0, 0.95, 0.55), Color(1.0, 1.0, 0.9), {"amount": amount * 0.5, "speed": 0.4, "floor": _ground(fi).y}, "prep")
 	if quality >= 1:
 		var steps := clampi(int(dur / 0.09), 1, 8)
 		for k in steps:
-			_later(0.09 * k, func(): bolt(anchor(fi, "antenna_l"), anchor(fi, "antenna_r"), Color(1.0, 0.92, 0.35), 0.08, 0.04, 0.08))
+			_later(0.09 * k, func():
+				if _prep_live(fi, pid):
+					bolt(anchor(fi, "antenna_l"), anchor(fi, "antenna_r"), Color(1.0, 0.92, 0.35), 0.08, 0.04, 0.08))
 
 
 ## Short arcs crawling over Jitters' body (static).
@@ -937,72 +1056,93 @@ func _on_effect(fi: int, ev: Dictionary) -> void:
 	var shape := str(ev.get("shape", "circle"))
 	var origin: Vector3 = ev.get("origin", pos)
 	var cid := _cid(fi) if fi >= 0 else ""
+	# the move's first effect ends its build-up, however long its windup really took
+	if _preps.has(fi) and str((_preps[fi] as Dictionary)["move"]) == str(ev.get("move", "")):
+		_end_prep(fi)
+	# areas are horizontal (EffectsSystem.area tests circles, cones and lines on the floor plane), so
+	# their footprints and rings lie on the floor even when the effect went off in the air (a
+	# projectile expiring mid-flight: Gust Bomb, Arc Lash)
+	var g := Vector3(pos.x, 0.0, pos.z)
+	var go := Vector3(origin.x, 0.0, origin.z)
 	match vfx:
 		"steam_vent":
-			_steam_vent(fi, origin, yaw, r, float(ev.get("cone_deg", 60.0)))
+			_steam_vent(fi, go, yaw, r, float(ev.get("cone_deg", 60.0)))
 			return
 		"stoke_the_fire":
 			_stoke_the_fire(fi)
 			return
 		"meltdown":
-			_meltdown(fi, pos, r)
+			_meltdown(fi, g, r)
 			return
 		"tide_ring":
-			_high_tide(fi, pos, r, float(ev.get("inner", 0.0)))
+			_high_tide(fi, g, r, float(ev.get("inner", 0.0)))
 			return
 		"brine_wave":
-			_brine_wave(fi, origin, yaw, float(ev.get("length", 3.5)), float(ev.get("width", 1.0)))
+			_brine_wave(fi, go, yaw, float(ev.get("length", 3.5)), float(ev.get("width", 1.0)))
 			return
 		"hurricane":
-			_hurricane(fi, origin, yaw, r, float(ev.get("cone_deg", 90.0)))
+			_hurricane(fi, go, yaw, r, float(ev.get("cone_deg", 90.0)))
 			return
 		"gust_burst":
 			_gust_burst(pos, r)
 			return
 		"crosswind":
-			_crosswind(fi, pos, r)
+			_crosswind(fi, g, r)
 			return
 		"downdraft", "tailspin":
-			_wind_ring(fi, pos, r, vfx == "tailspin")
+			_wind_ring(fi, g, r, vfx == "tailspin")
 			return
 		"landslide":
-			_landslide(fi, origin, yaw, float(ev.get("length", 6.0)), float(ev.get("width", 2.0)))
+			_landslide(fi, go, yaw, float(ev.get("length", 6.0)), float(ev.get("width", 2.0)))
 			return
 		"gravel_spray":
-			_gravel_spray(fi, origin, yaw, r, float(ev.get("cone_deg", 60.0)))
+			_gravel_spray(fi, go, yaw, r, float(ev.get("cone_deg", 60.0)))
 			return
 		"wave":
-			_sludge_wave(fi, origin, yaw, float(ev.get("length", 4.0)), float(ev.get("width", 1.6)))
+			_sludge_wave(fi, go, yaw, float(ev.get("length", 4.0)), float(ev.get("width", 1.6)))
 			return
 		"drain":
-			_drain_emerge(pos, r)
+			_drain_emerge(g, r)
 			return
 		"overcharge", "pulse", "squash", "discharge":
 			_static_burst(fi, pos, r, vfx)
 			return
 		"ring":
 			if cid == "f_knell":
-				_knell_toll(fi, pos, r)
+				_knell_toll(fi, g, r)
 				return
 		"bolt":
-			_sky_bolt(pos, r, el)
-			return
+			# only a Static delayed strike calls lightning down (Stormfront, storm zones); any other
+			# strike, or a projectile that merely looks like a bolt, is drawn by its type below
+			if t == "strike" and el == "static":
+				_sky_bolt(g, r, el)
+				return
 	match t:
 		"area":
 			_generic_area(fi, cid, el, shape, pos, origin, yaw, r, ev)
+		"strike":
+			_strike(el, g, r)
 		"zone":
-			_zone_spawn_splash(el, pos, r, vfx)
+			_zone_spawn_splash(el, g, r, vfx)
 		"buff":
 			_buff(fi, cid, ev)
 		"dash":
 			if cid == "f_varga":
 				_varga_dash(fi, ev)
 			else:
-				burst("dust", _ground(fi), -_fwd(fi) + Vector3.UP * 0.3, Color(0.8, 0.75, 0.65, 0.4), null, {"amount": 0.4})
+				burst("dust", _ground(fi), -_dash_dir(fi, ev) + Vector3.UP * 0.3, Color(0.8, 0.75, 0.65, 0.4), null, {"amount": 0.4})
 		"counter_stance":
-			_anchor_drop(fi, float(ev.get("duration", 2.5)))
+			# Anchor Drop's whirlpool is Dredge's own; anyone else (Snappington, Kid Lamprey) braces
+			if cid == "f_dredge":
+				_anchor_drop(fi, float(ev.get("duration", 2.5)))
+			else:
+				_brace(fi, el if el != "" else _move_element(fi, ev))
 		"charge":
-			_bulldoze(fi, float(ev.get("distance", 6.0)) / maxf(0.5, float(ev.get("speed", 7.0))))
+			# Bulldoze's plume is Dozer's own; anyone else's charge (Jitters' Pinball) kicks off generically
+			if cid == "f_dozer":
+				_bulldoze(fi, float(ev.get("distance", 6.0)) / maxf(0.5, float(ev.get("speed", 7.0))))
+			else:
+				_charge_kick(fi, el if el != "" else _move_element(fi, ev))
 		"juice_state":
 			pass        # the aura follows the fighter's JUICE state (see _update_fighters)
 		"projectile":
@@ -1016,7 +1156,23 @@ func _on_effect(fi: int, ev: Dictionary) -> void:
 		"shield":
 			ring_wall(_ground(fi), 0.6, 0.75, 1.6, Color(0.6, 0.85, 1.0), Color(1, 1, 1), 0.5, {"bands": 8.0})
 		"pull", "push":
-			_push_wave(fi, pos, maxf(r, 1.0), el, t == "pull")
+			_push_wave(fi, g, maxf(r, 1.0), el, t == "pull")
+
+
+## The element of the move that fired an effect event ("" when unknown).
+func _move_element(fi: int, ev: Dictionary) -> String:
+	var m := _move_def(fi, str(ev.get("move", "")))
+	return m.element if m != null else ""
+
+
+## The world direction a dash really went (the event's "dir"; "stick" dashes keep the facing on
+## the opponent), else the fighter's facing.
+func _dash_dir(fi: int, ev: Dictionary) -> Vector3:
+	var d := Vector3.ZERO
+	if ev.get("dir") is Vector3:
+		d = ev["dir"]
+	d.y = 0.0
+	return d.normalized() if d.length_squared() > 1e-4 else _fwd(fi)
 
 
 ## ---- Stoke: furnace pressure and ignition ----
@@ -1088,7 +1244,7 @@ func _brine_wave(fi: int, origin: Vector3, yaw: float, length: float, width: flo
 	crest(origin, yaw, length, width, 0.55, Color(0.25, 0.58, 0.92, 0.9), Color(0.92, 0.98, 1.0), 0.24, 0.6)
 	var fwd := MathX.forward_of_yaw(yaw)
 	burst("spray", origin + fwd * length * 0.5 + Vector3.UP * 0.2, fwd + Vector3.UP, Color(0.35, 0.65, 0.95, 0.8), null,
-		{"box": Vector3(width * 0.5, 0.1, length * 0.45), "speed": 0.7, "amount": 0.8})
+		{"box": Vector3(width * 0.5, 0.1, length * 0.45), "yaw": yaw, "speed": 0.7, "amount": 0.8})
 	burst("drops", origin + fwd * length * 0.8 + Vector3.UP * 0.2, fwd + Vector3.UP, Color(0.4, 0.7, 1.0, 0.85), null, {"amount": 0.5, "speed": 0.8, "floor": origin.y})
 
 
@@ -1165,12 +1321,17 @@ func _wind_streak(start: Vector3, yaw: float, length: float, dur: float, curl :=
 		draw_ribbon(mi, pts, w, al))
 
 
+## The Gust Bomb bursting at `pos` (in the air when it timed out mid-flight): its push is a circle on
+## the floor under that point.
 func _gust_burst(pos: Vector3, r: float) -> void:
-	footprint("gale", "circle", pos, 0.0, r, {"fill": 0.5}, 0.7, 0.12)
-	ring_wall(pos, 0.2, r, 0.7, Color(0.3, 0.72, 0.76), Color(1, 1, 1), 0.4, {"bands": 9.0, "scroll": Vector2(1.5, -0.5)})
-	burst("wind", pos + Vector3.UP * 0.4, Vector3.UP, Color(0.42, 0.78, 0.8, 0.55), null, {"ring": true, "radius": 0.2, "speed": r / 1.2, "spread": 0.2, "swirl": 3.0})
+	var g := Vector3(pos.x, 0.0, pos.z)
+	footprint("gale", "circle", g, 0.0, r, {"fill": 0.5}, 0.7, 0.12)
+	ring_wall(g, 0.2, r, 0.7, Color(0.3, 0.72, 0.76), Color(1, 1, 1), 0.4, {"bands": 9.0, "scroll": Vector2(1.5, -0.5)})
+	burst("wind", g + Vector3.UP * 0.4, Vector3.UP, Color(0.42, 0.78, 0.8, 0.55), null, {"ring": true, "radius": 0.2, "speed": r / 1.2, "spread": 0.2, "swirl": 3.0})
+	if pos.y > 0.6:
+		burst("wind", pos, Vector3.DOWN, Color(0.42, 0.78, 0.8, 0.5), null, {"spread": 1.2, "speed": 0.8, "amount": 0.5, "swirl": 4.0})
 	for k in 4:
-		_wind_streak(pos + Vector3.UP * 0.3, TAU * k / 4.0 + 0.3, r, 0.3, 0.6)
+		_wind_streak(g + Vector3.UP * 0.3, TAU * k / 4.0 + 0.3, r, 0.3, 0.6)
 
 
 func _crosswind(fi: int, pos: Vector3, r: float) -> void:
@@ -1203,20 +1364,40 @@ func _wind_ring(fi: int, pos: Vector3, r: float, spin: bool) -> void:
 	burst("feathers", anchor(fi, "core"), Vector3.UP, Color(0.95, 0.93, 0.85), Color(0.75, 0.9, 0.9), {"amount": 0.4, "floor": pos.y})
 
 
-func _on_hover(fi: int) -> void:
+## Hang Time's downdraft for as long as the hover really lasts: the event carries the effective
+## duration (the hover_duration mod applied); a hover event of duration 0 is a dive ending it.
+## Pulses and the wind stream stop early when the hover ends (_hover_end).
+func _on_hover(fi: int, ev: Dictionary) -> void:
+	_hover_end(fi)
 	if _cid(fi) != "f_gusto":
 		return
-	var m := _move_def(fi, "ability2")
-	var dur := float(effect_of(m, "hover").get("duration", 1.2))
+	var dur := float(ev.get("duration", effect_of(_move_def(fi, "ability2"), "hover").get("duration", 1.2)))
+	if dur <= 0.0:
+		return
+	_serial += 1
+	var hid := _serial
+	_hovers[fi] = hid
 	# downdraft: pulsing wind rings pressed onto the floor under him, dust spreading out
-	var g0 := _ground(fi)
-	var pulses := int(dur / 0.22)
-	for k in pulses:
-		_later(0.22 * k, func():
-			var gp := _ground(fi)
-			ring_wall(gp + Vector3.UP * 0.05, 0.2, 1.1, 0.15, Color(0.35, 0.75, 0.78, 0.85), Color(1, 1, 1), 0.35, {"bands": 6.0}))
+	var holder := Node.new()
+	add_child(holder)
+	var st := {"next": 0.0}
+	animate(holder, dur, func(k: float, t: float) -> void:
+		if int(_hovers.get(fi, -1)) != hid:
+			holder.queue_free()      # the hover ended early
+			return
+		if k >= 1.0:
+			_hovers.erase(fi)
+		elif t >= float(st["next"]) and float(st["next"]) <= dur - 0.22:
+			st["next"] = float(st["next"]) + 0.22
+			ring_wall(_ground(fi) + Vector3.UP * 0.05, 0.2, 1.1, 0.15, Color(0.35, 0.75, 0.78, 0.85), Color(1, 1, 1), 0.35, {"bands": 6.0}))
 	_stream_at(fi, "core", Vector3(0, -0.25, 0), dur, "wind", Color(0.42, 0.78, 0.8, 0.45), null, {"dir": Vector3.DOWN, "speed": 0.5, "amount": 0.5, "spread": 0.5}, "hover")
-	burst("dust", g0, Vector3.UP, Color(0.8, 0.77, 0.7, 0.4), null, {"ring": true, "radius": 0.5, "speed": 0.9})
+	burst("dust", _ground(fi), Vector3.UP, Color(0.8, 0.77, 0.7, 0.4), null, {"ring": true, "radius": 0.5, "speed": 0.9})
+
+
+## A fighter's hover is over (dive, landing, knockdown, another move, flinch): its downdraft stops.
+func _hover_end(fi: int) -> void:
+	_hovers.erase(fi)
+	release(fi, "hover")
 
 
 ## ---- Dozer: crushing debris ----
@@ -1229,21 +1410,38 @@ func _bulldoze(fi: int, dur: float) -> void:
 	burst("chunks", g0 + Vector3.UP * 0.15, back + Vector3.UP * 0.6, Color(0.5, 0.41, 0.31), Color(0.68, 0.58, 0.45), {"amount": 0.5, "speed": 0.8, "floor": g0.y})
 	burst("dust", g0, back + Vector3.UP * 0.3, Color(0.7, 0.58, 0.43, 0.6), null, {"amount": 0.8, "speed": 0.9, "scale": 1.3})
 	for hoof in ["hoof_bl", "hoof_br"]:
-		_stream_at(fi, hoof, Vector3.ZERO, dur, "dust", Color(0.7, 0.58, 0.43, 0.62), Color(0.8, 0.7, 0.55, 0.5), {"speed": 0.35, "amount": 1.0, "spread": 1.1, "scale": 1.4, "grow": 2.6}, "charge")
-	_stream_at(fi, "hoof_fl", Vector3.ZERO, dur, "pebbles", Color(0.5, 0.41, 0.31), Color(0.7, 0.6, 0.46), {"speed": 0.6, "amount": 0.8, "floor": g0.y}, "charge")
-	_stream_at(fi, "horn", Vector3.ZERO, dur, "sparks", Color(1.0, 0.8, 0.45), null, {"speed": 0.3, "amount": 0.25, "floor": g0.y}, "charge")
-	var holder := Node.new()
+		_stream_at(fi, hoof, Vector3.ZERO, dur, "dust", Color(0.7, 0.58, 0.43, 0.62), Color(0.8, 0.7, 0.55, 0.5), {"speed": 0.35, "amount": 1.0, "spread": 1.1, "scale": 1.4, "grow": 2.6}, "bulldoze")
+	_stream_at(fi, "hoof_fl", Vector3.ZERO, dur, "pebbles", Color(0.5, 0.41, 0.31), Color(0.7, 0.6, 0.46), {"speed": 0.6, "amount": 0.8, "floor": g0.y}, "bulldoze")
+	_stream_at(fi, "horn", Vector3.ZERO, dur, "sparks", Color(1.0, 0.8, 0.45), null, {"speed": 0.3, "amount": 0.25, "floor": g0.y}, "bulldoze")
+	# the torn-up floor: stamped while he is really charging. Everything stops when he is knocked
+	# out of the move (wall bonk, flinch, stun, KO; release(fi, "bulldoze")), and nothing piles up
+	# under a Dozer that has stopped (the charge ended into its recovery, a splat)
+	var holder := Node3D.new()
 	add_child(holder)
-	var st := {"next": 0.0}
+	var hid := holder.get_instance_id()
+	follow(holder, fi, "__ground", Vector3.ZERO, dur, func() -> void:
+		var o := instance_from_id(hid)
+		if o != null:
+			(o as Node).queue_free())
+	_follows[-1]["tag"] = "bulldoze"
+	var st := {"next": 0.0, "last": Vector3.INF, "seen": false}
 	animate(holder, dur, func(_k: float, t: float) -> void:
-		if t >= float(st["next"]) and _view(fi) != null:
+		var s := int(_info(fi).get("state", -1))
+		if s == Fighter.State.ABILITY or s == Fighter.State.ATTACK:
+			st["seen"] = true          # online the sampled state can trail the event a little
+		elif bool(st["seen"]):
+			release(fi, "bulldoze")
+			return
+		var gp := _ground(fi)
+		if t >= float(st["next"]) and _view(fi) != null and gp.distance_to(st["last"]) >= 0.15:
 			st["next"] = t + 0.09
-			footprint("grit", "circle", _ground(fi) + _fwd(fi) * 0.3, _yaw(fi), 0.5, {"fill": 0.75, "stain_a": 0.45, "front": 0.0}, 1.5, 0.05))
+			st["last"] = gp
+			footprint("grit", "circle", gp + _fwd(fi) * 0.3, _yaw(fi), 0.5, {"fill": 0.75, "stain_a": 0.45, "front": 0.0}, 1.5, 0.05))
 
 
 func _on_crash(fi: int, ev: Dictionary) -> void:
 	var p: Vector3 = ev.get("pos", anchor(fi, "core"))
-	release(fi, "charge")
+	release(fi, "bulldoze")
 	burst("chunks", p + Vector3.UP * 0.3, Vector3.UP, Color(0.5, 0.41, 0.31), Color(0.7, 0.6, 0.46), {"amount": 0.8, "floor": _ground(fi).y})
 	burst("dust", p, Vector3.UP, Color(0.72, 0.6, 0.45, 0.6), null, {"amount": 1.0, "scale": 1.3})
 	ring_wall(Vector3(p.x, _ground(fi).y, p.z), 0.2, 1.3, 0.35, Color(0.6, 0.48, 0.34, 0.8), Color(0.85, 0.75, 0.55), 0.35, {"add": false, "core": 0.3})
@@ -1260,8 +1458,8 @@ func _landslide(fi: int, origin: Vector3, yaw: float, length: float, width: floa
 		var delay := u * 0.28
 		var p := origin + fwd * length * u + side * _rng.randf_range(-width * 0.3, width * 0.3)
 		_later(delay, func(): _rock_spire(p, 0.35 + 0.25 * _rng.randf(), yaw))
-	burst("dust", origin + fwd * length * 0.5, Vector3.UP, Color(0.74, 0.62, 0.46, 0.5), null, {"box": Vector3(width * 0.5, 0.1, length * 0.5), "speed": 0.7, "amount": 1.0})
-	burst("chunks", origin + fwd * length * 0.5 + Vector3.UP * 0.2, Vector3.UP, Color(0.58, 0.47, 0.34), Color(0.8, 0.7, 0.55), {"box": Vector3(width * 0.4, 0.1, length * 0.45), "speed": 0.9, "floor": origin.y})
+	burst("dust", origin + fwd * length * 0.5, Vector3.UP, Color(0.74, 0.62, 0.46, 0.5), null, {"box": Vector3(width * 0.5, 0.1, length * 0.5), "yaw": yaw, "speed": 0.7, "amount": 1.0})
+	burst("chunks", origin + fwd * length * 0.5 + Vector3.UP * 0.2, Vector3.UP, Color(0.58, 0.47, 0.34), Color(0.8, 0.7, 0.55), {"box": Vector3(width * 0.4, 0.1, length * 0.45), "yaw": yaw, "speed": 0.9, "floor": origin.y})
 
 
 func _rock_spire(p: Vector3, size: float, yaw: float) -> void:
@@ -1297,8 +1495,8 @@ func _sludge_wave(fi: int, origin: Vector3, yaw: float, length: float, width: fl
 	crest(origin, yaw, length, width, 0.65, Color(0.3, 0.5, 0.06, 0.95), Color(0.65, 0.9, 0.2), 0.3, 0.75, {"depth": 0.7})
 	var fwd := MathX.forward_of_yaw(yaw)
 	burst("gobs", origin + fwd * length * 0.6 + Vector3.UP * 0.3, fwd + Vector3.UP * 1.2, Color(0.42, 0.68, 0.1), Color(0.62, 0.86, 0.2),
-		{"box": Vector3(width * 0.4, 0.1, length * 0.35), "speed": 0.8, "floor": origin.y})
-	burst("bubbles", origin + fwd * length * 0.5, Vector3.UP, Color(0.55, 0.85, 0.2, 0.8), null, {"box": Vector3(width * 0.5, 0.05, length * 0.5), "amount": 0.8})
+		{"box": Vector3(width * 0.4, 0.1, length * 0.35), "yaw": yaw, "speed": 0.8, "floor": origin.y})
+	burst("bubbles", origin + fwd * length * 0.5, Vector3.UP, Color(0.55, 0.85, 0.2, 0.8), null, {"box": Vector3(width * 0.5, 0.05, length * 0.5), "yaw": yaw, "amount": 0.8})
 
 
 func _on_submerge(fi: int, ev: Dictionary) -> void:
@@ -1362,22 +1560,25 @@ func _drain_emerge(pos: Vector3, r: float) -> void:
 
 ## ---- Jitters: electrical discharge ----
 
+## A static discharge at `pos`: forks out to its radius on the floor. An Arc Lash orb expiring in
+## the air forks down from where it burst.
 func _static_burst(fi: int, pos: Vector3, r: float, vfx: String) -> void:
 	var big := vfx == "overcharge"
 	var rr := maxf(r, 0.4)
-	footprint("static", "circle", pos, 0.0, rr, {"fill": 0.55 if big else 0.4, "front": 1.0}, 0.8 if big else 0.55, 0.08)
+	var g := Vector3(pos.x, 0.0, pos.z)
+	footprint("static", "circle", g, 0.0, rr, {"fill": 0.55 if big else 0.4, "front": 1.0}, 0.8 if big else 0.55, 0.08)
 	var c := Color(1.0, 0.9, 0.3)
 	var forks := 9 if big else (5 if rr >= 1.0 else 3)
 	var h := 0.35 if vfx != "discharge" else 0.0
-	var src := pos + Vector3.UP * (0.6 if vfx != "discharge" else 0.0)
+	var src := pos if pos.y > 0.6 else g + Vector3.UP * (0.6 if vfx != "discharge" else 0.0)
 	for k in forks:
 		var a := TAU * (float(k) + _rng.randf() * 0.6) / forks
-		var tip := pos + Vector3(sin(a), 0, cos(a)) * rr + Vector3.UP * (0.05 + h * _rng.randf())
+		var tip := g + Vector3(sin(a), 0, cos(a)) * rr + Vector3.UP * (0.05 + h * _rng.randf())
 		bolt(src, tip, c, 0.24 if big else 0.16, 0.07 if big else 0.05, 0.25)
 	if big:
-		ring_wall(pos, 0.3, rr, 0.5, Color(1.0, 0.92, 0.4), Color(1, 1, 0.9), 0.3, {"bands": 14.0, "scroll": Vector2(3.0, 0.0)})
+		ring_wall(g, 0.3, rr, 0.5, Color(1.0, 0.92, 0.4), Color(1, 1, 0.9), 0.3, {"bands": 14.0, "scroll": Vector2(3.0, 0.0)})
 		_body_arcs(fi, 4, 0.25)
-	burst("sparks", src, Vector3.UP, Color(1.0, 0.95, 0.6), Color(1.0, 1.0, 0.95), {"amount": 1.0 if big else 0.5, "speed": 1.2 if big else 0.8, "floor": pos.y})
+	burst("sparks", src, Vector3.UP, Color(1.0, 0.95, 0.6), Color(1.0, 1.0, 0.95), {"amount": 1.0 if big else 0.5, "speed": 1.2 if big else 0.8, "floor": g.y})
 	flash_light(src, Color(1.0, 0.95, 0.6), 4.0 if big else 2.0, rr * 2.0 + 1.0, 0.18)
 
 
@@ -1428,8 +1629,9 @@ func _varga_dash(fi: int, ev: Dictionary) -> void:
 	var dur := float(ev.get("time", 0.18)) + 0.04
 	var dist := clampf(float(ev.get("speed", 5.0)) * dur, 0.5, 2.5)
 	var g := _ground(fi)
-	var yaw := _yaw(fi)
-	var fwd := MathX.forward_of_yaw(yaw)
+	# along the dash itself: Cut the Angle goes where the stick points while he keeps facing his man
+	var fwd := _dash_dir(fi, ev)
+	var yaw := atan2(fwd.x, fwd.z)
 	_varga_afterimage(fi, g, dur)
 	footprint("scrap", "line", g - fwd * 0.2, yaw, 0.0, {"length": dist + 0.4, "width": 0.45, "fill": 0.55, "front": 1.0,
 		"color": Color(0.95, 0.62, 0.22), "color2": Color(1.0, 0.92, 0.65)}, 0.6, dur)
@@ -1485,22 +1687,25 @@ func _varga_afterimage(fi: int, _from: Vector3, dur: float) -> void:
 
 # ---- generic contact for other areas / fighters --------------------------------------------
 
+## Any other area: its true footprint on the floor (cones and lines from the feet, see
+## EffectsSystem.area; a burst in the air, e.g. a projectile's on_expire, still pops where it went off).
 func _generic_area(fi: int, cid: String, el: String, shape: String, pos: Vector3, origin: Vector3, yaw: float, r: float, ev: Dictionary) -> void:
 	if r <= 0.0 and shape != "line":
 		return
 	var o := {"cone_deg": float(ev.get("cone_deg", 60.0)), "length": float(ev.get("length", 3.0)), "width": float(ev.get("width", 1.0)),
 		"inner": float(ev.get("inner", 0.0)), "fill": 0.45}
-	var at := origin if shape in ["cone", "cone_back", "line"] else pos
+	var g := Vector3(pos.x, 0.0, pos.z)
+	var at := Vector3(origin.x, 0.0, origin.z) if shape in ["cone", "line"] else g
 	footprint(el, shape, at, yaw, r, o, 0.75, 0.12)
 	if shape == "circle" or shape == "ring":
 		var c := FxKit.el_color(el)
 		var covers := FxKit.AREA_COVERS.has(el)
-		ring_wall(pos, 0.2, r, 0.5, c, FxKit.el_hot(el), 0.4, {"add": not covers, "bands": 0.0 if covers else 6.0})
-	_element_burst(el, pos + Vector3.UP * 0.4, 1.0, pos.y)
+		ring_wall(g, 0.2, r, 0.5, c, FxKit.el_hot(el), 0.4, {"add": not covers, "bands": 0.0 if covers else 6.0})
+	_element_burst(el, pos if pos.y > 0.6 else g + Vector3.UP * 0.4, 1.0, g.y)
 	if cid == "f_varga":
-		_varga_ring(pos, r)
+		_varga_ring(g, r)
 	elif cid == "f_knell":
-		burst("wisps", pos + Vector3.UP * 0.5, Vector3.UP, Color(0.68, 0.52, 1.0, 0.7), null, {"ring": true, "radius": r * 0.8, "speed": 0.4})
+		burst("wisps", g + Vector3.UP * 0.5, Vector3.UP, Color(0.68, 0.52, 1.0, 0.7), null, {"ring": true, "radius": r * 0.8, "speed": 0.4})
 
 
 func _varga_ring(pos: Vector3, r: float) -> void:
@@ -1557,12 +1762,36 @@ func _push_wave(_fi: int, pos: Vector3, r: float, el: String, pull: bool) -> voi
 
 
 func _sky_bolt(pos: Vector3, r: float, el: String) -> void:
-	# Stormfront's delayed strike: a bolt from above into the marked circle
+	# a Static delayed strike (Stormfront, storm zones): a bolt from above into the marked circle
 	var c := FxKit.el_color(el if el != "" else "static")
 	bolt(pos + Vector3(0.3, 6.0, -0.2), pos + Vector3.UP * 0.05, c, 0.3, 0.12, 0.6)
-	footprint("static", "circle", pos, 0.0, maxf(r, 0.6), {"fill": 0.6, "front": 1.0}, 0.6, 0.06)
+	footprint("static", "circle", pos, 0.0, r if r > 0.0 else 0.6, {"fill": 0.6, "front": 1.0}, 0.6, 0.06)
 	burst("sparks", pos + Vector3.UP * 0.1, Vector3.UP, Color(1.0, 0.95, 0.6), null, {"speed": 1.2, "floor": pos.y})
 	flash_light(pos + Vector3.UP * 1.0, Color(1.0, 0.95, 0.7), 5.0, 5.0, 0.2)
+
+
+## Any other delayed strike landing (Gusto's and Slurry's follow-ups, thrown Blisters and
+## Scraplings): its true circle flashes on the floor with the element's burst.
+func _strike(el: String, pos: Vector3, r: float) -> void:
+	if r > 0.0:
+		footprint(el, "circle", pos, 0.0, r, {"fill": 0.5, "front": 1.0}, 0.55, 0.08)
+	_element_burst(el, pos + Vector3.UP * 0.3, clampf(r, 0.4, 1.0), pos.y)
+
+
+## Anyone's counter stance but Dredge's (Snappington, Kid Lamprey): a short bracing ring at the feet.
+func _brace(fi: int, el: String) -> void:
+	var g := _ground(fi)
+	var c := FxKit.el_color(el) if el != "" else Color(0.9, 0.88, 0.8)
+	ring_wall(g + Vector3.UP * 0.05, 0.9, 0.55, 0.5, c, Color(1, 1, 1), 0.35, {"add": not FxKit.AREA_COVERS.has(el), "bands": 6.0})
+	burst("dust", g, Vector3.UP, Color(0.8, 0.77, 0.7, 0.4), null, {"ring": true, "radius": 0.5, "speed": 0.5, "amount": 0.4})
+
+
+## Anyone's charge but Dozer's (Jitters' Pinball): a kick-off puff off the feet, in the move's element.
+func _charge_kick(fi: int, el: String) -> void:
+	var g := _ground(fi)
+	burst("dust", g, -_fwd(fi) + Vector3.UP * 0.3, Color(0.8, 0.75, 0.65, 0.45), null, {"amount": 0.5, "speed": 0.8})
+	if el != "":
+		_element_burst(el, anchor(fi, "core"), 0.5, g.y)
 
 
 func _zone_spawn_splash(el: String, pos: Vector3, r: float, _vfx: String) -> void:
@@ -1824,8 +2053,12 @@ func _update_charge(fi: int, inf: Dictionary, alive: bool) -> void:
 	if level >= 0.0:
 		lv = level                                   # local: the real charge
 	elif level == -2.0:
-		lv = clampf((t - start) / maxf(m.charge_time, 0.05), 0.0, 1.0)   # online: by time
-	var done := not alive or state != Fighter.State.ATTACK or t > start + m.charge_time + 0.35 or (level == -1.0 and t > start + 0.05)
+		lv = clampf((t - start) / maxf(m.charge_time, 0.05), 0.0, 1.0)   # online, while held: by time
+		ch["timed"] = t
+	# -1: not charging (a tapped heavy, or let go). Online the charging flag can drop a moment before
+	# the charged heavy's move_start (with its release flash) arrives, so a timed glow waits for it
+	var let_go := level == -1.0 and t > start + 0.05 and (not ch.has("timed") or t - float(ch["timed"]) > 0.1)
+	var done := not alive or state != Fighter.State.ATTACK or t > start + m.charge_time + 0.35 or let_go
 	if done:
 		_end_charge(fi, false)
 		return
@@ -2234,12 +2467,23 @@ func _make_zone(e: Dictionary) -> Dictionary:
 		root.add_child(extra)
 	var t0 := _clock
 	var en := {"node": root, "kind": "zone", "pos": p}
-	en["tick"] = func(_e: Dictionary) -> void:
+	var cur := {"r": r}              # the radius drawn now
+	en["tick"] = func(ze: Dictionary) -> void:
 		var t := _clock - t0
 		grow["t"] = t
 		mat.set_shader_parameter("progress", clampf(t / 0.25, 0.0, 1.0) * 1.02)
 		if extra != null and is_instance_valid(extra):
 			extra.rotation.y = -t * (6.0 if vfx == "gale_vortex" else 1.2)
+		# zones grow, shrink and slide in the simulation (zone reactions): keep drawing the real size
+		var nr := maxf(float(ze.get("radius", cur["r"])), 0.2)
+		if absf(nr - float(cur["r"])) > 0.005:
+			cur["r"] = nr
+			mat.set_shader_parameter("radius", nr)
+			_fit_footprint(fp, nr)
+			if extra != null and is_instance_valid(extra):
+				extra.scale = Vector3(nr, extra.scale.y, nr)
+			if gp != null and is_instance_valid(gp):
+				(gp.process_material as ShaderMaterial).set_shader_parameter("emit_radius", nr * 0.85)
 	en["end"] = func() -> void:
 		if gp != null and is_instance_valid(gp):
 			gp.emitting = false

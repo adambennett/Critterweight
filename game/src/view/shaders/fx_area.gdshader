@@ -32,6 +32,7 @@ uniform int style = 0;
 uniform float speed = 1.0;
 uniform float seed = 0.0;
 uniform float pulse = 0.0;          // zones: slow breathing of the rim
+uniform float flicker_hz = 12.0;    // static forks re-fork and re-brighten this often (<= 3 under Reduce flashing)
 
 varying vec3 local;
 
@@ -131,7 +132,7 @@ void fragment() {
 		pat += bub;
 	} else if (style == 6) {
 		// static: lightning forks in a radial burst, flickering
-		float fl = floor(t * 12.0);
+		float fl = floor(t * flicker_hz);
 		float n = fbm(vec2(ang2 * 4.0 + hash(vec2(fl, seed)) * 6.0, d * 1.2));
 		pat = smoothstep(0.035, 0.0, abs(n - 0.5)) * (0.6 + 0.4 * hash(vec2(fl, 3.0)));
 		pat += 0.25 * smoothstep(0.02, 0.0, abs(fract(d * 1.2 - t * 1.5) - 0.5) - 0.47);
