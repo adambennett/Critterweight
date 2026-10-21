@@ -212,3 +212,7 @@ scree patches. Pieces scale with the Effects quality and flashes dim under Reduc
 - The cover boulders keep the v0.9.17 prop look: a prop entity's vfx is its prop kind
   ("boulder"), so a kit cannot draw it. A generic fix: `EffectsSystem._spawn_prop` keeps the
   effect's `vfx` for the entity (`AbilityVfx._make_prop` already reads the kind from `prop`).
+- A hit that knocks down builds no Caked: `Combat.deliver` adds build-up after `receive_hit`, and
+  `StatusSet.add_buildup` ignores a downed fighter, so the Quake Stomp trip and a direct Boulder
+  Toss (like the v0.9.17 Landslide) lose their build-up. A generic fix: let the build-up of the
+  hit that caused the knockdown through (the target was not down before `receive_hit`).
