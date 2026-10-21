@@ -1,0 +1,187 @@
+# Critterweight v0.9.18 commentary recording script: Movesets (docs/audio/COMMENTARY.md, docs/design/MOVESET_COMBAT.md)
+# Parsed by tools/audio/breeze/prepare_commentary_v0918.py (same syntax as v0.9.17):
+#   @trigger {when}         sets the trigger and its context gate for the lines that follow
+#   S:delivery | text        a new take; S = D (Devon as Barnaby) or K (Kendall); delivery = a preset
+# The director calls a Movesets move by its pool id ("id") and its category ("cat"): move lines first,
+# then category lines, then the v0.9.17 generic ability lines. Rules as v0.9.17: subtitles <= 90
+# characters, no names inside sentences, facts checked against the move pools.
+
+## ---- Category calls: any move of the kind (every fighter) ----
+@ability {"cat": "stream"}
+D:call | And here comes the stream! Hold the button, hold the line!
+D:call | They're pouring it on now! Steer it, keep it on them!
+K:dry | A sustained attack. My favourite kind. It lasts as long as my attention.
+@ability_hit {"cat": "stream"}
+D:hype | Caught in the stream! There's no getting out of that by standing still!
+D:call | It's soaking right through the guard! Move, move, move!
+@ability_miss {"cat": "stream"}
+K:dry | All that pressure, and it painted the floor. Lovely floor.
+@ability {"cat": "projectile"}
+D:call | Shot away! Lined up and let go!
+D:call | Here comes the projectile! Sidestep or swallow it!
+@ability_hit {"cat": "projectile"}
+D:hype | Right on target! Thread the needle and it lands clean!
+K:react | Oh, that found them. From that far? Rude.
+@ability_miss {"cat": "projectile"}
+D:call | Wide! That shot sails past and keeps on going!
+@ability {"cat": "volley"}
+D:call | A spread of shots! Something in there is going to land!
+K:dry | One shot is a statement. Several shots is a strategy.
+@ability_hit {"cat": "volley"}
+D:hype | The volley connects! Count them later, they all hurt now!
+@ability_miss {"cat": "volley"}
+K:dry | That was a lot of shots for no hits. Statistically impressive.
+@ability {"cat": "blast"}
+D:tense | Charging it up! You can feel the pressure building from here!
+D:hype | Here comes the big one! Let it rip!
+@ability_hit {"cat": "blast"}
+D:hype | BOOM! Full blast, full force, full marks!
+D:hype | That blast sends them flying! What a release!
+@ability_miss {"cat": "blast"}
+D:call | All that charge, and it hits nothing! Now they're wide open!
+K:dry | A huge blast at nothing. Very dramatic for an empty corner.
+@ability {"cat": "rush"}
+D:call | And they're off like a shot! Straight at them!
+D:hype | Full speed ahead! That's a rush with bad intentions!
+@ability_hit {"cat": "rush"}
+D:hype | Run through! Didn't stop, didn't slow down, didn't apologise!
+@ability_miss {"cat": "rush"}
+D:call | Overcommitted! They rushed right past and the door is open!
+@ability {"cat": "counter"}
+D:tense | They're waiting for it! Swing now and you're walking into the counter!
+K:dry | A counter stance. The polite way of saying "go on, try it".
+@ability_hit {"cat": "counter"}
+D:hype | Counter! Read it, caught it, sent it right back!
+@ability {"cat": "control"}
+D:call | Owning the floor! That space belongs to one fighter now!
+K:dry | Area control. Like owning real estate, but it hurts to visit.
+@ability_hit {"cat": "control"}
+D:call | Caught in the zone! Get out of there before it gets worse!
+@ability {"cat": "support"}
+D:warm | A smart reset there, buying a little advantage for the next exchange.
+K:dry | A support move. Somebody's playing the long game tonight.
+@ability {"cat": "utility"}
+D:call | Repositioning! That fighter is going somewhere better!
+K:dry | Not an attack, exactly. More of a relocation with menace.
+
+## ---- Stoke ----
+@ability {"creature": "f_stoke", "id": "flamethrower"}
+D:hype | Stoke opens the stovepipe! It's a flamethrower, folks!
+D:call | Fire from the furnace! Stoke's sweeping the cage with flame!
+K:react | Oh, he just breathes fire now. That's new. That's very new.
+@ability_hit {"creature": "f_stoke", "id": "flamethrower"}
+D:hype | Caught in the flamethrower! That's Sizzle stacking up fast!
+K:dry | That's not a tan. That's the flamethrower.
+@ability {"creature": "f_stoke", "id": "cinder_shot"}
+D:call | Stoke scoops a coal and lobs it! Look out below!
+@ability_hit {"creature": "f_stoke", "id": "cinder_shot"}
+D:hype | The cinder lands on target! And the floor's on fire now too!
+@ability {"creature": "f_stoke", "id": "flare_rush"}
+D:hype | The stacks fire and Stoke launches! Flare Rush!
+@ability_hit {"creature": "f_stoke", "id": "flare_rush"}
+D:hype | Flare Rush connects and it EXPLODES! Both of them go flying!
+@ability {"creature": "f_stoke", "id": "fire_spin"}
+D:call | Stoke spins up a ring of fire! Nobody's getting close now!
+@ability_hit {"creature": "f_stoke", "id": "fire_spin"}
+D:call | Burned on the way in! The fire ring does its job!
+
+## ---- Dredge ----
+@ability {"creature": "f_dredge", "id": "bubble_stream"}
+D:call | Dredge blows a stream of bubbles! Pretty, slippery and in the way!
+K:dry | Bubbles. In a cage fight. I'm charmed and a little worried.
+@ability_hit {"creature": "f_dredge", "id": "bubble_stream"}
+D:call | The bubbles pop on contact! Soaked and slowed down!
+@ability {"creature": "f_dredge", "id": "hydro_cannon"}
+D:tense | Dredge braces and charges the hydro cannon! Get out of the line!
+D:hype | Hydro Cannon! The whole harbour in one shot!
+@ability_hit {"creature": "f_dredge", "id": "hydro_cannon"}
+D:hype | Blasted clean across the cage! That's the hydro cannon, folks!
+K:react | And the recoil sent Dredge back too. Everyone's moving tonight.
+@ability {"creature": "f_dredge", "id": "whirlpool"}
+D:call | A whirlpool opens up! It's pulling everything toward the middle!
+@ability_hit {"creature": "f_dredge", "id": "whirlpool"}
+D:call | Dragged into the whirlpool! Swim against it or go under!
+@ability {"creature": "f_dredge", "id": "shell_brace"}
+D:warm | Dredge braces the shell. Hit him now and you're hitting armour.
+
+## ---- Gusto ----
+@ability {"creature": "f_gusto", "id": "air_slash"}
+D:call | Air Slash! A crescent of wind cutting straight across!
+@ability_hit {"creature": "f_gusto", "id": "air_slash"}
+D:hype | The Air Slash slices right through! Precision from range!
+@ability {"creature": "f_gusto", "id": "feather_darts"}
+D:call | A fan of feather darts! Gusto's filling the air!
+@ability_hit {"creature": "f_gusto", "id": "feather_darts"}
+D:call | The feathers stick! That's a few too many darts to dodge!
+@ability {"creature": "f_gusto", "id": "twister"}
+D:call | Gusto whips up a twister! It's travelling and it's hungry!
+@ability_hit {"creature": "f_gusto", "id": "twister"}
+D:hype | Swept up in the twister! Around and around and out!
+@ability {"creature": "f_gusto", "id": "tailwind"}
+D:warm | Tailwind! Gusto's quicker than ever for the next few seconds.
+
+## ---- Dozer ----
+@ability {"creature": "f_dozer", "id": "rock_slide"}
+D:hype | Rock Slide! The floor tears open in a straight line!
+@ability_hit {"creature": "f_dozer", "id": "rock_slide"}
+D:hype | Caught by the rock slide! And those rocks are staying put!
+@ability {"creature": "f_dozer", "id": "boulder_toss"}
+D:call | Dozer heaves a boulder! That's a lot of rock in the air!
+@ability_hit {"creature": "f_dozer", "id": "boulder_toss"}
+D:hype | The boulder lands on them! Flattened!
+@ability {"creature": "f_dozer", "id": "quake_stomp"}
+D:hype | Quake Stomp! The whole cage jumps!
+@ability_hit {"creature": "f_dozer", "id": "quake_stomp"}
+D:call | Tripped by the quake! Feet off the floor, rear on the floor!
+@ability {"creature": "f_dozer", "id": "iron_hide"}
+D:warm | Iron Hide. Little shots are going to bounce right off Dozer now.
+
+## ---- Slurry ----
+@ability {"creature": "f_slurry", "id": "poison_darts"}
+D:call | Poison darts! Three quick shots, all of them nasty!
+@ability_hit {"creature": "f_slurry", "id": "poison_darts"}
+D:call | The darts stick! That poison is going to work for a while!
+K:dry | Darts. Venom darts. I'd like to see the inside of that mouth less.
+@ability {"creature": "f_slurry", "id": "acid_spray"}
+D:call | Slurry sprays acid! Wide, wet and wicked!
+@ability_hit {"creature": "f_slurry", "id": "acid_spray"}
+D:call | Doused in acid! That Gunk is piling on!
+@ability {"creature": "f_slurry", "id": "coil_crush"}
+D:tense | Slurry wraps up and squeezes! There's no guard against a coil!
+@ability_hit {"creature": "f_slurry", "id": "coil_crush"}
+D:hype | Coil Crush! Squeezed and slammed!
+@ability {"creature": "f_slurry", "id": "shed_skin"}
+D:warm | Slurry sheds the skin and everything stuck to it. Clean start.
+
+## ---- Jitters ----
+@ability {"creature": "f_jitters", "id": "thunder_jolt"}
+D:call | Thunder Jolt! That bolt is quicker than your eyes!
+@ability_hit {"creature": "f_jitters", "id": "thunder_jolt"}
+D:hype | Jolted! The bolt lands before they can even flinch!
+@ability {"creature": "f_jitters", "id": "discharge"}
+D:hype | Discharge! Lightning in every direction!
+@ability_hit {"creature": "f_jitters", "id": "discharge"}
+D:call | Caught in the discharge! Anyone too close just got zapped!
+@ability {"creature": "f_jitters", "id": "chain_lightning"}
+D:call | Chain Lightning! Watch it jump!
+@ability_hit {"creature": "f_jitters", "id": "chain_lightning"}
+D:hype | It jumps! The lightning finds a second target!
+K:react | Wet fighters conduct. I'm writing that down for safety reasons.
+@ability {"creature": "f_jitters", "id": "static_field"}
+D:call | A static field crackles to life! Step in there and you'll flinch!
+
+## ---- Knell ----
+@ability {"creature": "f_knell", "id": "night_shade"}
+D:call | Knell's lantern turns into a beam! Night Shade!
+@ability_hit {"creature": "f_knell", "id": "night_shade"}
+D:call | Caught in the ghostly beam! Haunted, and slowing down!
+@ability {"creature": "f_knell", "id": "hex_chain"}
+D:tense | A spectral chain! Knell's reeling somebody in!
+@ability_hit {"creature": "f_knell", "id": "hex_chain"}
+D:hype | Chained! Slowed and dragged right back to the diver!
+@ability {"creature": "f_knell", "id": "lantern_swarm"}
+D:call | Lantern Swarm! Three little lights, all of them hunting!
+@ability_hit {"creature": "f_knell", "id": "lantern_swarm"}
+D:call | The wisps find their mark! You can't outrun a ghost light!
+@ability {"creature": "f_knell", "id": "toll"}
+D:tense | The bell tolls! Hit Knell now and you'll hear it twice!
