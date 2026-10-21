@@ -6,14 +6,19 @@ extends Screen
 ##   Tabs (TabStrip, LB/RB): CAMP (TRAINING while unbooked, FIGHT WEEK! when due) · OFFERS · GYM ·
 ##   HISTORY. Side: the six stats with the overall rating, and condition (head/body/legs).
 ## CAMP unbooked: the train grid (each stat with the exact model gain for this week, its gym room
-## and level; Rest with its healing and the "you are healthy" hint). Booked: the fight card
-## (promotion, tier, title, purse + bonus, rounds, weeks to go, the opponent with fighter,
-## record, rating, bot tier, danger tag, the six-row stat comparison, the camp so far), then the
-## train grid — or, on fight week, FIGHT with the condition line. PULL OUT is a withdrawal
-## (danger confirmation, popularity -4). OFFERS: every offer as a card (A accepts) with the
-## next-promotion / title-shot / tier-cap hints. GYM: the eight facilities with level pips, effect
-## and next cost (A buys). HISTORY: the fights, newest first, then the news log.
-## Every action goes through the CareerController (which autosaves); Back returns to the slot list.
+## and level; Rest with its healing and the "you are healthy" hint; in Movesets bouts LEARN A MOVE
+## and DRILL A MOVE, which open a picker of this week's choices in place of the grid), then YOUR
+## MOVES. Booked: the fight card (promotion, tier, title, purse + bonus, rounds, weeks to go, the
+## opponent with fighter, record, rating, bot tier, danger tag, the six-row stat comparison, the
+## camp so far), then the train grid and YOUR MOVES — or, on fight week, FIGHT with the condition
+## line and YOUR MOVES (the pre-bout loadout). YOUR MOVES shows the equipped loadout with its
+## drilled styles; A pushes the loadout screen limited to the learned moves (MOVESET_COMBAT.md §5)
+## and the choice is saved with the career. PULL OUT is a withdrawal (danger confirmation,
+## popularity -4). OFFERS: every offer as a card (A accepts) with the next-promotion / title-shot /
+## tier-cap hints. GYM: the eight facilities with level pips, effect and next cost (A buys).
+## HISTORY: the fights, newest first, then the news log.
+## Every action goes through the CareerController (which autosaves); Back returns to the slot list
+## (or, from the learn / drill picker, to the train grid).
 ## params: {flow: CareerFlow, tab?: "camp"|"offers"|"gym"|"history"}. Without a flow it loads
 ## params.slot (or the first career of the active profile that loads), so a dev capture can open
 ## it directly: --screen career_hub --screen-arg tab=gym.
@@ -29,6 +34,9 @@ var _side: VBoxContainer
 var _status: Label
 var _help: Label
 var _built := false
+var _picker := ""             ## "" | "learn" | "drill": the camp tab lists that week's choices
+var _resume_route := ""       ## after the loadout screen: refresh and focus this route
+var _resume_status := ""
 
 
 func on_enter(p: Dictionary) -> void:
@@ -56,7 +64,9 @@ func on_enter(p: Dictionary) -> void:
 	_tabs = TabStrip.new()
 	var start := maxi(0, TABS.find(str(p.get("tab", "camp"))))
 	_tabs.setup(_tab_titles(), TABS, start)
-	_tabs.tab_changed.connect(func(_i: int) -> void: _show_tab())
+	_tabs.tab_changed.connect(func(_i: int) -> void:
+		_picker = ""
+		_show_tab())
 	body.add_child(_tabs)
 	var row := UiTheme.hbox(UiTheme.GAP_L)
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -307,10 +317,15 @@ func _grid() -> GridContainer:
 # CAMP / TRAINING / FIGHT WEEK --------------------------------------------------------------------
 
 func _build_camp() -> void:
+	if _picker != "":
+		_build_picker()
+		return
 	if not ctrl.is_booked():
 		_section("No fight booked")
-		_caption("Train one stat this week, or rest. A week without a fight booked costs %s popularity and brings new offers (see OFFERS)." % CareerUi.num(float(ctrl.rules.get("idle_week_pop", 0.6))))
+		_caption("Train one stat this week%s, or rest. A week without a fight booked costs %s popularity and brings new offers (see OFFERS)." % [
+			", learn or drill a move" if ctrl.movesets() else "", CareerUi.num(float(ctrl.rules.get("idle_week_pop", 0.6)))])
 		_train_grid()
+		_moves_card()
 		return
 	var card := ctrl.fight_card()
 	if bool(card["interrupted"]):
@@ -333,8 +348,10 @@ func _build_camp() -> void:
 		fb.pressed.connect(_fight)
 		_scroll.content.add_child(fb)
 		_caption(str(card["condition_line"]), "BodyStrong")
+		_moves_card()
 	else:
 		_train_grid()
+		_moves_card()
 	var plan: Array = card["plan"]
 	if not plan.is_empty():
 		_caption("Camp so far: %s" % " › ".join(PackedStringArray(plan)))
@@ -431,14 +448,18 @@ func _cell(text: String, variation: String, left := false) -> Label:
 	return l
 
 
-## The seven training choices: each stat with this week's exact gain (CareerController.preview_gain)
-## and its gym room level, and Rest with its healing and the "you are healthy" hint. The stat's
-## description shows in the help line under the list while its card has the focus.
+## The training choices: each stat with this week's exact gain (CareerController.preview_gain)
+## and its gym room level, Rest with its healing and the "you are healthy" hint, then (Movesets
+## bouts) Learn a move and Drill a move. The focused card's description shows in the help line
+## under the list.
 func _train_grid() -> void:
 	var g := _grid()
 	for r in ctrl.train_rows():
 		var d: Dictionary = r
 		var id := str(d["id"])
+		if id == "learn" or id == "drill":
+			g.add_child(_move_training_card(d))
+			continue
 		var card := CareerUi.ActionCard.new("rest" if id == "rest" else "train:%s" % id)
 		var head := UiTheme.hbox(UiTheme.GAP_S)
 		var t := UiTheme.label(str(d["label"]).to_upper(), "H3")
@@ -461,6 +482,115 @@ func _train_grid() -> void:
 		card.help_text = str(d["desc"])
 		card.activated.connect(_train.bind(id))
 		g.add_child(card)
+
+
+## LEARN A MOVE / DRILL A MOVE: a training week whose choice is picked from a list (A opens the
+## picker); without anything to learn or drill the card stays readable but refuses with the reason.
+func _move_training_card(d: Dictionary) -> Control:
+	var id := str(d["id"])
+	var avail := bool(d["available"])
+	var card := CareerUi.ActionCard.new(id)
+	var head := UiTheme.hbox(UiTheme.GAP_S)
+	var t := UiTheme.label(str(d["label"]).to_upper(), "H3")
+	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(t)
+	var count := int(d["options"]) if id == "learn" else int(d.get("moves", 0))
+	head.add_child(UiTheme.label("%d to pick" % count if avail else "none", "ValueGold" if avail else "BodyMuted"))
+	card.body.add_child(head)
+	var line := str(d["reason"])
+	if avail and id == "learn":
+		line = "This week: %s" % str(d["names"])
+	elif avail:
+		line = "%d move%s with two styles to choose from" % [count, "" if count == 1 else "s"]
+	card.body.add_child(UiTheme.label(line, "Caption", true))
+	card.help_title = str(d["label"])
+	card.help_text = str(d["desc"])
+	card.set_enabled(avail)
+	card.activated.connect(_open_picker.bind(id))
+	card.refused.connect(_set_status.bind(str(d["reason"])))
+	return card
+
+
+## The learn / drill picker (in place of the camp): this week's choices as cards, A spends the week
+## on one; BACK TO TRAINING (or Back) returns to the train grid.
+func _build_picker() -> void:
+	var g: GridContainer = null
+	if _picker == "learn":
+		_section("Learn a move · this week's training")
+		_caption("Pick the move to learn. It takes the week: no stat gains, injuries heal as in any training week.", "Body")
+		g = _grid()
+		for o in ctrl.learn_options():
+			var d: Dictionary = o
+			var card := CareerUi.ActionCard.new("learn:%s" % str(d["id"]))
+			var head := UiTheme.hbox(UiTheme.GAP_S)
+			var t := UiTheme.label(str(d["name"]).to_upper(), "H3")
+			t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			head.add_child(t)
+			head.add_child(UiTheme.label(str(d["category"]), "CaptionStrong"))
+			card.body.add_child(head)
+			card.body.add_child(UiTheme.label(str(d["short"]), "Body", true))
+			card.help_title = str(d["name"])
+			card.help_text = str(d["desc"])
+			card.activated.connect(_learn.bind(str(d["id"])))
+			g.add_child(card)
+	else:
+		_section("Drill a move · this week's training")
+		_caption("Pick a move and the style to drill into it: a drill is for good. It takes the week: no stat gains, injuries heal as in any training week.", "Body")
+		g = _grid()
+		for o in ctrl.drill_options():
+			var d2: Dictionary = o
+			var card2 := CareerUi.ActionCard.new("drill:%s:%s" % [str(d2["move"]), str(d2["style"])])
+			var head2 := UiTheme.hbox(UiTheme.GAP_S)
+			var t2 := UiTheme.label(str(d2["move_name"]).to_upper(), "H3")
+			t2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			t2.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			head2.add_child(t2)
+			if bool(d2["equipped"]):
+				head2.add_child(UiTheme.label("EQUIPPED", "CaptionStrong"))
+			card2.body.add_child(head2)
+			card2.body.add_child(UiTheme.label(str(d2["style_name"]), "ValueGold"))
+			card2.body.add_child(UiTheme.label(str(d2["desc"]), "Caption", true))
+			card2.help_title = "%s: %s" % [str(d2["move_name"]), str(d2["style_name"])]
+			card2.help_text = str(d2["desc"])
+			card2.activated.connect(_drill.bind(str(d2["move"]), str(d2["style"])))
+			g.add_child(card2)
+	var back := UiButton.new("BACK TO TRAINING", "", "back")
+	back.route = "picker_back"
+	back.set_help("Back to training", "Spend this week another way.")
+	back.pressed.connect(_close_picker)
+	_scroll.content.add_child(back)
+
+
+## YOUR MOVES: the equipped loadout (drilled styles named), how many moves are learned and drilled;
+## A pushes the loadout screen limited to the learned moves. Hidden when the bouts are Classic.
+func _moves_card() -> void:
+	if not ctrl.movesets():
+		return
+	var locked := ctrl.loadout_locked()
+	var mv := ctrl.moves()
+	var card := CareerUi.ActionCard.new("moves")
+	var head := UiTheme.hbox(UiTheme.GAP_S)
+	var t := UiTheme.label("YOUR MOVES", "H3")
+	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(t)
+	head.add_child(UiTheme.label(ctrl.loadout_name().to_upper(), "ValueGold"))
+	if locked == "":
+		head.add_child(UiTheme.label("CHANGE", "CaptionStrong"))
+		head.add_child(UiIcons.rect("forward", 26, UiTheme.MUTED))
+	card.body.add_child(head)
+	var names := PackedStringArray()
+	for r in ctrl.loadout_rows():
+		var d: Dictionary = r
+		names.append(str(d["name"]) + ((" (%s)" % str(d["style_name"])) if str(d["style_name"]) != "" else ""))
+	card.body.add_child(UiTheme.label(" · ".join(names), "BodyStrong", true))
+	card.body.add_child(UiTheme.label("%d learned · %d drilled" % [(mv["learned"] as Array).size(), (mv["drilled"] as Dictionary).size()], "Caption"))
+	card.help_title = "Your moves"
+	card.help_text = locked if locked != "" else \
+		"The moves you take into the cage, chosen before any bout from the moves you have learned. Learn a move adds to them; Drill a move improves one for good."
+	card.set_enabled(locked == "")
+	card.activated.connect(_change_moves)
+	card.refused.connect(_set_status.bind(locked))
+	_scroll.content.add_child(card)
 
 
 # OFFERS ------------------------------------------------------------------------------------------
@@ -646,6 +776,78 @@ func _train(id: String) -> void:
 	_refresh("fight" if bool(r["fight_ready"]) else ("rest" if id == "rest" else "train:%s" % id))
 
 
+func _open_picker(kind: String) -> void:
+	_picker = kind
+	_set_status("")
+	_show_tab()
+
+
+## Back to the train grid, focus on the card that opened the picker.
+func _close_picker() -> void:
+	var was := _picker
+	_picker = ""
+	_show_tab(was)
+
+
+func _learn(move_id: String) -> void:
+	var r := ctrl.learn_move(move_id)
+	if not bool(r["ok"]):
+		_set_status(str(r["error"]))
+		return
+	_picker = ""
+	var msg := "Learned %s: equip it under Your moves." % str(r["name"])
+	if bool(r["fight_ready"]):
+		msg += " Fight week: step in when you are ready."
+	_set_status("")
+	UiNav.toast(msg, "success", 3.0)
+	_refresh("fight" if bool(r["fight_ready"]) else "learn")
+
+
+func _drill(move_id: String, style: String) -> void:
+	var r := ctrl.drill_move(move_id, style)
+	if not bool(r["ok"]):
+		_set_status(str(r["error"]))
+		return
+	_picker = ""
+	var msg := "Drilled %s: %s." % [str(r["name"]), str(r["style_name"])]
+	if bool(r["fight_ready"]):
+		msg += " Fight week: step in when you are ready."
+	_set_status("")
+	UiNav.toast(msg, "success", 3.0)
+	_refresh("fight" if bool(r["fight_ready"]) else "drill")
+
+
+## The loadout screen over the learned moves (drilled styles shown); the choice is saved with the
+## career when the player confirms it (on_resume rebuilds the camp).
+func _change_moves() -> void:
+	var locked := ctrl.loadout_locked()
+	if locked != "":
+		_set_status(locked)
+		return
+	var mv := ctrl.moves()
+	App.push("loadout", {"creature": str(ctrl.state.get("fighter", "")), "loadout": mv["equipped"], "allowed": mv["learned"],
+		"styles": mv["drilled"], "title": "Career · your moves", "on_done": _on_moves_chosen})
+
+
+func _on_moves_chosen(lo: Array) -> void:
+	if ctrl.set_loadout(lo):
+		UiNav.toast("Your moves: %s." % ctrl.loadout_name(), "success", 2.5)
+		_resume_status = ""
+	else:
+		_resume_status = ctrl.last_error
+	_resume_route = "moves"
+
+
+func on_resume() -> void:
+	super()
+	if _resume_route != "":
+		var route := _resume_route
+		_resume_route = ""
+		_set_status(_resume_status)
+		_resume_status = ""
+		_refresh(route)
+
+
 func _accept(offer_id: String) -> void:
 	if not ctrl.accept(offer_id):
 		_set_status(ctrl.last_error)
@@ -699,6 +901,9 @@ func _call_off() -> void:
 
 
 func on_back() -> bool:
+	if _picker != "":
+		_close_picker()
+		return true
 	if flow != null:
 		flow.show_slots()
 	else:

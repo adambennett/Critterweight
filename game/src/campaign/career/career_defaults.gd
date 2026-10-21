@@ -61,6 +61,9 @@ static func rules() -> Dictionary:
 			"dimin_floor": 0.1, "injury_div": 260.0, "injury_floor": 0.35},
 		# Cage Rules healWeek: (base + recovery x lvl) x (rest ? rest_mult : 1) off every region
 		"healing": {"base": 10.0, "recovery_per_level": 4.0, "rest_mult": 2.5},
+		# v0.9.18 Movesets: "Learn a move" offers at most this many unlearned pool moves a week
+		# (CareerMoves.learn_options); learning and drilling each take a training week
+		"moves": {"learn_choices": 3},
 		"idle_week_pop": 0.6,
 		"withdraw_pop": 4.0,
 		"facility_max": 5,

@@ -58,8 +58,10 @@ func save(state: Dictionary, profile_id: String, slot: int) -> Error:
 
 ## Loads and validates a career. Returns {ok, state, error, problems, blocking, missing,
 ## recovered_from, migrated, exists, newer, path}. `ok` is false for missing, damaged, newer-format
-## or inconsistent saves and for a career whose own fighter is no longer installed; stale offers
-## and a booked fight with missing content load (CareerController repairs / offers to cancel).
+## or inconsistent saves and for a career whose own fighter is no longer installed; stale offers,
+## a booked fight with missing content and stale moves load (CareerController repairs / offers to
+## cancel). An older-format save is migrated in memory (`migrated`); the file is rewritten in the
+## current format by the next save.
 func load_slot(profile_id: String, slot: int, catalog: CampaignCatalog) -> Dictionary:
 	var path := slot_path(profile_id, slot)
 	var out := {"ok": false, "state": {}, "error": "", "problems": [], "blocking": [], "missing": {},
@@ -67,7 +69,8 @@ func load_slot(profile_id: String, slot: int, catalog: CampaignCatalog) -> Dicti
 	if not valid_slot(slot):
 		out["error"] = "There is no career slot %d." % slot
 		return out
-	var r := Saves.read_json(path, KIND, CareerState.VERSION, Callable(CareerState, "migrate"))
+	# older formats migrate on read (CareerState.migrate; the catalog resolves the fighter's moves)
+	var r := Saves.read_json(path, KIND, CareerState.VERSION, Callable(CareerState, "migrate").bind(catalog))
 	out["recovered_from"] = str(r.get("recovered_from", ""))
 	out["migrated"] = bool(r.get("migrated", false))
 	out["exists"] = bool(r.get("exists", false))

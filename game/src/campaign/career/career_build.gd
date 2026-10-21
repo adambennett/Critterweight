@@ -19,6 +19,9 @@ extends RefCounted
 ## Isolation: the block exists only in career fight configs (CareerFight). The pseudo state's
 ## variant is "career", so Fight Camp meta never applies, and versus/online never call this.
 ## Coefficients come from rules.build (CareerDefaults); the keys are fixed here.
+## Drilled move styles (v0.9.18, CareerMoves.drill_effects) ride the same path: each is a run effect
+## of the pseudo player BEFORE the stats block, so the style shapes the move and the career stats
+## scale the result (Power's moves.*.poise multiplies a style's own poise).
 
 ## [stat, mod key, op] — op "add", "mul" or "add_int" (whole numbers: grab_escape_add is int-cast)
 const MAP := [
@@ -91,15 +94,21 @@ static func injury_mods(rules: Dictionary, injury: Dictionary) -> Array:
 
 
 ## The pseudo run player BuildApplier composes (no techniques, supplements or meta: base kit +
-## the career block).
-static func pseudo_player(fighter: String, block: Dictionary, id := "career") -> Dictionary:
+## the drilled styles, if any, + the career block).
+static func pseudo_player(fighter: String, block: Dictionary, id := "career", drills: Array = []) -> Dictionary:
+	var effects: Array = []
+	for d in drills:
+		if typeof(d) == TYPE_DICTIONARY:
+			effects.append((d as Dictionary).duplicate(true))
+	effects.append({"source": "career", "apply": block})
 	return {"id": id, "fighter": fighter, "techniques": [], "supplements": [], "side_effects": [],
-		"run_effects": [{"source": "career", "apply": block}]}
+		"run_effects": effects}
 
 
 ## BuildApplier.compose result for a career fighter: {creature, creature_dict, mods, ...}.
-static func compose(catalog: CampaignCatalog, rules: Dictionary, fighter: String, stats: Dictionary, injury: Dictionary = {}, id := "career") -> Dictionary:
-	var pseudo := pseudo_player(fighter, apply_block(rules, stats, injury), id)
+## `drills`: CareerMoves.drill_effects of the career fighter (opponents have none).
+static func compose(catalog: CampaignCatalog, rules: Dictionary, fighter: String, stats: Dictionary, injury: Dictionary = {}, id := "career", drills: Array = []) -> Dictionary:
+	var pseudo := pseudo_player(fighter, apply_block(rules, stats, injury), id, drills)
 	var st := {"variant": "career", "dose": 0, "players": [pseudo]}
 	var res := BuildApplier.compose(catalog, st, pseudo, {"party": "solo"})
 	# belt and braces: the forbidden multipliers are never part of a career build

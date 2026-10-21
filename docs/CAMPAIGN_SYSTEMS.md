@@ -567,7 +567,7 @@ filters such as `-- --test test_campaign_generation` run one file.
 Match outcomes are asserted structurally or statistically (several fights), not bit-exactly;
 generation and content logic are asserted seed-deterministic.
 
-## Career (v0.9.16)
+## Career (v0.9.16; moves v0.9.18)
 
 One persistent fighter, recreated from Cage Rules' career (DECISIONS D-048). It is not a run: it
 does not use RunState, RunController or RunStore. Code: `game/src/campaign/career/`; screens:
@@ -577,16 +577,18 @@ merge key by key, arrays such as `orgs`, `facilities` and name lists are replace
 or partial block stays playable).
 
 ```
-CareerController (one save = one JSON-safe Dictionary, CareerState VERSION 1)
+CareerController (one save = one JSON-safe Dictionary, CareerState VERSION 2)
    |  CareerOffers   seeded offers per (career seed, week, re-roll): RunRng "career/offers/w<week>/r<roll>"
-   |  CareerBuild    six stats + carried injuries -> one apply block -> BuildApplier.compose
+   |  CareerMoves    learned / equipped / drilled pool moves (v0.9.18 Movesets), normalized on load
+   |  CareerBuild    drilled styles + six stats + carried injuries -> BuildApplier.compose
    |  CareerFight    Cage Rules bout config (presented or headless), seed RunRng.derive(seed, "fight/<offer>")
    |  CareerStore    Saves kind "career": careers/<profile slug>/slot_<1..3>.json (+ .tmp/.bak)
    v
 CareerFlow (UI glue: FIGHT -> begin_fight -> App.start_match -> apply_result -> career_result)
 ```
 
-* **Week loop.** `train(stat)` or `rest()` advances one week. Gain per week =
+* **Week loop.** `train(stat)`, `learn_move(id)`, `drill_move(id, style)` or `rest()` advances one
+  week. Gain per week =
   `0.026 × (1 + 0.3 × room level) × (1 + 0.12 × coach level) × ((1 − s)^1.2 + 0.1) ×
   max(0.35, 1 − injury total / 260)`, stats capped at 0.99. Healing per region per week =
   `(10 + 4 × recovery level) × (2.5 when resting)`. An unbooked week costs 0.6 popularity and rolls
@@ -613,8 +615,41 @@ CareerFlow (UI glue: FIGHT -> begin_fight -> App.start_match -> apply_result -> 
   → `poise_add` −0.3 per point (max −15), body → `stamina_regen` × (1 − carried/160), legs → `speed`
   × (1 − carried/200), floor × 0.7. The block is applied only in career bouts (state variant
   `career`), never to versus, online or Fight Camp builds.
+* **Moves (v0.9.18 Movesets, `CareerMoves`; docs/design/MOVESET_COMBAT.md §5).** The save keeps
+  `moves: {learned: [pool ids], equipped: [1-4 pool ids], drilled: {pool id: style id}}`.
+  - *Start.* A new career has every move of its fighter's two recommended loadouts learned (for the
+    roster: seven of the eight pool moves, the basic strike being in both), the default loadout
+    equipped and nothing drilled. A fighter without an authored pool has its derived Classic kit
+    (one loadout of four moves), so there is nothing to learn or drill.
+  - *Learn a move* (train grid). One training week: no stat gain, the same healing and camp
+    countdown as a stat week (an unbooked week still costs 0.6 popularity and brings new offers).
+    The choice is between this week's unlearned pool moves, at most `career.moves.learn_choices` (3)
+    of them, drawn by RunRng `career/learn/w<week>` from the career seed when there are more (stable
+    for the week, different the next).
+  - *Drill a move* (train grid). One training week spent on one of the two styles of a learned move
+    that is not drilled yet. Drills are permanent: a drilled move is never drilled again.
+  - Each week is recorded: the move lists, `last_train` (`focus` "learn"/"drill" with the move and
+    style), the booked camp's `plan` (`learn:<id>`, `drill:<id>:<style>`; the fight card reads
+    "Learned Fire Spin", "Drilled Flamethrower") and a news line.
+  - *Loadout.* YOUR MOVES on the camp (unbooked, during a camp, and on fight week right under FIGHT)
+    opens the loadout screen with `allowed` = learned and `styles` = drilled; `set_loadout` accepts
+    learned moves forming a valid loadout (or the default one), costs nothing and saves with the
+    career. It is refused while a launched bout waits to be re-fought (D4: the identical bout).
+  - *In the bout.* `CareerFight` puts `loadout` = equipped on the career fighter's entry and composes
+    each drilled style's ContentPatch ops (`movepool.<id>.styles.<style>.patch`) into its creature
+    through `BuildApplier`, as run effects before the stats block (`CareerBuild.compose(...,
+    drills)`), so the style shapes the move and the stats scale the result. Styles never travel as an
+    entry key (nothing applies them twice). Opponents fight with their default loadout.
+  - *Repair.* `CareerController.repair()` normalizes the block against the installed creature on every
+    load (`CareerMoves.normalize`): ids a content update renamed or removed are dropped, a derived pool
+    replaced by an authored one starts over with the starting moves, an invalid loadout falls back to
+    the default one (whose moves become learned), drills of unknown moves or styles are dropped. Moves
+    problems (`moves: ...` in `CareerState.check`) never block loading.
+  - Moves only matter when the career preset plays Movesets; with a Classic preset the train grid has
+    no move cards and the camp no YOUR MOVES.
 * **Bouts.** Rules = the `cage_rules` preset (10-point judges + referee) with 3 rounds (5 for a
-  title), the preset's 99 s rounds and sudden death off; arena from the career arena list; `no_record`
+  title), the preset's 99 s rounds and sudden death off, and the preset's combat style written out
+  (`combat: "moves"` unless the preset says Classic); arena from the career arena list; `no_record`
   and `context.career`. `begin_fight()` saves `booked.in_fight` before launch: a crash re-fights the
   identical bout; quitting from the pause menu is a withdrawal (popularity −4, week + 1, no purse),
   except once the judges or the referee have decided the bout: then leaving books that result.
@@ -631,6 +666,14 @@ CareerFlow (UI glue: FIGHT -> begin_fight -> App.start_match -> apply_result -> 
   `CareerState.check` reports missing fighters/arenas; stale offers re-roll on load; a booked fight
   whose content disappeared can be cancelled without penalty; Retire moves `.json`, `.tmp` and `.bak`
   to `careers/<profile>/retired/` so a backup can never bring it back.
+* **Format versions.** Career 1 (v0.9.16, v0.9.17) → 2 (v0.9.18): `CareerState.migrate` (the catalog
+  is bound in by `CareerStore.load_slot`) gives the fighter the starting moves above, keeps every
+  other field and records `migrated_from: 1`; without the fighter installed the block starts empty
+  and `repair()` fills it later. The file is rewritten as version 2 by the next save; older builds
+  refuse version 2 (the Saves version guard). Tested with the v0.9.16 fixture
+  (`test_saves_from_older_build`: migrated, booked, a real headless bout fought and settled) and in
+  `test_career_moves`. Profiles went 1 → 2 at the same time (`loadouts`, the custom versus loadouts,
+  added empty; `test_profile_loadouts`).
 * **Standing.** Tier name, popularity label (Unknown … Superstar), a contender number #15 … #1 between
   popularity 74 and 92 in the top tier, and Champion.
 

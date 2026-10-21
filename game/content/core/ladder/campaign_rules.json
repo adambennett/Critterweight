@@ -132,6 +132,7 @@
       "injury_floor": 0.35
     },
     "healing": {"base": 10.0, "recovery_per_level": 4.0, "rest_mult": 2.5},
+    "moves": {"learn_choices": 3},
     "idle_week_pop": 0.6,
     "withdraw_pop": 4.0,
     "facility_max": 5,

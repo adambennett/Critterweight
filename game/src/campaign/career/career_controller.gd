@@ -5,8 +5,14 @@ extends RefCounted
 ## plain-data helpers. Every mutating call validates, mutates, writes a news line where Cage Rules
 ## does, and commits: `changed` is emitted and the career autosaves to its CareerStore slot.
 ##
-## Week loop: train one stat or rest per week (unbooked weeks cost popularity and bring new
-## offers), accept an offer (camp of N weeks), fight on fight week, apply the result once.
+## Week loop: train one stat, learn a move, drill a move or rest per week (unbooked weeks cost
+## popularity and bring new offers), accept an offer (camp of N weeks), fight on fight week, apply
+## the result once.
+## Moves (v0.9.18 Movesets, CareerMoves): learn_move / drill_move are training weeks like a stat
+## week (no stat gain, the same healing, the same camp countdown); set_loadout equips any learned
+## moves before a bout (free, saved with the career; refused while a launched bout is unsettled, so
+## a re-fought bout is the identical bout). repair() normalizes the moves against the installed
+## creature on every load.
 ## Fight lifecycle (design contract D4):
 ##   begin_fight()   marks booked.in_fight and saves BEFORE the bout launches
 ##   apply_result()  claims the fight id once (a second result for it is rejected), pays, moves
@@ -29,8 +35,11 @@ var profile_id := ""
 var slot := 0
 var last_error := ""
 var last_save_error := OK
-## Set by repair() when it changed the loaded state (stale offers re-rolled), for the UI.
+## Set by repair() when it changed the loaded state (stale offers re-rolled, stale moves
+## normalized), for the UI.
 var repairs: Array = []
+var _kit: CreatureDef = null        ## creature() cache (the career fighter's base kit)
+var _kit_id := ""
 
 
 func _init(cat: CampaignCatalog = null, st: Dictionary = {}) -> void:
@@ -58,6 +67,7 @@ static func create(cat: CampaignCatalog, opts: Dictionary, store_: CareerStore =
 	var o := opts.duplicate()
 	o["profile_id"] = profile_id_
 	o["slot"] = slot_n
+	o["moves"] = CareerMoves.starting(CareerMoves.creature(cat, fighter))
 	c.state = CareerState.create(c.rules, o)
 	c.store = store_
 	c.profile_id = profile_id_
@@ -92,7 +102,8 @@ static func load_career(cat: CampaignCatalog, store_: CareerStore, profile_id_: 
 
 
 ## Re-rolls offers that name content which is no longer installed (and rolls offers for an
-## unbooked career that has none). Returns true when it changed (and saved) the state.
+## unbooked career that has none) and normalizes the moves against the installed kit
+## (CareerMoves.normalize). Returns true when it changed (and saved) the state.
 func repair() -> bool:
 	repairs.clear()
 	if is_booked():
@@ -113,6 +124,12 @@ func repair() -> bool:
 			state["offers"] = CareerOffers.make_offers(catalog, rules, state)     # this week's own roll
 			if not (state.get("offers", []) as Array).is_empty():
 				repairs.append("offers rolled")
+	# the moves against the installed kit: moves renamed or removed by a content update, an authored
+	# pool replacing a derived one, a v1 career migrated while its fighter was not installed
+	var mv := CareerMoves.normalize(creature(), state.get("moves", {}))
+	if not CareerMoves.same(mv, state.get("moves", {})):
+		state["moves"] = mv
+		repairs.append("moves updated")
 	if repairs.is_empty():
 		return false
 	_commit("repair")
@@ -169,8 +186,7 @@ func heal_amount(rest_week: bool) -> float:
 ## One week: train `focus` (a stat) or "rest". Returns {ok, error, week, focus, gain, before,
 ## after, healed, fight_ready}.
 func train(focus: String) -> Dictionary:
-	var out := {"ok": false, "error": "", "week": int(state["week"]), "focus": focus, "gain": 0.0, "before": 0.0,
-		"after": 0.0, "healed": 0.0, "fight_ready": false}
+	var out := _week_report(focus)
 	if fight_ready():
 		out["error"] = "It's fight week: step in, or pull out."
 		return _fail(out)
@@ -188,10 +204,131 @@ func train(focus: String) -> Dictionary:
 		out["after"] = after
 		out["gain"] = after - before
 		out["healed"] = _heal(false)
+	_end_week(focus, out, "train")
+	return out
+
+
+func rest() -> Dictionary:
+	return train("rest")
+
+
+## A training week spent learning `move_id`, one of this week's learn_options() (MOVESET_COMBAT.md
+## §5: the training week adds "Learn a move"). Costs the week like a stat (no stat gain, the same
+## healing, the camp counts down). Returns the train report + {move, name}.
+func learn_move(move_id: String) -> Dictionary:
+	var out := _week_report("learn")
+	out["move"] = move_id
+	if fight_ready():
+		out["error"] = "It's fight week: step in, or pull out."
+		return _fail(out)
+	var kit := creature()
+	if kit == null or not kit.pool.has(move_id):
+		out["error"] = "Unknown move '%s'." % move_id
+		return _fail(out)
+	out["name"] = CareerMoves.move_name(kit, move_id)
+	var mv := CareerMoves.well_formed(state.get("moves", {}))
+	if (mv["learned"] as Array).has(move_id):
+		out["error"] = "%s is already learned." % str(out["name"])
+		return _fail(out)
+	if not learn_ids().has(move_id):
+		out["error"] = "Nobody at the gym can teach %s this week." % str(out["name"])
+		return _fail(out)
+	(mv["learned"] as Array).append(move_id)
+	state["moves"] = mv
+	out["healed"] = _heal(false)
+	_say("Learned a new move: %s." % str(out["name"]))
+	_end_week("learn:%s" % move_id, out, "learn")
+	return out
+
+
+## A training week drilling a learned move into one of its two styles (permanent: a drilled move
+## is never drilled again). Costs the week like a stat. Returns the train report + {move, style,
+## name, style_name}.
+func drill_move(move_id: String, style: String) -> Dictionary:
+	var out := _week_report("drill")
+	out["move"] = move_id
+	out["style"] = style
+	if fight_ready():
+		out["error"] = "It's fight week: step in, or pull out."
+		return _fail(out)
+	var kit := creature()
+	if kit == null or not kit.pool.has(move_id):
+		out["error"] = "Unknown move '%s'." % move_id
+		return _fail(out)
+	out["name"] = CareerMoves.move_name(kit, move_id)
+	out["style_name"] = CareerMoves.style_name(kit, move_id, style)
+	var mv := CareerMoves.well_formed(state.get("moves", {}))
+	var drilled: Dictionary = mv["drilled"]
+	if not (mv["learned"] as Array).has(move_id):
+		out["error"] = "Learn %s before drilling it." % str(out["name"])
+		return _fail(out)
+	if drilled.has(move_id):
+		out["error"] = "%s is already drilled (%s): a drill is for good." % [str(out["name"]), CareerMoves.style_name(kit, move_id, str(drilled[move_id]))]
+		return _fail(out)
+	if not (kit.pool[move_id] as PoolMove).styles.has(style):
+		out["error"] = "%s has no style '%s'." % [str(out["name"]), style]
+		return _fail(out)
+	drilled[move_id] = style
+	state["moves"] = mv
+	out["healed"] = _heal(false)
+	_say("Drilled %s: %s." % [str(out["name"]), str(out["style_name"])])
+	_end_week("drill:%s:%s" % [move_id, style], out, "drill")
+	return out
+
+
+## Equips `ids` (free, before any bout; saved with the career). False (last_error) when they are
+## not learned moves forming a valid loadout, or while a launched bout waits to be fought again
+## (D4: the re-fight is the identical bout).
+func set_loadout(ids: Array) -> bool:
+	var locked := loadout_locked()
+	if locked != "":
+		last_error = locked
+		return false
+	var mv := CareerMoves.well_formed(state.get("moves", {}))
+	var problem := CareerMoves.loadout_problem(creature(), mv, ids)
+	if problem != "":
+		last_error = "Those moves can't be equipped: %s." % problem
+		return false
+	last_error = ""
+	var lo := CareerMoves.strings(ids)
+	if lo == (mv["equipped"] as Array):
+		return true
+	mv["equipped"] = lo
+	state["moves"] = mv
+	_commit("loadout")
+	return true
+
+
+## Why the loadout cannot be changed right now ("" when it can).
+func loadout_locked() -> String:
+	if not movesets():
+		return "Career bouts are fought in Classic combat: moves are not used."
+	var kit := creature()
+	if kit == null:
+		return "This fighter is not installed."
+	# a kit whose own default loadout does not validate (a pool still being authored) has nothing
+	# the loadout screen could confirm: its fights use the default loadout
+	if kit.loadout_problem(CareerMoves.default_loadout(kit)) != "":
+		return "%s's moves can't be changed yet." % CareerOffers.fighter_name(catalog, str(state.get("fighter", "")))
+	if interrupted():
+		return "This bout already started: it is fought again with the moves it started with."
+	return ""
+
+
+## The week's report (train, learn, drill share its shape; last_train keeps the latest).
+func _week_report(focus: String) -> Dictionary:
+	return {"ok": false, "error": "", "week": int(state["week"]), "focus": focus, "gain": 0.0, "before": 0.0,
+		"after": 0.0, "healed": 0.0, "fight_ready": false}
+
+
+## The rest of every training week (a stat, rest, learn, drill): the calendar moves on; a booked
+## camp counts down and records the week's focus in its plan; an unbooked week costs a sliver of
+## popularity and brings new offers. The report becomes last_train and the career saves.
+func _end_week(plan_focus: String, out: Dictionary, reason: String) -> void:
 	state["week"] = int(state["week"]) + 1
 	if is_booked():
 		var b: Dictionary = state["booked"]
-		(b["plan"] as Array).append(focus)
+		(b["plan"] as Array).append(plan_focus)
 		b["weeks_left"] = maxi(0, int(b["weeks_left"]) - 1)
 	else:
 		# no fight booked: a quiet week costs a sliver of popularity and brings new offers
@@ -200,12 +337,7 @@ func train(focus: String) -> Dictionary:
 	out["ok"] = true
 	out["fight_ready"] = fight_ready()
 	state["last_train"] = out.duplicate()
-	_commit("train")
-	return out
-
-
-func rest() -> Dictionary:
-	return train("rest")
+	_commit(reason)
 
 
 func _heal(rest_week: bool) -> float:
@@ -737,7 +869,8 @@ func stat_rows() -> Array:
 
 
 ## The train grid (Cage Rules camp page): the six stat rows + {id: "rest", label, heal,
-## rest_mult, healthy, desc}. Empty on fight week.
+## rest_mult, healthy, desc}, then (Movesets bouts) the "learn" and "drill" rows (_learn_row,
+## _drill_row). Empty on fight week.
 func train_rows() -> Array:
 	if fight_ready():
 		return []
@@ -749,7 +882,137 @@ func train_rows() -> Array:
 		desc += " You are healthy: probably train instead."
 	out.append({"id": "rest", "label": "Rest & recover", "short": "REST", "desc": desc, "heal": heal_amount(true),
 		"rest_mult": float(h.get("rest_mult", 2.5)), "healthy": healthy})
+	if movesets():
+		out.append(_learn_row())
+		out.append(_drill_row())
 	return out
+
+
+## The "Learn a move" choice of the train grid: {id: "learn", label, short, desc, options (count),
+## names, available, reason}.
+func _learn_row() -> Dictionary:
+	var names := PackedStringArray()
+	for o in learn_options():
+		names.append(str(o["name"]))
+	var who := CareerOffers.fighter_name(catalog, str(state.get("fighter", "")))
+	var reason := ""
+	if creature() == null:
+		reason = "This fighter is not installed."
+	elif names.is_empty():
+		reason = "Nothing left to learn: every move in %s's pool is learned." % who
+	return {"id": "learn", "label": "Learn a move", "short": "LEARN", "options": names.size(), "names": ", ".join(names),
+		"available": not names.is_empty(), "reason": reason,
+		"desc": "Spend the week learning a new move from %s's pool. No stat gains this week; injuries heal as in any training week. Equip it under Your moves before a bout." % who}
+
+
+## The "Drill a move" choice of the train grid: {id: "drill", label, short, desc, options (count of
+## move/style pairs), moves (count of drillable moves), available, reason}.
+func _drill_row() -> Dictionary:
+	var opts := drill_options()
+	var ids := {}
+	for o in opts:
+		ids[str(o["move"])] = true
+	var reason := ""
+	if creature() == null:
+		reason = "This fighter is not installed."
+	elif opts.is_empty():
+		reason = "No learned move has a style left to drill."
+	return {"id": "drill", "label": "Drill a move", "short": "DRILL", "options": opts.size(), "moves": ids.size(),
+		"available": not opts.is_empty(), "reason": reason,
+		"desc": "Spend the week drilling one of your learned moves into one of its two styles, for good. No stat gains this week; injuries heal as in any training week."}
+
+
+# --- moves -----------------------------------------------------------------------------------------
+
+## The career fighter's base kit (no stats or drills; cached per fighter id). Null when the fighter
+## is not installed.
+func creature() -> CreatureDef:
+	var f := str(state.get("fighter", ""))
+	if f != _kit_id:
+		_kit_id = f
+		_kit = CareerMoves.creature(catalog, f)
+	return _kit
+
+
+## The moves block {learned, equipped, drilled} (read-only: write through learn_move, drill_move
+## and set_loadout).
+func moves() -> Dictionary:
+	return CareerMoves.well_formed(state.get("moves", {}))
+
+
+## Whether career bouts are fought in Movesets (the career preset's combat style): only then do
+## moves matter (the train grid and the camp show them).
+func movesets() -> bool:
+	return CareerFight.combat_style(CareerFight.base_rules(catalog, rules)) == "moves"
+
+
+## Pool ids of this week's "Learn a move" choices (CareerMoves.learn_options).
+func learn_ids() -> Array:
+	var kit := creature()
+	if kit == null:
+		return []
+	var mr = rules.get("moves", {})
+	var n := int((mr as Dictionary).get("learn_choices", 3)) if typeof(mr) == TYPE_DICTIONARY else 3
+	return CareerMoves.learn_options(kit, moves(), int(state.get("seed", 1)), int(state.get("week", 1)), n)
+
+
+## This week's "Learn a move" choices: [{id, name, category, short, desc}].
+func learn_options() -> Array:
+	var out := []
+	var kit := creature()
+	for id in learn_ids():
+		var pm: PoolMove = kit.pool[id]
+		out.append({"id": str(id), "name": pm.display_name, "category": CareerMoves.category_label(pm), "short": pm.short,
+			"desc": pm.desc if pm.desc != "" else pm.short})
+	return out
+
+
+## "Drill a move" choices: [{move, style, move_name, style_name, desc, equipped}] (pool order).
+func drill_options() -> Array:
+	var out := []
+	var kit := creature()
+	var mv := moves()
+	var eq: Array = mv["equipped"]
+	for o in CareerMoves.drill_options(kit, mv):
+		var mid := str(o["move"])
+		var sid := str(o["style"])
+		out.append({"move": mid, "style": sid, "move_name": CareerMoves.move_name(kit, mid), "style_name": CareerMoves.style_name(kit, mid, sid),
+			"desc": CareerMoves.style_desc(kit, mid, sid), "equipped": eq.has(mid)})
+	return out
+
+
+## The equipped moves for the screens: [{id, name, category, style, style_name, short}].
+func loadout_rows() -> Array:
+	var out := []
+	var kit := creature()
+	var mv := moves()
+	var drilled: Dictionary = mv["drilled"]
+	for id in mv["equipped"]:
+		var mid := str(id)
+		var pm: PoolMove = kit.pool.get(mid) if kit != null else null
+		var sid := str(drilled.get(mid, ""))
+		out.append({"id": mid, "name": CareerMoves.move_name(kit, mid), "category": CareerMoves.category_label(pm), "style": sid,
+			"style_name": CareerMoves.style_name(kit, mid, sid) if sid != "" else "", "short": pm.short if pm != null else ""})
+	return out
+
+
+## The recommended loadout's name when the equipped moves are one ("Furnace"), else "Custom".
+func loadout_name() -> String:
+	var n := CareerMoves.loadout_name(creature(), moves()["equipped"])
+	return n if n != "" else "Custom"
+
+
+## A camp plan entry as the fight card lists it: "Power", "Rest", "Learned Fire Spin", "Drilled
+## Flamethrower".
+func plan_label(p: String) -> String:
+	if p == "rest":
+		return "Rest"
+	if p.begins_with("learn:"):
+		return "Learned %s" % CareerMoves.move_name(creature(), p.substr(6))
+	if p.begins_with("drill:"):
+		var parts := p.split(":")
+		return "Drilled %s" % CareerMoves.move_name(creature(), parts[1] if parts.size() > 1 else "")
+	return stat_label(p)
 
 
 ## Condition: {regions: [{id, label, value, level ("healthy"|"sore"|"hurt"|"injured"), text}],
@@ -864,7 +1127,7 @@ func fight_card() -> Dictionary:
 		rows.append({"id": k, "label": str(info.get("label", k)), "short": str(info.get("short", k)), "me": mine, "opp": theirs, "me_ahead": mine >= theirs})
 	var plan := []
 	for p in b.get("plan", []):
-		plan.append("Rest" if str(p) == "rest" else stat_label(str(p)))
+		plan.append(plan_label(str(p)))
 	var d := decorate_offer(o)
 	return {"fight_id": str(o.get("id", "")), "org_name": str(o.get("org_name", "")), "tier_name": d["tier_name"],
 		"title": bool(o.get("title", false)), "defence": bool(o.get("defence", false)), "purse": int(o.get("purse", 0)),
