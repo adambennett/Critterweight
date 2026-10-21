@@ -165,8 +165,11 @@ func derive_pool() -> void:
 
 
 ## Why a list of pool ids is not a valid loadout ("" when it is): 1-4 known, distinct moves with at
-## least one basic strike (a fighter must always have something to do).
+## least one basic strike (a fighter must always have something to do). Martial creatures (Varga)
+## equip techniques instead: one per modifier group, his limb strikes being always available.
 func loadout_problem(ids: Array) -> String:
+	if tags.has("martial") and not pool.is_empty():
+		return _martial_loadout_problem(ids)
 	if ids.is_empty() or ids.size() > 4:
 		return "a loadout has 1 to 4 moves"
 	var seen := {}
@@ -181,6 +184,28 @@ func loadout_problem(ids: Array) -> String:
 		basic = basic or (pool[k] as PoolMove).role == "basic"
 	if not basic:
 		return "a loadout needs a basic move"
+	return ""
+
+
+func _martial_loadout_problem(ids: Array) -> String:
+	var groups := {}
+	for p: PoolMove in pool.values():
+		if not p.martial.is_empty():
+			groups[str(p.martial.get("group", ""))] = true
+	var seen := {}
+	for id in ids:
+		var k := str(id)
+		if not pool.has(k):
+			return "unknown move '%s'" % k
+		var p: PoolMove = pool[k]
+		var g := str(p.martial.get("group", ""))
+		if g == "":
+			return "'%s' is not a technique" % k
+		if seen.has(g):
+			return "two techniques for %s" % g
+		seen[g] = true
+	if seen.size() != groups.size():
+		return "a technique for every group (%s)" % ", ".join(PackedStringArray(groups.keys()))
 	return ""
 
 

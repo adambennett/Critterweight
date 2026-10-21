@@ -693,6 +693,19 @@ func _update_projectile(ent: Dictionary, dt: float) -> void:
 			p = clamped
 		else:
 			ent["life"] = 0.0
+	# v0.9.18 "intercept": this projectile stops enemy projectiles it touches (bubbles that soak
+	# up shots); with "intercept_survives" it goes on, else both pop
+	if bool(ent["e"].get("intercept", false)) and float(ent["life"]) > 0.0:
+		for other in entities:
+			if other == ent or str(other["kind"]) != "projectile" or float(other["life"]) <= 0.0 or int(other["team"]) == int(ent["team"]):
+				continue
+			if Vector3(other["pos"]).distance_to(p) < float(other["radius"]) + float(ent["radius"]):
+				other["life"] = 0.0
+				other["consumed"] = true
+				sim.emit_event({"type": "projectile_destroyed", "fighter": int(ent["owner"]), "pos": Vector3(other["pos"]), "by": "intercept"})
+				if not bool(ent["e"].get("intercept_survives", false)):
+					ent["life"] = 0.0
+					break
 	# blocking props
 	for pr in entities:
 		if pr["kind"] == "prop" and pr["body"] != null:

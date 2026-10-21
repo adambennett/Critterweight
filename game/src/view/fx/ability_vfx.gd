@@ -96,11 +96,13 @@ var _hovers := {}                ## fighter -> id of its running downdraft (Hang
 var _serial := 0                 ## ids of build-ups and downdrafts (scheduled pieces check theirs)
 var _lights := 0
 var _clock := 0.0
+var moves: MoveVfx = null        ## v0.9.18 Movesets kits (MoveVfx): offered every move event first
 var _rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
 	_rng.randomize()
+	moves = MoveVfx.new(self)        # v0.9.18: the Movesets moves' own effects (moves/<creature>.gd)
 	# build every effect material once during the intro, out of sight, so the first ability of the
 	# match never waits on a shader
 	for preset in PRESETS:
@@ -633,6 +635,8 @@ func _stream_at(fi: int, anchor_name: String, off: Vector3, dur: float, preset: 
 
 func _process(delta: float) -> void:
 	_clock += delta
+	if moves != null:
+		moves.process(delta)
 	# animations (fn may free things; iterate a copy)
 	var keep: Array = []
 	for a in _anims:
@@ -707,6 +711,8 @@ func _update_fighters() -> void:
 
 func on_event(ev: Dictionary) -> void:
 	var fi := int(ev.get("fighter", -1))
+	if moves != null and moves.on_event(fi, _cid(fi), ev):
+		return          # a Movesets kit drew this move's effect itself
 	match str(ev.get("type", "")):
 		"move_start":
 			_on_move_start(fi, ev)
@@ -2192,6 +2198,10 @@ func sync_entities(entities: Array) -> void:
 
 
 func _make_entity(e: Dictionary) -> Dictionary:
+	if moves != null:
+		var ke := moves.make_entity(e)
+		if not ke.is_empty():
+			return ke
 	var kind := str(e.get("kind", "zone"))
 	match kind:
 		"projectile":

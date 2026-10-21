@@ -42,6 +42,7 @@ var classic_slots: PackedStringArray = PackedStringArray()   ## Classic slots it
 var styles := {}                  ## style id -> {name, desc, patch}
 var ai := {}                      ## bot hints {range: [min, max], hold: [min, max], when: [...], chance, apart}
 var derived := false              ## built from the Classic slots (no movepool in the content)
+var martial := {}                 ## martial techniques: {group, slots: {limb slot: technique move key}}
 
 
 ## Stamina a press needs (the move's own stamina when no explicit cost).
@@ -89,6 +90,13 @@ static func parse(c: CreatureDef, key: String, d: Dictionary, errors: PackedStri
 		p.aim_turn = float((aim as Dictionary).get("turn_rate", 0.0))
 	p.cost = float(d.get("cost", -1.0))
 	p.styles = d.get("styles", {}) if typeof(d.get("styles", {})) == TYPE_DICTIONARY else {}
+	p.martial = d.get("martial", {}) if typeof(d.get("martial", {})) == TYPE_DICTIONARY else {}
+	if not p.martial.is_empty():
+		var reps = p.martial.get("slots", {})
+		if typeof(reps) == TYPE_DICTIONARY:
+			for slot in reps:
+				if not c.moves.has(str(reps[slot])):
+					errors.append("%s: technique '%s': move '%s' missing" % [c.id, key, str(reps[slot])])
 	p.ai = d.get("ai", {}) if typeof(d.get("ai", {})) == TYPE_DICTIONARY else {}
 	if d.has("use"):
 		p.use = str(d["use"])
@@ -125,6 +133,11 @@ static func parse(c: CreatureDef, key: String, d: Dictionary, errors: PackedStri
 				p.classic_slots.append(p.dash)
 			else:
 				errors.append("%s: move '%s': dash strike '%s' missing" % [c.id, key, p.dash])
+	elif not p.martial.is_empty():
+		# a martial technique: no input of its own, it changes the strikes of its modifier group
+		var first = (p.martial.get("slots", {}) as Dictionary).values()
+		if not first.is_empty() and c.moves.has(str(first[0])):
+			p.move = c.moves[str(first[0])]
 	elif typeof(d.get("move", null)) == TYPE_DICTIONARY:
 		p.move = _inline(c, key, d["move"], "", p, errors)
 		if typeof(d.get("charged_move", null)) == TYPE_DICTIONARY:

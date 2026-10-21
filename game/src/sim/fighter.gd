@@ -67,6 +67,7 @@ var sustaining := false          ## a `hold: sustain` move is looping while its 
 var _hold_button := -1           ## FighterInput button that charges / sustains the current move
 var _sustain_t := 0.0
 var _tick_stun_at := -99.0       ## last stun from a repeating (tick) hit: streams stun at most every 0.5 s
+var move_overrides := {}         ## Movesets, martial creatures: move slot -> MoveDef from an equipped technique
 var cooldown_left := {}
 var charges_left := {}
 var facing_yaw := 0.0
@@ -179,6 +180,18 @@ func reset_vitals() -> void:
 func set_combat(style: String, wanted: Array = []) -> void:
 	combat_style = "classic" if style == "classic" else "moves"
 	loadout = creature.resolve_loadout(wanted) if combat_style == "moves" else []
+	# a martial fighter's equipped techniques replace the strikes of their modifier group
+	move_overrides.clear()
+	for id in loadout:
+		var pm: PoolMove = creature.pool.get(str(id))
+		if pm == null or pm.martial.is_empty():
+			continue
+		var reps = pm.martial.get("slots", {})
+		if typeof(reps) == TYPE_DICTIONARY:
+			for slot in reps:
+				var key := str(reps[slot])
+				if creature.moves.has(key):
+					move_overrides[str(slot)] = creature.moves[key]
 	reset_vitals()
 
 
@@ -635,8 +648,16 @@ func _st_neutral(dt: float) -> void:
 	_try_actions(false)
 
 
-## Picks a move for a slot, honouring "<slot>@<flag>" variants for active timed flags.
+## Picks a move for a slot, honouring "<slot>@<flag>" variants for active timed flags (and, in
+## Movesets, the techniques a martial fighter has equipped: move_overrides).
 func _move_variant(slot: String, abilities := false) -> Array:
+	if not abilities and not move_overrides.is_empty():
+		for fl in ["hovering", "pad_launched", "juiced", "airborne"]:
+			var ok := "%s@%s" % [slot, fl]
+			if move_overrides.has(ok) and (has_flag(fl) or (fl == "airborne" and _airborne)):
+				return [move_overrides[ok], ok]
+		if move_overrides.has(slot):
+			return [move_overrides[slot], slot]
 	var table: Dictionary = creature.abilities if abilities else creature.moves
 	for fl in ["hovering", "pad_launched", "juiced", "airborne"]:
 		var vkey := "%s@%s" % [slot, fl]
@@ -923,7 +944,9 @@ func _st_move(dt: float) -> void:
 		rig.desired_vel = mv * spd + forward() * lunge
 		rig.max_accel = eff("accel") * (1.6 if lunge > 0.0 else 1.0)
 		var pma: PoolMove = creature.pool.get(move_pool_id) if move_pool_id != "" else null
-		if pma != null and pma.aim_turn > 0.0 and t >= m.first_active() * 0.5:
+		# aimed moves steer from their sustain (or half their wind-up) on
+		var aim_from := float(m.sustain[0]) * 0.5 if not m.sustain.is_empty() else m.first_active() * 0.5
+		if pma != null and pma.aim_turn > 0.0 and t >= aim_from:
 			# an aimed move (streams, beams): the stick steers it, else it tracks the target, at the
 			# move's own turn rate (a flamethrower sweeps; it does not snap)
 			if input.move.length() > 0.3:
