@@ -61,7 +61,7 @@ static func stable_float(x: float) -> float:
 ## for runs that reference content which is no longer installed (problems lists every id).
 func load_slot(profile_id: String, slot: String, catalog: CampaignCatalog) -> Dictionary:
 	var path := slot_path(profile_id, slot)
-	var r := Saves.read_json(path, KIND, RunState.VERSION, migrate)
+	var r := Saves.read_json(path, KIND, RunState.VERSION, Callable(RunStore, "migrate").bind(catalog))
 	var out := {"ok": false, "state": {}, "error": "", "problems": [], "recovered_from": str(r.get("recovered_from", "")),
 		"migrated": bool(r.get("migrated", false)), "exists": bool(r.get("exists", false)), "path": path,
 		"newer": bool(r.get("newer", false))}
@@ -196,10 +196,17 @@ func quarantine(profile_id: String, slot: String) -> String:
 	return main
 
 
-## Save-format migrations. v0 (pre-release prototype) lacked claims/flags/log; future versions
-## chain here. Returning null rejects the file (it stays on disk).
-static func migrate(data, from_version: int):
-	if typeof(data) != TYPE_DICTIONARY:
+## Save-format migrations, chained up to RunState.VERSION. Returning null rejects the file (it stays
+## on disk; loading never rewrites it - the next save writes the current format).
+##   v0 -> v1 (pre-release prototype): adds claims, flags and the decision log.
+##   v1 -> v2 (v0.9.18 Movesets): the run fights "moves"; every player gets the moves a new run
+##     starts with (RunMoves.start_moves: the fighter's recommended loadouts learned, the default one
+##     equipped, nothing drilled); every other field is kept. `legacy_log` (also in start_cfg, so
+##     replays rebuild it) records how many decisions the older build logged: those replay with the
+##     rules they were made under (no move tutors, scrolls or move-aware offers for them).
+## `catalog` resolves the fighters' pools (default: the live content's catalog).
+static func migrate(data, from_version: int, catalog: CampaignCatalog = null):
+	if typeof(data) != TYPE_DICTIONARY or from_version < 0 or from_version > RunState.VERSION:
 		return null
 	var d: Dictionary = data
 	if from_version == 0:
@@ -210,8 +217,20 @@ static func migrate(data, from_version: int):
 		if not d.has("log"):
 			d["log"] = []
 		d["version"] = 1
-		return d
-	return d if from_version == RunState.VERSION else null
+	if from_version <= 1:
+		var cat := catalog if catalog != null else CampaignCatalog.shared()
+		if not d.has("combat"):
+			d["combat"] = "moves"
+		var logged := (d.get("log", []) as Array).size() if typeof(d.get("log")) == TYPE_ARRAY else 0
+		if logged > 0 and int(d.get("legacy_log", 0)) <= 0:
+			d["legacy_log"] = logged
+			if typeof(d.get("start_cfg")) == TYPE_DICTIONARY:
+				(d["start_cfg"] as Dictionary)["legacy_log"] = logged
+		for p in d.get("players", []):
+			if typeof(p) == TYPE_DICTIONARY and typeof((p as Dictionary).get("moves")) != TYPE_DICTIONARY:
+				p["moves"] = RunMoves.start_moves(cat, str((p as Dictionary).get("fighter", "")))
+		d["version"] = 2
+	return d
 
 
 # ---------------------------------------------------------------------------------------------

@@ -5,7 +5,9 @@ extends RefCounted
 ##           random fighter picks + builds, minion loadouts, boss, waves, tag bouts, special
 ##           rules, hazards, difficulty/Dose/party scaling, bot tier). Resumes reuse the plan.
 ##   build_match(): the MatchSim/App.start_match config (ArenaDef, rules, CampaignMatchMode or
-##           BossMode, fighters with patched creatures, mods and input sources).
+##           BossMode, fighters with patched creatures, mods and input sources). In a Movesets run
+##           each player fighter brings its equipped moves (entry "loadout") on a creature composed
+##           with its drilled styles; enemy fighters use their default loadout.
 ## Special rules map onto the engine as: handicap -> several enemies with HP mults; low gravity ->
 ## per-body gravity_scale; hazards -> CampaignHazards schedule (effects vocabulary); tag bouts /
 ## waves / sequential entries -> parked fighters swapped in by the mode; timed sudden death ->
@@ -384,12 +386,17 @@ static func build_match(catalog: CampaignCatalog, state: Dictionary, plan_d: Dic
 	var players: Array = state.get("players", [])
 	var spar := bool(plan_d.get("spar", false))
 	var spar_pid := str(opts.get("spar_player", ""))
+	# the run's combat style (v0.9.18: Movesets unless the run was started as Classic)
+	var combat := "classic" if str(state.get("combat", "moves")) == "classic" else "moves"
 	for p in players:
 		if spar and spar_pid != "" and str(p["id"]) != spar_pid:
 			continue
 		var arena_key := str(plan_d.get("arena_key", ""))
+		# Movesets: the player's equipped moves, composed with their drilled styles (BuildApplier)
+		var loadout: Array = RunMoves.fight_loadout(catalog, p) if combat == "moves" else []
 		var built := BuildApplier.compose(catalog, state, p, {"party": party, "include_next_fight": not spar, "arena_key": arena_key,
-			"roll_seed": int(state.get("seed", 1)), "roll_key": "node/%s/fightroll/%s/%s" % [state.get("position", ""), p["id"], plan_d.get("encounter", "")]})
+			"roll_seed": int(state.get("seed", 1)), "roll_key": "node/%s/fightroll/%s/%s" % [state.get("position", ""), p["id"], plan_d.get("encounter", "")],
+			"combat": combat, "loadout": loadout})
 		if built["creature"] == null:
 			errors.append_array(built["errors"])
 			continue
@@ -400,6 +407,8 @@ static func build_match(catalog: CampaignCatalog, state: Dictionary, plan_d: Dic
 		mods["start_hype"] = start_hype
 		var kind := str(kinds.get(str(p["id"]), "bot" if bool(p.get("bot", false)) else "player"))
 		var entry := {"creature": built["creature"], "team": PLAYER_TEAM, "name": str(p.get("name", "Player")), "mods": mods}
+		if not loadout.is_empty():
+			entry["loadout"] = loadout.duplicate()
 		match kind:
 			"player":
 				entry["kind"] = "player"
@@ -425,7 +434,7 @@ static func build_match(catalog: CampaignCatalog, state: Dictionary, plan_d: Dic
 		var ebuild := {}
 		if e["kind"] == "fighter":
 			var pseudo := {"id": e["key"], "fighter": e["creature"], "techniques": e.get("techniques", []), "supplements": [], "side_effects": []}
-			ebuild = BuildApplier.compose(catalog, {"variant": "off_the_street", "dose": 0, "players": [pseudo]}, pseudo, {"party": "solo"})
+			ebuild = BuildApplier.compose(catalog, {"variant": "off_the_street", "dose": 0, "players": [pseudo], "combat": combat}, pseudo, {"party": "solo"})
 			if ebuild["creature"] == null:
 				errors.append_array(ebuild["errors"])
 				continue
@@ -482,8 +491,6 @@ static func build_match(catalog: CampaignCatalog, state: Dictionary, plan_d: Dic
 	CampaignModes.ensure_registered()
 	# no_record: the campaign credits whole runs itself (CampaignProgression), so App does not
 	# also count each campaign fight as a versus match
-	# the run's combat style (v0.9.18: Movesets unless the run was started as Classic)
-	var combat := "classic" if str(state.get("combat", "moves")) == "classic" else "moves"
 	var config := {"arena": arena, "rules": {"rounds": 1, "round_time": float(r.get("round_time", 150.0)), "mode": mode.id(),
 		"friendly_fire": false, "lives": 1, "combat": combat}, "seed": seed_value, "mode": mode, "fighters": fighters, "no_record": true,
 		"context": {"campaign": true, "variant": plan_d.get("variant", ""), "encounter": plan_d.get("encounter", ""),

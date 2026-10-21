@@ -4,18 +4,22 @@ extends RefCounted
 ## A run is ONE JSON-safe Dictionary (saved as-is by RunStore, sent as the co-op party ticket):
 ##   version, run_id, seed, seed_text, variant, mode (campaign|bookie), difficulty, dose,
 ##   coop_format (simultaneous|tag), custom, custom_reasons, seeded, created_at, elapsed,
-##   content_hash, acts: [3 act maps], act (1..3), position (node id or ""), path: [node ids],
-##   phase: map|fight|event|shop|rest|reward|victory|defeat, node: {active node session},
-##   players: [player], claims: {node_key: {player_id: [claim ids]}}, log: [decisions],
+##   content_hash, combat (moves|classic: the fights' combat style), legacy_log (v1 runs: how many
+##   decisions an older build logged), acts: [3 act maps], act (1..3), position (node id or ""),
+##   path: [node ids], phase: map|fight|event|shop|rest|reward|victory|defeat, node: {active node
+##   session}, players: [player], claims: {node_key: {player_id: [claim ids]}}, log: [decisions],
 ##   flags: {run-wide: boss_mods, film_study, act_intro...}, stats, result.
 ## Player: id, name, profile_id, fighter, hp, scrip, hype_carry, supplements [{id, stacks}],
 ##   techniques, side_effects, consumables {id: n}, run_effects [{source, apply}],
 ##   next_fights [{source, remaining, apply, rules, arena}], triggers [...], meta {upgrade: level},
-##   coupon, rerolls_free, cosmetics, stats, clout, connected, bot, out.
+##   moves {learned, equipped, drilled} (RunMoves), coupon, rerolls_free, cosmetics, stats, clout,
+##   connected, bot, out.
 ## Invariants (check()): position is a node of the current act reachable from the path; phase and
-## node session agree; every referenced content id exists; hp within (0, max]; no negative Scrip.
+## node session agree; every referenced content id exists; hp within (0, max]; no negative Scrip;
+## every player has a moves block whose equipped moves are learned.
+## Version 2 (v0.9.18) added combat, legacy_log and the players' moves (RunStore.migrate).
 
-const VERSION := 1
+const VERSION := 2
 const PHASES := ["map", "fight", "event", "shop", "rest", "reward", "victory", "defeat"]
 
 
@@ -33,6 +37,7 @@ static func new_player(catalog: CampaignCatalog, cfg: Dictionary, p: Dictionary,
 		"hype_carry": 0.0, "supplements": [], "techniques": [], "side_effects": [], "consumables": {},
 		"run_effects": [], "next_fights": [], "triggers": [],
 		"meta": (p.get("meta", {}) as Dictionary).duplicate() if str(cfg.get("variant", "")) == "fight_camp" else {},
+		"moves": RunMoves.start_moves(catalog, str(p.get("fighter", ""))),
 		"coupon": 0.0, "rerolls_free": 0, "cosmetics": [],
 		"stats": {"fights": 0, "wins": 0, "kos": 0, "minion_kos": 0, "knockdowns_taken": 0, "damage_dealt": 0.0,
 			"damage_taken": 0.0, "biggest_hit": 0.0, "taunts": 0, "downs": 0, "boss_no_hit": [], "scrip_earned": 0},
@@ -70,6 +75,7 @@ static func create(catalog: CampaignCatalog, cfg: Dictionary) -> Dictionary:
 		"custom": bool(cfg.get("custom", false)), "custom_reasons": (cfg.get("custom_reasons", []) as Array).duplicate(),
 		"seeded": bool(cfg.get("seeded", false)), "created_at": int(cfg.get("created_at", 0)), "elapsed": 0.0,
 		"content_hash": str(cfg.get("content_hash", "")),
+		"combat": "classic" if str(cfg.get("combat", "moves")) == "classic" else "moves",
 		"acts": MapGenerator.generate(catalog, gen_cfg),
 		"act": 1, "position": "", "path": [], "phase": "map", "node": {},
 		"players": players, "claims": {}, "log": [], "flags": {"boss_mods": {}, "film_study": {}, "revealed": {}},
@@ -77,6 +83,10 @@ static func create(catalog: CampaignCatalog, cfg: Dictionary) -> Dictionary:
 		"result": {},
 		"gen_cfg": gen_cfg,
 	}
+	# a run converted from an older format: its first decisions were logged by that build
+	# (RunStore.migrate); moves features start after them (RunController.moves_live)
+	if int(cfg.get("legacy_log", 0)) > 0:
+		state["legacy_log"] = int(cfg["legacy_log"])
 	# starting resources from run modifiers (Fight Camp upgrades)
 	for p in state["players"]:
 		var rr := RunRules.compute(catalog, state, p)
@@ -85,8 +95,38 @@ static func create(catalog: CampaignCatalog, cfg: Dictionary) -> Dictionary:
 		var anti := int(rr.get("start_antidotes", 0.0))
 		if anti > 0:
 			p["consumables"]["sup_antidote_lozenge"] = anti
+		_start_moves_bonus(catalog, state, p, int(rr.get("start_learned_moves", 0.0)), int(rr.get("start_drilled_moves", 0.0)))
 		p["hp"] = BuildApplier.max_hp(catalog, state, p)
 	return state
+
+
+## Fight Camp's Sparring Partner (one more learned move per level) and Film Study (one drilled
+## move per level), drawn from the run's own streams.
+static func _start_moves_bonus(catalog: CampaignCatalog, state: Dictionary, p: Dictionary, learn: int, drill: int) -> void:
+	var m := RunMoves.block(p)
+	var seed_value := int(state.get("seed", 1))
+	var pid := str(p.get("id", ""))
+	for i in learn:
+		var cands := RunMoves.learnable(catalog, p)
+		if cands.is_empty():
+			break
+		var pick = RunRng.stream(seed_value, "start/%s/learn/%d" % [pid, i]).pick(cands)
+		(m["learned"] as Array).append(str(pick))
+	for j in drill:
+		var moves := RunMoves.drillable(catalog, p)
+		if moves.is_empty():
+			break
+		var rng := RunRng.stream(seed_value, "start/%s/drill/%d" % [pid, j])
+		# an equipped move when there is one (drillable lists those first)
+		var equipped := []
+		for id in moves:
+			if (m["equipped"] as Array).has(id):
+				equipped.append(id)
+		var mv := str(rng.pick(equipped if not equipped.is_empty() else moves))
+		var styles: Array = (RunMoves.move_info(catalog, str(p.get("fighter", "")), mv).get("styles", {}) as Dictionary).keys()
+		if styles.is_empty():
+			continue
+		(m["drilled"] as Dictionary)[mv] = str(rng.pick(styles))
 
 
 static func player(state: Dictionary, pid: String) -> Dictionary:
@@ -251,4 +291,13 @@ static func check(catalog: CampaignCatalog, state: Dictionary) -> Array:
 			out.append("player %s has no HP outside a defeat" % p.get("id", "?"))
 		if int(p.get("scrip", 0)) < 0:
 			out.append("player %s has negative Scrip" % p.get("id", "?"))
+		var mv = p.get("moves")
+		if typeof(mv) != TYPE_DICTIONARY or typeof((mv as Dictionary).get("learned")) != TYPE_ARRAY \
+				or typeof((mv as Dictionary).get("equipped")) != TYPE_ARRAY or typeof((mv as Dictionary).get("drilled")) != TYPE_DICTIONARY:
+			out.append("player %s has no moves record" % p.get("id", "?"))
+		else:
+			for id in mv["equipped"]:
+				if not (mv["learned"] as Array).has(id):
+					out.append("player %s equips a move it has not learned (%s)" % [p.get("id", "?"), id])
+					break
 	return out

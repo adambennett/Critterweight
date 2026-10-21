@@ -303,7 +303,8 @@ then the anchor.
   learned too. Elite and boss rewards offer a **move tutor** next to techniques; the shop sells a
   **move scroll**; resting can **train** (learn) or **drill** (style); events can teach moves. The
   pre-fight screen has a **Moves** panel to equip any four learned moves (free). Every learn, equip
-  and drill is a logged RunController decision, so runs verify and replay.
+  and drill is a logged RunController decision, so runs verify and replay. (Implementation, the
+  translation rules and the v1 → v2 run migration: docs/CAMPAIGN_SYSTEMS.md "Moves in runs".)
 * **Fight Camp**: new Cannery upgrades (*Sparring Partner*: one more learned move at the start;
   *Film Study*: start with one drilled move); the existing upgrades translate (§7).
 * **Career**: the training week adds *Learn a move* and *Drill a move*; the loadout is chosen before

@@ -1,10 +1,51 @@
 {
   "_doc": "DOZER techniques and build directions (docs/design/ROSTER.md §4).",
   "items": [
-    {"id": "tech_dozer_quarry_legs", "type": "technique", "fighter": "f_dozer", "name": "Quarry Legs", "build": "build_dozer_freight_train",
-     "tags": ["charge", "mobility"], "effect": "Bulldoze 7 -> 8.5 m/s, steering 20 -> 30 deg/s; Quarry Ram dash 3 -> 4 m",
-     "apply": {"mods": [{"key": "charge_speed", "mul": 1.214}, {"key": "charge_steer", "mul": 1.5}],
-               "patches": [{"op": "mul", "path": "moves.heavy_charged.lunge[*][2]", "value": 1.333}]}},
+    {
+  "id": "tech_dozer_quarry_legs",
+  "type": "technique",
+  "fighter": "f_dozer",
+  "name": "Quarry Legs",
+  "build": "build_dozer_freight_train",
+  "tags": [
+    "charge",
+    "mobility"
+  ],
+  "effect": "Bulldoze 7 -> 8.5 m/s, steering 20 -> 30 deg/s; Quarry Ram dash 3 -> 4 m; Movesets: Rock Slide and Quake Stomp cost 15% less stamina",
+  "apply": {
+    "mods": [
+      {
+        "key": "charge_speed",
+        "mul": 1.214
+      },
+      {
+        "key": "charge_steer",
+        "mul": 1.5
+      }
+    ],
+    "patches": [
+      {
+        "op": "mul",
+        "path": "moves.heavy_charged.lunge[*][2]",
+        "value": 1.333
+      }
+    ],
+    "movesets": {
+      "patches": [
+        {
+          "op": "mul",
+          "path": "pool.rock_slide.cost",
+          "value": 0.85
+        },
+        {
+          "op": "mul",
+          "path": "pool.quake_stomp.cost",
+          "value": 0.85
+        }
+      ]
+    }
+  }
+},
     {"id": "tech_dozer_pack_mule", "type": "technique", "fighter": "f_dozer", "name": "Pack Mule", "build": "build_dozer_boulder",
      "tags": ["tank"], "effect": "Max HP +15; knockback taken -20%",
      "apply": {"mods": [{"key": "max_health_add", "add": 15}, {"key": "knockback_taken", "mul": 0.8}]}},

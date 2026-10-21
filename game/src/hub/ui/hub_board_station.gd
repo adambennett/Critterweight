@@ -23,6 +23,7 @@ const VISIBLE := {
 	"meta_title_contender": "A title plaque behind the desk.", "meta_crowd_connection": "String lights over the dock, then a fan barricade.",
 	"meta_walkout": "A sound system on the dock that plays your walkout.", "meta_second_skin": "A ring jacket on a tailor's dummy.",
 	"meta_bookies_favor": "Today's odds board in the Boiler Room.", "meta_boiler_room_key": "A key on the hook by the AI Lab terminal.",
+	"meta_sparring_partner": "A pad rack with focus mitts by the dock workbench.", "meta_film_study": "A shelf of fight tapes in the Office.",
 }
 
 

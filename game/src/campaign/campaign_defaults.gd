@@ -67,6 +67,9 @@ static func rules() -> Dictionary:
 			"coop_timer": 90,
 		},
 		"rest": {"patch_up": 0.30, "rest_easy_bonus": 0.15, "rub_down_heal": 0.10, "film_study_hype": 15, "train_options": 2},
+		# Movesets runs (docs/CAMPAIGN_SYSTEMS.md "Moves in runs"): elite/boss move tutors, the rest
+		# stop's move training and drills, the shop's move scroll
+		"moves": {"tutor_options": 3, "learn_options": 3, "drill_moves": 2, "scroll_price": 80, "event_options": 2},
 		"fight": {"round_time": 150.0, "sudden_death_grace": 45.0, "intro": 2.2},
 		"pacing": {"fight": 90, "elite": 120, "boss": 180, "event": 45, "shop": 60, "rest": 30, "treasure": 20,
 			"mystery": 70, "act_transition": 30, "target_min": 25, "target_max": 40},

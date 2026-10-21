@@ -436,6 +436,9 @@
        "max"
       ]
      }
+    },
+    "movesets": {
+     "$ref": "#/$defs/apply"
     }
    },
    "additionalProperties": false
@@ -474,7 +477,8 @@
       "nothing",
       "consumable",
       "quip",
-      "stat"
+      "stat",
+      "learn_move"
      ]
     }
    }

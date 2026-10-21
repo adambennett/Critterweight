@@ -1,10 +1,12 @@
 extends Screen
-## Reward pick: the player's next pending pick (supplement or technique) as option cards, with
-## reroll (cost / free rerolls / limit), skip, the Scrip alternative (treasure) and the Dose 7
-## side-effect preview. Picks resolve through RunController.claim (claims are keyed by node, so a
-## double press or a resumed save can never grant a reward twice). Controller: left/right
-## between cards, down to the action row, A/Enter picks. In an online party run every member picks
-## only their own rewards (flow.do_claim goes to the party's host; the screen waits for its answer).
+## Reward pick: the player's next pending pick (supplement, technique, a move to learn or a move
+## style to drill) as option cards, with reroll (cost / free rerolls / limit), skip, the Scrip
+## alternative (treasure) and the Dose 7 side-effect preview. Picks resolve through
+## RunController.claim (moves: the learn / drill decisions; claims are keyed by node, so a double
+## press or a resumed save can never grant a reward twice). Supplement and technique cards say
+## which moves they improve (and which of those are not equipped). Controller: left/right between
+## cards, down to the action row, A/Enter picks. In an online party run every member picks only
+## their own rewards (the flow sends them to the party's host; the screen waits for its answer).
 
 var flow: CampaignFlow
 var ctrl: RunController
@@ -34,6 +36,10 @@ func _build() -> void:
 	var kind := str(_entry.get("kind", "supplement"))
 	var source := str(_entry.get("source", "fight"))
 	var heading := "LEARN A TECHNIQUE" if kind == "technique" else ("TREASURE!" if source == "treasure" else "PICK A SUPPLEMENT")
+	if kind == "move":
+		heading = "LEARN A MOVE"
+	elif kind == "drill":
+		heading = "DRILL A MOVE"
 	var sub := _banner()
 	if pend.size() > 1:
 		sub += ("   ·   " if sub != "" else "") + "%d picks waiting" % pend.size()
@@ -46,21 +52,37 @@ func _build() -> void:
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(row)
 	var options: Array = _entry.get("options", [])
+	var fighter := str(p.get("fighter", ""))
+	var equipped := RunMoves.fight_loadout(ctrl.catalog, p)
+	var card_w := 360.0 if options.size() <= 4 else 290.0
 	for id in options:
-		var parts := CampaignUI.card(360, 290, CampaignUI.GOOD if kind == "technique" else CampaignUI.ACCENT)
+		var parts := CampaignUI.card(card_w, 290, CampaignUI.GOOD if kind in ["technique", "drill"] else CampaignUI.ACCENT)
 		var b: Button = parts[0]
 		var extra := []
-		if kind == "supplement":
-			var d: Dictionary = ctrl.catalog.supplements.get(str(id), {})
-			var have := RewardRoller.stacks_of(p, str(id))
-			if have > 0:
-				extra.append(["You have %d / %d" % [have, int(d.get("stack", 1))], CampaignUI.ACCENT])
-			var tags: Array = d.get("tags", [])
-			if not tags.is_empty():
-				extra.append("Tags: " + ", ".join(tags))
-		CampaignUI.describe_item(parts[1], ctrl.catalog, str(id), extra)
+		match kind:
+			"move":
+				CampaignUI.describe_move(parts[1], ctrl.catalog, fighter, str(id), "MOVE TUTOR" if source in ["elite", "boss"] else "NEW MOVE")
+				b.tooltip_text = "Learn %s" % RunMoves.move_name(ctrl.catalog, fighter, str(id))
+			"drill":
+				var md := RunMoves.split_drill(str(id))
+				var on := equipped.has(str(md[0]))
+				CampaignUI.describe_move(parts[1], ctrl.catalog, fighter, str(md[0]), "DRILL" + (" · EQUIPPED" if on else " · NOT EQUIPPED"), str(md[1]))
+				b.tooltip_text = "Drill %s: %s" % [RunMoves.move_name(ctrl.catalog, fighter, str(md[0])), RunMoves.style_name(ctrl.catalog, fighter, str(md[0]), str(md[1]))]
+			_:
+				if kind == "supplement":
+					var d: Dictionary = ctrl.catalog.supplements.get(str(id), {})
+					var have := RewardRoller.stacks_of(p, str(id))
+					if have > 0:
+						extra.append(["You have %d / %d" % [have, int(d.get("stack", 1))], CampaignUI.ACCENT])
+					var tags: Array = d.get("tags", [])
+					if not tags.is_empty():
+						extra.append("Tags: " + ", ".join(tags))
+				var imp := RunMoves.improves_text(ctrl.catalog, ctrl.state, p, str(id))
+				if imp != "":
+					extra.append([imp, CampaignUI.GOOD])
+				CampaignUI.describe_item(parts[1], ctrl.catalog, str(id), extra)
+				b.tooltip_text = "Take %s" % ctrl.catalog.item_name(str(id))
 		b.pressed.connect(_pick.bind(str(id)))
-		b.tooltip_text = "Take %s" % ctrl.catalog.item_name(str(id))
 		row.add_child(b)
 		_cards.append(b)
 	if options.is_empty():
@@ -113,6 +135,8 @@ func _build() -> void:
 ## One line about the fight that produced this reward (won in m:ss, HP left).
 func _banner() -> String:
 	var src := str(_entry.get("source", ""))
+	if str(_entry.get("kind", "")) in ["move", "drill"] and src in ["elite", "boss"]:
+		return "The tutor in the corner has seen enough: pick a move to learn."
 	if not src in ["fight", "elite", "boss"]:
 		return str({"rest": "Training at the back room.", "treasure": "A locker full of the good stuff.", "event": "A little something on the side."}.get(src, ""))
 	var lf := ctrl.last_fight()
@@ -128,7 +152,18 @@ func _banner() -> String:
 
 
 func _pick(choice: String) -> void:
-	if not flow.do_claim(str(_entry.get("rid", "")), choice):
+	var rid := str(_entry.get("rid", ""))
+	var ok := false
+	var kind := str(_entry.get("kind", "")) if choice != "skip" else ""
+	match kind:
+		"move":
+			ok = flow.do_learn(choice, "pick:" + rid)
+		"drill":
+			var md := RunMoves.split_drill(choice)
+			ok = flow.do_drill(str(md[0]), str(md[1]), "pick:" + rid)
+		_:
+			ok = flow.do_claim(rid, choice)
+	if not ok:
 		_msg.text = flow.error_text()
 		return
 	if flow.is_party():

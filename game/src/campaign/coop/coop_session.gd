@@ -16,6 +16,9 @@ extends RefCounted
 ##     the first member who answers (fighter-specific ones by the matching player).
 ##   * Per-player picks: every member claims only their own pending rewards (own sub-seed,
 ##     separate inventories and Scrip); the claim ledger rejects duplicates and resent messages.
+##   * Moves (Movesets runs): "learn" {move, source}, "equip" {loadout} and "drill" {move, style,
+##     source} are member intents the host applies to that member's own fighter as RunController
+##     decisions (the party's decision log), so members' tickets verify them like any pick.
 ##   * Run ownership: the host saves the run; after every node every member receives a party
 ##     ticket (state + checksum) and keeps it as a local replica checkpoint. Party slots are
 ##     cleared when the run ends.
@@ -596,6 +599,16 @@ func _host_message(from: String, type: String, payload: Dictionary) -> bool:
 			ok = ctrl.rest_choose(from, str(payload.get("option", "")))
 		"consume":
 			ok = ctrl.use_consumable(from, str(payload.get("item", "")))
+		# moves (Movesets runs): each member learns, equips and drills only their own fighter's
+		"learn":
+			ok = ctrl.learn_move(from, str(payload.get("move", "")), str(payload.get("source", "")))
+		"equip":
+			var lo = payload.get("loadout", [])
+			if typeof(lo) != TYPE_ARRAY:
+				return _refuse(from, type, "a loadout is a list of moves")
+			ok = ctrl.equip_moves(from, lo)
+		"drill":
+			ok = ctrl.drill_move(from, str(payload.get("move", "")), str(payload.get("style", "")), str(payload.get("source", "")))
 		"pause":
 			if not request_pause(from):
 				return _refuse(from, type, last_error)

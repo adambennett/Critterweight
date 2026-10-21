@@ -150,7 +150,9 @@ run through one **apply block**:
 * `statuses` — statuses applied at the bell of every fight.
 * `run` — economy/run rules `[{key, mul|add|set}]` (`CampaignCatalog.RUN_DEFAULTS`: `scrip_mult`,
   `shop_price_mult`, `rest_heal_add`, `post_fight_heal`, `free_rerolls`, `reveal_rows_add`,
-  `boss_tell_lead`, `supplement_side_effects`, …).
+  `boss_tell_lead`, `supplement_side_effects`, `start_learned_moves`, `start_drilled_moves`, …).
+* `movesets` — an apply block used only when the fighter fights Movesets (see
+  [Moves in runs](#moves-in-runs-v0918)); its patches may use `pool.` paths.
 
 Meta upgrades use `per_level` instead of `apply` (numbers scale linearly with the owned level).
 
@@ -169,6 +171,10 @@ Paths are dot separated; `*` matches every key; selectors `[3]`, `[*]`, `[field=
 array elements. `time_scale` scales every authored time of a move/ability (`phase: "startup"`
 only stretches the wind-up and shifts later times). Missing paths are skipped at apply time (kits
 differ) and reported by `apply_all` so tests can flag patches that never hit their fighter.
+
+Build patches go through `UpgradeTranslation.apply_patch`, which also carries them to the
+Movesets pool moves (see [Moves in runs](#moves-in-runs-v0918)); `ContentPatch.targets()` resolves a
+path to the leaves it would touch. `time_scale` also scales a Movesets move's `sustain` window.
 
 **Kit contract for techniques.** Techniques target the kit slot names of `ROSTER.md`:
 moves `l1 l2 l3 heavy heavy_charged finisher dash_attack grab pummel taunt`, abilities
@@ -295,7 +301,8 @@ synergy, reroll, hype carry, boss heals, shop, rest, fight, pacing, co-op, hazar
 
 ### Meta upgrades
 
-`meta_upgrades/cannery.json`, `"type": "meta_upgrade"`, 24 entries at six stations:
+`meta_upgrades/cannery.json`, `"type": "meta_upgrade"`, 26 entries at six stations (v0.9.18 added
+Sparring Partner and Film Study, see [Moves in runs](#moves-in-runs-v0918)):
 
 ```json
 {"id": "meta_heavy_bag", "type": "meta_upgrade", "meta_bonus": true, "name": "Heavy Bag",
@@ -344,6 +351,104 @@ stats, enemies, boss phase).
 `SimSpeed` (k× physics ticks per second at the fixed 1/120 s step) fights run 10–14× faster than
 real time. Pausing freezes the fight's physics space.
 
+## Moves in runs (v0.9.18)
+
+Campaign fights are Movesets fights (docs/design/MOVESET_COMBAT.md): each fighter brings four moves
+from its move pool. A run records its combat style (`state.combat`: `"moves"` for every run today;
+`"classic"` only when a future start option deals a Classic card, `cfg.combat`) and every player's
+moves (`RunMoves`, `src/campaign/run_moves.gd`):
+
+```json
+"moves": {"learned": ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire", "furnace_haymaker", "flare_rush", "cinder_shot"],
+          "equipped": ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"],
+          "drilled": {"flamethrower": "wide_nozzle"}}
+```
+
+* **Start.** A new run learns the fighter's two recommended loadouts combined and equips its
+  default loadout; nothing is drilled. A fighter without a pool (an NPC, a mod written before
+  v0.9.18) fights its Classic kit as four moves. In Fight Camp, **Sparring Partner** (Loading
+  Dock, 160 Clout) adds one more learned move and **Film Study** (Office, 220 Clout, after Act 1 is
+  beaten) starts the run with one equipped move drilled; both draw their move (and style) from the
+  run's own streams (`RunState._start_moves_bonus`, run keys `start_learned_moves`,
+  `start_drilled_moves`).
+* **Learning** (decision `learn {move, source}`): elite and boss wins add a **move tutor** pick
+  (1 of `rules.moves.tutor_options` = 3 unlearned moves) after the supplement and technique picks;
+  the shop stocks a **move scroll** for one unlearned move (slot `m0`, `rules.moves.scroll_price` =
+  80 Scrip with the stall's price modifiers; buying it is the learn decision, source
+  `shop:<slot>`); a rest stop's **Learn a move** opens a pick (1 of 3); the event op `learn_move`
+  (`{options: n}` a pick, or `{move: id}`) teaches at events - the Highway Rest Stop's *Shadowbox*.
+  A pick is learned with source `pick:<rid>` (`claim()` routes move picks there). Learning never
+  changes the loadout. A Classic run, or a fighter who knows every move, gets 25 Scrip from
+  `learn_move` instead; tutors and scrolls appear only while something is left to learn.
+* **Drilling** (decision `drill {move, style, source}`): a rest stop's **Drill a move** opens a
+  pick of styles for two learned, undrilled moves (equipped ones first), as options
+  `"move:style"`. A style is permanent for the run. Drilled styles are build packages applied
+  before every upgrade (`BuildApplier.compose`, Movesets only): the style shapes the move (Wide
+  Nozzle's 60° fan), upgrades then improve it.
+* **Equipping** (decision `equip {loadout}`): free, between fights - the run map's MOVES panel
+  opens the loadout screen with `allowed` = the learned moves and `styles` = the drilled ones.
+  Learned moves only, a valid loadout for the fighter (a basic strike, 1-4 distinct moves; a
+  recommended loadout always is). The same loadout again changes and logs nothing.
+* **Fights.** `EncounterBuilder.build_match` gives each player fighter `loadout` = its equipped
+  moves on a creature composed with its drilled styles (`RunMoves.fight_loadout`; a stale id falls
+  back to the default loadout as MatchSim would). Enemy fighters fight their default loadout,
+  composed in the run's style.
+* **Upgrades written for the Classic slots** reach the moves through `UpgradeTranslation`
+  (`src/campaign/upgrade_translation.gd`): patches apply as written (pool moves built with `use` or a
+  basic `string` share the Classic slot dicts) and also reach the inline pool moves by role
+  (`moves.l1|l2|l3|finisher|dash_attack` → role basic, `moves.heavy|heavy_charged` → role heavy,
+  `moves.*` → every inline move, `abilities.*` → role special). A lone hit field (damage, poise,
+  knockback, stun, launch, buildup, element, guard_break) reaches the inline move's effects too;
+  multipliers transfer as they are, an additive damage/build-up op on a repeating (`every`) effect
+  becomes the multiplier (base + value) / base of the Classic slot's current value, and a leaf
+  changes at most once per upgrade. Edits of a move's own timing (keyframes, hit windows,
+  duration...) stay with the Classic move they were written for. A `string` patch (Lead Hand
+  Learner) re-strings a basic move that starts with the old light string. Martial fighters (Varga)
+  keep their Classic strike kit in Movesets, so their upgrades are checked against that kit. With **no heavy-role move equipped**, hit-field patches on
+  the heavy also reach the equipped basic string's finisher (the Classic engine files the finisher
+  under the heavy class) and hooks naming only heavy slots answer `move_class: "heavy"` — so heavy
+  upgrades always mean something, and never twice (an upgrade that already improves the finisher
+  itself, like Feather Knives, is not added again). Hook conditions on Classic slots otherwise
+  translate in the engine (`Hooks._slot_matches`). Classic compositions get none of this except
+  the harmless inline translation.
+* **Movesets-specific effects.** An apply block (and an event's `run_patches`) may carry a
+  `"movesets"` apply block used only in Movesets compositions; its patches may address pool moves
+  directly: `pool.<id>.<rest>` or `pool[role=X]` / `pool[category=X]` / `pool[hold=X]` (entry fields
+  `cooldown`, `charges`, `cost`, `max_hold`, `drain` go to the pool entry, an ability's cooldown and
+  charges to the ability). Projectile Polish reaches streams this way; the Boiler Inspector also
+  tunes Flare Rush for Stoke's Brawler loadout. The completed roster also maps Quarry Legs to
+  cheaper rock attacks; Molting Season to Shell Brace; Undertow to bubble puddles/Whirlpool;
+  Tailwind to bouncing air shots; Bouncy Castle/Short Fuse to Jitters's field/rings/chain;
+  Knell's lantern/veil upgrades to wisps and Hex Chain; and Slurry's Double Dip/Grease Trap to
+  Coil Crush/Acid Spray. Their descriptions state the additional effects. Fighter-specific
+  battery, molting and drain events also improve the corresponding new build.
+* **Texts and offers.** Reward and shop cards say which moves an upgrade improves
+  ("Improves: Ember Jab (not equipped: Furnace Haymaker)", `RunMoves.improves_text`; event
+  `run_patches` lines too). Reward and shop rolls weight upgrades by `RunMoves.offer_weight`: ×1.4
+  when they improve an equipped move, ×0.6 for techniques that only improve unequipped ones,
+  and ×1 for fighter-wide upgrades. Generic supplements with no equipped or fighter-wide benefit
+  are excluded: equipping a projectile enables Projectile Polish, unequipping every projectile
+  and stream excludes it again. In Classic, an offer must benefit the Classic kit.
+  `test_upgrade_translation.gd` lints all of it: every technique, supplement, side
+  effect, Cannery upgrade and event patch must change a move of each recommended loadout (or only
+  the fighter as a whole), and the Classic kit; hooks naming slots must match a pool move; every
+  fighter with all its upgrades at once must still compose into a valid creature. The only
+  exceptions it accepts are generic supplements with no equipped benefit (for example, redundant
+  Flavor Packs or Projectile Polish without a projectile/stream equipped), and only while their
+  offer weight is zero. The lint still rejects every unfiltered ineffective offer.
+* **Older runs.** `RunStore.migrate` turns a v1 run into v2: `combat: "moves"`, every player the
+  moves a new run starts with, every other field kept; `legacy_log` (in the state and its
+  `start_cfg`) records how many decisions the older build logged. Those decisions replay with the
+  rules they were made under (`RunController.new_rules()` false: no tutors, scrolls, move-aware
+  offer weights or Movesets event effects), so the run still verifies and replays; everything after
+  them plays with today's rules. "Run it back" starts a plain v2 card.
+* **Co-op.** `learn`, `equip` and `drill` are member intents (`CoopSession`): the host applies them
+  to that member's own fighter as decisions of the party's log, so members' tickets verify them.
+* **Autopilot.** Learns the best new move (owned upgrades that improve it, a category it lacks),
+  drills an equipped move, buys a scroll when it can afford one with its reserve, and after every
+  pick keeps the basic strike plus the three best learned moves (its current ones win ties): a run
+  keeps its recommended loadout until its build favours other moves (`CampaignAutoPilot.best_loadout`).
+
 ## Persistence
 
 `RunStore` (kind `campaign_run`, version `RunState.VERSION`) under `<user>/runs/<profile>/`:
@@ -353,7 +458,9 @@ newer-format or content-incompatible saves return a clear error (missing content
 so the player can re-enable the mod); abandoning a damaged save moves every copy of the slot
 (`.json`, `.tmp`, `.bak`) aside (quarantine). `RunStore.list` shows a slot as soon as any copy
 exists — also when a crash left only the verified `.tmp` and/or the `.bak`, which `load_slot`
-recovers from. `RunStore.migrate` chains format migrations (v0 → v1 included).
+recovers from. `RunStore.migrate` chains format migrations (v0 → v1 → v2; v2 is the v0.9.18
+moves format, see [Moves in runs](#moves-in-runs-v0918)); older builds refuse a v2 file through
+the `Saves` version guard and leave it untouched.
 
 **One suspended run per variant.** A new run never silently replaces the one in its slot: the
 campaign menu's START RUN and the hub's sign-up sheet ask first (abandon it and start / resume
@@ -393,7 +500,8 @@ event?}`, `vote_update {votes}`, `vote_result {node, reason, tie, counts}`, `fig
 
 Members → host: `hello {player}`, `vote {node}`, `event_choice {choice}`, `pick {rid, choice}`,
 `reroll {rid}`, `shop_buy {slot}`, `shop_service {}`, `shop_sell {item}`, `shop_leave {}`,
-`rest {option}`, `consume {item}`, `pause {}`, `resume {}`, `rejoin {player}`, `move_on {}`.
+`rest {option}`, `consume {item}`, `learn {move, source}`, `equip {loadout}`, `drill {move, style,
+source}`, `pause {}`, `resume {}`, `rejoin {player}`, `move_on {}`.
 
 **Trust.** The sender of a message is the transport's peer id (`from` of `message_received`),
 never a payload field (payload `host`/`player` fields are informational). The host acts on a
@@ -498,15 +606,19 @@ tests (deterministic for a given state):
 * **Shop** — best affordable item above a threshold keeping 30 Scrip; Rub-down with 2+ side
   effects; leave.
 * **Rest** — Patch up below 60% HP, Rub-down with 2+ side effects, Train if a technique is left,
-  Patch up below 90%, else Film study.
+  Drill a move, Learn a move, Patch up below 90%, else Film study.
+* **Moves** — see [Moves in runs](#moves-in-runs-v0918): learn the best new move, drill an
+  equipped one, re-equip only when the build favours other moves.
 
 ## UI
 
 `src/campaign/ui/` (self-contained widgets in `CampaignUI`, own modal): `campaign_menu`
 (variant, fighter, difficulty, Dose, co-op format, seed, suspended runs, Bookie, Cannery Ledger),
 `run_map` (branching map with icon + text node types, reachable nodes focusable, side panel with
-HP/Scrip/Hype/build/consumables, suspend/abandon, act intro card), `reward`, `event`, `shop`,
-`rest`, `run_summary` (victory/defeat, numbers, build, Clout/ladder/records; Run it back, New card,
+HP/Scrip/Hype, the MOVES panel (equipped moves and styles; CHANGE MOVES opens the `loadout` screen
+with the learned moves), build/consumables, suspend/abandon, act intro card), `reward` (supplement,
+technique, move and drill picks; upgrade cards name the moves they improve), `event`, `shop`
+(with the move scroll), `rest` (Learn a move / Drill a move in Movesets runs), `run_summary` (victory/defeat, numbers, build, Clout/ladder/records; Run it back, New card,
 Raise the Dose), `bookie` (setup, live view, overlay over presented fights), `camp_ledger`.
 Everything is operable with a controller (focus chains, `ui_accept`, `ui_cancel` = back/close
 modal) and with mouse/keyboard. `CampaignFlow` routes phases to screens and launches presented
@@ -557,7 +669,10 @@ filters such as `-- --test test_campaign_generation` run one file.
 | `test_campaign_run.gd` | run state machine, rewards, shop, rest (Train pick), events (group costs, pass), claims, replay/verify (incl. incremental, tampering), ladder and Dose eligibility, custom runs and camp milestones, spar scaling, boss phase-2 threshold, variants |
 | `test_campaign_fights.gd` | encounters → real MatchSim fights: plain, waves/timer, tag bout, boss phases/telegraphs/Daze, co-op downed/revive |
 | `test_campaign_persistence.gd` | suspend/resume, crash recovery (also slots left with only `.tmp`/`.bak`), duplicate claims across resumes, damaged/missing/newer saves, removed content, migration, tickets, unstable floats |
-| `test_campaign_coop.gd` | loopback co-op: votes, ties, picks, disconnect/rejoin, host departure, pause budget, tag format, per-player credit; forged member messages, tampered host results, host-change election rule, group-event ballots (affordable only, failed picks dropped, member choice = vote), party slots cleared at the end, host Dose clamp |
+| `test_campaign_coop.gd` | loopback co-op: votes, ties, picks, disconnect/rejoin, host departure, pause budget, tag format, per-player credit; forged member messages, tampered host results, host-change election rule, group-event ballots (affordable only, failed picks dropped, member choice = vote), party slots cleared at the end, host Dose clamp; members' learn / equip / drill intents in the party's log (tickets verify them) |
+| `test_campaign_moves.gd` | moves in runs: starting moves, learn / equip / drill decisions (log, verify, replay), tutors, the move scroll, rest training and drills, the event op, fights bringing the equipped moves as drilled (a real MatchSim set up), the v1 → v2 migration with legacy decisions, Sparring Partner / Film Study, the autopilot (co-op learn / equip / drill intents: `test_campaign_coop.gd`) |
+| `test_upgrade_translation.gd` | the upgrade lint (every technique, supplement, side effect, Cannery upgrade and event patch reaches each recommended loadout and the Classic kit; hook slots match pool moves) and the translation rules (multipliers once, additive → multiplier on streams, heavy fallback, `movesets` blocks, string translation, texts and offer weights) |
+| `test_saves_from_older_build.gd` | v0.9.16 player saves: the Off the Street run migrates to v2, verifies, replays and plays on; Career; settings; presets |
 | `test_campaign_bookie.gd` | three unattended complete runs with real fights; pause/take over |
 | `test_campaign_full_runs.gd` | complete runs with real fights: victory and defeat in both variants |
 | `test_campaign_ui.gd` | every screen builds with a focused control; real `ui_accept`/`ui_down` input walks a run to the summary; modals, forfeit, ledger, Bookie controls; Rest → Train without a screen loop (also from a stuck save and at the table), replace-a-suspended-run confirmations (menu, hub sheet), Doses on the hub sheet, party rows, custom re-checks, play time, Bookie speed across presented fights |
@@ -693,3 +808,11 @@ CareerFlow (UI glue: FIGHT -> begin_fight -> App.start_match -> apply_result -> 
   Counter Clock as a move-speed buff, Slippery Customer on any parry, Sidewinder as a general dash
   buff, grab reach via lunge); the arena hazard positions use defaults until arenas provide
   `hazard_<kind>` markers.
+* Moves in runs (v0.9.18): only Stoke's move pool was final when the run progression landed; the
+  other fighters run on pools derived from their Classic kits until theirs land, and
+  `test_upgrade_translation.gd` then decides whether an ability-specific upgrade (Undertow, Long
+  Wick, Bouncy Castle...) still reaches each of their recommended loadouts or needs a `movesets`
+  effect. In the engine, `Hooks._slot_matches` answers a Classic slot name through the pool move
+  even when the move reports that very slot, so in Movesets a hook naming `heavy_charged` also
+  fires on the uncharged Furnace Haymaker and one naming `dash_attack` or `l1` on every step of a
+  basic string.

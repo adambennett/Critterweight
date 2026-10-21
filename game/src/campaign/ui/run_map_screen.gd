@@ -3,7 +3,9 @@ extends Screen
 ## nodes, node types as icon + text (unrevealed rows show ???), the current position and the
 ## reachable next nodes as focusable buttons. Controller: up/down cycles the reachable nodes,
 ## left/right jumps between the map and the side panel, A/Enter enters, B/Esc offers to suspend.
-## Mouse: click. Side panel: fighter, HP, Scrip, Hype carry, build, consumables, suspend/abandon.
+## Mouse: click. Side panel: fighter, HP, Scrip, Hype carry, MOVES (Movesets runs: the equipped
+## moves with their drilled styles; CHANGE MOVES opens the loadout screen with the learned moves,
+## equipping is free between fights), build, consumables, suspend/abandon.
 ## Online party runs: pressing a reachable stop is this player's VOTE (each stop shows its votes;
 ## the majority decides, the Captain breaks ties, the timer resolves it); the side panel offers
 ## the Captain's "move on" for absent players and suspend (host: for everyone) / leave (member);
@@ -280,17 +282,21 @@ func _side_panel() -> Control:
 	var mode := "The Bookie's Table" if str(ctrl.state.get("mode", "")) == "bookie" else str(ctrl.state.get("variant", "")).replace("_", " ").capitalize()
 	box.add_child(CampaignUI.label("%s · %s%s · seed %s%s" % [mode, diff, (" · Dose %d" % dose) if dose > 0 else "",
 		ctrl.state.get("seed_text", ""), " · CUSTOM RUN" if bool(ctrl.state.get("custom", false)) else ""], 18, CampaignUI.MUTED))
+	if RunMoves.is_movesets(ctrl.state):
+		_moves_section(box, p)
 	var build := VBoxContainer.new()
 	build.add_theme_constant_override("separation", 4)
 	build.add_child(CampaignUI.label("BUILD", 22, CampaignUI.INK, "900"))
 	for t in p.get("techniques", []):
 		build.add_child(CampaignUI.label("Technique: %s — %s" % [ctrl.catalog.item_name(str(t)), ctrl.catalog.item(str(t)).get("effect", "")], 17, CampaignUI.GOOD))
+		_improves_line(build, p, str(t))
 	for s in p.get("supplements", []):
 		var d: Dictionary = ctrl.catalog.supplements.get(str(s["id"]), {})
 		var stacks := int(s.get("stacks", 1))
 		var r := str(d.get("rarity", "otc"))
 		build.add_child(CampaignUI.label("%s%s (%s) — %s" % [d.get("name", s["id"]), (" x%d" % stacks) if stacks > 1 else "",
 			CampaignUI.rarity_text(r).capitalize(), d.get("effect", "")], 17, CampaignUI.RARITY_COLORS.get(r, CampaignUI.INK)))
+		_improves_line(build, p, str(s["id"]))
 	for se in p.get("side_effects", []):
 		build.add_child(CampaignUI.label("Side effect: %s — %s" % [ctrl.catalog.item_name(str(se)), ctrl.catalog.item(str(se)).get("effect", "")], 17, CampaignUI.DANGER))
 	if (p.get("supplements", []) as Array).is_empty() and (p.get("techniques", []) as Array).is_empty():
@@ -312,6 +318,60 @@ func _side_panel() -> Control:
 	box.add_child(ab)
 	_side_buttons.append(ab)
 	return box
+
+
+## Movesets: which moves an owned upgrade improves with the current loadout (muted, indented).
+func _improves_line(build: VBoxContainer, p: Dictionary, item_id: String) -> void:
+	var txt := RunMoves.improves_text(ctrl.catalog, ctrl.state, p, item_id)
+	if txt != "":
+		build.add_child(CampaignUI.label("    " + txt, 15, CampaignUI.MUTED))
+
+
+## The equipped moves (slot, name, drilled style) and the CHANGE MOVES button.
+func _moves_section(box: VBoxContainer, p: Dictionary) -> void:
+	var cat := ctrl.catalog
+	var fighter := str(p.get("fighter", ""))
+	var m := RunMoves.moves_of(p)
+	var lo := RunMoves.fight_loadout(cat, p)
+	box.add_child(CampaignUI.label("MOVES", 22, CampaignUI.INK, "900"))
+	var slots := PackedStringArray()
+	for i in lo.size():
+		var id := str(lo[i])
+		var style := str((m["drilled"] as Dictionary).get(id, ""))
+		slots.append("%d. %s%s" % [i + 1, RunMoves.move_name(cat, fighter, id), (" · " + RunMoves.style_name(cat, fighter, id, style)) if style != "" else ""])
+	box.add_child(CampaignUI.label("   ".join(slots), 17, CampaignUI.GOOD))
+	var spare := (m["learned"] as Array).size() - lo.size()
+	var drilled_n := (m["drilled"] as Dictionary).size()
+	box.add_child(CampaignUI.label("%d learned (%d on the bench) · %d drilled" % [(m["learned"] as Array).size(), maxi(0, spare), drilled_n], 16, CampaignUI.MUTED))
+	var mb := CampaignUI.button("CHANGE MOVES", _open_moves, 20)
+	mb.tooltip_text = "Equip any four learned moves (free, between fights)."
+	mb.disabled = ctrl.is_over()
+	box.add_child(mb)
+	_side_buttons.append(mb)
+
+
+func _open_moves() -> void:
+	var p := ctrl.player(flow.me)
+	var m := RunMoves.moves_of(p)
+	App.push("loadout", {"creature": str(p.get("fighter", "")), "loadout": RunMoves.fight_loadout(ctrl.catalog, p),
+		"allowed": (m["learned"] as Array).duplicate(), "styles": (m["drilled"] as Dictionary).duplicate(),
+		"title": "Your moves", "on_done": _on_moves_chosen})
+
+
+func _on_moves_chosen(lo: Array) -> void:
+	if not flow.do_equip(lo):
+		notify_error(flow.error_text())
+		return
+	if flow.is_party():
+		CampaignUI.wait_for_party(self, _msg)
+	else:
+		_build.call_deferred()
+
+
+func notify_error(text: String) -> void:
+	if _msg != null and is_instance_valid(_msg):
+		_msg.text = text
+		_msg.add_theme_color_override("font_color", CampaignUI.DANGER)
 
 
 ## Party runs: the Captain may move on for absent players; the host suspends the run for everyone

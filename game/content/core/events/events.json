@@ -212,7 +212,9 @@
        {"id": "stretch", "label": "Stretch", "desc": "Max stamina +5 this run.", "risk": "safe",
         "outcomes": [{"text": "Something pops. Good pop.", "effects": [{"op": "run_mods", "mods": [{"key": "stamina_add", "add": 5}], "text": "Max stamina +5"}]}]},
        {"id": "graffiti", "label": "Read the graffiti", "desc": "Unlock an announcer idle quip.", "risk": "safe",
-        "outcomes": [{"text": "'BELLOWS WAS HERE'. Of course he was.", "effects": [{"op": "quip"}]}]}]},
+        "outcomes": [{"text": "'BELLOWS WAS HERE'. Of course he was.", "effects": [{"op": "quip"}]}]},
+       {"id": "shadowbox", "label": "Shadowbox", "desc": "Work on something new in the parking lot: learn a new move (1 of 2).", "risk": "safe",
+        "outcomes": [{"text": "A trucker honks. You take it as applause.", "effects": [{"op": "learn_move", "options": 2}]}]}]},
 
     {"id": "evt_the_belt", "type": "event", "title": "The Belt", "speaker": "",
      "text": "A replica title belt in a pawn shop window.", "group": true, "requires": {"act": [3]},
@@ -225,23 +227,114 @@
     {"id": "evt_boiler_inspector", "type": "event", "title": "Boiler Inspector", "speaker": "City inspector",
      "text": "A city inspector taps your belly with a wrench. \"That's not up to code.\"", "requires": {"fighters": ["f_stoke"]},
      "choices": [
-       {"id": "fix", "label": "Let him \"fix\" it", "desc": "Steam Vent cooldown 7 -> 5 s this run, max HP -6.", "risk": "costly",
+       {"id": "fix", "label": "Let him \"fix\" it", "desc": "Steam Vent cooldown 7 -> 5 s (and Flare Rush 6 -> 4.5 s) this run, max HP -6.", "risk": "costly",
         "outcomes": [{"text": "He hits it with the wrench until it sounds different.", "effects": [{"op": "max_hp", "amount": -6},
-          {"op": "run_patches", "patches": [{"op": "mul", "path": "abilities.ability1.cooldown", "value": 0.714}], "text": "Steam Vent cooldown -2 s"}]}]},
-       {"id": "bribe", "label": "Bribe", "desc": "Stoke the Fire no longer burns you this run.", "risk": "safe", "cost": {"scrip": 30},
+          {"op": "run_patches", "patches": [{"op": "mul", "path": "abilities.ability1.cooldown", "value": 0.714}],
+           "movesets": {"patches": [{"op": "mul", "path": "pool.flare_rush.cooldown", "value": 0.75}]}, "text": "Steam Vent cooldown -2 s, Flare Rush -1.5 s"}]}]},
+       {"id": "bribe", "label": "Bribe", "desc": "Stoke the Fire no longer burns you, and Flare Rush's backblast throws you 40% less far, this run.", "risk": "safe", "cost": {"scrip": 30},
         "outcomes": [{"text": "\"Everything's up to code.\" It is not.", "effects": [{"op": "run_patches", "patches": [
-          {"op": "remove", "path": "abilities.ability2.effects[type=self_damage]"}, {"op": "set", "path": "abilities.ability2.effects[type=buff].status.dps", "value": 0}], "text": "No more self-burn"}]}]},
+          {"op": "remove", "path": "abilities.ability2.effects[type=self_damage]"}, {"op": "set", "path": "abilities.ability2.effects[type=buff].status.dps", "value": 0}],
+          "movesets": {"patches": [{"op": "mul", "path": "pool.flare_rush.on_hit[*].do[type=recoil].speed", "value": 0.6}]}, "text": "No more self-burn, a tamer backblast"}]}]},
        {"id": "run", "label": "Run", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "He doesn't chase. He writes it down.", "effects": [{"op": "nothing"}]}]}]},
 
-    {"id": "evt_molting", "type": "event", "title": "Molting Day", "speaker": "",
-     "text": "Your shell is coming off. It always picks the worst time.", "requires": {"fighters": ["f_dredge"]},
-     "choices": [
-       {"id": "molt", "label": "Molt now", "desc": "Lose 15 HP; then poise +20 and knockback taken -10% this run.", "risk": "costly",
-        "outcomes": [{"text": "Crunch. Squelch. New you.", "effects": [{"op": "hp", "amount": -15},
-          {"op": "run_mods", "mods": [{"key": "poise_add", "add": 20}, {"key": "knockback_taken", "mul": 0.9}], "text": "Poise +20, knockback taken -10%"}]}]},
-       {"id": "hold", "label": "Hold it in", "desc": "Next fight, Anchor Drop has an extra charge.", "risk": "safe",
-        "outcomes": [{"text": "You clench. Everything.", "effects": [{"op": "next_fight", "apply": {"patches": [{"op": "add", "path": "abilities.ability2.charges", "value": 1, "default": 1}]}, "text": "Next fight: free Anchor Drop"}]}]},
-       {"id": "ignore", "label": "Ignore", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "It'll happen when it happens.", "effects": [{"op": "nothing"}]}]}]},
+    {
+  "id": "evt_molting",
+  "type": "event",
+  "title": "Molting Day",
+  "speaker": "",
+  "text": "Your shell is coming off. It always picks the worst time.",
+  "requires": {
+    "fighters": [
+      "f_dredge"
+    ]
+  },
+  "choices": [
+    {
+      "id": "molt",
+      "label": "Molt now",
+      "desc": "Lose 15 HP; then poise +20 and knockback taken -10% this run.",
+      "risk": "costly",
+      "outcomes": [
+        {
+          "text": "Crunch. Squelch. New you.",
+          "effects": [
+            {
+              "op": "hp",
+              "amount": -15
+            },
+            {
+              "op": "run_mods",
+              "mods": [
+                {
+                  "key": "poise_add",
+                  "add": 20
+                },
+                {
+                  "key": "knockback_taken",
+                  "mul": 0.9
+                }
+              ],
+              "text": "Poise +20, knockback taken -10%"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hold",
+      "label": "Hold it in",
+      "desc": "Next fight, Anchor Drop has an extra charge. In Movesets, Shell Brace also has an extra charge.",
+      "risk": "safe",
+      "outcomes": [
+        {
+          "text": "You clench. Everything.",
+          "effects": [
+            {
+              "op": "next_fight",
+              "apply": {
+                "patches": [
+                  {
+                    "op": "add",
+                    "path": "abilities.ability2.charges",
+                    "value": 1,
+                    "default": 1
+                  }
+                ],
+                "movesets": {
+                  "patches": [
+                    {
+                      "op": "add",
+                      "path": "pool.shell_brace.charges",
+                      "value": 1,
+                      "default": 1
+                    }
+                  ]
+                }
+              },
+              "text": "Next fight: free Anchor Drop; Movesets: Shell Brace +1 charge"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ignore",
+      "label": "Ignore",
+      "desc": "Nothing.",
+      "risk": "safe",
+      "outcomes": [
+        {
+          "text": "It'll happen when it happens.",
+          "effects": [
+            {
+              "op": "nothing"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+},
 
     {"id": "evt_fan_club", "type": "event", "title": "Fan Club", "speaker": "Six terns",
      "text": "Six terns in matching crests want a feather.", "requires": {"fighters": ["f_gusto"]},
@@ -252,24 +345,183 @@
         "outcomes": [{"text": "Signed photos. Of you. By you.", "effects": [{"op": "scrip", "amount": 45}]}]},
        {"id": "nothing", "label": "Sign nothing", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "They chant your name anyway.", "effects": [{"op": "nothing"}]}]}]},
 
-    {"id": "evt_headlamp", "type": "event", "title": "Dead Battery", "speaker": "",
-     "text": "Your headlamp went out. You walked into a wall.", "requires": {"fighters": ["f_dozer"]},
-     "choices": [
-       {"id": "battery", "label": "Buy a battery", "desc": "Bulldoze steering +10 deg/s this run.", "risk": "safe", "cost": {"scrip": 20},
-        "outcomes": [{"text": "Let there be light. And steering.", "effects": [{"op": "run_patches", "patches": [{"op": "add", "path": "abilities.ability1.effects[type=charge].steer_deg", "value": 10, "default": 20}], "text": "Bulldoze steering +10 deg/s"}]}]},
-       {"id": "dark", "label": "Fight in the dark", "desc": "Next fight is at night with the rim light off; win it for a Black Market pick.", "risk": "risky",
-        "outcomes": [{"text": "You can't see them. They can see you. Fair.", "effects": [{"op": "next_fight", "rules": {"dark": true}, "text": "Next fight: lights out"},
-          {"op": "bet", "if": {"won": true}, "win": [{"op": "reward_pick", "min_rarity": "black_market", "options": 3}], "lose": [], "text": "Win in the dark: Black Market pick"}]}]}]},
+    {
+  "id": "evt_headlamp",
+  "type": "event",
+  "title": "Dead Battery",
+  "speaker": "",
+  "text": "Your headlamp went out. You walked into a wall.",
+  "requires": {
+    "fighters": [
+      "f_dozer"
+    ]
+  },
+  "choices": [
+    {
+      "id": "battery",
+      "label": "Buy a battery",
+      "desc": "Bulldoze steering +10 deg/s this run. In Movesets, Boulder Toss also reaches 1 m further.",
+      "risk": "safe",
+      "cost": {
+        "scrip": 20
+      },
+      "outcomes": [
+        {
+          "text": "Let there be light. And steering.",
+          "effects": [
+            {
+              "op": "run_patches",
+              "patches": [
+                {
+                  "op": "add",
+                  "path": "abilities.ability1.effects[type=charge].steer_deg",
+                  "value": 10,
+                  "default": 20
+                }
+              ],
+              "text": "Bulldoze steering +10 deg/s; Movesets: Boulder Toss range +1 m",
+              "movesets": {
+                "patches": [
+                  {
+                    "op": "add",
+                    "path": "pool.boulder_toss.effects[type=projectile].range",
+                    "value": 1.0
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dark",
+      "label": "Fight in the dark",
+      "desc": "Next fight is at night with the rim light off; win it for a Black Market pick.",
+      "risk": "risky",
+      "outcomes": [
+        {
+          "text": "You can't see them. They can see you. Fair.",
+          "effects": [
+            {
+              "op": "next_fight",
+              "rules": {
+                "dark": true
+              },
+              "text": "Next fight: lights out"
+            },
+            {
+              "op": "bet",
+              "if": {
+                "won": true
+              },
+              "win": [
+                {
+                  "op": "reward_pick",
+                  "min_rarity": "black_market",
+                  "options": 3
+                }
+              ],
+              "lose": [],
+              "text": "Win in the dark: Black Market pick"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+},
 
-    {"id": "evt_drain_backup", "type": "event", "title": "Drain Backup", "speaker": "",
-     "text": "The cannery drain is overflowing. It's your drain.", "requires": {"fighters": ["f_slurry"]},
-     "choices": [
-       {"id": "clear", "label": "Clear it", "desc": "Drain Dive cooldown 9 -> 7 s this run, -8 HP.", "risk": "costly",
-        "outcomes": [{"text": "You go in. You come out. Don't ask.", "effects": [{"op": "hp", "amount": -8},
-          {"op": "run_patches", "patches": [{"op": "mul", "path": "abilities.ability2.cooldown", "value": 0.778}], "text": "Drain Dive cooldown -2 s"}]}]},
-       {"id": "leave", "label": "Leave it", "desc": "Your puddles last +1 s this run.", "risk": "safe",
-        "outcomes": [{"text": "The overflow is... inspiring.", "effects": [{"op": "run_mods", "mods": [{"key": "zone_duration_add", "add": 1}], "text": "Puddles +1 s"}]}]},
-       {"id": "blame", "label": "Blame Ludlow", "desc": "Nothing.", "risk": "safe", "outcomes": [{"text": "Ludlow mops. Ludlow sighs.", "effects": [{"op": "nothing"}]}]}]},
+    {
+  "id": "evt_drain_backup",
+  "type": "event",
+  "title": "Drain Backup",
+  "speaker": "",
+  "text": "The cannery drain is overflowing. It's your drain.",
+  "requires": {
+    "fighters": [
+      "f_slurry"
+    ]
+  },
+  "choices": [
+    {
+      "id": "clear",
+      "label": "Clear it",
+      "desc": "Drain Dive cooldown 9 -> 7 s this run, -8 HP. In Movesets, Shed Skin cooldown is also 22% shorter.",
+      "risk": "costly",
+      "outcomes": [
+        {
+          "text": "You go in. You come out. Don't ask.",
+          "effects": [
+            {
+              "op": "hp",
+              "amount": -8
+            },
+            {
+              "op": "run_patches",
+              "patches": [
+                {
+                  "op": "mul",
+                  "path": "abilities.ability2.cooldown",
+                  "value": 0.778
+                }
+              ],
+              "text": "Drain Dive cooldown -2 s; Movesets: Shed Skin cooldown -22%",
+              "movesets": {
+                "patches": [
+                  {
+                    "op": "mul",
+                    "path": "pool.shed_skin.cooldown",
+                    "value": 0.778
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leave",
+      "label": "Leave it",
+      "desc": "Your puddles last +1 s this run.",
+      "risk": "safe",
+      "outcomes": [
+        {
+          "text": "The overflow is... inspiring.",
+          "effects": [
+            {
+              "op": "run_mods",
+              "mods": [
+                {
+                  "key": "zone_duration_add",
+                  "add": 1
+                }
+              ],
+              "text": "Puddles +1 s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blame",
+      "label": "Blame Ludlow",
+      "desc": "Nothing.",
+      "risk": "safe",
+      "outcomes": [
+        {
+          "text": "Ludlow mops. Ludlow sighs.",
+          "effects": [
+            {
+              "op": "nothing"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+},
 
     {"id": "evt_static_storm", "type": "event", "title": "Storm Warning", "speaker": "",
      "text": "A thunderhead rolls over the bay. Your bulbs are humming.", "requires": {"party_element": "static"},

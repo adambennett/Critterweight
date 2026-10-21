@@ -14,17 +14,137 @@
      "apply": {"hooks": [{"on": "status_applied", "if": {"element": "sludge"}, "do": [{"type": "status", "target": "target",
                             "status": {"id": "blood_thinner", "name": "Blood Thinner", "duration": 6.0, "dps": 0.75, "tick": 0.5}}]},
                          {"on": "pre_hit_dealt", "if": {"target_status": "sludge", "hit_blocked": true}, "do": [{"type": "damage_mult", "mult": 1.4}]}]}},
-    {"id": "tech_slurry_grease_trap", "type": "technique", "fighter": "f_slurry", "name": "Grease Trap", "build": "build_slurry_swamp",
-     "tags": ["zone", "mobility"], "effect": "Enemies in Slurry's puddles dodge 40% shorter; Slurry moves +15% faster in any Sludge zone",
-     "apply": {"patches": [{"op": "merge", "path": "abilities.ability1.effects[type=projectile].on_expire", "value": {"status": {"id": "grease_trap", "name": "Greased", "duration": 0.6, "dash": 0.6}, "owner_immune": true}},
-                           {"op": "merge", "path": "moves.heavy_charged.effects[type=zone]", "value": {"status": {"id": "grease_trap", "name": "Greased", "duration": 0.6, "dash": 0.6}, "owner_immune": true}},
-                           {"op": "merge", "path": "abilities.juice.effects[type=zone]", "value": {"status": {"id": "grease_trap", "name": "Greased", "duration": 0.6, "dash": 0.6}, "owner_immune": true}}],
-               "hooks": [{"on": "tick", "every": 0.25, "if": {"in_zone": "sludge"}, "do": [{"type": "buff", "status": {"id": "grease_glide", "name": "Greased Lightning", "duration": 0.3, "speed": 1.15}}]}]}},
-    {"id": "tech_slurry_double_dip", "type": "technique", "fighter": "f_slurry", "name": "Double Dip", "build": "build_slurry_toxin",
-     "tags": ["projectile", "blink"], "effect": "Sludge Lob charges 2 -> 3; Drain Dive emerge damage 5 -> 9 and radius 1.2 -> 1.6 m",
-     "apply": {"patches": [{"op": "add", "path": "abilities.ability1.charges", "value": 1, "default": 2},
-                           {"op": "add", "path": "abilities.ability2.effects[type=blink].on_emerge[type=area].damage", "value": 4},
-                           {"op": "mul", "path": "abilities.ability2.effects[type=blink].on_emerge[type=area].radius", "value": 1.333}]}},
+    {
+  "id": "tech_slurry_grease_trap",
+  "type": "technique",
+  "fighter": "f_slurry",
+  "name": "Grease Trap",
+  "build": "build_slurry_swamp",
+  "tags": [
+    "zone",
+    "mobility"
+  ],
+  "effect": "Enemies in Slurry's puddles dodge 40% shorter; Slurry moves +15% faster in any Sludge zone; Movesets: Acid Spray corrosion also shortens enemy dodges by 40%",
+  "apply": {
+    "patches": [
+      {
+        "op": "merge",
+        "path": "abilities.ability1.effects[type=projectile].on_expire",
+        "value": {
+          "status": {
+            "id": "grease_trap",
+            "name": "Greased",
+            "duration": 0.6,
+            "dash": 0.6
+          },
+          "owner_immune": true
+        }
+      },
+      {
+        "op": "merge",
+        "path": "moves.heavy_charged.effects[type=zone]",
+        "value": {
+          "status": {
+            "id": "grease_trap",
+            "name": "Greased",
+            "duration": 0.6,
+            "dash": 0.6
+          },
+          "owner_immune": true
+        }
+      },
+      {
+        "op": "merge",
+        "path": "abilities.juice.effects[type=zone]",
+        "value": {
+          "status": {
+            "id": "grease_trap",
+            "name": "Greased",
+            "duration": 0.6,
+            "dash": 0.6
+          },
+          "owner_immune": true
+        }
+      }
+    ],
+    "hooks": [
+      {
+        "on": "tick",
+        "every": 0.25,
+        "if": {
+          "in_zone": "sludge"
+        },
+        "do": [
+          {
+            "type": "buff",
+            "status": {
+              "id": "grease_glide",
+              "name": "Greased Lightning",
+              "duration": 0.3,
+              "speed": 1.15
+            }
+          }
+        ]
+      }
+    ],
+    "movesets": {
+      "patches": [
+        {
+          "op": "set",
+          "path": "pool.acid_spray.effects[type=area].status.dash",
+          "value": 0.6,
+          "create": true
+        }
+      ]
+    }
+  }
+},
+    {
+  "id": "tech_slurry_double_dip",
+  "type": "technique",
+  "fighter": "f_slurry",
+  "name": "Double Dip",
+  "build": "build_slurry_toxin",
+  "tags": [
+    "projectile",
+    "blink"
+  ],
+  "effect": "Sludge Lob charges 2 -> 3; Drain Dive emerge damage 5 -> 9 and radius 1.2 -> 1.6 m; Movesets: Coil Crush ends with 4 more damage and a 33% wider final squeeze",
+  "apply": {
+    "patches": [
+      {
+        "op": "add",
+        "path": "abilities.ability1.charges",
+        "value": 1,
+        "default": 2
+      },
+      {
+        "op": "add",
+        "path": "abilities.ability2.effects[type=blink].on_emerge[type=area].damage",
+        "value": 4
+      },
+      {
+        "op": "mul",
+        "path": "abilities.ability2.effects[type=blink].on_emerge[type=area].radius",
+        "value": 1.333
+      }
+    ],
+    "movesets": {
+      "patches": [
+        {
+          "op": "add",
+          "path": "pool.coil_crush.effects[vfx=slurry_coil_crush].damage",
+          "value": 4
+        },
+        {
+          "op": "mul",
+          "path": "pool.coil_crush.effects[vfx=slurry_coil_crush].radius",
+          "value": 1.333
+        }
+      ]
+    }
+  }
+},
     {"id": "tech_slurry_hardened_arteries", "type": "technique", "fighter": "f_slurry", "name": "Hardened Arteries", "build": "build_slurry_constrictor",
      "tags": ["tank", "glass"], "effect": "Poise 55 -> 80; loses Drain Dive's cooldown refund and Overflow's self-heal",
      "apply": {"patches": [{"op": "add", "path": "stats.poise", "value": 25, "default": 55},

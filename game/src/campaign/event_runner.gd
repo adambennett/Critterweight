@@ -5,7 +5,10 @@ extends RefCounted
 ## weighted outcomes. Each outcome is a list of effect ops (CampaignCatalog.EVENT_OPS):
 ##   hp, hp_pct, max_hp, scrip, clout, hype_carry, hype_carry_set, grant_supplement, side_effect,
 ##   remove_supplement, remove_side_effects, technique_pick, reward_pick, run_mods, run_patches,
-##   run_hooks, next_fight, bet, boss_mod, fight, cosmetic, coupon, flag, nothing, consumable, quip.
+##   run_hooks, next_fight, bet, boss_mod, fight, cosmetic, coupon, flag, nothing, consumable, quip,
+##   learn_move ({options: n} a pick of new moves, or {move: id} that move; Movesets runs - a
+##   Classic run, or a fighter who knows every move, gets 25 Scrip instead).
+## run_patches may carry a "movesets" apply block (Movesets-only effects, UpgradeTranslation).
 ## Rolls use the node's own stream, so the same seed always produces the same outcome.
 ## Group events (marked "group": true) are decided once for the whole party and apply to every
 ## member; Scrip costs are split evenly (rounding up on the Captain), so a group choice is only
@@ -312,8 +315,27 @@ static func apply_effect(ctrl: RunController, pid: String, eff: Dictionary, ctx:
 			p["hp"] = clampf(float(p["hp"]), 1.0, ctrl.max_hp(p))
 			return str(eff.get("text", ""))
 		"run_patches":
-			(p["run_effects"] as Array).append({"source": src, "apply": {"patches": eff.get("patches", [])}})
-			return str(eff.get("text", ""))
+			var ap := {"patches": eff.get("patches", [])}
+			# (an outcome an older build applied is replayed exactly as it was stored)
+			if typeof(eff.get("movesets")) == TYPE_DICTIONARY and ctrl.new_rules():
+				ap["movesets"] = (eff["movesets"] as Dictionary).duplicate(true)
+			(p["run_effects"] as Array).append({"source": src, "apply": ap})
+			var line := str(eff.get("text", ""))
+			var imp := RunMoves.improves_text(cat, ctrl.state, p, "", ap) if ctrl.new_rules() else ""
+			return line + (" (%s)" % imp if imp != "" and line != "" else "")
+		"learn_move":
+			if not RunMoves.is_movesets(ctrl.state) or (RunMoves.learnable(cat, p).is_empty() and ctrl.new_rules()):
+				p["scrip"] = int(p["scrip"]) + 25
+				return "Nothing new to learn: +25 Scrip"
+			if not ctrl.new_rules():
+				return ""
+			var fighter := str(p.get("fighter", ""))
+			var mv := str(eff.get("move", ""))
+			if mv != "" and not RunMoves.move_info(cat, fighter, mv).is_empty() and RunMoves.learnable(cat, p).has(mv):
+				(RunMoves.block(p)["learned"] as Array).append(mv)
+				return "Learned %s" % RunMoves.move_name(cat, fighter, mv)
+			ctrl.add_pending(pid, "move", {"n": int(eff.get("options", cat.rules.get("moves", {}).get("event_options", 2))), "source": "event"})
+			return "Move pick"
 		"run_hooks":
 			(p["run_effects"] as Array).append({"source": src, "apply": {"hooks": eff.get("hooks", [])}})
 			return str(eff.get("text", ""))

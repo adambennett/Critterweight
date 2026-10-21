@@ -278,6 +278,9 @@
        "max"
       ]
      }
+    },
+    "movesets": {
+     "$ref": "#/$defs/apply"
     }
    },
    "additionalProperties": false

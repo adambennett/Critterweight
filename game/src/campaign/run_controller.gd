@@ -17,6 +17,12 @@ extends RefCounted
 ## the reward pick first whenever one is pending (CampaignFlow.current_screen).
 ## Everything that changes the outcome is logged, so `verify()` can rebuild any state from its
 ## own start config + log (co-op members check the host's checkpoints and result that way).
+## Moves (v0.9.18 Movesets; RunMoves, docs/CAMPAIGN_SYSTEMS.md "Moves in runs"): the decisions
+## `learn` {move, source: "pick:<rid>" | "shop:<slot>"}, `equip` {loadout} and `drill` {move,
+## style, source} change a player's learned / equipped / drilled moves. Elite and boss wins add a
+## move tutor pick, shops stock a move scroll, rests offer Learn a move / Drill a move, events
+## may teach (op learn_move), and reward offers favour upgrades that improve the equipped moves.
+## A run converted from v1 (state.legacy_log) replays its older decisions without any of that.
 
 signal changed(reason: String)
 
@@ -47,7 +53,8 @@ static func from_state(cat: CampaignCatalog, st: Dictionary) -> RunController:
 
 static func _cfg_snapshot(cfg: Dictionary, seed_value: int) -> Dictionary:
 	var c := {}
-	for k in ["variant", "difficulty", "dose", "mode", "coop_format", "custom", "custom_reasons", "seeded", "created_at", "run_id", "content_hash"]:
+	for k in ["variant", "difficulty", "dose", "mode", "coop_format", "custom", "custom_reasons", "seeded", "created_at", "run_id", "content_hash",
+			"combat", "legacy_log"]:
 		if cfg.has(k):
 			c[k] = cfg[k]
 	c["seed"] = seed_value
@@ -104,6 +111,13 @@ func _apply_log(log_entries: Array) -> void:
 				rest_choose(pid, str(d.get("option", "")))
 			"consume":
 				use_consumable(pid, str(d.get("item", "")))
+			"learn":
+				learn_move(pid, str(d.get("move", "")), str(d.get("source", "")))
+			"equip":
+				var lo = d.get("loadout", [])
+				equip_moves(pid, lo if typeof(lo) == TYPE_ARRAY else [])
+			"drill":
+				drill_move(pid, str(d.get("move", "")), str(d.get("style", "")), str(d.get("source", "")))
 			"custom":
 				var rs = d.get("reasons", [])
 				mark_custom(rs if typeof(rs) == TYPE_ARRAY else [])
@@ -224,6 +238,18 @@ func rules_for(pid: String) -> Dictionary:
 
 func session() -> Dictionary:
 	return state.get("node", {})
+
+
+## True once the decision being made was not logged by an older build: a run converted from v1
+## (state.legacy_log = its v1 log size) replays its first decisions with the rules they were made
+## under, then plays on with today's.
+func new_rules() -> bool:
+	return (state.get("log", []) as Array).size() > int(state.get("legacy_log", 0))
+
+
+## Moves features (tutors, scrolls, event teaching) are on: a Movesets run past its legacy log.
+func moves_live() -> bool:
+	return RunMoves.is_movesets(state) and new_rules()
 
 
 ## Captain (CAMPAIGN.md §11): host in Act 1, then rotates each act; in 4-player parties the
@@ -525,6 +551,9 @@ func _grant_fight_rewards(tier: String, reward_mults: Dictionary = {}) -> void:
 			techs = 2
 		if techs > 0:
 			add_pending(pid, "technique", {"n": techs, "source": tier})
+		# Movesets: elites and bosses also bring a move tutor (learn one of a few new moves)
+		if tier in ["elite", "boss"] and moves_live() and not RunMoves.learnable(catalog, p).is_empty():
+			add_pending(pid, "move", {"n": int(catalog.rules.get("moves", {}).get("tutor_options", 3)), "source": tier})
 
 
 ## Starts a fight from an event outcome (mini-encounter or spar) inside the current node.
@@ -551,8 +580,8 @@ func has_pending() -> bool:
 	return false
 
 
-## Adds a pick for a player. kind: supplement | technique. opts: {n, source, min_rarity,
-## banned_chance, scrip_alt}
+## Adds a pick for a player. kind: supplement | technique | move (learn one) | drill (options
+## "move:style"). opts: {n, source, min_rarity, banned_chance, scrip_alt}
 func add_pending(pid: String, kind: String, opts: Dictionary) -> void:
 	var sess := session()
 	if not sess.has("pending"):
@@ -581,10 +610,30 @@ func add_pending(pid: String, kind: String, opts: Dictionary) -> void:
 func _roll_options(pid: String, entry: Dictionary, key: String) -> Array:
 	var p := player(pid)
 	var opts: Dictionary = entry.get("opts", {})
-	if str(entry["kind"]) == "technique":
-		return RewardRoller.technique_offer(catalog, state, p, key, int(opts.get("n", 2)))
+	match str(entry["kind"]):
+		"technique":
+			return RewardRoller.technique_offer(catalog, state, p, key, int(opts.get("n", 2)), offer_weights(pid, "technique"))
+		"move":
+			return RunMoves.tutor_offer(catalog, state, p, key, int(opts.get("n", 3)))
+		"drill":
+			return RunMoves.drill_offer(catalog, state, p, key, int(opts.get("n", 2)))
 	return RewardRoller.supplement_offer(catalog, state, p, key, {"source": str(opts.get("source", "fight")), "n": int(opts.get("n", 3)),
-		"min_rarity": str(opts.get("min_rarity", "")), "banned_chance": float(opts.get("banned_chance", 0.0)), "act": int(state.get("act", 1))})
+		"min_rarity": str(opts.get("min_rarity", "")), "banned_chance": float(opts.get("banned_chance", 0.0)), "act": int(state.get("act", 1)),
+		"prefer": offer_weights(pid, "supplement")})
+
+
+## Offer weights by item id (RunMoves.offer_weight): upgrades that improve the equipped moves come
+## up more often, ones this fighter cannot use at all never. {} (plain weights) for decisions an
+## older build logged.
+func offer_weights(pid: String, kind: String) -> Dictionary:
+	if not new_rules():
+		return {}
+	var p := player(pid)
+	var ids: Array = catalog.technique_ids_for(str(p.get("fighter", ""))) if kind == "technique" else CampaignCatalog._sorted_keys(catalog.supplements)
+	var out := {}
+	for id in ids:
+		out[str(id)] = RunMoves.offer_weight(catalog, state, p, str(id))
+	return out
 
 
 func _find_pending(pid: String, rid: String) -> Dictionary:
@@ -636,6 +685,12 @@ func claim(pid: String, rid: String, choice: String) -> bool:
 	var e := _find_pending(pid, rid)
 	if e.is_empty():
 		return _fail("no such pending reward")
+	# move picks are the `learn` / `drill` decisions (skipping one is an ordinary claim)
+	if str(e["kind"]) == "move" and choice != "skip":
+		return learn_move(pid, choice, "pick:" + rid)
+	if str(e["kind"]) == "drill" and choice != "skip":
+		var md := RunMoves.split_drill(choice)
+		return drill_move(pid, str(md[0]), str(md[1]), "pick:" + rid)
 	var p := player(pid)
 	if choice == "skip":
 		pass
@@ -712,6 +767,137 @@ func _grant_technique(pid: String, tid: String) -> void:
 
 
 # =============================================================================================
+# Moves (learn / equip / drill decisions)
+# =============================================================================================
+
+## Decision `learn`: the player learns pool move `move` from `source`: "pick:<rid>" (one of the
+## options of a pending move pick - a tutor, rest training, an event) or "shop:<slot>" (the move
+## scroll in the open shop, paid here). Learning never changes the loadout (equip does).
+func learn_move(pid: String, move: String, source: String) -> bool:
+	var p := player(pid)
+	var why := _moves_problem(p)
+	if why != "":
+		return _fail(why)
+	var fighter := str(p.get("fighter", ""))
+	if RunMoves.move_info(catalog, fighter, move).is_empty():
+		return _fail("%s has no move '%s'" % [str(catalog.fighter_info(fighter).get("name", fighter)), move])
+	if (RunMoves.moves_of(p)["learned"] as Array).has(move):
+		return _fail("you already know %s" % RunMoves.move_name(catalog, fighter, move))
+	var sess := session()
+	var node_id := str(sess.get("id", ""))
+	if node_id == "":
+		return _fail("moves are learned at a stop on the card")
+	if source.begins_with("pick:"):
+		var rid := source.substr(5)
+		if _claimed(node_id, pid, rid):
+			return _fail("reward %s already claimed" % rid)
+		var e := _find_pending(pid, rid)
+		if e.is_empty() or str(e.get("kind", "")) != "move":
+			return _fail("no such move pick")
+		if not (e.get("options", []) as Array).has(move):
+			return _fail("'%s' is not one of the offered moves" % move)
+		_record_claim(node_id, pid, rid)
+		(sess["pending"][pid] as Array).erase(e)
+	elif source.begins_with("shop:"):
+		var slot := source.substr(5)
+		if phase() != "shop":
+			return _fail("no shop open")
+		var s: Dictionary = sess.get("shop", {}).get(pid, {})
+		if s.is_empty() or bool(s.get("done", false)):
+			return _fail("shop closed for this player")
+		var ck := "buy:%s:%d" % [slot, int(s.get("rerolls", 0))]
+		if _claimed(node_id, pid, ck):
+			return _fail("already bought")
+		var item := {}
+		for it in s.get("items", []):
+			if str(it.get("slot", "")) == slot:
+				item = it
+		if item.is_empty() or str(item.get("kind", "")) != "move" or str(item.get("id", "")) != move or bool(item.get("sold", false)):
+			return _fail("no scroll for that move in slot %s" % slot)
+		if int(p["scrip"]) < int(item["price"]):
+			return _fail("not enough Scrip")
+		p["scrip"] = int(p["scrip"]) - int(item["price"])
+		item["sold"] = true
+		_record_claim(node_id, pid, ck)
+	else:
+		return _fail("unknown source '%s'" % source)
+	(RunMoves.block(p)["learned"] as Array).append(move)
+	_log("learn", pid, {"move": move, "source": source})
+	_commit("learn")
+	_try_complete_node()
+	return true
+
+
+## Decision `equip`: the moves the player fights with from the next fight on (free, between
+## fights): learned moves only, a valid loadout for the fighter. Equipping the same loadout again
+## changes and logs nothing.
+func equip_moves(pid: String, loadout: Array) -> bool:
+	var p := player(pid)
+	var why := _moves_problem(p)
+	if why != "":
+		return _fail(why)
+	var ids := []
+	for id in loadout:
+		ids.append(str(id))
+	var problem := RunMoves.loadout_problem(catalog, p, ids)
+	if problem != "":
+		return _fail(problem)
+	var m := RunMoves.block(p)
+	if m["equipped"] == ids:
+		last_error = ""
+		return true
+	m["equipped"] = ids
+	_log("equip", pid, {"loadout": ids})
+	_commit("equip")
+	return true
+
+
+## Decision `drill`: one of a learned move's two styles, permanent for the run, from a pending
+## drill pick ("pick:<rid>", option "move:style": rest training, events).
+func drill_move(pid: String, move: String, style: String, source: String) -> bool:
+	var p := player(pid)
+	var why := _moves_problem(p)
+	if why != "":
+		return _fail(why)
+	var fighter := str(p.get("fighter", ""))
+	var mv := RunMoves.move_info(catalog, fighter, move)
+	if mv.is_empty() or not (mv.get("styles", {}) as Dictionary).has(style):
+		return _fail("no style '%s' for '%s'" % [style, move])
+	var m := RunMoves.block(p)
+	if not (m["learned"] as Array).has(move):
+		return _fail("learn %s before drilling it" % RunMoves.move_name(catalog, fighter, move))
+	if (m["drilled"] as Dictionary).has(move):
+		return _fail("%s is already drilled" % RunMoves.move_name(catalog, fighter, move))
+	if not source.begins_with("pick:"):
+		return _fail("unknown source '%s'" % source)
+	var sess := session()
+	var node_id := str(sess.get("id", ""))
+	var rid := source.substr(5)
+	if node_id == "" or _claimed(node_id, pid, rid):
+		return _fail("no such drill pick")
+	var e := _find_pending(pid, rid)
+	if e.is_empty() or str(e.get("kind", "")) != "drill" or not (e.get("options", []) as Array).has("%s:%s" % [move, style]):
+		return _fail("that drill is not on offer")
+	_record_claim(node_id, pid, rid)
+	(sess["pending"][pid] as Array).erase(e)
+	(m["drilled"] as Dictionary)[move] = style
+	_log("drill", pid, {"move": move, "style": style, "source": source})
+	_commit("drill")
+	_try_complete_node()
+	return true
+
+
+func _moves_problem(p: Dictionary) -> String:
+	if p.is_empty():
+		return "unknown player"
+	if is_over():
+		return "the run is over"
+	if not RunMoves.is_movesets(state):
+		return "this run fights Classic: moves are not used"
+	return ""
+
+
+# =============================================================================================
 # Events
 # =============================================================================================
 
@@ -771,6 +957,8 @@ func shop_buy(pid: String, slot: String) -> bool:
 			item = it
 	if item.is_empty() or bool(item.get("sold", false)):
 		return _fail("nothing to buy in slot %s" % slot)
+	if str(item["kind"]) == "move":
+		return learn_move(pid, str(item["id"]), "shop:" + slot)      # a move scroll: the `learn` decision
 	var p := player(pid)
 	if int(p["scrip"]) < int(item["price"]):
 		return _fail("not enough Scrip")
@@ -883,16 +1071,28 @@ func rest_heal_fraction(pid: String) -> float:
 	return (base + float(rr.get("rest_heal_add", 0.0))) * float(rr.get("rest_heal_mult", 1.0))
 
 
+## Rest options [{id, label, desc, available, reason}]. Movesets runs add Learn a move (a pick of
+## new moves) and Drill a move (a pick of styles for learned moves) after the four classic ones.
 func rest_options(pid: String) -> Array:
 	var p := player(pid)
 	var rest: Dictionary = catalog.rules.get("rest", {})
 	var techs_left := RewardRoller.technique_offer(catalog, state, p, "probe", 1).size() > 0
-	return [
-		{"id": "patch_up", "label": "Patch up", "desc": "Heal %d%% of max HP" % int(round(rest_heal_fraction(pid) * 100.0)), "available": true},
-		{"id": "train", "label": "Train", "desc": "Learn 1 technique (1 of %d)" % int(rest.get("train_options", 2)), "available": techs_left},
-		{"id": "rub_down", "label": "Rub-down", "desc": "Remove all side effects and heal %d%%" % int(float(rest.get("rub_down_heal", 0.1)) * 100.0), "available": true},
-		{"id": "film_study", "label": "Film study", "desc": "Reveal the next act's elite and boss; +%d Hype carry" % int(rest.get("film_study_hype", 15)), "available": true},
+	var out := [
+		{"id": "patch_up", "label": "Patch up", "desc": "Heal %d%% of max HP" % int(round(rest_heal_fraction(pid) * 100.0)), "available": true, "reason": ""},
+		{"id": "train", "label": "Train", "desc": "Learn 1 technique (1 of %d)" % int(rest.get("train_options", 2)), "available": techs_left,
+			"reason": "" if techs_left else "you already know every technique"},
+		{"id": "rub_down", "label": "Rub-down", "desc": "Remove all side effects and heal %d%%" % int(float(rest.get("rub_down_heal", 0.1)) * 100.0), "available": true, "reason": ""},
+		{"id": "film_study", "label": "Film study", "desc": "Reveal the next act's elite and boss; +%d Hype carry" % int(rest.get("film_study_hype", 15)), "available": true, "reason": ""},
 	]
+	if RunMoves.is_movesets(state):
+		var mr: Dictionary = catalog.rules.get("moves", {})
+		var new_moves := not RunMoves.learnable(catalog, p).is_empty()
+		var drills := not RunMoves.drillable(catalog, p).is_empty()
+		out.append({"id": "learn", "label": "Learn a move", "desc": "Learn 1 new move (1 of %d)" % int(mr.get("learn_options", 3)),
+			"available": new_moves, "reason": "" if new_moves else "you already know every move"})
+		out.append({"id": "drill", "label": "Drill a move", "desc": "Drill one of your moves into a style for the rest of the run",
+			"available": drills, "reason": "" if drills else "every move you know is drilled"})
+	return out
 
 
 func rest_choose(pid: String, option: String) -> bool:
@@ -917,6 +1117,10 @@ func rest_choose(pid: String, option: String) -> bool:
 			p["hp"] = minf(max_hp(p), float(p["hp"]) + max_hp(p) * rest_heal_fraction(pid))
 		"train":
 			add_pending(pid, "technique", {"n": int(rest.get("train_options", 2)), "source": "rest"})
+		"learn":
+			add_pending(pid, "move", {"n": int(catalog.rules.get("moves", {}).get("learn_options", 3)), "source": "rest"})
+		"drill":
+			add_pending(pid, "drill", {"n": int(catalog.rules.get("moves", {}).get("drill_moves", 2)), "source": "rest"})
 		"rub_down":
 			p["side_effects"] = []
 			p["hp"] = minf(max_hp(p), float(p["hp"]) + max_hp(p) * float(rest.get("rub_down_heal", 0.1)))
@@ -1072,7 +1276,7 @@ func _end_run(victory: bool, abandoned := false) -> void:
 		per[str(p["id"])] = {"fighter": p["fighter"], "name": p["name"], "supplements": (p["supplements"] as Array).duplicate(true),
 			"techniques": (p["techniques"] as Array).duplicate(), "side_effects": (p["side_effects"] as Array).duplicate(),
 			"scrip": int(p["scrip"]), "stats": (p["stats"] as Dictionary).duplicate(true), "clout_raw": int(p.get("clout", 0)),
-			"cosmetics": (p.get("cosmetics", []) as Array).duplicate()}
+			"cosmetics": (p.get("cosmetics", []) as Array).duplicate(), "moves": RunMoves.moves_of(p).duplicate(true)}
 	state["result"] = {"victory": victory, "abandoned": abandoned, "act": int(state.get("act", 1)), "node": str(state.get("position", "")),
 		"elapsed": float(state.get("elapsed", 0.0)), "dose": int(state.get("dose", 0)), "difficulty": str(state.get("difficulty", "")),
 		"variant": str(state.get("variant", "")), "mode": str(state.get("mode", "")), "custom": bool(state.get("custom", false)),

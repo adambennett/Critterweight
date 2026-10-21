@@ -8,20 +8,161 @@
      "tags": ["tank", "guard"], "effect": "Guard absorbs 85% instead of 75%; each blocked hit refunds +2 stamina",
      "apply": {"mods": [{"key": "guard_absorb_mult", "mul": 0.6}],
                "hooks": [{"on": "pre_hit_taken", "if": {"hit_blocked": true}, "do": [{"type": "stamina", "amount": 2, "target": "self"}]}]}},
-    {"id": "tech_dredge_undertow", "type": "technique", "fighter": "f_dredge", "name": "Undertow", "build": "build_dredge_riptide",
-     "tags": ["zone", "pull"], "effect": "Brine puddles Dredge creates pull other fighters toward their centre",
-     "apply": {"patches": [{"op": "merge", "path": "abilities.ability1.effects[type=projectile].on_expire", "value": {"push_out": -0.6, "owner_immune": true}},
-                           {"op": "merge", "path": "moves.heavy_charged.effects[type=zone]", "value": {"push_out": -0.6, "owner_immune": true}}]}},
+    {
+  "id": "tech_dredge_undertow",
+  "type": "technique",
+  "fighter": "f_dredge",
+  "name": "Undertow",
+  "build": "build_dredge_riptide",
+  "tags": [
+    "zone",
+    "pull"
+  ],
+  "effect": "Brine puddles Dredge creates pull other fighters toward their centre; Movesets: expired Bubble Stream bubbles leave brief pulling puddles; Whirlpool pulls 25% harder",
+  "apply": {
+    "patches": [
+      {
+        "op": "merge",
+        "path": "abilities.ability1.effects[type=projectile].on_expire",
+        "value": {
+          "push_out": -0.6,
+          "owner_immune": true
+        }
+      },
+      {
+        "op": "merge",
+        "path": "moves.heavy_charged.effects[type=zone]",
+        "value": {
+          "push_out": -0.6,
+          "owner_immune": true
+        }
+      }
+    ],
+    "movesets": {
+      "patches": [
+        {
+          "op": "append",
+          "path": "pool.bubble_stream.effects[type=projectile].on_expire",
+          "value": {
+            "type": "zone",
+            "kind": "brine_puddle",
+            "radius": 0.65,
+            "duration": 1.2,
+            "push_out": -0.6,
+            "owner_immune": true
+          },
+          "create": true
+        },
+        {
+          "op": "mul",
+          "path": "pool.whirlpool.effects[type=zone].push_out",
+          "value": 1.25
+        }
+      ]
+    }
+  }
+},
     {"id": "tech_dredge_wall_and_chain", "type": "technique", "fighter": "f_dredge", "name": "Wall-and-Chain", "build": "build_dredge_hurler",
      "tags": ["grab", "arena"], "effect": "Wall splats from any Dredge throw or shove deal +6 damage and +15 poise",
      "apply": {"mods": [{"key": "splat_damage_add", "add": 6}, {"key": "splat_poise_add", "add": 15}]}},
-    {"id": "tech_dredge_molting_season", "type": "technique", "fighter": "f_dredge", "name": "Molting Season", "build": "build_dredge_the_wall",
-     "tags": ["counter", "cleanse"], "effect": "Anchor Drop ends with a shell-shed pulse (r 2 m, 8 dmg, push) and cleanses Dredge; Anchor Drop cooldown +3 s",
-     "apply": {"patches": [{"op": "append", "path": "abilities.ability2.effects", "value": {"t": 0.15, "type": "delayed", "delay": 2.5, "radius": 2.0, "damage": 8, "knockback": 3.0, "poise": 15, "stun": 0.3}},
-                           {"op": "add", "path": "abilities.ability2.cooldown", "value": 3}],
-               "hooks": [{"on": "ability_used", "if": {"slot": "ability2"}, "do": [{"type": "status", "target": "self",
-                  "status": {"id": "molting", "name": "Molting", "duration": 2.9,
-                             "hooks": [{"on": "tick", "every": 2.6, "max_uses": 1, "do": [{"type": "cleanse", "target": "self"}]}]}}]}]}},
+    {
+  "id": "tech_dredge_molting_season",
+  "type": "technique",
+  "fighter": "f_dredge",
+  "name": "Molting Season",
+  "build": "build_dredge_the_wall",
+  "tags": [
+    "counter",
+    "cleanse"
+  ],
+  "effect": "Anchor Drop ends with a shell-shed pulse (r 2 m, 8 dmg, push) and cleanses Dredge; Anchor Drop cooldown +3 s; Movesets: Shell Brace cleanses on entry and sheds an 8-damage shell pulse after 3 s, with +3 s cooldown",
+  "apply": {
+    "patches": [
+      {
+        "op": "append",
+        "path": "abilities.ability2.effects",
+        "value": {
+          "t": 0.15,
+          "type": "delayed",
+          "delay": 2.5,
+          "radius": 2.0,
+          "damage": 8,
+          "knockback": 3.0,
+          "poise": 15,
+          "stun": 0.3
+        }
+      },
+      {
+        "op": "add",
+        "path": "abilities.ability2.cooldown",
+        "value": 3
+      }
+    ],
+    "hooks": [
+      {
+        "on": "ability_used",
+        "if": {
+          "slot": "ability2"
+        },
+        "do": [
+          {
+            "type": "status",
+            "target": "self",
+            "status": {
+              "id": "molting",
+              "name": "Molting",
+              "duration": 2.9,
+              "hooks": [
+                {
+                  "on": "tick",
+                  "every": 2.6,
+                  "max_uses": 1,
+                  "do": [
+                    {
+                      "type": "cleanse",
+                      "target": "self"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "movesets": {
+      "patches": [
+        {
+          "op": "append",
+          "path": "pool.shell_brace.effects",
+          "value": {
+            "t": 0.2,
+            "type": "cleanse"
+          }
+        },
+        {
+          "op": "append",
+          "path": "pool.shell_brace.effects",
+          "value": {
+            "t": 0.2,
+            "type": "delayed",
+            "delay": 3.0,
+            "radius": 2.0,
+            "damage": 8,
+            "knockback": 3.0,
+            "poise": 15,
+            "stun": 0.3
+          }
+        },
+        {
+          "op": "add",
+          "path": "pool.shell_brace.cooldown",
+          "value": 3
+        }
+      ]
+    }
+  }
+},
     {"id": "tech_dredge_sidewinder", "type": "technique", "fighter": "f_dredge", "name": "Sidewinder", "build": "build_dredge_riptide",
      "tags": ["mobility"], "effect": "Sideways walk 3.2 -> 3.8 m/s, dash +0.6 m; Scuttle Check deals x1.25",
      "apply": {"patches": [{"op": "add", "path": "stats.side_speed", "value": 0.6, "default": 3.2}, {"op": "add", "path": "stats.dodge_distance", "value": 0.6, "default": 2.2}],

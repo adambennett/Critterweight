@@ -61,10 +61,23 @@ func test_run_from_v0916_resumes_verifies_and_finishes() -> void:
 		return
 	var v := RunController.verify(cat(), r["state"])
 	check(bool(v["ok"]), "its decision log still rebuilds it: %s" % str(v.get("error", "")))
+	# v0.9.18: the v1 run became a v2 Movesets run (RunStore.migrate)
+	var st: Dictionary = r["state"]
+	check(bool(r["migrated"]), "the run was migrated to the current format")
+	check_eq(int(st.get("version", 0)), RunState.VERSION, "run format v%d" % RunState.VERSION)
+	check_eq(str(st.get("combat", "")), "moves", "it fights Movesets now")
+	check_eq(int(st.get("legacy_log", 0)), (st["log"] as Array).size(), "its v0.9.16 decisions are marked as made under the older rules")
+	for p in st["players"]:
+		check_eq(p.get("moves", {}), RunMoves.start_moves(cat(), str(p["fighter"])), "%s starts with both recommended loadouts learned, the default equipped" % p["id"])
+	var rp := RunController.replay(cat(), st["start_cfg"], (st["log"] as Array).slice(1))
+	check_eq(RunController.digest(rp.state), RunController.digest(st), "a replay of its log rebuilds the migrated run")
 	var ctrl := RunController.from_state(cat(), r["state"])
 	check(not ctrl.is_over(), "suspended mid-run")
+	check(ctrl.equip_moves("p0", ["ember_jab", "furnace_haymaker", "flare_rush", "cinder_shot"]), "its fighter equips another loadout: %s" % ctrl.last_error)
 	play_synthetic(ctrl)
 	check(ctrl.is_over(), "and it plays on to the end (%s)" % ctrl.phase())
+	var v2 := RunController.verify(cat(), RunStore.json_stable(ctrl.state))
+	check(bool(v2["ok"]), "the whole run - older decisions and new ones - verifies: %s" % str(v2.get("error", "")))
 	check_eq(rs.save(ctrl.state, PROFILE), OK, "and saves again in the current format")
 
 

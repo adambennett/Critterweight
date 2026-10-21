@@ -14,10 +14,58 @@
      "apply": {"patches": [{"op": "add", "path": "moves.l1.damage", "value": 2}, {"op": "add", "path": "moves.heavy.damage", "value": 2},
                            {"op": "add", "path": "moves.finisher.damage", "value": 2},
                            {"op": "append", "path": "moves.heavy.effects", "value": {"t": 0.36, "type": "area", "shape": "cone", "radius": 1.5, "cone_deg": 100, "damage": 5, "knockback": 1.5, "poise": 8, "element": "gale", "buildup": 10}}]}},
-    {"id": "tech_gusto_tailwind", "type": "technique", "fighter": "f_gusto", "name": "Tailwind", "build": "build_gusto_razorwing",
-     "tags": ["status", "projectile"], "effect": "Winded enemies take +25% knockback from Gusto; Gust Bomb bounces off one wall",
-     "apply": {"patches": [{"op": "add", "path": "abilities.ability1.effects[type=projectile].bounce", "value": 1, "default": 0}],
-               "hooks": [{"on": "pre_hit_dealt", "if": {"target_status": "gale"}, "do": [{"type": "knockback_mult", "mult": 1.25}]}]}},
+    {
+  "id": "tech_gusto_tailwind",
+  "type": "technique",
+  "fighter": "f_gusto",
+  "name": "Tailwind",
+  "build": "build_gusto_razorwing",
+  "tags": [
+    "status",
+    "projectile"
+  ],
+  "effect": "Winded enemies take +25% knockback from Gusto; Gust Bomb bounces off one wall; Movesets: Air Slash and Feather Darts also bounce off one wall",
+  "apply": {
+    "patches": [
+      {
+        "op": "add",
+        "path": "abilities.ability1.effects[type=projectile].bounce",
+        "value": 1,
+        "default": 0
+      }
+    ],
+    "hooks": [
+      {
+        "on": "pre_hit_dealt",
+        "if": {
+          "target_status": "gale"
+        },
+        "do": [
+          {
+            "type": "knockback_mult",
+            "mult": 1.25
+          }
+        ]
+      }
+    ],
+    "movesets": {
+      "patches": [
+        {
+          "op": "add",
+          "path": "pool.air_slash.effects[type=projectile].bounce",
+          "value": 1,
+          "default": 0
+        },
+        {
+          "op": "add",
+          "path": "pool.feather_darts.effects[type=projectile].bounce",
+          "value": 1,
+          "default": 0
+        }
+      ]
+    }
+  }
+},
     {"id": "tech_gusto_air_superiority", "type": "technique", "fighter": "f_gusto", "name": "Air Superiority", "build": "build_gusto_skyhook",
      "tags": ["air", "heavy"], "effect": "Hang Time 1.2 -> 2.0 s; Dive Peck and Downdraft +30% poise damage; Hang Time cooldown 6 -> 8 s",
      "apply": {"mods": [{"key": "hover_duration", "mul": 1.667}],

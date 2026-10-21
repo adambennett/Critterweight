@@ -1,8 +1,9 @@
 extends Screen
-## Needles' pop-up stall: supplement and technique cards with prices (sold / can't afford /
-## can't carry shown as text), this stall's one service (Rub-down, Antidote Lozenge, Restock or
-## Sell at 50%), the player's Scrip, and LEAVE. Every purchase goes through RunController (claim
-## keys stop double buys). Controller: arrows move between cards and buttons, A/Enter buys.
+## Needles' pop-up stall: supplement, technique and (Movesets) move scroll cards with prices (sold /
+## can't afford / can't carry shown as text; upgrades say which moves they improve), this stall's
+## one service (Rub-down, Antidote Lozenge, Restock or Sell at 50%), the player's Scrip, and LEAVE.
+## Every purchase goes through RunController (claim keys stop double buys; a scroll is the learn
+## decision). Controller: arrows move between cards and buttons, A/Enter buys.
 
 var flow: CampaignFlow
 var ctrl: RunController
@@ -94,11 +95,20 @@ func _item_card(it: Dictionary, p: Dictionary, scrip: int) -> Control:
 	var extra := [["%d SCRIP" % price, CampaignUI.ACCENT]]
 	if why != "":
 		extra.append([why, CampaignUI.DANGER])
-	CampaignUI.describe_item(parts[1], ctrl.catalog, id, extra)
+	var item_name := ctrl.catalog.item_name(id)
+	if str(it.get("kind", "")) == "move":
+		var fighter := str(p.get("fighter", ""))
+		item_name = "the %s scroll" % RunMoves.move_name(ctrl.catalog, fighter, id)
+		CampaignUI.describe_move(parts[1], ctrl.catalog, fighter, id, "MOVE SCROLL · LEARN IT FOR GOOD", "", extra)
+	else:
+		var imp := RunMoves.improves_text(ctrl.catalog, ctrl.state, p, id)
+		if imp != "":
+			extra.append([imp, CampaignUI.GOOD])
+		CampaignUI.describe_item(parts[1], ctrl.catalog, id, extra)
 	b.disabled = why != ""
 	b.focus_mode = Control.FOCUS_NONE if b.disabled else Control.FOCUS_ALL
-	b.tooltip_text = "Buy %s for %d Scrip" % [ctrl.catalog.item_name(id), price]
-	b.pressed.connect(_buy.bind(str(it.get("slot", "")), ctrl.catalog.item_name(id)))
+	b.tooltip_text = "Buy %s for %d Scrip" % [item_name, price]
+	b.pressed.connect(_buy.bind(str(it.get("slot", "")), item_name))
 	_cards.append(b)
 	return b
 
