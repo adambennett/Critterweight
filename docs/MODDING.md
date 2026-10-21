@@ -245,6 +245,9 @@ under either rule.
   fighter's own definition (`set`, `mul`, `add`, `time_scale`, paths such as
   `abilities.ability1.effects[type=area].cone_deg`). Runs and Career choose one per move.
 - `ai`: bot hints for the move (`range` [min, max] metres, `hold` [min, max] seconds, `when`).
+- `sfx`: optional sound bank ids, `cast` (when the move starts) and `loop` (held while a sustained
+  move pours). Without them a move of its own gets its category's cast sound and a sustained move
+  its element's loop; effects keep their usual launch, impact and zone sounds.
 - Loadouts list four pool ids, at least one `basic`; the first move goes on the Light button, then
   Heavy, Ability 1 and Ability 2. An invalid or unknown loadout (a stale save, an online request)
   falls back to `default_loadout`. Every hit and effect event carries the pool move id and its
