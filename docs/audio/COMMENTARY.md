@@ -72,9 +72,24 @@ sentence boundary. Conversation answers (`follow_id`) ride with their question.
   assert any of those carry the matching `when` key and are only eligible when it is true.
 * Results: `round_end` carries `decided`; stoppages, decisions and knockouts have their own triggers
   and their own lines; decision calls name the kind (unanimous, split, majority, draw) and the
-  winner; ceremonial winner names come from the `{w}` token.
+  winner; ceremonial winner names come from the `{w}` token (only for names recorded ceremonially).
+  A knockout or referee stoppage waits for the round_end of the same tick: `ends` is `fight`,
+  `round` (Health scoring with rounds to go: the bout and its commentary go on) or `none` (an
+  elimination); lines that sound final ("It's over!", "your winner by T.K.O.") carry `ends: fight`.
+  Under Health scoring the clock's decision call comes with the round_end that settles the bout and
+  names its winner; a tied round's sudden death ends with that round. 10-point closeness ("a close
+  fight") comes from the cards, not from health (which 10-point holds full).
+* Knockdowns carry `counted`: true only for strike knockdowns by an opponent (what the referee
+  counts and the judges score, `RoundJudge.STRIKE_KD_REASONS`); count and scorecard lines require it.
+  First hits carry `round` (`first` / `2plus`): "first of the night" lines need `first`.
+* Who: `who`/`target` are relative to the local player and only set when there is one (never while
+  spectating, locally or online; never for a teammate). The legacy `{p}`/`{o}` lines are written
+  from the player's corner, so whenever the player is involved `{p}` names the player and `{o}` the
+  other fighter; otherwise `{p}` is the actor.
 * Names: whole-sentence name variants are preferred; in a mirror match the spoken name is only used
   when it is unambiguous (`SpeechLibrary.spoken_name`).
+* Talk budget: a line cut off by a bigger call or by a stop ends its talk interval there (an
+  interval never counts past 12 s), so interruptions cannot starve the rest of the match.
 * 59 old lines were retired (wrong facts: ropes and corner crews in a cage, feints the game does not
   have, "Devon" on air, wrong Haunted descriptions, Port Hook); the reviewed classification of all
   1045 legacy lines is `docs/audio/commentary/classification.json`, reproducible with
@@ -108,8 +123,13 @@ selector prefers specific fresh lines but never traps on them and spaces joke fa
 expires stale calls and results invalidate older ones; interrupts fade and low lines wait for room;
 the director distinguishes knockdown, stoppage, knockout and decisions, detects whiffs, exchanges
 and pressure, does not spam repeated abilities, paces lulls with observations and color, and
-receives the Career bout context. `test_audio_announcer.gd` covers event mapping and referee /
-ten-point calls; `test_recorded_speech.gd` covers full clips, token resolution, mirror-safe names
+receives the Career bout context; after the v0.9.17 code review it also checks that the talk budget
+recovers from interrupted and stopped lines, that a stoppage in a best-of ends only the round, that
+names follow the player's corner, that spectating never addresses a player, that landed abilities
+are never called misses, that clock decisions and sudden death name the real winner, that count,
+scorecard and first-of-the-night lines fit the moment, that ceremonial names never replace other
+names, and that a second interrupt inside the fade keeps the new line. `test_audio_announcer.gd`
+covers event mapping and referee / ten-point calls; `test_recorded_speech.gd` covers full clips, token resolution, mirror-safe names
 and ceremonial winner names.
 
 ## 10. Adding lines

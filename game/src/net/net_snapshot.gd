@@ -30,6 +30,7 @@ const F_GUARD := 8
 const F_GROUNDED := 16
 const F_AI := 32
 const F_HIDDEN := 64
+const F_CHARGING := 128      ## holding a heavy to charge it (view only: the charge glow)
 
 const M_INPUT := 1
 const M_FINISHED := 2
@@ -153,6 +154,8 @@ static func _encode_fighter(w: NetWriter, f: Fighter) -> void:
 		flags |= F_AI
 	if is_hidden(f):
 		flags |= F_HIDDEN
+	if f._charging:
+		flags |= F_CHARGING
 	w.u8(flags)
 	var bodies := f.rig.bodies
 	w.vec3q(bodies[0].global_position)

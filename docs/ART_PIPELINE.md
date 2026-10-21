@@ -253,9 +253,8 @@ module per fighter, `fighters_v17_<id>.py`, each defining `build(s)` on the `Stu
 one fighter's source and model:
 
 ```powershell
-. .	oolslenderrt_env.ps1 -ArtRoot B:\Critterweight-workrt; Set-ArtRuntimePaths
-& B:\Blenderlender.exe -b -t 2 --python-exit-code 1 --python tools/blender/build_creatures.py -- f_dredge --reference-root B:\Critterweight-workrt
-ef --out-source tools/blender/f_dredge.blend --out-glb game/assets/models/creatures/f_dredge.glb
+. .\tools\blender\art_env.ps1 -ArtRoot B:\Critterweight-work\art; Set-ArtRuntimePaths
+& B:\Blender\blender.exe -b -t 2 --python-exit-code 1 --python tools/blender/build_creatures.py -- f_dredge --reference-root B:\Critterweight-work\art\ref --out-source tools/blender/f_dredge.blend --out-glb game/assets/models/creatures/f_dredge.glb
 ```
 
 `--v16` builds the previous generation instead. `export_creature.py` validates view bones (names,

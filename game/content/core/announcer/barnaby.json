@@ -336,7 +336,8 @@
       "speaker": "barnaby",
       "trigger": "first_hit",
       "when": {
-        "kind": "heavy"
+        "kind": "heavy",
+        "round": "first"
       },
       "priority": 35,
       "text": "FIRST hit of the night and it was a big one! That's a mission statement!",
@@ -1219,7 +1220,10 @@
         "sign_off"
       ],
       "energy": "high",
-      "situation": "result"
+      "situation": "result",
+      "when": {
+        "ends": "fight"
+      }
     },
     {
       "id": "ann_ko_02",

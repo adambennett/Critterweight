@@ -297,7 +297,9 @@
       "pack": "vintage_bellows",
       "speaker": "barnaby",
       "trigger": "ko",
-      "when": {},
+      "when": {
+        "ends": "fight"
+      },
       "priority": 100,
       "text": "It's OVER! The house lights go up on a brand-new legend!",
       "families": [

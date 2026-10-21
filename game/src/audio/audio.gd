@@ -94,6 +94,7 @@ var _babble: Babble
 var _speech := preload("res://src/audio/speech_library.gd").new()
 var _speech_player: AudioStreamPlayer
 var _speech_player_b: AudioStreamPlayer   ## the other half of the interrupt crossfade
+var _speech_fade: Tween = null            ## the running fade-out of an interrupted recording
 var _speech_clips: Array = []
 var _ann_current := {}                ## {id, priority, until, speaker, follow, trigger}
 var _ann_queue: Array = []            ## waiting lines, best first (QUEUE_MAX), each with expires/not_before/tag
@@ -985,6 +986,8 @@ func speech_seconds(speaker: String, text: String, vars := {}) -> float:
 
 func stop_announcer() -> void:
 	_stop_speech()
+	if not _ann_current.is_empty() and _director:
+		_director.note_line_finished(_director.t)     # the cut line's talk time ends here
 	_ann_current = {}
 	_ann_queue.clear()
 	_ann_last_end = -100.0      # an explicit silence: the next line may start at once
@@ -1156,18 +1159,26 @@ func _start_line(entry: Dictionary) -> void:
 	_duck_target["Crowd"] = -3.0
 
 
-## crossfade = true: the outgoing recording fades for INTERRUPT_FADE instead of clicking off.
+## crossfade = true: the outgoing recording fades for INTERRUPT_FADE instead of clicking off. A
+## second interrupt inside that fade stops the fading recording at once first: its tween must
+## never reach the player that now carries the new line.
 func _stop_speech(crossfade := false) -> void:
 	_speech_clips.clear()
 	if _speech_player == null:
 		return
+	if _speech_fade != null and _speech_fade.is_valid():
+		_speech_fade.kill()
+		_speech_player_b.stop()
+		_speech_player_b.stream = null
+		_speech_player_b.volume_db = SPEECH_DB
+	_speech_fade = null
 	if crossfade and _speech_player.playing and enabled:
 		var old := _speech_player
 		_speech_player = _speech_player_b
 		_speech_player_b = old
-		var tw := create_tween()
-		tw.tween_property(old, "volume_db", -40.0, INTERRUPT_FADE)
-		tw.tween_callback(func() -> void:
+		_speech_fade = create_tween()
+		_speech_fade.tween_property(old, "volume_db", -40.0, INTERRUPT_FADE)
+		_speech_fade.tween_callback(func() -> void:
 			old.stop()
 			old.stream = null
 			old.volume_db = SPEECH_DB)
@@ -1998,6 +2009,10 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 		_director = CommentaryDirector.new()
 		_director.begin({"fighters": _match.get("fighters", []), "player_index": int(_match.get("player_index", 0)),
 			"context": str(_match.get("context", "versus")), "seed": _ann_seed})
+	if str(ev.get("type", "")) == "ref_stoppage":
+		# the round is over whatever the stoppage ends (its call waits for the round_end in the same
+		# tick): every waiting play-by-play call is stale now
+		invalidate_queued(100)
 	for r in _director.on_event(ev, info):
 		var id := _do_request(r)
 		if id != "":
