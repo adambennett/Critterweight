@@ -215,3 +215,25 @@ Cage Rules referee walks the cage, holds the attacker back ("Back up!"), waves o
 winner's arm.
 
 The built-in **Cage Rules** preset is the Standard Duel with 10-point scoring and the referee on.
+
+## New in v0.9.17: commentary, new looks and ability effects
+
+**Commentary** follows the fight you are watching: knockouts, referee stoppages, judges' decisions
+and round results each have their own calls, every fighter's abilities are called by name (and
+whether they landed), and quiet stretches get observations about pressure, momentum, the clock or a
+hurt fighter before any joke. The booth remembers what you have heard across rematches, Career bouts
+and restarts and avoids repeating itself. The announcer, subtitle and voice settings work as before;
+all speech is offline.
+
+**New looks.** All eight fighters were rebuilt with new forms, faces and details. Eyes follow the
+opponent and blink, brows and jaws react, and crests, fins, chains, tentacles, hoses and hair swing
+with the motion. Every fighter's hitboxes and moves are exactly as before.
+
+**Legacy Varga skin** (Settings › Graphics): shows Varga's original look from before v0.9.17
+everywhere you see him. It is your own preference (other players see their own choice) and does not
+change how he fights.
+
+**Ability effects.** Abilities, JUICE, charged heavies, projectiles, ground effects, elemental hits and
+reactions have new effects in each fighter's style. Every area shows its real shape and reach on the
+floor. Settings › Graphics › Effects and Settings › Accessibility › Reduce flashing apply to all of
+them.
