@@ -194,9 +194,13 @@ func test_hooks_translate_classic_slots() -> void:
 	var a := sim.fighters[0]
 	a.hooks.add({"on": "move_start", "if": {"slot": "heavy"}, "do": [{"type": "set_flag", "flag": "heavy_hook", "seconds": 5.0}]}, "test")
 	a.hooks.add({"on": "move_start", "if": {"slot": "ability1"}, "do": [{"type": "set_flag", "flag": "vent_hook", "seconds": 5.0}]}, "test")
+	# mods can name a pool move or a category
+	a.hooks.add({"on": "move_start", "if": {"move": "blast"}, "do": [{"type": "set_flag", "flag": "blast_id_hook", "seconds": 5.0}]}, "test")
+	a.hooks.add({"on": "move_start", "if": {"move_category": "stream"}, "do": [{"type": "set_flag", "flag": "stream_cat_hook", "seconds": 5.0}]}, "test")
 	a.input.press(FighterInput.AB1)        # the blast: role heavy
 	await step_sim(sim, 0.05)
 	check(a.has_flag("heavy_hook") and not a.has_flag("vent_hook"), "a 'heavy' hook reaches a heavy-role move only")
+	check(a.has_flag("blast_id_hook") and not a.has_flag("stream_cat_hook"), "a 'move' condition names the pool move; another category does not fire")
 	_release_all(a)
 	await step_sim(sim, 1.6)
 	a.input.press(FighterInput.AB2)        # Steam Vent, built on ability1

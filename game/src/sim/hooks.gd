@@ -153,6 +153,14 @@ func _conditions(c: Dictionary, ctx: Dictionary) -> bool:
 			"move_class":
 				if str(ctx.get("move_class", "")) != str(v):
 					return false
+			"move":   # Movesets: the pool move id (docs/MODDING.md)
+				var pmv := _ctx_pool(ctx)
+				if pmv == null or pmv.id != str(v):
+					return false
+			"move_category":   # Movesets: the pool move's category (strike, stream, blast, ...)
+				var pmc := _ctx_pool(ctx)
+				if pmc == null or pmc.category != str(v):
+					return false
 			"charged":
 				if bool(ctx.get("charged", false)) != bool(v):
 					return false
@@ -231,9 +239,18 @@ func _slot_matches(ctx: Dictionary, want: String) -> bool:
 	var s := str(ctx.get("slot", ""))
 	if s == want:
 		return true
+	var pm := _ctx_pool(ctx)
+	return pm != null and pm.answers_slot(want)
+
+
+## The Movesets pool move of a hook context (null under Classic rules or for a move from no pool):
+## the context's own pool id, the hit's, or a pool slot name ("mv.<id>"). It belongs to the hook's
+## owner, or (hit_taken, pre_hit_taken) to the other fighter.
+func _ctx_pool(ctx: Dictionary) -> PoolMove:
 	var f = fighter
 	if f == null or f.combat_style != "moves":
-		return false
+		return null
+	var s := str(ctx.get("slot", ""))
 	var pool_id := str(ctx.get("pool", ""))
 	var hit = ctx.get("hit")
 	if pool_id == "" and hit != null:
@@ -241,13 +258,12 @@ func _slot_matches(ctx: Dictionary, want: String) -> bool:
 	if pool_id == "" and s.begins_with("mv."):
 		pool_id = s.substr(3)
 	if pool_id == "":
-		return false
-	# the move belongs to the hook's owner, or (hit_taken, pre_hit_taken) to the other fighter
+		return null
 	var pm: PoolMove = f.creature.pool.get(pool_id)
 	var other = ctx.get("other")
 	if pm == null and other is Fighter:
 		pm = (other as Fighter).creature.pool.get(pool_id)
-	return pm != null and pm.answers_slot(want)
+	return pm
 
 
 func _run(h: Dictionary, ctx: Dictionary) -> void:

@@ -105,7 +105,7 @@ the Mods screen says exactly why.
 
 | What | Where | Notes |
 |---|---|---|
-| Fighters & abilities | `creatures/` | Body (segments, chains, weapons, poses), stats, moves by slot (`l1 l2 l3 heavy heavy_charged finisher dash_attack grab pummel taunt`), `abilities` (`ability1 ability2 juice`), `passives` (hooks), `art`, `audio`, `ai` weights. Schema: `creature.schema.json`; fighter space is +Z forward, +Y up, +X = the creature's left |
+| Fighters & abilities | `creatures/` | Body (segments, chains, weapons, poses), stats, moves by slot (`l1 l2 l3 heavy heavy_charged finisher dash_attack grab pummel taunt`), `abilities` (`ability1 ability2 juice`), `passives` (hooks), `art`, `audio`, `ai` weights, and the Movesets `movepool`, `loadouts` and `default_loadout` (below). Schema: `creature.schema.json`; fighter space is +Z forward, +Y up, +X = the creature's left |
 | Balance | `tuning.json`, entries with `override` | `tuning.json` keys merge over core (unknown keys and non-numbers are reported); needs `replaces_core`. Every reload starts from the built-in defaults, so disabling the mod restores them |
 | Rules & modes | `rules/`, `modes/`, `playlists/` | Any built-in mode (`standard`, `spotlight_hog`, `chumball`, `absolute_unit`, `chum_rush`, `tag_team`, `practice`) with its options, plus the data hooks below |
 | Arenas | `arenas/`, `props/` | Format 2: a base (`gullet drydock crusher rooftop` or a mod base `<mod>:<id>` defined by an entry with `base_def`), size, props from the catalog, mode markers (`spawn`, `goal`, `ball_spawn`, `spotlight_anchor`, `wave_gate`, `unit_spawn`, `boss`, `respawn`); new palette props in `props/`. Format 1 (shape bases, `spawns`) still loads. Schemas: `arena.schema.json`, `prop.schema.json`; reference: `docs/ARENAS_AND_EDITOR.md` |
@@ -155,6 +155,14 @@ match (anything else runs plain HP rules). Results then carry `scoring` (method,
 cards and totals, per-round tallies) and/or `referee` (stoppages). The built-in `cage_rules` preset
 is `duel` plus both. Details: docs/design/MODES.md, DECISIONS D-044..D-047.
 
+**Combat style** (v0.9.18): `"combat": "moves" | "classic"`. `moves` (the default, and what every
+built-in preset says) is Movesets combat: each fighter equips four moves from its pool on the four
+attack buttons. `classic` is the 0.9.17 scheme (Light, Heavy, Grab and two ability buttons) as a
+real rule: it is saved with the preset, shown before the fight, travels to online clients and is
+checked by the validator; any other value is read as `moves`. Custom presets saved by 0.9.17 are
+migrated to version 2 with `combat: "moves"` and a `migrated_from` note (import does the same), so
+a player who wants the old feel picks Classic in the rules editor or on the versus screen.
+
 **Hooks** are the one behaviour language shared by kits, statuses, techniques, supplements,
 modes and mods (`game/src/sim/hooks.gd`):
 
@@ -170,7 +178,9 @@ modes and mods (`game/src/sim/hooks.gd`):
   round_start tick` (with `"every": seconds`).
 - Conditions: `slot(s) move_class charged target_status self_status target_element
   self_health_below/above target_health_below target_guarding target_down self_juiced
-  distance_below/above in_zone flag`.
+  distance_below/above in_zone flag`, and under Movesets rules `move` (a pool move id) and
+  `move_category`. A `slot` condition written for the old slots also matches the pool moves that
+  stand in for it (a `heavy` hook fires for a fighter's `role: heavy` moves).
 - Actions: every effect type (`projectile area zone buff debuff heal shield dash leap hover
   charge counter_stance reflect pull push blink prop delayed destroy_projectiles chain_arc
   self_damage cleanse hype juice_state`), hit modifiers in `pre_*` events (`damage_add
@@ -187,6 +197,61 @@ modes and mods (`game/src/sim/hooks.gd`):
 - Bot behaviour: the creature `ai` block takes kit hints (`range`, `charge_heavy`, `grab_status`,
   `abilities` with `min/max/chance/apart/when`, `pack`, `ally_ko_flinch`, `rest`, `reach`,
   `keep_distance`, `bulky`) — documented in the kit-hint block of `game/src/ai/bot_brain.gd`.
+
+### Movesets: move pools and loadouts (v0.9.18)
+
+Under Movesets rules a fighter fights with four moves chosen from its `movepool` (Classic rules
+ignore the pool). Design and the shipped pools: `docs/design/MOVESET_COMBAT.md`. A creature without
+a `movepool` still works: the game derives one from its v0.9.17 moves (a basic string from
+`l1 l2 l3 finisher dash_attack`, its heavy, and its two abilities), so older fighter mods play
+under either rule.
+
+```jsonc
+"movepool": {
+  "ember_jab": {"name": "Ember Jab", "category": "strike", "role": "basic",
+                "string": ["l1", "l2", "l3", "finisher"], "dash": "dash_attack"},
+  "furnace_haymaker": {"name": "Furnace Haymaker", "category": "strike", "role": "heavy",
+                       "use": "heavy", "charged": "heavy_charged", "hold": "charge"},
+  "steam_vent": {"name": "Steam Vent", "category": "blast", "use": "ability1"},
+  "flamethrower": {"name": "Flamethrower", "category": "stream", "hold": "sustain",
+                   "max_hold": 2.4, "drain": 10, "aim": {"turn_rate": 2.2},
+                   "cooldown": 6, "cost": 6,
+                   "move": { /* an ordinary move: duration, keys, "sustain": [0.28, 0.5], effects */ },
+                   "styles": {"wide_nozzle": {"name": "Wide Nozzle", "desc": "...", "patch": [ /* ContentPatch ops */ ]}},
+                   "ai": {"range": [0.8, 3.2], "hold": [0.8, 1.8]}}
+},
+"loadouts": {"furnace": {"name": "Furnace", "moves": ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]},
+             "brawler": {"name": "Brawler", "moves": ["ember_jab", "furnace_haymaker", "flare_rush", "cinder_shot"]}},
+"default_loadout": "furnace"
+```
+
+- A pool move is exactly one of `string` (a basic strike string, plus an optional `dash` strike),
+  `use` (an existing move or ability by slot, with `charged` for its charged version) or `move` (a
+  new move, any MoveDef fields). `use` keeps the animation, hit windows and effects, so upgrades and
+  techniques written for that slot keep improving the move.
+- `category`: `strike projectile volley stream blast rush control counter support utility` (the
+  HUD, commentary, judges and bots read it). `role`: `basic` (no cooldown, cheap), `heavy`,
+  `special` (default) or `support`; upgrades and hooks written for the old slots apply by role.
+- `hold`: `charge` (hold to charge, release to fire; `charge_scale` on effects scales them by the
+  charge) or `sustain` (the move's `sustain: [t0, t1]` window loops while held, up to `max_hold`
+  seconds, draining `drain` stamina per second). `aim.turn_rate` (rad/s) lets the stick steer it.
+- `cooldown`, `charges`, `cost` (stamina) apply per equipped move.
+- Effects may repeat inside a move: `"every": 0.12, "until": "release"` (or seconds, or a
+  `"count"`). Hits from repeating effects are throttled (30% hype, no stamina refund, at most one
+  stun per 0.5 s per target, no hit pause), so a stream cannot stun-lock. New effect type
+  `recoil` {`speed`, `up`} pushes the user back; projectiles take `intercept` (they stop enemy
+  projectiles) and `on_expire` (a list of effects fired where they land or burst).
+- `styles`: two named variants per move; a style is a list of ContentPatch operations on the
+  fighter's own definition (`set`, `mul`, `add`, `time_scale`, paths such as
+  `abilities.ability1.effects[type=area].cone_deg`). Runs and Career choose one per move.
+- `ai`: bot hints for the move (`range` [min, max] metres, `hold` [min, max] seconds, `when`).
+- Loadouts list four pool ids, at least one `basic`; the first move goes on the Light button, then
+  Heavy, Ability 1 and Ability 2. An invalid or unknown loadout (a stale save, an online request)
+  falls back to `default_loadout`. Every hit and effect event carries the pool move id and its
+  category (`pool`, `cat`), which hooks can test with the `move` and `move_category` conditions.
+
+Visual effects for new moves are presentation scripts (`game/src/view/fx/moves/<creature>.gd`,
+built-in only); a mod's moves show the generic effects for their effect types.
 
 ## 5. Assets
 
