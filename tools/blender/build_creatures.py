@@ -75,15 +75,22 @@ if __name__=='__main__':
     parser.add_argument('--reference-root',required=True)
     parser.add_argument('--out-source')
     parser.add_argument('--out-glb', help='export here instead of the shipped model path (scratch builds)')
-    parser.add_argument('--v16', action='store_true', help='build the v0.9.10-v0.9.16 art (comparison only)')
+    parser.add_argument('--v16', action='store_true', help='build the v0.9.10-v0.9.16 art (comparison only: needs --out-source and --out-glb outside the repository)')
     args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
+    if args.v16:
+        # a comparison build never lands on the shipped v0.9.17 sources or models
+        if not (args.out_source and args.out_glb):
+            parser.error('--v16 builds are for comparison only: pass both --out-source and --out-glb (outside the repository)')
+        for p in (args.out_source, args.out_glb):
+            if pathlib.Path(p).resolve().is_relative_to(ROOT.resolve()):
+                parser.error('--v16 output inside the repository: '+p)
     s=Studio(args.id,pathlib.Path(args.reference_root)/'creatures'/f'{args.id}.glb')
+    out=(pathlib.Path(args.out_glb) if args.out_glb else ROOT/'game/assets/models'/s.entry['out']).resolve()
+    if out.name.lower().endswith('_legacy.glb'):
+        raise SystemExit('refusing to export over a legacy skin: '+str(out))
     builders={'f_stoke':stoke,'f_jitters':jitters,'f_dredge':dredge,'f_slurry':slurry,'f_gusto':gusto,'f_dozer':dozer,'boss_bilge':bilge,'boss_conduit':conduit,'boss_snappington':snappington,'npc_scrapling':scrapling,'npc_blister':blister,'npc_kid_lamprey':lamprey}
     if not args.v16:
         builders.update(fighters_v17.BUILDERS)   # v0.9.17 roster art (docs/ART_REVAMP.md)
     builders[args.id](s)
     s.save(args.out_source or ROOT/'tools/blender'/f'{args.id}.blend')
-    out=pathlib.Path(args.out_glb) if args.out_glb else ROOT/'game/assets/models'/s.entry['out']
-    if out.name.endswith('_legacy.glb'):
-        raise SystemExit('refusing to export over a legacy skin: '+str(out))
     export(out,ROOT.parent/'tmp')

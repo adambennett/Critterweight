@@ -25,9 +25,10 @@ const DEFAULT_JUICE := Color(1.0, 0.55, 0.1)
 const VARGA_MODEL := "res://assets/models/creatures/f_varga.glb"
 const VARGA_LEGACY_MODEL := "res://assets/models/creatures/f_varga_legacy.glb"
 const LEGACY_VARGA_SETTING := "cosmetic.legacy_varga"
-## v0.9.17 finish: surfaces are shaded by material class (creature.gdshader material_kind) chosen from
-## the model's material names; glowing surfaces animate by glow mode (the model's extras.look, else
-## this table: the fighter's "Hype feature" character).
+## v0.9.17 finish (models whose extras carry `look`; every other model keeps the v0.9.16 shading):
+## surfaces are shaded by material class (creature.gdshader material_kind) chosen from the model's
+## material names; glowing surfaces animate by glow mode (the model's extras.look, else this table:
+## the fighter's "Hype feature" character).
 const MATERIAL_KINDS := {"skin": 0, "hide": 0, "cloth": 1, "team": 1, "wrap": 1, "metal": 2, "iron": 2, "brass": 2, "eye": 3,
 	"jelly": 4, "shell": 5, "lacquer": 5, "chitin": 5, "enamel": 5, "glass": 5, "ghost": 6, "spectral": 6, "ember": 0, "lamp": 5, "coil": 4}
 const GLOW_MODES := {"steady": 0, "flicker": 1, "pulse": 2, "shimmer": 3, "lamp": 4}
@@ -75,8 +76,14 @@ var _point_sources: Array = []             ## [[MeshInstance3D, model root Node]
 var _cosmetic_items: Array = []            ## the dress last applied (re-fitted after a model swap)
 var _fx: CreatureFxRig = null              ## expressions/secondary motion when the model has fx_* bones
 var _look := {}                            ## the model's extras (look: glow mode, fx parameters)
-var _finish := 1.0                         ## 0: the model keeps the pre-v0.9.17 shading (legacy skins)
-## Set by the match scenes each frame (view only): the fighter's expression and what it looks at.
+## 1: the v0.9.17 finish, only for models made for it (their extras carry `look`: the upgraded roster);
+## 0: the exact pre-v0.9.17 shading (the legacy Varga, bosses, NPCs, the referee, mods' older models,
+## the built-in segment look).
+var _finish := 0.0
+var _last_alpha := 1.0                     ## the interpolation the last render() used
+var _fx_frame := -1                        ## the process frame the face rig last stepped in
+## Set by the match scenes and the hub each frame (view only): the fighter's expression and what it
+## looks at.
 var fx_mood := "neutral"
 var fx_look := Vector3.INF
 
@@ -108,21 +115,42 @@ static func model_path_for(c: CreatureDef, legacy = null) -> String:
 
 
 func _on_setting_changed(key: String, _v) -> void:
-	if key == LEGACY_VARGA_SETTING and creature != null:
+	# Settings re-sends keys that did not change (Reset Graphics sends them all): swap only when the
+	# model this player should see is not the one drawn
+	if key == LEGACY_VARGA_SETTING and creature != null and model_path_for(creature) != loaded_model_path():
 		reload_model()
 
 
+## The model file this view draws (the creature_model meta of its loaded instance); "" when it shows
+## the built-in segment look.
+func loaded_model_path() -> String:
+	for child in get_children():
+		if child.has_meta("creature_model") and not child.is_queued_for_deletion():
+			return str(child.get_meta("creature_model"))
+	return ""
+
+
 ## Swaps the drawn model in place (the Legacy Varga skin toggled mid-match): same bones, so the
-## pose, cosmetics and effects carry over from the next rendered frame.
+## pose, cosmetics and effects carry over. A view that already has a pose is re-posed at once
+## (fighter previews render a single time).
 func reload_model() -> void:
+	# a piece that already popped off this round (the gold tooth gag) stays off on the new model
+	var popped := {}
+	for a in _attachments:
+		if bool(a["popped"]):
+			popped[str(a["id"])] = true
 	for child in get_children():
 		if child is Node3D and child.has_meta("creature_model"):
+			remove_child(child)
 			child.queue_free()
 	for n in _seg_nodes:
 		if is_instance_valid(n):
+			remove_child(n)
 			n.queue_free()
 	_seg_nodes.clear()
 	_skeleton = null
+	_fx = null
+	_look = {}
 	_materials.clear()
 	_glow_materials.clear()
 	_gore_mesh = null
@@ -134,6 +162,11 @@ func reload_model() -> void:
 	set_juice_style(juice_color, glow_color)
 	if not _cosmetic_items.is_empty():
 		set_cosmetics(_cosmetic_items)
+		for a in _attachments:
+			a["popped"] = popped.has(str(a["id"]))
+		_update_attachments()
+	if is_inside_tree() and not _curr.is_empty() and _curr[0] != Transform3D():
+		render(_last_alpha)
 
 
 func _exit_tree() -> void:
@@ -155,11 +188,19 @@ func _palette(key: String, fallback: Color) -> Color:
 	return fallback
 
 
+## The shader's material class for a model material name (MATERIAL_KINDS by its first word): hide
+## when unknown, and always without the v0.9.17 finish.
+func _material_kind(mat_name: String) -> int:
+	if _finish <= 0.0:
+		return 0
+	return int(MATERIAL_KINDS.get(mat_name.trim_prefix("detail_").get_slice("_", 0), 0))
+
+
 func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := false, outlined := true, mat_name := "") -> ShaderMaterial:
 	var m := Materials.creature_material()
 	m.set_shader_parameter("tint", color)
 	var key := mat_name.trim_prefix("detail_").get_slice("_", 0)
-	m.set_shader_parameter("material_kind", int(MATERIAL_KINDS.get(key, 0)) if _finish > 0.0 else 0)
+	m.set_shader_parameter("material_kind", _material_kind(mat_name))
 	m.set_shader_parameter("glow_mode", int(MATERIAL_GLOW.get(key, _look_glow_mode())))
 	m.set_shader_parameter("finish", _finish)
 	m.set_shader_parameter("roughness_v", float(creature.art.get("roughness", 0.65)) if roughness < 0.0 else roughness)
@@ -189,13 +230,14 @@ func _try_load_model(path: String) -> bool:
 		return false
 	var inst := scene.instantiate()
 	inst.set_meta("creature_model", path)
-	_finish = 0.0 if path == VARGA_LEGACY_MODEL else 1.0
 	_look = {}
 	for c0 in inst.get_children():
 		if c0.has_meta("extras") and typeof(c0.get_meta("extras")) == TYPE_DICTIONARY:
 			_look = c0.get_meta("extras")
 	if inst.has_meta("extras") and typeof(inst.get_meta("extras")) == TYPE_DICTIONARY:
 		_look = inst.get_meta("extras")
+	# the v0.9.17 finish belongs to the art made for it (extras.look); never the original Varga
+	_finish = 1.0 if _look.has("look") and path != VARGA_LEGACY_MODEL else 0.0
 	add_child(inst)
 	_skeleton = _find_skeleton(inst)
 	if _skeleton == null:
@@ -220,6 +262,7 @@ func _try_load_model(path: String) -> bool:
 		_fx = null
 	# parents-first bone order so hierarchical skeletons (any importer layout) pose correctly
 	_bone_order = PackedInt32Array()
+	_bone_global.clear()          # nothing carries over from a swapped-out model's bones
 	_bone_global.resize(nb)
 	var pending: Array[int] = []
 	for b in _skeleton.get_parentless_bones():
@@ -335,8 +378,9 @@ func _find_meshes(n: Node) -> Array[MeshInstance3D]:
 	return out
 
 
-## Stylized fallback: smooth primitive per shape, coloured by body part.
+## Stylized fallback: smooth primitive per shape, coloured by body part (pre-v0.9.17 shading).
 func _build_fallback() -> void:
+	_finish = 0.0
 	var primary := _palette("primary", Color(0.85, 0.55, 0.3))
 	var secondary := _palette("secondary", primary.darkened(0.25))
 	var accent := _palette("accent", Color(0.95, 0.85, 0.7))
@@ -448,6 +492,7 @@ func _jolt_offset() -> Vector3:
 
 
 func render(alpha: float) -> void:
+	_last_alpha = alpha
 	var n := _curr.size()
 	var off := _jolt_offset()
 	if _skeleton:
@@ -476,7 +521,11 @@ func render(alpha: float) -> void:
 		if _fx != null:
 			_fx.mood = fx_mood
 			_fx.look_target = fx_look
-			_fx.update(get_process_delta_time(), _bone_global_of)
+			# a second render in one frame (the model swapped mid-frame) poses the face without
+			# stepping it: the springs would read the repeat as a sudden stop
+			var frame := Engine.get_process_frames()
+			_fx.update(get_process_delta_time() if frame != _fx_frame else 0.0, _bone_global_of)
+			_fx_frame = frame
 			for bi2 in _bone_order:
 				if not _fx.is_fx_bone(bi2):
 					continue
@@ -674,6 +723,10 @@ func detach_piece(impulse_dir: Vector3) -> RigidBody3D:
 		var pm := Materials.creature_material()
 		pm.set_shader_parameter("tint", Color.WHITE)
 		pm.set_shader_parameter("roughness_v", 0.35)
+		# the finish of the model it came off, shaded as its own material class (Dozer's shell chip)
+		var gm: Material = _gore_mesh.surface_get_material(0) if _gore_mesh.get_surface_count() > 0 else null
+		pm.set_shader_parameter("finish", _finish)
+		pm.set_shader_parameter("material_kind", _material_kind(gm.resource_name if gm != null else ""))
 		pm.next_pass = Materials.outline_material(float(creature.art.get("outline", 0.012)) * 0.6)
 		mi.material_override = pm
 	else:

@@ -93,6 +93,12 @@ func test_settings_and_rules_preset_from_v0916_load() -> void:
 	var sdir := _copy("profiles")
 	Settings.path_override = sdir.path_join("settings.json")
 	Settings.read_only = false
+	var old_file := Saves.read_json(Settings.path_override, "settings", Settings.VERSION)
+	check(bool(old_file["ok"]) and not (old_file["data"] as Dictionary).has("cosmetic.legacy_varga"), "the v0.9.16 file predates the Legacy Varga option")
+	# loaded the way the game starts (defaults first, then the file): a key the old file lacks must
+	# come from the defaults, never from whatever this process held before
+	Settings.values["cosmetic.legacy_varga"] = true
+	Settings.init_defaults()
 	Settings.load_settings()
 	check_eq(int(Settings.get_value("audio.master")), 60, "a changed volume is kept")
 	check_eq(str(Settings.get_value("access.subtitle_size")), "large", "a changed subtitle size is kept")

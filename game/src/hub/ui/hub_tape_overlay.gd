@@ -61,12 +61,14 @@ void fragment() {
 	hb.add_child(back)
 	cap.add_child(hb)
 	col.add_child(cap)
-	# the challenger is a silhouette (rim light only)
+	# the challenger is a silhouette (rim light only: the plain pre-v0.9.17 shading, no finish
+	# reflections or highlights)
 	if scene.views.size() > 1 and scene.views[1] != null:
 		var cv: CreatureView = scene.views[1]
 		for mat in cv._materials:
 			mat.set_shader_parameter("tint", Color(0.02, 0.02, 0.03))
 			mat.set_shader_parameter("rim_strength", 0.9)
+			mat.set_shader_parameter("finish", 0.0)
 
 
 func _process(dt: float) -> void:
