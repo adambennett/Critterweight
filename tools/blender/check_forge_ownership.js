@@ -12,5 +12,7 @@ verify(['npc_blister'],'Blender source owns');
 verify(['--legacy'],'outside game/assets/models');
 verify(['--legacy','--out',path.join(root,'game/assets/models/creatures')],'outside game/assets/models');
 const list=cp.spawnSync(process.execPath,[path.join(root,'tools/forge/forge.js'),'--list'],{encoding:'utf8'});
-if(list.status!==0 || (list.stdout.match(/\[Blender source\]/g)||[]).length!==12)throw Error('Expected 12 Blender owners');
-console.log('PASS lists 12 Blender-owned models');
+// 12 since the 2026-10-16 revamp, + f_knell in v0.9.17 (f_varga is Blender-owned too but never had a forge definition)
+if(list.status!==0 || (list.stdout.match(/\[Blender source\]/g)||[]).length!==13)throw Error('Expected 13 Blender owners');
+verify(['f_knell'],'Blender source owns');
+console.log('PASS lists 13 Blender-owned models');

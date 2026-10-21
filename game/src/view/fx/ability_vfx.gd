@@ -1313,6 +1313,23 @@ func _on_submerge(fi: int, ev: Dictionary) -> void:
 		burst("mist", a + Vector3.UP * 0.4, Vector3.UP, Color(0.55, 0.45, 0.75, 0.35), null, {"radius": 0.4, "amount": 0.6})
 		footprint("spectral", "circle", a, 0.0, 0.8, {"fill": 0.5}, 0.9, 0.1)
 		_traveller(a + Vector3.UP * 0.9, b + Vector3.UP * 0.9, delay, "wisps", Color(0.7, 0.55, 1.0, 0.85), Color(0.95, 0.9, 1.0, 0.8))
+		# the streak of a spirit crossing the cage: a violet ribbon whose head runs ahead to the arrival point
+		if quality >= 1:
+			var rib := ribbon(Color(0.58, 0.4, 1.0), Color(0.92, 0.86, 1.0), true)
+			var a2 := a + Vector3.UP * 0.9
+			var b2 := b + Vector3.UP * 0.9
+			animate(rib, delay + 0.35, func(k: float, t: float) -> void:
+				var head := clampf(t / maxf(delay, 0.05), 0.0, 1.0)
+				var tail := clampf((t - 0.12) / maxf(delay, 0.05), 0.0, 1.0)
+				var pts := []
+				var w := []
+				var al := []
+				for i in 8:
+					var u := lerpf(tail, head, float(i) / 7.0)
+					pts.append(a2.lerp(b2, u) + Vector3.UP * 0.12 * sin(u * PI * 3.0 + t * 8.0))
+					w.append(0.16 * float(i) / 7.0)
+					al.append(float(i) / 7.0 * (1.0 - smoothstep(0.7, 1.0, k)))
+				draw_ribbon(rib, pts, w, al))
 		_later(delay * 0.6, func(): _converge_point(b + Vector3.UP * 0.9, delay * 0.4, Color(0.7, 0.55, 1.0), Color(0.95, 0.9, 1.0), 0.6, "wisps"))
 		return
 	# Slurry (and any diver): the floor opens into a sludge pool, bubbles trace the path under the
@@ -1405,11 +1422,30 @@ func _knell_toll(fi: int, pos: Vector3, r: float) -> void:
 
 ## ---- Varga: precise martial impact ----
 
-func _varga_dash(fi: int, _ev: Dictionary) -> void:
-	var dur := 0.22
-	_varga_afterimage(fi, _ground(fi), dur)
+func _varga_dash(fi: int, ev: Dictionary) -> void:
+	# a clean cut across the floor: gold speed lines behind him, a skid line where his feet go,
+	# glints off the plant foot
+	var dur := float(ev.get("time", 0.18)) + 0.04
+	var dist := clampf(float(ev.get("speed", 5.0)) * dur, 0.5, 2.5)
 	var g := _ground(fi)
-	burst("dust", g, -_fwd(fi) + Vector3.UP * 0.2, Color(0.85, 0.8, 0.72, 0.35), null, {"amount": 0.4, "speed": 0.6})
+	var yaw := _yaw(fi)
+	var fwd := MathX.forward_of_yaw(yaw)
+	_varga_afterimage(fi, g, dur)
+	footprint("scrap", "line", g - fwd * 0.2, yaw, 0.0, {"length": dist + 0.4, "width": 0.45, "fill": 0.55, "front": 1.0,
+		"color": Color(0.95, 0.62, 0.22), "color2": Color(1.0, 0.92, 0.65)}, 0.6, dur)
+	if quality >= 1:
+		var side := fwd.cross(Vector3.UP).normalized()
+		for k in 5:
+			var off := side * lerpf(-0.35, 0.35, float(k) / 4.0) + Vector3.UP * (0.45 + 0.25 * float(k % 3))
+			var rib := ribbon(Color(1.0, 0.78, 0.4), Color(1.0, 0.97, 0.85), true)
+			var st := g + off - fwd * 0.3
+			animate(rib, dur + 0.18, func(k2: float, t: float) -> void:
+				var head := clampf(t / dur, 0.0, 1.0)
+				var a := st + fwd * dist * maxf(0.0, head - 0.55)
+				var b := st + fwd * dist * head
+				draw_ribbon(rib, [a, b], [0.0, 0.035], [0.0, (1.0 - smoothstep(0.6, 1.0, k2))]))
+	burst("dust", g, -fwd + Vector3.UP * 0.2, Color(0.8, 0.72, 0.6, 0.45), null, {"amount": 0.5, "speed": 0.7})
+	burst("glints", g + Vector3.UP * 0.1, Vector3.UP, Color(1.0, 0.8, 0.45), null, {"amount": 0.4, "speed": 0.5})
 
 
 ## Crisp speed lines streaming off his body along the move (a cut, not a smear).
@@ -1463,7 +1499,9 @@ func _buff(fi: int, cid: String, ev: Dictionary) -> void:
 	var p := anchor(fi, "core")
 	match cid:
 		"f_varga":
-			# Second Wind / Cut the Angle / Championship Rounds: a breath ring and rising focus motes
+			if str(ev.get("move", "")).ends_with("ability1"):
+				return      # Cut the Angle: its dash draws the move (_varga_dash)
+			# Second Wind / Championship Rounds: a breath ring and rising focus motes
 			var g := _ground(fi)
 			ring_wall(g + Vector3.UP * 0.05, 0.3, 1.2, 0.3, Color(0.95, 0.68, 0.32), Color(1.0, 0.92, 0.7), 0.35, {"add": false, "bands": 0.0, "core": 0.5})
 			burst("motes", p, Vector3.UP, Color(1.0, 0.85, 0.55), Color(1, 1, 0.9), {"radius": 0.35, "height": 0.3, "speed": 0.8, "spread": 0.3, "amount": 0.7})

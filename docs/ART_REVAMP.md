@@ -108,3 +108,33 @@ For the twelve models listed in `tools/blender/adopted.json`, supplement D-012's
 ### Proposed progress/release text
 
 Draft for user visual approval; merged-main validation passes all 684 tests: replaces twelve combat-creature visual models with cleaner faces, fitted shapes and readable signature details; adds editable Blender sources and reproducible export. Preserves every gameplay body and kit, the common shader effects, team tint and cosmetic attachments. Ten optional hub/crowd models retain their original art. Claude should first provide the separate alternate preview requested on main, then wait for the user's art choice before integration and release-ledger updates.
+
+## v0.9.17 roster pass (2026-10-20)
+
+The owner asked for a substantial visual upgrade of the whole playable roster (Stoke, Dredge, Gusto,
+Dozer, Slurry, Jitters, Varga, Knell), obvious at normal gameplay distance, with useful expressions
+and visual motion, keeping the cohesive style and every gameplay body. Stoke was the pilot; the other
+seven were built in parallel from one brief (`fighters_v17*.py`, ART_PIPELINE §5b/§7b). Every model
+binds the unchanged segment skeleton (exact pivots), keeps the team-tint material and the unskinned
+KO piece, passes `audit_models.js` (30k budget) and the art tests (`test_new_fighters`,
+`test_hub_cosmetics`, `test_content_audit`), and rebuilds byte-identically from its committed source.
+
+| Fighter | What changed | Triangles | Outside collision (p95 / max) |
+|---|---|---:|---|
+| Stoke | Salamander blotches, saw-tooth ember crest and back spines, riveted boiler with gauge and grille, two back stacks fed by shoulder pipes, ember gills on springs, toes and knuckles, rigged eyes/lids/brows/jaw | 26,376 | 4.7 / 10.1 cm (crest spines) |
+| Dredge | Lacquered crab plates with "H" grooves and worn rims, glowing barnacle clusters, toothed crusher with a mooring chain on springs, slim cutter, stalk eyes with weary lids, brows, mandible jaw, seaweed on springs | 29,668 | 3.9 / 7.6 cm |
+| Gusto | Layered feathered wings (three covert rows, 16 secondaries, 6 black-tipped primaries) with a turquoise Hype sheen, wayfarer shades with a strap, slimmer beak with an opening jaw, half-lidded eyes and feather brows, two-row pompadour and a seven-feather tail fan on springs, cream chest, feathered thighs, scaly shins and webbed feet | 29,428 | 4.4 / 8.1 cm |
+| Dozer | Shingled ochre armour bands, pauldrons and rump shield with rims, rivets and dust-packed cracks; dished steel shovel snout; headlamp (Hype, `lamp`) with a strapped battery pack; hog face with lids, brows and a tusked jaw; ears, corkscrew tail and collar tag on springs; mud and dust paint | 29,444 | 5.3 / 9.3 cm |
+| Slurry | Moray skull with a toothy grin, slit-pupil eyes under slanted lid folds, brows, wide jaw with tongue and glowing gullet; glossy back with two rows of glowing slime pores; ruffled dorsal fin, gill frills and tail fin on springs; brass collars with goo seams and drips | 28,620 | 2.9 / 7.4 cm |
+| Jitters | Battery jellyfish: frilled jelly bell, eight tentacles on spring chains, glowing coil under the rim, lightning bolts and a charge badge on the back, bulb electrode antennae, steel battery cap, mitten arms with team cuffs, worried face with blush and sweat bead | 28,700 | 6.0 / 7.6 cm |
+| Varga | Sculpted fighter build (pecs, abs, lats, deltoid caps, calves), full beard and moustache, boxer's nose and cauliflower ears, amber eyes with heavy lids, brows and a kiai jaw, topknot and team headband, wraps and hair on springs, red shorts with gold trim, fingerless gloves, ankle tape, glowing copper scrap markings | 29,518 | 3.7 / 7.8 cm |
+| Knell | Haunted diving suit: copper helmet with brass ports and a violet ghost face (eyes, lids, brows, mouth) in the front port, bolted corselet with wing nuts, weathered canvas with patches, weight belt with an anchor buckle, lead boots, Ghost Light lantern; air hose, wisps and an anchor charm on springs | 29,808 | 5.2 / 8.5 cm |
+
+The legacy Varga skin is the untouched v0.9.16 model (`f_varga_legacy.glb`, sha256 `4fa78a8a…0460fc`).
+
+Known limitations (from the per-fighter reviews): springs swing in two directions only, so upright
+fins and tentacles can lean into sudden moves and dip briefly into the body; face animation was
+checked in stills, sandbox frames and posed previews, not watched as video; Dredge's four-lobed
+outline and Dozer's barrel body follow their locked collision shapes; Knell's hose rides the head
+bone; Jitters' rigged lids read heavy from the high front camera; Varga's rest pose sits 17.5 cm
+below his floor (static previews lift it, see `CreatureView.rest_sink`).
