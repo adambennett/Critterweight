@@ -184,10 +184,11 @@ func test_check_reports_invariants() -> void:
 	var probs := CareerState.check(cat(), bad)
 	check(probs.size() >= 3, "out-of-range values reported: %s" % [probs])
 	var old: Dictionary = ctrl.state.duplicate(true)
-	old["version"] = 2
+	old["version"] = CareerState.VERSION + 1
 	check(not CareerState.check(cat(), old).is_empty(), "a different version is reported")
-	check(CareerState.migrate(ctrl.state, CareerState.VERSION) != null, "v1 passes migrate")
+	check(CareerState.migrate(ctrl.state, CareerState.VERSION) != null, "the current version passes migrate")
 	check(CareerState.migrate(ctrl.state, 0) == null, "no migration from unknown versions (file kept)")
+	check(CareerState.migrate(ctrl.state, CareerState.VERSION + 1) == null, "nor from newer ones")
 	var dup: Dictionary = ctrl.state.duplicate(true)
 	var o: Dictionary = dup["offers"][0]
 	dup["booked"] = {"offer": o.duplicate(true), "weeks_left": 2, "plan": [], "in_fight": false}

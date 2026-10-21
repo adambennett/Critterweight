@@ -115,8 +115,8 @@ func test_profiles_from_a_newer_version_are_never_overwritten() -> void:
 	var root := dir.path_join("profiles")
 	var index := root.path_join("index.json")
 	var rookie := root.path_join("rookie").path_join("profile.json")
-	Saves.write_json(index, "profile_index", 2, {"profiles": [{"id": "rookie", "name": "Rookie"}], "active": "rookie"})
-	Saves.write_json(rookie, "profile", 2, {"id": "rookie", "name": "Rookie", "stats": {"wins": 99}})
+	Saves.write_json(index, "profile_index", Profiles.INDEX_VERSION + 1, {"profiles": [{"id": "rookie", "name": "Rookie"}], "active": "rookie"})
+	Saves.write_json(rookie, "profile", Profiles.VERSION + 1, {"id": "rookie", "name": "Rookie", "stats": {"wins": 99}})
 	var index_before := _text(index)
 	var rookie_before := _text(rookie)
 	var p = load("res://src/persist/profiles.gd").new()
@@ -136,8 +136,8 @@ func test_profiles_from_a_newer_version_are_never_overwritten() -> void:
 	# our own list, but one listed profile is newer: it is skipped, never deleted
 	var root2 := dir.path_join("profiles2")
 	Saves.write_json(root2.path_join("index.json"), "profile_index", 1, {"profiles": [{"id": "champ", "name": "Champ"}, {"id": "rookie", "name": "Rookie"}], "active": "champ"})
-	Saves.write_json(root2.path_join("champ/profile.json"), "profile", 2, {"id": "champ"})
-	Saves.write_json(root2.path_join("rookie/profile.json"), "profile", 1, Profiles.default_profile("rookie", "Rookie"))
+	Saves.write_json(root2.path_join("champ/profile.json"), "profile", Profiles.VERSION + 1, {"id": "champ"})
+	Saves.write_json(root2.path_join("rookie/profile.json"), "profile", Profiles.VERSION, Profiles.default_profile("rookie", "Rookie"))
 	var champ_before := _text(root2.path_join("champ/profile.json"))
 	var p2 = load("res://src/persist/profiles.gd").new()
 	p2.root_override = root2

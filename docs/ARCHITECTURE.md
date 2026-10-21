@@ -18,7 +18,7 @@ persist (atomic versioned JSON) ◄── settings, profiles, runs, presets, are
 | `Paths` | src/persist/paths.gd | user-data root and subfolders (profiles, mods, arenas, presets, policies, playlists, runs, careers, logs, lab, captures); `--user-root <dir>` override for tests; never writes into the install folder |
 | `Saves` | src/persist/saves.gd | `write_json(path, kind, version, data) -> Error` (temp + flush + rename + .bak), `read_json(path, kind, migrator) -> SaveResult` (validates checksum, recovers from .bak/.tmp, never silently overwrites a recoverable file) |
 | `Settings` | src/persist/settings.gd | schema of every option (default/range/apply/restart flag); `get_value(key)`, `set_value(key, v)`, `reset(category)`, `changed(key)` signal; applies display/audio/input/accessibility |
-| `Profiles` | src/persist/profiles.gd | active profile: stats, records, unlocks, ladder (The Dosage), Fight Camp meta-progression, cosmetics |
+| `Profiles` | src/persist/profiles.gd | active profile: stats, records, unlocks, ladder (The Dosage), Fight Camp meta-progression, cosmetics, custom versus loadouts per fighter (`loadouts`, profile format 2 since v0.9.18) |
 | `Content` | src/data/content.gd | loads packages (core + enabled mods) in deterministic order; typed getters `creature(id)`, `arena(id)`, `rules_preset(id)`, `mode(id)`, `upgrade(id)`, `event(id)`, `encounter(id)`, `playlist(id)`; `errors`; `content_hash()` for multiplayer compatibility |
 | `Mods` | src/mods/mod_manager.gd | discovery, manifests, dependency/order resolution, enable/disable, mod sets, package import/export (zip), trust/capability prompts |
 | `Controls` | src/input/controls.gd | input actions, rebinding, device tracking, prompts, `fill(FighterInput, cam_basis)` |

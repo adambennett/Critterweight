@@ -6,12 +6,16 @@ extends RefCounted
 ## (HeadlessFightRunner) and plays out the same for the same seed.
 ##   rules     the "Cage Rules" preset (standard 1v1, 10-point scoring, referee) — or, while that
 ##             preset is not installed, the Standard Duel + {"scoring": "ten_point", "referee": true}
-##             — with rounds 3 (titles 5), the offer's round_time (99 s) and sudden_death false
+##             — with rounds 3 (titles 5), the offer's round_time (99 s) and sudden_death false;
+##             `combat` is the preset's combat style, written out ("moves" unless it says Classic)
 ##   seed      RunRng.derive(career seed, "fight/<offer id>"): a bout re-fought after a crash is the
 ##             same bout (same opponent, bot, arena and seed)
 ##   fighters  team 0 = the career fighter (kind "player", or a bot for unattended/test runs),
 ##             team 1 = the opponent with a BotBrain of the offer's bot tier; both built by
-##             CareerBuild (same stat -> mod mapping)
+##             CareerBuild (same stat -> mod mapping). The career fighter's entry carries its
+##             equipped `loadout` and its creature has the drilled styles composed in
+##             (CareerMoves; the moves are normalized against the installed creature first). The
+##             opponent fights with its creature's default loadout.
 ##   flags     no_record: true (career results reach the profile only through its own history),
 ##             context {career: true, variant, career_id, fight_id, title}
 
@@ -45,13 +49,20 @@ static func base_rules(catalog: CampaignCatalog, rules: Dictionary) -> Dictionar
 
 
 ## The bout's rules: the preset with the offer's rounds and round time, no sudden death (career
-## bouts can be drawn, as in Cage Rules).
+## bouts can be drawn, as in Cage Rules), and the preset's combat style (Movesets unless it names
+## Classic; MOVESET_COMBAT.md §1: a missing key means Movesets).
 static func bout_rules(catalog: CampaignCatalog, rules: Dictionary, offer: Dictionary) -> Dictionary:
 	var r := base_rules(catalog, rules)
 	r["rounds"] = int(offer.get("rounds", rules.get("rounds", 3)))
 	r["round_time"] = float(offer.get("round_time", rules.get("round_time", 99.0)))
 	r["sudden_death"] = false
+	r["combat"] = combat_style(r)
 	return r
+
+
+## "moves" or "classic" for a rules dictionary (a missing or unknown value is Movesets).
+static func combat_style(r: Dictionary) -> String:
+	return "classic" if str(r.get("combat", "moves")) == "classic" else "moves"
 
 
 static func fight_seed(st: Dictionary, offer: Dictionary) -> int:
@@ -114,7 +125,12 @@ static func build(catalog: CampaignCatalog, rules: Dictionary, st: Dictionary, o
 			arena = content.arena(str(catalog.rules.get("fallback_arena", "the_gullet")))
 	if arena == null:
 		arena = ArenaDef.from_dict({"id": "career_fallback", "name": "The Gullet", "base": "octagon", "radius": 5.0})
-	var me := CareerBuild.compose(catalog, rules, str(st.get("fighter", "")), st.get("stats", {}), st.get("injury", {}), "career_player")
+	# the career fighter's moves against its installed kit: the drilled styles are composed into the
+	# creature (before the stats), the equipped loadout travels with the fighter entry
+	var kit := CareerMoves.creature(catalog, str(st.get("fighter", "")))
+	var moves := CareerMoves.normalize(kit, st.get("moves", {}))
+	var me := CareerBuild.compose(catalog, rules, str(st.get("fighter", "")), st.get("stats", {}), st.get("injury", {}), "career_player",
+		CareerMoves.drill_effects(kit, moves["drilled"]))
 	if me["creature"] == null:
 		errors.append_array(me["errors"])
 		return out
@@ -126,7 +142,8 @@ static func build(catalog: CampaignCatalog, rules: Dictionary, st: Dictionary, o
 	warnings.append_array(them["warnings"])
 	var me_c: CreatureDef = me["creature"]
 	var them_c: CreatureDef = them["creature"]
-	var player := {"creature": me_c, "team": PLAYER_TEAM, "name": str(st.get("name", "You")), "mods": (me["mods"] as Dictionary).duplicate()}
+	var player := {"creature": me_c, "team": PLAYER_TEAM, "name": str(st.get("name", "You")), "mods": (me["mods"] as Dictionary).duplicate(),
+		"loadout": (moves["equipped"] as Array).duplicate()}
 	var pk := str(opts.get("player_kind", "player"))
 	if opts.has("player_source"):
 		player["kind"] = "campaign_bot" if pk == "bot" else "net"

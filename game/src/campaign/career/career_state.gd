@@ -4,34 +4,42 @@ extends RefCounted
 ## (Saves kind "career", VERSION). Pure functions only; CareerController is the only writer.
 ##
 ## {
-##   "version": 1, "career_id": "car_<seed text>_<created_at>", "seed": 53-bit int, "seed_text",
+##   "version": 2, "career_id": "car_<seed text>_<created_at>", "seed": 53-bit int, "seed_text",
 ##   "created_at": unix int, "profile_id", "slot": 1..3, "content_hash",
 ##   "name" (<= 14), "nick" (<= 16), "fighter": roster creature id, "difficulty": easy|normal|hard,
 ##   "stats": {stamina, chin, speed, power, clinch, defence} in 0..stat_cap,
+##   "moves": {"learned": [pool ids], "equipped": [1-4 pool ids], "drilled": {pool id: style id}}
+##            (v0.9.18 Movesets, CareerMoves),
 ##   "week": >= 1, "money": int >= 0, "pop": 0..100 (one decimal),
 ##   "record": {"w", "l", "d", "tko", "dec"}, "streak": +n wins / -n losses / 0,
 ##   "gym": {stamina..defence, recovery, coach: 0..facility_max},
 ##   "injury": {"head", "body", "legs": 0..100},
 ##   "booked": {} | {"offer": offer, "weeks_left": n, "plan": [focus...], "in_fight": bool,
 ##               "accepted_week": w, "starts": n (fight launches, crash re-fights included)},
+##               a plan focus is a stat, "rest", "learn:<move>" or "drill:<move>:<style>",
 ##   "offers": [offer...], "offer_roll": n (re-rolls within the current week),
 ##   "history": [entry...] (oldest first), "log": [{"week", "text"}] (<= news_cap, oldest first),
 ##   "champion": bool, "title_defences": n, "claims": [fight ids applied or withdrawn],
 ##   "last_fight": {} | result summary, "last_train": {} | train report,
+##   "migrated_from": n (only on a career migrated from an older format),
 ##   "saved_at": unix int (stamped by CareerStore.save; absent until the first save)
 ## }
 ## Invariants (check()): every stat in 0..1, injuries 0..100, money >= 0, a booked fight is not
 ## also offered, weeks_left >= 0, an in-fight marker only on a booked fight whose id is unclaimed.
 ## Content references (the career fighter, offer/booked creatures and arenas) are reported as
 ## "missing ..." problems; only a missing career fighter blocks loading (design contract D9).
+## The moves block is checked for its shape ("moves: ..." problems, never blocking) and against the
+## creature by CareerMoves.normalize (CareerController.repair): a move renamed or removed by a
+## content update is repaired on load instead of locking the player out of the career.
 
-const VERSION := 1
+const VERSION := 2
 const REQUIRED := ["version", "career_id", "seed", "name", "fighter", "difficulty", "stats", "week", "money", "pop",
 	"record", "streak", "gym", "injury", "booked", "offers", "history", "log", "champion", "title_defences", "claims"]
 
 
 ## A fresh career dict (no offers yet: CareerController.create rolls them). opts: {name, nick,
-## fighter, difficulty, seed (0 = fresh), created_at, profile_id, slot, content_hash}.
+## fighter, difficulty, seed (0 = fresh), created_at, profile_id, slot, content_hash, moves (the
+## starting moves, CareerMoves.starting; empty when not given)}.
 static func create(rules: Dictionary, opts: Dictionary) -> Dictionary:
 	var seed_value := int(opts.get("seed", 0))
 	seed_value = RunRng.normalize_seed(seed_value) if seed_value != 0 else RunRng.fresh_seed()
@@ -55,6 +63,7 @@ static func create(rules: Dictionary, opts: Dictionary) -> Dictionary:
 		"nick": clean_name(str(opts.get("nick", "")), int(rules.get("nick_max", 16)), ""),
 		"fighter": fighter, "difficulty": diff,
 		"stats": starting_stats(rules, fighter),
+		"moves": CareerMoves.well_formed(opts.get("moves", {})),
 		"week": int(start.get("week", 1)), "money": int(start.get("money", 2000)), "pop": float(start.get("pop", 2.0)),
 		"record": {"w": 0, "l": 0, "d": 0, "tko": 0, "dec": 0}, "streak": 0,
 		"gym": gym, "injury": {"head": 0.0, "body": 0.0, "legs": 0.0},
@@ -223,6 +232,7 @@ static func check(catalog: CampaignCatalog, st: Dictionary) -> Array:
 			p.append("'%s' is not a list" % k2)
 	if not p.is_empty():
 		return p
+	p.append_array(moves_problems(st.get("moves")))
 	for s in CareerDefaults.STATS:
 		var v = st["stats"].get(s)
 		if not (typeof(v) in [TYPE_INT, TYPE_FLOAT]) or float(v) < 0.0 or float(v) > 1.0:
@@ -270,23 +280,51 @@ static func check(catalog: CampaignCatalog, st: Dictionary) -> Array:
 	return p
 
 
-## Problems that make a save unusable: everything except stale offers and a booked fight with
-## missing content (both are repairable in play, design contract D9).
+## Shape problems of the moves block ("moves: ..."). Never blocking: CareerController.repair
+## rebuilds the block from the creature on load (CareerMoves.normalize).
+static func moves_problems(mv) -> Array:
+	if typeof(mv) != TYPE_DICTIONARY:
+		return ["moves: missing"]
+	var m: Dictionary = mv
+	if typeof(m.get("learned")) != TYPE_ARRAY or typeof(m.get("equipped")) != TYPE_ARRAY or typeof(m.get("drilled")) != TYPE_DICTIONARY \
+			or not CareerMoves.same(CareerMoves.well_formed(m), m):
+		return ["moves: malformed"]
+	var out := []
+	for e in m["equipped"]:
+		if not (m["learned"] as Array).has(e):
+			out.append("moves: %s is equipped but not learned" % str(e))
+	return out
+
+
+## Problems that make a save unusable: everything except stale offers, a booked fight with missing
+## content (both repairable in play, design contract D9) and the moves block (repaired on load).
 static func blocking(problems: Array) -> Array:
 	var out := []
 	for pr in problems:
 		var s := str(pr)
-		if s.begins_with("missing offer ") or s.begins_with("missing booked "):
+		if s.begins_with("missing offer ") or s.begins_with("missing booked ") or s.begins_with("moves: "):
 			continue
 		out.append(s)
 	return out
 
 
-## Save-format migrations (none yet: VERSION 1 is the first career format). Future versions
-## chain here; returning null rejects the file (it stays on disk).
-static func migrate(data, from_version: int):
+## Save-format migrations, chained version by version; returning null rejects the file (it stays on
+## disk). `catalog` (CareerStore binds it) resolves the career fighter's creature.
+##   v1 (v0.9.16, v0.9.17) -> v2 (v0.9.18 Movesets): the fighter gets the starting moves of a new
+##   career (CareerMoves.starting: its recommended loadouts learned, the default one equipped,
+##   nothing drilled); every other field is kept, `migrated_from` records the old version. Without
+##   a catalog, or while the fighter is not installed, `moves` starts empty and
+##   CareerController.repair fills it in once the fighter can be resolved.
+static func migrate(data, from_version: int, catalog: CampaignCatalog = null):
 	if typeof(data) != TYPE_DICTIONARY:
 		return null
 	if from_version == VERSION:
 		return data
-	return null
+	if from_version < 1 or from_version > VERSION:
+		return null
+	var d: Dictionary = (data as Dictionary).duplicate(true)
+	if from_version == 1:
+		d["moves"] = CareerMoves.starting(CareerMoves.creature(catalog, str(d.get("fighter", ""))))
+	d["version"] = VERSION
+	d["migrated_from"] = from_version
+	return d

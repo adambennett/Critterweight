@@ -366,16 +366,19 @@ func movesets() -> bool:
 	return str(rules_dict().get("combat", "moves")) != "classic"
 
 
-## The loadout a slot fights with: its own pick, else the profile's last loadout for that fighter,
-## else the fighter's recommended loadout.
+## The loadout a slot fights with: its own pick, else the profile's saved loadout for that fighter
+## (players only, Profiles.saved_loadout), else the fighter's recommended loadout. A pick or a saved
+## loadout that no longer validates (a move renamed or removed, a malformed profile entry) falls
+## back to the recommended loadout instead of reaching the match.
 func slot_loadout(s: Dictionary) -> Array:
-	var c := Content.creature(str(s["creature"]))
+	var c := Content.creature(str(s.get("creature", "")))
 	if c == null:
 		return []
-	var mine: Array = s.get("loadout", [])
+	var mine := Profiles.clean_loadout(s.get("loadout", []))
+	if not mine.is_empty() and c.loadout_problem(mine) != "":
+		mine = []
 	if mine.is_empty() and str(s.get("kind", "")) == "player":
-		var saved = (Profiles.current.get("loadouts", {}) as Dictionary).get(c.id, []) if typeof(Profiles.current.get("loadouts", {})) == TYPE_DICTIONARY else []
-		mine = saved if typeof(saved) == TYPE_ARRAY else []
+		mine = Profiles.saved_loadout(c.id)
 	return c.resolve_loadout(mine)
 
 
@@ -403,11 +406,7 @@ func _pick_loadout(i: int) -> void:
 		"on_done": func(lo: Array) -> void:
 			s["loadout"] = lo.duplicate()
 			if str(s.get("kind", "")) == "player":
-				var all = Profiles.current.get("loadouts", {})
-				var d: Dictionary = all if typeof(all) == TYPE_DICTIONARY else {}
-				d[cid] = lo.duplicate()
-				Profiles.current["loadouts"] = d
-				Profiles.save()
+				Profiles.save_loadout(cid, lo)
 			_rebuild("moves%d" % i)})
 
 

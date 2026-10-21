@@ -6,6 +6,8 @@ extends CareerTestCase
 ## a bout is launched through CareerFlow and settled with a synthetic 10-point result (design
 ## contract B1 shape) onto career_result and back to the hub, the pause menu's quit in a career bout
 ## is a withdrawal (D4), an interrupted bout is offered again (D4) and retiring frees the slot (D3).
+## v0.9.18 Movesets: Learn a move / Drill a move from the train grid and the pre-bout loadout change
+## (YOUR MOVES -> the loadout screen limited to the learned moves) with real input.
 ## User data is redirected to a temporary root and a test profile; no real save is touched.
 
 var _root := ""
@@ -635,6 +637,110 @@ func test_interrupted_bout_is_offered_again() -> void:
 	var st := reload(1)
 	check((st["claims"] as Array).has(str(o["id"])), "settled once")
 	check((st["booked"] as Dictionary).is_empty(), "and no longer booked")
+
+
+## v0.9.18 (MOVESET_COMBAT.md §5): LEARN A MOVE and DRILL A MOVE in the train grid open a picker of
+## the week's choices in place of the grid; A spends the week on one (autosaved), Back returns to
+## the grid without spending anything; YOUR MOVES names the drilled style.
+func test_learn_and_drill_a_move_with_real_input() -> void:
+	var ctrl := make_career(1)
+	var f := career_flow_for(ctrl)
+	f.show_hub("camp")
+	await wait_frames(4)
+	check_eq(route_of(focus_owner()), "train:stamina", "the train grid still starts on Stamina")
+	check(top().call("find_route", "moves") != null, "YOUR MOVES is on the camp")
+	var ok: bool = await nav_to("rest")
+	check(ok, "Rest is reachable")
+	await action("ui_right")
+	if not check(route_of(focus_owner()) == "learn", "LEARN A MOVE sits right of Rest (focus on '%s')" % route_of(focus_owner())):
+		return
+	await action("ui_accept")
+	await wait_frames(3)
+	check(top().call("find_route", "learn:fire_spin") != null, "the picker offers Fire Spin")
+	check(top().call("find_route", "train:stamina") == null, "in place of the train grid")
+	expect_focus("learn picker")
+	check_eq(route_of(focus_owner()), "learn:fire_spin", "the first choice has the focus")
+	await action("ui_cancel")
+	await wait_frames(3)
+	check_eq(top_name(), "career_hub", "Back closes the picker and stays on the hub")
+	expect_focus("picker closed")
+	check_eq(route_of(focus_owner()), "learn", "focus back on LEARN A MOVE")
+	check_eq(int(ctrl.state["week"]), 1, "nothing was spent")
+	await action("ui_accept")
+	await wait_frames(3)
+	check_eq(route_of(focus_owner()), "learn:fire_spin", "the picker again")
+	await action("ui_accept")
+	await wait_frames(3)
+	check((ctrl.state["moves"]["learned"] as Array).has("fire_spin"), "Fire Spin learned")
+	check_eq(int(ctrl.state["week"]), 2, "it took the week")
+	check((reload(1)["moves"]["learned"] as Array).has("fire_spin"), "autosaved")
+	expect_focus("after learning")
+	check_eq(route_of(focus_owner()), "learn", "focus stays on the card")
+	ok = await nav_to("drill")
+	if not check(ok, "DRILL A MOVE is reachable"):
+		return
+	await action("ui_accept")
+	await wait_frames(3)
+	check(top().call("find_route", "drill:flamethrower:pressure_jet") != null, "the picker lists each move's two styles")
+	ok = await nav_to("drill:flamethrower:wide_nozzle")
+	check(ok, "Wide Nozzle is reachable")
+	await action("ui_accept")
+	await wait_frames(3)
+	check_eq(ctrl.state["moves"]["drilled"], {"flamethrower": "wide_nozzle"}, "Flamethrower drilled into a Wide Nozzle")
+	check_eq(int(ctrl.state["week"]), 3, "another week")
+	check_eq(reload(1)["moves"]["drilled"], {"flamethrower": "wide_nozzle"}, "autosaved")
+	check(find_label(top(), "Flamethrower (Wide Nozzle)") != null, "YOUR MOVES names the drilled style")
+	check(str(ctrl.news()[0]["text"]).contains("Wide Nozzle"), "the week is in the news")
+
+
+## v0.9.18: before a bout YOUR MOVES opens the loadout screen limited to the learned moves (drilled
+## styles shown); the new loadout is saved with the career and the bout is fought with it.
+func test_pre_bout_loadout_change_persists() -> void:
+	var ctrl := make_career(1)
+	check(bool(ctrl.drill_move("flamethrower", "pressure_jet")["ok"]), "a drilled move")
+	var o := book(ctrl)
+	TestCareerFlow.next_result = scoring_result(0, "Unanimous Decision")
+	var f := career_flow_for(ctrl)
+	f.show_hub()
+	await wait_frames(4)
+	check_eq(route_of(focus_owner()), "fight", "FIGHT keeps the focus on fight week")
+	var ok: bool = await nav_to("moves")
+	if not check(ok, "YOUR MOVES is reachable on fight week"):
+		return
+	await action("ui_accept")
+	await wait_frames(4)
+	check_eq(top_name(), "loadout", "the loadout screen opens")
+	expect_focus("loadout screen")
+	var learned: Array = ctrl.state["moves"]["learned"]
+	var ids: Array = top().get("_ids")
+	check_eq(ids.size(), learned.size(), "only the learned moves can be equipped (%s)" % [ids])
+	check(not ids.has("fire_spin"), "an unlearned move is not offered")
+	check(find_label(top(), "Pressure Jet") != null, "the drilled style is shown")
+	ok = await nav_to("key:slot1")
+	check(ok, "the second slot is reachable")
+	await action("ui_right")
+	await wait_frames(2)
+	ok = await nav_to("done")
+	check(ok, "Done is reachable")
+	await action("ui_accept")
+	await wait_frames(4)
+	check_eq(top_name(), "career_hub", "back on the hub")
+	var eq: Array = ctrl.state["moves"]["equipped"]
+	check_eq(eq, ["ember_jab", "cinder_shot", "steam_vent", "stoke_the_fire"], "Cinder Shot replaced Flamethrower")
+	check_eq(reload(1)["moves"]["equipped"], eq, "saved with the career")
+	expect_focus("loadout -> hub")
+	check_eq(route_of(focus_owner()), "moves", "focus back on YOUR MOVES")
+	ok = await nav_to("fight", "ui_up")
+	await action("ui_accept")
+	await wait_frames(4)
+	check_eq(TestCareerFlow.launches.size(), 1, "the bout launched")
+	if TestCareerFlow.launches.is_empty():
+		return
+	var l: Dictionary = TestCareerFlow.launches[0]
+	check_eq(str(l["fight_id"]), str(o["id"]), "the booked bout")
+	var cfg: Dictionary = l["cfg"]
+	check_eq(cfg["fighters"][0]["loadout"], eq, "fought with the new loadout")
+	check_eq(str(cfg["rules"]["combat"]), "moves", "in Movesets")
 
 
 ## D3: RETIRE asks (danger), moves the save aside and frees the slot; a damaged slot is moved aside

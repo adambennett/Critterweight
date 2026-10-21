@@ -198,6 +198,14 @@ for titles) and possible draws. Everything saves after each action, in three slo
 moves a save aside instead of deleting it. Quitting a bout from the pause menu pulls you out of it (no
 purse, popularity −4); once the judges or the referee have decided it, leaving keeps that result.
 
+**Career moves (v0.9.18).** Your fighter starts its career knowing the moves of both recommended
+loadouts, with the first one equipped. Two more training choices sit next to Rest: *Learn a move*
+spends the week learning one of the moves you don't know yet, and *Drill a move* spends it drilling one
+of your moves into one of its two styles (a drill is for good). Neither raises a stat; injuries heal as
+in any training week. *Your moves* on the camp page (right under FIGHT on fight week) lets you equip
+any of the moves you know before a bout; the choice is saved with the career. Careers from earlier
+versions keep everything and get the starting moves.
+
 **10-point scoring** (Rules Editor › Rounds & winning › Scoring, Duel only): nobody can be knocked out
 by damage, so the HP bars disappear. Every round is fought and three judges score it — Even card
 (everything counts equally), Volume (leans toward clean strikes landed and parries) and Impact (leans
