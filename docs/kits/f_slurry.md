@@ -289,3 +289,20 @@ Crush at 0.4–1.9 m on a Gunked or cornered target, when Slurry's own poise is 
 Shed Skin reactively against a wind-up within 2.2 m, in an enemy zone, or at low poise. Sludge Lob
 and Drain Dive keep their v0.9.17 hints. (The bot conditions have no "I carry a status" test, so
 bots cannot yet use Shed Skin as a cleanse on purpose.)
+
+### Tests
+
+`test_moves_slurry.gd` (12 tests, all pass): the pool, both loadouts and every style patch (each
+patch hits a real field and the drilled creature still parses); a duel per move against Dredge
+(the dart burst's spacing, hits, attribution, sticking, extra Gunked and parry; the spray's ticks
+while held, Gunked, Corroded, stamina drain, stop on release and stick steering; Coil Crush through
+a held guard: Coiled, three squeezes, the crush, a whiff's commitment; Shed Skin's cleanse,
+invulnerability, slip and halved build-up; the string, the lob, the dive and the charged heavy);
+and the effects kit headless (registration, darts that fly, stick, ride and clean up, the spray's
+life and width, coils that clench, ride, burst and let go, the husk, Low quality, Reduce flashing).
+
+Known gap: `test_kit_f_slurry.gd` (the Classic coverage above) builds its fights through
+`kit_sj_helpers.duel()`, which sets no `combat` rule, so they run in Movesets; there the Heavy input
+is Poison Darts, the per-row light strings do not reach the pool's string, and cooldowns live in
+loadout slots (`m3`, `m4`). Until that shared helper pins `"combat": "classic"` (as
+`TestCase.make_sim` does for the pre-v0.9.18 tests), 7 of its 15 tests fail.
