@@ -119,7 +119,8 @@ func test_vintage_bellows_calls_matches_when_selected() -> void:
 	Audio.begin_match(ctx)
 	check_eq(Audio.announcer_pack, "vintage_bellows", "matches pick it up")
 	for trig in ["intro", "round_start", "ko", "win"]:
-		check(Audio.pick_line(trig, {"creature": "f_stoke", "kind": ["heavy"], "round": 1}).begins_with("ann_v73_"), "%s is called by 1973 Barnaby" % trig)
+		# (the 1973 "It's OVER!" KO call is only for the knockout that ends the fight, v0.9.17)
+		check(Audio.pick_line(trig, {"creature": "f_stoke", "kind": ["heavy"], "round": 1, "ends": "fight"}).begins_with("ann_v73_"), "%s is called by 1973 Barnaby" % trig)
 	check(Audio.pick_line("tutorial", {"kind": "intro"}).begins_with("ann_v73_") == false, "triggers the pack doesn't cover use the standard bank")
 	st.set_pack("vintage_bellows", false)
 	Audio.begin_match(ctx)
