@@ -46,3 +46,29 @@ and lesson transitions replace stale speech. Physical listening approval remains
 Generated 2026-10-18 for the v0.9.15 playtest preview. The approved batch contains 854 offline recordings: 515 Devon takes for Barnaby and 339 Kendall takes, totaling 49 minutes 21 seconds. The nine rare booth conversations are ten turns each. The added 108 takes call out Varga, Knell, Scrap, Spectral, ability use and eight roster matchups.
 
 The provider charged 5,656.5 credits from the owner's 6,000-credit allowance, leaving 343.5. All 854 processed WAVs and their raw masters match the generation journal SHA-256 values. Installed clips are mono 24 kHz PCM16 with peaks between -7.3 and -3.0 dBFS. Runtime files are under `game/assets/audio/speech/announcer_expansion/`; raw masters are in `B:/Critterweight/release-work/v0.9.15-preview4/breeze-raw`. See `announcer-expansion-audit.json`, `announcer-expansion-ledger.jsonl`, and `announcer-expansion-budget-final.json` for verification.
+
+## Commentary overhaul for v0.9.17
+
+Authorized by the owner's v0.9.17/v0.9.18 specification (2026-10-20): one Breeze allowance of
+10,000 credits for both releases, the approved voices only (Devon for Barnaby, Kendall, Coach Buck),
+the existing key workflow, offline shipped speech. `tools/audio/breeze/prepare_commentary_v0917.py`
+turns `commentary_script.txt` (the reviewed v0.9.17 lines: new calls for stoppages, decisions, round
+results, every fighter's abilities and ability hits, observations, Career context, conversations,
+corrected re-records, whole-sentence name variants and ceremonial winner names) into `v0.9.17/plan.json`.
+`generate.py` journaled every request in `v0.9.17/generation-ledger.jsonl` before sending it; there
+were no uncertain requests and no automatic retries.
+
+After the technical speech audit (`tools/audio/breeze/audit_speech.py`: levels, clipping, silences,
+endings, pace, pitch range, joins; heuristics, not a listening verdict) 20 retakes were generated
+with direction notes for the problem (`tools/audio/breeze/prepare_retakes_v0917.py`,
+`v0.9.17/plan-retakes.json`): four cut-off endings, four flat deliveries on big calls, three long
+mid-line pauses and the eight fastest deliveries. One retake was rejected (its ending was unclear;
+a second take replaced it) and one had a stray sound after 0.4 s of digital silence trimmed from its
+end (`v0.9.17/retakes-installed.json`). Replaced takes stay journaled and their raw masters stay on B:.
+
+Installed: 521 clips (426 Devon, 93 Kendall, 2 Coach Buck), 33.7 minutes, 97,067,644 bytes of mono
+16-bit PCM at 24 kHz under `game/assets/audio/speech/v0917/` with `catalog.json` (498 lines); every
+installed WAV matches its catalog SHA-256. Raw masters: `B:\Critterweight-work\v0.9.17\breeze-raw`.
+Spend: 541 completed requests, 3,255.8 credits (3,132.2 for the main batch, 123.6 for retakes); the
+provider reports 3,255.8 used, zero reserved and 6,744.2 remaining of the 10,000 allowance
+(`v0.9.17/budget-final.json`). Physical listening approval remains with the owner.
