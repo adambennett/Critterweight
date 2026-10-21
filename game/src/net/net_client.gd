@@ -689,6 +689,11 @@ func send_lobby(kind: int, value) -> void:
 			if b.size() > NetProtocol.MAX_COSMETICS_BYTES:
 				return
 			w.blob(b)
+		NetProtocol.LQ_LOADOUT:
+			var lo := NetProtocol.clean_loadout(value)
+			w.u8(lo.size())
+			for id in lo:
+				w.text(str(id), 40)
 	transport.send(1, NetProtocol.CH_CONTROL, w.data(), true)
 
 

@@ -860,6 +860,13 @@ func _handle_lobby(p: NetPlayer, data: PackedByteArray) -> void:
 					set_cosmetics(p.id, dec["value"])
 				else:
 					_violation(p, 2.0, "bad cosmetics payload: %s" % str(dec["error"]))
+		NetProtocol.LQ_LOADOUT:
+			var nl := r.count(4)
+			var ids: Array = []
+			for k in nl:
+				ids.append(r.text(40))
+			if r.expect_end():
+				set_loadout(p.id, ids)
 		_:
 			# host-only requests never come over the network (the listen host is local)
 			_violation(p, 2.0, "lobby request %d not allowed" % kind)
@@ -995,6 +1002,17 @@ func set_ready(pid: int, v: bool) -> void:
 	var p: NetPlayer = players.get(pid)
 	if p and p.ready != v:
 		p.ready = v
+		_lobby_dirty = true
+
+
+## A player's Movesets loadout request (validated against the fighter's pool when the match is built).
+func set_loadout(pid: int, ids: Array) -> void:
+	var p: NetPlayer = players.get(pid)
+	if p == null:
+		return
+	var clean := NetProtocol.clean_loadout(ids)
+	if clean != p.loadout:
+		p.loadout = clean
 		_lobby_dirty = true
 
 
@@ -1708,6 +1726,9 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 		# presentation only: views dress the fighter (MatchScene / NetMatchScene); MatchSim ignores it
 		if not p2.cosmetics.is_empty():
 			e["cosmetics"] = p2.cosmetics.duplicate()
+		# Movesets: the player's own loadout (MatchSim falls back to the recommended one if it does not fit)
+		if not p2.loadout.is_empty():
+			e["loadout"] = p2.loadout.duplicate()
 		p2.fighter = i
 		fighters.append(e)
 	var policy_list: Array = []      ## [{fighter, id, name, hash}] for MATCH_START and the log

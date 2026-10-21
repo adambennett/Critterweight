@@ -555,6 +555,25 @@ func set_creature(id: String) -> void:
 		server.set_creature(SERVER_ID, id)
 	elif client:
 		client.send_lobby(NetProtocol.LQ_CREATURE, id)
+	set_loadout(saved_loadout(id))
+
+
+## The loadout this profile last chose for a fighter in versus (Profiles "loadouts"), or [] for the
+## fighter's recommended one.
+static func saved_loadout(creature_id: String) -> Array:
+	var all = Profiles.current.get("loadouts", {}) if typeof(Profiles.current) == TYPE_DICTIONARY else {}
+	if typeof(all) != TYPE_DICTIONARY:
+		return []
+	var lo = (all as Dictionary).get(creature_id, [])
+	return (lo as Array).duplicate() if typeof(lo) == TYPE_ARRAY else []
+
+
+## Movesets: the moves this player equips in the next matches.
+func set_loadout(ids: Array) -> void:
+	if role == "host":
+		server.set_loadout(SERVER_ID, ids)
+	elif client:
+		client.send_lobby(NetProtocol.LQ_LOADOUT, ids)
 
 
 func set_team(team: int) -> void:

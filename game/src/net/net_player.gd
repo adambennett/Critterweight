@@ -12,6 +12,7 @@ var team := -1                   ## requested team (-1 = automatic)
 var creature := ""
 var assist := 1.0                ## aim-assist multiplier from the player's settings (fighter mods)
 var cosmetics := {}              ## equipped cosmetics {slot: id} (NetProtocol.clean_cosmetics; presentation only)
+var loadout: Array = []          ## v0.9.18 Movesets: requested pool move ids (NetProtocol.clean_loadout)
 var ready := false
 var spectator := false
 var is_host := false

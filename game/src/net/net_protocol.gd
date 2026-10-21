@@ -71,6 +71,7 @@ const LQ_TEAM := 3
 const LQ_SPECTATE := 4
 const LQ_ASSIST := 5          ## aim-assist level for the next matches (accessibility setting)
 const LQ_COSMETICS := 6       ## equipped cosmetics {slot: id} (presentation only, see clean_cosmetics)
+const LQ_LOADOUT := 7         ## v0.9.18 Movesets: the pool move ids the player equips (see clean_loadout)
 const MAX_COSMETIC_SLOTS := 8
 const MAX_COSMETICS_BYTES := 768
 const LQ_HOST_RULES := 10     ## host only (listen server): rules preset id
@@ -407,6 +408,23 @@ static func valid_app_type(t: String) -> bool:
 		if not ok:
 			return false
 	return true
+
+
+## A player's requested Movesets loadout: at most 4 pool move ids of plain id characters. Whether
+## they fit the creature is decided when the fighter is built (CreatureDef.resolve_loadout falls
+## back to the recommended loadout), so a stale or foreign list can never break a match.
+static func clean_loadout(v) -> Array:
+	var out: Array = []
+	if typeof(v) != TYPE_ARRAY:
+		return out
+	var re := RegEx.create_from_string("^[a-z0-9_]{1,40}$")
+	for x in v:
+		var id := str(x)
+		if re.search(id) != null and not out.has(id):
+			out.append(id)
+		if out.size() >= 4:
+			break
+	return out
 
 
 ## A player's equipped cosmetics as the other players may see them: {slot: id} where every id
