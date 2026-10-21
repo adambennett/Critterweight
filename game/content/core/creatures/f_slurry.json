@@ -400,5 +400,174 @@
    "shape": "tooth",
    "color": "#EDE6D6"
   }
- }
+ },
+ "movepool": {
+  "venom_fangs": {"name": "Venom Fangs", "category": "strike", "role": "basic", "string": ["l1", "l2", "l3", "finisher"], "dash": "dash_attack",
+   "short": "Head Butt, Tail Flick, Fang Snap, then the Venom Spit",
+   "desc": "Slurry's striking string, every hit building Gunked. Press again to keep it going: Head Butt, the spinning Tail Flick, the Fang Snap that yanks the target in, then the Venom Spit finisher, a glob spat at the target. Out of a dodge it is the low Slither Strike, which hits harder from a sludge puddle.",
+   "styles": {
+    "spitting_cobra": {"name": "Spitting Cobra", "desc": "The Venom Spit finisher sprays three smaller globs in a 24° fan.", "patch": [
+     {"op": "set", "path": "moves.finisher.effects[type=projectile].count", "value": 3},
+     {"op": "set", "path": "moves.finisher.effects[type=projectile].spread_deg", "value": 24},
+     {"op": "mul", "path": "moves.finisher.effects[type=projectile].damage", "value": 0.5},
+     {"op": "mul", "path": "moves.finisher.effects[type=projectile].buildup", "value": 0.5}]},
+    "barbed_fangs": {"name": "Barbed Fangs", "desc": "Fang Snap yanks twice as hard, and Head Butt and Fang Snap build half again as much Gunked.", "patch": [
+     {"op": "mul", "path": "moves.l3.pull", "value": 2.0},
+     {"op": "mul", "path": "moves.l3.on_hit[*].do[type=delayed].knockback", "value": 2.0},
+     {"op": "mul", "path": "moves.l1.buildup", "value": 1.5},
+     {"op": "mul", "path": "moves.l3.buildup", "value": 1.5}]}},
+   "ai": {"range": [0.0, 1.5]}},
+  "tail_sweep": {"name": "Tail Sweep", "category": "strike", "role": "heavy", "use": "heavy", "charged": "heavy_charged", "hold": "charge",
+   "short": "Tail Sweep; hold to rear up into Rear & Crash",
+   "desc": "A spinning sweep of the tail at knee height that trips Gunked fighters. Hold the button to rear up (light hits do not stop it) and release into Rear & Crash: the upper body crashes down on the target, breaks guards and leaves a sludge puddle.",
+   "styles": {
+    "quick_coil": {"name": "Quick Coil", "desc": "Rears up into Rear & Crash in half the time.", "patch": [{"op": "mul", "path": "moves.heavy.charge_time", "value": 0.5}]},
+    "undertow": {"name": "Undertow", "desc": "Every Tail Sweep trips, Gunked or not, but it winds up slower.", "patch": [
+     {"op": "set", "path": "moves.heavy.on_hit", "value": [{"do": [{"type": "knockdown"}]}]},
+     {"op": "time_scale", "path": "moves.heavy", "value": 1.15, "phase": "startup"}]}},
+   "ai": {"range": [0.0, 1.8], "hold": [0.35, 1.0]}},
+  "sludge_lob": {"name": "Sludge Lob", "category": "projectile", "use": "ability1",
+   "short": "Lob a glob of sludge (two charges) that leaves a puddle",
+   "desc": "Slurry lobs a glob of sludge at its target, up to nine metres away; it splats into a puddle that Gunks anyone standing in it for five seconds. It holds two charges. The glob is slow and arcs high: keep moving and it lands behind you.",
+   "styles": {
+    "triple_gland": {"name": "Triple Gland", "desc": "Holds three charges, but each glob hits a quarter softer and leaves a smaller puddle.", "patch": [
+     {"op": "set", "path": "abilities.ability1.charges", "value": 3},
+     {"op": "mul", "path": "abilities.ability1.effects[type=projectile].damage", "value": 0.75},
+     {"op": "mul", "path": "abilities.ability1.effects[type=projectile].on_expire.radius", "value": 0.8}]},
+    "long_lob": {"name": "Long Lob", "desc": "Reaches thirteen metres, and its puddle lasts eight seconds.", "patch": [
+     {"op": "set", "path": "abilities.ability1.effects[type=projectile].range", "value": 13.0},
+     {"op": "set", "path": "abilities.ability1.effects[type=projectile].on_expire.duration", "value": 8.0}]}},
+   "ai": {"range": [2.5, 9.0]}},
+  "drain_dive": {"name": "Drain Dive", "category": "utility", "use": "ability2",
+   "short": "Sink under the floor and erupt where the stick points",
+   "desc": "Slurry sinks into the floor, untouchable, and comes up to 4.5 metres away in the direction of the stick, erupting in a gooey burst that pops anyone close into the air. Surfacing in its own puddle takes three seconds off the cooldown. Watch the bubbles: they show where it will come up.",
+   "styles": {
+    "deep_dive": {"name": "Deep Dive", "desc": "Travels 6.5 metres under the floor instead of 4.5.", "patch": [
+     {"op": "set", "path": "abilities.ability2.effects[type=blink].distance", "value": 6.5}]},
+    "sinkhole": {"name": "Sinkhole", "desc": "Surfacing leaves a sludge puddle, so the dive always refunds three seconds, but the eruption no longer pops fighters up.", "patch": [
+     {"op": "append", "path": "abilities.ability2.effects[type=blink].on_emerge", "value": {"type": "zone", "kind": "sludge_puddle", "radius": 1.1, "duration": 4.0, "owner_immune": true}},
+     {"op": "set", "path": "abilities.ability2.effects[type=blink].on_emerge[type=area].launch", "value": 0.0}]}},
+   "ai": {"range": [0.0, 2.6], "when": [{"self_poise_below": 0.4}], "stick": "away"}},
+  "poison_darts": {"name": "Poison Darts", "category": "volley", "cooldown": 5, "cost": 8,
+   "short": "Spit three quick venom darts that stick and build Gunked",
+   "desc": "Slurry rears back and spits three venom darts at its target in a quick burst, reaching almost ten metres. Each dart that lands sticks for a few seconds, and while one is stuck every hit the target takes builds extra Gunked. The darts are small and fast, but a sidestep or a guard stops them, and a parry swats a dart away and staggers Slurry.",
+   "move": {"duration": 0.72, "stamina": 8, "move_mult": 0.15, "turn_rate": 7.0, "speed": 1.6, "element": "sludge",
+    "keys": [
+     {"t": 0.0},
+     {"t": 0.12, "lean": [-10, 0, 0], "height": 0.1, "joints": {"body2": [-14, 0, 0], "body1": [-12, 0, 0], "head": [34, 0, 0], "body4": [6, 0, 0]}},
+     {"t": 0.2, "lean": [4, 0, 0], "height": 0.06, "joints": {"body2": [-2, 0, 0], "body1": [10, 0, 0], "head": [-8, 0, 0], "body4": [4, 0, 0]}},
+     {"t": 0.26, "lean": [-4, 0, 0], "height": 0.08, "joints": {"body2": [-10, 0, 0], "body1": [-6, 0, 0], "head": [24, 6, 0], "body4": [4, 0, 0]}},
+     {"t": 0.32, "lean": [5, 0, 0], "height": 0.06, "joints": {"body2": [-1, 0, 0], "body1": [12, 4, 0], "head": [-10, 6, 0], "body4": [4, 0, 0]}},
+     {"t": 0.38, "lean": [-4, 0, 0], "height": 0.08, "joints": {"body2": [-10, 0, 0], "body1": [-6, 0, 0], "head": [24, -6, 0], "body4": [4, 0, 0]}},
+     {"t": 0.44, "lean": [6, 0, 0], "height": 0.05, "joints": {"body2": [0, 0, 0], "body1": [14, -4, 0], "head": [-12, -6, 0], "body4": [4, 0, 0]}},
+     {"t": 0.56, "lean": [1, 0, 0], "height": 0.02, "joints": {"body2": [2, 0, 0], "body1": [6, 0, 0], "head": [10, 0, 0], "body4": [2, 0, 0]}},
+     {"t": 0.72}],
+    "effects": [
+     {"t": 0.2, "type": "projectile", "from": "fang", "aim": "target", "speed": 22, "life": 0.45, "radius": 0.1,
+      "damage": 2.6, "knockback": 0.8, "stun": 0.2, "poise": 4, "element": "sludge", "buildup": 18, "parryable": true,
+      "every": 0.12, "until": 0.3, "vfx": "slurry_dart",
+      "status": {"id": "slurry_venom_dart", "name": "Venom Dart", "duration": 2.5, "hit_buildup": {"sludge": 6}}}]},
+   "styles": {
+    "fan_of_fangs": {"name": "Fan of Fangs", "desc": "All three darts leave at once in a 24° fan: harder to sidestep at range, but each hits a fifth softer.", "patch": [
+     {"op": "set", "path": "movepool.poison_darts.move.effects[type=projectile].every", "value": 0},
+     {"op": "set", "path": "movepool.poison_darts.move.effects[type=projectile].count", "value": 3},
+     {"op": "set", "path": "movepool.poison_darts.move.effects[type=projectile].spread_deg", "value": 24},
+     {"op": "mul", "path": "movepool.poison_darts.move.effects[type=projectile].damage", "value": 0.8}]},
+    "numbing_venom": {"name": "Numbing Venom", "desc": "A stuck dart also numbs: the target moves a fifth slower while it sticks.", "patch": [
+     {"op": "set", "path": "movepool.poison_darts.move.effects[type=projectile].status.speed", "value": 0.8}]}},
+   "ai": {"range": [2.2, 8.5], "when": [{"target_closing": true}, {"min": 3.2}]}},
+  "acid_spray": {"name": "Acid Spray", "category": "stream", "hold": "sustain", "max_hold": 1.8, "drain": 12, "aim": {"turn_rate": 2.6},
+   "cooldown": 6.5, "cost": 6,
+   "short": "Hold to hose a short, wide cone of acid; it Gunks fast",
+   "desc": "Slurry gapes and hoses acid over a wide 80° cone two metres deep for as long as the button is held (up to 1.8 seconds), swinging it with the stick. The acid Gunks a fighter in little more than a second, eats into guards and stops a soaked fighter's balance from recovering. It reaches no further than a long step: back off, dodge out to the side or hit Slurry while it pours.",
+   "move": {"duration": 0.9, "sustain": [0.26, 0.56], "stamina": 6, "move_mult": 0.1, "turn_rate": 2.6, "speed": 1.4, "element": "sludge",
+    "keys": [
+     {"t": 0.0},
+     {"t": 0.12, "lean": [-6, 0, 0], "height": 0.06, "joints": {"body2": [-10, 0, 0], "body1": [-14, 0, 0], "head": [32, 0, 0]}},
+     {"t": 0.26, "lean": [12, 0, 0], "height": -0.08, "joints": {"body2": [34, 0, 0], "body1": [10, -10, 0], "head": [-24, -16, 0]}},
+     {"t": 0.41, "lean": [12, 0, 0], "height": -0.1, "joints": {"body2": [36, 0, 0], "body1": [10, 10, 0], "head": [-26, 16, 0]}},
+     {"t": 0.56, "lean": [12, 0, 0], "height": -0.08, "joints": {"body2": [34, 0, 0], "body1": [10, -10, 0], "head": [-24, -16, 0]}},
+     {"t": 0.7, "lean": [3, 0, 0], "height": -0.02, "joints": {"body2": [10, 0, 0], "body1": [4, 0, 0], "head": [6, 0, 0]}},
+     {"t": 0.9}],
+    "effects": [
+     {"t": 0.26, "type": "area", "shape": "cone", "cone_deg": 80, "radius": 2.0, "damage": 1.6, "knockback": 0.4, "stun": 0.1, "poise": 1.5,
+      "element": "sludge", "buildup": 13, "guard_break": 3.0, "every": 0.15, "until": "release", "vfx": "slurry_acid",
+      "status": {"id": "slurry_corroded", "name": "Corroded", "duration": 1.0, "poise_regen": 0.0}}]},
+   "styles": {
+    "sticky_bile": {"name": "Sticky Bile", "desc": "The acid pools where it lingers, leaving sludge puddles on the floor.", "patch": [
+     {"op": "append", "path": "movepool.acid_spray.move.effects", "value": {"t": 0.4, "type": "zone", "kind": "sludge_puddle", "at": "forward:1.3", "radius": 0.8,
+      "duration": 3.0, "owner_immune": true, "every": 0.6, "until": "release"}}]},
+    "searing_acid": {"name": "Searing Acid", "desc": "A tighter 55° cone, 1.7 metres deep, that melts guards twice as fast.", "patch": [
+     {"op": "set", "path": "movepool.acid_spray.move.effects[type=area].cone_deg", "value": 55},
+     {"op": "set", "path": "movepool.acid_spray.move.effects[type=area].radius", "value": 1.7},
+     {"op": "mul", "path": "movepool.acid_spray.move.effects[type=area].guard_break", "value": 2.0}]}},
+   "ai": {"range": [0.0, 1.9], "hold": [0.8, 1.6]}},
+  "coil_crush": {"name": "Coil Crush", "category": "strike", "cooldown": 8, "cost": 12,
+   "short": "Lunge, coil round the target and squeeze; guards do not help",
+   "desc": "Slurry lunges at a target up to about two metres away and wraps its coils around it: the victim can neither guard nor dodge while coiled, takes three squeezes that build Gunked, then is crushed and thrown clear. Guarding does nothing against it, so dodge the lunge, stay out of reach, or punish the long recovery when it misses; hitting Slurry breaks the hold.",
+   "move": {"duration": 1.44, "stamina": 12, "move_mult": 0.0, "turn_rate": 3.0, "speed": 1.7, "element": "sludge",
+    "damage": 4, "knockback": 0.0, "pull": 0.6, "stun": 0.7, "poise": 10, "buildup": 15, "vmin": 1.0, "vref": 4.5, "unblockable": true,
+    "lunge": [[0.18, 0.38, 6.5]],
+    "hit": [{"t0": 0.24, "t1": 0.44, "weapons": ["coil", "body_upper", "head", "fang"]}],
+    "on_hit": [{"do": [{"type": "status", "status": {"id": "slurry_coiled", "name": "Coiled", "duration": 1.0, "speed": 0.2, "no_guard": true, "no_dodge": true}}]}],
+    "keys": [
+     {"t": 0.0},
+     {"t": 0.16, "lean": [-10, 0, 0], "height": 0.08, "joints": {"body2": [-16, 0, 0], "body1": [-14, 0, 0], "head": [36, 0, 0], "body4": [6, 18, 0], "body5": [4, 22, 0], "body6": [4, 24, 0]}},
+     {"t": 0.28, "lean": [30, 0, 0], "height": -0.14, "joints": {"body2": [52, 0, 0], "body1": [18, 0, 0], "head": [-34, 0, 0], "body4": [-14, 8, 0], "body5": [-4, 12, 0], "body6": [0, 14, 0]}},
+     {"t": 0.42, "lean": [22, 0, 0], "height": -0.16, "joints": {"body2": [42, 0, -22], "body1": [24, 0, -26], "head": [-6, 0, 18], "body4": [-6, 40, 0], "body5": [0, 40, 0], "body6": [0, 35, 0]}},
+     {"t": 0.52, "lean": [25, 0, 0], "height": -0.21, "joints": {"body2": [47, 0, -28], "body1": [29, 0, -32], "head": [-4, 0, 22], "body4": [-6, 48, 0], "body5": [0, 48, 0], "body6": [0, 42, 0]}},
+     {"t": 0.65, "lean": [22, 0, 0], "height": -0.16, "joints": {"body2": [42, 0, -22], "body1": [24, 0, -26], "head": [-6, 0, 18], "body4": [-6, 40, 0], "body5": [0, 40, 0], "body6": [0, 35, 0]}},
+     {"t": 0.78, "lean": [25, 0, 0], "height": -0.21, "joints": {"body2": [47, 0, -28], "body1": [29, 0, -32], "head": [-4, 0, 22], "body4": [-6, 48, 0], "body5": [0, 48, 0], "body6": [0, 42, 0]}},
+     {"t": 0.91, "lean": [22, 0, 0], "height": -0.16, "joints": {"body2": [42, 0, -22], "body1": [24, 0, -26], "head": [-6, 0, 18], "body4": [-6, 40, 0], "body5": [0, 40, 0], "body6": [0, 35, 0]}},
+     {"t": 1.04, "lean": [25, 0, 0], "height": -0.21, "joints": {"body2": [47, 0, -28], "body1": [29, 0, -32], "head": [-4, 0, 22], "body4": [-6, 48, 0], "body5": [0, 48, 0], "body6": [0, 42, 0]}},
+     {"t": 1.12, "lean": [10, 0, 0], "height": -0.04, "joints": {"body2": [20, 0, -10], "body1": [-8, 0, -10], "head": [32, 0, 6], "body4": [-6, 30, 0], "body5": [0, 24, 0], "body6": [0, 16, 0]}},
+     {"t": 1.2, "lean": [34, 0, 0], "height": -0.18, "joints": {"body2": [56, 0, 0], "body1": [24, 0, 0], "head": [-30, 0, 0], "body4": [-10, 0, 0], "body5": [-4, -8, 0], "body6": [0, -12, 0]}},
+     {"t": 1.32, "lean": [10, 0, 0], "height": -0.06, "joints": {"body2": [16, 0, 0], "body1": [8, 0, 0], "head": [4, 0, 0]}},
+     {"t": 1.44}],
+    "effects": [
+     {"t": 0.52, "type": "area", "at": "forward:0.75", "radius": 0.8, "damage": 2.2, "knockback": 1.2, "kb_dir": "toward", "stun": 0.55, "poise": 6,
+      "element": "sludge", "buildup": 14, "unblockable": true, "every": 0.26, "count": 3, "vfx": "slurry_coil_squeeze"},
+     {"t": 1.2, "type": "area", "at": "forward:0.8", "radius": 0.85, "damage": 4.5, "knockback": 5.0, "kb_dir": "forward", "launch": 1.2, "stun": 0.5, "poise": 26,
+      "element": "sludge", "buildup": 20, "unblockable": true, "vfx": "slurry_coil_crush"}]},
+   "styles": {
+    "strangler": {"name": "Strangler", "desc": "The crush no longer throws the victim clear: it stays coiled for half a second more, open to a follow-up.", "patch": [
+     {"op": "set", "path": "movepool.coil_crush.move.effects[vfx=slurry_coil_crush].knockback", "value": 0.6},
+     {"op": "set", "path": "movepool.coil_crush.move.on_hit[*].do[type=status].status.duration", "value": 1.7}]},
+    "lunging_coil": {"name": "Lunging Coil", "desc": "The lunge reaches half a metre further, but the coil-up before it is slower.", "patch": [
+     {"op": "set", "path": "movepool.coil_crush.move.lunge", "value": [[0.18, 0.4, 8.5]]},
+     {"op": "time_scale", "path": "movepool.coil_crush.move", "value": 1.2, "phase": "startup"}]}},
+   "ai": {"range": [0.4, 1.9], "when": [{"target_status": "sludge"}, {"target_cornered": true}, {"self_poise_below": 0.5}, {"chance": 0.3}]}},
+  "shed_skin": {"name": "Shed Skin", "category": "support", "role": "support", "cooldown": 12, "cost": 10,
+   "short": "Slip out of your skin: cleanse statuses and evade",
+   "desc": "Slurry shivers and slides back out of its old skin: every elemental status and all build-up are washed off, nothing can touch it for a moment, and its fresh scales take half build-up and move faster for 2.5 seconds. Use it to shrug off Sizzle or Jolted, or to slip a wind-up; it has a long cooldown, so a patient opponent waits it out.",
+   "move": {"duration": 0.62, "stamina": 10, "move_mult": 0.0, "turn_rate": 0.0, "speed": 1.8, "element": "sludge",
+    "invuln": [[0.04, 0.4]],
+    "keys": [
+     {"t": 0.0},
+     {"t": 0.05, "height": -0.04, "joints": {"body2": [2, 0, 12], "body1": [4, 0, -14], "head": [10, 0, 10], "body4": [0, 12, 0], "body5": [0, -14, 0]}},
+     {"t": 0.1, "height": -0.06, "joints": {"body2": [2, 0, -12], "body1": [4, 0, 14], "head": [10, 0, -10], "body4": [0, -12, 0], "body5": [0, 14, 0]}},
+     {"t": 0.16, "lean": [-16, 0, 0], "height": -0.2, "joints": {"body2": [-18, 0, 0], "body1": [-10, 0, 0], "head": [24, 0, 0], "body4": [8, 0, 0], "body5": [6, 0, 0]}},
+     {"t": 0.34, "lean": [-10, 0, 0], "height": -0.14, "joints": {"body2": [-12, 0, 0], "body1": [-6, 0, 0], "head": [18, 0, 0], "body4": [4, 0, 0], "body5": [2, 0, 0]}},
+     {"t": 0.48, "lean": [-2, 0, 0], "height": 0.02, "joints": {"body2": [0, 0, 0], "body1": [4, 0, 0], "head": [8, 0, 0]}},
+     {"t": 0.62}],
+    "effects": [
+     {"t": 0.1, "type": "cleanse", "vfx": "slurry_shed_skin"},
+     {"t": 0.1, "type": "buff", "vfx": "slurry_fresh_scales",
+      "status": {"id": "slurry_fresh_scales", "name": "Fresh Scales", "duration": 2.5, "speed": 1.15,
+       "buildup_received": {"scorch": 0.5, "brine": 0.5, "gale": 0.5, "grit": 0.5, "sludge": 0.5, "static": 0.5, "spectral": 0.5, "scrap": 0.5}}},
+     {"t": 0.12, "type": "dash", "speed": -7.5, "evade": true, "time": 0.3, "vfx": "slurry_shed_slip"}]},
+   "styles": {
+    "second_skin": {"name": "Second Skin", "desc": "The fresh scales also soak up the next 15 damage for 2.5 seconds.", "patch": [
+     {"op": "append", "path": "movepool.shed_skin.move.effects", "value": {"t": 0.1, "type": "shield", "amount": 15, "duration": 2.5}}]},
+    "venom_molt": {"name": "Venom Molt", "desc": "The old skin bursts into a sludge puddle where Slurry stood, Gunking whoever follows it in.", "patch": [
+     {"op": "append", "path": "movepool.shed_skin.move.effects", "value": {"t": 0.1, "type": "area", "radius": 1.1, "damage": 3, "knockback": 2.0, "stun": 0.2,
+      "poise": 6, "element": "sludge", "buildup": 25, "vfx": "slurry_molt_burst"}},
+     {"op": "append", "path": "movepool.shed_skin.move.effects", "value": {"t": 0.1, "type": "zone", "kind": "sludge_puddle", "radius": 1.2, "duration": 4.0, "owner_immune": true}}]}},
+   "ai": {"reactive": true, "range": [0.0, 4.0], "when": [{"target_winding": true, "max": 2.2, "chance": 0.4}, {"in_enemy_zone": true}, {"self_poise_below": 0.35, "chance": 0.6}]}}
+ },
+ "loadouts": {
+  "venomous": {"name": "Venomous", "moves": ["venom_fangs", "poison_darts", "sludge_lob", "drain_dive"]},
+  "swamp": {"name": "Swamp", "moves": ["venom_fangs", "acid_spray", "coil_crush", "shed_skin"]}
+ },
+ "default_loadout": "venomous"
 }

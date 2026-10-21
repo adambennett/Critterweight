@@ -188,3 +188,121 @@ All data-driven, none keyed to a fighter id; unit tests in `test_kit_extensions_
 - Fang Snap's pull is knockback, so it is mass-scaled: 0.4–0.7 m on Jitters but under 0.1 m on
   heavy bodies (dev_biped, another Slurry) without Lockjaw.
 - Gulp-and-Spit trajectory (above).
+
+## Movesets (v0.9.18)
+
+In Movesets (the default combat style, `docs/design/MOVESET_COMBAT.md` §4) Slurry fights with four
+moves equipped from an eight-move pool; everything above is Classic and unchanged. Data: the
+`movepool`, `loadouts` and `default_loadout` blocks of `f_slurry.json`. Effects:
+`game/src/view/fx/moves/f_slurry.gd`. Tests: `game/src/test/kits/test_moves_slurry.gd`.
+
+### The pool
+
+| Move | Category | Input | How to use it | What it is for |
+|---|---|---|---|---|
+| **Venom Fangs** (basic) ★A ★B | strike | tap, tap… | Head Butt → Tail Flick → Fang Snap → Venom Spit (the 4th press); out of a dodge, Slither Strike. No cooldown. | The string that is always there; every hit builds Gunked, Fang Snap yanks the target in. |
+| **Tail Sweep** | strike (heavy) | tap / hold | Tap: Tail Sweep (trips Gunked fighters). Hold to rear up (armour against light hits while rearing), release for Rear & Crash (guard-crush, sludge puddle). | The big committal hit. Not in either recommended build. |
+| **Sludge Lob** ★A | projectile | tap | The v0.9.17 lob: two charges (7 s each), a puddle that Gunks for 5 s. | Zoning; puddles power Slither Strike and the Drain Dive refund. |
+| **Drain Dive** ★A | utility | tap + stick | The v0.9.17 dive: untouchable for 0.5 s, comes up 4.5 m along the stick in a gooey burst; −3 s cooldown when it surfaces in its own puddle. | Escape when rushed, or engage from range. |
+| **Poison Darts** ★A | volley | tap | Three darts spat 0.12 s apart from the fangs at the target (22 m/s, about 10 m): 2.6 damage and 18 Gunked each. A landed dart sticks for 2.5 s (Venom Dart: every hit the target takes builds +6 Gunked). Parryable. Cooldown 5 s, 8 stamina. | A fast poke that interrupts an approach and primes Gunked for the lobs and the string. |
+| **Acid Spray** ★B | stream | hold (≤ 1.8 s) | A short, wide cone (80°, 2 m) from the jaws, a tick every 0.15 s while held: 1.6 damage, 13 Gunked, `guard_break` 3 and Corroded (no poise recovery for 1 s). Drains 12 stamina/s; the stick swings it at 2.6 rad/s. Cooldown 6.5 s, 6 stamina. | Smothering at close range: Gunked in about a second of contact, guards melt, and the target cannot get its balance back for a Coil Crush or Tail Sweep. |
+| **Coil Crush** ★B | strike | tap | A 0.24 s coil-up, then a 1.3 m lunge: the unblockable wrap (4 damage) leaves the target **Coiled** for 1 s (cannot guard or dodge, speed ×0.2); three squeezes 0.26 s apart (2.2 damage, 14 Gunked, drawn in) and the crush (4.5 damage, 26 poise, thrown clear). 1.44 s in all. Cooldown 8 s, 12 stamina. | The guard-breaker: punishes turtles and Gunked targets. |
+| **Shed Skin** ★B | support | tap | Untouchable from 0.04 to 0.4 s, washes off every elemental status and all build-up, slides about 1.2 m back; **Fresh Scales** for 2.5 s (build-up ×0.5, speed ×1.15). Cooldown 12 s, 10 stamina. | Shrugging off Sizzle, Jolted or Haunted, and slipping a wind-up. |
+
+### Loadouts
+
+* **A — Venomous** (default): Venom Fangs, Poison Darts, Sludge Lob, Drain Dive. *Poke and dive*:
+  darts and lobs at range prime Gunked and lay puddles, Drain Dive gets out when rushed (refunded in
+  its own puddles), Fang Snap and Slither Strike punish whoever wades in.
+* **B — Swamp**: Venom Fangs, Acid Spray, Coil Crush, Shed Skin. *Close in, smother, squeeze*: the
+  spray Gunks and corrodes, Coil Crush squeezes through any guard, Shed Skin answers statuses and
+  wind-ups on the way in.
+
+### Styles (drills)
+
+| Move | Style | What changes |
+|---|---|---|
+| Venom Fangs | Spitting Cobra | the Venom Spit sprays three half-strength globs in a 24° fan |
+| | Barbed Fangs | Fang Snap yanks twice as hard; Head Butt and Fang Snap build ×1.5 Gunked |
+| Tail Sweep | Quick Coil | rears up into Rear & Crash in half the time |
+| | Undertow | every Tail Sweep trips, Gunked or not; its wind-up is 15 % slower |
+| Sludge Lob | Triple Gland | three charges; each glob ×0.75 damage, puddle ×0.8 radius |
+| | Long Lob | 13 m range; the puddle lasts 8 s |
+| Drain Dive | Deep Dive | 6.5 m under the floor |
+| | Sinkhole | surfacing leaves a puddle (so it always refunds 3 s); the burst no longer launches |
+| Poison Darts | Fan of Fangs | all three darts at once in a 24° fan, ×0.8 damage each |
+| | Numbing Venom | a stuck dart also slows the target to ×0.8 speed |
+| Acid Spray | Sticky Bile | the acid leaves 0.8 m sludge puddles where it lingers (one per 0.6 s) |
+| | Searing Acid | a 55°, 1.7 m cone that drains guards twice as fast |
+| Coil Crush | Strangler | the crush barely knocks back and Coiled lasts 1.7 s: about half a second free after the move |
+| | Lunging Coil | the lunge reaches about 0.5 m further; the coil-up is 20 % slower |
+| Shed Skin | Second Skin | also a 15-point shield for 2.5 s |
+| | Venom Molt | the old skin bursts (3 damage, 25 Gunked) into a 1.2 m puddle where Slurry stood |
+
+### Tips and counters
+
+* After a dart volley, keep hitting: while a dart is stuck, every hit builds 6 more Gunked. Against
+  Slurry, sidestep the burst or guard it; a parry timed on the first dart destroys it and staggers
+  Slurry out of the rest.
+* Acid Spray reaches 2 m and turns at 2.6 rad/s: back out of it or dodge to the side. Guarding only
+  melts the guard (and Gunked makes guarding cost more).
+* Coil Crush ignores guards, not dodges or counters: the coil-up is a clear 0.24 s tell, a counter
+  stance (Anchor Drop, Toll) answers the wrap, and a whiff leaves Slurry stuck for about a second.
+  Hitting Slurry during the squeeze ends the hold.
+* Shed Skin has a 12 s cooldown: bait it out, then apply the status.
+
+### How it is built
+
+| Move | Engine features |
+|---|---|
+| Poison Darts | one projectile effect with `every 0.12`, `until 0.3` (three firings on the move clock; `count` would also multiply the darts of every firing), `aim: target`, `parryable`, `status` Venom Dart with `hit_buildup {sludge: 6}` |
+| Acid Spray | `hold: sustain`, `sustain [0.26, 0.56]` (the loop sweeps the head side to side), `max_hold` 1.8, `drain` 12, `aim.turn_rate` 2.6; a cone area `every 0.15` `until: release` carrying the Corroded status (`poise_regen` 0) |
+| Coil Crush | melee wrap with `unblockable`, `pull` 0.6 and an inline `on_hit` → `status` Coiled (`no_guard`, `no_dodge`, `speed` 0.2); squeezes: an area `every 0.26`, `count 3`, `unblockable`, `kb_dir: toward` (repeat ticks: 30 % hype, no stamina refund, at most one stun per 0.5 s, so the 0.26 s spacing lets the first and third squeezes re-stun and the hold has no gap before the crush); crush: an area with `kb_dir: forward`. The effects stop if Slurry is interrupted. |
+| Shed Skin | `invuln [[0.04, 0.4]]`, `cleanse`, a `buff` (Fresh Scales: `buildup_received` ×0.5 for every element, `speed` 1.15) and a backward `dash` (`speed` −7.5, `evade`) |
+
+### Effects (`f_slurry.gd`)
+
+* **Poison Darts**: venom wells up in the fangs while Slurry rears back; each spit puffs green
+  droplets. A dart is a glossy black needle with a glowing venom bead at the tip and Slurry's pink
+  barb at the tail, trailing a fine mist; a landed dart sticks in the victim's body on Slurry's side
+  and rides it for 2.5 s (three at most per fighter), then works loose.
+* **Acid Spray**: acid bubbles gather at the jaws; while held, a flat, wide fan of acid pours from
+  the jaws, follows the head as it hoses side to side, is exactly as wide as the cone and meets the
+  floor at its reach; each tick throws droplets and gobs that rain down and hiss, and the true
+  footprint flickers. Released, it dribbles off; cut off, it dies with the move.
+* **Coil Crush**: goo is wrung out of the body during the coil-up; the wrap winds thick, glossy
+  sludge coils up the victim (sized to its girth) that ride it, clench on every squeeze and fly
+  apart in a sludge wave on the crush. Knocked out of the move, Slurry lets go; a whiff wrings only
+  a little goo out of the air.
+* **Shed Skin**: the old skin stays standing in Slurry's exact pose (a translucent shell over every
+  body part), sags and flakes away; a slick smear marks the slip; the fresh scales gleam while they
+  last.
+* Effects quality: particles come from the shared presets (scaled down at Low); darts, coils, the
+  spray and the husk are combat cues and always draw, trails and gleams are skipped at Low.
+  Reduce flashing dims the venom glow and the spray.
+
+### Bots
+
+`ai` hints per move (bot_brain `_moves_think`): Poison Darts at 2.2–8.5 m when the target closes
+in or stands beyond 3.2 m; Acid Spray within 1.9 m, held 0.8–1.6 s and kept on the target; Coil
+Crush at 0.4–1.9 m on a Gunked or cornered target, when Slurry's own poise is low, or now and then;
+Shed Skin reactively against a wind-up within 2.2 m, in an enemy zone, or at low poise. Sludge Lob
+and Drain Dive keep their v0.9.17 hints. (The bot conditions have no "I carry a status" test, so
+bots cannot yet use Shed Skin as a cleanse on purpose.)
+
+### Tests
+
+`test_moves_slurry.gd` (12 tests, all pass): the pool, both loadouts and every style patch (each
+patch hits a real field and the drilled creature still parses); a duel per move against Dredge
+(the dart burst's spacing, hits, attribution, sticking, extra Gunked and parry; the spray's ticks
+while held, Gunked, Corroded, stamina drain, stop on release and stick steering; Coil Crush through
+a held guard: Coiled, three squeezes, the crush, a whiff's commitment; Shed Skin's cleanse,
+invulnerability, slip and halved build-up; the string, the lob, the dive and the charged heavy);
+and the effects kit headless (registration, darts that fly, stick, ride and clean up, the spray's
+life and width, coils that clench, ride, burst and let go, the husk, Low quality, Reduce flashing).
+
+Known gap: `test_kit_f_slurry.gd` (the Classic coverage above) builds its fights through
+`kit_sj_helpers.duel()`, which sets no `combat` rule, so they run in Movesets; there the Heavy input
+is Poison Darts, the per-row light strings do not reach the pool's string, and cooldowns live in
+loadout slots (`m3`, `m4`). Until that shared helper pins `"combat": "classic"` (as
+`TestCase.make_sim` does for the pre-v0.9.18 tests), 7 of its 15 tests fail.
