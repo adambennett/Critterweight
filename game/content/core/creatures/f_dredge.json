@@ -742,5 +742,177 @@
       "ability1": {"min": 3, "max": 7},
       "ability2": {"max": 2.4, "when": [{"self_poise_below": 0.4}, {"target_heavy": true}]}
     }
-  }
+  },
+  "movepool": {
+    "claw_snap": {"name": "Claw Snap", "category": "strike", "role": "basic", "string": ["l1", "l2", "l3", "finisher"], "dash": "dash_attack",
+      "short": "Snip, backhand, double clamp, then the Bilge Pump",
+      "desc": "Dredge's claw string: the Cutter Snip, the Backhand Claw sweep and the Double Clamp, then the Bilge Pump shove that splats a fighter against the cage wall. Press again to keep it going; out of a dodge it is the Scuttle Check shell charge, stronger out of a sideways scuttle. Every claw builds Soaked, and the Double Clamp holds a Soaked fighter longer.",
+      "styles": {
+        "pistol_shrimp": {"name": "Pistol Shrimp", "desc": "The Bilge Pump fires a cavitation snap: a small brine shockwave around the claw that also clips anyone beside the target.", "patch": [
+          {"op": "append", "path": "moves.finisher.on_hit", "value": {"do": [{"type": "area", "radius": 1.1, "damage": 3, "knockback": 3.0, "stun": 0.2, "poise": 8,
+            "element": "brine", "buildup": 15, "vfx": "dredge_cavitation"}]}}]},
+        "tidepool_grip": {"name": "Tidepool Grip", "desc": "The Backhand Claw and the Double Clamp drag the target back in instead of shoving it away, so the whole string stays in claw range.", "patch": [
+          {"op": "set", "path": "moves.l2.pull", "value": 0.4}, {"op": "set", "path": "moves.l3.pull", "value": 0.4}]}},
+      "ai": {"range": [0.0, 1.4]}},
+    "crusher_slam": {"name": "Crusher Slam", "category": "strike", "role": "heavy", "use": "heavy", "charged": "heavy_charged", "hold": "charge",
+      "short": "Overhead claw slam and its floor wave; hold for the Hull Breaker",
+      "desc": "The crusher claw rises overhead, armoured on the way up, and slams down, sending a 3.5-metre brine wave along the floor that trips Soaked fighters. Hold the button to keep the claw raised and release into the Hull Breaker: a guard-crushing slam that leaves a brine puddle. The raised claw is a long, readable wind-up: step off its line or punish the recovery.",
+      "styles": {
+        "riptide_wave": {"name": "Riptide Wave", "desc": "The slam's floor wave rolls five metres and soaks much harder, so it trips Soaked fighters from further away and soaks the rest on the way.", "patch": [
+          {"op": "set", "path": "moves.heavy.effects[type=area].length", "value": 5.0},
+          {"op": "set", "path": "moves.heavy.effects[type=area].buildup", "value": 20}]},
+        "keelhaul": {"name": "Keelhaul", "desc": "The Hull Breaker hooks its target: it hauls them in and always knocks them flat, but the charged slam comes down slower.", "patch": [
+          {"op": "set", "path": "moves.heavy_charged.knockdown", "value": true},
+          {"op": "set", "path": "moves.heavy_charged.pull", "value": 0.5},
+          {"op": "time_scale", "path": "moves.heavy_charged", "value": 1.12}]}},
+      "ai": {"range": [0.0, 1.5], "hold": [0.4, 1.0]}},
+    "tide_spit": {"name": "Tide Spit", "category": "projectile", "use": "ability1",
+      "short": "A lobbed glob of seawater that leaves a brine puddle",
+      "desc": "Dredge spits a glob of seawater in an arc at his target, up to seven metres away: it soaks whoever it hits and leaves a brine puddle for five seconds where it lands. The arc is slow and the glob can be reflected: sidestep it, or keep moving.",
+      "styles": {
+        "skipping_spit": {"name": "Skipping Spit", "desc": "The glob skips once off the floor before it bursts, carrying on past a fighter who stepped back and leaving its puddle further along.", "patch": [
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].bounce", "value": 1},
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].life", "value": 2.4}]},
+        "brine_bomb": {"name": "Brine Bomb", "desc": "The glob bursts where it lands in a 1.6-metre splash that soaks and shoves everyone around it, on top of the puddle.", "patch": [
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].on_expire", "value": [
+            {"type": "area", "radius": 1.6, "damage": 4, "knockback": 3.5, "stun": 0.25, "poise": 8, "element": "brine", "buildup": 30, "vfx": "dredge_spit_splash"},
+            {"type": "zone", "kind": "brine_puddle", "radius": 1.2, "duration": 5}]}]}},
+      "ai": {"range": [3.0, 7.0]}},
+    "anchor_drop": {"name": "Anchor Drop", "category": "counter", "use": "ability2",
+      "short": "A planted counter stance: strike him and get snapped",
+      "desc": "Dredge drops his weight and plants both claws for two and a half seconds: he cannot walk, shrugs off every hit and takes half the knockback, and any strike that lands on him is answered with a claw snap. Grabs and projectiles beat it, so drop anchor when someone commits to a melee rush.",
+      "styles": {
+        "keel_over": {"name": "Keel Over", "desc": "The counter-snap knocks the attacker off their feet instead of just shoving them away.", "patch": [
+          {"op": "set", "path": "abilities.ability2.effects[type=counter_stance].counter.knockdown", "value": true}]},
+        "sea_wall": {"name": "Sea Wall", "desc": "While he is anchored, a wall of water in front of him washes away incoming projectiles, so the stance stops shots too.", "patch": [
+          {"op": "append", "path": "abilities.ability2.effects", "value": {"t": 0.15, "type": "destroy_projectiles", "radius": 1.8, "cone_deg": 150, "every": 0.1, "until": 2.4}}]}},
+      "ai": {"range": [0.0, 2.4], "when": [{"self_poise_below": 0.4}, {"target_heavy": true}]}},
+    "bubble_stream": {"name": "Bubble Stream", "category": "stream", "hold": "sustain", "max_hold": 2.5, "drain": 9, "aim": {"turn_rate": 1.9},
+      "cooldown": 6, "cost": 6,
+      "short": "Hold to blow drifting bubbles that soak and stop shots",
+      "desc": "Dredge blows a stream of slow brine bubbles from his mouth for as long as the button is held (up to 2.5 seconds); the stick sweeps it, slowly. The bubbles drift about four metres and pop on whoever they touch for small hits that quickly build Soaked, and they soak up enemy shots that fly into them. They are slow: sidestep the stream or get behind it.",
+      "move": {"duration": 0.9, "sustain": [0.3, 0.6], "stamina": 6, "move_mult": 0.15, "turn_rate": 1.9, "speed": 1.2, "element": "brine",
+        "keys": [
+          {"t": 0},
+          {"t": 0.12, "chains": {"arm_l": [0.3, 0.8, 0.84], "arm_r": [-0.34, 0.82, 0.82]}, "joints": {"head": [-16, 0, 0]}, "lean": [-6, 0, 0], "height": 0.06},
+          {"t": 0.3, "chains": {"arm_l": [0.82, 0.8, 0.7], "arm_r": [-0.86, 0.82, 0.68]}, "joints": {"head": [6, 0, 0]}, "lean": [5, 0, 0], "height": -0.02},
+          {"t": 0.45, "chains": {"arm_l": [0.72, 0.88, 0.8], "arm_r": [-0.76, 0.9, 0.78]}, "joints": {"head": [0, 0, 0]}, "lean": [2, 0, 0], "height": 0.01},
+          {"t": 0.6, "chains": {"arm_l": [0.82, 0.8, 0.7], "arm_r": [-0.86, 0.82, 0.68]}, "joints": {"head": [6, 0, 0]}, "lean": [5, 0, 0], "height": -0.02},
+          {"t": 0.9}],
+        "effects": [
+          {"t": 0.3, "type": "projectile", "offset": [0, 0.66, 0.62], "speed": 2.6, "life": 1.55, "radius": 0.22, "gravity": -0.15,
+           "damage": 1.8, "knockback": 0.6, "stun": 0.12, "poise": 2, "element": "brine", "buildup": 9, "guard_break": 2.5,
+           "intercept": true, "burst_on_hit": false, "every": 0.15, "until": "release", "vfx": "dredge_bubble"}]},
+      "styles": {
+        "froth_fan": {"name": "Froth Fan", "desc": "Every puff blows two bubbles in a 30° fan: a wider screen that catches sidesteps and more shots, with smaller pops.", "patch": [
+          {"op": "set", "path": "movepool.bubble_stream.move.effects[type=projectile].count", "value": 2},
+          {"op": "set", "path": "movepool.bubble_stream.move.effects[type=projectile].spread_deg", "value": 30},
+          {"op": "mul", "path": "movepool.bubble_stream.move.effects[type=projectile].damage", "value": 0.6},
+          {"op": "mul", "path": "movepool.bubble_stream.move.effects[type=projectile].buildup", "value": 0.6}]},
+        "bubble_mines": {"name": "Bubble Mines", "desc": "Fewer, bigger bubbles that crawl out and hang in the air for three seconds, bursting in a soaking splash when they pop on their own: a minefield to close off a path.", "patch": [
+          {"op": "set", "path": "movepool.bubble_stream.move.effects[type=projectile].speed", "value": 1.2},
+          {"op": "set", "path": "movepool.bubble_stream.move.effects[type=projectile].life", "value": 3.0},
+          {"op": "set", "path": "movepool.bubble_stream.move.effects[type=projectile].radius", "value": 0.3},
+          {"op": "set", "path": "movepool.bubble_stream.move.effects[type=projectile].gravity", "value": -0.05},
+          {"op": "set", "path": "movepool.bubble_stream.move.effects[type=projectile].every", "value": 0.25},
+          {"op": "set", "path": "movepool.bubble_stream.move.effects[type=projectile].on_expire", "value": [
+            {"type": "area", "radius": 0.9, "damage": 2.5, "knockback": 1.5, "stun": 0.15, "poise": 4, "element": "brine", "buildup": 14, "repeat_hit": true,
+             "vfx": "dredge_bubble_pop"}]}]}},
+      "ai": {"range": [0.4, 3.4], "hold": [0.9, 2.0], "when": [{"projectile_incoming": true}, {"target_ranged": true}, {"chance": 0.7}]}},
+    "hydro_cannon": {"name": "Hydro Cannon", "category": "blast", "hold": "charge", "cooldown": 9, "cost": 14,
+      "short": "Hold to pump the crusher claw full, release a water beam",
+      "desc": "Dredge levels his crusher claw and pumps it full of seawater: hold the button to charge (up to 1.2 seconds) and let go to fire. A tap squirts a short jet; a full charge fires a six-metre beam that hits hard, blasts the target down the cage and slides Dredge back on the recoil. The charge and the long recovery are wide open: rush him, or stay off the line.",
+      "move": {"duration": 1.45, "charge_time": 1.2, "charge_at": 0.32, "stamina": 14, "move_mult": 0.0, "turn_rate": 1.4, "speed": 1.1, "element": "brine",
+        "keys": [
+          {"t": 0},
+          {"t": 0.14, "chains": {"arm_l": [0.52, 0.42, 0.96], "arm_r": [-0.74, 0.92, 0.46]}, "joints": {"head": [-10, 0, 0]}, "lean": [-5, 0, 0], "height": -0.03},
+          {"t": 0.32, "chains": {"arm_l": [0.2, 0.52, 1.0], "arm_r": [-0.16, 0.78, 1.12]}, "joints": {"head": [12, 0, 0]}, "lean": [6, 0, 0], "height": -0.1},
+          {"t": 0.42, "chains": {"arm_l": [0.2, 0.5, 1.02], "arm_r": [-0.14, 0.76, 1.16]}, "joints": {"head": [14, 0, 0]}, "lean": [8, 0, 0], "height": -0.11},
+          {"t": 0.5, "chains": {"arm_l": [0.36, 0.62, 0.9], "arm_r": [-0.3, 1.0, 0.88]}, "joints": {"head": [-12, 0, 0]}, "lean": [-12, 0, 0], "height": 0.02},
+          {"t": 0.85, "chains": {"arm_l": [0.42, 0.66, 0.92], "arm_r": [-0.44, 0.84, 0.92]}, "joints": {"head": [-4, 0, 0]}, "lean": [-6, 0, 0], "height": -0.02},
+          {"t": 1.45}],
+        "effects": [
+          {"t": 0.44, "type": "area", "shape": "line", "length": 3.6, "width": 0.9, "damage": 7, "knockback": 4.0, "launch": 0.5, "stun": 0.45, "poise": 22,
+           "element": "brine", "buildup": 30, "guard_break": 2.5, "vfx": "dredge_hydro_beam",
+           "charge_scale": {"damage": 2.6, "length": 1.67, "width": 1.35, "knockback": 2.4, "launch": 4.0}},
+          {"t": 0.44, "type": "recoil", "speed": 2.4, "vfx": "dredge_hydro_kick", "charge_scale": {"speed": 2.5}}]},
+      "styles": {
+        "wide_bore": {"name": "Wide Bore", "desc": "A wide nozzle: the cannon fires a 40° spray instead of a beam, four metres deep at full charge. It is easy to land up close, with less reach and knockback.", "patch": [
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=area].shape", "value": "cone"},
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=area].cone_deg", "value": 40},
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=area].radius", "value": 2.6},
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=area].knockback", "value": 3.0},
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=area].charge_scale", "value": {"damage": 2.3, "radius": 1.55, "knockback": 2.0, "launch": 3.0}}]},
+        "riptide": {"name": "Riptide", "desc": "The beam hauls instead of blasting: whatever it hits is dragged along the water toward Dredge, into claw range, and the recoil is gentler.", "patch": [
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=area].kb_dir", "value": "toward"},
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=area].knockback", "value": 2.6},
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=area].launch", "value": 0.0},
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=area].vfx", "value": "dredge_riptide_beam"},
+          {"op": "set", "path": "movepool.hydro_cannon.move.effects[type=recoil].speed", "value": 1.2}]}},
+      "ai": {"range": [1.6, 5.6], "hold": [0.7, 1.6], "when": [{"target_ranged": true}, {"chance": 0.5}]}},
+    "whirlpool": {"name": "Whirlpool", "category": "control", "cooldown": 11, "cost": 12,
+      "short": "A whirlpool ahead that drags fighters in and soaks them",
+      "desc": "Dredge stirs the water with both claws and drives them into the floor: a whirlpool almost five metres across opens just in front of him for three and a half seconds. It yanks everyone inside toward its centre and keeps dragging them there, slowed and soaking. Walk or dodge out across the rim before it closes; fighters hovering above the floor drift over it.",
+      "move": {"duration": 0.95, "stamina": 12, "move_mult": 0.0, "turn_rate": 3.0, "speed": 1.3, "element": "brine",
+        "keys": [
+          {"t": 0},
+          {"t": 0.12, "chains": {"arm_l": [0.62, 1.12, 0.72], "arm_r": [-0.66, 1.15, 0.7]}, "joints": {"head": [-14, 0, 0]}, "lean": [-8, 0, 0], "height": 0.06},
+          {"t": 0.24, "chains": {"arm_l": [0.86, 0.92, 0.8], "arm_r": [-0.2, 1.0, 1.06]}, "joints": {"head": [-8, 12, 0]}, "lean": [-4, 16, 0], "height": 0.04},
+          {"t": 0.34, "chains": {"arm_l": [0.24, 1.0, 1.04], "arm_r": [-0.9, 0.94, 0.78]}, "joints": {"head": [-8, -12, 0]}, "lean": [-3, -16, 0], "height": 0.04},
+          {"t": 0.44, "chains": {"arm_l": [0.4, 0.14, 1.04], "arm_r": [-0.44, 0.12, 1.08]}, "joints": {"head": [10, 0, 0]}, "lean": [12, 0, 0], "height": -0.12},
+          {"t": 0.62, "chains": {"arm_l": [0.42, 0.16, 1.02], "arm_r": [-0.46, 0.14, 1.06]}, "joints": {"head": [8, 0, 0]}, "lean": [10, 0, 0], "height": -0.1},
+          {"t": 0.95}],
+        "effects": [
+          {"t": 0.46, "type": "area", "at": "forward:1.6", "radius": 2.4, "damage": 3, "knockback": 2.0, "kb_dir": "toward", "strength": -5.0, "stun": 0.15,
+           "poise": 8, "element": "brine", "buildup": 20, "vfx": "dredge_whirl_open"},
+          {"t": 0.48, "type": "zone", "kind": "brine_puddle", "at": "forward:1.6", "radius": 2.4, "duration": 3.5, "tick": 0.4, "tick_damage": 1.0, "buildup": 12,
+           "push_out": -4.0, "owner_immune": true, "affects_allies": false, "skip_zone_reaction": true,
+           "status": {"id": "dredge_undertow", "name": "Undertow", "duration": 0.5, "speed": 0.8}, "vfx": "dredge_whirlpool"}]},
+      "styles": {
+        "eye_of_the_storm": {"name": "Eye of the Storm", "desc": "The whirlpool opens around Dredge himself and travels with him for three seconds, dragging anyone near him into his claws.", "patch": [
+          {"op": "set", "path": "movepool.whirlpool.move.effects[type=area].at", "value": "self"},
+          {"op": "set", "path": "movepool.whirlpool.move.effects[type=area].radius", "value": 2.2},
+          {"op": "set", "path": "movepool.whirlpool.move.effects[type=zone].at", "value": "self"},
+          {"op": "set", "path": "movepool.whirlpool.move.effects[type=zone].radius", "value": 2.2},
+          {"op": "set", "path": "movepool.whirlpool.move.effects[type=zone].duration", "value": 3.0},
+          {"op": "set", "path": "movepool.whirlpool.move.effects[type=zone].push_out", "value": -3.0},
+          {"op": "set", "path": "movepool.whirlpool.move.effects[type=zone].follow_owner", "value": true}]},
+        "geyser": {"name": "Geyser", "desc": "When the whirlpool closes, its eye erupts in a geyser that launches anyone still caught in the middle and soaks them through.", "patch": [
+          {"op": "set", "path": "movepool.whirlpool.move.effects[type=zone].on_expire", "value": [
+            {"type": "area", "radius": 1.4, "damage": 6, "knockback": 1.0, "launch": 4.5, "stun": 0.4, "poise": 20, "element": "brine", "buildup": 35,
+             "vfx": "dredge_geyser"}]}]}},
+      "ai": {"range": [1.0, 4.0], "when": [{"min": 2.2}, {"target_ranged": true}, {"self_poise_below": 0.4}]}},
+    "shell_brace": {"name": "Shell Brace", "category": "support", "role": "support", "cooldown": 12, "cost": 10,
+      "short": "Three seconds of shell: less damage and knockback, slower feet",
+      "desc": "Dredge clamps his claws over his eyes and hunkers down under his shell: for three seconds he takes 40% less damage and half the knockback, but walks slower. Use it to wade through a flurry or to hold his ground in someone's face. It does not stop a grab, and a braced crab is slow to chase: back off and wait it out.",
+      "move": {"duration": 0.6, "stamina": 10, "move_mult": 0.0, "turn_rate": 4.0, "speed": 1.4, "element": "brine",
+        "keys": [
+          {"t": 0},
+          {"t": 0.1, "chains": {"arm_l": [0.3, 0.98, 0.76], "arm_r": [-0.32, 1.0, 0.74]}, "joints": {"head": [14, 0, 0]}, "lean": [-3, 0, 0], "height": -0.04},
+          {"t": 0.2, "chains": {"arm_l": [0.18, 0.86, 0.7], "arm_r": [-0.2, 0.9, 0.66]}, "joints": {"head": [28, 0, 0]}, "lean": [4, 0, 0], "height": -0.18},
+          {"t": 0.27, "chains": {"arm_l": [0.18, 0.84, 0.7], "arm_r": [-0.2, 0.88, 0.66]}, "joints": {"head": [28, 0, 0]}, "lean": [4, 0, 5], "height": -0.19},
+          {"t": 0.34, "chains": {"arm_l": [0.18, 0.86, 0.7], "arm_r": [-0.2, 0.9, 0.66]}, "joints": {"head": [28, 0, 0]}, "lean": [4, 0, -5], "height": -0.18},
+          {"t": 0.42, "chains": {"arm_l": [0.2, 0.86, 0.72], "arm_r": [-0.22, 0.9, 0.68]}, "joints": {"head": [24, 0, 0]}, "lean": [3, 0, 0], "height": -0.17},
+          {"t": 0.6}],
+        "effects": [
+          {"t": 0.2, "type": "buff", "duration": 3.0, "vfx": "dredge_shell_brace",
+           "status": {"id": "shell_braced", "name": "Shell Brace", "duration": 3.0, "damage_taken": 0.6, "knockback_taken": 0.5, "speed": 0.7}}]},
+      "styles": {
+        "barnacle_crust": {"name": "Barnacle Crust", "desc": "Barnacles bristle on the braced shell: a fighter who lands a hit on him up close is cut by a burst of shell shards (at most every 0.8 seconds).", "patch": [
+          {"op": "set", "path": "movepool.shell_brace.move.effects[type=buff].status.hooks", "value": [
+            {"on": "hit_taken", "if": {"distance_below": 1.9}, "cooldown": 0.8, "do": [
+              {"type": "area", "at": "self", "radius": 1.5, "damage": 3, "knockback": 3.0, "stun": 0.2, "poise": 6, "element": "brine", "buildup": 10,
+               "vfx": "dredge_barnacle_burst"}]}]}]},
+        "hunker_down": {"name": "Hunker Down", "desc": "Dredge digs in deeper: light strikes cannot stagger him and the brace lasts four seconds, but he moves at half speed.", "patch": [
+          {"op": "set", "path": "movepool.shell_brace.move.effects[type=buff].status.armor_lights", "value": true},
+          {"op": "set", "path": "movepool.shell_brace.move.effects[type=buff].status.duration", "value": 4.0},
+          {"op": "set", "path": "movepool.shell_brace.move.effects[type=buff].status.speed", "value": 0.5},
+          {"op": "set", "path": "movepool.shell_brace.move.effects[type=buff].duration", "value": 4.0}]}},
+      "ai": {"range": [0.0, 3.0], "reactive": true, "when": [{"target_heavy": true, "max": 3.0}, {"self_health_below": 0.5, "chance": 0.5}, {"target_closing": true, "chance": 0.4}]}}
+  },
+  "loadouts": {
+    "tidecaller": {"name": "Tidecaller", "moves": ["claw_snap", "bubble_stream", "hydro_cannon", "anchor_drop"]},
+    "breakwater": {"name": "Breakwater", "moves": ["claw_snap", "crusher_slam", "whirlpool", "shell_brace"]}
+  },
+  "default_loadout": "tidecaller"
 }
