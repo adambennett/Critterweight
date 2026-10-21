@@ -34,7 +34,9 @@
       "id": "cmt17_0003",
       "speaker": "barnaby",
       "trigger": "stoppage",
-      "when": {},
+      "when": {
+        "ends": "fight"
+      },
       "priority": 100,
       "text": "The referee steps in! It's a T.K.O., and nobody in this building is arguing!",
       "families": [
@@ -64,7 +66,9 @@
       "id": "cmt17_0005",
       "speaker": "barnaby",
       "trigger": "stoppage",
-      "when": {},
+      "when": {
+        "ends": "fight"
+      },
       "priority": 100,
       "text": "It's over by stoppage! Somebody bring the loser a very comfortable chair!",
       "families": [
@@ -78,7 +82,9 @@
       "id": "cmt17_0006",
       "speaker": "barnaby",
       "trigger": "stoppage",
-      "when": {},
+      "when": {
+        "ends": "fight"
+      },
       "priority": 100,
       "text": "The referee says no more! Technical knockout, folks, technically wonderful!",
       "families": [
@@ -107,7 +113,9 @@
       "id": "cmt17_0008",
       "speaker": "barnaby",
       "trigger": "stoppage",
-      "when": {},
+      "when": {
+        "ends": "fight"
+      },
       "priority": 100,
       "text": "And the referee stops it! That's enough trips to the canvas for one night!",
       "families": [
@@ -121,7 +129,9 @@
       "id": "cmt17_0009",
       "speaker": "barnaby",
       "trigger": "stoppage",
-      "when": {},
+      "when": {
+        "ends": "fight"
+      },
       "priority": 100,
       "text": "Waved off by the referee! Your winner by T.K.O.: {w}!",
       "families": [
@@ -135,7 +145,9 @@
       "id": "cmt17_0010",
       "speaker": "barnaby",
       "trigger": "stoppage",
-      "when": {},
+      "when": {
+        "ends": "fight"
+      },
       "priority": 100,
       "text": "T.K.O.! The referee calls it, and your winner is {w}!",
       "families": [
@@ -150,7 +162,8 @@
       "speaker": "barnaby",
       "trigger": "stoppage",
       "when": {
-        "who": "player"
+        "who": "player",
+        "ends": "fight"
       },
       "priority": 100,
       "text": "You did it, kid! The referee stops it and the night is yours!",
@@ -166,7 +179,8 @@
       "speaker": "barnaby",
       "trigger": "stoppage",
       "when": {
-        "target": "player"
+        "target": "player",
+        "ends": "fight"
       },
       "priority": 100,
       "text": "The referee's done the kind thing, kid. Rest up. We'll see you back here.",
@@ -3037,7 +3051,9 @@
       "id": "cmt17_0200",
       "speaker": "barnaby",
       "trigger": "first_hit",
-      "when": {},
+      "when": {
+        "round": "first"
+      },
       "priority": 45,
       "text": "First touch of the night! Somebody's warmed up and somebody's not!",
       "families": [],
@@ -3063,7 +3079,9 @@
       "id": "cmt17_0202",
       "speaker": "barnaby",
       "trigger": "first_hit",
-      "when": {},
+      "when": {
+        "round": "first"
+      },
       "priority": 45,
       "text": "First bruise of the fight! Glandco reminds you that bruises are temporary!",
       "families": [
@@ -3386,7 +3404,8 @@
       "speaker": "barnaby",
       "trigger": "knockdown",
       "when": {
-        "scoring": "ten_point"
+        "scoring": "ten_point",
+        "counted": true
       },
       "priority": 80,
       "text": "DOWN! That's a knockdown, and it's going straight onto the scorecards!",
@@ -3402,7 +3421,8 @@
       "speaker": "barnaby",
       "trigger": "knockdown",
       "when": {
-        "scoring": "ten_point"
+        "scoring": "ten_point",
+        "counted": true
       },
       "priority": 80,
       "text": "Knocked DOWN! The judges are writing that one in capital letters!",
@@ -3418,7 +3438,8 @@
       "speaker": "barnaby",
       "trigger": "knockdown",
       "when": {
-        "referee": true
+        "referee": true,
+        "counted": true
       },
       "priority": 80,
       "text": "DOWN they go! The referee's on it, folks, here comes the count!",

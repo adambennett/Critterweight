@@ -253,16 +253,21 @@ func test_ten_point_and_referee_event_mapping() -> void:
 	check((lines.call(acts) as Array).is_empty(), "no decision line at a 10-point bell (%s)" % str(acts))
 	acts = Audio.on_sim_event({"type": "round_scored", "round": 1, "teams": [0, 1], "judges": [[10, 9], [10, 9], [10, 9]], "winner": 0})
 	check(acts.has("ui_card_flip"), "the scorecard turns over (%s)" % str(acts))
-	# Health scoring keeps the old decision call at time (a match is judged one way throughout)
+	# Health scoring: the bell rings at every timeout; the decision call comes with the round_end
+	# that settles the bout, and names its real winner (never just the local player)
 	Audio.end_match()
 	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_stoke", "name": "STOKE", "team": 0},
 		{"index": 1, "creature": "f_dredge", "name": "DREDGE", "team": 1}], "arena": "the_gullet", "seed": 13})
 	acts = Audio.on_sim_event({"type": "timeout"})
+	check(acts.has("ann_bell") and (lines.call(acts) as Array).is_empty(), "HP timeout: the bell, no call before the result is known (%s)" % str(acts))
+	_subs.clear()
+	acts = Audio.on_sim_event({"type": "round_end", "winner": 1, "round": 1, "decided": true})
 	var hp_call := ""
 	for a0 in acts:
 		if str(a0).begins_with("line:"):
 			hp_call = str(a0).trim_prefix("line:")
-	check(acts.has("ann_bell") and str(Audio.line(hp_call).get("when", {}).get("kind", "")) == "decision", "HP timeout still goes to the cards (%s)" % str(acts))
+	check(str(Audio.line(hp_call).get("when", {}).get("kind", "")) == "decision", "HP timeout still goes to the cards (%s)" % str(acts))
+	check(not _subs.is_empty() and not str(_subs[-1]["text"]).contains("STOKE"), "and the cards name the winner: %s" % str(_subs))
 	Audio.stop_announcer()
 	Audio.end_match()
 	Audio.begin_match({"player_index": 0, "fighters": [{"index": 0, "creature": "f_stoke", "name": "STOKE", "team": 0},

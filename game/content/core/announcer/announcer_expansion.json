@@ -2114,7 +2114,8 @@
       "trigger": "getup",
       "id": "ann_exp_0137",
       "when": {
-        "referee": true
+        "referee": true,
+        "counted": true
       },
       "families": [
         "floor",
@@ -2151,7 +2152,8 @@
       "trigger": "knockdown",
       "id": "ann_exp_0139",
       "when": {
-        "scoring": "ten_point"
+        "scoring": "ten_point",
+        "counted": true
       },
       "families": [
         "scorekeeping"
@@ -2168,7 +2170,10 @@
       "priority": 22,
       "trigger": "knockdown",
       "id": "ann_exp_0140",
-      "when": {},
+      "when": {
+        "referee": true,
+        "counted": true
+      },
       "families": [
         "officials",
         "crowd",
@@ -2245,7 +2250,8 @@
       "trigger": "getup",
       "id": "ann_exp_0145",
       "when": {
-        "referee": true
+        "referee": true,
+        "counted": true
       },
       "families": [
         "officials",
@@ -2494,7 +2500,8 @@
       "trigger": "knockdown",
       "id": "ann_exp_0160",
       "when": {
-        "scoring": "ten_point"
+        "scoring": "ten_point",
+        "counted": true
       },
       "families": [
         "scorekeeping",
@@ -2566,7 +2573,8 @@
       "trigger": "knockdown",
       "id": "ann_exp_0165",
       "when": {
-        "referee": true
+        "referee": true,
+        "counted": true
       },
       "families": [
         "notes",

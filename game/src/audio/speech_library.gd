@@ -134,9 +134,10 @@ func _expand(line: Dictionary, vars: Dictionary, context: Dictionary) -> Array:
 func _token(voice: String, token: String, value: String, context: Dictionary) -> Array:
 	var vocabulary: Dictionary = catalog.get("tokens", {}).get(voice, {})
 	if token == "w":
-		# the winner's name at the climax of a result call, in its ceremonial take when recorded
+		# the winner's name at the climax of a result call, in its ceremonial take when that name was
+		# recorded ceremonially; any other name keeps its normal take (never another fighter's name)
 		var ceremony: Dictionary = catalog.get("tokens", {}).get(voice + "_ceremony", {})
-		if not ceremony.is_empty():
+		if not ceremony.is_empty() and spoken_name(value.strip_edges().to_lower(), ceremony, {}) != "":
 			vocabulary = ceremony
 	var normalized := value.strip_edges().to_lower()
 	var words: Array = []

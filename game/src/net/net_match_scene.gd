@@ -126,6 +126,8 @@ func start(info_: Dictionary, replica_: NetReplica, client_: NetClient = null) -
 	# audio bridge on the mirror: impacts, voices, crowd, announcer and music like local play
 	var seed_v := int(info.get("match_id", 1))
 	var ctx := "coop" if str((info.get("rules", {}) as Dictionary).get("format", "")) == "coop" else "versus"
+	if my_index < 0:
+		ctx = "spectate"      # an online spectator: nobody in the cage is "you"
 	_audio_bridge = Audio.attach_match(mirror.sim, my_index, {"context": ctx, "seed": seed_v})
 	Audio.music(_default_music(), 1.5, {"seed": seed_v})
 	if not Audio.subtitle.is_connected(hud.subtitle):

@@ -33,6 +33,7 @@ const COLOR_LULL := 7.0         ## ... before booth color
 const TALK_WINDOW := 30.0
 const TALK_BUDGET_LOW := 0.55   ## low/color requests yield above this share of talk
 const TALK_BUDGET_MEDIUM := 0.8
+const MAX_LINE_SECONDS := 12.0  ## no recorded line is longer: an open talk interval ends by then
 
 var fighters: Array = []        ## [{index, creature, name, team}]
 var player_index := 0
@@ -55,6 +56,10 @@ var _rng := RandomNumberGenerator.new()
 var _color_next_at := 14.0      ## the first color line is never right at the bell
 var _conversation_done := false
 var _pending_ko := {}           ## a KO call waiting for its round_end (does it end the bout or a round?)
+var _pending_stop := {}         ## a referee stoppage waiting for its round_end (the bout, or one round?)
+var _timeout_pending := false   ## Health scoring: the clock ran out; the round_end says who it went to
+var _kd_counted := {}           ## fighter -> whether its last knockdown was a counted (strike) knockdown
+var _cards_close := false       ## 10-point: the final cards were close (split/majority or 1-point margins)
 var _round_wins := {}           ## team -> rounds won (best-of formats: match point)
 var _taunted_at := {}           ## fighter -> time of its last taunt (a punished taunt)
 var _stamina_low := {}          ## fighter -> already called
@@ -88,6 +93,11 @@ func begin(ctx: Dictionary) -> void:
 	_taunted_at.clear()
 	_stamina_low.clear()
 	_sudden_death = false
+	_pending_ko = {}
+	_pending_stop = {}
+	_timeout_pending = false
+	_kd_counted.clear()
+	_cards_close = false
 	_last_round_end = ""
 	_finish = ""
 	_st = _new_round_state()
@@ -104,6 +114,9 @@ func _new_round_state() -> Dictionary:
 # ---- talk accounting (Audio reports what was actually spoken) -----------------------------------
 
 func note_line_started(start_t: float) -> void:
+	# a line that was cut off (interrupted by a bigger call) never reports its end: it ends here
+	if not _talk.is_empty() and float(_talk.back()[1]) < 0.0:
+		_talk.back()[1] = start_t
 	_talk.append([start_t, -1.0])
 
 
@@ -113,14 +126,15 @@ func note_line_finished(end_t: float) -> void:
 	last_line_end_t = end_t
 
 
-## Share of the last TALK_WINDOW seconds spent talking.
+## Share of the last TALK_WINDOW seconds spent talking. An interval still open after
+## MAX_LINE_SECONDS (a line whose end was never reported) counts only that long.
 func talk_share() -> float:
 	var from := t - TALK_WINDOW
 	var sum := 0.0
 	var keep: Array = []
 	for iv in _talk:
 		var s := float(iv[0])
-		var e := float(iv[1]) if float(iv[1]) >= 0.0 else t
+		var e := float(iv[1]) if float(iv[1]) >= 0.0 else minf(t, s + MAX_LINE_SECONDS)
 		if e < from:
 			continue
 		keep.append(iv)
@@ -196,32 +210,57 @@ func _ability_damages(i: int, slot: String) -> bool:
 	return false
 
 
+## Whether this match has a local player the booth talks to ("kid"). Spectating (local or online)
+## and demos have none: lines addressed to the player or about "your opponent" never fit there.
+func _has_player() -> bool:
+	return player_index >= 0 and context != "spectate"
+
+
 func _is_player(i: int) -> bool:
-	return i == player_index and context != "spectate"
+	return _has_player() and i == player_index
 
 
-## {who, target} relative to the local player, plus {p}/{o} vars naming the actual fighters.
+## A fighter on another team than the local player (never a teammate).
+func _is_rival(i: int) -> bool:
+	return _has_player() and i >= 0 and i != player_index and _team(i) != _team(player_index)
+
+
+## {who, target} relative to the local player (empty without one).
 func _who(attacker: int, target: int) -> Dictionary:
 	var d := {}
 	if _is_player(attacker):
 		d["who"] = "player"
-	elif _is_player(target):
+	elif _is_player(target) and (attacker < 0 or _is_rival(attacker)):
 		d["who"] = "opponent"
 	if _is_player(target):
 		d["target"] = "player"
-	elif target >= 0:
+	elif _is_rival(target):
 		d["target"] = "opponent"
 	return d
 
 
-## Names for a line about attacker a and target b: {p} = the side the line is about.
+## Names for a line about fighters a (the actor) and b (the other side). The booth's {p}/{o} lines
+## are written from the local player's corner: whenever the player is involved {p} names the
+## player and {o} the other fighter ("{o} gets there first. Shake it off, {p}"); without the player
+## {p} is the actor. Result calls set {w} (the winner) explicitly.
 func _vars(a: int, b: int) -> Dictionary:
+	var first := a
+	var second := b
+	if _is_player(b) and not _is_player(a):
+		first = b
+		second = a
 	var v := {}
-	if a >= 0 and _name(a) != "":
-		v["p"] = _name(a)
-	if b >= 0 and _name(b) != "":
-		v["o"] = _name(b)
+	if first >= 0 and _name(first) != "":
+		v["p"] = _name(first)
+	if second >= 0 and _name(second) != "":
+		v["o"] = _name(second)
 	return v
+
+
+## The winner's name(s) for {w}: the members of `team` joined with "&" ({} for no team).
+func _winner_vars(team: int) -> Dictionary:
+	var tn := _team_names(team)
+	return {"w": tn["w"]} if tn.has("w") else {}
 
 
 func _ready(key: String) -> bool:
@@ -282,6 +321,8 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 		"round_start":
 			round_no = int(ev.get("round", round_no))
 			_st = _new_round_state()
+			_sudden_death = false
+			_timeout_pending = false
 			_action(t)
 			var cr := {}
 			if round_no >= 2:
@@ -332,7 +373,9 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 		"getup":
 			if _ready("getup") and not finished and int((_st["kd"] as Dictionary).get(fi, 0)) > 0:
 				_cool_for("getup", 18.0)
-				out.append(_req("getup", _who(-1, fi), "low", _vars(fi, -1), {"ttl": 2.0, "tag": "round"}))
+				var cg := _who(-1, fi)
+				cg["counted"] = bool(_kd_counted.get(fi, false))
+				out.append(_req("getup", cg, "low", _vars(fi, -1), {"ttl": 2.0, "tag": "round"}))
 		"ref_count":
 			# the first count of the bout gets a word; later ones are the referee's own business
 			if int(ev.get("n", 0)) == 2 and _ready("ref_count"):
@@ -343,16 +386,15 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 				_cool_for("ref_wave", 20.0)
 				out.append(_req("referee", {"kind": "wave_up"}, "medium", _vars(fi, -1), {"ttl": 2.0, "tag": "round"}))
 		"ref_stoppage":
-			finished = true
-			_finish = "stopped"
 			_action(t)
 			var by := int(ev.get("by", -1))
 			var cs := _who(by, fi)
 			cs["kind"] = ["stoppage"]
 			var sv := _vars(by, fi)
-			if sv.has("p"):
-				sv["w"] = sv["p"]
-			out.append(_req("stoppage", cs, "critical", sv, {"tag": "result", "energy": "high"}))
+			sv.merge(_winner_vars(_team(by) if by >= 0 else _other_team(_team(fi))), true)
+			# held until the same tick's round_end says whether it ends the bout or only a round
+			# (Health scoring: a stoppage ends the round and a best-of goes on)
+			_pending_stop = _req("stoppage", cs, "critical", sv, {"tag": "result", "energy": "high"})
 		"ko":
 			_action(t)
 			# held until the same tick's round_end says whether it decides the bout
@@ -388,9 +430,9 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 				out.append(_req("big_hit", cw, "medium", _vars(att, fi), {"energy": "high"}))
 		"ringout":
 			_action(t)
-			var cr2 := _who(int(ev.get("by", -1)), fi)
+			var cr2 := {}
 			if _is_player(fi):
-				cr2["who"] = "player"
+				cr2["who"] = "player"      # the player went over ("{p} goes off the roof!")
 			out.append(_req("ringout", cr2, "high", _vars(int(ev.get("by", -1)), fi), {"energy": "high"}))
 		"throw":
 			_action(t)
@@ -414,10 +456,12 @@ func on_event(ev: Dictionary, info: Dictionary) -> Array:
 				_cool_for("taunt", 20.0)
 				out.append(_req("taunt", ct, "low", _vars(fi, -1), {"ttl": 1.6}))
 		"timeout":
-			if not ten_point:
-				out.append(_req("time", {"kind": "decision"}, "critical", {}, {"tag": "result"}))
+			# Health scoring: every round's clock ends in a timeout; the round_end that follows says
+			# whether it decided the bout and for whom (a tie goes to sudden death instead)
+			_timeout_pending = not ten_point
 		"sudden_death":
 			_sudden_death = true
+			_timeout_pending = false
 			out.append(_req("time", {"kind": "sudden_death"}, "high", {}, {"energy": "high"}))
 		"arena_hazard":
 			if str(ev.get("phase", "")) == "active" and _ready("hazard"):
@@ -503,6 +547,15 @@ func _on_hit(ev: Dictionary, info: Dictionary) -> Array:
 	if slot in ["zone", "reaction", "throw", "slam", "pummel"] or fi < 0:
 		return out
 	_touched(fi)
+	# an ability that touched someone (landed, blocked or parried) did not miss: resolve its pending
+	# check first, whatever is called below (each cast has its own entry)
+	var landed_ability := {}
+	if slot.begins_with("ability") or slot == "effect":
+		for p in _pending:
+			if str(p["kind"]) == "ability" and int(p["fighter"]) == fi and not bool(p.get("cancel", false)):
+				p["cancel"] = true
+				landed_ability = p
+				break
 	if bool(ev.get("blocked", false)) or bool(ev.get("parried", false)):
 		_action(t)
 		if bool(ev.get("blocked", false)):
@@ -545,25 +598,25 @@ func _on_hit(ev: Dictionary, info: Dictionary) -> Array:
 	# a taunt answered with a hit
 	if t - float(_taunted_at.get(ti, -100.0)) < 2.5 and _ready("taunt_punished"):
 		_taunted_at.erase(ti)
+		_st["first_hit"] = true
 		_cool_for("taunt_punished", 20.0)
 		return [_req("taunt_punished", {"kind": "punished"}, "medium", _vars(fi, ti), {"ttl": 1.6, "energy": "high"})]
 	# 1. first damaging touch of the round
 	if not bool(_st["first_hit"]):
 		_st["first_hit"] = true
 		var c1 := who.duplicate()
+		c1["round"] = "first" if round_no <= 1 else "2plus"     # "first hit of the night" only once
 		if heavy:
 			c1["kind"] = "heavy"
 		out.append(_req("first_hit", c1, "medium", names, {"ttl": 2.0}))
 		return out
 	# 2. the ability that landed (melee abilities hit with their slot, projectiles and areas as "effect")
-	if slot.begins_with("ability") or slot == "effect":
-		for p in _pending:
-			if str(p["kind"]) == "ability" and int(p["fighter"]) == fi:
-				p["cancel"] = true
-				if _ready("ability_hit:" + str(p["id"])):
-					_cool_for("ability_hit:" + str(p["id"]), 22.0)
-					out.append(_req("ability_hit", {"creature": _creature(fi), "id": str(p["id"])}, "medium", names, {"ttl": 1.6}))
-				return out
+	if not landed_ability.is_empty():
+		var aid := str(landed_ability["id"])
+		if _ready("ability_hit:" + aid):
+			_cool_for("ability_hit:" + aid, 22.0)
+			out.append(_req("ability_hit", {"creature": _creature(fi), "id": aid}, "medium", names, {"ttl": 1.6}))
+		return out
 	# 3. big moments
 	var kinds: Array = []
 	if bool(ev.get("counter", false)):
@@ -626,6 +679,11 @@ func _on_knockdown(ev: Dictionary, info: Dictionary) -> Array:
 	var reason := str(ev.get("reason", "hit"))
 	var att := int(ev.get("by", (_st["last_attacker"] as Dictionary).get(fi, -1)))
 	var ck := _who(att, fi)
+	# the referee counts and the judges score strike knockdowns by an opponent only (never throws,
+	# trips or hazards): count and scorecard lines need this (RoundJudge.is_strike_knockdown)
+	var counted := reason in RoundJudge.STRIKE_KD_REASONS and att >= 0 and att != fi and _team(att) != _team(fi)
+	ck["counted"] = counted
+	_kd_counted[fi] = counted
 	var kinds: Array = []
 	if reason in ["poise", "throw", "trip"]:
 		kinds.append(reason)
@@ -687,6 +745,34 @@ func _release_ko(ends: String) -> Array:
 	return [r]
 
 
+## The held stoppage call: "fight" (it ends the bout: T.K.O., the winner named) or "round" (Health
+## scoring with rounds to go: the round is stopped, the bout goes on; final-sounding lines are gated
+## on ends "fight").
+func _release_stop(ends: String) -> Array:
+	if _pending_stop.is_empty():
+		return []
+	var r := _pending_stop
+	_pending_stop = {}
+	(r["ctx"] as Dictionary)["ends"] = ends
+	if ends == "fight":
+		finished = true
+		_finish = "stopped"
+	else:
+		r["class"] = "high"
+		r["priority"] = int(CLASS_PRIORITY["high"])
+		r["tag"] = "round"
+	return [r]
+
+
+## The other team in a two-team match (-1 when unknown).
+func _other_team(team: int) -> int:
+	for f in fighters:
+		var tm := int(f.get("team", -1))
+		if tm != team and tm >= 0:
+			return tm
+	return -1
+
+
 func _on_ability(ev: Dictionary) -> Array:
 	var out: Array = []
 	var fi := int(ev.get("fighter", -1))
@@ -709,6 +795,14 @@ func _on_round_end(ev: Dictionary) -> Array:
 	var decided := bool(ev.get("decided", false))
 	if winner_team >= 0:
 		_round_wins[winner_team] = int(_round_wins.get(winner_team, 0)) + 1
+	var sudden := _sudden_death
+	_sudden_death = false
+	var timed_out := _timeout_pending
+	_timeout_pending = false
+	if not _pending_stop.is_empty():
+		# a referee stoppage ended this round: its call says it all (no "Bell!" on top)
+		_last_round_end = "ko"
+		return _release_stop("fight" if decided or ten_point or rounds <= 1 else "round")
 	if not _pending_ko.is_empty():
 		# a knockout ended this round: its call says it all
 		_last_round_end = "ko"
@@ -720,28 +814,32 @@ func _on_round_end(ev: Dictionary) -> Array:
 		_finish = "time"
 	if decided:
 		finished = true
-	if ten_point or rounds <= 1 or decided:
+	if ten_point:
 		return out
-	var wf := -1
-	for f in fighters:
-		if int(f.get("team", -9)) == winner_team:
-			wf = int(f.get("index", -1))
-			break
+	if sudden and winner_team >= 0:
+		# one touch settled a tied round (Health scoring)
+		out.append(_req("time", {"kind": "sudden_death_won"}, "critical" if decided else "high", _team_names(winner_team),
+			{"tag": "result" if decided else "round"}))
+		return out
+	if decided:
+		if timed_out and winner_team >= 0:
+			# the clock decided the bout: "the cards say {p}" names the real winner
+			out.append(_req("time", {"kind": "decision"}, "critical", _team_names(winner_team), {"tag": "result"}))
+		return out
+	if rounds <= 1:
+		return out
 	var c := {"kind": "won" if winner_team >= 0 else "even"}
-	if wf >= 0 and _is_player(wf):
-		c["who"] = "player"
-	elif wf >= 0:
-		c["who"] = "opponent"
-	var rv := _vars(wf, -1)
-	if rv.has("p"):
-		rv["w"] = rv["p"]
-	out.append(_req("round_end", c, "high", rv, {"ttl": 3.0, "follow": {"trigger": "round_break", "ctx": {"round_end": "time"},
-		"class": "color", "ttl": 3.0}}))
+	if _has_player() and winner_team >= 0:
+		c["who"] = "player" if winner_team == _team(player_index) else "opponent"
+	out.append(_req("round_end", c, "high", _winner_vars(winner_team), {"ttl": 3.0, "follow": {"trigger": "round_break",
+		"ctx": {"round_end": "time"}, "class": "color", "ttl": 3.0}}))
 	return out
 
 
 func _on_round_scored(ev: Dictionary) -> Array:
 	var out: Array = []
+	if not _pending_stop.is_empty():
+		return out        # a stoppage ended the bout: the T.K.O. call says it, not the round's card
 	var judges: Array = ev.get("judges", [])
 	var winner_team := int(ev.get("winner", -1))
 	var margin := 0
@@ -783,14 +881,19 @@ func _on_decision(ev: Dictionary, info: Dictionary) -> Array:
 			wf = int(f.get("index", -1))
 			break
 	var names := _team_names(wt)
+	_cards_close = _close_cards(ev.get("totals", []), method)
 	if wt >= 0 and method.begins_with("Sudden Death"):
+		finished = true
 		out.append(_req("time", {"kind": "sudden_death_won"}, "critical", names, {"tag": "result"}))
 		return out
 	if wt < 0:
 		if not bool(info.get("sudden_death_follows", false)):
+			finished = true
 			_st["draw_announced"] = true
 			out.append(_req("draw", {"kind": "decision"}, "critical", {}, {"tag": "result"}))
 		return out
+	# the cards decided the bout: the ceremony that follows is no time for whiffs or colour
+	finished = true
 	_finish = "decision"
 	var kind := "unanimous"
 	var lower := method.to_lower()
@@ -803,6 +906,19 @@ func _on_decision(ev: Dictionary, info: Dictionary) -> Array:
 		c["who"] = "player"
 	out.append(_req("decision", c, "critical", names, {"tag": "result", "energy": "high"}))
 	return out
+
+
+## 10-point: a split or majority decision, or no card wider than one point, is a close fight.
+static func _close_cards(totals, method: String) -> bool:
+	var lower := method.to_lower()
+	if lower.contains("split") or lower.contains("majority"):
+		return true
+	if typeof(totals) != TYPE_ARRAY or (totals as Array).is_empty():
+		return false
+	for c in totals:
+		if typeof(c) != TYPE_ARRAY or (c as Array).size() < 2 or absi(int(c[0]) - int(c[1])) > 1:
+			return false
+	return true
 
 
 func _team_names(team: int) -> Dictionary:
@@ -834,7 +950,10 @@ func _on_match_end(ev: Dictionary, _info: Dictionary) -> Array:
 		c["who"] = "player" if wf >= 0 and _is_player(wf) else "opponent"
 	var names := _team_names(w)
 	var rc := {"finish": _finish if _finish != "" else "stopped"}
-	if _health.size() >= 2:
+	if ten_point:
+		# 10-point holds health full: closeness comes from the cards
+		rc["close"] = _cards_close and _finish == "decision"
+	elif _health.size() >= 2:
 		var lo := 1.0
 		var hi := 0.0
 		for h in _health:
@@ -854,7 +973,9 @@ func on_tick(health: Array, time_left: float, dt: float, info := {}) -> Array:
 	var out: Array = []
 	t += dt
 	_health = health.duplicate()
-	# a KO whose tick brought no round_end: an elimination in a match that continues
+	# a stoppage whose tick brought no round_end ends the bout; a KO without one is an elimination
+	# in a match that continues
+	out.append_array(_release_stop("fight"))
 	out.append_array(_release_ko("none"))
 	# deferred checks (whiffs, evasions, throws, ability results)
 	var keep: Array = []
@@ -937,14 +1058,18 @@ func _watch_health(health: Array) -> Array:
 		var h2 := float(health[i])
 		if h2 < 0.2 and h2 > 0.0 and not bool(low.get(i, false)):
 			low[i] = true
-			var ctx := {"who": "player" if _is_player(i) else "opponent"}
+			var ctx := {}
+			if _is_player(i):
+				ctx["who"] = "player"
+			elif _is_rival(i):
+				ctx["who"] = "opponent"      # a teammate in trouble is neither ("they're nearly done, kid!")
 			if low_count >= 2:
 				ctx["who"] = "both"
 			if h2 < 0.1:
 				ctx["kind"] = "ten"
 			if context == "coop":
 				ctx["context"] = "coop"
-			out.append(_req("low_health", ctx, "medium", _vars(i, -1), {"ttl": 3.0}))
+			out.append(_req("low_health", ctx, "medium", _vars(i, player_index if _is_rival(i) else -1), {"ttl": 3.0}))
 		elif h2 >= 0.3:
 			low[i] = false
 	_st["low"] = low
@@ -976,14 +1101,21 @@ func _watch_momentum(health: Array) -> Array:
 			continue
 		var my_hp := float(health[me])
 		var best_other := 0.0
+		var leader := -1
 		for j in health.size():
-			if j != me and _team(j) != _team(me):
-				best_other = maxf(best_other, float(health[j]))
+			if j != me and _team(j) != _team(me) and float(health[j]) >= best_other:
+				best_other = float(health[j])
+				leader = j
 		if mine >= 20.0 and mine >= 2.2 * theirs and my_hp + 0.2 < best_other and int(_st.get("momentum_owner", -1)) != me:
 			_st["momentum_owner"] = me
 			_cool_for("momentum", 30.0)
-			var c := {"who": "player" if _is_player(me) else "opponent"}
-			out.append(_req("comeback", c, "medium", _vars(me, -1), {"ttl": 3.0, "energy": "high"}))
+			var c := {}
+			if _is_player(me):
+				c["who"] = "player"
+			elif _is_rival(me):
+				c["who"] = "opponent"
+			# "{o} is swinging back, {p}!": the one coming back and the one they are catching
+			out.append(_req("comeback", c, "medium", _vars(me, leader), {"ttl": 3.0, "energy": "high"}))
 			break
 	return out
 
