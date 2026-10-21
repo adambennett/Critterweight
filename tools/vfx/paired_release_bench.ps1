@@ -37,7 +37,7 @@ $reserve = Join-Path $env:TEMP "critterweight_release.reserve"
 Set-Content -LiteralPath $reserve -Value "paired bench $PID"
 while ($null -eq $lock) {
 	try { $lock = [System.IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') }
-	catch { Write-Host "waiting for the full-suite lock"; Start-Sleep -Seconds 15 }
+	catch { Write-Host "waiting for the full-suite lock"; Set-Content -LiteralPath $reserve -Value "paired bench $PID"; Start-Sleep -Seconds 15 }
 }
 $results = @()
 try {

@@ -50,6 +50,7 @@ while ($null -eq $lock) {
 	try { $lock = [System.IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') }
 	catch {
 		if (-not $announced) { Write-Host "waiting for the test lock (another checkout or agent is running Godot tests)"; $announced = $true }
+		if ($Filter -eq "") { Set-Content -LiteralPath $reserve -Value "full suite $PID" }   # keep the reservation while waiting
 		if ((Get-Date) -gt $deadline) { Write-Host "gave up waiting for the test lock"; exit 99 }
 		Start-Sleep -Seconds $(if ($Filter -eq "") { 15 } else { 3 })
 	}

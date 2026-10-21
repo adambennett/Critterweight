@@ -25,7 +25,7 @@ $reserve = Join-Path $env:TEMP "critterweight_release.reserve"
 Set-Content -LiteralPath $reserve -Value "commentary audit $PID"
 while ($null -eq $lock) {
 	try { $lock = [System.IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') }
-	catch { Write-Host "waiting for the test lock"; Start-Sleep -Seconds 10 }
+	catch { Write-Host "waiting for the test lock"; Set-Content -LiteralPath $reserve -Value "commentary audit $PID"; Start-Sleep -Seconds 10 }
 }
 New-Item -ItemType Directory -Force $Out | Out-Null
 $root = Join-Path $Out "user_root"

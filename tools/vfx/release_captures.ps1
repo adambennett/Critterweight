@@ -24,7 +24,7 @@ $lock = $null
 $lockPath = Join-Path $env:TEMP "critterweight_full_suite.lock"
 while ($null -eq $lock) {
 	try { $lock = [System.IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') }
-	catch { Write-Host "waiting for the test lock"; Start-Sleep -Seconds 10 }
+	catch { Write-Host "waiting for the test lock"; Set-Content -LiteralPath $reserve -Value "release captures $PID"; Start-Sleep -Seconds 10 }
 }
 $want = $Steps.Split(",")
 New-Item -ItemType Directory -Force $Out | Out-Null
