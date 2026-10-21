@@ -62,7 +62,8 @@ Linux:    ./CritterweightServer.x86_64 --headless -- --server --config server.cf
 * Command-line overrides (validated like the file): `--port N`, `--name "Text"`, `--password X`,
   `--max-players N`, `--playlist <id|path>`, `--log-level <level>`, `--admin-port N`,
   `--admin-token X`, `--bind <ip>`, `--discovery-port N`, `--lobby-time S`, `--results-time S`,
-  `--empty idle|showcase`, `--mods id1,id2`, `--mods-dir <dir>`, `--user-root <dir>`.
+  `--empty idle|showcase`, `--mods id1,id2`, `--mods-dir <dir>`, `--user-root <dir>`,
+  `--combat playlist|moves|classic`.
 * Debug network conditioner for testing (adds delay/jitter/loss in both directions on the server's
   public port): `--net-latency <ms one-way> --net-jitter <ms> --net-loss <0..1>`.
 * Exit codes: `0` normal shutdown, `2` invalid configuration (errors are printed with file and
@@ -158,6 +159,7 @@ full, so playlists may use mod presets as long as the players have the mod.
 | `empty_behavior` | enum | idle | idle/showcase | Without players: no simulation, or bot matches on the rotation |
 | `vote_candidates` | int | 3 | 1-5 | Entries offered per vote (also capped by the playlist) |
 | `bot_policy` | text | (empty) | policy ids, comma separated | AI Lab policies for bot slots (used in turn; each bot fights as its policy's creature; unavailable ones fall back to the scripted AI). Policies come from the server's user data folder (`policies/`, e.g. copied from a player's AI Lab export), the built-ins and loaded mods; the log names each policy with the first 16 characters of its checksum per match. Entries can set their own `bot_policy` |
+| `combat` | enum | playlist | playlist/moves/classic | Combat style (v0.9.18, docs/design/MOVESET_COMBAT.md): `playlist` = each entry's own rules (every built-in preset plays Movesets); `moves` or `classic` = force that style for every match on this server. The style travels with the rules, so every client plays the server's choice. AI Lab policies were trained on Classic combat: in Movesets matches their bot slots fight as scripted bots |
 | `player_assist` | bool | true | | true: each remote player's aim-assist level (low/normal/high, snapped to those) applies to their fighter; false: everyone gets normal |
 
 ### [admin]

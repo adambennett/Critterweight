@@ -69,7 +69,7 @@ fighter in a slot before any event refers to them; snapshots carry the match id 
 when they belong to another match. Disconnects carry a reason code (ENet disconnect data) as a
 fallback when the reason message itself could not be delivered.
 
-## 5. Protocol (version 6)
+## 5. Protocol (version 7)
 
 Every packet: `[u8 message id][payload]`. Ids 1-63 client->server, 64-127 server->client; the wrong
 direction, an unknown id, the wrong channel, an oversized payload or a failed bounds-checked decode
@@ -80,7 +80,7 @@ is a **protocol violation**. Layouts are documented in `src/net/net_protocol.gd`
 |---|---|---|---|---|
 | 1 | HELLO | C->S | 16 KB | protocol, game version, gameplay content hash, packages (<= 64) [{id, version, hash, client_only}], name, password proof, rejoin token, flags, creature, aim assist (x100) |
 | 2 | LEAVE | C->S | 16 B | - (graceful leave: no rejoin reservation) |
-| 3 | LOBBY | C->S | 1 KB | kind (ready, creature, team, spectate, assist, cosmetics) + value |
+| 3 | LOBBY | C->S | 1 KB | kind (ready, creature, team, spectate, assist, cosmetics, loadout) + value |
 | 4 | CHAT | C->S | 600 B | text (<= 200 chars after cleaning) |
 | 5 | VOTE | C->S | 16 B | candidate index (-1 = none) |
 | 6 | INPUT | C->S | 256 B | seq, last snapshot tick, n (1-8), n x sample (17 bytes core, 24 with guest counters) |
@@ -180,7 +180,7 @@ rotations). The reader never reads past the end: the first failure flags the who
    [u8 state][u8 flags: juiced, evading, crash, guard, grounded, ai, hidden][vec3q root]
    [u8 n][quat32 x n segment rotations]
    [u16 x6 health/max, stamina/max, poise/max (x10)][u8 hype][i8 lives][i8 target]
-   [cooldowns: u8 n x (str slot, u16 s x100)] [statuses: u8 n x (str id, str element, u16 s x100)]
+   [cooldowns: u8 n x (str slot, u16 s x100, u8 charges)] [statuses: u8 n x (str id, str element, u16 s x100)]
 [u8 entities] per: [u16 id][u8 kind][str zone_kind/prop][str vfx][vec3q pos][u16 radius][str element][i8 team]
 [u8 dynamic props] per: [u8 index][vec3q pos][quat32 rot]
 mode: [u8 phase][u8 round][u16 timer x10][u8 flags][i8 winner][i8 round winner]
@@ -195,11 +195,14 @@ under 2 mm / 0.125 deg (`test_net_snapshot.gd`). Static props and hazard zones a
 definition in MATCH_START builds them).
 
 **Roster** (`ROSTER` and MATCH_START): per slot `{generation, creature id, body scale, team, name,
-controller kind, despawned, tags}`. The server bumps a slot's generation whenever its body changes
+controller kind, despawned, tags, combat, loadout}`. The server bumps a slot's generation whenever its body changes
 (spawn into a reused slot, despawn, rebuild with a scaled creature such as the Absolute Unit);
 clients only interpolate between snapshots of the same generation and rebuild a creature view when
 the generation changes. `tags` are the fighter's true boolean flags (`headliner`, `boss`,
-`resting`, ...) for presentation.
+`resting`, ...) for presentation. `combat` (`moves` or `classic`) and `loadout` (the pool move ids
+the server equipped, v0.9.18) let a client's mirror fighter show the right move cards and call the
+right moves; under Movesets the snapshot's cooldown list is the four loadout slots `m1`..`m4`
+(Classic: the creature's ability slots), each with its charges left.
 
 **Events** (`NetEventCodec`): `[u32 base tick][u8 n]`, per event `[type: u8 table index | 0xFF +
 string][svarint tick delta][u8 fields]`, per field `[key: u8 table index | 0xFF + string][tagged
@@ -260,6 +263,17 @@ changes (used from the next match). The server never takes a number from the cli
 request to one of the setting's three levels (what any player can pick), and with
 `match.player_assist = false` (or `Net.host({"player_assist": false})`) it gives every remote
 player the normal level instead. Nothing else gameplay-related comes from clients.
+
+**Movesets loadouts** (v0.9.18, docs/design/MOVESET_COMBAT.md): the combat style is a rules
+field (`combat`), so it travels with the rules in MATCH_START and every client and server applies
+the same one; a dedicated server can force it (`match.combat`, docs/SERVER.md). Each player's
+chosen loadout for their fighter (the profile's saved choice for that creature, or the fighter's
+recommended loadout) goes out after the join and on every creature change (`LQ_LOADOUT`: up to
+four pool move ids; `Net.set_loadout()`). The server keeps only plain ids
+(`NetProtocol.clean_loadout`) and puts the list in that player's fighter entry; whether it fits the
+creature is decided when the fighter is built, where an unknown or invalid loadout falls back to the
+recommended one (`CreatureDef.resolve_loadout`), so a stale or foreign list can never break a match.
+The server's choice reaches every client in the roster.
 
 **Cosmetics** (presentation only): each player's equipped cosmetics - wearables, the name-card
 frame, the JUICE colour (Sizzle) - travel as `{slot: id}` with the player info: the active
@@ -400,7 +414,7 @@ cost, traffic, memory, objects/nodes/orphans).
 
 ## 13. Version compatibility
 
-* `NetProtocol.VERSION` (now **6**: 32-bit held masks and optional extra counters for the Cage Rules guest; **5**: co-op campaign fights on the session - MATCH_START `campaign`
+* `NetProtocol.VERSION` (now **7**: Movesets - roster `combat` and `loadout`, charges per cooldown slot in snapshots, the `LQ_LOADOUT` lobby request; **6**: 32-bit held masks and optional extra counters for the Cage Rules guest; **5**: co-op campaign fights on the session - MATCH_START `campaign`
   with the campaign's own rules/mode, the arena's look as its variant - and packed party payloads;
   4 = party seats, cosmetics, arena packages and policy hashes in MATCH_START; 3 = content package
   lists with hashes in the challenge and hello, aim assist; 2 = 11-button input samples, roster
