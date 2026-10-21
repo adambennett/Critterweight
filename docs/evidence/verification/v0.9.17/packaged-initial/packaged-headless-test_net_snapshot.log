@@ -1,0 +1,15 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 16:26:42 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-packaged-test_net_snapshot-162639943
+2026-10-21 16:26:42 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:26:42 [INFO] app: Critterweight 0.9.17+1161cfe.dirty (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/net/test_net_snapshot.gd::test_charging_flag_rides_in_the_flags_byte (421 ms)
+    FK reconstruction: worst segment position error 2.49 mm, rotation error 0.105 deg
+ok    res://src/test/net/test_net_snapshot.gd::test_fk_reconstruction_matches_simulation (4124 ms)
+ok    res://src/test/net/test_net_snapshot.gd::test_hud_mirror_drives_real_fight_hud (59 ms)
+ok    res://src/test/net/test_net_snapshot.gd::test_replica_interpolation_teleports_and_events (0 ms)
+ok    res://src/test/net/test_net_snapshot.gd::test_roster_codec_and_generations (1 ms)
+    snapshot sizes (dev_biped, 13 segments): 2 fighters 259 B, 8 fighters 889 B
+    cage rules duel (sudden death, cards, referee count): 367 B
+ok    res://src/test/net/test_net_snapshot.gd::test_snapshot_sizes_fit_one_packet (13219 ms)
+tests: 6 run, 0 failed, 6 passed, 0 skipped in 21.4 s

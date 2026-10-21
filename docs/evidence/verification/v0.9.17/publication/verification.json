@@ -1,0 +1,100 @@
+{
+  "version": "0.9.17",
+  "commit": "e2870289c69c721024ac4ed200a5e6eda7ae4288",
+  "annotated_tag": "4058c0275e0ff713947957eaecd3240a471a0bb6",
+  "url": "https://github.com/adambennett/Critterweight/releases/tag/v0.9.17",
+  "published_at": "2026-10-21T22:39:35Z",
+  "prerelease": true,
+  "checked_at": "2026-10-21T22:40:14.948573+00:00",
+  "downloads": [
+    {
+      "name": "BUILD_MANIFEST.json",
+      "bytes": 22720,
+      "sha256": "27a299374ce198ab32d3a8053190d9fa1e88340af9833c27e04ddf676cdc90b6",
+      "url": "https://github.com/adambennett/Critterweight/releases/download/v0.9.17/BUILD_MANIFEST.json",
+      "passed": true
+    },
+    {
+      "name": "Critterweight-0.9.17-linux-x86_64.tar.gz",
+      "bytes": 239625520,
+      "sha256": "e396d2facba1f0626936f1fd0f6e41ce66b40179cbdc20935881133b31379506",
+      "url": "https://github.com/adambennett/Critterweight/releases/download/v0.9.17/Critterweight-0.9.17-linux-x86_64.tar.gz",
+      "passed": true
+    },
+    {
+      "name": "Critterweight-0.9.17-server-linux-x86_64.tar.gz",
+      "bytes": 96036564,
+      "sha256": "4ecd6cb11282685c61061e5109e4190f9bb03ed04141ff9e86cd092e83bf7876",
+      "url": "https://github.com/adambennett/Critterweight/releases/download/v0.9.17/Critterweight-0.9.17-server-linux-x86_64.tar.gz",
+      "passed": true
+    },
+    {
+      "name": "Critterweight-0.9.17-server-windows-x64.zip",
+      "bytes": 103567509,
+      "sha256": "ec649dd8ff6b3aac534272e6924ed526319238e2624124f717ec9aa2ac322671",
+      "url": "https://github.com/adambennett/Critterweight/releases/download/v0.9.17/Critterweight-0.9.17-server-windows-x64.zip",
+      "passed": true
+    },
+    {
+      "name": "Critterweight-0.9.17-windows-x64.exe",
+      "bytes": 323307960,
+      "sha256": "b17a82e1d69f54fb76752560758f81dc3675171c29033277ee8f2a1e678446d0",
+      "url": "https://github.com/adambennett/Critterweight/releases/download/v0.9.17/Critterweight-0.9.17-windows-x64.exe",
+      "passed": true
+    },
+    {
+      "name": "Critterweight-0.9.17-windows-x64.zip",
+      "bytes": 247123741,
+      "sha256": "b007453ae21e9be745cb2983bb96341cee8222523a6421b71438ad8d18c08e6e",
+      "url": "https://github.com/adambennett/Critterweight/releases/download/v0.9.17/Critterweight-0.9.17-windows-x64.zip",
+      "passed": true
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 629,
+      "sha256": "da14d2ed79656e5666f047db29a92072388d1ef43e3ba12261df7a218a3b9065",
+      "url": "https://github.com/adambennett/Critterweight/releases/download/v0.9.17/SHA256SUMS.txt",
+      "passed": true
+    }
+  ],
+  "archives": {
+    "version": "0.9.17",
+    "commit": "e287028",
+    "tag": "v0.9.17",
+    "dirty": false,
+    "targets": [
+      {
+        "target": "Windows Desktop",
+        "archive": "Critterweight-0.9.17-windows-x64.zip",
+        "sha256": "b007453ae21e9be745cb2983bb96341cee8222523a6421b71438ad8d18c08e6e",
+        "files_checked": 18,
+        "passed": true
+      },
+      {
+        "target": "Linux",
+        "archive": "Critterweight-0.9.17-linux-x86_64.tar.gz",
+        "sha256": "e396d2facba1f0626936f1fd0f6e41ce66b40179cbdc20935881133b31379506",
+        "files_checked": 18,
+        "passed": true
+      },
+      {
+        "target": "Windows Server",
+        "archive": "Critterweight-0.9.17-server-windows-x64.zip",
+        "sha256": "ec649dd8ff6b3aac534272e6924ed526319238e2624124f717ec9aa2ac322671",
+        "files_checked": 12,
+        "passed": true
+      },
+      {
+        "target": "Linux Server",
+        "archive": "Critterweight-0.9.17-server-linux-x86_64.tar.gz",
+        "sha256": "4ecd6cb11282685c61061e5109e4190f9bb03ed04141ff9e86cd092e83bf7876",
+        "files_checked": 11,
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "standalone_matches_package": true,
+  "checksum_list_passed": true,
+  "passed": true
+}

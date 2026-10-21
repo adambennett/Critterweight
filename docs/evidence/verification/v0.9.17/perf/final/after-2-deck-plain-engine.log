@@ -1,0 +1,10 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti SUPER
+
+2026-10-21 16:56:17 [INFO] paths: user data root: B:/Critterweight-work/v0.9.17/codex-perf-final-20261021/user-deck
+2026-10-21 16:56:18 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:56:18 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-21 16:56:18 [INFO] toast: [success] XInput Controller connected.
+2026-10-21 16:56:18 [INFO] match: start free_for_all_lives on the_gullet: f_dozer/t0/bot, f_dredge/t1/bot, f_gusto/t2/bot, f_jitters/t3/bot, f_knell/t4/bot, f_slurry/t5/bot, f_stoke/t6/bot, f_varga/t7/bot
+BENCH {"abilities_every_s":0.0,"ability_bursts":0,"alive_fighters_end":6,"bench":"busy","boot_ms":8731,"cores":8,"cpu":"Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz","date":"2026-10-21T16:56:18","draw_calls":{"max":780.0,"mean":642.525,"min":576.0,"n":3673,"p50":634.0,"p95":712.0,"p99":755.0},"engine":"4.5.1-stable (official)","fighters":8,"fps_avg":122.414004162076,"frame_ms":{"max":79.056,"mean":8.169,"min":3.229,"n":3673,"p50":7.484,"p95":12.833,"p99":21.165},"frames":3673,"frames_over_16_7ms":74,"frames_over_16_7ms_pct":2.01470187857337,"game_version":"0.9.17","headless":false,"hits":120,"match_load_ms":457.051,"memory_growth_mb":8.81658458709717,"memory_static_mb":335.697372436523,"objects":10112.0,"os":"Windows","physics_frame_ms":{"max":13.113,"mean":6.401,"min":4.22,"n":3673,"p50":5.951,"p95":9.112,"p99":13.113},"preset":"deck","primitives":{"max":818180.0,"mean":731634.559,"min":662412.0,"n":3673,"p50":728074.0,"p95":786460.0,"p99":814784.0},"process_frame_ms":{"max":27.365,"mean":10.151,"min":6.823,"n":3673,"p50":8.372,"p95":15.974,"p99":27.365},"process_rss_mb":335.697616577148,"renderer":"NVIDIA GeForce RTX 4070 Ti SUPER","resolution":[1280,800],"total_ms":44223,"video_mem_mb":145.65544128418}
+BENCH_REPORT B:\Critterweight-work\v0.9.17\codex-perf-final-20261021\after-2-deck-plain.json

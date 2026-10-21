@@ -1,0 +1,3 @@
+# Preserve the bytes downloaded from GitHub so the recorded manifest digest is reproducible.
+BUILD_MANIFEST.json -text -whitespace
+SHA256SUMS.txt -text -whitespace

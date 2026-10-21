@@ -1,0 +1,29 @@
+2026-10-21 16:03:40 [INFO] paths: user data root: B:/Critterweight-work/v0.9.17/codex-source-20261021/captures/tests/net/soak/srv
+2026-10-21 16:03:41 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:03:41 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-21 16:03:41 [INFO] server: content: core 1.0.0; gameplay hash ab08811e0977
+2026-10-21 16:03:41 [INFO] playlist: no saved playlist state (first run)
+2026-10-21 16:03:41 [INFO] net: dedicated server 'Test Server' listening on UDP *:58566 (protocol 6, game 0.9.17, content ab08811e0977)
+2026-10-21 16:03:41 [INFO] server: admin console ready on stdin (type 'help')
+2026-10-21 16:03:41 [INFO] server: TCP admin listening on 127.0.0.1:58567 (token required)
+2026-10-21 16:03:41 [INFO] server: ready: 'Test Server' on UDP 58566, 4 players max, playlist 'Test soak' (5 valid entries)
+2026-10-21 16:03:44 [INFO] net: playlist pick: s_ffa (no votes: highest weight)
+2026-10-21 16:03:44 [INFO] net: match 1 started: free_for_all on the_gullet, 4 fighters (0 humans, 4 bots)
+2026-10-21 16:03:48 [INFO] net: player 2 'Grinder' joined from 127.0.0.1
+2026-10-21 16:03:49 [INFO] net: player 3 'Watcher' joined from 127.0.0.1 as spectator
+2026-10-21 16:04:05 [INFO] stats: phase=match players=1 spect=1 match=1 fighters=4 sim_ms(1s avg/max)=1.14/1.84 phys_frame_max_ms=2.91 out=34.1KB/s in=0.2KB/s mem=179.4MB objects=6015 nodes=201 orphans=0
+2026-10-21 16:04:19 [INFO] net: match 1 finished: winner team 0
+2026-10-21 16:04:25 [INFO] net: playlist pick: s_rush (won the vote (1-0-0))
+2026-10-21 16:04:25 [INFO] net: match 2 started: chum_rush on the_gullet, 1 fighters (1 humans, 0 bots)
+2026-10-21 16:04:35 [INFO] stats: phase=match players=1 spect=1 match=2 fighters=1 sim_ms(1s avg/max)=0.31/0.53 phys_frame_max_ms=1.42 out=24.5KB/s in=5.1KB/s mem=178.3MB objects=5795 nodes=86 orphans=0
+2026-10-21 16:05:05 [INFO] stats: phase=match players=1 spect=1 match=2 fighters=5 sim_ms(1s avg/max)=1.14/2.32 phys_frame_max_ms=3.03 out=37.4KB/s in=5.2KB/s mem=179.6MB objects=6077 nodes=210 orphans=0
+2026-10-21 16:05:05 [INFO] net: match 2 finished: winner team 0
+2026-10-21 16:05:11 [INFO] net: playlist pick: s_hog (won the vote (1-0-0))
+2026-10-21 16:05:11 [INFO] net: match 3 started: spotlight_hog on the_gullet, 4 fighters (1 humans, 3 bots)
+2026-10-21 16:05:35 [INFO] stats: phase=match players=1 spect=1 match=3 fighters=4 sim_ms(1s avg/max)=1.54/12.72 phys_frame_max_ms=3.81 out=51.0KB/s in=5.0KB/s mem=180.4MB objects=6171 nodes=214 orphans=0
+2026-10-21 16:05:41 [INFO] admin: TCP admin authenticated from 127.0.0.1
+2026-10-21 16:05:42 [INFO] admin: [tcp] shutdown
+2026-10-21 16:05:42 [WARN] server: shutdown requested: Server shutting down.
+2026-10-21 16:05:42 [INFO] net: server closing (server_shutdown): Server shutting down.
+2026-10-21 16:05:42 [INFO] net: server closed (server_shutdown): Server shutting down.
+2026-10-21 16:05:42 [WARN] server: server stopped

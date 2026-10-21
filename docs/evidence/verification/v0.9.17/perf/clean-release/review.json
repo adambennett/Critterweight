@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-21T18:35:48",
+  "commit": "e2870289c69c721024ac4ed200a5e6eda7ae4288",
+  "source_suite_passed": true,
+  "performance_runs": 16,
+  "benchmark_engine_errors_or_warnings": 0,
+  "tam_running": false,
+  "review": "All required paired scenarios measured and retained. Candidate averages 107.2-129.1 FPS plain and 85.3-104.2 FPS with simultaneous abilities. High-resolution simultaneous abilities have 6.004-7.263 percent of frames above 16.7 ms: a documented performance limitation, not a claim of constant 60 FPS. One baseline 1080p plain repeat is much faster; all observations retained. Interrupted TAM-overlap run preserved separately. Steam Deck hardware not tested."
+}

@@ -1,13 +1,13 @@
 # Verification report
 
-**v0.9.17 verification in progress, 2026-10-21.** The [release report](evidence/verification/v0.9.17/README.md)
-holds the commentary comparison, roster/VFX captures, saved-game checks, matched performance and
-source results. The continuation run passed the two earlier failures; its short-soak failure is
-retained beside a passing ten-minute soak. All eight current models pass the contract audit and
-byte-identical saved-source export check; all 521 new speech clips match their catalog hashes and
-PCM format. The candidate packages pass the focused feature checks and packaged loopback session.
-A final clean-commit full run with `-SoakMinutes 10` and verified publication are still required.
-See [the continuation record](releases/v0.9.17-takeover.md).
+**v0.9.17 released and verified, 2026-10-21.** The [release report](evidence/verification/v0.9.17/README.md)
+records the exact clean release commit `e287028`, 925 source checks (924 passed, one expected
+graphical-audio skip, zero failed), a passing ten-minute soak, all eight source-model exports,
+521 speech-clip hashes, rendered roster/VFX/skin evidence and packaged loopback checks. The tagged
+build passes 455 scripts and all 20 rendered playtests. All seven actual downloads, annotated tag,
+checksums and archived members are verified; the downloaded Windows game boots in 5.7 seconds.
+Final paired performance: 107-129 FPS plain and 85-104 FPS with simultaneous abilities on this PC;
+the heaviest 1080p case has 6-7% of frames over 16.7 ms. This is not a constant-60-FPS or Deck claim.
 
 **Release 0.9.16, 2026-10-20.** [The v0.9.16 report](evidence/verification/v0.9.16/README.md): Career,
 10-point scoring, the referee and the Cage Rules preset. 437 scripts; full source suite on the release
@@ -32,6 +32,7 @@ dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`
 
 | Version | Commit | Source suite before release | Packaged checks |
 |---|---|---|---|
+| 0.9.17 | `e287028` (`v0.9.17`) | 925 run: 924 passed, 0 failed, 1 graphical-audio skip; ten-minute soak | Tagged Windows: 455 scripts, title in 5.5 s, 20/20 rendered playtests; all seven actual downloads and archived members verified; downloaded title in 5.7 s; [report](evidence/verification/v0.9.17/README.md) |
 | 0.9.16 | `a5af0d1` (`v0.9.16`; suite on `9d0a29c`, docs-only after) | 862 run: 861 passed, 0 failed, 1 graphical-only skip | Windows export of `9d0a29c`: title in 4.4 s, rendered playtests 20/20, new-feature suites 96 headless + 26 rendered, 0 failed, 0 skipped |
 | 0.9.15 | `f8e4bbb` (`v0.9.15`) | 775 run: 774 passed, 0 failed, 1 graphical-only skip (combined build `8f9baff`) | combined preview package 72 checks: 70 passed, 2 source-only skips; release smoke: 406 scripts, title boot 4.3 s (no rendered filter) |
 | 0.9.14 | `95c857a` (`v0.9.14`) | focused audio suite 20/20 (full suite not rerun for the menu-audio mix) | Tagged Windows: 394 scripts, title in 5.7 s, 20/20 rendered; packaged audio 18 passed, 2 source-only skips |

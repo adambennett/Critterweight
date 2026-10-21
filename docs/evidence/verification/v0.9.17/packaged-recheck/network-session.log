@@ -1,0 +1,7 @@
+[PASS] dedicated server start (server package) - 'Verification Server' on UDP 47212, playlist verify_duel, pid 33832
+[PASS] online duel, 2 packaged clients (LOOPBACK) - authoritative result reached both; attacker won: True; Alice hits 14; Bob lowest health 0.0; 29.8 snapshots/s, interpolation 49 ms, RTT 10.0 ms
+[PASS] online spectator frame (windowed packaged client) - capture_online_spectator.png
+[PASS] server TCP admin (token, 127.0.0.1) - Verification Server | phase results | up 32s | players 0/4 (+0 reserved) | spectators 0
+[PASS] server TCP admin refuses a wrong token - ERR auth
+[PASS] server graceful shutdown - exit code 0
+[PASS] no errors logged (server, clients, spectator) - 5 logs scanned

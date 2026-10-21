@@ -264,9 +264,10 @@ letters as in the legend.
 
 The v0.9.17 `B`/`W` states below are backed by the candidate Windows exports and focused runtime
 suites in `docs/evidence/verification/v0.9.17/packaged-initial/` and `packaged-recheck/`, plus the
-rendered art/VFX evidence. They do not imply human listening, a physical-controller playtest,
-Linux runtime or an already published release. Final source/tag/publication evidence is recorded
-in the release verification report.
+rendered art/VFX evidence. Final source/tag/publication evidence now verifies the published
+`v0.9.17` at `e287028`, all seven downloads and a boot of the downloaded Windows game. These states
+do not imply human listening, a physical-controller playtest, Linux runtime or Steam Deck testing.
+See the release verification report for the final performance measurements and limitations.
 
 | ID | Requirement / acceptance | State | Evidence |
 |---|---|---|---|

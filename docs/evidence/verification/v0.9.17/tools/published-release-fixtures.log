@@ -1,0 +1,11 @@
+test_accepts_complete_published_prerelease (test_published_release.PublishedReleaseTests) ... ok
+test_checksums_require_exact_names_and_content (test_published_release.PublishedReleaseTests) ... ok
+test_rejects_draft_or_wrong_release_kind (test_published_release.PublishedReleaseTests) ... ok
+test_rejects_incomplete_or_undigested_upload (test_published_release.PublishedReleaseTests) ... ok
+test_rejects_missing_duplicate_or_extra_assets (test_published_release.PublishedReleaseTests) ... ok
+test_rejects_wrong_tag (test_published_release.PublishedReleaseTests) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.034s
+
+OK

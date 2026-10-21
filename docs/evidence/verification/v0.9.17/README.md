@@ -9,6 +9,32 @@ ART-10, ART-11, VFX-01, SAV-04 (docs/REQUIREMENTS.md). Checklist:
 Machine: Windows 10 (19045), i7-7700K, RTX 4070 Ti Super, Godot 4.5.1 (official), Blender 5.2.2.
 Networking is loopback on this PC.
 
+## Published release
+
+[v0.9.17](https://github.com/adambennett/Critterweight/releases/tag/v0.9.17) was published on
+2026-10-21 at 22:39:35 UTC from the clean, tested commit
+`e2870289c69c721024ac4ed200a5e6eda7ae4288`. The annotated tag is immutable.
+
+- Final integrated source run: **925 run, 924 passed, one expected graphical-audio skip, zero
+  failures**, 3139.6 seconds. Source stayed clean and unchanged. [Run metadata](final-source-run.json),
+  [all results](full-source-results.json), [log](full-source.log).
+- Final ten-minute soak: 13 matches, zero orphan nodes, static-memory slope +0.0074 MB/min and
+  working-set slope +0.0306 MB/min; clean server exit. [Report](soak/final-ten-minute-report.json).
+- Tagged Windows build: 455 scripts compile; title in 5461 ms; all 20 rendered playtests pass
+  with no skips/failures or engine/script errors. [Release smoke](publication/release-smoke/).
+- All **seven actual GitHub downloads**, uploaded SHA-256 digests, checksum-list entries,
+  manifest source/version, four archives' members and Linux executable permissions verify. The
+  standalone Windows executable matches the packaged executable exactly.
+  [Publication verification](publication/verification.json), [manifest](publication/BUILD_MANIFEST.json).
+- The downloaded standalone Windows game reaches the title in **5717 ms**, reports the expected
+  tagged build stamp, and exits cleanly with no engine/script errors.
+  [Downloaded-game smoke](publication/downloaded-smoke/).
+
+The source-only audio skip is covered by the rendered packaged audio/UI checks. Physical-controller,
+human listening, external-network, Linux-runtime and Steam Deck checks are not claimed. The final
+performance measurements below retain occasional frame-time spikes; they do not establish a
+constant 60 FPS on this PC or the Deck. Earlier failures remain as chronological evidence.
+
 ## Baseline (before the work)
 
 - `main` = `origin/main` = `0465a05` (v0.9.16 published, tag `v0.9.16`), clean; playable roster
@@ -140,11 +166,35 @@ candidate effect-heavy runs with 15.8-17.2% of frames over 16.7 ms. This repeat 
 headroom on this PC; it does not establish a consistently met 60 FPS frame-time budget under this
 desktop load. The earlier quiet-machine comparison above remains separately identified.
 
+### Final clean release commit
+
+All sixteen paired runs were repeated on `e287028` with a 15-second warm-up and 30-second measurement
+per run. An initial attempt overlapped a running TAM game and was stopped after eleven completed
+reports. The owner closed TAM, and the complete comparison was restarted in a fresh folder.
+Both the interrupted data and the process-load sample are retained in `perf/interrupted-desktop/`;
+the final sixteen reports, logs, load sample and review are in [perf/clean-release/](perf/clean-release/).
+All final benchmark engine logs are free of warnings/errors. All measured windows have the requested
+resolution, and every abilities run includes ten simultaneous bursts across the eight fighters.
+
+| Scene | v0.9.16 FPS, both runs | v0.9.17 FPS, both runs | v0.9.17 p95 frame time | v0.9.17 frames over 16.7 ms |
+|---|---|---|---|---|
+| 1280x800, plain | 197.2 / 187.4 | 128.0 / 129.1 | 11.41 / 10.94 ms | 0.86% / 0.34% |
+| 1280x800, simultaneous abilities | 182.2 / 172.4 | 104.2 / 96.1 | 15.22 / 16.52 ms | 2.75% / 4.89% |
+| 1920x1080, plain | 180.1 / 337.0 | 113.1 / 107.2 | 12.92 / 14.38 ms | 0.94% / 2.39% |
+| 1920x1080, simultaneous abilities | 150.7 / 157.5 | 85.3 / 88.8 | 17.63 / 17.21 ms | 7.26% / 6.00% |
+
+The late 1080p plain baseline is substantially faster than its first pass; no cause is asserted and
+neither result is discarded. The upgraded art/effects have measurable cost, with average frame-rate
+headroom in all four measured scenes. The heaviest 1080p scenario exceeds the 16.7 ms budget in
+6-7% of frames, so a consistently met 60 FPS frame-time target is **not** claimed. The original
+quiet-machine and intermediate results remain separate rather than replacing these final observations.
+
 ## Source checks
 
-The fresh continuation suite on `1161cfe` completed 924 tests: 922 passed, one graphical-audio
-skip and one short-soak failure. A final integrated run with `-SoakMinutes 10` is required before
-publication. The original run on `16b2dc3` had two different failures, both passing in this fresh run:
+The earlier continuation suite on `1161cfe` completed 924 tests: 922 passed, one graphical-audio
+skip and one short-soak failure. The final integrated run on `e287028` with `-SoakMinutes 10`
+subsequently passed, as recorded above. The original run on `16b2dc3` had two different failures,
+both passing in this continuation run and the final run:
 
 - `test_hub_unlocks::test_vintage_bellows_calls_matches_when_selected` asked the 1973 Barnaby pack
   for a KO call without saying the fight had ended; its "It's OVER!" line is gated to a fight-ending
@@ -194,7 +244,7 @@ also revealed a raised horizontal cage rail excluded from fading because it was 
 now accepts long thin raised geometry, with a regression that retains low-trim/tiny-prop exclusion.
 Another spectator angle exposed the small caps and bands left opaque above a faded post; the
 minimum span now includes those actual cage parts too, with a separate ray through a cap in the
-regression. The final full-suite and performance runs must include that completed fix.
+regression. The final full-suite and performance runs on `e287028` include that completed fix.
 
 The third candidate's rendered playtests also exposed a fixture precondition: the dropdown test
 assumed its application had native foreground focus, although verification launches in the
@@ -211,8 +261,8 @@ game constructs, both ELF64 x86-64 executables with embedded data and glibc <=2.
 execute bits. `res://build_info.json` is an explicitly generated export input, so the source-path
 audit now recognizes that exact path. This is not Linux runtime verification.
 
-These candidates were built from an uncommitted documentation/evidence tree and are not published
-releases; the final build must come from the clean verified release commit.
+These earlier candidates were built from an uncommitted documentation/evidence tree. The published
+build was subsequently rebuilt from the clean verified release commit, as recorded above.
 
 ## Bug hunt
 

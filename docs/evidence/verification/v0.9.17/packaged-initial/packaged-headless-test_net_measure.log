@@ -1,0 +1,9 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 16:30:16 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-packaged-test_net_measure-163014315
+2026-10-21 16:30:17 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:30:17 [INFO] app: Critterweight 0.9.17+1161cfe.dirty (Windows x86_64, Godot 4.5.1-stable (official))
+    MEASURE duel (LOOPBACK, 2 fighters, 21 s): per client down 9.1 KB/s (wire 10.1), up 5.2 KB/s (wire 7.0), 36/67 pkt/s; snapshot 289 B; server sim 0.50 ms/tick, net 0.141 ms/tick, longest physics frame 1.31 ms (avg of 1 s maxima), main thread busy 10.4%, process CPU 1.7% of one core (CritterweightServer.exe)
+    MEASURE ffa8 (LOOPBACK, 8 fighters, 21 s): per client down 24.7 KB/s (wire 25.6), up 4.0 KB/s (wire 5.6), 36/60 pkt/s; snapshot 1002 B; server sim 1.82 ms/tick, net 0.252 ms/tick, longest physics frame 4.05 ms (avg of 1 s maxima), main thread busy 30.5%, process CPU 25.7% of one core (CritterweightServer.exe)
+ok    res://src/test/net/test_net_measure.gd::test_measure_duel_and_ffa8 (72945 ms)
+tests: 1 run, 0 failed, 1 passed, 0 skipped in 76.5 s

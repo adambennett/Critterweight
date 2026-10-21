@@ -1,0 +1,6 @@
+{
+  "at": "2026-10-21T18:20:05",
+  "reason": "TAM overlapped the benchmark and exited during it. Stop this load-confounded run and repeat all sixteen measurements from a fresh folder.",
+  "stopped_process": 31808,
+  "completed_reports": 11
+}

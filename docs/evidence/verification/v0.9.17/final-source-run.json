@@ -1,0 +1,15 @@
+﻿{
+    "commit":  "e2870289c69c721024ac4ed200a5e6eda7ae4288",
+    "started":  "2026-10-21T17:15:56",
+    "user_root":  "B:\\Critterweight-work\\v0.9.17\\codex-final-source-20261021",
+    "log":  "B:\\Critterweight-work\\v0.9.17\\logs\\codex-final-full-20261021.log",
+    "soak_minutes":  10,
+    "passed":  true,
+    "finished":  "2026-10-21T18:08:23",
+    "exit_code":  0,
+    "total":  925,
+    "failed":  0,
+    "skipped":  1,
+    "summary":  "tests: 925 run, 0 failed, 924 passed, 1 skipped in 3139.6 s",
+    "unchanged_source":  true
+}

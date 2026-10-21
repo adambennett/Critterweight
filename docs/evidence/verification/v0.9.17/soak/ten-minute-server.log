@@ -1,0 +1,78 @@
+2026-10-21 16:09:04 [INFO] paths: user data root: B:/Critterweight-work/v0.9.17/codex-soak10-20261021/captures/tests/net/soak/srv
+2026-10-21 16:09:04 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:09:04 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-21 16:09:04 [INFO] server: content: core 1.0.0; gameplay hash ab08811e0977
+2026-10-21 16:09:04 [INFO] playlist: no saved playlist state (first run)
+2026-10-21 16:09:04 [INFO] net: dedicated server 'Test Server' listening on UDP *:59846 (protocol 6, game 0.9.17, content ab08811e0977)
+2026-10-21 16:09:04 [INFO] server: admin console ready on stdin (type 'help')
+2026-10-21 16:09:04 [INFO] server: TCP admin listening on 127.0.0.1:59847 (token required)
+2026-10-21 16:09:04 [INFO] server: ready: 'Test Server' on UDP 59846, 4 players max, playlist 'Test soak' (5 valid entries)
+2026-10-21 16:09:07 [INFO] net: playlist pick: s_duel (no votes: highest weight)
+2026-10-21 16:09:07 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (0 humans, 2 bots)
+2026-10-21 16:09:12 [INFO] net: player 2 'Grinder' joined from 127.0.0.1
+2026-10-21 16:09:12 [INFO] net: player 3 'Watcher' joined from 127.0.0.1 as spectator
+2026-10-21 16:09:28 [INFO] stats: phase=match players=1 spect=1 match=1 fighters=2 sim_ms(1s avg/max)=0.54/1.03 phys_frame_max_ms=1.44 out=20.6KB/s in=0.1KB/s mem=178.2MB objects=5727 nodes=90 orphans=0
+2026-10-21 16:09:42 [INFO] net: match 1 finished: winner team 0
+2026-10-21 16:09:48 [INFO] net: playlist pick: s_ffa (won the vote (1-0-0))
+2026-10-21 16:09:49 [INFO] net: match 2 started: free_for_all on the_gullet, 4 fighters (1 humans, 3 bots)
+2026-10-21 16:09:58 [INFO] stats: phase=match players=1 spect=1 match=2 fighters=4 sim_ms(1s avg/max)=0.95/1.57 phys_frame_max_ms=1.94 out=32.8KB/s in=5.2KB/s mem=179.2MB objects=6010 nodes=178 orphans=0
+2026-10-21 16:10:24 [INFO] net: match 2 finished: winner team 0
+2026-10-21 16:10:28 [INFO] stats: phase=lobby players=1 spect=1 match=2 fighters=0 sim_ms(1s avg/max)=1.14/1.75 phys_frame_max_ms=2.98 out=25.4KB/s in=2.1KB/s mem=178.1MB objects=5702 nodes=18 orphans=0
+2026-10-21 16:10:30 [INFO] net: playlist pick: s_duel (won the vote (1-0-0))
+2026-10-21 16:10:30 [INFO] net: match 3 started: duel on the_gullet, 2 fighters (1 humans, 1 bots)
+2026-10-21 16:10:58 [INFO] stats: phase=match players=1 spect=1 match=3 fighters=2 sim_ms(1s avg/max)=0.57/0.92 phys_frame_max_ms=1.44 out=19.2KB/s in=5.1KB/s mem=178.8MB objects=5883 nodes=113 orphans=0
+2026-10-21 16:11:05 [INFO] net: match 3 finished: winner team 1
+2026-10-21 16:11:11 [INFO] net: playlist pick: s_rush (won the vote (1-0-0))
+2026-10-21 16:11:11 [INFO] net: match 4 started: chum_rush on the_gullet, 1 fighters (1 humans, 0 bots)
+2026-10-21 16:11:28 [INFO] stats: phase=match players=1 spect=1 match=4 fighters=3 sim_ms(1s avg/max)=0.78/1.16 phys_frame_max_ms=2.48 out=35.5KB/s in=5.2KB/s mem=179.1MB objects=5991 nodes=148 orphans=0
+2026-10-21 16:11:51 [INFO] net: match 4 finished: winner team 0
+2026-10-21 16:11:57 [INFO] net: playlist pick: s_ffa (won the vote (1-0-0))
+2026-10-21 16:11:57 [INFO] net: match 5 started: free_for_all on the_gullet, 4 fighters (1 humans, 3 bots)
+2026-10-21 16:11:58 [INFO] stats: phase=match players=1 spect=1 match=5 fighters=4 sim_ms(1s avg/max)=1.03/1.03 phys_frame_max_ms=14.92 out=6.0KB/s in=0.1KB/s mem=180.0MB objects=6251 nodes=223 orphans=0
+2026-10-21 16:12:28 [INFO] stats: phase=match players=1 spect=1 match=5 fighters=4 sim_ms(1s avg/max)=1.19/1.86 phys_frame_max_ms=3.04 out=31.1KB/s in=5.2KB/s mem=180.4MB objects=6252 nodes=223 orphans=0
+2026-10-21 16:12:33 [INFO] net: match 5 finished: winner team 3
+2026-10-21 16:12:39 [INFO] net: playlist pick: s_rush (won the vote (1-0-0))
+2026-10-21 16:12:39 [INFO] net: match 6 started: chum_rush on the_gullet, 1 fighters (1 humans, 0 bots)
+2026-10-21 16:12:58 [INFO] stats: phase=match players=1 spect=1 match=6 fighters=4 sim_ms(1s avg/max)=1.31/2.46 phys_frame_max_ms=4.26 out=39.2KB/s in=5.2KB/s mem=179.9MB objects=6177 nodes=179 orphans=0
+2026-10-21 16:13:19 [INFO] net: match 6 finished: winner team 0
+2026-10-21 16:13:25 [INFO] net: playlist pick: s_hog (won the vote (1-0-0))
+2026-10-21 16:13:25 [INFO] net: match 7 started: spotlight_hog on the_gullet, 4 fighters (1 humans, 3 bots)
+2026-10-21 16:13:28 [INFO] stats: phase=match players=1 spect=1 match=7 fighters=4 sim_ms(1s avg/max)=1.06/1.76 phys_frame_max_ms=2.74 out=53.3KB/s in=5.2KB/s mem=181.1MB objects=6330 nodes=214 orphans=0
+2026-10-21 16:13:58 [INFO] stats: phase=match players=1 spect=1 match=7 fighters=4 sim_ms(1s avg/max)=1.18/2.53 phys_frame_max_ms=3.17 out=52.6KB/s in=5.2KB/s mem=181.3MB objects=6330 nodes=214 orphans=0
+2026-10-21 16:14:05 [INFO] net: match 7 finished: winner team 3
+2026-10-21 16:14:11 [INFO] net: playlist pick: s_ffa (won the vote (1-0-0))
+2026-10-21 16:14:11 [INFO] net: match 8 started: free_for_all on the_gullet, 4 fighters (1 humans, 3 bots)
+2026-10-21 16:14:28 [INFO] stats: phase=match players=1 spect=1 match=8 fighters=4 sim_ms(1s avg/max)=1.19/1.95 phys_frame_max_ms=3.12 out=35.5KB/s in=5.3KB/s mem=181.3MB objects=6308 nodes=201 orphans=0
+2026-10-21 16:14:47 [INFO] net: match 8 finished: winner team 2
+2026-10-21 16:14:53 [INFO] net: playlist pick: s_rush (won the vote (1-0-0))
+2026-10-21 16:14:53 [INFO] net: match 9 started: chum_rush on the_gullet, 1 fighters (1 humans, 0 bots)
+2026-10-21 16:14:58 [INFO] stats: phase=match players=1 spect=1 match=9 fighters=1 sim_ms(1s avg/max)=0.30/0.54 phys_frame_max_ms=1.19 out=24.5KB/s in=5.1KB/s mem=180.3MB objects=6088 nodes=86 orphans=0
+2026-10-21 16:15:28 [INFO] stats: phase=match players=1 spect=1 match=9 fighters=5 sim_ms(1s avg/max)=2.92/21.48 phys_frame_max_ms=6.97 out=41.0KB/s in=5.2KB/s mem=181.4MB objects=6333 nodes=210 orphans=0
+2026-10-21 16:15:33 [INFO] net: match 9 finished: winner team 0
+2026-10-21 16:15:39 [INFO] net: playlist pick: s_duel (won the vote (1-0-0))
+2026-10-21 16:15:39 [INFO] net: match 10 started: duel on the_gullet, 2 fighters (1 humans, 1 bots)
+2026-10-21 16:15:58 [INFO] stats: phase=match players=1 spect=1 match=10 fighters=2 sim_ms(1s avg/max)=0.73/1.39 phys_frame_max_ms=3.28 out=18.2KB/s in=5.1KB/s mem=180.6MB objects=6188 nodes=139 orphans=0
+2026-10-21 16:16:14 [INFO] net: match 10 finished: winner team 1
+2026-10-21 16:16:20 [INFO] net: playlist pick: s_hog (won the vote (1-0-0))
+2026-10-21 16:16:20 [INFO] net: match 11 started: spotlight_hog on the_gullet, 4 fighters (1 humans, 3 bots)
+2026-10-21 16:16:28 [INFO] stats: phase=match players=1 spect=1 match=11 fighters=4 sim_ms(1s avg/max)=1.10/2.27 phys_frame_max_ms=3.13 out=50.6KB/s in=5.1KB/s mem=181.1MB objects=6316 nodes=206 orphans=0
+2026-10-21 16:16:58 [INFO] stats: phase=match players=1 spect=1 match=11 fighters=4 sim_ms(1s avg/max)=1.12/1.95 phys_frame_max_ms=2.73 out=51.5KB/s in=5.2KB/s mem=181.3MB objects=6317 nodes=206 orphans=0
+2026-10-21 16:17:01 [INFO] net: match 11 finished: winner team 1
+2026-10-21 16:17:07 [INFO] net: playlist pick: s_duel (won the vote (1-0-0))
+2026-10-21 16:17:07 [INFO] net: match 12 started: duel on the_gullet, 2 fighters (1 humans, 1 bots)
+2026-10-21 16:17:28 [INFO] stats: phase=match players=1 spect=1 match=12 fighters=2 sim_ms(1s avg/max)=0.56/0.97 phys_frame_max_ms=1.54 out=19.9KB/s in=5.1KB/s mem=180.6MB objects=6138 nodes=111 orphans=0
+2026-10-21 16:17:40 [INFO] net: match 12 finished: winner team 0
+2026-10-21 16:17:46 [INFO] net: playlist pick: s_teams (won the vote (1-0-0))
+2026-10-21 16:17:46 [INFO] net: match 13 started: teams_2v2 on the_gullet, 4 fighters (1 humans, 3 bots)
+2026-10-21 16:17:58 [INFO] stats: phase=match players=1 spect=1 match=13 fighters=4 sim_ms(1s avg/max)=1.26/1.91 phys_frame_max_ms=3.00 out=32.9KB/s in=5.3KB/s mem=181.5MB objects=6357 nodes=195 orphans=0
+2026-10-21 16:18:21 [INFO] net: match 13 finished: winner team 0
+2026-10-21 16:18:27 [INFO] net: playlist pick: s_rush (won the vote (1-0-0))
+2026-10-21 16:18:27 [INFO] net: match 14 started: chum_rush on the_gullet, 1 fighters (1 humans, 0 bots)
+2026-10-21 16:18:28 [INFO] stats: phase=match players=1 spect=1 match=14 fighters=1 sim_ms(1s avg/max)=0.00/0.00 phys_frame_max_ms=5.34 out=6.1KB/s in=0.1KB/s mem=180.6MB objects=6146 nodes=86 orphans=0
+2026-10-21 16:18:58 [INFO] stats: phase=match players=1 spect=1 match=14 fighters=5 sim_ms(1s avg/max)=1.04/1.69 phys_frame_max_ms=2.57 out=36.9KB/s in=5.1KB/s mem=181.7MB objects=6390 nodes=210 orphans=0
+2026-10-21 16:19:05 [INFO] admin: TCP admin authenticated from 127.0.0.1
+2026-10-21 16:19:06 [INFO] admin: [tcp] shutdown
+2026-10-21 16:19:06 [WARN] server: shutdown requested: Server shutting down.
+2026-10-21 16:19:06 [INFO] net: server closing (server_shutdown): Server shutting down.
+2026-10-21 16:19:06 [INFO] net: server closed (server_shutdown): Server shutting down.
+2026-10-21 16:19:06 [WARN] server: server stopped

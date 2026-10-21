@@ -1,0 +1,15 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti SUPER
+
+2026-10-21 16:34:08 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-packaged-test_hub_cosmetics-163404376
+2026-10-21 16:34:09 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:34:09 [INFO] app: Critterweight 0.9.17+1161cfe.dirty (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_attachments_fit_every_body_and_follow_it (399 ms)
+2026-10-21 16:34:11 [INFO] hub: view build ms: structure 17 dressing 56 commit 3 water+npcs 37 props+upgrades 19 ambient 23; batch verts 35052
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_fished_cans_sit_on_the_locker_shelf (287 ms)
+2026-10-21 16:34:11 [INFO] match: start ? on the_gullet: f_stoke/t0/player, f_dredge/t1/bot
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_only_the_profile_owner_is_dressed_in_a_match (3171 ms)
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_sizzle_is_stoke_only_and_frames_show_on_results_and_profile (404 ms)
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_the_gold_tooth_is_the_gag_piece (54 ms)
+ok    res://src/test/hub/test_hub_cosmetics.gd::test_the_locker_only_offers_what_shows (12 ms)
+tests: 6 run, 0 failed, 6 passed, 0 skipped in 7.8 s

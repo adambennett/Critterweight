@@ -1,0 +1,49 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 16:27:07 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-packaged-test_new_fighters-162704374
+2026-10-21 16:27:07 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:27:07 [INFO] app: Critterweight 0.9.17+1161cfe.dirty (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/kits/test_new_fighters.gd::test_every_limb_modifier_has_a_move_in_both_stances (8 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_extended_inputs_roundtrip_with_high_held_bits_and_wrap (0 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_guard_shove_requires_its_stamina_cost (5 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_guest_dodge_lesson_does_not_require_standard_dash_attack (1 ms)
+GUEST LESSON 1 success String 3 / 3
+GUEST LESSON 2 success Heavy ✓
+GUEST LESSON 5 success 
+GUEST LESSON 6 success 
+GUEST LESSON 8 success Hype 0 / 100   JUICE –
+ok    res://src/test/kits/test_new_fighters.gd::test_guest_tutorial_teaches_completable_inputs (48139 ms)
+VARGA lh_straight gap 0.7 hits 1 up 1.00 reach 1.07 pen 0.00 base 0.00
+VARGA rh_straight gap 0.7 hits 1 up 1.00 reach 1.11 pen 0.00 base 0.00
+VARGA lh_hook gap 0.7 hits 1 up 1.00 reach 0.97 pen 0.00 base 0.00
+VARGA rh_hook gap 0.7 hits 1 up 1.00 reach 0.96 pen 0.00 base 0.00
+VARGA lh_uppercut gap 0.7 hits 1 up 1.00 reach 0.96 pen 0.01 base 0.00
+VARGA rh_uppercut gap 0.7 hits 1 up 1.00 reach 0.96 pen 0.01 base 0.00
+VARGA lh_overhand gap 0.7 hits 0 up 0.99 reach 0.96 pen 0.00 base 0.00
+VARGA lh_overhand gap 1.0 hits 1 up 1.00 reach 0.96 pen 0.00 base 0.00
+VARGA rh_overhand gap 0.7 hits 1 up 1.00 reach 0.97 pen 0.00 base 0.00
+VARGA ll_teep gap 0.7 hits 1 up 0.98 reach 1.13 pen 0.00 base 0.00
+VARGA rl_knee gap 0.7 hits 1 up 0.95 reach 0.68 pen 0.00 base 0.00
+VARGA ll_bkick gap 0.7 hits 1 up 0.84 reach 1.16 pen 0.05 base 0.00
+VARGA rl_bkick gap 0.7 hits 1 up 0.84 reach 1.16 pen 0.05 base 0.00
+VARGA ll_hkick gap 0.7 hits 1 up 0.48 reach 1.17 pen 0.04 base 0.00
+VARGA rl_hkick gap 0.7 hits 1 up 0.46 reach 1.17 pen 0.01 base 0.00
+VARGA ll_lkick gap 0.7 hits 0 up 0.96 reach 1.17 pen 0.00 base 0.00
+VARGA ll_lkick gap 1.0 hits 1 up 0.94 reach 1.17 pen 0.00 base 0.00
+VARGA rl_lkick gap 0.7 hits 1 up 0.96 reach 1.17 pen 0.00 base 0.00
+ok    res://src/test/kits/test_new_fighters.gd::test_imported_strikes_connect_and_stay_physically_stable (34458 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_knell_blink_and_last_bell_have_real_effects (5291 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_knell_normal_string_and_spectral_projectile (4147 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_live_input_context_isolated_and_opponent_relative (0 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_low_check_cannot_block_unblockable_hits (800 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_martial_buffer_remembers_modifier_and_stance_switches (1799 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_models_have_every_segment_and_playable_campaign_kits (53 ms)
+NEW FIGHTERS SPAR { "wins": { "f_varga": 0, "f_knell": 1 }, "draws": 0, "bouts": 1, "dmg": { "f_varga": 26.1820632188928, "f_knell": 84.8921979965409 }, "hits": { "f_varga": 4, "f_knell": 9 }, "kos": { "f_varga": 0, "f_knell": 0 }, "time": 28.3166666666657, "used": { "f_varga": { "ability1": 3, "grab": 8, "ability2": 1, "dodge": 1 }, "f_knell": { "ability1": 3, "ability2": 3 } } }
+ok    res://src/test/kits/test_new_fighters.gd::test_new_bots_finish_bout_and_varga_varies_strikes (28340 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_new_statuses_and_reaction (2102 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_online_footwork_uses_selected_target_not_nearest_enemy (5 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_southpaw_physical_strikes_recover_and_keep_reach (52805 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_tutorial_kid_does_not_retain_a_finished_course (1 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_varga_abilities_and_juice (5292 ms)
+ok    res://src/test/kits/test_new_fighters.gd::test_view_target_chord_does_not_switch_stance_or_fire_juice (0 ms)
+tests: 19 run, 0 failed, 19 passed, 0 skipped in 186.8 s

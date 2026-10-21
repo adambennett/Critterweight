@@ -1,0 +1,55 @@
+{
+  "at": "2026-10-21T18:12:04",
+  "seconds": 5,
+  "note": "Read-only shared-desktop CPU sample during the final benchmark. Unrelated processes were left running. This does not establish causation for frame spikes.",
+  "processes": [
+    {
+      "name": "TAM",
+      "pid": 33828,
+      "one_core_percent": 313.1,
+      "working_set_mb": 1812.0
+    },
+    {
+      "name": "Godot_v4.5.1-stable_win64",
+      "pid": 32720,
+      "one_core_percent": 102.2,
+      "working_set_mb": 729.0
+    },
+    {
+      "name": "ChatGPT",
+      "pid": 34648,
+      "one_core_percent": 8.1,
+      "working_set_mb": 125.0
+    },
+    {
+      "name": "ChatGPT",
+      "pid": 22800,
+      "one_core_percent": 7.8,
+      "working_set_mb": 732.0
+    },
+    {
+      "name": "pwsh",
+      "pid": 37332,
+      "one_core_percent": 3.1,
+      "working_set_mb": 82.0
+    },
+    {
+      "name": "grep",
+      "pid": 20920,
+      "one_core_percent": 0.3,
+      "working_set_mb": 4.0
+    },
+    {
+      "name": "audiodg",
+      "pid": 40348,
+      "one_core_percent": 0.3,
+      "working_set_mb": 13.0
+    },
+    {
+      "name": "SDTray",
+      "pid": 20016,
+      "one_core_percent": 0.3,
+      "working_set_mb": 26.0
+    }
+  ]
+}
