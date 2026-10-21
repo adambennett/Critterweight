@@ -26,7 +26,9 @@ param(
 	[switch]$Import,
 	# a filtered run that is part of a release (focused checks of the release build): it reserves the
 	# machine like a full suite instead of holding back for a reservation
-	[switch]$Release
+	[switch]$Release,
+	# wall-clock limit of a filtered run (the full suite has none)
+	[int]$FilterTimeoutMinutes = 60
 )
 $ErrorActionPreference = "Continue"
 try { (Get-Process -Id $PID).PriorityClass = 'BelowNormal' } catch {}
@@ -74,13 +76,30 @@ try {
 		& $Godot --headless --path $GamePath --import *> (Join-Path $UserRoot 'import.log')
 	}
 	$a = @("--headless", "--path", $GamePath, "--log-file", (Join-Path $UserRoot 'engine.log'), "--fixed-fps", "120")
-	# a filtered run that never finishes (a script that failed to parse leaves the runner idle) quits
-	# after 50 simulated minutes instead of holding the machine-wide lock forever
-	if ($Filter -ne "") { $a += @("--quit-after", "360000") }
 	$a += @("--", "--user-root", $UserRoot, "--test")
 	if ($Filter -ne "") { $a += $Filter }
-	if ($Log -ne "") { & $Godot @a *> $Log } else { & $Godot @a }
-	$code = $LASTEXITCODE
+	if ($Filter -eq "") {
+		if ($Log -ne "") { & $Godot @a *> $Log } else { & $Godot @a }
+		$code = $LASTEXITCODE
+	} else {
+		# a filtered run that never finishes (a script that failed to parse leaves the runner idle) is
+		# stopped after $FilterTimeoutMinutes of wall time instead of holding the machine-wide lock
+		# forever (a frame-count limit cannot be used: with --fixed-fps the frames run uncapped while a
+		# test waits on real time, e.g. the network tests' child processes)
+		$out = if ($Log -ne "") { $Log } else { Join-Path $UserRoot 'filtered_run.log' }
+		$quoted = $a | ForEach-Object { if ($_ -match '\s') { '"' + $_ + '"' } else { $_ } }
+		$p = Start-Process -FilePath $Godot -ArgumentList $quoted -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError ($out + ".err")
+		try { $p.PriorityClass = 'BelowNormal' } catch {}
+		if ($p.WaitForExit($FilterTimeoutMinutes * 60 * 1000)) {
+			$code = $p.ExitCode
+		} else {
+			Write-Host "the filtered run passed $FilterTimeoutMinutes minutes; stopping it"
+			& taskkill /PID $p.Id /T /F | Out-Null
+			$code = 98
+		}
+		if (Test-Path ($out + ".err")) { Get-Content ($out + ".err") | Add-Content $out; Remove-Item ($out + ".err") -ErrorAction SilentlyContinue }
+		if ($Log -eq "") { Get-Content $out }
+	}
 } finally {
 	if ($null -ne $lock) { $lock.Close() }
 	if ($reserving) { Remove-Item -LiteralPath $reserve -ErrorAction SilentlyContinue }
