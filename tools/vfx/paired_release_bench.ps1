@@ -32,6 +32,9 @@ foreach ($pair in @(@('before', $Before), @('after', $After))) {
 if ($bench['before'] -ne $bench['after']) { throw "bench.gd differs between the checkouts; copy the same file into both first" }
 $lockPath = Join-Path $env:TEMP "critterweight_full_suite.lock"
 $lock = $null
+# reserve the machine (tools/dev/run_suite.ps1): filtered test runs hold back until the bench is done
+$reserve = Join-Path $env:TEMP "critterweight_release.reserve"
+Set-Content -LiteralPath $reserve -Value "paired bench $PID"
 while ($null -eq $lock) {
 	try { $lock = [System.IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') }
 	catch { Write-Host "waiting for the full-suite lock"; Start-Sleep -Seconds 15 }
@@ -64,6 +67,7 @@ try {
 	}
 } finally {
 	if ($null -ne $lock) { $lock.Close() }
+	Remove-Item -LiteralPath $reserve -ErrorAction SilentlyContinue
 }
 $results | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $Out 'summary.json') -Encoding utf8
 $md = @("| build | preset | load | fps (2 runs) | p95 ms | p99 ms | frames > 16.7 ms | draw calls |", "|---|---|---|---|---|---|---|---|")

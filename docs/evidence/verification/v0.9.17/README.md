@@ -78,7 +78,33 @@ PACKAGED_RESULTS
 
 ## Bug hunt
 
-BUG_HUNT
+Three independent code reviews read the whole v0.9.17 diff (commentary engine, ability effects,
+fighter art and the skin option) for real bugs, each finding checked against the code before it was
+reported. 30 were confirmed and all were fixed with regression tests; none changed gameplay.
+
+- **Commentary (10):** the talk budget stuck at 100% after any interrupted line (starving the rest of
+  the match); a referee stoppage that ended only a round was called as the end of the bout; legacy
+  `{p}`/`{o}` lines named the wrong fighters (and a ringout of the opponent was called as the
+  player's); spectators got lines addressed to a player and team rounds were misattributed; landed
+  abilities were sometimes called misses; 10-point decisions did not end the bout's commentary and
+  every decision was called close; count and scorecard lines followed throw knockdowns,
+  "first hit of the night" played every round, "It's over!" played on round KOs; a second interrupt
+  inside the 0.12 s fade silenced the new line; ceremonial winner names replaced unrecorded names.
+  `test_commentary` 19/19, `test_audio_announcer` 9/9, `test_recorded_speech` 9/9.
+- **Ability effects (13):** delayed strikes drew Stormfront's lightning; Bulldoze and Anchor Drop looks
+  fired for other fighters' charges and counters; areas from expiring projectiles were drawn in the
+  air; box bursts ignored the line's direction; zone decals kept their spawn size; Hang Time's
+  downdraft played on dives; Cut the Angle was drawn along the facing instead of the dash; Reduce
+  flashing left a 12 Hz floor flicker; pre-contact warnings did not follow the fighter; online, every
+  tapped heavy showed a charge glow (now a replicated charging bit); build-up glows ignored the light
+  cap and the move's real speed. `test_ability_vfx` 18/18, `test_net_snapshot` 6/6.
+- **Art and skin (7):** secondary-motion springs swung the wrong way except when hanging straight down
+  (now a 3D spring about the link's real direction, with gravity); new shader terms ignored the tint
+  (the 1973 tape silhouette) and older models silently received the new finish (now only the
+  v0.9.17 roster art does); a skin swap reset popped cosmetics; comparison and import tooling could
+  overwrite shipped or legacy models; three test assertions could not fail; the hub never drove
+  expressions. `test_creature_fx_rig` 3/3, `test_creature_finish` 3/3, `test_varga_skins` 7/7,
+  `test_saves_from_older_build` 3/3, `test_hub_flow` 12/12.
 
 ## Not verified
 
