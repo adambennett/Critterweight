@@ -8,6 +8,9 @@ extends RefCounted
 ##         MyTutorial.start(lesson_id, fighter_id)
 ## Lesson data comes from Content kind "tutorial" ({id, name, goal, order, skippable}) when present,
 ## otherwise from DEFAULT_LESSONS (docs/design/ANNOUNCER_AND_TUTORIAL.md §2.1).
+## v0.9.18: two courses, "moves" (Movesets: the fighter's equipped moves) and "classic"; a lesson's
+## "style" names its course (none = both) and "moves_order" its place in the Movesets course. The
+## launcher receives the combat style too: launcher(lesson_id, fighter_id, combat).
 
 static var launcher: Callable
 
@@ -29,23 +32,25 @@ static func is_wired() -> bool:
 	return launcher.is_valid()
 
 
-static func lessons() -> Array:
+## The lessons of a course ("moves" | "classic"), in course order.
+static func lessons(course := "moves") -> Array:
 	var ids := Content.ids("tutorial")
 	if ids.is_empty():
 		return DEFAULT_LESSONS.duplicate(true)
 	var out := []
 	for id in ids:
 		var d := Content.get_entry("tutorial", str(id))
-		if d.has("name"):
+		if d.has("name") and str(d.get("style", "")) in ["", course]:
 			out.append(d)
-	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("order", 0)) < int(b.get("order", 0)))
+	var key := "moves_order" if course == "moves" else "order"
+	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get(key, a.get("order", 0))) < int(b.get(key, b.get("order", 0))))
 	return out if not out.is_empty() else DEFAULT_LESSONS.duplicate(true)
 
 
 ## Returns false when no tutorial gameplay is wired yet (the menu explains this to the player).
-static func launch(lesson_id: String, fighter_id := "") -> bool:
+static func launch(lesson_id: String, fighter_id := "", combat := "moves") -> bool:
 	if not launcher.is_valid():
 		Log.w("ui", "tutorial lesson '%s' requested but TutorialHook.launcher is not set" % lesson_id)
 		return false
-	launcher.call(lesson_id, fighter_id)
+	launcher.call(lesson_id, fighter_id, combat)
 	return true

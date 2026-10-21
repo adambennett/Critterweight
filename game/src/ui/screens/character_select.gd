@@ -2,9 +2,13 @@ extends Screen
 ## Character select. Cards for every playable creature (Content.playable_creatures(), so mods add
 ## fighters automatically) plus a Random card; the poster on the right shows the focused fighter:
 ## name, epithet, element icon + name + status, weight class, stat bars, playstyle and kit.
-## params: {mode: "quick" | "pick", title, current, allow_random, on_pick: Callable(id)}
-##  - quick: picking starts a 1v1 against a random opponent at the default bot tier (Quick Fight).
+## params: {mode: "quick" | "pick", title, current, allow_random, on_pick: Callable(id),
+##          combat: "moves" | "classic" (default "moves"), player: bool (default: quick mode)}
+##  - quick: picking starts a 1v1 against a random opponent at the default bot tier (Quick Fight),
+##    the player bringing their saved loadout for that fighter.
 ##  - pick:  returns the id to on_pick (versus/spectate setup) and closes.
+## The poster (FighterInfo) follows `combat`: in Movesets the fighter's moves (the player's saved
+## loadout when `player`, else the recommended default), in Classic the v0.9.17 kit.
 ## Creature JSON fields used for presentation (all optional): name, title (epithet), element,
 ## stats {health, walk_speed, stamina, poise, power}, blurb (playstyle), tags, abilities.*.name, juice.name.
 
@@ -52,6 +56,8 @@ func on_enter(p: Dictionary) -> void:
 	cols.add_child(poster)
 	# the tale of the tape scrolls inside the poster so long kits never push the footer off screen
 	_fighter_info = FighterInfo.new()
+	_fighter_info.combat = "classic" if str(p.get("combat", "moves")) == "classic" else "moves"
+	_fighter_info.saved_loadouts = bool(p.get("player", mode == "quick"))
 	poster.add_child(_fighter_info)
 	_detail = _fighter_info.content
 	if ids.is_empty():
@@ -113,7 +119,7 @@ func _choose(id: String) -> void:
 		foe_name += " II"
 	var tier := BotTiers.default_tier()
 	MatchFlow.launch({"arena": arena, "rules": "duel",
-		"fighters": [{"creature": mine, "team": 0, "kind": "player", "name": Profiles.player_name()},
+		"fighters": [{"creature": mine, "team": 0, "kind": "player", "name": Profiles.player_name(), "loadout": MovesUi.saved_loadout(mine)},
 			{"creature": foe, "team": 1, "kind": "bot", "difficulty": BotTiers.brain_tier(tier), "name": foe_name}],
 		"ui": {"mode": "quick", "tier": tier}})
 

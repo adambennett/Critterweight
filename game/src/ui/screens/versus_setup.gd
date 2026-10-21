@@ -301,8 +301,9 @@ func _add_slot_rows(c: VBoxContainer, i: int) -> void:
 	if movesets():
 		# Movesets: the four moves this fighter brings (loadout A, B or the player's own)
 		var lr := PickRow.new("Moves")
-		lr.set_choice(_loadout_text(s), "", null)
-		lr.set_help("Moves", "The four moves fighter %d equips: a recommended loadout or your own pick from the fighter's move pool." % (i + 1))
+		lr.set_choice(_loadout_text(s), _loadout_moves_text(s), null)
+		lr.set_help("Moves", "The four moves fighter %d equips: a recommended loadout or your own pick from the fighter's move pool.%s" % [i + 1,
+			" Your pick is remembered for this fighter." if str(s.get("kind", "")) == "player" else ""])
 		lr.set_meta("focus_key", "moves%d" % i)
 		lr.activated.connect(_pick_loadout.bind(i))
 		c.add_child(lr)
@@ -351,6 +352,7 @@ func _add_slot_rows(c: VBoxContainer, i: int) -> void:
 func _pick_creature(i: int) -> void:
 	var s: Dictionary = slots()[i]
 	App.push("character_select", {"mode": "pick", "title": "Fighter %d" % (i + 1), "current": str(s["creature"]),
+		"combat": "moves" if movesets() else "classic", "player": str(s.get("kind", "")) == "player",
 		"allow_random": true, "on_pick": func(id: String) -> void:
 			if str(s["creature"]) != id:
 				s.erase("loadout")     # another fighter: its own (or the profile's saved) loadout
@@ -374,23 +376,25 @@ func slot_loadout(s: Dictionary) -> Array:
 		return []
 	var mine: Array = s.get("loadout", [])
 	if mine.is_empty() and str(s.get("kind", "")) == "player":
-		var saved = (Profiles.current.get("loadouts", {}) as Dictionary).get(c.id, []) if typeof(Profiles.current.get("loadouts", {})) == TYPE_DICTIONARY else []
-		mine = saved if typeof(saved) == TYPE_ARRAY else []
+		mine = MovesUi.saved_loadout(c.id)
 	return c.resolve_loadout(mine)
 
 
+## The Moves row's title: the recommended loadout's name, else "Custom".
 func _loadout_text(s: Dictionary) -> String:
 	var c := Content.creature(str(s["creature"]))
 	if c == null or str(s["creature"]) == "random":
 		return "Recommended"
-	var lo := slot_loadout(s)
-	for lk in c.loadouts:
-		if (c.loadouts[lk] as Dictionary)["moves"] == lo:
-			return str((c.loadouts[lk] as Dictionary).get("name", lk))
-	var names := PackedStringArray()
-	for id in lo:
-		names.append((c.pool[str(id)] as PoolMove).display_name if c.pool.has(str(id)) else str(id))
-	return ", ".join(names)
+	var title := MovesUi.loadout_title(c, slot_loadout(s))
+	return title if title != "" else "Custom"
+
+
+## The Moves row's subtitle: the equipped move names in input order.
+func _loadout_moves_text(s: Dictionary) -> String:
+	var c := Content.creature(str(s["creature"]))
+	if c == null or str(s["creature"]) == "random":
+		return "Each fighter's default moves"
+	return ", ".join(MovesUi.loadout_names(c, slot_loadout(s)))
 
 
 func _pick_loadout(i: int) -> void:
@@ -403,11 +407,7 @@ func _pick_loadout(i: int) -> void:
 		"on_done": func(lo: Array) -> void:
 			s["loadout"] = lo.duplicate()
 			if str(s.get("kind", "")) == "player":
-				var all = Profiles.current.get("loadouts", {})
-				var d: Dictionary = all if typeof(all) == TYPE_DICTIONARY else {}
-				d[cid] = lo.duplicate()
-				Profiles.current["loadouts"] = d
-				Profiles.save()
+				MovesUi.remember_loadout(cid, lo)
 			_rebuild("moves%d" % i)})
 
 

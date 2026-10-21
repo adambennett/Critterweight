@@ -1,6 +1,10 @@
 class_name CompendiumData
 extends RefCounted
 ## Read-only field guide. Stats/cooldowns/status values come from the loaded content, including mods.
+## Fighter pages list the Movesets move pool (category, how to use it, cooldown, cost, description,
+## its two styles) and both recommended loadouts, then the Classic kit; "Combat basics" explains
+## Movesets and Classic with the live bindings (docs/design/MOVESET_COMBAT.md §9). ABILITIES are
+## the Classic ability texts (still used by Classic and by pool moves built on those abilities).
 const ABILITIES := {
 	"f_varga": ["Slip a short distance in your movement direction with brief evasion, then deal 18% more damage for two seconds.", "Take a breath: stamina regeneration doubles and poise regeneration rises by 50% for four seconds. It restores resources over time, not HP.", "Push nearby rivals, then attack 20% faster with 20% more damage and 50% faster stamina regeneration for seven seconds, in addition to the standard JUICE bonus."],
 	"f_knell": ["Send a violet ghost-light toward your target. It gently tracks them, deals Spectral damage and builds Haunted.", "Vanish briefly, then emerge 3.2 metres in the movement direction. A small pulse punishes enemies near your exit. Mired prevents the dive.", "Ring three expanding pulses around yourself, building Haunted. For six seconds, take 20% less damage and 25% less knockback. The pulses can be escaped or interrupted."],
@@ -17,7 +21,7 @@ const MODES := {
 	"chumball": "Drive the chum ball into the opposing goal. Attacks and body contact move the ball; defend your goal while disrupting the other team.",
 	"absolute_unit": "The oversized Unit earns one point per second. Knock it out to become the next Unit after a two-second transformation. First to the score target, or the highest score when time expires, wins. The default Unit has 2.5x health, light-attack armor and stronger hits, but moves slower, cannot dodge and has longer ability cooldowns.",
 	"chum_rush": "Survive successive enemy waves. Clear enemies to advance; use the breaks to recover and choose supplements when offered.",
-	"tag_team": "Teams alternate the active fighter. Tag strategically to let a battered teammate rest; eliminate the other team. Tag uses D-pad Down / G with a four-second cooldown. Resting partners can taunt to cheer, or use Ability 1 for an assist.",
+	"tag_team": "Teams alternate the active fighter. Tag strategically to let a battered teammate rest; eliminate the other team. Tag uses D-pad Down / G with a four-second cooldown. Resting partners can taunt to cheer, or press Move 3 (Ability 1 in Classic) for an assist.",
 	"practice": "A training cage with no meaningful win/loss stakes. Use the practice options to set the opponent and work on specific moves.",
 }
 const REACTIONS := {
@@ -36,8 +40,8 @@ const REACTIONS := {
 	"spray": "Consumes Sludge and sprays its build-up onto nearby fighters, leaving a puddle.",
 	"sandblast": "Consumes Grit, deals damage, prevents guarding briefly and sprays Grit behind the target.",
 }
+## Guide pages after "Combat basics" (which combat_basics() writes with the live bindings).
 const GUIDE := {
-	"Combat basics": "Light attacks chain; heavy attacks can be charged. Guard faces forward, and a precisely timed guard parries. Dodges have brief evasion windows. Grabs beat passive defense. Damage depends on physical contact and closing speed, so spacing matters.\n\nAbilities use stamina and cooldowns. You cannot start one while knocked down, stunned or committed to an uninterruptible action. The HUD shows the binding, move name and cooldown. Defensive abilities need the right situation to show their benefit. JUICE requires a full Hype meter.",
 	"Campaign & saves": "Career is one persistent fighter: take fights, train between them and climb to the belt; it saves after every action in one of three slots. Off the Street is a fresh three-act run. Fight Camp adds the Cannery and permanent upgrades. Select a connected node on the map, resolve its fight or encounter, collect any reward, then choose the next route. Progress saves after committed choices and completed fights. Resume returns to the pending reward, shop, event, rest or map. In a run, quitting during an unfinished fight restarts that fight; in a Career, quitting a bout from the pause menu pulls you out (no purse, minus 4 popularity) unless the judges or the referee have already decided it, and only a crash re-fights it.",
 	"Career": "Create a fighter from any playable creature, give them a ring name and pick a difficulty. Each week you train one stat (Stamina, Chin, Speed, Power, Clinch, Defence) or rest to heal. Promoters send two or three fight offers; accept one, train through the camp, then fight on fight week. Wins and finishes raise popularity, which opens bigger promotions (popularity caps per tier: 42, 66, 88), and at 92 the Grand Circuit offers a five-round title shot. Purses buy gym upgrades that make training count for more or heal injuries faster. Injuries from a fight carry into training and the next bout until they heal. Bouts use Cage Rules: 10-point judges and a referee, three rounds (five for titles), and a draw is possible. Quitting a bout from the pause menu pulls you out: no purse and minus 4 popularity.",
 	"Ten-point scoring": "With 10-point must scoring nobody can be knocked out by damage: health stays full and the HP bars are hidden. Three judges score every round. Even card weighs everything evenly; Volume leans toward clean strikes landed and parries; Impact leans toward damage and knockdowns. Each judge gives the better fighter 10-9, a round too close to call 10-10 and a dominant round 10-8. The round line under the timer shows each judge's running total; the cards appear between rounds. After the last round the judges decide: Unanimous, Majority or Split Decision, or a Draw. A drawn decision goes to sudden death (next clean hit wins) when Sudden death is on.",
@@ -109,14 +113,67 @@ static func entries(section: String) -> Array:
 				for d: Dictionary in ArenaCatalog.palette(str(tab)):
 					result.append({"id": d.get("id", ""), "name": d.get("name", "Prop"), "text": str(d.get("desc", d.get("description", "Arena object")))})
 		"guide":
+			result.append({"id": "Combat basics", "name": "Combat basics", "text": combat_basics()})
 			for title in GUIDE:
 				result.append({"id": title, "name": title, "text": GUIDE[title]})
 	return result
+
+
+## "Combat basics": Movesets (the four move inputs, the basic strike, holds, stamina and cooldowns,
+## defence, the Ultimate, types) and Classic (the rule, and how to pick it), with live bindings.
+static func combat_basics() -> String:
+	var k := {}
+	for a in ["light", "heavy", "ability1", "ability2", "guard", "dodge", "grab", "juice"]:
+		k[a] = "(%s)" % Controls.prompt_for(a)     # parentheses: a key name in brackets could read as BBCode
+	var t := "[b]Movesets[/b] (the default in every game type)\n"
+	t += "Each fighter brings four named moves from its move pool, one on each move input: Move 1 %s, Move 2 %s, Move 3 %s and Move 4 %s. Choose them with Moves in fight setup (two recommended loadouts, or any four of your own); the HUD names each move on its button, and the Compendium lists every fighter's pool.\n\n" % [k["light"], k["heavy"], k["ability1"], k["ability2"]]
+	t += "[b]Basic strike.[/b] Every loadout has one. Tap it, and press again as each hit lands to keep the string going; the last press is the finisher, and pressed out of a dodge it is a dash strike. No cooldown and next to no stamina: there is always something to throw.\n\n"
+	t += "[b]Holds.[/b] A HOLD move charges while you hold it and strikes when you let go; a full charge hits much harder. A HOLD+AIM move keeps going while you hold it (up to a limit) and the left stick steers it; with the stick at rest it follows your target. Anything else is a tap.\n\n"
+	t += "[b]Stamina and cooldowns.[/b] Every move costs stamina as it starts, and streams drain it while held; low on stamina you slow down. Special moves have a cooldown (the card goes dark and refills) and some store two charges (×2 on the card). A press you can't afford flashes the card red (TIRED); one still cooling down flashes grey.\n\n"
+	t += "[b]Defence.[/b] Guard %s blocks the front but costs stamina: tap it just as a hit lands to parry (strikes, and darts, slashes and bolts). Dodge %s slips through strikes, shots and streams. Grapple %s beats guard and counter stances: grab, then push a direction and press it again to throw. Some loadouts add counters, deflectors and shields of their own.\n\n" % [k["guard"], k["dodge"], k["grab"]]
+	t += "[b]Ultimate.[/b] Landing hits, taking them and taunting fill Hype; at full Hype press %s for the fighter's Ultimate (its JUICE).\n\n" % k["juice"]
+	t += "[b]Types.[/b] Moves carry their element: the matchup table (±15% damage), status build-up (Sizzle, Soaked, Jolted, Gunked...), status reactions and zone reactions (fire on sludge burns, static in water spreads). See Elements.\n\n"
+	t += "[b]Classic[/b]\nThe original combat, kept whole as a match rule: Light %s chains, Heavy %s charges when held (Light, Light, Heavy is the finisher), Grab %s throws, two abilities on %s and %s, and JUICE %s. To play it, open Create › Rules Editor, edit a copy of a preset, set Fighters › Combat style to Classic, save, and pick that preset in Versus or when hosting online. Granny's lessons come in both styles." % [k["light"], k["heavy"], k["grab"], k["ability1"], k["ability2"], k["juice"]]
+	return t
+
+
+## A fighter's Movesets section: every pool move (name, category, hold, how to use it, cooldown and
+## cost, description, styles), then the recommended loadouts with their inputs.
+static func moves_text(c: CreatureDef) -> String:
+	if c.pool.is_empty():
+		return ""
+	var text := "\n[b]Move pool (Movesets)[/b]\n"
+	for id in c.pool:
+		var pm: PoolMove = c.pool[id]
+		var tag := MovesUi.hold_tag(pm)
+		text += "\n[b]%s[/b] · %s%s%s\n" % [pm.display_name, MovesUi.category_name(pm.category), " · basic" if pm.role == "basic" else "", " · " + tag if tag != "" else ""]
+		text += MovesUi.how_to_use(pm, c) + ".\n" + MovesUi.facts(pm) + "\n"
+		var desc := MovesUi.description(pm, c)
+		if desc != "":
+			text += desc + "\n"
+		var styles := MovesUi.style_lines(pm)
+		if not styles.is_empty():
+			text += "Styles: " + "; ".join(styles) + "\n"
+	if not c.loadouts.is_empty():
+		text += "\n[b]Recommended loadouts[/b]\n"
+		for lk in c.loadouts:
+			var lo: Dictionary = c.loadouts[lk]
+			var ids: Array = lo.get("moves", [])
+			var parts := PackedStringArray()
+			var names := MovesUi.loadout_names(c, ids)
+			for i in mini(names.size(), 4):
+				parts.append("%s (%s)" % [names[i], Controls.prompt_for(MovesUi.slot_action(i))])
+			text += "%s%s: %s\n" % [str(lo.get("name", str(lk).capitalize())), " (default)" if str(lk) == c.default_loadout else "", ", ".join(parts)]
+	return text
+
 
 static func fighter_text(c: CreatureDef) -> String:
 	var text := "[b]%s[/b]\n%s · %s\n\n" % [c.title, Elements.display_name(c.element), "Opponent / NPC" if c.npc_only else "Playable fighter"]
 	for pair in [["health", "Health"], ["stamina", "Stamina"], ["walk_speed", "Move speed"], ["poise", "Poise"], ["power", "Power"], ["defense", "Defense"]]:
 		text += "%s: %s\n" % [pair[1], str(c.stats.get(pair[0], 0))]
+	text += moves_text(c)
+	if not c.pool.is_empty():
+		text += "\n[b]Classic kit[/b] (the Classic match rule)\n"
 	var i := 0
 	for slot in ["ability1", "ability2", "juice"]:
 		if c.abilities.has(slot):

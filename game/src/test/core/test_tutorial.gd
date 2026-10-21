@@ -2,6 +2,8 @@ extends TestCase
 ## UI-12: every tutorial exercise can be completed with the inputs it teaches (driven by a
 ## scripted player standing in for a competent human), failures give hints, retry/skip work,
 ## exercises adapt honestly to kits that lack a slot, and completion is saved.
+## This file is the Classic course (the v0.9.17 lessons, run under the Classic rule, unchanged);
+## the Movesets course is test_tutorial_movesets.gd.
 ## Run fast with --fixed-fps 120. TUTORIAL_TRACE=1 prints each exercise's events.
 
 ## The fighter taking the course: TUTORIAL_CREATURE=<id> runs the whole course with another
@@ -53,7 +55,7 @@ func _sim(index: int, c: CreatureDef = null) -> MatchSim:
 	if c == null:
 		c = Content.creature(_player_id())
 	sim.setup({"arena": Tutorial.practice_cage(), "seed": 4, "mode": mode,
-		"rules": {"id": "tutorial", "name": "Tutorial", "mode": "tutorial", "round_time": 0.0, "intro_time": 0.0},
+		"rules": {"id": "tutorial", "name": "Tutorial", "mode": "tutorial", "combat": "classic", "round_time": 0.0, "intro_time": 0.0},
 		"fighters": [{"creature": c, "team": 0, "source": null, "kind": "player"},
 			{"creature": Content.creature(_partner_id(c.id)), "team": 1, "source": null, "kind": "scripted"}]})
 	return sim
@@ -132,8 +134,11 @@ func _trace(sim: MatchSim, cursor: int) -> int:
 
 
 func test_exercises_load_with_live_prompts() -> void:
-	var list := Tutorial.exercises()
+	var list := Tutorial.exercises("classic")
 	check_eq(list.size(), 10, "ten exercises")
+	var ids: Array = list.map(func(e): return str(e["id"]))
+	check_eq(ids, ["tut_footwork", "tut_hands", "tut_heavy", "tut_guard", "tut_dodge", "tut_ability", "tut_grab", "tut_parry", "tut_finish", "tut_freestyle"],
+		"the Classic course is the v0.9.17 course, in its order")
 	var c := Content.creature(_player_id())
 	for ex in list:
 		for key in ["title", "goal", "intro", "success", "hint", "check", "dummy"]:

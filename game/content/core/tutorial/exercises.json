@@ -3,6 +3,7 @@
     {
       "id": "tut_footwork",
       "order": 1,
+      "moves_order": 1,
       "title": "Footwork",
       "name": "Footwork",
       "goal": "Walk to the three rings, then circle the Kid while facing him.",
@@ -35,6 +36,7 @@
     {
       "id": "tut_hands",
       "order": 2,
+      "style": "classic",
       "title": "Hands",
       "name": "Hands",
       "goal": "Land a full three-hit Light string: {l_names}.",
@@ -53,6 +55,7 @@
     {
       "id": "tut_heavy",
       "order": 3,
+      "style": "classic",
       "title": "The big one",
       "name": "The big one",
       "goal": "Land a Heavy ({heavy_name}), then hold {heavy} to land the charged one ({charged_name}).",
@@ -76,6 +79,7 @@
     {
       "id": "tut_guard",
       "order": 4,
+      "moves_order": 6,
       "title": "Hands up",
       "name": "Hands up",
       "goal": "Hold {guard} through the Kid's three-hit string (lose less than 10% health).",
@@ -94,6 +98,7 @@
     {
       "id": "tut_dodge",
       "order": 5,
+      "style": "classic",
       "title": "Not there",
       "name": "Not there",
       "goal": "Dodge the Kid's Heavy without getting hit, then land a Dash Attack.",
@@ -117,6 +122,7 @@
     {
       "id": "tut_ability",
       "order": 6,
+      "style": "classic",
       "title": "Your trick",
       "name": "Your trick",
       "goal": "Use {ability1_name} ({ability1}) and make it connect.",
@@ -141,6 +147,7 @@
     {
       "id": "tut_grab",
       "order": 7,
+      "style": "classic",
       "title": "Hands on",
       "name": "Hands on",
       "goal": "Grab the Kid through his guard ({grab}) and throw him.",
@@ -162,6 +169,7 @@
     {
       "id": "tut_parry",
       "order": 8,
+      "moves_order": 9,
       "title": "The read",
       "name": "The read",
       "goal": "Parry two attacks: tap {guard} right as they land.",
@@ -180,6 +188,7 @@
     {
       "id": "tut_finish",
       "order": 9,
+      "style": "classic",
       "title": "Close it",
       "name": "Close it",
       "goal": "Land a Finisher ({light} {light} then {heavy}), then fill Hype and pop {juice_name} ({juice}).",
@@ -213,6 +222,7 @@
     {
       "id": "tut_freestyle",
       "order": 10,
+      "moves_order": 11,
       "title": "Freestyle",
       "name": "Freestyle",
       "goal": "Beat the Kid in a 60-second round: KO him, or have more health left at the bell.",
@@ -227,6 +237,179 @@
       "success": "Hm. Fine. Granny's corner is always open. Go lose to someone better and come tell me about it.",
       "hint": "Guard when he winds up. Hit him when he's done. Three things, kid.",
       "barnaby": "ann_tut_freestyle"
+    },
+    {
+      "id": "tut_m_string",
+      "order": 2,
+      "style": "moves",
+      "title": "Hands",
+      "name": "Hands",
+      "goal": "Land your whole {basic_name} string with {basic}: {string_names}.",
+      "dummy": "loose",
+      "check": "basic_string",
+      "params": {
+        "gap": 1.2
+      },
+      "highlight": "",
+      "intro": "{basic}: {basic_name}. Press again as each one lands. The last one's the finisher.",
+      "success": "That's your string, finisher and all. When in doubt, do that.",
+      "hint": "Plant your feet. Tap {basic}, let it land, tap again, all the way to the finisher.",
+      "rush": "Easy. Tap, let it land, tap again. Rush it and the next one cancels the last.",
+      "adapt": {
+        "skip": {
+          "goal": "Land your basic string. Your loadout has no basic strike.",
+          "success": "No basic strike in your loadout. Moving on."
+        }
+      },
+      "barnaby": "ann_tut_string"
+    },
+    {
+      "id": "tut_m_charge",
+      "order": 3,
+      "style": "moves",
+      "title": "Wind it up",
+      "name": "Wind it up",
+      "goal": "Land {charge_name} ({charge}), then hold {charge} and land {charge_full}.",
+      "dummy": "loose",
+      "check": "charge_move",
+      "params": {},
+      "highlight": "",
+      "intro": "{charge}: {charge_name}. Tap it for the quick one. Hold it to wind up the big one.",
+      "success": "That one ends arguments. It's also the one you'll miss most.",
+      "hint": "Tap {charge} with him in front of you. Then hold it, and let go with him in range.",
+      "stage": "Good. Now hold {charge} till you're wound up, and let go with him in range.",
+      "adapt": {
+        "skip": {
+          "goal": "Land a hold-to-charge move. Your loadout hasn't got one.",
+          "success": "No hold-to-charge move in your loadout. Moving on."
+        }
+      },
+      "barnaby": "ann_tut_heavy"
+    },
+    {
+      "id": "tut_m_sustain",
+      "order": 4,
+      "style": "moves",
+      "title": "Hold and aim",
+      "name": "Hold and aim",
+      "goal": "Hold {sustain} for {sustain_name}, steer it with {move} and keep it on the Kid.",
+      "dummy": "strafe",
+      "check": "sustain_aim",
+      "params": {
+        "hits": 3,
+        "steer": 0.25
+      },
+      "highlight": "stamina",
+      "intro": "{sustain}: {sustain_name}. It keeps going while you hold it. Steer it with the stick.",
+      "success": "That's pressure. Mind your stamina: run it dry and you've got nothing.",
+      "hint": "Get close and hold {sustain}. Push the stick at him as he walks. It turns slow.",
+      "adapt": {
+        "skip": {
+          "goal": "Hold and steer a sustained move. Your loadout hasn't got one.",
+          "success": "No hold-and-aim move in your loadout. Moving on."
+        }
+      },
+      "barnaby": "ann_tut_ability"
+    },
+    {
+      "id": "tut_m_special",
+      "order": 5,
+      "style": "moves",
+      "title": "Your special",
+      "name": "Your special",
+      "goal": "Use {special_name} ({special}) and make it connect.",
+      "dummy": "loose",
+      "check": "special_connect",
+      "params": {
+        "window": 3.0
+      },
+      "highlight": "cooldown",
+      "intro": "{special}: {special_name}. Specials cost stamina and cool down. Watch its card.",
+      "success": "That's what makes you you. Everything else, everyone's got.",
+      "hint": "Press {special} when he's in range. When its card lights up, it's ready again.",
+      "adapt": {
+        "use_only": {
+          "intro": "{special}: {special_name}. It doesn't hit, it sets you up. Use it and watch its card.",
+          "goal": "Use {special_name} ({special}).",
+          "hint": "Press {special}. That one works on you, not on him.",
+          "success": "That's your setup move. Use it before you need it."
+        },
+        "skip": {
+          "goal": "Use a special move. Your loadout hasn't got one.",
+          "success": "No special in your loadout. Moving on."
+        }
+      },
+      "barnaby": "ann_tut_ability"
+    },
+    {
+      "id": "tut_m_dodge",
+      "order": 7,
+      "style": "moves",
+      "title": "Not there",
+      "name": "Not there",
+      "goal": "Dodge the Kid's Heavy without getting hit, then press {basic} while dodging: {dash_name}.",
+      "dummy": "heavy",
+      "check": "dodge_then_dash",
+      "params": {},
+      "highlight": "",
+      "intro": "{dodge} plus a direction, and nothing can touch you. Press {basic} mid-dodge to strike.",
+      "success": "Nothing hits what isn't there. Come back swinging.",
+      "hint": "Wait for his big wind-up, then {dodge} sideways. Then {basic} while you slide.",
+      "stage": "Nothing hits what isn't there. Now press {basic} while you're dodging.",
+      "adapt": {
+        "no_dash": {
+          "intro": "{dodge} plus a direction, and nothing can touch you. That's the whole lesson.",
+          "goal": "Dodge the Kid's Heavy without getting hit. (No dash strike on your basic.)",
+          "hint": "Wait for his big wind-up, then {dodge} sideways.",
+          "success": "Nothing hits what isn't there. Come back with your hands."
+        }
+      },
+      "barnaby": "ann_tut_dodge"
+    },
+    {
+      "id": "tut_m_grapple",
+      "order": 8,
+      "style": "moves",
+      "title": "Hands on",
+      "name": "Hands on",
+      "goal": "Grapple the Kid through his guard ({grab}) and throw him.",
+      "dummy": "guard",
+      "check": "grab_throw",
+      "params": {},
+      "highlight": "",
+      "intro": "He's guarding. Grapple beats guard. {grab} to grab, a direction and {grab} to throw.",
+      "success": "Strikes beat grapples, grapples beat guard, guard beats strikes. Your triangle.",
+      "hint": "Walk up while his guard's up and press {grab}. Push toward the wall, {grab} again.",
+      "adapt": {
+        "skip": {
+          "goal": "Grapple the Kid through his guard ({grab}). Your fighter can't grapple.",
+          "success": "No grapple in your kit. Work around his guard. Moving on."
+        }
+      },
+      "barnaby": "ann_tut_grab"
+    },
+    {
+      "id": "tut_m_ultimate",
+      "order": 10,
+      "style": "moves",
+      "title": "Ultimate",
+      "name": "Ultimate",
+      "goal": "Fill Hype, then pop {ultimate_name} ({juice}).",
+      "skippable": true,
+      "dummy": "loose",
+      "check": "ultimate",
+      "params": {},
+      "highlight": "hype",
+      "intro": "Hits fill Hype. So does taunting, {taunt}. Full meter, {juice}: your Ultimate.",
+      "success": "That's the whole kit. Everything after this is timing.",
+      "hint": "Hit him, or taunt with {taunt} when he's far off. Full meter? Press {juice}.",
+      "adapt": {
+        "skip": {
+          "goal": "Fill Hype and pop your Ultimate. Your fighter hasn't got one.",
+          "success": "No Ultimate in your kit. Moving on."
+        }
+      },
+      "barnaby": "ann_tut_juice"
     }
   ]
 }

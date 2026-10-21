@@ -17,7 +17,7 @@ const ENTRIES := [
 			{"id": "spectate", "label": "Spectate", "icon": "spectate", "screen": "spectate", "params": {},
 				"desc": "Book a fight between bots, pick their skill tiers and watch from the director's chair."},
 			{"id": "tutorial", "label": "Tutorial", "icon": "tutorial", "screen": "tutorial_menu", "params": {},
-				"desc": "Granny Haymaker's corner: ten short lessons from footwork to the JUICE."},
+				"desc": "Granny Haymaker's corner: short lessons from footwork to your Ultimate, taught with your own moves."},
 		]},
 	{"id": "campaign", "label": "Campaign", "icon": "campaign", "desc": "A persistent fighter career, or a seeded fight card from the Undercard to the Title Card.",
 		"children": [

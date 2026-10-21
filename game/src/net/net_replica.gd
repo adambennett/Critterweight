@@ -76,7 +76,11 @@ func apply_roster_entry(e: Dictionary) -> bool:
 	var entry := {"gen": int(e.get("gen", 1)), "creature": str(e.get("creature", "")), "scale": float(e.get("scale", 1.0)),
 		"team": int(e.get("team", slot)), "name": str(e.get("name", "")), "kind": str(e.get("kind", "")),
 		"despawned": bool(e.get("despawned", false)), "player": int(e.get("player", 0)),
-		"tags": (e.get("tags", []) as Array).duplicate()}
+		"tags": (e.get("tags", []) as Array).duplicate(),
+		# v0.9.18 Movesets: the fighter's combat style and equipped loadout (NetHudMirror gives the
+		# client's HUD the same move cards as the host's)
+		"combat": "moves" if str(e.get("combat", "classic")) == "moves" else "classic",
+		"loadout": (e.get("loadout", []) as Array).duplicate() if typeof(e.get("loadout", [])) == TYPE_ARRAY else []}
 	var body_changed := prev.is_empty() or int(prev["gen"]) != int(entry["gen"])
 	if body_changed:
 		entry["def"] = NetSnapshot.roster_creature(entry)

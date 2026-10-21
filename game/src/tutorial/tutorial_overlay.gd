@@ -19,6 +19,7 @@ var _font: Font
 var _font_heavy: Font
 var _last_line := ""
 var _type_t := 0.0
+var _coach: PanelContainer
 
 
 func bind(s: MatchScene) -> void:
@@ -81,8 +82,10 @@ func _build() -> void:
 	coach.offset_bottom = -92
 	coach.offset_top = -310
 	coach.offset_right = 820
+	coach.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	coach.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(coach)
+	_coach = coach
 	var cb := VBoxContainer.new()
 	cb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coach.add_child(cb)
@@ -138,9 +141,25 @@ func _refresh_static() -> void:
 	_prompt.text = "[%s] Tutorial menu: retry, skip, pick an exercise" % Controls.prompt_for("pause")
 
 
+## The coach box and the menu prompt sit just above the HUD's control strip, whose height follows
+## the fighter's kit (Movesets: a row of move cards and a row of hints).
+func _place_above_strip() -> void:
+	var bottom := -92.0
+	if is_instance_valid(scene) and scene.hud:
+		var strip = scene.hud.get("_hints")
+		if strip != null and is_instance_valid(strip) and strip is Control:
+			bottom = minf(-92.0, (strip as Control).offset_top - 14.0)
+	if _coach:
+		_coach.offset_bottom = bottom
+		_coach.offset_top = bottom - 218.0
+	_prompt.offset_bottom = bottom
+	_prompt.offset_top = bottom - 36.0
+
+
 func _process(delta: float) -> void:
 	if mode == null:
 		return
+	_place_above_strip()
 	if _menu.visible:
 		scene.sim.paused = true
 	var ex := mode.current()
@@ -234,7 +253,7 @@ func _open_menu(finished: bool) -> void:
 			_button("Skip to the next exercise", func():
 				_close_menu()
 				mode.skip())
-			if mode.index < 7:
+			if mode.index < mode.list.size() - 3:      # before the skippable last layer (parry, ...)
 				_button("Skip to Freestyle", func():
 					_close_menu()
 					mode.start_exercise(mode.list.size() - 1))
