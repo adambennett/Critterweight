@@ -185,3 +185,25 @@ D:call | Lantern Swarm! Three little lights, all of them hunting!
 D:call | The wisps find their mark! You can't outrun a ghost light!
 @ability {"creature": "f_knell", "id": "toll"}
 D:tense | The bell tolls! Hit Knell now and you'll hear it twice!
+
+## ---- Varga's techniques (called when one lands on his strikes) ----
+@ability_hit {"creature": "f_varga", "id": "comet_hook"}
+D:hype | Comet Hook! The gold arc keeps travelling and clips whoever's next!
+D:call | The hook lands and the shockwave trails right behind it!
+@ability_hit {"creature": "f_varga", "id": "spiral_hook"}
+D:call | Spiral Hook! The aura spins them around and drags them back in!
+K:react | He punched them into a spin. I didn't know punches could do laps.
+@ability_hit {"creature": "f_varga", "id": "pressure_palm"}
+D:hype | Pressure Palm! The aura leaves his hand and flies across the cage!
+@ability_hit {"creature": "f_varga", "id": "force_palm"}
+D:hype | Force Palm, point blank! That guard simply stopped existing!
+@ability_hit {"creature": "f_varga", "id": "meteor_hammer"}
+D:hype | Meteor Hammer! The floor cracks right under that overhead!
+@ability_hit {"creature": "f_varga", "id": "thunder_chop"}
+D:call | Thunder Chop! Quick over the top, and the spark freezes them!
+@ability_hit {"creature": "f_varga", "id": "shockwave_kicks"}
+D:hype | The kick throws a shockwave! He's hitting from outside his own reach!
+K:dry | His kicks travel further than his legs do. Physics has filed a complaint.
+@ability_hit {"creature": "f_varga", "id": "iron_shins"}
+D:call | Iron Shins! He kicks straight through whatever's coming at him!
+K:dry | Shins of iron. That explains why he walks so loudly.
