@@ -134,3 +134,85 @@ armored chargers trade — and the cross-matchup alternates sides, so its number
   (hurt 0.4–0.6), so damage on them is below nominal.
 - Dust Bowl's projectile destruction runs as a 0.08 s tick hook (12 effect events per second
   while active).
+
+## Movesets (v0.9.18)
+
+In Movesets (the default combat style, `docs/design/MOVESET_COMBAT.md`) Dozer fights with four
+moves from an eight-move pool (`movepool` in `f_dozer.json`); Classic keeps everything above
+unchanged. Effects: `game/src/view/fx/moves/f_dozer.gd`. Tests: `game/src/test/kits/test_moves_dozer.gd`.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/dev/run_suite.ps1 -Filter test_moves_dozer
+```
+
+### The pool
+
+Damage figures are nominal (before his power ×1.15).
+
+| Move | Category | Input | Stamina / cooldown | How it plays |
+|---|---|---|---|---|
+| **Snout Jab** (basic) | strike | press, press again | 5–10 / – | The Classic string: Snout Jab → Hoof Stomp → Scoop (launcher) → Gravel Toss finisher; out of a dodge, the Shoulder Barge. Every hit builds Caked. The pressure he always has. |
+| **Horn Lunge** (heavy) | strike | hold = charge | 12 (16) / – | The armoured Horn Lunge; hold to wind it up and release into the Quarry Ram (3 m armoured dash, horn uppercut, guard crush). Not in either recommended build. |
+| **Bulldoze** | rush | press, steer with the stick | 14 / 8 s | The v0.9.17 charge: paws, then up to 6 m armoured, carrying the first fighter it meets; a wall at the end is a splat and a knockdown. Juiced: 10 m, free repeats, boulders. |
+| **Dust Bowl** | control | press | 10 / 11 s | The v0.9.17 cloud: 2.5 m around him for 4 s; enemies inside are Caked and stop regaining poise, projectiles flying in are destroyed, he has armour against light hits. |
+| **Rock Slide** | control | press (aimed at the press; it does not turn) | 12 / 9 s | Snout into the floor, heave: a 5 × 1.3 m fault line erupts 0.30 s in (6 damage, knock-up 3.8 m/s, 22 Caked). 0.44–0.54 s in, three boulders (0.4 m radius, 24 HP) rise along it at 2, 3.4 and 4.8 m and stand 3 s as cover that stops projectiles. |
+| **Boulder Toss** | projectile | press | 11 / 7 s | Digs a boulder up with the snout and lobs it at the target (8 m reach, released 0.40 s in). Direct hit: 7 damage and a knockdown. A miss shatters on landing: 3 damage and 15 Caked within 1.3 m. |
+| **Quake Stomp** | blast | press | 14 / 10 s | Bounds up on all fours (armour against light hits 0.1–0.5 s) and crashes down 0.48 s in: a 2.4 m ring, 5 damage and an unblockable knockdown; 0.57 s of recovery. |
+| **Iron Hide** | support | press | 10 / 12 s | Hunkers down and clamps the plates: for 4 s light hits do not stagger him, knockback taken ×0.6, speed ×0.92. |
+
+### Loadouts
+
+- **Bulldozer** (default; Snout Jab, Rock Slide, Bulldoze, Dust Bowl): charge through, wall off.
+  Rock Slide pops up whoever stands in its lane and plants cover against a shooter, Dust Bowl
+  eats projectiles up close, Bulldoze carries anyone left in front of him into the fence. Good
+  against ranged kits (Gusto, Jitters, Knell).
+- **Quarry** (Snout Jab, Quake Stomp, Boulder Toss, Iron Hide): siege from a distance, then stomp.
+  Lob boulders while they cross the cage, lock Iron Hide to walk through their jabs, Quake Stomp
+  when they arrive. Good against rushdown and strings (Stoke, Slurry, Varga).
+
+### Styles (drills)
+
+| Move | Style | Style |
+|---|---|---|
+| Snout Jab | **Battering Snout**: the jab and the scoop are armoured against light hits on the way in; ×1.25 stamina | **Gravel Mouth**: the Gravel Toss fan is 3 m / 90° and builds ×1.5 Caked |
+| Horn Lunge | **Pickaxe Horn**: the quick lunge knocks down a Caked fighter | **Long Haul**: the Quarry Ram dashes 4 m |
+| Bulldoze | **Steamroller**: steers 40°/s | **Gravel Wake**: drops three slowing rubble patches behind him |
+| Dust Bowl | **Choking Dust**: the cloud also slows (×0.85) | **Sandstorm**: a 3.2 m cloud and projectile wipe |
+| Rock Slide | **Scree Field**: no cover; three 0.9 m scree patches slow (×0.75) for 4 s | **Landslip**: the line drags fighters toward him instead of launching them |
+| Boulder Toss | **Avalanche**: three smaller stones in a 26° fan (3.9 damage, half the poise damage, no knockdown) | **Skipping Stone**: bounces once and rolls on |
+| Quake Stomp | **Aftershock**: a second ring (2.1–3.6 m) 0.4 s later | **Seismic Charge**: hold to hang at the top of the bound; the ring grows to 3.4 m and ×1.6 damage |
+| Iron Hide | **Spiked Plates**: a light hit on him is answered by a 1.3 m grit shove (2 damage, 15 Caked, at most every 0.4 s) | **Bedrock**: 2 s of armour against everything but grabs, speed ×0.75 |
+
+### Tips and counters
+
+- Rock Slide is aimed when he presses it and never turns: sidestep while he digs (0.3 s) and he
+  has 0.6 s of recovery to eat. The boulders are props: a few hits break them, and shots above
+  1 m sail over them.
+- Boulder Toss lands where you stood when it left his snout: step off the spot while it climbs
+  (its shadow shows the landing) or guard it (a blocked boulder does not knock down).
+- Quake Stomp goes through guard: back out of 2.4 m when he bounds up, dodge through the landing,
+  or hit him with something heavy during the bound (only light hits are armoured). Iron Hide
+  stops neither heavies nor grabs.
+
+### Effects
+
+`f_dozer.gd` draws the four new moves in his crushing-debris look: the hoof scrape, the line
+telegraph and the eruption of tilted slabs along the line's true footprint; the boulder dug up
+onto the snout, its tumbling flight (it casts a shadow) and the shatter or the break on a body;
+the quake's cracked disc, radial cracks and earth wave out to the true ring; Iron Hide's clang and
+iron sheen; the cover boulders' cracked footing and rubble skirt (crumbling with the boulder);
+scree patches. Pieces scale with the Effects quality and flashes dim under Reduce flashing.
+
+### Known gaps (Movesets)
+
+- "Trips anything not airborne": areas have no grounded-only filter, so a hovering or leaping
+  fighter inside the ring is tripped too (a dodge still passes through it). A generic fix: an
+  area field `"grounded": true` skipping targets that `EffectsSystem.zone_ignores` (hovering) or
+  that `Fighter.is_airborne()`.
+- The cover boulders keep the v0.9.17 prop look: a prop entity's vfx is its prop kind
+  ("boulder"), so a kit cannot draw it. A generic fix: `EffectsSystem._spawn_prop` keeps the
+  effect's `vfx` for the entity (`AbilityVfx._make_prop` already reads the kind from `prop`).
+- A hit that knocks down builds no Caked: `Combat.deliver` adds build-up after `receive_hit`, and
+  `StatusSet.add_buildup` ignores a downed fighter, so the Quake Stomp trip and a direct Boulder
+  Toss (like the v0.9.17 Landslide) lose their build-up. A generic fix: let the build-up of the
+  hit that caused the knockdown through (the target was not down before `receive_hit`).

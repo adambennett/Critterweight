@@ -376,5 +376,428 @@
       "ability1": {"min": 3, "max": 6.5, "when": [{"wall_behind_target": 3}, {"min": 4}]},
       "ability2": {"max": 7, "chance": 0.6, "when": [{"target_ranged": true, "min": 3.5}, {"self_poise_below": 0.45, "max": 2.5}, {"target_mashing": true, "max": 2.5}]}
     }
-  }
+  },
+  "movepool": {
+    "snout_jab": {
+      "name": "Snout Jab", "category": "strike", "role": "basic", "string": ["l1", "l2", "l3", "finisher"],
+      "dash": "dash_attack",
+      "short": "Snout jab, hoof stomp, scoop, then the Gravel Toss",
+      "desc": "Dozer's head-first string, every hit building Caked. Press again to keep it going: the jab, a stamping fore-hoof, a scoop that launches, and on the fourth press the Gravel Toss flicks the target aside behind a fan of gravel. Out of a dodge it is the Shoulder Barge.",
+      "styles": {
+        "battering_snout": {
+          "name": "Battering Snout", "desc": "The jab and the scoop shrug off light hits on the way in, but cost a quarter more stamina.",
+          "patch": [
+            {"op": "set", "path": "moves.l1.armor", "value": [[0, 0.16]]},
+            {"op": "set", "path": "moves.l1.armor_level", "value": "lights"},
+            {"op": "set", "path": "moves.l3.armor", "value": [[0, 0.22]]},
+            {"op": "set", "path": "moves.l3.armor_level", "value": "lights"},
+            {"op": "mul", "path": "moves.l1.stamina", "value": 1.25},
+            {"op": "mul", "path": "moves.l3.stamina", "value": 1.25}
+          ]
+        },
+        "gravel_mouth": {
+          "name": "Gravel Mouth", "desc": "The Gravel Toss sprays a wider, longer fan of gravel (3 m, 90°) that builds half again as much Caked.",
+          "patch": [
+            {"op": "set", "path": "moves.finisher.effects[type=area].radius", "value": 3},
+            {"op": "set", "path": "moves.finisher.effects[type=area].cone_deg", "value": 90},
+            {"op": "mul", "path": "moves.finisher.effects[type=area].buildup", "value": 1.5}
+          ]
+        }
+      },
+      "ai": {"range": [0, 1.7]}
+    },
+    "horn_lunge": {
+      "name": "Horn Lunge", "category": "strike", "role": "heavy", "use": "heavy", "charged": "heavy_charged",
+      "hold": "charge",
+      "short": "Armoured horn lunge; hold to load the Quarry Ram",
+      "desc": "A head-down lunge that drives the horn through light hits. Hold the button to keep winding it up and release into the Quarry Ram: a three-metre armoured dash ending in a horn uppercut that crushes guards. Both leave him stretched out: dodge the lunge and punish the recovery.",
+      "styles": {
+        "pickaxe_horn": {
+          "name": "Pickaxe Horn", "desc": "The quick Horn Lunge knocks down a Caked fighter.",
+          "patch": [
+            {
+              "op": "set", "path": "moves.heavy.on_hit",
+              "value": [{"if": {"target_status": "grit"}, "do": [{"type": "knockdown"}]}]
+            }
+          ]
+        },
+        "long_haul": {
+          "name": "Long Haul", "desc": "The Quarry Ram's dash runs a metre further before the uppercut.",
+          "patch": [{"op": "set", "path": "moves.heavy_charged.lunge", "value": [[0, 0.66, 6]]}]
+        }
+      },
+      "ai": {"range": [0, 1.8], "hold": [0.35, 1.0]}
+    },
+    "bulldoze": {
+      "name": "Bulldoze", "category": "rush", "use": "ability1",
+      "short": "An armoured, steerable charge that carries its target into the wall",
+      "desc": "Dozer paws the floor and charges up to six metres, armoured the whole way and steered a little with the stick. The first fighter he meets is carried along, and a wall at the end is a splat and a knockdown. Sidestep the run-up, or make him charge an empty wall: he staggers off it.",
+      "styles": {
+        "steamroller": {
+          "name": "Steamroller", "desc": "Steers twice as hard: a late sidestep no longer shakes him off.",
+          "patch": [
+            {"op": "set", "path": "abilities.ability1.effects[type=charge].steer_deg", "value": 40},
+            {"op": "set", "path": "abilities.ability1@juiced.effects[type=charge].steer_deg", "value": 40}
+          ]
+        },
+        "gravel_wake": {
+          "name": "Gravel Wake", "desc": "The charge drops three patches of loose rubble behind him that slow anyone crossing them.",
+          "patch": [
+            {
+              "op": "append", "path": "abilities.ability1.effects",
+              "value": {
+                "t": 0.55, "type": "zone", "kind": "grit_rubble", "radius": 0.9, "duration": 3, "owner_immune": true,
+                "affects_allies": false, "every": 0.3, "count": 3
+              }
+            },
+            {
+              "op": "append", "path": "abilities.ability1@juiced.effects",
+              "value": {
+                "t": 0.55, "type": "zone", "kind": "grit_rubble", "radius": 0.9, "duration": 3, "owner_immune": true,
+                "affects_allies": false, "every": 0.3, "count": 3
+              }
+            }
+          ]
+        }
+      }
+    },
+    "dust_bowl": {
+      "name": "Dust Bowl", "category": "control", "use": "ability2",
+      "short": "A choking dust cloud around Dozer: shots die in it, light hits don't stagger him",
+      "desc": "Four stamping hooves raise a 2.5-metre cloud that follows Dozer for four seconds. Enemies inside choke on Caked dust and stop regaining poise, projectiles that fly in are destroyed, and Dozer shrugs off light hits. Step out of it and wait it out, or grab him.",
+      "styles": {
+        "choking_dust": {
+          "name": "Choking Dust", "desc": "The cloud also slows anyone caught in it.",
+          "patch": [{"op": "set", "path": "abilities.ability2.effects[type=zone].status.speed", "value": 0.85}]
+        },
+        "sandstorm": {
+          "name": "Sandstorm", "desc": "A 3.2-metre cloud that also wipes out shots further from him.",
+          "patch": [
+            {"op": "set", "path": "abilities.ability2.effects[type=zone].radius", "value": 3.2},
+            {
+              "op": "set",
+              "path": "abilities.ability2.effects[type=buff].status.hooks[0].do[type=destroy_projectiles].radius",
+              "value": 3.2
+            }
+          ]
+        }
+      }
+    },
+    "rock_slide": {
+      "name": "Rock Slide", "category": "control", "cooldown": 9, "cost": 12,
+      "short": "A line of rocks bursts from the floor ahead; three boulders stay as cover",
+      "desc": "Dozer drives his shovel snout into the floor and heaves: a five-metre fault line erupts in front of him, knocking up and Caking anyone standing on it. Three boulders rise along the crack and stand for three seconds as cover that stops projectiles. The line cannot turn once he digs in: sidestep it, or break the rocks.",
+      "move": {
+        "duration": 0.9, "stamina": 12, "move_mult": 0.1, "turn_rate": 0, "speed": 1.6, "element": "grit",
+        "keys": [
+          {"t": 0},
+          {
+            "t": 0.1, "chains": {"leg_fr": [-0.31, 0.26, 0.6]}, "joints": {"neck": [-10, 0, 0], "head": [-12, 0, 0]},
+            "lean": [-5, 0, 0], "height": 0.04
+          },
+          {
+            "t": 0.2, "chains": {"leg_fr": [-0.32, 0.03, 0.7]}, "joints": {"neck": [30, 0, 0], "head": [28, 0, 0]},
+            "lean": [12, 0, 0], "height": -0.12
+          },
+          {
+            "t": 0.27, "chains": {"leg_fr": [-0.32, 0.03, 0.7]}, "joints": {"neck": [32, 0, 0], "head": [30, 0, 0]},
+            "lean": [13, 0, 0], "height": -0.14
+          },
+          {"t": 0.34, "joints": {"neck": [-16, 0, 0], "head": [-22, 0, 0]}, "lean": [-4, 0, 0], "height": 0.06},
+          {"t": 0.5, "joints": {"neck": [-18, 0, 0], "head": [-24, 0, 0]}, "lean": [-5, 0, 0], "height": 0.06},
+          {"t": 0.9}
+        ],
+        "effects": [
+          {
+            "t": 0.3, "type": "area", "shape": "line", "length": 5, "width": 1.3, "damage": 6, "knockback": 1.5,
+            "launch": 3.8, "stun": 0.45, "poise": 16, "element": "grit", "buildup": 22, "vfx": "dozer_rockslide"
+          },
+          {
+            "t": 0.44, "type": "prop", "prop": "boulder", "at": "forward:2", "radius": 0.8, "hp": 24, "duration": 3,
+            "vfx": "dozer_rockslide_rock"
+          },
+          {
+            "t": 0.49, "type": "prop", "prop": "boulder", "at": "forward:3.4", "radius": 0.8, "hp": 24, "duration": 3,
+            "vfx": "dozer_rockslide_rock"
+          },
+          {
+            "t": 0.54, "type": "prop", "prop": "boulder", "at": "forward:4.8", "radius": 0.8, "hp": 24, "duration": 3,
+            "vfx": "dozer_rockslide_rock"
+          }
+        ]
+      },
+      "styles": {
+        "scree_field": {
+          "name": "Scree Field", "desc": "The rocks crumble at once: instead of cover, three patches of scree slow anyone crossing them for four seconds.",
+          "patch": [
+            {"op": "remove", "path": "movepool.rock_slide.move.effects[type=prop]"},
+            {
+              "op": "append", "path": "movepool.rock_slide.move.effects", "spread": true,
+              "value": [
+                {
+                  "t": 0.44, "type": "zone", "kind": "grit_rubble", "at": "forward:2", "radius": 0.9, "duration": 4,
+                  "owner_immune": true, "affects_allies": false, "vfx": "dozer_scree",
+                  "status": {"id": "scree", "name": "Scree", "duration": 0.6, "speed": 0.75}
+                },
+                {
+                  "t": 0.49, "type": "zone", "kind": "grit_rubble", "at": "forward:3.4", "radius": 0.9, "duration": 4,
+                  "owner_immune": true, "affects_allies": false, "vfx": "dozer_scree",
+                  "status": {"id": "scree", "name": "Scree", "duration": 0.6, "speed": 0.75}
+                },
+                {
+                  "t": 0.54, "type": "zone", "kind": "grit_rubble", "at": "forward:4.8", "radius": 0.9, "duration": 4,
+                  "owner_immune": true, "affects_allies": false, "vfx": "dozer_scree",
+                  "status": {"id": "scree", "name": "Scree", "duration": 0.6, "speed": 0.75}
+                }
+              ]
+            }
+          ]
+        },
+        "landslip": {
+          "name": "Landslip", "desc": "The ground tips toward Dozer: the eruption drags whoever stands on the line into his reach instead of popping them up.",
+          "patch": [
+            {"op": "set", "path": "movepool.rock_slide.move.effects[type=area].kb_dir", "value": "toward"},
+            {"op": "set", "path": "movepool.rock_slide.move.effects[type=area].knockback", "value": 5},
+            {"op": "set", "path": "movepool.rock_slide.move.effects[type=area].launch", "value": 1}
+          ]
+        }
+      },
+      "ai": {"range": [1.2, 5], "when": [{"target_ranged": true}, {"projectile_incoming": true}, {"chance": 0.45}]}
+    },
+    "boulder_toss": {
+      "name": "Boulder Toss", "category": "projectile", "cooldown": 7, "cost": 11,
+      "short": "Rips a boulder out of the floor and lobs it: a knockdown on a direct hit",
+      "desc": "Dozer scoops a boulder out of the floor with his snout and flings it in a high arc at his target, up to eight metres away. A direct hit hurts and knocks the fighter down; a miss shatters into gravel that still clips anyone close by. It is slow and easy to read: step aside as it falls, or guard.",
+      "move": {
+        "duration": 0.95, "stamina": 11, "move_mult": 0.15, "turn_rate": 3, "speed": 1.7, "element": "grit",
+        "keys": [
+          {"t": 0},
+          {"t": 0.12, "joints": {"neck": [30, 0, 0], "head": [30, 0, 0]}, "lean": [12, 0, 0], "height": -0.12},
+          {"t": 0.2, "joints": {"neck": [32, 8, 0], "head": [26, 0, 0]}, "lean": [13, 4, 0], "height": -0.14},
+          {
+            "t": 0.31, "chains": {"leg_bl": [0.3, 0.03, -0.62], "leg_br": [-0.3, 0.03, -0.62]},
+            "joints": {"neck": [4, 10, 0], "head": [8, 0, 0]}, "lean": [2, 6, 0], "height": -0.04
+          },
+          {
+            "t": 0.42, "chains": {"leg_fl": [0.32, 0.22, 0.56], "leg_fr": [-0.32, 0.22, 0.56]},
+            "joints": {"neck": [-30, -6, 0], "head": [-32, 0, 0]}, "lean": [-12, -4, 0], "height": 0.1
+          },
+          {"t": 0.56, "joints": {"neck": [-24, 0, 0], "head": [-20, 0, 0]}, "lean": [-5, 0, 0], "height": 0.04},
+          {"t": 0.95}
+        ],
+        "effects": [
+          {
+            "t": 0.4, "type": "projectile", "from": "snout", "lob": true, "speed": 7.5, "range": 8, "radius": 0.36,
+            "life": 2.4, "arrive_y": 0.55, "damage": 7, "knockback": 4.5, "launch": 1.5, "knockdown": true, "stun": 0.5,
+            "poise": 35, "element": "grit", "buildup": 30, "burst_on_hit": false, "vfx": "dozer_boulder",
+            "on_expire": [
+              {
+                "type": "area", "radius": 1.3, "damage": 3, "knockback": 2.5, "stun": 0.2, "poise": 8, "element": "grit",
+                "buildup": 15, "vfx": "dozer_boulder_shatter"
+              }
+            ]
+          }
+        ]
+      },
+      "styles": {
+        "avalanche": {
+          "name": "Avalanche", "desc": "Three smaller stones in a 26° fan: easier to land, but none of them knocks down.",
+          "patch": [
+            {"op": "set", "path": "movepool.boulder_toss.move.effects[type=projectile].count", "value": 3},
+            {"op": "set", "path": "movepool.boulder_toss.move.effects[type=projectile].spread_deg", "value": 26},
+            {"op": "set", "path": "movepool.boulder_toss.move.effects[type=projectile].radius", "value": 0.26},
+            {"op": "set", "path": "movepool.boulder_toss.move.effects[type=projectile].knockdown", "value": false},
+            {"op": "mul", "path": "movepool.boulder_toss.move.effects[type=projectile].damage", "value": 0.55},
+            {"op": "mul", "path": "movepool.boulder_toss.move.effects[type=projectile].poise", "value": 0.5}
+          ]
+        },
+        "skipping_stone": {
+          "name": "Skipping Stone", "desc": "The boulder bounces once and rolls on: backing away from where it lands no longer saves you.",
+          "patch": [
+            {"op": "set", "path": "movepool.boulder_toss.move.effects[type=projectile].bounce", "value": 1},
+            {"op": "set", "path": "movepool.boulder_toss.move.effects[type=projectile].life", "value": 3.2}
+          ]
+        }
+      },
+      "ai": {"range": [2.8, 7.8]}
+    },
+    "quake_stomp": {
+      "name": "Quake Stomp", "category": "blast", "cooldown": 10, "cost": 14,
+      "short": "Bounds up and crashes down: a quake ring trips everyone around him",
+      "desc": "Dozer springs up on all four legs and crashes down belly-first, sending a quake through the floor in a 2.4-metre ring. Everyone inside is tripped, guarding or not. The bound is the warning: back off, dodge through the landing, or hit him first with something heavy, then punish his long recovery.",
+      "move": {
+        "duration": 1.05, "stamina": 14, "move_mult": 0, "turn_rate": 0.5, "speed": 1.5, "element": "grit",
+        "armor": [[0.1, 0.5]], "armor_level": "lights",
+        "keys": [
+          {"t": 0},
+          {"t": 0.16, "joints": {"neck": [14, 0, 0], "head": [10, 0, 0]}, "lean": [4, 0, 0], "height": -0.12},
+          {
+            "t": 0.32,
+            "chains": {
+              "leg_fl": [0.3, 0.34, 0.5], "leg_fr": [-0.3, 0.34, 0.5], "leg_bl": [0.28, 0.32, -0.46],
+              "leg_br": [-0.28, 0.32, -0.46]
+            },
+            "joints": {"neck": [-12, 0, 0], "head": [-8, 0, 0]}, "lean": [-4, 0, 0], "height": 0.26
+          },
+          {
+            "t": 0.4,
+            "chains": {
+              "leg_fl": [0.3, 0.36, 0.5], "leg_fr": [-0.3, 0.36, 0.5], "leg_bl": [0.28, 0.34, -0.46],
+              "leg_br": [-0.28, 0.34, -0.46]
+            },
+            "joints": {"neck": [-14, 0, 0], "head": [-10, 0, 0]}, "lean": [-3, 0, 0], "height": 0.28
+          },
+          {
+            "t": 0.48,
+            "chains": {
+              "leg_fl": [0.44, 0.03, 0.56], "leg_fr": [-0.44, 0.03, 0.56], "leg_bl": [0.4, 0.03, -0.6],
+              "leg_br": [-0.4, 0.03, -0.6]
+            },
+            "joints": {"neck": [22, 0, 0], "head": [16, 0, 0]}, "lean": [3, 0, 0], "height": -0.2
+          },
+          {
+            "t": 0.58,
+            "chains": {
+              "leg_fl": [0.44, 0.03, 0.56], "leg_fr": [-0.44, 0.03, 0.56], "leg_bl": [0.4, 0.03, -0.6],
+              "leg_br": [-0.4, 0.03, -0.6]
+            },
+            "joints": {"neck": [16, 0, 0], "head": [12, 0, 0]}, "lean": [2, 0, 0], "height": -0.14
+          },
+          {
+            "t": 0.68,
+            "chains": {
+              "leg_fl": [0.44, 0.03, 0.56], "leg_fr": [-0.44, 0.03, 0.56], "leg_bl": [0.4, 0.03, -0.6],
+              "leg_br": [-0.4, 0.03, -0.6]
+            },
+            "joints": {"neck": [18, 0, 0], "head": [14, 0, 0]}, "lean": [3, 0, 0], "height": -0.19
+          },
+          {"t": 1.05}
+        ],
+        "effects": [
+          {
+            "t": 0.48, "type": "area", "shape": "ring", "radius": 2.4, "inner": 0, "damage": 5, "knockback": 1.2,
+            "knockdown": true, "unblockable": true, "stun": 0.4, "poise": 20, "element": "grit", "buildup": 20,
+            "vfx": "dozer_quake"
+          }
+        ]
+      },
+      "styles": {
+        "aftershock": {
+          "name": "Aftershock", "desc": "A second, wider ring rolls out 0.4 s later and trips anyone who stepped out of the first.",
+          "patch": [
+            {
+              "op": "append", "path": "movepool.quake_stomp.move.effects",
+              "value": {
+                "t": 0.88, "type": "area", "shape": "ring", "radius": 3.6, "inner": 2.1, "damage": 3, "knockback": 1.5,
+                "knockdown": true, "unblockable": true, "stun": 0.3, "poise": 12, "element": "grit", "buildup": 12,
+                "vfx": "dozer_aftershock"
+              }
+            }
+          ]
+        },
+        "seismic_charge": {
+          "name": "Seismic Charge", "desc": "Hold the button to hang at the top of the bound: the longer he waits, the wider and harder the ring (up to 3.4 m).",
+          "patch": [
+            {"op": "set", "path": "movepool.quake_stomp.hold", "value": "charge"},
+            {"op": "set", "path": "movepool.quake_stomp.move.charge_time", "value": 0.8},
+            {"op": "set", "path": "movepool.quake_stomp.move.charge_at", "value": 0.34},
+            {
+              "op": "set", "path": "movepool.quake_stomp.move.effects[type=area].charge_scale",
+              "value": {"radius": 1.42, "damage": 1.6}
+            }
+          ]
+        }
+      },
+      "ai": {
+        "range": [0, 2.1], "hold": [0.3, 0.8],
+        "when": [{"target_closing": true}, {"target_winding": true}, {"self_poise_below": 0.5}, {"chance": 0.45}]
+      }
+    },
+    "iron_hide": {
+      "name": "Iron Hide", "category": "support", "role": "support", "cooldown": 12, "cost": 10,
+      "short": "Clamps his plates shut: light hits can't stagger him for four seconds",
+      "desc": "Dozer hunkers down and clamps his armour plates: for four seconds light hits no longer stagger him and every blow shoves him less, though he moves a little slower. Use it to walk through jabs and land something big. Heavy hits, grabs and throws still work on him: grab him or wait it out.",
+      "move": {
+        "duration": 0.65, "stamina": 10, "move_mult": 0.3, "turn_rate": 3, "speed": 1.6, "element": "grit",
+        "armor": [[0, 0.3]], "armor_level": "lights",
+        "keys": [
+          {"t": 0},
+          {
+            "t": 0.12,
+            "chains": {
+              "leg_fl": [0.38, 0.03, 0.48], "leg_fr": [-0.38, 0.03, 0.48], "leg_bl": [0.36, 0.03, -0.54],
+              "leg_br": [-0.36, 0.03, -0.54]
+            },
+            "joints": {"neck": [24, 0, 0], "head": [20, 0, 0]}, "lean": [4, 0, 0], "height": -0.12
+          },
+          {
+            "t": 0.22,
+            "chains": {
+              "leg_fl": [0.38, 0.03, 0.48], "leg_fr": [-0.38, 0.03, 0.48], "leg_bl": [0.36, 0.03, -0.54],
+              "leg_br": [-0.36, 0.03, -0.54]
+            },
+            "joints": {"neck": [24, 0, 0], "head": [20, 0, 0]}, "lean": [4, 0, 9], "height": -0.13
+          },
+          {
+            "t": 0.32,
+            "chains": {
+              "leg_fl": [0.38, 0.03, 0.48], "leg_fr": [-0.38, 0.03, 0.48], "leg_bl": [0.36, 0.03, -0.54],
+              "leg_br": [-0.36, 0.03, -0.54]
+            },
+            "joints": {"neck": [24, 0, 0], "head": [20, 0, 0]}, "lean": [4, 0, -9], "height": -0.12
+          },
+          {"t": 0.42, "joints": {"neck": [22, 0, 0], "head": [18, 0, 0]}, "lean": [4, 0, 5], "height": -0.1},
+          {"t": 0.65}
+        ],
+        "effects": [
+          {
+            "t": 0.28, "type": "buff", "duration": 4, "vfx": "dozer_iron_hide",
+            "status": {
+              "id": "iron_hide", "name": "Iron Hide", "duration": 4, "armor_lights": true, "knockback_taken": 0.6,
+              "speed": 0.92
+            }
+          }
+        ]
+      },
+      "styles": {
+        "spiked_plates": {
+          "name": "Spiked Plates", "desc": "Light hits that land on the hide cost the attacker: a burst of grit shoves them off and Cakes them.",
+          "patch": [
+            {
+              "op": "set", "path": "movepool.iron_hide.move.effects[type=buff].status.hooks",
+              "value": [
+                {
+                  "on": "hit_taken", "if": {"move_class": "light"}, "cooldown": 0.4,
+                  "do": [
+                    {
+                      "type": "area", "radius": 1.3, "damage": 2, "knockback": 3.5, "stun": 0.15, "poise": 6,
+                      "element": "grit", "buildup": 15, "vfx": "dozer_spikes", "pool": "iron_hide", "cat": "support"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "bedrock": {
+          "name": "Bedrock", "desc": "Two seconds of armour against everything but grabs, instead of four against light hits; he barely moves.",
+          "patch": [
+            {"op": "set", "path": "movepool.iron_hide.move.effects[type=buff].status.armor_all", "value": true},
+            {"op": "set", "path": "movepool.iron_hide.move.effects[type=buff].status.duration", "value": 2},
+            {"op": "set", "path": "movepool.iron_hide.move.effects[type=buff].status.speed", "value": 0.75},
+            {"op": "set", "path": "movepool.iron_hide.move.effects[type=buff].duration", "value": 2}
+          ]
+        }
+      },
+      "ai": {
+        "range": [0, 3.5],
+        "when": [{"target_closing": true}, {"target_mashing": true}, {"self_health_below": 0.5, "chance": 0.4}]
+      }
+    }
+  },
+  "loadouts": {
+    "bulldozer": {"name": "Bulldozer", "moves": ["snout_jab", "rock_slide", "bulldoze", "dust_bowl"]},
+    "quarry": {"name": "Quarry", "moves": ["snout_jab", "quake_stomp", "boulder_toss", "iron_hide"]}
+  },
+  "default_loadout": "bulldozer"
 }
