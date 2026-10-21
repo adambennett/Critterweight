@@ -14,6 +14,9 @@ Playstyle: a grappler wall that scuttles sideways. Long, slow claws; armored sla
 reach and throws; Brine puddles that soak opponents (Soaked targets get tripped by the slam's
 wave line and held by Double Clamp).
 
+The sections up to "Known gaps" describe the Classic kit (v0.9.17, unchanged). Dredge's Movesets
+move pool and loadouts are in [Movesets (v0.9.18)](#movesets-v0918) at the end.
+
 ## Stats (engine keys)
 
 | health | walk / side walk | accel | turn | stamina | poise | dash fwd / side | power / defense / weight |
@@ -165,3 +168,102 @@ Dozer mirrors; the cross alternates sides, so this does not bias the matchup num
   under his chest at a glancing angle and does not register; it lands from 1.4 m out.
 - The bot's wall/anchor-spot preference and tier-specific behaviours from the AI notes are not
   modelled.
+
+## Movesets (v0.9.18)
+
+In Movesets (the default combat style, `docs/design/MOVESET_COMBAT.md`) Dredge fights with four
+equipped moves out of an eight-move pool; the Classic kit above is untouched. Data: the
+`movepool`, `loadouts` and `default_loadout` blocks at the end of `f_dredge.json`. Effects:
+`game/src/view/fx/moves/f_dredge.gd`. Tests: `game/src/test/kits/test_moves_dredge.gd`.
+
+### The pool
+
+Damage is nominal (Dredge's `power` 0.92 and the element table still apply; Brine is +15% on
+Scorch). Costs are stamina at the start of the move.
+
+| Move | Category | Hold | Cooldown / cost | How to use it | What it is for |
+|---|---|---|---|---|---|
+| **Claw Snap** (basic) | strike | – | – / per strike (5–10) | press again to walk Cutter Snip → Backhand Claw → Double Clamp → Bilge Pump; out of a dodge it is the Scuttle Check | the always-available string: every claw builds Soaked, the Double Clamp holds a Soaked fighter, the Bilge Pump splats on the wall |
+| **Crusher Slam** (heavy) | strike | charge | – / 12 (16 charged) | tap for the slam and its 3.5 m floor wave; hold (0.9 s) for the Hull Breaker | the wave trips Soaked fighters (kit passive); the Hull Breaker crushes guards and leaves a puddle |
+| **Tide Spit** | projectile | – | 6 s / 10 | at a target 3–7 m away | the v0.9.17 lob: soaks on a hit and leaves a 5 s brine puddle |
+| **Anchor Drop** | counter | – | 10 s / 8 | just before a melee rush lands | the v0.9.17 stance: 2.5 s planted, armour, half knockback, every strike that lands answered with a claw snap |
+| **Bubble Stream** | stream | sustain, up to 2.5 s (9 stamina/s) | 6 s / 6 | hold; the stick sweeps it at 1.9 rad/s (else it tracks the target) | a bubble from the mouth every 0.15 s, drifting ~4 m at 2.6 m/s and rising a little: each pops on contact for 1.8 damage and 9 Soaked (≈12 damage a second on a fighter who stands in it); every bubble stops the first enemy shot it touches |
+| **Hydro Cannon** | blast | charge, 1.2 s (from 0.32 s in) | 9 s / 14 | hold to pump it, release to fire; a tap squirts a short jet | a line beam from his feet: 3.6 → 6 m long, 0.9 → 1.2 m wide, 7 → 18 damage, knockback 4 → 9.6 m/s plus lift, from a tap to a full charge; the recoil slides Dredge back (up to ~0.8 m); one second of recovery |
+| **Whirlpool** | control | – | 11 s / 12 | at a fighter 2–4 m away | a pool 2.4 m in radius opening 1.6 m ahead for 3.5 s: the opening yanks everyone inside toward its centre (3 damage, Soaked 20), then it keeps dragging them in (≈1 m/s against a fighter standing still; walking out, Stoke still makes ≈1.7 m/s), slows them (×0.8 "Undertow"), soaks them (12 every 0.4 s) and churns (1 damage every 0.4 s); Dredge and his allies are not pulled |
+| **Shell Brace** | support | – | 12 s / 10 | before a flurry, or to plant himself in someone's face | 3 s of damage taken ×0.6, knockback taken ×0.5, walk ×0.7 |
+
+Animation: Bubble Stream gulps (claws drawn in, eyestalks back), then spreads the claws wide and
+pumps them in and out while the shell bobs; Hydro Cannon cocks the crusher claw back, levels it
+across his front with the cutter cradling it (the pose holds while charging), then the recoil kicks
+the claw up and the shell back; Whirlpool raises both claws, stirs them left and right with a twist
+of the shell, and drives them into the floor; Shell Brace clamps both claws over the eyestalks,
+folds the eyestalks down and drops the shell 18 cm with a shudder.
+
+Engine use: the bubbles are a repeating `projectile` (`every` 0.15 s, `until: release`) with
+`intercept` and `burst_on_hit: false`, so their hits are throttled stream ticks (30% hype, a stun
+at most every 0.5 s, no stamina refund); the cannon's beam and recoil carry `charge_scale`; the
+whirlpool is a `brine_puddle` zone (fire, static and grit still react with it later) with a
+negative `push_out` (a pull), `owner_immune`, `affects_allies: false`, `skip_zone_reaction` (it
+always forms) and a per-tick slow status; the brace is a `buff` status.
+
+### Loadouts
+
+* **Tidecaller** (A, the default): Claw Snap, Bubble Stream, Hydro Cannon, Anchor Drop. Dredge as
+  a zoner: the bubbles screen out projectiles and soak whoever walks through them, the cannon
+  punishes from range (a Soaked fighter takes 25% more knockback and walks slower, so the full beam
+  lands and throws him into the cage), and Anchor Drop answers anyone who rushes through the stream.
+* **Breakwater** (B): Claw Snap, Crusher Slam, Whirlpool, Shell Brace. Dredge as a brawler:
+  pull them in, brace, crush. The whirlpool drags a fighter in front of him and soaks him, the
+  brace lets him take the exchange, and the Crusher Slam's wave trips the Soaked fighter for a
+  Hull Breaker or a grab.
+
+Tide Spit is in neither build: it trades the bubbles' screen for a puddle at range.
+
+### Styles (drills)
+
+| Move | Style | What it changes |
+|---|---|---|
+| Claw Snap | Pistol Shrimp | the Bilge Pump fires a 1.1 m cavitation burst at the claw (3 damage, Soaked 15) that also clips anyone beside the target |
+| | Tidepool Grip | Backhand Claw and Double Clamp pull the target back in (0.4 m) instead of shoving it, so the string stays in range |
+| Crusher Slam | Riptide Wave | the floor wave rolls 5 m instead of 3.5 and builds Soaked 20 instead of 8 |
+| | Keelhaul | the Hull Breaker hauls its target in and always knocks it down, but comes out 12% slower |
+| Tide Spit | Skipping Spit | the glob skips once off the floor before it bursts (2.4 s life) |
+| | Brine Bomb | the landing bursts in a 1.6 m splash (4 damage, Soaked 30, a shove) on top of the puddle |
+| Anchor Drop | Keel Over | the counter-snap knocks the attacker down |
+| | Sea Wall | while anchored, enemy projectiles within 1.8 m in front (150°) are washed away |
+| Bubble Stream | Froth Fan | two bubbles per puff in a 30° fan, each with 60% of the damage and Soaked |
+| | Bubble Mines | bigger (0.3 m), slow (1.2 m/s) bubbles every 0.25 s that hang ~3 s and burst in a 0.9 m soaking splash when they pop on their own |
+| Hydro Cannon | Wide Bore | a 40° spray cone (2.6 → 4 m deep with the charge) instead of the line, with less knockback |
+| | Riptide | the beam pulls its target toward Dredge (up to 6.2 m/s at full charge) and the recoil is gentler |
+| Whirlpool | Eye of the Storm | a smaller (2.2 m), weaker, 3 s pool that opens on Dredge and travels with him |
+| | Geyser | when the pool closes its centre erupts: 1.4 m, 6 damage, launch 4.5, Soaked 35 |
+| Shell Brace | Barnacle Crust | while braced, a hit taken from within 1.9 m is answered by a 1.5 m shard burst (3 damage, at most every 0.8 s) |
+| | Hunker Down | armour against light hits and 4 s long, but he walks at half speed |
+
+### Bots
+
+Each new move's `ai` hint: Bubble Stream at 0.4–3.4 m, held 0.9–2 s, when a projectile is coming,
+against a ranged fighter or at random; Hydro Cannon at 1.6–5.6 m, held 0.7–1.6 s; Whirlpool at
+1–4 m when the target is at least 2.2 m away, ranged, or Dredge's poise is low; Shell Brace within
+3 m, also as an answer to a heavy wind-up it sees (`reactive`), when hurt, or against a fighter
+closing in. Claw Snap, Crusher Slam, Tide Spit and Anchor Drop are pressed by the Classic brain
+through the loadout, with their v0.9.17 hints.
+
+### Tips and counters
+
+* Soak first: Bubble Stream or the Whirlpool make the target Soaked, which the Crusher Slam's wave
+  turns into a knockdown and the Hydro Cannon into a long flight (+25% knockback).
+* Against the bubbles: they are slow and the stream turns slowly, so sidestep it, circle behind
+  Dredge, or wait out the 2.5 s; a guard holds but drains like any stream. Shots fired into it
+  pop the bubbles instead of reaching him.
+* Against the cannon and the whirlpool: the charge has only light armour and a one-second
+  recovery follows the shot, so close in while he pumps or punish after; walk or dodge out across
+  the whirlpool's rim (hovering fighters float over it). A braced or anchored Dredge can still be
+  grabbed.
+
+### Known limits
+
+* The whirlpool's churn ticks go through the engine's zone damage, which carries no pool
+  attribution; its opening yank does (category `control`).
+* The beam's footprint is a line from Dredge's feet along his facing; it is drawn from the crusher
+  claw, which the cannon pose holds just right of his centre line.
