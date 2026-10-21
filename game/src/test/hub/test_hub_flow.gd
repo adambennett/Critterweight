@@ -346,3 +346,51 @@ func test_dev_stand_ins_apply_to_one_sign_up_only() -> void:
 	check(not hub.services.stand_ins, "the next sheet of the visit is a normal one")
 	check_eq(hub.services.catalog(), CampaignCatalog.shared(), "stations, the Bookie's Table and later sign-ups use the real catalog")
 	App.clear_screens()
+
+
+# --- v0.9.17 fighter art ---------------------------------------------------------------------------
+
+func test_the_fighters_face_follows_the_hub() -> void:
+	var hub := await enter_hub({"spot": "main_floor", "fighter": "f_dozer"})
+	var cv := hub.creature_view
+	check(cv._fx != null, "Dozer's face rig is live in the hub")
+	# beside Granny, facing her: the eyes go to her face
+	var granny := hub.view.npc("granny")
+	var near: Vector3 = HubLayout.NAV["mf_granny"]
+	var to := granny.global_position - near
+	hub.mode.teleport(hub.player(), near, atan2(to.x, to.z))
+	await settle()
+	var at := cv.fx_look
+	var gp := granny.global_position
+	check(at != Vector3.INF and Vector2(at.x - gp.x, at.z - gp.z).length() < 0.3 and at.y > gp.y + 0.5,
+		"looking at Granny's face (%s; she stands at %s)" % [str(at), str(gp)])
+	# nobody and nothing close: no particular target
+	hub.mode.teleport(hub.player(), HubLayout.NAV["mf_east"], 0.0)
+	await settle()
+	check(cv.fx_look == Vector3.INF, "nothing close: the eyes rest (%s)" % str(cv.fx_look))
+	# the expression follows the fighter's state, as in a match
+	var f := hub.player()
+	Input.action_press("guard")
+	await settle()
+	check_eq(f.state, Fighter.State.GUARD, "guarding")
+	check_eq(cv.fx_mood, "guard", "the face shows the guard")
+	check_eq(cv._fx.mood if cv._fx != null else "", "guard", "and the face rig gets it")
+	Input.action_release("guard")
+	await settle()
+	check_eq(cv.fx_mood, CreatureView.mood_for_state(f.state, f.health_frac()), "and lets it go")
+
+
+func test_the_tapes_challenger_is_a_plain_silhouette() -> void:
+	var hub := await enter_hub({"spot": "main_floor"})
+	var ms := HubSparring.play_tape(hub)
+	await settle()
+	if not check(ms != null and ms.views.size() > 1 and ms.views[1] != null, "the 1973 tape plays"):
+		return
+	var cv: CreatureView = ms.views[1]
+	check(not cv._materials.is_empty(), "the challenger is drawn")
+	var lit := 0
+	for m in cv._materials:
+		var tint: Color = m.get_shader_parameter("tint")
+		if float(m.get_shader_parameter("finish")) != 0.0 or not tint.is_equal_approx(Color(0.02, 0.02, 0.03)):
+			lit += 1
+	check_eq(lit, 0, "every surface is near black without the v0.9.17 finish (no reflections or highlights)")

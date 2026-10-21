@@ -246,6 +246,10 @@ func _process(dt: float) -> void:
 	if sim == null:
 		return
 	_time += dt
+	# the face (view only), as in a match: the expression the fighter's state calls for, eyes on
+	# whoever or whatever is close
+	creature_view.fx_mood = CreatureView.mood_for_state(player().state, player().health_frac())
+	creature_view.fx_look = _look_point()
 	creature_view.render(Engine.get_physics_interpolation_fraction())
 	creature_view.hype = player().hype / 100.0
 	if ability_fx:
@@ -268,6 +272,35 @@ func _process(dt: float) -> void:
 		Profiles.save()
 		state.dirty = false
 		_save_t = 0.0
+
+
+## What the player's fighter looks at (CreatureView.fx_look): the thing it can interact with (an
+## NPC's face), else the nearest NPC in look range on its floor, else nothing in particular (INF).
+func _look_point() -> Vector3:
+	var f := player()
+	var foc := mode.focus_of(f)
+	if not foc.is_empty():
+		if str(foc.get("kind", "")) == "npc":
+			var nv := view.npc(str((foc.get("def", {}) as Dictionary).get("npc", "")))
+			if nv != null:
+				return _npc_face(nv)
+		var at: Vector3 = foc.get("pos", f.ground_pos())
+		return at + Vector3.UP * 0.8
+	var g := f.ground_pos()
+	var best: HubNpcView = null
+	var best_d := HubNpcView.LOOK_RANGE
+	for key in view.npc_views:
+		var npc: HubNpcView = view.npc_views[key]
+		var q := npc.global_position
+		var d := Vector2(q.x - g.x, q.z - g.z).length()
+		if d < best_d and absf(q.y - g.y) < 1.0 and npc.is_visible_in_tree():
+			best = npc
+			best_d = d
+	return _npc_face(best) if best != null else Vector3.INF
+
+
+func _npc_face(npc: HubNpcView) -> Vector3:
+	return npc.global_position + Vector3.UP * npc.height * 0.85
 
 
 func _unhandled_input(event: InputEvent) -> void:

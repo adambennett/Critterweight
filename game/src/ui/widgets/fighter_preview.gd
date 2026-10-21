@@ -85,7 +85,7 @@ func show_fighter(c: CreatureDef) -> void:
 		height = maxf(height, segment.pivot.y)
 		extent = maxf(extent, segment.pivot.length())
 	model.snap_transforms(transforms)
-	model.render(1.0)
+	model.render(1.0)      # once: a skin swap (CreatureView.reload_model) re-poses from these transforms
 	target = Vector3(0, height * 0.5, 0)
 	distance = maxf(4.2, extent * 2.5)
 	yaw = 0.4
