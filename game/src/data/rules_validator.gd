@@ -57,6 +57,10 @@ const FIELDS := {
 		"help": "How fast the JUICE meter fills. 0 = no JUICE from Hype."},
 	"start_hype": {"group": "Fighters", "label": "Starting Hype", "type": "float", "def": 0.0, "min": 0.0, "max": 100.0, "step": 5.0,
 		"help": "100 = everyone can pop their JUICE right away."},
+	# v0.9.18 (docs/design/MOVESET_COMBAT.md): every built-in game type uses Movesets; Classic keeps
+	# the v0.9.17 combat whole. A real rule: sent with the match, validated by server and clients.
+	"combat": {"group": "Fighters", "label": "Combat style", "type": "enum", "def": "moves", "options": ["moves", "classic"],
+		"help": "Movesets: each fighter fights with its four equipped named moves (plus guard, dodge, grapple and JUICE). Classic: the original light / heavy / grab and two-ability combat."},
 	"abilities": {"group": "Fighters", "label": "Abilities", "type": "bool", "def": true,
 		"help": "Off: fighters only have strikes, guard, dodge and grabs."},
 	"juice": {"group": "Fighters", "label": "JUICE", "type": "bool", "def": true, "help": "Allow the JUICE ultimate."},
