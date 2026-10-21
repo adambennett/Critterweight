@@ -503,3 +503,30 @@ func test_a_second_interrupt_inside_the_fade_keeps_the_new_line() -> void:
 	Audio._speech_player_b = keep_b
 	live.queue_free()
 	fading.queue_free()
+
+
+func test_movesets_moves_are_called_by_name_and_kind() -> void:
+	var d := _director({"fighters": [{"index": 0, "creature": "f_stoke", "name": "STOKE", "team": 0},
+		{"index": 1, "creature": "f_dredge", "name": "DREDGE", "team": 1}]})
+	d.on_event({"type": "round_start", "round": 1}, {"time": 0.0})
+	d.on_event({"type": "hit", "fighter": 0, "target": 1, "damage": 3.0, "slot": "l1"}, {"time": 0.5})   # the round's first hit
+	var cast := d.on_event({"type": "ability", "fighter": 0, "slot": "mv.flamethrower", "id": "f_stoke.mv.flamethrower",
+		"pool": "flamethrower", "cat": "stream"}, {"time": 2.0})
+	check_eq(_triggers(cast), ["ability"], "the Flamethrower is called")
+	check(not cast.is_empty() and str(cast[0]["ctx"].get("id", "")) == "flamethrower" and str(cast[0]["ctx"].get("cat", "")) == "stream",
+		"by the move's own id and its kind (%s)" % str(cast[0]["ctx"] if not cast.is_empty() else {}))
+	var hit := d.on_event({"type": "hit", "fighter": 0, "target": 1, "damage": 1.6, "slot": "mv.flamethrower", "pool": "flamethrower",
+		"cat": "stream", "tick": true}, {"time": 2.4})
+	check_eq(_triggers(hit), ["ability_hit"], "the stream touching Dredge is a landed move")
+	check(not hit.is_empty() and str(hit[0]["ctx"].get("id", "")) == "flamethrower" and str(hit[0]["ctx"].get("cat", "")) == "stream",
+		"named and of its kind")
+	# a lobbed Cinder Shot that touches nobody is a miss of a projectile
+	d.on_event({"type": "ability", "fighter": 0, "slot": "mv.cinder_shot", "id": "f_stoke.mv.cinder_shot", "pool": "cinder_shot",
+		"cat": "projectile"}, {"time": 12.0})
+	var misses: Array = []
+	for k in 16:
+		for r in d.on_tick([0.8, 1.0], 80.0, 0.25):
+			if str(r["trigger"]) == "ability_miss":
+				misses.append(r)
+	check(misses.size() == 1 and str(misses[0]["ctx"].get("id", "")) == "cinder_shot" and str(misses[0]["ctx"].get("cat", "")) == "projectile",
+		"a projectile that touched nobody is called a miss, by name and kind (%s)" % str(misses))
