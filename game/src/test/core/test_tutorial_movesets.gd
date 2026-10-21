@@ -385,12 +385,9 @@ func test_charge_move_tapped_then_charged() -> void:
 	while t < 45.0 and mode.state == "active":
 		await step_sim(sim, 0.25)
 		t += 0.25
-		# a move without a cooldown must stay usable; this engine build spends its only charge and
-		# never refills it (Fighter._try_moves; reported): the lesson can't be finished until fixed
-		if f.state == Fighter.State.NEUTRAL and int(f.charges_left.get("m2", 1)) <= 0 and float(f.cooldown_left.get("m2", 0.0)) <= 0.0:
-			skip("engine: Fighter._try_moves spends the only charge of a move without a cooldown and never refills it (Furnace Haymaker works once per life)")
-			return
 	check(mode.state in ["success", "complete", "done_single"], "the charge lesson completed (state %s, progress '%s')" % [mode.state, mode.progress_text()])
+	# a move without a cooldown stays usable (a regression: it once spent a charge that never came back)
+	check_eq(int(f.charges_left.get("m2", 1)), 1, "the Furnace Haymaker spends no charge")
 
 
 ## Holds the sustained move from close range; steering (the stick on the Kid) only when `steer`.

@@ -786,9 +786,12 @@ func _try_moves(from_cancel: bool) -> bool:
 		if stamina < pm.stamina_cost() * 0.5:
 			_emit({"type": "move_denied", "slot": slot, "pool": pm.id, "why": "stamina"})
 			continue
-		charges_left[slot] = int(charges_left.get(slot, 1)) - 1
-		if float(cooldown_left.get(slot, 0.0)) <= 0.0 and pm.cooldown > 0.0:
-			cooldown_left[slot] = pm.cooldown
+		if pm.cooldown > 0.0:
+			# a charge comes back when the cooldown runs out; a move without a cooldown (a heavy
+			# strike, stamina-gated like a basic) spends none
+			charges_left[slot] = int(charges_left.get(slot, 1)) - 1
+			if float(cooldown_left.get(slot, 0.0)) <= 0.0:
+				cooldown_left[slot] = pm.cooldown
 		var mv := _pool_variant(pm)
 		var m: MoveDef = mv[0]
 		_start_move(m, str(mv[1]), State.ATTACK if m.kind == "melee" else State.ABILITY, pm.id, slot)
