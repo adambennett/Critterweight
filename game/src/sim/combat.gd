@@ -376,6 +376,12 @@ func apply_simple_damage(source: Fighter, b: Fighter, amount: float, kind: Strin
 		"move": kind, "slot": kind, "knockdown": h["knockdown"], "otg": false}
 	if was_down:
 		ev["was_down"] = true
+	if extra.has("pool"):
+		# a Movesets move's zone (a scorch patch, a whirlpool): attributed to the move, and a repeat
+		# (the judges credit its contact once a second)
+		ev["pool"] = str(extra["pool"])
+		ev["cat"] = str(extra.get("cat", ""))
+		ev["repeat"] = true
 	sim.emit_event(ev)
 
 

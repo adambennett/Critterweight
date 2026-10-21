@@ -804,7 +804,11 @@ func _update_zone(ent: Dictionary, dt: float) -> void:
 		var ally := f != null and o != f and not sim.are_enemies(f, o)
 		var dmg_mult: float = float(sim.rules.get("ally_reaction_damage_mult", Elements.rules.get("ally_reaction_damage_mult", 0.25))) if ally else 1.0
 		if float(e.get("tick_damage", 0.0)) > 0.0:
-			sim.combat.apply_simple_damage(f, o, float(e["tick_damage"]) * float(dmg_mult), "zone", {"element": e.get("element", "")})
+			var zx := {"element": e.get("element", "")}
+			if e.has("pool"):
+				zx["pool"] = e["pool"]
+				zx["cat"] = e.get("cat", "")
+			sim.combat.apply_simple_damage(f, o, float(e["tick_damage"]) * float(dmg_mult), "zone", zx)
 		var el := str(e.get("element", ""))
 		if el != "" and float(e.get("buildup", 0.0)) > 0.0 and not (o.creature.element == el):
 			o.statuses.add_buildup(el, float(e["buildup"]), f, 0.5 if ally else 1.0)
