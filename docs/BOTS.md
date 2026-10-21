@@ -92,6 +92,31 @@ hint section in `bot_brain.gd`). Added here: the `when` condition **`target_mash
 the bot's `read` skill notices the mashing); Dozer's Dust Bowl (`ability2`) uses it. The Slurry/Jitters hints
 (`stick`, `range_needs_tools`, `heavy_vs_windup`, `avoid_zones`) are kept verbatim.
 
+## Movesets (v0.9.18)
+
+Under Movesets rules (`combat: "moves"`, docs/design/MOVESET_COMBAT.md) the same brain plays every
+tier; a layer at the end of `bot_brain.gd` adapts it to the fighter's loadout:
+
+- **Translation.** The Classic brain still decides strikes, punishes, guard and footwork. Its
+  Light, Heavy and Ability presses (and the heavy charge hold) are rewritten each poll to the loadout
+  button holding that move: Light to the basic strike, Heavy to the move built on the heavy, Ability
+  1/2 to the moves built on those abilities. A meant move that is not equipped is dropped and counted
+  (`mv_dropped` tally). Grabbing, being held, knockdowns and get-ups read the raw buttons in both
+  styles (throws, mashing, wake-ups).
+- **The loadout's own moves.** Streams, blasts, volleys, rushes, control, supports and counters are
+  used from each move's `ai` hint (`range` [min, max] to the target's body, `when` conditions in the
+  kit-hint language, `hold` [min, max] seconds for charges and sustains, `chance`), falling back to
+  category defaults (`MOVE_AI_DEFAULTS`) and, for a move built on a v0.9.17 ability, that ability's
+  old hint. Tier skill scales how often (the `ability` parameter) and how fully a charge or sustain is
+  held (`combo`). A stream is kept aimed at the target while it pours (the stick steers it); counters,
+  blasts and utility moves can be used reactively, as an attack is seen beginning.
+- **What it may know** is unchanged: the same perception delays and visibility as Classic.
+- Varga's techniques ride on his strikes (limb, modifier, stance), so the Classic brain's strike
+  choices play them; the moves layer above is for the ordinary roster's loadouts.
+- AI Lab policies were trained on Classic combat (their action space is the Classic buttons), so in
+  a Movesets match a policy slot fights as a scripted bot at the entry's difficulty
+  (`PolicyInputSource.for_match` says so in the log); Lab training and evaluation run Classic rules.
+
 ## Measurements
 
 **Current code (2026-10-16), acceptance run** (`NAIVE_BOUTS=4`: 24 mirror bouts per tier at the test's

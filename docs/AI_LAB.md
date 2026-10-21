@@ -249,6 +249,10 @@ a warning. Incompatible files are listed with their reason and cannot be used.
   is simulated: on a host or dedicated server the server drives the bot; clients need nothing.
   Policies are not gameplay content, so they do not affect the multiplayer content hash.
 - Mods may ship policies in `policies/*.json` with ids `<modid>:<name>`.
+- Combat style (v0.9.18): policies act through act_v1, the Classic buttons, so they are used only in
+  Classic matches. In a Movesets match (the default rules) a policy slot fights as a scripted bot,
+  with a log line naming the policy; Lab training, recording, scenarios and evaluation always run
+  Classic rules (`combat: "classic"`), so existing datasets and policies stay valid.
 
 ## 7. Datasets and recording
 
@@ -431,6 +435,10 @@ Windowed tools (not part of `--test`):
 - `lab_evidence_summary.gd` collects run folders into `summary.json`.
 
 ## 12. Limitations and known gaps
+
+- Policies play Classic combat only (act_v1 has no loadout buttons or move holds); Movesets
+  matches replace them with scripted bots. A Movesets-aware action space (act_v2) would need new
+  training runs.
 
 - Policies are per fighter; a policy only plays the creature it was trained for (by design: the
   observation is generic, the learned behaviour is not). The shipped samples are for the
