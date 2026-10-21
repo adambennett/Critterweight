@@ -1103,10 +1103,12 @@ func arm_splat(by: Fighter, params: Dictionary) -> void:
 
 
 func start_hover(height: float, duration: float, speed: float) -> void:
-	_hover_until = time + duration * float(mods.get("hover_duration", 1.0))
+	var dur := duration * float(mods.get("hover_duration", 1.0))
+	_hover_until = time + dur
 	_hover_extra = height
 	_hover_speed = speed
-	_emit({"type": "hover"})
+	# "duration" is view-only (the hover's effects): 0 = this ends the hover (a dive)
+	_emit({"type": "hover", "duration": dur})
 
 
 func begin_airborne(on_land: Array, air_time: float) -> void:

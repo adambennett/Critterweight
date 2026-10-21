@@ -69,6 +69,7 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 		e = e.duplicate()
 		e["element"] = str(f.mods["effect_element"])
 	var p := _point(f, e)
+	var view := {}                   # view-only extras for the effect event below (never read back)
 	match t:
 		"projectile":
 			if f.is_out():
@@ -108,6 +109,8 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 			f.rig.apply_body_impulse(dir * float(e.get("speed", 8.0)) * f.rig.total_mass)
 			if bool(e.get("evade", false)):
 				f.evade_until = f.time + float(e.get("time", 0.2))
+			# the way the dash really goes ("stick" dashes leave the facing on the target)
+			view["dir"] = dir if float(e.get("speed", 8.0)) >= 0.0 else -dir
 		"leap":
 			_leap(f, e)
 		"hover":
@@ -151,13 +154,15 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 		"vfx": e.get("vfx", t), "radius": float(e.get("radius", 0.0)), "shape": str(e.get("shape", "circle")),
 		"yaw": f.facing_yaw, "move": m.id if m else ""}
 	# view-only: the rest of the footprint, so the VFX draw exactly the area that can hit
-	# (cones and lines start at the fighter's feet, see area()); presentation only, never read back
+	# (cones and lines start at the fighter's feet, see area(); cone_back is measured from `pos`);
+	# presentation only, never read back
 	for k in ["cone_deg", "length", "width", "inner", "duration", "distance", "delay", "speed"]:
 		var v = e.get(k)
 		if typeof(v) == TYPE_FLOAT or typeof(v) == TYPE_INT:
 			ev[k] = float(v)
-	if t == "area" and str(e.get("shape", "circle")) in ["cone", "cone_back", "line"]:
+	if t == "area" and str(e.get("shape", "circle")) in ["cone", "line"]:
 		ev["origin"] = f.ground_pos()
+	ev.merge(view)
 	sim.emit_event(ev)
 
 
