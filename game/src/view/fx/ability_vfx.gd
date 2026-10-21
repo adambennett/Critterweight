@@ -27,7 +27,7 @@ const CORE_OFF := {"f_stoke": Vector3(0, 0.26, 0.04), "f_dredge": Vector3(0, 0.0
 	"f_dozer": Vector3(0, 0.04, -0.03), "f_slurry": Vector3(0, 0.175, -0.025), "f_jitters": Vector3.ZERO,
 	"f_varga": Vector3(0, 0.233, 0), "f_knell": Vector3(0, 0.22, 0)}
 ## Stoke's two back stacks (tops), relative to the core centre
-const STOKE_STACKS := [Vector3(0.12, 0.31, -0.22), Vector3(-0.12, 0.31, -0.22)]
+const STOKE_STACKS := [Vector3(0.12, 0.26, -0.195), Vector3(-0.12, 0.26, -0.195)]
 
 ## Particle presets. "debris" = solid pieces (fx_debris.gdshader), "puff" = soft volumes (fx_puff).
 const PRESETS := {

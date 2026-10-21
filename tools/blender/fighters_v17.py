@@ -137,11 +137,12 @@ def stoke(s):
     # ---- two back stacks fed by pipes over the shoulders (read from the fight camera) ----
     for side in (-1, 1):
         x = .12 * side
-        s.tube('Exhaust pipe %d' % side, [(side * .2, 1.05, .2), (side * .27, 1.17, .05), (side * .19, 1.2, -.1), (x, 1.18, -.15)],
+        # tucked against the back (the stacks stay within ~7.5 cm of the chest collision shapes)
+        s.tube('Exhaust pipe %d' % side, [(side * .2, 1.05, .2), (side * .27, 1.17, .05), (side * .19, 1.19, -.1), (x, 1.16, -.14)],
                [.024, .024, .024, .028], 'chest', dark, 'metal', n=14)
-        s.tube('Back stack %d' % side, [(x, 1.12, -.165), (x, 1.24, -.175), (x, 1.31, -.18)], [.038, .036, .044], 'chest', dark, 'metal', n=20)
-        ring(s, 'Detail stack band %d' % side, (x, 1.2, -.172), .039, .039, 'chest', brass, .006, 'brass', n=20)
-        s.ellipsoid('Stack ember %d' % side, (x, 1.305, -.18), (.03, .006, .03), 'chest', 'FF7A1A', 'ember', glow=.55, n=16, m=6)
+        s.tube('Back stack %d' % side, [(x, 1.10, -.15), (x, 1.20, -.155), (x, 1.26, -.155)], [.036, .034, .04], 'chest', dark, 'metal', n=20)
+        ring(s, 'Detail stack band %d' % side, (x, 1.17, -.152), .037, .037, 'chest', brass, .006, 'brass', n=20)
+        s.ellipsoid('Stack ember %d' % side, (x, 1.255, -.155), (.027, .006, .027), 'chest', 'FF7A1A', 'ember', glow=.55, n=16, m=6)
 
     # ---- dorsal crest: rounded spines down the back and onto the tail, ember tips ----
     back_z = [zc[i] - rad[i][1] for i in range(len(ys))]
