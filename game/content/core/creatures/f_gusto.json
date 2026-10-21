@@ -243,5 +243,177 @@
                                                             {"min": 2.5, "chance": 0.12}]},
                        "ability2": {"chance": 4.5, "when": [{"in_enemy_zone": true, "chance": 0.9}]}},
          "charge_heavy": {"from": "pro", "chance": 0.27},
-         "parry_heavy": {"from": "champion", "chance": 0.35}}
+         "parry_heavy": {"from": "champion", "chance": 0.35}},
+  "movepool": {
+    "wing_snap": {"name": "Wing Snap", "category": "strike", "role": "basic", "string": ["l1", "l2", "l3", "finisher"], "dash": "dash_attack",
+      "short": "Wing, beak, kick, then the Tailspin; dives from the air",
+      "desc": "Gusto's hit-and-run string: a wing snap, a double beak peck, a scissor kick that launches a Winded target, and the Tailspin finisher that spins everyone off him. Out of a dodge it is the Skid Kick slide, which trips a Winded or Soaked fighter; from the hover it is the Dive Peck. Every hit is light, so a raised guard soaks the whole string.",
+      "styles": {
+        "featherweight": {"name": "Featherweight", "desc": "The wing, beak and kick come out faster but cost a little more stamina.", "patch": [
+          {"op": "time_scale", "path": "moves.l1", "value": 0.88}, {"op": "time_scale", "path": "moves.l2", "value": 0.88}, {"op": "time_scale", "path": "moves.l3", "value": 0.88},
+          {"op": "mul", "path": "moves.l1.stamina", "value": 1.25}, {"op": "mul", "path": "moves.l2.stamina", "value": 1.25}, {"op": "mul", "path": "moves.l3.stamina", "value": 1.25}]},
+        "gale_kick": {"name": "Gale Kick", "desc": "The Scissor Kick launches any fighter into the air, and a Winded one higher still.", "patch": [
+          {"op": "set", "path": "moves.l3.on_hit", "value": [{"do": [{"type": "launch", "amount": 2.6}]}, {"if": {"target_status": "gale"}, "do": [{"type": "launch", "amount": 1.4}]}]}]}},
+      "ai": {"range": [0.0, 1.5]}},
+    "crosswind_slash": {"name": "Crosswind Slash", "category": "strike", "role": "heavy", "use": "heavy", "charged": "heavy_charged", "hold": "charge",
+      "short": "Both wings cross; hold for the Downdraft stomp",
+      "desc": "Both wings sweep in and cross at chest height, and the gust behind them shoves the target back even when the wings miss. Hold the button to crouch and charge, then release into the Downdraft: a leap onto the target and a two-footed stomp that bursts on landing (from the hover it comes at once). The charge is slow and the leap easy to read: step aside and punish the landing.",
+      "styles": {
+        "inward_gale": {"name": "Inward Gale", "desc": "The gust behind the wings pulls the target back in instead of shoving it away, keeping it in reach of the string.", "patch": [
+          {"op": "set", "path": "moves.heavy.effects[type=push].type", "value": "pull"}]},
+        "updraft_stomp": {"name": "Updraft Stomp", "desc": "The Downdraft's landing burst spreads wider and throws everyone around it into the air.", "patch": [
+          {"op": "set", "path": "moves.heavy_charged.effects[type=leap].on_land[0].launch", "value": 3.6},
+          {"op": "mul", "path": "moves.heavy_charged.effects[type=leap].on_land[0].radius", "value": 1.25}]}},
+      "ai": {"range": [0.0, 1.6], "hold": [0.3, 0.9]}},
+    "gust_bomb": {"name": "Gust Bomb", "category": "projectile", "use": "ability1",
+      "short": "Spit a knot of air that bursts and blows fighters away",
+      "desc": "Gusto spits a ball of compressed air at his target, up to eight metres. It knocks back whatever it hits and bursts at the end of its flight, blowing away anyone near and building Winded. It flies straight and can be reflected: sidestep it, or stay clear of where it will pop.",
+      "styles": {
+        "vacuum_bomb": {"name": "Vacuum Bomb", "desc": "The burst sucks fighters in toward the pop instead of blowing them away.", "patch": [
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].on_expire.kb_dir", "value": "toward"}]},
+        "updraft_bomb": {"name": "Updraft Bomb", "desc": "The burst throws fighters up into the air instead of blowing them away.", "patch": [
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].on_expire.launch", "value": 4.6},
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].on_expire.knockback", "value": 1.5}]}},
+      "ai": {"range": [1.6, 7.5]}},
+    "hang_time": {"name": "Hang Time", "category": "utility", "use": "ability2",
+      "short": "Rise two metres and hover above the fray",
+      "desc": "One strong wing beat lifts Gusto two metres for 1.2 seconds: he can steer, ground zones cannot touch him, and his strike string and heavy become dives from the air. Any other move drops him out of the hover. Shots and anti-air strikes still reach him, and the landing is open to a punish.",
+      "styles": {
+        "thermal_rider": {"name": "Thermal Rider", "desc": "Rides a thermal: hovers half again as long and steers faster.", "patch": [
+          {"op": "set", "path": "abilities.ability2.effects[type=hover].duration", "value": 1.8},
+          {"op": "set", "path": "abilities.ability2.effects[type=hover].speed", "value": 4.2}]},
+        "liftoff_gust": {"name": "Lift-off Gust", "desc": "The take-off beat blasts the floor: fighters next to Gusto are blown away as he rises.", "patch": [
+          {"op": "append", "path": "abilities.ability2.effects", "value": {"t": 0.15, "type": "area", "radius": 1.6, "damage": 2, "knockback": 5.5, "stun": 0.2, "poise": 6,
+            "element": "gale", "buildup": 12, "vfx": "gusto_liftoff_gust"}}]}},
+      "ai": {"when": [{"in_enemy_zone": true}]}},
+    "air_slash": {"name": "Air Slash", "category": "projectile", "cooldown": 4, "cost": 8,
+      "short": "A fast crescent of air that cuts through everyone in a line",
+      "desc": "Gusto coils and whips his left wing across his body, flinging a razor crescent of air at his target. It crosses nine metres in under half a second, cuts through every fighter in its path and builds Winded. A well-timed parry shatters it and leaves Gusto reeling; at long range a sidestep is enough.",
+      "move": {"duration": 0.62, "stamina": 8, "move_mult": 0.3, "turn_rate": 8.0, "speed": 1.7, "element": "gale",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.09, "chains": {"wing_l": {"target": [0.88, 1.86, -0.50], "pole": [0.2, 0.9, -0.4]}, "wing_r": {"target": [-0.62, 1.30, 0.24], "pole": [-0.3, 0.9, -0.5]}},
+            "joints": {"neck": [-6, -12, 0], "head": [6, -10, 0]}, "lean": [-6, 30, 0], "height": -0.05},
+          {"t": 0.17, "chains": {"wing_l": {"target": [1.02, 1.90, -0.30], "pole": [0.2, 0.9, -0.4]}, "wing_r": {"target": [-0.66, 1.32, 0.28], "pole": [-0.3, 0.9, -0.5]}},
+            "joints": {"neck": [-8, -16, 0], "head": [8, -12, 0]}, "lean": [-8, 38, 0], "height": -0.07},
+          {"t": 0.21, "chains": {"wing_l": {"target": [0.70, 1.56, 1.00], "pole": [0.1, 0.9, 0.0]}},
+            "joints": {"neck": [4, -4, 0], "head": [-2, -4, 0]}, "lean": [4, 8, 0], "height": -0.03},
+          {"t": 0.25, "chains": {"wing_l": {"target": [0.15, 1.46, 1.18], "pole": [0.0, 0.9, 0.2]}},
+            "joints": {"neck": [8, 6, 0], "head": [-4, 6, 0]}, "lean": [8, -22, 0]},
+          {"t": 0.31, "chains": {"wing_l": {"target": [-0.30, 1.30, 1.05], "pole": [-0.1, 0.9, 0.3]}}, "lean": [6, -30, 0]},
+          {"t": 0.44, "chains": {"wing_l": {"target": [0.10, 1.10, 0.62], "pole": [0.2, 0.9, -0.2]}}, "lean": [2, -10, 0]},
+          {"t": 0.62}],
+        "effects": [
+          {"t": 0.22, "type": "projectile", "from": "wing_edge_l", "aim": "target", "speed": 22.0, "radius": 0.22, "life": 0.41, "pierce": true, "parryable": true,
+           "damage": 6, "knockback": 2.4, "stun": 0.3, "poise": 9, "element": "gale", "buildup": 16, "vfx": "gusto_air_slash"}]},
+      "styles": {
+        "twin_crescents": {"name": "Twin Crescents", "desc": "A second crescent follows the first a beat later: two chances to land, each a little lighter.", "patch": [
+          {"op": "set", "path": "movepool.air_slash.move.effects[type=projectile].every", "value": 0.12},
+          {"op": "set", "path": "movepool.air_slash.move.effects[type=projectile].until", "value": 0.18},
+          {"op": "mul", "path": "movepool.air_slash.move.effects[type=projectile].damage", "value": 0.7}]},
+        "cleaving_gale": {"name": "Cleaving Gale", "desc": "A heavier crescent that stops in the first fighter it meets: half again the damage, twice the push, and it drains a guard three times as fast.", "patch": [
+          {"op": "set", "path": "movepool.air_slash.move.effects[type=projectile].pierce", "value": false},
+          {"op": "mul", "path": "movepool.air_slash.move.effects[type=projectile].damage", "value": 1.5},
+          {"op": "mul", "path": "movepool.air_slash.move.effects[type=projectile].knockback", "value": 2.0},
+          {"op": "set", "path": "movepool.air_slash.move.effects[type=projectile].guard_break", "value": 3.0}]}},
+      "ai": {"range": [2.2, 8.5], "when": [{"target_closing": true}, {"target_winding": true}, {"chance": 0.5}]}},
+    "feather_darts": {"name": "Feather Darts", "category": "volley", "cooldown": 6, "cost": 9,
+      "short": "Five feather darts in a 30° fan; builds Winded fast",
+      "desc": "Gusto rears back and flings both wings forward, loosing five feather darts in a 30° fan. Up close most of them land and the Winded build-up piles on; at range only one or two find the target. Each dart is light and can be parried, and a raised guard soaks the volley.",
+      "move": {"duration": 0.66, "stamina": 9, "move_mult": 0.2, "turn_rate": 7.0, "speed": 1.6, "element": "gale",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.10, "chains": {"wing_l": {"target": [0.96, 1.62, -0.42], "pole": [0.2, 0.9, -0.4]}, "wing_r": {"target": [-0.96, 1.62, -0.42], "pole": [-0.2, 0.9, -0.4]}},
+            "joints": {"neck": [-12, 0, 0], "head": [12, 0, 0]}, "lean": [-8, 0, 0], "height": 0.02},
+          {"t": 0.18, "chains": {"wing_l": {"target": [1.04, 1.70, -0.56], "pole": [0.2, 0.9, -0.4]}, "wing_r": {"target": [-1.04, 1.70, -0.56], "pole": [-0.2, 0.9, -0.4]}},
+            "joints": {"neck": [-16, 0, 0], "head": [14, 0, 0]}, "lean": [-12, 0, 0], "height": 0.03},
+          {"t": 0.22, "chains": {"wing_l": {"target": [0.90, 1.52, 0.52], "pole": [0.1, 0.9, 0.0]}, "wing_r": {"target": [-0.90, 1.52, 0.52], "pole": [-0.1, 0.9, 0.0]}},
+            "joints": {"neck": [10, 0, 0], "head": [-6, 0, 0]}, "lean": [6, 0, 0]},
+          {"t": 0.26, "chains": {"wing_l": {"target": [0.62, 1.34, 0.98], "pole": [0.0, 0.9, 0.3]}, "wing_r": {"target": [-0.62, 1.34, 0.98], "pole": [0.0, 0.9, 0.3]}},
+            "joints": {"neck": [16, 0, 0], "head": [-10, 0, 0]}, "lean": [12, 0, 0], "height": -0.04},
+          {"t": 0.34, "chains": {"wing_l": {"target": [0.58, 1.24, 0.86], "pole": [0.0, 0.9, 0.3]}, "wing_r": {"target": [-0.58, 1.24, 0.86], "pole": [0.0, 0.9, 0.3]}},
+            "lean": [10, 0, 0], "height": -0.04},
+          {"t": 0.48, "chains": {"wing_l": {"target": [0.50, 1.12, 0.40], "pole": [0.3, 0.9, -0.5]}, "wing_r": {"target": [-0.50, 1.12, 0.40], "pole": [-0.3, 0.9, -0.5]}}, "lean": [4, 0, 0]},
+          {"t": 0.66}],
+        "effects": [
+          {"t": 0.225, "type": "projectile", "from": "body", "aim": "target", "count": 5, "spread_deg": 30, "speed": 17.0, "radius": 0.11, "life": 0.42, "parryable": true,
+           "damage": 2.2, "knockback": 0.9, "stun": 0.14, "poise": 3, "element": "gale", "buildup": 12, "class": "light", "vfx": "gusto_feather_darts"}]},
+      "styles": {
+        "quill_storm": {"name": "Quill Storm", "desc": "Seven lighter darts in a 50° fan: very hard to sidestep up close.", "patch": [
+          {"op": "set", "path": "movepool.feather_darts.move.effects[type=projectile].count", "value": 7},
+          {"op": "set", "path": "movepool.feather_darts.move.effects[type=projectile].spread_deg", "value": 50},
+          {"op": "mul", "path": "movepool.feather_darts.move.effects[type=projectile].damage", "value": 0.75}]},
+        "pinfeathers": {"name": "Pinfeathers", "desc": "Three heavier darts in a tight line that curve toward the target: they land at range, but there is no fan to catch a sidestep.", "patch": [
+          {"op": "set", "path": "movepool.feather_darts.move.effects[type=projectile].count", "value": 3},
+          {"op": "set", "path": "movepool.feather_darts.move.effects[type=projectile].spread_deg", "value": 6},
+          {"op": "set", "path": "movepool.feather_darts.move.effects[type=projectile].homing_deg", "value": 90},
+          {"op": "mul", "path": "movepool.feather_darts.move.effects[type=projectile].damage", "value": 1.5},
+          {"op": "mul", "path": "movepool.feather_darts.move.effects[type=projectile].buildup", "value": 1.4}]}},
+      "ai": {"range": [0.8, 4.2], "when": [{"max": 2.6}, {"target_closing": true}, {"chance": 0.35}]}},
+    "twister": {"name": "Twister", "category": "control", "cooldown": 9, "cost": 11,
+      "short": "A slow vortex that rolls five metres, lifting fighters and eating shots",
+      "desc": "Gusto pirouettes to spin up a twister and sends it rolling forward five metres at a walking pace. Anyone it reaches is lifted off their feet and thrown along its path, enemy projectiles it touches are swallowed, and where it dies down it leaves a whirl that pushes fighters out and bends shots for two seconds. It is slow: walk around it, or hover over it.",
+      "move": {"duration": 0.8, "stamina": 11, "move_mult": 0.0, "turn_rate": 6.0, "speed": 1.6, "element": "gale",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.06, "chains": {"wing_l": {"target": [1.02, 1.46, 0.0], "pole": [0.2, 0.9, -0.4]}, "wing_r": {"target": [-1.02, 0.98, 0.0], "pole": [-0.2, 0.9, -0.4]}},
+            "joints": {"neck": [8, 0, 0], "head": [-6, 0, 0]}, "lean": [6, 0, 10], "height": -0.10},
+          {"t": 0.16, "chains": {"wing_l": {"target": [1.02, 1.46, 0.0], "pole": [0.2, 0.9, -0.4]}, "wing_r": {"target": [-1.02, 0.98, 0.0], "pole": [-0.2, 0.9, -0.4]}},
+            "joints": {"neck": [8, 0, 0], "head": [-6, 0, 0]}, "lean": [6, 100, 10], "height": -0.12},
+          {"t": 0.26, "chains": {"wing_l": {"target": [1.02, 1.46, 0.0], "pole": [0.2, 0.9, -0.4]}, "wing_r": {"target": [-1.02, 0.98, 0.0], "pole": [-0.2, 0.9, -0.4]}},
+            "joints": {"neck": [8, 0, 0], "head": [-6, 0, 0]}, "lean": [6, 200, 10], "height": -0.12},
+          {"t": 0.36, "chains": {"wing_l": {"target": [1.02, 1.46, 0.0], "pole": [0.2, 0.9, -0.4]}, "wing_r": {"target": [-1.02, 0.98, 0.0], "pole": [-0.2, 0.9, -0.4]}},
+            "joints": {"neck": [8, 0, 0], "head": [-6, 0, 0]}, "lean": [6, 300, 10], "height": -0.10},
+          {"t": 0.43, "chains": {"wing_l": {"target": [0.42, 1.36, 1.04], "pole": [0.0, 0.9, 0.3]}, "wing_r": {"target": [-0.42, 1.36, 1.04], "pole": [0.0, 0.9, 0.3]}},
+            "joints": {"neck": [14, 0, 0], "head": [-8, 0, 0]}, "lean": [12, 360, 0], "height": -0.04},
+          {"t": 0.52, "chains": {"wing_l": {"target": [0.40, 1.30, 0.96], "pole": [0.0, 0.9, 0.3]}, "wing_r": {"target": [-0.40, 1.30, 0.96], "pole": [0.0, 0.9, 0.3]}},
+            "joints": {"neck": [12, 0, 0], "head": [-8, 0, 0]}, "lean": [10, 360, 0], "height": -0.04},
+          {"t": 0.66, "lean": [4, 360, 0]},
+          {"t": 0.8, "lean": [0, 360, 0]}],
+        "effects": [
+          {"t": 0.44, "type": "projectile", "offset": [0, 0.8, 1.0], "speed": 4.6, "radius": 0.7, "life": 1.1, "pierce": true, "intercept": true, "intercept_survives": true,
+           "reflectable": false, "damage": 4, "knockback": 4.5, "launch": 4.2, "stun": 0.5, "poise": 14, "element": "gale", "buildup": 25, "guard_break": 1.5,
+           "vfx": "gusto_twister",
+           "on_expire": [{"type": "zone", "kind": "gale_vortex", "radius": 1.3, "duration": 2.0, "owner_immune": true, "vfx": "gusto_twister_eddy"}]}]},
+      "styles": {
+        "seeking_squall": {"name": "Seeking Squall", "desc": "The twister bends toward its target as it travels, a little slower.", "patch": [
+          {"op": "set", "path": "movepool.twister.move.effects[type=projectile].homing_deg", "value": 50},
+          {"op": "mul", "path": "movepool.twister.move.effects[type=projectile].speed", "value": 0.8},
+          {"op": "mul", "path": "movepool.twister.move.effects[type=projectile].life", "value": 1.25}]},
+        "eye_of_the_storm": {"name": "Eye of the Storm", "desc": "It dies down into a bigger whirl that lasts three seconds and drags fighters into its eye instead of pushing them out.", "patch": [
+          {"op": "set", "path": "movepool.twister.move.effects[type=projectile].on_expire", "value": [
+            {"type": "zone", "kind": "gale_vortex", "radius": 1.7, "duration": 3.0, "push_out": -2.6, "owner_immune": true, "vfx": "gusto_storm_eye"}]}]}},
+      "ai": {"range": [1.4, 5.0], "when": [{"projectile_incoming": true}, {"target_ranged": true, "chance": 0.6}, {"target_closing": true, "chance": 0.5}, {"chance": 0.25}]}},
+    "tailwind": {"name": "Tailwind", "category": "support", "role": "support", "cooldown": 12, "cost": 10,
+      "short": "Ride the wind: 30% faster, cheaper dodges for four seconds",
+      "desc": "One great backward wing beat puts the wind at Gusto's back: for four seconds he moves 30% faster and his dodges cost half the stamina and carry further. Use it to close in, to kite, or to get out of a corner. It does nothing to the opponent, so pressure Gusto before he can cast it.",
+      "move": {"duration": 0.52, "stamina": 10, "move_mult": 0.6, "speed": 1.6, "element": "gale",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.08, "chains": {"wing_l": {"target": [0.72, 1.62, 0.42], "pole": [0.2, 0.9, -0.2]}, "wing_r": {"target": [-0.72, 1.62, 0.42], "pole": [-0.2, 0.9, -0.2]}},
+            "joints": {"neck": [-10, 0, 0], "head": [-6, 0, 0]}, "lean": [-6, 0, 0], "height": 0.02},
+          {"t": 0.19, "chains": {"wing_l": {"target": [1.02, 1.18, -0.58], "pole": [0.2, 0.9, -0.4]}, "wing_r": {"target": [-1.02, 1.18, -0.58], "pole": [-0.2, 0.9, -0.4]}},
+            "joints": {"neck": [6, 0, 0], "head": [-4, 0, 0]}, "lean": [10, 0, 0], "height": -0.06},
+          {"t": 0.28, "chains": {"wing_l": {"target": [0.50, 1.20, -0.60], "pole": [0.3, 0.9, -0.5]}, "wing_r": {"target": [-0.50, 1.20, -0.60], "pole": [-0.3, 0.9, -0.5]}},
+            "joints": {"neck": [22, 0, 0], "head": [-16, 0, 0]}, "lean": [16, 0, 0], "height": -0.10},
+          {"t": 0.38, "chains": {"wing_l": {"target": [0.48, 1.16, -0.50], "pole": [0.3, 0.9, -0.5]}, "wing_r": {"target": [-0.48, 1.16, -0.50], "pole": [-0.3, 0.9, -0.5]}},
+            "joints": {"neck": [16, 0, 0], "head": [-12, 0, 0]}, "lean": [12, 0, 0], "height": -0.08},
+          {"t": 0.52}],
+        "effects": [
+          {"t": 0.19, "type": "buff", "vfx": "gusto_tailwind",
+           "status": {"id": "gusto_tailwind", "name": "Tailwind", "duration": 4.0, "speed": 1.3, "dodge_cost": 0.5, "dash": 1.15}}]},
+      "styles": {
+        "slipstream": {"name": "Slipstream", "desc": "Every dodge under Tailwind leaves a little whirlwind where it started, pushing chasers away and bending their shots.", "patch": [
+          {"op": "set", "path": "movepool.tailwind.move.effects[type=buff].status.hooks", "value": [
+            {"on": "dodge", "do": [{"type": "zone", "kind": "gale_vortex", "radius": 1.0, "duration": 1.5, "owner_immune": true, "vfx": "gusto_slipstream_eddy"}]}]}]},
+        "quick_draft": {"name": "Quick Draft", "desc": "The cast darts Gusto along the stick and slips attacks on the way: an escape that buffs.", "patch": [
+          {"op": "set", "path": "movepool.tailwind.move.invuln", "value": [[0.04, 0.3]]},
+          {"op": "append", "path": "movepool.tailwind.move.effects", "value": {"t": 0.08, "type": "dash", "dir": "stick", "speed": 8.0, "evade": true, "time": 0.25, "vfx": "gusto_tailwind_dart"}}]}},
+      "ai": {"when": [{"min": 3.5}, {"self_health_below": 0.4}, {"target_closing": true, "chance": 0.4}]}}
+  },
+  "loadouts": {
+    "skyhook": {"name": "Skyhook", "moves": ["wing_snap", "air_slash", "feather_darts", "hang_time"]},
+    "cyclone": {"name": "Cyclone", "moves": ["wing_snap", "twister", "gust_bomb", "tailwind"]}
+  },
+  "default_loadout": "skyhook"
 }
