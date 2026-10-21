@@ -282,7 +282,8 @@ static func effect_value(ctrl: RunController, pid: String, eff: Dictionary) -> f
 		"technique_pick":
 			return 1.1
 		"learn_move":
-			return 1.0 if RunMoves.is_movesets(ctrl.state) and not RunMoves.learnable(ctrl.catalog, ctrl.player(pid)).is_empty() else 0.3
+			# a new move beats a stretch, but a hurt fighter takes the heal (nap: 0.9 below half HP)
+			return 0.8 if RunMoves.is_movesets(ctrl.state) and not RunMoves.learnable(ctrl.catalog, ctrl.player(pid)).is_empty() else 0.3
 		"reward_pick":
 			return 1.3
 		"run_mods", "run_patches", "run_hooks":

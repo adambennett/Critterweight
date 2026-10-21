@@ -252,9 +252,10 @@ func test_elite_and_boss_wins_bring_a_move_tutor() -> void:
 func test_the_shop_sells_a_move_scroll() -> void:
 	var seed_value := _seed_with("shop")
 	check(seed_value > 0, "precondition: a card with a shop")
+	cat().rules["start_scrip"] = 500         # (this test's catalog: the replay starts the same way)
 	var ctrl := new_run({"seed": seed_value})
 	check(_walk_to(ctrl, "shop"), "walked to the shop")
-	ctrl.player("p0")["scrip"] = 500
+	var scrip0 := int(ctrl.player("p0")["scrip"])
 	var v := ctrl.shop_view("p0")
 	var scroll := {}
 	for it in v["items"]:
@@ -267,7 +268,7 @@ func test_the_shop_sells_a_move_scroll() -> void:
 	check(int(scroll["price"]) > 0 and int(scroll["price"]) <= int(round(80.0 * 1.3)), "at the scroll price (%d)" % int(scroll["price"]))
 	check(not ctrl.learn_move("p0", str(scroll["id"]), "shop:s0"), "a supplement slot is no scroll")
 	check(ctrl.shop_buy("p0", str(scroll["slot"])), "buy the scroll: %s" % ctrl.last_error)
-	check_eq(int(ctrl.player("p0")["scrip"]), 500 - int(scroll["price"]), "paid")
+	check_eq(int(ctrl.player("p0")["scrip"]), scrip0 - int(scroll["price"]), "paid")
 	check((_moves(ctrl)["learned"] as Array).has(str(scroll["id"])), "learned")
 	var lg := _logged(ctrl, "learn")
 	check(lg.size() == 1 and str(lg[0]["d"]["source"]) == "shop:" + str(scroll["slot"]), "logged as learn from the shop")
