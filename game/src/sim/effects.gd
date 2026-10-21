@@ -223,7 +223,7 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 	if e.has("pool"):
 		ev["pool"] = str(e["pool"])
 		if bool(e.get("repeat_hit", false)):
-			ev["tick"] = true
+			ev["repeat"] = true      # ("tick" is the event's simulation tick, set by emit_event)
 	ev.merge(view)
 	sim.emit_event(ev)
 

@@ -191,7 +191,7 @@ func _take_damage(by: int, target: int, dmg: float, part: String, ev: Dictionary
 		return   # the referee keeps it off a downed fighter: nothing to credit
 	var pooled := str(ev.get("pool", "")) != ""
 	if str(ev.get("type", "")) == "hit" and (bool(ev.get("melee", false)) or pooled):
-		var tick := bool(ev.get("tick", false))
+		var tick := bool(ev.get("repeat", false))
 		if bool(ev.get("blocked", false)):
 			if not tick:
 				_add(s, "blocked", 1)

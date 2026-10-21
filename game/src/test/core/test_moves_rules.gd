@@ -66,7 +66,7 @@ func test_judges_credit_a_stream_per_second_of_contact() -> void:
 	var t0: Dictionary = sim.mode.judge.live_tally()[0]
 	await use_slot(sim, 0, 1, 2.2, 0.6)     # the Flamethrower, poured for 2.2 s
 	var ticks := pool_events(sim, "hit", "flamethrower").filter(func(e: Dictionary) -> bool:
-		return bool(e.get("tick", false)) and not bool(e.get("blocked", false)) and int(e.get("target", -1)) == 1)
+		return bool(e.get("repeat", false)) and not bool(e.get("blocked", false)) and int(e.get("target", -1)) == 1)
 	check(ticks.size() >= 8, "the stream ticked on Dredge (%d hits)" % ticks.size())
 	var t1: Dictionary = sim.mode.judge.live_tally()[0]
 	var landed := int(t1["landed"]) - int(t0["landed"])

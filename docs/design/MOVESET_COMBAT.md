@@ -127,7 +127,8 @@ A move pool entry (creature JSON `movepool`, Movesets only; Classic ignores it):
   keep the v0.9.17 aim assist (`aim: "target"`), lobs land on the target point.
 * **Attribution**: every hit and effect event carries the pool move id and its category, so judges,
   commentary, hooks, statistics and the HUD know which move landed.
-* **Tick throttles**: hits from repeating effects (`tick: true`) give 30% hype, refund no stamina,
+* **Tick throttles**: hits from repeating effects (hit events carry `repeat: true`; an event's `tick` is
+  its simulation tick) give 30% hype, refund no stamina,
   stun at most once per 0.5 s per target, count once per 0.5 s in combo scaling and the stun budget,
   and never trigger hit pause or camera shake. A stream cannot stun-lock or snowball hype.
 * **Denied presses**: a move press without enough stamina, or on cooldown, is consumed with a

@@ -583,7 +583,7 @@ func _on_event(ev: Dictionary) -> void:
 				vfx.emit("spark", p, n, col, HitFeel.spark_scale(dmg, mine))
 				if dmg >= (6.0 if mine else 10.0):
 					vfx.ring(p, 0.8, Color(1, 1, 1, 0.8), 0.25, false)
-			var tick := bool(ev.get("tick", false))
+			var tick := bool(ev.get("repeat", false))
 			camera.add_trauma(HitFeel.trauma(dmg, mine) * (0.15 if tick else 1.0))
 			if not tick:
 				camera.punch(HitFeel.punch(dmg, blocked, mine))

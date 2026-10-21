@@ -516,7 +516,7 @@ func test_movesets_moves_are_called_by_name_and_kind() -> void:
 	check(not cast.is_empty() and str(cast[0]["ctx"].get("id", "")) == "flamethrower" and str(cast[0]["ctx"].get("cat", "")) == "stream",
 		"by the move's own id and its kind (%s)" % str(cast[0]["ctx"] if not cast.is_empty() else {}))
 	var hit := d.on_event({"type": "hit", "fighter": 0, "target": 1, "damage": 1.6, "slot": "mv.flamethrower", "pool": "flamethrower",
-		"cat": "stream", "tick": true}, {"time": 2.4})
+		"cat": "stream", "repeat": true}, {"time": 2.4})
 	check_eq(_triggers(hit), ["ability_hit"], "the stream touching Dredge is a landed move")
 	check(not hit.is_empty() and str(hit[0]["ctx"].get("id", "")) == "flamethrower" and str(hit[0]["ctx"].get("cat", "")) == "stream",
 		"named and of its kind")

@@ -129,7 +129,7 @@ func test_sustained_stream_repeats_drains_and_ends_on_release() -> void:
 	check(a.move_pool_id == "stream" and a.sustaining, "still flaming while held, past the move's 0.9 s length")
 	var fx := _events(sim, "effect").filter(func(e: Dictionary) -> bool: return str(e.get("pool", "")) == "stream")
 	check(fx.size() >= 6, "the cone repeats every 0.12 s while held (%d)" % fx.size())
-	check(fx.all(func(e: Dictionary) -> bool: return bool(e.get("tick", false))), "repeating fire is tick fire")
+	check(fx.all(func(e: Dictionary) -> bool: return bool(e.get("repeat", false))), "repeating fire is tick fire")
 	check(a.stamina < st0 - 4.0 - STREAM_DRAIN * 0.6, "it drains stamina while held (%.1f -> %.1f)" % [st0, a.stamina])
 	a.input.set_held(FighterInput.HEAVY, false)
 	var n := fx.size()
@@ -142,7 +142,7 @@ func test_sustained_stream_repeats_drains_and_ends_on_release() -> void:
 	# the target took throttled ticks
 	var hits := sim.events.filter(func(e: Dictionary) -> bool: return str(e["type"]) == "hit" and int(e["fighter"]) == 0 and str(e.get("pool", "")) == "stream")
 	check(not hits.is_empty(), "stream ticks hit the opponent in front")
-	check(hits.all(func(e: Dictionary) -> bool: return bool(e.get("tick", false)) and str(e.get("cat", "")) == "stream"), "attributed ticks")
+	check(hits.all(func(e: Dictionary) -> bool: return bool(e.get("repeat", false)) and str(e.get("cat", "")) == "stream"), "attributed ticks")
 	check(a.hype < 15.0, "a stream's ticks build little hype (%.1f)" % a.hype)
 	check(sim.fighters[1].state != Fighter.State.HITSTUN or sim.fighters[1].stun_left <= 0.3, "no stun-lock")
 
@@ -209,3 +209,17 @@ func test_hooks_translate_classic_slots() -> void:
 	# a cooldown action naming ability1 acts on the loadout slot holding it
 	a.hooks.run_inline({"do": [{"type": "cooldown", "slot": "ability1", "set": 0.0}]}, {})
 	check(int(a.charges_left.get("m4", 0)) == 1, "cooldown hooks resolve Classic slots to loadout slots")
+
+
+func test_single_blows_are_not_repeats() -> void:
+	# a regression: the repeat flag once shared the event's "tick" key, which emit_event fills with the
+	# simulation tick, so every hit read as a stream tick (no hit pause, judges crediting once a second)
+	var sim := _sim("moves", [], 1.1)
+	await step_sim(sim, 0.4)
+	var a := sim.fighters[0]
+	a.input.press(FighterInput.LIGHT)     # the jab (the basic string)
+	await step_sim(sim, 0.7)
+	var hits := _events(sim, "hit")
+	check(not hits.is_empty(), "the jab lands")
+	check(hits.all(func(e: Dictionary) -> bool: return not bool(e.get("repeat", false)) and typeof(e.get("tick")) == TYPE_INT),
+		"a single blow is not a repeat, and its tick is the simulation tick")

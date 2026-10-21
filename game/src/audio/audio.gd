@@ -1791,7 +1791,7 @@ func on_sim_event(ev: Dictionary, listener_pos := Vector3.ZERO, info := {}) -> A
 		sfx(id, p if p != null else pos, vol, pitch)
 		acts.append(id)
 	var sound_type := type
-	if bool(ev.get("tick", false)) and type in ["hit", "effect"]:
+	if bool(ev.get("repeat", false)) and type in ["hit", "effect"]:
 		# Movesets: a stream or repeating effect ticks many times a second and its held loop carries
 		# the sound, so a touched target only gets a quiet hit now and then and only repeated
 		# launches (darts, bubbles) sound on their own

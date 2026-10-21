@@ -344,7 +344,7 @@ func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 			cat = pm.category if pm else ""
 		ev["cat"] = cat
 	if bool(h.get("tick", false)):
-		ev["tick"] = true
+		ev["repeat"] = true      # a repeating effect's hit (MatchSim.emit_event owns "tick": the event's tick)
 	sim.emit_event(ev)
 
 

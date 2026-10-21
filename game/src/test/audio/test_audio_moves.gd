@@ -20,9 +20,9 @@ func test_streams_hold_a_loop_and_ticks_stay_quiet() -> void:
 	var sounds := 0
 	for k in 8:
 		sounds += Audio.on_sim_event({"type": "effect", "fighter": 0, "effect": "area", "element": "scorch", "pos": Vector3.ZERO,
-			"pool": "flamethrower", "tick": true}, Vector3.ZERO, at).size()
+			"pool": "flamethrower", "repeat": true}, Vector3.ZERO, at).size()
 		sounds += Audio.on_sim_event({"type": "hit", "fighter": 0, "target": 1, "damage": 1.6, "slot": "mv.flamethrower",
-			"pool": "flamethrower", "cat": "stream", "tick": true, "element": "scorch"}, Vector3.ZERO, at).size()
+			"pool": "flamethrower", "cat": "stream", "repeat": true, "element": "scorch"}, Vector3.ZERO, at).size()
 	check(sounds <= 1, "eight ticks in a burst make at most one quiet hit sound (%d)" % sounds)
 	var loops: Dictionary = Audio._state().get("sustain_loops", {})
 	check(loops.has(0), "the loop runs while the stream pours")
@@ -30,5 +30,5 @@ func test_streams_hold_a_loop_and_ticks_stay_quiet() -> void:
 	check(not (Audio._state().get("sustain_loops", {}) as Dictionary).has(0), "and stops when it ends")
 	# a darts volley's repeated launches still sound, quietly
 	var darts := Audio.on_sim_event({"type": "effect", "fighter": 0, "effect": "projectile", "element": "sludge", "pos": Vector3.ZERO,
-		"pool": "poison_darts", "tick": true}, Vector3.ZERO, at)
+		"pool": "poison_darts", "repeat": true}, Vector3.ZERO, at)
 	check(darts.has("proj_launch_sludge"), "a repeated launch sounds (%s)" % str(darts))
