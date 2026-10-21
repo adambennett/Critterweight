@@ -499,6 +499,20 @@ func render(alpha: float) -> void:
 	_update_materials()
 
 
+## Metres a body's REST pose reaches below its floor (y = 0 of fighter space), 0 when it does not.
+## Physics stands every fighter on the floor in play; static previews lift the rest pose by this so
+## feet never sink into the pedestal (Varga's imported body reaches 17 cm below its rest floor).
+static func rest_sink(b: BodyDef) -> float:
+	var lowest := 0.0
+	for s: BodyDef.Seg in b.segments:
+		for sh: BodyDef.Shape in s.shapes:
+			var r := sh.size.y * 0.5 if sh.type == BodyDef.SHAPE_BOX else sh.radius
+			var ends := [sh.a, sh.b] if sh.type == BodyDef.SHAPE_CAPSULE else [sh.a]   # spheres/boxes: a = centre
+			for p in ends:
+				lowest = minf(lowest, s.pivot.y + (p as Vector3).y - r)
+	return -lowest
+
+
 ## The expression a fighter's state calls for (Fighter.State values; works from snapshots too).
 static func mood_for_state(state: int, health_frac: float) -> String:
 	match state:

@@ -9,7 +9,7 @@ Adam Bennett
 
 ## Design, engineering and art direction
 Developed with AI-assisted tooling (Anthropic Claude) under the project lead's direction. All names, characters,
-writing, UI and icons are original to this project. Varga and the referee use Jeremy's models as credited below. Music and selected sound effects are third-party recordings
+writing, UI and icons are original to this project. The referee and Varga's Legacy skin use Jeremy's models as credited below. Music and selected sound effects are third-party recordings
 under the free licences listed below; the remaining generated audio comes from tools/audio.
 
 ## Campaign event art
@@ -18,7 +18,8 @@ under the free licences listed below; the remaining generated audio comes from t
 
 ## Reference project
 Cage Rules, by Jeremy — its code, ideas and project-owned assets were authorised for reuse. Varga uses the original
-fighter model, rig, standing poses and strike definitions, adapted to Critterweight's simulation and controls. The
+fighter rig, standing poses and strike definitions, adapted to Critterweight's simulation and controls; his original
+fighter model is the "Legacy Varga skin" (Settings › Graphics), kept unchanged since v0.9.16. The
 referee is Jeremy's original referee model and outfit, with his poses and ring positioning ported to Critterweight. The
 Barlow typefaces also came through Cage Rules (their own SIL OFL 1.1 licence applies). Source hashes and conversion
 commands are recorded in tools/cage_rules/README.md; the original ground/submission engine is not included.
@@ -55,3 +56,11 @@ exact prompts and provenance are in `docs/evidence/art/concepts/prompts.json` an
 Blender Foundation and contributors provide Blender; Siddharth Ahuja and contributors provide the
 optional MIT Blender MCP bridge. No third-party character, texture or material asset ships in this revamp.
 These acknowledgements are included in the in-game credits.
+
+## v0.9.17 roster art and ability effects
+
+The eight playable fighters' v0.9.17 models (including Varga's default look) and all ability effects
+are original work built with Anthropic Claude under Adam Bennett's direction: editable Blender
+sources (`tools/blender/fighters_v17*.py`, `tools/blender/*.blend`) on the same skeleton contract,
+and procedural shaders and particle programs (`game/src/view/fx/`, `game/src/view/shaders/fx_*`).
+No third-party character, texture, material or effect asset ships in this pass.

@@ -20,7 +20,7 @@
 			"heading": "Reference project",
 			"lines": [
 				"Cage Rules, by Jeremy — its code, ideas and project-owned assets are reused with permission.",
-				"Varga adapts Jeremy's original fighter model, rig, standing poses and strike definitions.",
+				"Varga adapts Jeremy's original fighter rig, standing poses and strike definitions; his original model is the Legacy Varga skin.",
 				"The referee is Jeremy's original referee model and outfit, with his poses and ring positioning ported to Critterweight.",
 				"The Barlow typefaces came to this project through Cage Rules (their own OFL licence still applies)."
 			]
@@ -30,7 +30,14 @@
 			"lines": [
 				"Creature models and concept direction assisted by OpenAI Codex (Astra), under the project lead's direction.",
 				"Made in Blender (Blender Foundation and contributors); concept references from OpenAI image generation.",
-				"Optional Blender MCP bridge by Siddharth Ahuja and contributors (MIT). Varga's guest model is credited under Reference project."
+				"Optional Blender MCP bridge by Siddharth Ahuja and contributors (MIT). Varga's original guest model (the Legacy skin) is credited under Reference project."
+			]
+		},
+		{
+			"heading": "Roster art and ability effects (v0.9.17)",
+			"lines": [
+				"The eight fighters' v0.9.17 models, including Varga's default look, and every ability effect were built with Anthropic Claude under the project lead's direction.",
+				"Original Blender sources and procedural shaders; no third-party character, texture or effect assets."
 			]
 		},
 		{

@@ -83,7 +83,6 @@ var _pool := {}                  ## preset -> Array[GPUParticles3D]
 var _anims: Array = []           ## [{node, t, dur, fn: Callable(k, t), free}]
 var _follows: Array = []         ## [{node, fi, anchor, off, until, end: Callable}]
 var _ents := {}                  ## entity id -> {node, kind, pos, end: Callable, ...}
-var _moves := {}                 ## fighter -> {def: MoveDef, slot, t0, id}
 var _auras := {}                 ## fighter -> {node, end: Callable}
 var _charges := {}               ## fighter -> {node, mat, glow}
 var _trails := {}                ## fighter -> {rib, pts: [[pos, t]], weapon, until, color}
@@ -730,7 +729,6 @@ func _on_move_start(fi: int, ev: Dictionary) -> void:
 	if m == null:
 		return
 	var slot := str(ev.get("slot", "")).split("@")[0]
-	_moves[fi] = {"def": m, "slot": slot, "t0": _clock, "id": id}
 	_end_charge(fi, slot == "heavy_charged")
 	var cid := _cid(fi)
 	if slot in ["ability1", "ability2", "juice"]:

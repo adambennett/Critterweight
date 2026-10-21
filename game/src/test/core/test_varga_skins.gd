@@ -109,3 +109,21 @@ func test_live_swap_keeps_the_rig_and_the_gameplay() -> void:
 	await wait_frames(2)
 	check_eq(v._finish, 1.0, "back to the upgraded model")
 	v.queue_free()
+
+
+func test_previews_stand_every_fighter_on_the_floor() -> void:
+	# Varga's imported body reaches 17.5 cm below its rest floor; previews lift it (both skins)
+	check_near(CreatureView.rest_sink(Content.creature("f_varga").body), 0.1749, 0.002, "Varga's rest pose sink")
+	for id in ["f_stoke", "f_dredge", "f_gusto", "f_dozer", "f_slurry", "f_jitters", "f_knell"]:
+		check(CreatureView.rest_sink(Content.creature(id).body) < 0.02, "%s already stands on its floor" % id)
+	var preview := FighterPreview.new()
+	add_child(preview)
+	await wait_frames(1)
+	preview.show_fighter(Content.creature("f_varga"))
+	var v: CreatureView = preview.model
+	var lowest := INF
+	for i in v.body.segments.size():
+		lowest = minf(lowest, v.segment_world(i).origin.y)
+	check(lowest > -0.05, "no body pivot below the pedestal (lowest %.3f)" % lowest)
+	check_near(v.segment_world(0).origin.y, Content.creature("f_varga").body.segments[0].pivot.y + 0.1749, 0.003, "lifted by the sink")
+	preview.queue_free()

@@ -79,8 +79,9 @@ func show_fighter(c: CreatureDef) -> void:
 	var transforms: Array[Transform3D] = []
 	var height := 1.0
 	var extent := 1.0
+	var lift := Vector3.UP * CreatureView.rest_sink(c.body)    # feet on the pedestal, not in it
 	for segment in c.body.segments:
-		transforms.append(Transform3D(Basis.IDENTITY, segment.pivot))
+		transforms.append(Transform3D(Basis.IDENTITY, segment.pivot + lift))
 		height = maxf(height, segment.pivot.y)
 		extent = maxf(extent, segment.pivot.length())
 	model.snap_transforms(transforms)
