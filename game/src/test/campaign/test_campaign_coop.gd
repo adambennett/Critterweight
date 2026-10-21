@@ -583,12 +583,16 @@ func test_members_learn_equip_and_drill_through_the_host() -> void:
 	check(lp.size() == 1 and dp.size() == 1, "a move pick for the host, a drill pick for the member")
 	if lp.is_empty() or dp.is_empty():
 		return
-	check(host.act("learn", {"move": str(lp[0]["options"][0]), "source": "pick:" + str(lp[0]["rid"])}), "the host learns: %s" % host.last_error)
+	# (the pending lists are live: picks leave them when claimed)
+	var taught := str(lp[0]["options"][0])
+	var learn_src := "pick:" + str(lp[0]["rid"])
 	var md := RunMoves.split_drill(str(dp[0]["options"][0]))
-	mem.act("drill", {"move": str(md[0]), "style": str(md[1]), "source": "pick:" + str(dp[0]["rid"])})
-	mem.act("drill", {"move": str(md[0]), "style": str(md[1]), "source": "pick:" + str(dp[0]["rid"])})    # resent
+	var drill_src := "pick:" + str(dp[0]["rid"])
+	check(host.act("learn", {"move": taught, "source": learn_src}), "the host learns: %s" % host.last_error)
+	mem.act("drill", {"move": str(md[0]), "style": str(md[1]), "source": drill_src})
+	mem.act("drill", {"move": str(md[0]), "style": str(md[1]), "source": drill_src})    # resent
 	tick_all(s, 0.1, 3)
-	check((RunMoves.moves_of(host.ctrl.player("p0"))["learned"] as Array).has(str(lp[0]["options"][0])), "the host learned the move")
+	check((RunMoves.moves_of(host.ctrl.player("p0"))["learned"] as Array).has(taught), "the host learned the move")
 	check_eq(str((RunMoves.moves_of(host.ctrl.player("p1"))["drilled"] as Dictionary).get(str(md[0]), "")), str(md[1]), "the member drilled the style")
 	var drills := 0
 	for e2 in host.ctrl.state["log"]:
