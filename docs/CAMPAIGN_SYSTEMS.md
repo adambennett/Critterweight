@@ -401,11 +401,14 @@ moves (`RunMoves`, `src/campaign/run_moves.gd`):
   knockback, stun, launch, buildup, element, guard_break) reaches the inline move's effects too;
   multipliers transfer as they are, an additive damage/build-up op on a repeating (`every`) effect
   becomes the multiplier (base + value) / base of the Classic slot's current value, and a leaf
-  changes at most once per upgrade. A `string` patch (Lead Hand Learner) re-strings a basic move
-  that starts with the old light string. With **no heavy-role move equipped**, hit-field patches on
+  changes at most once per upgrade. Edits of a move's own timing (keyframes, hit windows,
+  duration...) stay with the Classic move they were written for. A `string` patch (Lead Hand
+  Learner) re-strings a basic move that starts with the old light string. Martial fighters (Varga)
+  keep their Classic strike kit in Movesets, so their upgrades are checked against that kit. With **no heavy-role move equipped**, hit-field patches on
   the heavy also reach the equipped basic string's finisher (the Classic engine files the finisher
   under the heavy class) and hooks naming only heavy slots answer `move_class: "heavy"` — so heavy
-  upgrades always mean something, and never twice. Hook conditions on Classic slots otherwise
+  upgrades always mean something, and never twice (an upgrade that already improves the finisher
+  itself, like Feather Knives, is not added again). Hook conditions on Classic slots otherwise
   translate in the engine (`Hooks._slot_matches`). Classic compositions get none of this except
   the harmless inline translation.
 * **Movesets-specific effects.** An apply block (and an event's `run_patches`) may carry a
@@ -422,7 +425,11 @@ moves (`RunMoves`, `src/campaign/run_moves.gd`):
   supplement for a fighter without that kind of move; in Classic, one that changes nothing of the
   Classic kit). `test_upgrade_translation.gd` lints all of it: every technique, supplement, side
   effect, Cannery upgrade and event patch must change a move of each recommended loadout (or only
-  the fighter as a whole), and the Classic kit; hooks naming slots must match a pool move.
+  the fighter as a whole), and the Classic kit; hooks naming slots must match a pool move; every
+  fighter with all its upgrades at once must still compose into a valid creature. The only
+  exceptions it accepts are generic supplements that can improve nothing a fighter has (Flavor
+  Packs of the fighter's own element, Projectile Polish for a fighter without projectiles or
+  streams), and only because those are never offered to that fighter.
 * **Older runs.** `RunStore.migrate` turns a v1 run into v2: `combat: "moves"`, every player the
   moves a new run starts with, every other field kept; `legacy_log` (in the state and its
   `start_cfg`) records how many decisions the older build logged. Those decisions replay with the
