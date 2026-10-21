@@ -147,3 +147,72 @@ damage per bout.
   point (0.7 × startup = 0.168 s): a lunge spanning that time keeps driving while Heavy is held, and
   the first version slid Gusto forward through the whole charge.
 * Pummels are not animated (engine); the ROSTER's 0.25 s per peck is the pummel `interval`.
+
+## Movesets (v0.9.18)
+
+In Movesets (the default combat style, `docs/design/MOVESET_COMBAT.md` §4) Gusto brings four of
+the eight moves of his pool (`movepool` in the JSON) to the fight; Classic keeps the kit above,
+unchanged. Effects: `game/src/view/fx/moves/f_gusto.gd` (vfx names `gusto_*`). Tests:
+`game/src/test/kits/test_moves_gusto.gd`.
+
+### The pool
+
+| Move | Cat. | Input | What it does | What it is for |
+|---|---|---|---|---|
+| **Wing Snap** (basic) | strike | tap, tap again | Wing Snap → Beak Peck → Scissor Kick → Tailspin finisher; out of a dodge the Skid Kick slide, from the hover the Dive Peck. No cooldown | the always-available string; Winded targets get launched (Kick) and tripped (Skid Kick) |
+| **Crosswind Slash** (heavy) | strike | hold = charge | two crossing wings and a gust that shoves even on a miss; held and released, the Downdraft leap and stomp (from the hover it comes at once) | the committal hit; the gust pushes a crowding opponent off him |
+| **Gust Bomb** | projectile | tap | the v0.9.17 air ball: 8 m, knocks back, bursts at the end of its flight (Gale 25 + 15); 5 s cooldown | pushing people around at mid range |
+| **Hang Time** | utility | tap | the v0.9.17 hover: 2 m up for 1.2 s, steerable, ground zones cannot touch him; his string and heavy become dives; 6 s cooldown | getting off burning, sludged or electrified floor and out of corners |
+| **Air Slash** | projectile | tap | a crescent whipped off the left wing (fires 0.22 s in): 22 m/s, 9 m, pierces every fighter on its line, 6 damage, Gale 16, parryable; 4 s cooldown, 8 stamina | precise poke at range, punishing whiffs, hitting two fighters lined up |
+| **Feather Darts** | volley | tap | five darts in a 30° fan from his chest (0.225 s in): 2.2 damage and Gale 12 each, 7 m, parryable; 6 s cooldown, 9 stamina | close-range shotgun that builds Winded fast (3-5 darts land inside 3 m, 1-2 at range) |
+| **Twister** | control | tap | a pirouette, then a funnel (0.44 s in) rolls 5 m at 4.6 m/s: 4 damage, lift 4.2 m/s, push 4.5, Gale 25; passes through fighters and swallows enemy shots it touches; dies down into a gale whirl (r 1.3 m, 2 s) that pushes fighters out and bends shots; 9 s cooldown, 11 stamina | space control against zoners and rushers, launching for follow-ups |
+| **Tailwind** | support | tap | one backward wing beat: for 4 s speed ×1.3, dodges cost half the stamina (net 2 with his refund) and carry ×1.15 further; 12 s cooldown, 10 stamina | chasing, kiting, escaping a corner |
+
+The four new moves are inline moves with their own animations: Air Slash coils the left wing high
+and back (body twisted 38°) and whips it across his front; Feather Darts rears both wings back and
+flings them forward together; Twister is a full pirouette with the wings banked, then a
+two-winged forward thrust; Tailwind lifts the wings forward and beats them back into a
+streamlined, forward-leaning crouch (he can keep walking while casting).
+
+### Loadouts
+
+* **Skyhook** (A, default): Wing Snap, Air Slash (Move 2), Feather Darts (Move 3), Hang Time
+  (Move 4). Hover and shoot: poke with the crescent at range, darts when they close in (Winded),
+  then the string's Winded launch and trip; Hang Time lifts him off hazards and out of corners.
+* **Cyclone** (B): Wing Snap, Twister (Move 2), Gust Bomb (Move 3), Tailwind (Move 4). Wind
+  control and speed: the twister and bomb shove and lift opponents and break up their shots,
+  Tailwind makes him the fastest fighter on the floor to chase or to leave.
+
+### Styles (drills)
+
+| Move | Style | Changes |
+|---|---|---|
+| Wing Snap | Featherweight | wing, beak and kick 12% faster, 25% more stamina |
+| | Gale Kick | the Scissor Kick launches any fighter (a Winded one higher) |
+| Crosswind Slash | Inward Gale | the gust pulls the target back in (stays in string range) |
+| | Updraft Stomp | the Downdraft's landing burst is wider and launches |
+| Gust Bomb | Vacuum Bomb | the burst sucks fighters in toward the pop |
+| | Updraft Bomb | the burst throws fighters up instead of away |
+| Hang Time | Thermal Rider | hovers 1.8 s and steers faster |
+| | Lift-off Gust | the take-off blasts fighters next to him away |
+| Air Slash | Twin Crescents | a second crescent 0.12 s later (70% damage each, tick hits) |
+| | Cleaving Gale | stops in the first fighter: ×1.5 damage, ×2 push, guard drain ×3 |
+| Feather Darts | Quill Storm | seven darts in a 50° fan, 75% damage each |
+| | Pinfeathers | three heavier darts in a 6° line that home (90°/s) |
+| Twister | Seeking Squall | bends toward its target (50°/s), a little slower |
+| | Eye of the Storm | dies down into a 3 s whirl (r 1.7 m) that drags fighters in |
+| Tailwind | Slipstream | every dodge under Tailwind leaves a small gale whirl behind |
+| | Quick Draft | the cast darts him along the stick and slips attacks (0.04-0.3 s) |
+
+### Tips and counters
+
+* Against Skyhook: Air Slash and Feather Darts are parryable, and a parried crescent stuns
+  Gusto for 0.6 s; at long range a sidestep beats the crescent, and a guard soaks the darts.
+* Against Cyclone: the twister walks at 4.6 m/s: step around it or hover over it (it cannot reach
+  a hovering fighter), and do not shoot into it. Tailwind does nothing to you: pressure him before
+  he casts it, or wait it out (4 s, 12 s cooldown).
+* Gusto's moves build Winded fast: a Winded fighter regains no stamina and is pushed twice as far,
+  so the Scissor Kick launch and Skid Kick trip follow. Cleanse it or get out of range.
+* Any move but the string and the heavy drops Gusto out of Hang Time (the engine has hovering
+  variants for the Classic slots only): from the hover, Air Slash and Feather Darts fire while he
+  drops.
