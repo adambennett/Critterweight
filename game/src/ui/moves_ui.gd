@@ -226,7 +226,8 @@ static func local_fighter() -> Fighter:
 
 
 ## A small category chip: the category's name on its colour (the name is the cue, the colour helps).
-static func chip(text: String, color: Color, size_du := 26) -> PanelContainer:
+## `size_du` < 0: the theme's caption size (menus: legible at 1280x800, follows the text size).
+static func chip(text: String, color: Color, size_du := -1) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -243,14 +244,14 @@ static func chip(text: String, color: Color, size_du := 26) -> PanelContainer:
 	var l := Label.new()
 	l.text = text.to_upper()
 	l.add_theme_font_override("font", UiTheme.font("label"))
-	l.add_theme_font_size_override("font_size", size_du)
+	l.add_theme_font_size_override("font_size", size_du if size_du > 0 else UiTheme.size("caption"))
 	l.add_theme_color_override("font_color", color.lightened(0.35))
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(l)
 	return p
 
 
-static func category_chip(cat: String, size_du := 26) -> PanelContainer:
+static func category_chip(cat: String, size_du := -1) -> PanelContainer:
 	var p := chip(category_name(cat), category_color(cat), size_du)
 	p.name = "Category_" + cat
 	return p

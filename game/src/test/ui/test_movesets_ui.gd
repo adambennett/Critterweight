@@ -479,6 +479,14 @@ func test_hud_move_cards_hold_charges_stamina_and_denied_flash() -> void:
 	f.stamina = f.max_stamina
 	hud._process(0.0)
 	check(hud.move_card("m2").affordable and not state.visible, "affordable again")
+	# the "Abilities" rule off: specials are off (said on the card), basics and heavies stay
+	sim.rules["abilities"] = false
+	hud._process(0.0)
+	var off := hud.move_card("m3").find_child("MoveState", true, false) as Label
+	check(hud.move_card("m3").locked and not hud.move_card("m3").available and off.visible and off.text == "OFF", "abilities off: the special says OFF")
+	check(not hud.move_card("m1").locked and hud.move_card("m1").available, "the basic strike stays")
+	sim.rules["abilities"] = true
+	hud._process(0.0)
 	# a denied press flashes the card (its own flash: the tutorial highlight can't clear it)
 	hud.move_denied("m2", "stamina")
 	check(hud.move_card("m2").is_flashing(), "denied: the card flashes")

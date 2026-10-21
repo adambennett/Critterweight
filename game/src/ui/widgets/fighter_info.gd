@@ -107,14 +107,14 @@ func _pool_page(c: CreatureDef) -> void:
 		var pm: PoolMove = c.pool[id]
 		var head := UiTheme.hbox(UiTheme.GAP_S)
 		head.name = "Move_" + str(id)
-		head.add_child(MovesUi.category_chip(pm.category, 26))
+		head.add_child(MovesUi.category_chip(pm.category))
 		var nm := UiTheme.label(pm.display_name, "H3")
 		head.add_child(nm)
 		var tag := MovesUi.hold_tag(pm)
 		if tag != "":
-			head.add_child(MovesUi.chip(tag, UiTheme.WARM, 26))
+			head.add_child(MovesUi.chip(tag, UiTheme.WARM))
 		if pm.role == "basic":
-			head.add_child(MovesUi.chip("Basic", UiTheme.GOLD_HI, 26))
+			head.add_child(MovesUi.chip("Basic", UiTheme.GOLD_HI))
 		content.add_child(head)
 		content.add_child(UiTheme.label(MovesUi.how_to_use(pm, c) + ".", "BodyStrong", true))
 		content.add_child(UiTheme.label(MovesUi.facts(pm), "Caption", true))
@@ -150,10 +150,10 @@ func _move_prompt(pm: PoolMove, action: String, glyph_du: float) -> ButtonPrompt
 	var prompt := ButtonPrompt.new([action], pm.display_name, glyph_du)
 	prompt.name = "MovePrompt_" + pm.id
 	prompt.clickable = false
-	prompt.add_child(MovesUi.category_chip(pm.category, 26))
+	prompt.add_child(MovesUi.category_chip(pm.category))
 	var tag := MovesUi.hold_tag(pm)
 	if tag != "":
-		prompt.add_child(MovesUi.chip(tag, UiTheme.WARM, 26))
+		prompt.add_child(MovesUi.chip(tag, UiTheme.WARM))
 	return prompt
 
 
