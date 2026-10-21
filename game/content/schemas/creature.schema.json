@@ -40,7 +40,8 @@
         "cost": {"type": "number", "minimum": 0, "maximum": 100}, "drain": {"type": "number", "minimum": 0, "maximum": 100},
         "max_hold": {"type": "number", "minimum": 0, "maximum": 10}, "element": {"type": "string"},
         "aim": {"type": "object"}, "styles": {"type": "object"}, "ai": {"type": "object"}, "martial": {"type": "object"},
-        "sfx": {"type": "object", "properties": {"cast": {"type": "string"}, "loop": {"type": "string"}}}
+        "sfx": {"type": "object", "properties": {"cast": {"type": "string"}, "loop": {"type": "string"}}},
+        "air": {"type": "boolean"}
       }
     },
     "move": {

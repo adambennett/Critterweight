@@ -835,8 +835,9 @@ func gain_hype(amount: float) -> void:
 
 ## pool_id / button: the Movesets pool move and loadout slot this action performs ("" otherwise).
 func _start_move(m: MoveDef, slot: String, st: int, pool_id := "", button := "") -> void:
-	if not slot.ends_with("@hovering") and has_flag("hovering") and slot != "juice":
-		_hover_until = -1.0
+	var pm_air: PoolMove = creature.pool.get(pool_id) if pool_id != "" else null
+	if not slot.ends_with("@hovering") and has_flag("hovering") and slot != "juice" and not (pm_air != null and pm_air.air):
+		_hover_until = -1.0     # (a Movesets move marked "air" is used from the hover and keeps it)
 	move = m
 	move_slot = slot
 	move_pool_id = pool_id

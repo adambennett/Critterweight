@@ -43,6 +43,7 @@ var styles := {}                  ## style id -> {name, desc, patch}
 var ai := {}                      ## bot hints {range: [min, max], hold: [min, max], when: [...], chance, apart}
 var derived := false              ## built from the Classic slots (no movepool in the content)
 var martial := {}                 ## martial techniques: {group, slots: {limb slot: technique move key}}
+var air := false                  ## usable while hovering without ending the hover (Gusto's Hang Time)
 
 
 ## Stamina a press needs (the move's own stamina when no explicit cost).
@@ -89,6 +90,7 @@ static func parse(c: CreatureDef, key: String, d: Dictionary, errors: PackedStri
 	if typeof(aim) == TYPE_DICTIONARY:
 		p.aim_turn = float((aim as Dictionary).get("turn_rate", 0.0))
 	p.cost = float(d.get("cost", -1.0))
+	p.air = bool(d.get("air", false))
 	p.styles = d.get("styles", {}) if typeof(d.get("styles", {})) == TYPE_DICTIONARY else {}
 	p.martial = d.get("martial", {}) if typeof(d.get("martial", {})) == TYPE_DICTIONARY else {}
 	if not p.martial.is_empty():

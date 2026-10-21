@@ -235,7 +235,8 @@ under either rule.
 - `hold`: `charge` (hold to charge, release to fire; `charge_scale` on effects scales them by the
   charge) or `sustain` (the move's `sustain: [t0, t1]` window loops while held, up to `max_hold`
   seconds, draining `drain` stamina per second). `aim.turn_rate` (rad/s) lets the stick steer it.
-- `cooldown`, `charges`, `cost` (stamina) apply per equipped move.
+- `cooldown`, `charges`, `cost` (stamina) apply per equipped move. `air: true` lets a move be used
+  while hovering without ending the hover (Gusto's Hang Time).
 - Effects may repeat inside a move: `"every": 0.12, "until": "release"` (or seconds, or a
   `"count"`). Hits from repeating effects are throttled (30% hype, no stamina refund, at most one
   stun per 0.5 s per target, no hit pause), so a stream cannot stun-lock. New effect type
