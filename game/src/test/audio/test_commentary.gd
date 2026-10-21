@@ -530,3 +530,18 @@ func test_movesets_moves_are_called_by_name_and_kind() -> void:
 				misses.append(r)
 	check(misses.size() == 1 and str(misses[0]["ctx"].get("id", "")) == "cinder_shot" and str(misses[0]["ctx"].get("cat", "")) == "projectile",
 		"a projectile that touched nobody is called a miss, by name and kind (%s)" % str(misses))
+
+
+func test_varga_techniques_are_called_when_they_land() -> void:
+	var d := _director()      # VARGA (martial) is fighter 0
+	d.on_event({"type": "round_start", "round": 1}, {"time": 0.0})
+	d.on_event({"type": "hit", "fighter": 1, "target": 0, "damage": 3.0, "slot": "l1"}, {"time": 0.5})   # the round's first hit
+	var r := d.on_event({"type": "hit", "fighter": 0, "target": 1, "damage": 6.0, "slot": "lh_comet_hook", "pool": "comet_hook", "cat": "strike"}, {"time": 3.0})
+	check_eq(_triggers(r), ["ability_hit"], "a landed technique is called")
+	check(not r.is_empty() and str(r[0]["ctx"].get("id", "")) == "comet_hook" and str(r[0]["ctx"].get("creature", "")) == "f_varga", "by its name")
+	var again := d.on_event({"type": "hit", "fighter": 0, "target": 1, "damage": 6.0, "slot": "rh_comet_hook", "pool": "comet_hook", "cat": "strike"}, {"time": 6.0})
+	check(not _triggers(again).has("ability_hit"), "not on every hook")
+	var blocked := d.on_event({"type": "hit", "fighter": 0, "target": 1, "damage": 6.0, "slot": "lh_force_palm", "pool": "force_palm", "cat": "strike", "blocked": true}, {"time": 20.0})
+	check(not _triggers(blocked).has("ability_hit"), "a blocked technique is not called as landed")
+	var other := d.on_event({"type": "hit", "fighter": 1, "target": 0, "damage": 6.0, "slot": "l1", "pool": "sounding_jab", "cat": "strike"}, {"time": 40.0})
+	check(not _triggers(other).has("ability_hit"), "an ordinary fighter's basic strike is not a technique")

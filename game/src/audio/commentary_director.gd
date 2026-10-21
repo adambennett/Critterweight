@@ -221,6 +221,12 @@ func _pool_move_def(i: int, pool: String) -> Dictionary:
 	return {}
 
 
+## Whether a fighter fights with martial techniques on its strikes (Varga under Movesets).
+func _is_martial(i: int) -> bool:
+	var tags = Content.creature_entry(_creature(i)).get("tags", [])
+	return typeof(tags) == TYPE_ARRAY and (tags as Array).has("martial")
+
+
 func _ability_damages(i: int, slot: String, pool := "") -> bool:
 	var a := _pool_move_def(i, pool) if pool != "" else _ability_def(i, slot)
 	if float(a.get("damage", 0.0)) > 0.0:
@@ -640,6 +646,17 @@ func _on_hit(ev: Dictionary, info: Dictionary) -> Array:
 			if str(landed_ability.get("cat", "")) != "":
 				ch["cat"] = str(landed_ability["cat"])
 			out.append(_req("ability_hit", ch, "medium", names, {"ttl": 1.6}))
+		return out
+	# 2b. a Movesets technique that landed on one of Varga's strikes (his strikes carry the technique's
+	# pool id): called by name now and then, never more often than one technique call in 12 s
+	var tech := str(ev.get("pool", ""))
+	if tech != "" and not slot.begins_with("mv.") and _is_martial(fi) and _ready("technique") and _ready("ability_hit:" + tech):
+		_cool_for("technique", 12.0)
+		_cool_for("ability_hit:" + tech, 30.0)
+		var ct := {"creature": _creature(fi), "id": tech}
+		if str(ev.get("cat", "")) != "":
+			ct["cat"] = str(ev["cat"])
+		out.append(_req("ability_hit", ct, "medium", names, {"ttl": 1.5}))
 		return out
 	# 3. big moments
 	var kinds: Array = []
