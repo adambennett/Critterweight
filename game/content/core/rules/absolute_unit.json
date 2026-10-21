@@ -3,6 +3,7 @@
   "name": "Absolute Unit",
   "mode": "absolute_unit",
   "format": "ffa",
+  "combat": "moves",
   "teams": 0,
   "players": [
     3,

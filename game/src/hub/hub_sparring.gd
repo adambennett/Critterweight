@@ -72,7 +72,7 @@ static func config(me: String, player_name: String, choices: Dictionary) -> Dict
 		opp = FighterSelection.resolve("random", opponents)
 	var tier := str(choices.get("tier", "journeyman"))
 	var practice := str(choices.get("format", "spar")) == "practice"
-	var rules := {"id": "hub_spar", "name": "Ring Sparring", "mode": "practice" if practice else "standard", "rounds": 1,
+	var rules := {"id": "hub_spar", "name": "Ring Sparring", "mode": "practice" if practice else "standard", "combat": "moves", "rounds": 1,
 		"round_time": 0.0 if practice else 90.0, "intro_time": 1.5, "lives": 1}
 	if practice:
 		# the practice dummy fights back at the chosen tier (read by PracticeMode at setup, so a
@@ -117,7 +117,7 @@ static func play_tape(_scene: Node) -> MatchScene:
 	var shadow := "f_dozer" if Content.creature("f_dozer") != null else "dev_biped"
 	var cfg := {"arena": "the_gullet", "seed": 1973, "no_record": true, "spectate": true, "music": "title_night", "audio_context": "versus",
 		"overlay_script": TAPE_OVERLAY,
-		"rules": {"id": "tape_1973", "name": "1973 Title Fight", "mode": "standard", "rounds": 1, "round_time": 40.0, "intro_time": 1.0, "lives": 1},
+		"rules": {"id": "tape_1973", "name": "1973 Title Fight", "mode": "standard", "combat": "moves", "rounds": 1, "round_time": 40.0, "intro_time": 1.0, "lives": 1},
 		"fighters": [{"creature": champ, "team": 0, "kind": "bot", "difficulty": BotTiers.brain_tier("headliner"), "name": "Snappington ('73)"},
 			{"creature": shadow, "team": 1, "kind": "bot", "difficulty": BotTiers.brain_tier("headliner"), "name": "???"}]}
 	Profiles.save()

@@ -20,7 +20,9 @@ class_name NetProtocol
 ## large party payloads packed ({_z, _n}: unpack_party_payload).
 
 ## 6 = 32-bit held mask with an extension flag; 11 core or 18 guest counters.
-const VERSION := 6
+## 7 = v0.9.18 Movesets: roster entries carry the combat style and the equipped loadout; snapshot
+##     cooldown slots carry their charges.
+const VERSION := 7
 
 ## ---- channels (ENet) ----
 const CH_CONTROL := 0      ## reliable ordered: handshake, lobby, chat, app messages, match lifecycle
@@ -602,8 +604,10 @@ static func campaign_match_problem(info: Dictionary) -> String:
 		return "campaign rules are not a dictionary"
 	var rules: Dictionary = r
 	for k in rules:
-		if not str(k) in ["rounds", "round_time", "mode", "friendly_fire", "lives"]:
+		if not str(k) in ["rounds", "round_time", "mode", "friendly_fire", "lives", "combat"]:
 			return "unexpected campaign rule '%s'" % str(k).left(24)
+	if rules.has("combat") and not str(rules["combat"]) in ["moves", "classic"]:
+		return "unknown combat style"
 	if int(rules.get("rounds", 1)) != 1 or int(rules.get("lives", 1)) != 1:
 		return "campaign fights are one round, one life"
 	var rt := float(rules.get("round_time", 150.0))

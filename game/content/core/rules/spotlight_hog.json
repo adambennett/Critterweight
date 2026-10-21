@@ -3,6 +3,7 @@
   "name": "Spotlight Hog",
   "mode": "spotlight_hog",
   "format": "ffa",
+  "combat": "moves",
   "teams": 0,
   "players": [
     2,

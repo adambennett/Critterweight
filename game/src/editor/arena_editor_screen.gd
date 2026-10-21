@@ -1379,7 +1379,7 @@ func _test_play(format: String) -> void:
 	if not pc.is_empty():
 		creature = str(pc[0])
 	var fighters := []
-	var rules := {"mode": "standard", "rounds": 1, "round_time": 99, "win": "ko", "lives": 1}
+	var rules := {"mode": "standard", "combat": "moves", "rounds": 1, "round_time": 99, "win": "ko", "lives": 1}
 	match format:
 		"ffa":
 			for i in 4:

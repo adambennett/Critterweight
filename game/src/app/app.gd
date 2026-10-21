@@ -15,6 +15,7 @@ const SCREENS := {
 	"settings": "res://src/ui/screens/settings_screen.gd",
 	"versus_setup": "res://src/ui/screens/versus_setup.gd",
 	"character_select": "res://src/ui/screens/character_select.gd",
+	"loadout": "res://src/ui/screens/loadout_screen.gd",
 	"rules_editor": "res://src/ui/screens/rules_editor_screen.gd",
 	"arena_editor": "res://src/editor/arena_editor_screen.gd",
 	"online": "res://src/ui/screens/online_screen.gd",

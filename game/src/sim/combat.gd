@@ -283,7 +283,8 @@ func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 	# counter stance: struck while countering -> instant retaliation at the attacker
 	if a and b.counter_active() and bool(h.get("melee", false)) and not bool(h["parried"]):
 		h["counter_triggered"] = true
-	if not bool(h["blocked"]) and not bool(h["parried"]) and a:
+	if not bool(h["blocked"]) and not bool(h["parried"]) and a and not bool(h.get("tick", false)):
+		# (repeating stream / emitter ticks refund nothing: a stream must not pay for itself)
 		a.stamina = minf(a.max_stamina, a.stamina + (a.move.stamina if a.move else 0.0) * Tuning.v("hit_stamina_refund"))
 	b.receive_hit(h)
 	if bool(h.get("counter_triggered", false)):
@@ -330,6 +331,20 @@ func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 		"knockdown": h.get("knockdown", false), "otg": b.is_down(), "melee": bool(h.get("melee", false))}
 	if was_down:
 		ev["was_down"] = true
+	# Movesets attribution (docs/design/MOVESET_COMBAT.md §3.3): which pool move landed, its category,
+	# and whether it was a repeating tick (judges count streams per second, views skip hit pause)
+	var pool := str(h.get("pool", ""))
+	if pool == "" and a and a.move_pool_id != "" and bool(h.get("melee", false)):
+		pool = a.move_pool_id
+	if pool != "":
+		ev["pool"] = pool
+		var cat := str(h.get("cat", ""))
+		if cat == "" and a:
+			var pm: PoolMove = a.creature.pool.get(pool)
+			cat = pm.category if pm else ""
+		ev["cat"] = cat
+	if bool(h.get("tick", false)):
+		ev["tick"] = true
 	sim.emit_event(ev)
 
 

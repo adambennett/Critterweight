@@ -3,6 +3,7 @@
   "name": "Four-Way Teams",
   "mode": "standard",
   "format": "teams",
+  "combat": "moves",
   "teams": 4,
   "players": [
     8,

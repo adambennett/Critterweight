@@ -3,6 +3,7 @@
   "name": "Practice",
   "mode": "practice",
   "format": "practice",
+  "combat": "moves",
   "teams": 2,
   "players": [
     1,

@@ -3,6 +3,7 @@
   "name": "Chum Rush",
   "mode": "chum_rush",
   "format": "coop",
+  "combat": "moves",
   "teams": 1,
   "players": [
     1,

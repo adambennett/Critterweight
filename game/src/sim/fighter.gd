@@ -10,6 +10,11 @@ extends Node3D
 ## timed flag is set the variant replaces the slot. JUICE adds the flag "juiced".
 
 enum State { NEUTRAL, ATTACK, GUARD, DODGE, HITSTUN, KNOCKDOWN, DOWN, GETUP, GRABBING, HELD, ABILITY, TAUNT, GUARD_BREAK, KO, DOWNED, CELEBRATE, INACTIVE }
+## Movesets: loadout slots and the inputs that use them (the Classic Light / Heavy / Ability inputs).
+const MOVE_SLOTS := ["m1", "m2", "m3", "m4"]
+const TICK_HYPE := 0.3            ## hype from a repeating (stream) hit, of a normal hit's
+const TICK_STUN_GAP := 0.5        ## seconds between stuns from repeating hits on one fighter
+const MOVE_BUTTONS := [FighterInput.LIGHT, FighterInput.HEAVY, FighterInput.AB1, FighterInput.AB2]
 const STATE_NAMES := ["neutral", "attack", "guard", "dodge", "hitstun", "knockdown", "down", "getup", "grabbing", "held", "ability", "taunt", "guard_break", "ko", "downed", "celebrate", "inactive"]
 
 var index := 0
@@ -52,6 +57,16 @@ var last_hit_target: Fighter = null
 var move_charge := 0.0           ## 0..1 charge level of the current move
 var _charging := false
 var _light_step := 0             ## index into the creature's light string
+# ---- Movesets (v0.9.18, docs/design/MOVESET_COMBAT.md) ----
+var combat_style := "classic"    ## "moves" | "classic": the match rule `combat`, set by MatchSim per fighter
+var loadout: Array = []          ## Movesets: the equipped pool move ids, slot m1..m4 = Light, Heavy, Ability 1, Ability 2 inputs
+var move_pool_id := ""           ## the pool move being performed ("" in Classic and for non-pool actions)
+var move_button := ""            ## its loadout slot ("m1".."m4")
+var move_clock := 0.0            ## seconds into the current move, never rewound (charge holds and sustain loops rewind state_time)
+var sustaining := false          ## a `hold: sustain` move is looping while its input is held
+var _hold_button := -1           ## FighterInput button that charges / sustains the current move
+var _sustain_t := 0.0
+var _tick_stun_at := -99.0       ## last stun from a repeating (tick) hit: streams stun at most every 0.5 s
 var cooldown_left := {}
 var charges_left := {}
 var facing_yaw := 0.0
@@ -151,10 +166,63 @@ func reset_vitals() -> void:
 	charges_left.clear()
 	for slot in creature.abilities:
 		charges_left[slot] = int(creature.ability_charges.get(slot, 1))
+	for i in loadout.size():
+		charges_left[MOVE_SLOTS[i]] = slot_max_charges(MOVE_SLOTS[i])
 	timed_flags.clear()
 	martial_southpaw = false
 	_martial_guard_tap = -99.0
 	_set_state(State.NEUTRAL)
+
+
+## Movesets or Classic for this fighter (MatchSim, from the rules), with the loadout it fights with:
+## `wanted` when valid for its creature, else the creature's default loadout.
+func set_combat(style: String, wanted: Array = []) -> void:
+	combat_style = "classic" if style == "classic" else "moves"
+	loadout = creature.resolve_loadout(wanted) if combat_style == "moves" else []
+	reset_vitals()
+
+
+## The pool move equipped in loadout slot "m1".."m4" (null in Classic or when empty).
+func slot_move(slot: String) -> PoolMove:
+	if combat_style != "moves" or slot.length() != 2 or not slot.begins_with("m"):
+		return null
+	var i := int(slot.substr(1)) - 1
+	if i < 0 or i >= loadout.size():
+		return null
+	return creature.pool.get(str(loadout[i]))
+
+
+## Charges and cooldown of a cooldown slot (Classic ability slots or Movesets m1..m4).
+func slot_max_charges(slot: String) -> int:
+	var pm := slot_move(slot)
+	if pm != null:
+		return pm.charges
+	return int(creature.ability_charges.get(slot, 1))
+
+
+func slot_cooldown(slot: String) -> float:
+	var pm := slot_move(slot)
+	if pm != null:
+		return pm.cooldown
+	return float(creature.cooldowns.get(slot, 6.0))
+
+
+## The loadout slot holding a pool move ("" when not equipped).
+func slot_of_move(pool_id: String) -> String:
+	var i := loadout.find(pool_id)
+	return MOVE_SLOTS[i] if i >= 0 else ""
+
+
+## The loadout slot that answers a Classic slot name written in an upgrade or hook ("ability1" ->
+## the slot holding Steam Vent), or the name itself in Classic.
+func resolve_slot(classic_slot: String) -> String:
+	if combat_style != "moves":
+		return classic_slot
+	for i in loadout.size():
+		var pm: PoolMove = creature.pool.get(str(loadout[i]))
+		if pm and pm.answers_slot(classic_slot):
+			return MOVE_SLOTS[i]
+	return classic_slot
 
 
 func respawn(pos: Vector3, yaw: float) -> void:
@@ -393,10 +461,10 @@ func _update_timers(dt: float) -> void:
 		if float(cooldown_left[k]) > 0.0:
 			cooldown_left[k] = maxf(0.0, float(cooldown_left[k]) - dt * cd_rate)
 			if float(cooldown_left[k]) <= 0.0:
-				var maxc := int(creature.ability_charges.get(k, 1))
+				var maxc := slot_max_charges(str(k))
 				charges_left[k] = mini(maxc, int(charges_left.get(k, 0)) + 1)
 				if int(charges_left[k]) < maxc:
-					cooldown_left[k] = float(creature.cooldowns.get(k, 6.0))
+					cooldown_left[k] = slot_cooldown(str(k))
 	_dodge_cd = maxf(0.0, _dodge_cd - dt)
 	_taunt_cd = maxf(0.0, _taunt_cd - dt)
 	if _combo_timer > 0.0:
@@ -591,7 +659,10 @@ func _try_actions(from_cancel: bool) -> bool:
 		_consume(FighterInput.DODGE)
 		_start_dodge()
 		return true
-	for slot in ["ability1", "ability2"]:
+	var movesets := combat_style == "moves" and not creature.tags.has("martial")
+	if movesets and _try_moves(from_cancel):
+		return true
+	for slot in ([] if movesets else ["ability1", "ability2"]):
 		var b := FighterInput.AB1 if slot == "ability1" else FighterInput.AB2
 		if _peek(b) and creature.abilities.has(slot) and int(charges_left.get(slot, 1)) > 0 and not bool(mods.get("no_abilities", false)):
 			_consume(b)
@@ -615,7 +686,7 @@ func _try_actions(from_cancel: bool) -> bool:
 		return true
 	if creature.tags.has("martial") and MartialStyle.actions(self, from_cancel):
 		return true
-	if not creature.tags.has("martial") and _peek(FighterInput.HEAVY):
+	if not creature.tags.has("martial") and not movesets and _peek(FighterInput.HEAVY):
 		_consume(FighterInput.HEAVY)
 		if from_cancel and _light_step > 0 and creature.moves.has("finisher") and not has_flag("hovering"):
 			var fv: Array = _move_variant("finisher")
@@ -627,7 +698,7 @@ func _try_actions(from_cancel: bool) -> bool:
 			_charging = hm.charge_time > 0.0 and not bool(mods.get("auto_charge", false))
 		_light_step = 0
 		return true
-	if not creature.tags.has("martial") and _peek(FighterInput.LIGHT):
+	if not creature.tags.has("martial") and not movesets and _peek(FighterInput.LIGHT):
 		_consume(FighterInput.LIGHT)
 		if state == State.DODGE or (from_cancel and move_slot == "dodge"):
 			if creature.moves.has("dash_attack"):
@@ -665,22 +736,102 @@ func _try_actions(from_cancel: bool) -> bool:
 	return false
 
 
+## Movesets: the four move inputs start the equipped moves (the earliest buffered press first).
+## A press that cannot start (cooldown, stamina) is consumed with a `move_denied` event instead of
+## vanishing silently.
+func _try_moves(from_cancel: bool) -> bool:
+	var i := 0
+	while i < _buffer.size():
+		var b := int(_buffer[i]["b"])
+		var bi := MOVE_BUTTONS.find(b)
+		i += 1
+		if bi < 0 or bi >= loadout.size():
+			continue
+		var slot: String = MOVE_SLOTS[bi]
+		var pm := slot_move(slot)
+		if pm == null or pm.move == null:
+			continue
+		if pm.role == "basic":
+			_consume(b)
+			_start_basic(pm, slot, from_cancel)
+			return true
+		if pm.role != "heavy" and bool(mods.get("no_abilities", false)):
+			continue          # the "abilities" rule off: basic strikes and heavies only
+		_consume(b)
+		i -= 1
+		if int(charges_left.get(slot, 1)) <= 0:
+			_emit({"type": "move_denied", "slot": slot, "pool": pm.id, "why": "cooldown"})
+			continue
+		if stamina < pm.stamina_cost() * 0.5:
+			_emit({"type": "move_denied", "slot": slot, "pool": pm.id, "why": "stamina"})
+			continue
+		charges_left[slot] = int(charges_left.get(slot, 1)) - 1
+		if float(cooldown_left.get(slot, 0.0)) <= 0.0 and pm.cooldown > 0.0:
+			cooldown_left[slot] = pm.cooldown
+		var mv := _pool_variant(pm)
+		var m: MoveDef = mv[0]
+		_start_move(m, str(mv[1]), State.ATTACK if m.kind == "melee" else State.ABILITY, pm.id, slot)
+		_hold_button = b if pm.hold != "" else -1
+		_charging = pm.hold == "charge" and m.charge_time > 0.0 and not bool(mods.get("auto_charge", false))
+		if pm.role != "heavy":
+			var rs := pm.report_slot()
+			hooks.fire("ability_used", {"slot": rs})
+			_emit({"type": "ability", "slot": rs, "id": m.id, "pool": pm.id, "cat": pm.category})
+		return true
+	return false
+
+
+## The move a pool move performs now, honouring "<slot>@<flag>" variants of the Classic slot it is
+## built on (Gusto's hovering strikes, Dozer's juiced Bulldoze): [MoveDef, reported slot].
+func _pool_variant(pm: PoolMove) -> Array:
+	if pm.use != "":
+		var v := _move_variant(pm.use, creature.abilities.has(pm.use))
+		if not v.is_empty():
+			return v
+	return [pm.move, pm.report_slot()]
+
+
+## A basic strike: walks its string (press again inside the cancel window to continue; the last step
+## is the finisher), or its dash strike out of a dodge. No cooldown; stamina may run dry.
+func _start_basic(pm: PoolMove, slot: String, from_cancel: bool) -> void:
+	if (state == State.DODGE or (from_cancel and move_slot == "dodge")) and pm.dash != "":
+		var dv: Array = _move_variant(pm.dash)
+		if not dv.is_empty():
+			_start_move(dv[0], dv[1], State.ATTACK, pm.id, slot)
+			_light_step = 0
+			return
+	var step := _light_step if from_cancel and move_pool_id == pm.id and _light_step < pm.string.size() else 0
+	var lv: Array = _move_variant(str(pm.string[step]))
+	if lv.is_empty():
+		lv = _move_variant(str(pm.string[0]))
+	_start_move(lv[0], lv[1], State.ATTACK, pm.id, slot)
+	_light_step = step + 1
+
+
 func gain_hype(amount: float) -> void:
 	hype = clampf(hype + amount * float(mods["hype_gain"]), 0.0, 100.0)
 
 
-func _start_move(m: MoveDef, slot: String, st: int) -> void:
+## pool_id / button: the Movesets pool move and loadout slot this action performs ("" otherwise).
+func _start_move(m: MoveDef, slot: String, st: int, pool_id := "", button := "") -> void:
 	if not slot.ends_with("@hovering") and has_flag("hovering") and slot != "juice":
 		_hover_until = -1.0
 	move = m
 	move_slot = slot
+	move_pool_id = pool_id
+	move_button = button
+	move_clock = 0.0
+	sustaining = false
+	_sustain_t = 0.0
+	_hold_button = -1
 	move_hits.clear()
 	move_hit_any = false
 	move_charge = 1.0 if bool(mods.get("auto_charge", false)) and m.charge_time > 0.0 else 0.0
 	_charging = false
 	_charge = {}
 	_set_state(st)
-	spend_stamina(m.stamina * float(mods.get("stamina_cost", 1.0)))
+	var pm0: PoolMove = creature.pool.get(pool_id) if pool_id != "" else null
+	spend_stamina((pm0.stamina_cost() if pm0 and pm0.role != "basic" and m == pm0.move else m.stamina) * float(mods.get("stamina_cost", 1.0)))
 	# targeting assistance: snap toward the target if roughly in front, else toward input
 	var snap := Tuning.v("attack_snap_deg") * float(mods.get("assist", 1.0))
 	if _focus_preferred():
@@ -710,8 +861,12 @@ func _start_move(m: MoveDef, slot: String, st: int) -> void:
 				rig.seg_speed[si] = m.speed
 		for ji in m.animated_joints:
 			rig.seg_speed[ji] = m.speed
-	hooks.fire("move_start", {"slot": slot.split("@")[0], "move_class": current_move_class()})
-	_emit({"type": "move_start", "slot": slot, "id": m.id})
+	hooks.fire("move_start", {"slot": slot.split("@")[0], "move_class": current_move_class(), "pool": pool_id})
+	var ms := {"type": "move_start", "slot": slot, "id": m.id}
+	if pool_id != "":
+		ms["pool"] = pool_id
+		ms["cat"] = pm0.category if pm0 else ""
+	_emit(ms)
 	if sim and not m.effects.is_empty():
 		sim.effects.begin_move(self, m)
 
@@ -722,22 +877,39 @@ func _st_move(dt: float) -> void:
 	if m == null:
 		_set_state(State.NEUTRAL)
 		return
+	move_clock += dt * _time_scale()
 	if _charging:
-		if input.is_held(FighterInput.HEAVY) and move_charge < 1.0 and t >= m.first_active() * 0.7:
+		var hb := _hold_button if _hold_button >= 0 else FighterInput.HEAVY
+		if input.is_held(hb) and move_charge < 1.0 and t >= m.charge_start():
 			move_charge = minf(1.0, move_charge + dt / m.charge_time)
 			state_time -= dt * _time_scale()
 			t = state_time
 			armor_until = time + 0.05
 			armor_level = "lights"
-		elif not input.is_held(FighterInput.HEAVY) or move_charge >= 1.0:
+		elif not input.is_held(hb) or move_charge >= 1.0:
 			_charging = false
-			if move_charge >= 0.35 and creature.moves.has("heavy_charged") and move_slot.split("@")[0] == "heavy":
+			var pmc: PoolMove = creature.pool.get(move_pool_id) if move_pool_id != "" else null
+			if pmc != null:
+				if move_charge >= 0.35 and pmc.charged != null and m == pmc.move:
+					# Movesets: a long hold switches to the move's charged follow-up
+					var ckeep := move_charge
+					var cbutton := move_button
+					var cslot := pmc.charged_use if pmc.charged_use != "" else pmc.report_slot()
+					var cmv: Array = _move_variant(cslot) if pmc.charged_use != "" else [pmc.charged, cslot]
+					var cm: MoveDef = cmv[0]
+					_start_move(cm, str(cmv[1]), State.ATTACK if cm.kind == "melee" else State.ABILITY, pmc.id, cbutton)
+					move_charge = ckeep
+					return
+			elif move_charge >= 0.35 and creature.moves.has("heavy_charged") and move_slot.split("@")[0] == "heavy":
 				# a long hold switches to the dedicated charged heavy
 				var cv: Array = _move_variant("heavy_charged")
 				var keep := move_charge
 				_start_move(cv[0], cv[1], State.ATTACK)
 				move_charge = keep
 				return
+	if not m.sustain.is_empty() and move_pool_id != "" and (_hold_button >= 0 or sustaining):
+		_sustain_tick(m, dt)
+		t = state_time
 	motor.guard_blend = move_toward(motor.guard_blend, 0.0, dt / Tuning.v("guard_blend_time"))
 	m.apply_overlay(t, motor)
 	if not _charge.is_empty():
@@ -750,7 +922,15 @@ func _st_move(dt: float) -> void:
 		var lunge := m.lunge_speed(t)
 		rig.desired_vel = mv * spd + forward() * lunge
 		rig.max_accel = eff("accel") * (1.6 if lunge > 0.0 else 1.0)
-		if target and _target_in_lock_range():
+		var pma: PoolMove = creature.pool.get(move_pool_id) if move_pool_id != "" else null
+		if pma != null and pma.aim_turn > 0.0 and t >= m.first_active() * 0.5:
+			# an aimed move (streams, beams): the stick steers it, else it tracks the target, at the
+			# move's own turn rate (a flamethrower sweeps; it does not snap)
+			if input.move.length() > 0.3:
+				_turn_toward(atan2(input.move.x, input.move.z), pma.aim_turn, dt)
+			elif target and _target_in_lock_range():
+				_turn_toward(_yaw_to_target(), pma.aim_turn, dt)
+		elif target and _target_in_lock_range():
 			_turn_toward(_yaw_to_target(), m.turn_rate, dt)
 	if m.in_ranges(m.armor, t):
 		armor_until = time + 0.02
@@ -773,13 +953,48 @@ func _st_move(dt: float) -> void:
 		_end_move()
 
 
+## Movesets `hold: sustain`: while the input is held (up to max_hold, while stamina lasts) the
+## move's sustain window loops and drains stamina; on release it plays on into its recovery.
+func _sustain_tick(m: MoveDef, dt: float) -> void:
+	var pm: PoolMove = creature.pool.get(move_pool_id)
+	if pm == null or pm.hold != "sustain":
+		return
+	var t0 := float(m.sustain[0])
+	var t1 := float(m.sustain[1])
+	if state_time < t0:
+		return
+	var holding := _hold_button >= 0 and input.is_held(_hold_button) and _sustain_t < pm.max_hold and stamina > 0.0
+	if holding:
+		if not sustaining:
+			sustaining = true
+			_emit({"type": "sustain", "phase": "start", "pool": pm.id, "slot": move_button})
+		_sustain_t += dt
+		stamina = maxf(0.0, stamina - pm.drain * dt * float(mods.get("stamina_cost", 1.0)))
+		_stamina_delay = Tuning.v("stamina_regen_delay")
+		if state_time >= t1:
+			state_time = t0 + fmod(state_time - t0, maxf(t1 - t0, 0.02))
+	else:
+		if sustaining:
+			_emit({"type": "sustain", "phase": "end", "pool": pm.id, "slot": move_button, "held": _sustain_t})
+		sustaining = false
+		_hold_button = -1
+		if state_time < t1:
+			state_time = t1        # released (or never held): straight into the recovery
+
+
 func _end_move() -> void:
 	if sim and move and not move.effects.is_empty():
 		sim.effects.end_move(self, move)
 	if not _charge.is_empty():
 		_finish_charge()
+	if sustaining:
+		_emit({"type": "sustain", "phase": "end", "pool": move_pool_id, "slot": move_button, "held": _sustain_t})
 	move = null
 	move_slot = ""
+	move_pool_id = ""
+	move_button = ""
+	sustaining = false
+	_hold_button = -1
 	_charging = false
 	_clear_overlay()
 	_set_state(State.GUARD if guard_held else State.NEUTRAL)
@@ -834,10 +1049,24 @@ func _st_dodge(dt: float) -> void:
 		var dist := dodge_distance_now() * float(mods.get("dodge_distance", 1.0)) * statuses.mult("dash")
 		rig.desired_vel = dodge_dir * (dist / maxf(dur, 0.05)) * speed_mult()
 		rig.max_accel = 90.0
-		if _peek(FighterInput.LIGHT) and creature.moves.has("dash_attack") and t > dur * 0.35:
-			_consume(FighterInput.LIGHT)
-			var dv: Array = _move_variant("dash_attack")
-			_start_move(dv[0], dv[1], State.ATTACK)
+		var dash_b := FighterInput.LIGHT
+		var dash_pm: PoolMove = null
+		if combat_style == "moves" and not creature.tags.has("martial"):
+			# Movesets: the basic strike's input, out of a dodge, is its dash strike
+			dash_b = -1
+			for bi in loadout.size():
+				var bp: PoolMove = creature.pool.get(str(loadout[bi]))
+				if bp and bp.role == "basic" and bp.dash != "":
+					dash_b = MOVE_BUTTONS[bi]
+					dash_pm = bp
+					break
+		if dash_b >= 0 and _peek(dash_b) and t > dur * 0.35 and (dash_pm != null or creature.moves.has("dash_attack")):
+			_consume(dash_b)
+			var dv: Array = _move_variant(dash_pm.dash if dash_pm else "dash_attack")
+			if dash_pm:
+				_start_move(dv[0], dv[1], State.ATTACK, dash_pm.id, slot_of_move(dash_pm.id))
+			else:
+				_start_move(dv[0], dv[1], State.ATTACK)
 	elif t < dur + Tuning.v("dodge_recovery"):
 		rig.desired_vel = Vector3.ZERO
 		rig.max_accel = eff("accel") * 1.5
@@ -1406,6 +1635,8 @@ func receive_hit(h: Dictionary) -> void:
 	var mc := str(h.get("move_class", ""))
 	if attacker and attacker != self and dmg > 0.0:
 		var gain: float = float({"light": 2.0, "heavy": 4.0, "ability": 3.0, "juice": 0.0}.get(mc, 1.0))
+		if bool(h.get("tick", false)):
+			gain *= TICK_HYPE      # a stream's many small hits build hype like a few big ones
 		attacker.gain_hype(float(gain) * float(h.get("hype_mult", 1.0)))
 		gain_hype(2.0 if mc == "heavy" else 1.0)
 		attacker.stats_record["damage_dealt"] += dmg
@@ -1459,6 +1690,12 @@ func receive_hit(h: Dictionary) -> void:
 	if armored:
 		return
 	var st: float = h.get("stun", 0.0)
+	if st > 0.0 and bool(h.get("tick", false)):
+		# repeating ticks stun at most every TICK_STUN_GAP s (no stun-lock, one combo step per gap)
+		if time - _tick_stun_at < TICK_STUN_GAP:
+			st = 0.0
+		else:
+			_tick_stun_at = time
 	if st > 0.0:
 		stun(st, false)
 
@@ -1493,8 +1730,14 @@ func _interrupt_move() -> void:
 	if not _charge.is_empty():
 		_charge = {}
 		_end_carry()
+	if sustaining:
+		_emit({"type": "sustain", "phase": "end", "pool": move_pool_id, "slot": move_button, "held": _sustain_t})
 	move = null
 	move_slot = ""
+	move_pool_id = ""
+	move_button = ""
+	sustaining = false
+	_hold_button = -1
 	_charging = false
 	if rig:
 		_clear_overlay()
@@ -1572,7 +1815,7 @@ func state_name() -> String:
 func cooldown_frac(slot: String) -> float:
 	if int(charges_left.get(slot, 1)) > 0:
 		return 0.0
-	var total := float(creature.cooldowns.get(slot, 1.0))
+	var total := slot_cooldown(slot)
 	return clampf(float(cooldown_left.get(slot, 0.0)) / maxf(total, 0.01), 0.0, 1.0)
 
 

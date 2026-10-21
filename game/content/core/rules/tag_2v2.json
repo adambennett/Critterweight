@@ -3,6 +3,7 @@
   "name": "Tag Team 2v2",
   "mode": "tag_team",
   "format": "tag",
+  "combat": "moves",
   "teams": 2,
   "players": [
     4,

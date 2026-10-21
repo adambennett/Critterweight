@@ -96,7 +96,9 @@ func _create_fighter(idx: int, e: Dictionary, pos: Vector3, yaw: float) -> Fight
 		f.mods[k] = mv if typeof(mv) == TYPE_STRING or typeof(mv) == TYPE_BOOL else float(mv)
 	for h in e.get("hooks", []):
 		f.hooks.add(h, "loadout")
-	f.reset_vitals()
+	# Movesets or Classic (the match rule; a missing key is Movesets, docs/design/MOVESET_COMBAT.md §1)
+	# with the entry's loadout when it is valid for this creature
+	f.set_combat(combat_style(), e.get("loadout", []) if typeof(e.get("loadout", [])) == TYPE_ARRAY else [])
 	_apply_rule_mods(f)
 	if idx < fighters.size():
 		fighters[idx] = f
@@ -105,6 +107,11 @@ func _create_fighter(idx: int, e: Dictionary, pos: Vector3, yaw: float) -> Fight
 		fighters.append(f)
 		input_sources.append(e.get("source"))
 	return f
+
+
+## The match's combat style: "moves" (the default) or "classic" (rules `combat`).
+func combat_style() -> String:
+	return "classic" if str(rules.get("combat", "moves")) == "classic" else "moves"
 
 
 ## Rules multipliers are clamped to RulesValidator's ranges here as well: rules may come from mods,

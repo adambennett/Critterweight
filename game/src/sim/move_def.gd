@@ -46,6 +46,8 @@ var guard_break := 1.0        ## multiplier on stamina drained from a guarding t
 var speed := 1.0              ## muscle speed multiplier for animated segments
 var charge_time := 0.0        ## >0: hold to charge up to this many seconds
 var charge_damage := 0.5      ## extra damage fraction at full charge
+var charge_at := -1.0         ## when holding starts to charge (s); < 0 = 70% of the wind-up (first hit window)
+var sustain: Array = []       ## Movesets `hold: sustain` moves: [t0, t1] loops while the input is held
 var effects: Array = []       ## ability timeline events: [{t, type, ...}]
 var keys: Array = []          ## [{t, chains:{name:Vector3|BASE}, poles:{}, joints:{idx:Quaternion|BASE}, lean, height}]
 var animated_chains: PackedStringArray = PackedStringArray()
@@ -93,16 +95,21 @@ static func parse(d: Dictionary, body: BodyDef, errors: PackedStringArray) -> Mo
 	for oh in m.on_hit:
 		if typeof(oh) != TYPE_DICTIONARY:
 			errors.append("move '%s': on_hit entries must be objects" % m.id)
-	for ef in m.effects:
-		var ve := EffectsSystem.validate(ef) if typeof(ef) == TYPE_DICTIONARY else "effect is not an object"
-		if ve != "":
-			errors.append("move '%s': %s" % [m.id, ve])
 	m.unblockable = bool(d.get("unblockable", false))
 	m.guard_break = float(d.get("guard_break", 1.0))
 	m.speed = float(d.get("speed", 1.0))
 	m.charge_time = float(d.get("charge_time", 0.0))
 	m.charge_damage = float(d.get("charge_damage", 0.5))
 	m.effects = d.get("effects", [])
+	# validated after they are read (they were checked before assignment until v0.9.18: never)
+	for ef in m.effects:
+		var ve := EffectsSystem.validate(ef) if typeof(ef) == TYPE_DICTIONARY else "effect is not an object"
+		if ve != "":
+			errors.append("move '%s': %s" % [m.id, ve])
+	m.charge_at = float(d.get("charge_at", -1.0))
+	var sus = d.get("sustain", [])
+	if typeof(sus) == TYPE_ARRAY and (sus as Array).size() >= 2:
+		m.sustain = [float(sus[0]), float(sus[1])]
 	m.props = PackedStringArray(d.get("props", []))
 	m.interval = float(d.get("interval", 0.0))
 	for w in d.get("hit", []):
@@ -173,6 +180,11 @@ func window_index(t: float) -> int:
 
 func first_active() -> float:
 	return windows[0]["t0"] if not windows.is_empty() else duration
+
+
+## When holding the input starts to charge this move (the v0.9.17 heavy: 70% of the wind-up).
+func charge_start() -> float:
+	return charge_at if charge_at >= 0.0 else first_active() * 0.7
 
 
 ## When the last hit window closes (0 for moves without windows).

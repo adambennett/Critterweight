@@ -113,6 +113,12 @@ func sync_roster(replica: NetReplica) -> void:
 			f2.creature = e["def"]
 			f2.max_health = f2.creature.stat("health")
 			f2.health = f2.max_health
+		# Movesets: the HUD's move cards, prompts and names follow the server's loadout
+		var style := str(e.get("combat", "classic"))
+		var lo: Array = e.get("loadout", [])
+		if f2.combat_style != style or f2.loadout != lo:
+			f2.combat_style = style
+			f2.loadout = lo.duplicate() if style == "moves" and f2.creature and f2.creature.loadout_problem(lo) == "" else []
 
 
 func update(sample: Dictionary, dt: float) -> void:
@@ -150,6 +156,7 @@ func update(sample: Dictionary, dt: float) -> void:
 			else:
 				tfd.erase("submerged")
 		f.cooldown_left = (fd["cooldowns"] as Dictionary).duplicate()
+		f.charges_left = (fd.get("charges", {}) as Dictionary).duplicate()
 		f.statuses.active = (fd["statuses"] as Array).duplicate(true)
 		var ti := int(fd["target"])
 		f.target = sim.fighters[ti] if ti >= 0 and ti < sim.fighters.size() else null

@@ -168,18 +168,34 @@ func _add_control_hints(_n: int) -> void:
 	bar.add_theme_constant_override("h_separation", 20)
 	bar.alignment = FlowContainer.ALIGNMENT_CENTER
 	var fighter: Fighter = sim.fighters[player_index]
+	var movesets := fighter.combat_style == "moves" and not fighter.creature.tags.has("martial")
 	if bool(Settings.get_value("gameplay.tutorial_prompts")):
 		var hints := [["light", "Light"], ["heavy", "Heavy"], ["guard", "Guard"], ["dodge", "Dodge"], ["grab", "Grab"]]
+		if movesets:
+			hints = [["guard", "Guard (tap: parry)"], ["dodge", "Dodge"], ["grab", "Grapple"]]
 		if fighter.creature.tags.has("martial"):
 			hints = [["mma_lh", "L hand"], ["mma_rh", "R hand"], ["mma_ll", "L leg"], ["mma_rl", "R leg"], ["mma_mod1", "Hooks"], ["mma_mod2", "Straights"], ["mma_mod3", "Overhands"], ["mma_guard", "Guard"], ["mma_grab", "Grapple"], ["mma_dodge", "Slip"]]
 		for item in hints:
 			var prompt := ButtonPrompt.new([item[0]], item[1], 36)
 			prompt.clickable = false
 			bar.add_child(prompt)
-	for slot in ["ability1", "ability2", "juice"]:
+	if movesets:
+		# Movesets: one card per equipped move, named after it, on its own input
+		for i in fighter.loadout.size():
+			var pm: PoolMove = fighter.creature.pool.get(str(fighter.loadout[i]))
+			if pm == null:
+				continue
+			var mslot: String = Fighter.MOVE_SLOTS[i]
+			var mprompt := CombatPrompt.new([MOVE_ACTIONS[i]], move_card_title(pm), 40)
+			bar.add_child(mprompt)
+			_ability_prompts[mslot] = mprompt
+	for slot in (["juice"] if movesets else ["ability1", "ability2", "juice"]):
 		if slot != "juice" and not fighter.creature.abilities.has(slot):
 			continue
-		var prompt := CombatPrompt.new([MartialControls.action(slot, fighter.creature)], "JUICE" if slot == "juice" else ("Trick 1" if slot == "ability1" else "Trick 2"), 40)
+		var title := "JUICE" if slot == "juice" else ("Trick 1" if slot == "ability1" else "Trick 2")
+		if movesets:
+			title = "Ultimate"
+		var prompt := CombatPrompt.new([MartialControls.action(slot, fighter.creature)], title, 40)
 		bar.add_child(prompt)
 		_ability_prompts[slot] = prompt
 	var strip := PanelContainer.new()
@@ -380,8 +396,8 @@ func _process(dt: float) -> void:
 			for slot in _ability_prompts:
 				var left := float(f.cooldown_left.get(slot, 0.0))
 				var full := 1.0
-				if f.creature.abilities.has(slot):
-					full = maxf(0.01, float(f.creature.cooldowns.get(slot, 1.0)))
+				if f.creature.abilities.has(slot) or f.slot_move(str(slot)) != null:
+					full = maxf(0.01, f.slot_cooldown(str(slot)))
 				var available := int(f.charges_left.get(slot, 1)) > 0
 				if available:
 					left = 0.0 # A second charge stays usable while the spent charge recharges.
@@ -729,6 +745,31 @@ func show_decision(ev: Dictionary, round_no := 0) -> void:
 	_banner_until = _banner_shown + DECISION_SECONDS
 	_banner_draw = w < 0
 	_place_bottom_panels()
+
+
+## Movesets: the Controls actions of loadout slots m1..m4 (the Classic Light/Heavy/Ability inputs).
+const MOVE_ACTIONS := ["light", "heavy", "ability1", "ability2"]
+
+
+## A move card's title: its name, and how to use it when that is not a tap.
+static func move_card_title(pm: PoolMove) -> String:
+	match pm.hold:
+		"charge":
+			return "%s (hold)" % pm.display_name
+		"sustain":
+			return "%s (hold, aim)" % pm.display_name if pm.aim_turn > 0.0 else "%s (hold)" % pm.display_name
+	return pm.display_name
+
+
+## A move press that could not start (Fighter `move_denied`: cooldown or stamina): the card flashes.
+func move_denied(slot: String, why: String) -> void:
+	var p = _ability_prompts.get(slot)
+	if p == null or not is_instance_valid(p):
+		return
+	var c := p as CanvasItem
+	c.modulate = Color(1.0, 0.35, 0.3) if why == "stamina" else Color(0.75, 0.75, 0.8)
+	var tw := create_tween()
+	tw.tween_property(c, "modulate", Color.WHITE, 0.35)
 
 
 func callout(text: String, seconds := 1.4, color := Color(1, 0.92, 0.7)) -> void:

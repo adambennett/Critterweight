@@ -22,7 +22,7 @@ const ROUND_END_TIME := 3.0     ## MatchMode.ROUND_END_TIME
 const DECISION_TIME := 6.0      ## the bout-end ceremony under 10-point scoring / the referee (§3.5)
 ## Standard Duel (content/core/rules/duel.json) for content doubles without rules presets.
 const DUEL := {"id": "duel", "name": "Standard Duel", "mode": "standard", "format": "duel", "teams": 2, "players": [2, 2],
-	"rounds": 3, "round_time": 99, "win": "ko", "lives": 1, "sudden_death": true, "version": 1}
+	"rounds": 3, "round_time": 99, "win": "ko", "lives": 1, "sudden_death": true, "combat": "moves", "version": 1}
 
 
 ## The preset career bouts start from (a copy).

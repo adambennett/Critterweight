@@ -43,7 +43,7 @@ static func start(index := 0, creature_id := "", exit_to: Dictionary = {}) -> Ma
 	# plain data only (no mode object): MatchFlow keeps it for the pause menu's Restart
 	return MatchFlow.launch({"arena": "practice_cage", "seed": 1234, "overlay_script": OVERLAY,
 		"audio_context": "tutorial", "music": "fight_night_poster", "no_record": true,
-		"rules": {"id": "tutorial", "name": "Tutorial", "mode": "tutorial", "round_time": 0.0, "rounds": 1, "intro_time": 0.0,
+		"rules": {"id": "tutorial", "name": "Tutorial", "mode": "tutorial", "combat": "moves", "round_time": 0.0, "rounds": 1, "intro_time": 0.0,
 			"tutorial_start": index},
 		"fighters": [
 			{"creature": cid, "team": 0, "kind": "player", "name": Profiles.player_name()},

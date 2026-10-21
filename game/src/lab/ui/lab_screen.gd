@@ -1153,7 +1153,7 @@ func _spectate() -> void:
 	else:
 		opp["kind"] = "script"
 		opp["source"] = LabOpponents.create(key, randi(), Content.creature(p.creature))
-	App.start_match({"arena": "the_gullet", "rules": {"rounds": 1, "round_time": 60, "mode": "standard"}, "fighters": [
+	App.start_match({"arena": "the_gullet", "rules": {"rounds": 1, "round_time": 60, "mode": "standard", "combat": "classic"}, "fighters": [
 		{"creature": p.creature, "team": 0, "kind": "policy", "policy_id": p.id, "name": p.name}, opp]}, _back_to_lab)
 
 

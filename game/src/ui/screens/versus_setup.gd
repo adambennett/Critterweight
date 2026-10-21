@@ -8,7 +8,7 @@ extends Screen
 ## Launches through MatchFlow.launch(); the config carries ui.setup so Results can come back here.
 
 const MAX_FIGHTERS := 8
-const PRACTICE_RULES := {"id": "practice", "name": "Practice", "mode": "standard", "rounds": 1, "round_time": 0,
+const PRACTICE_RULES := {"id": "practice", "name": "Practice", "mode": "standard", "combat": "moves", "rounds": 1, "round_time": 0,
 	"lives": -1, "respawn": true, "respawn_delay": 2.0,
 	"description": "No clock and endless respawns: knocked-out fighters come back after two seconds."}
 
@@ -298,6 +298,14 @@ func _add_slot_rows(c: VBoxContainer, i: int) -> void:
 	pr.activated.connect(_pick_creature.bind(i))
 	c.add_child(pr)
 	_pick_rows[i] = pr
+	if movesets():
+		# Movesets: the four moves this fighter brings (loadout A, B or the player's own)
+		var lr := PickRow.new("Moves")
+		lr.set_choice(_loadout_text(s), "", null)
+		lr.set_help("Moves", "The four moves fighter %d equips: a recommended loadout or your own pick from the fighter's move pool." % (i + 1))
+		lr.set_meta("focus_key", "moves%d" % i)
+		lr.activated.connect(_pick_loadout.bind(i))
+		c.add_child(lr)
 	if i > 0 and mode == "practice":
 		var kr := OptionRow.new("Controlled by")
 		kr.setup(["dummy", "bot"], ["Training dummy", "Bot"], s["kind"])
@@ -344,10 +352,63 @@ func _pick_creature(i: int) -> void:
 	var s: Dictionary = slots()[i]
 	App.push("character_select", {"mode": "pick", "title": "Fighter %d" % (i + 1), "current": str(s["creature"]),
 		"allow_random": true, "on_pick": func(id: String) -> void:
+			if str(s["creature"]) != id:
+				s.erase("loadout")     # another fighter: its own (or the profile's saved) loadout
 			s["creature"] = id
 			if i < _pick_rows.size():
 				_pick_rows[i].set_choice(_creature_name(id), "", _creature_icon(id))
-			_update_poster()})
+			_update_poster()
+			_rebuild("pick%d" % i)})
+
+
+## Whether the chosen rules play Movesets (every built-in preset does; a user preset may say Classic).
+func movesets() -> bool:
+	return str(rules_dict().get("combat", "moves")) != "classic"
+
+
+## The loadout a slot fights with: its own pick, else the profile's last loadout for that fighter,
+## else the fighter's recommended loadout.
+func slot_loadout(s: Dictionary) -> Array:
+	var c := Content.creature(str(s["creature"]))
+	if c == null:
+		return []
+	var mine: Array = s.get("loadout", [])
+	if mine.is_empty() and str(s.get("kind", "")) == "player":
+		var saved = (Profiles.current.get("loadouts", {}) as Dictionary).get(c.id, []) if typeof(Profiles.current.get("loadouts", {})) == TYPE_DICTIONARY else []
+		mine = saved if typeof(saved) == TYPE_ARRAY else []
+	return c.resolve_loadout(mine)
+
+
+func _loadout_text(s: Dictionary) -> String:
+	var c := Content.creature(str(s["creature"]))
+	if c == null or str(s["creature"]) == "random":
+		return "Recommended"
+	var lo := slot_loadout(s)
+	for lk in c.loadouts:
+		if (c.loadouts[lk] as Dictionary)["moves"] == lo:
+			return str((c.loadouts[lk] as Dictionary).get("name", lk))
+	var names := PackedStringArray()
+	for id in lo:
+		names.append((c.pool[str(id)] as PoolMove).display_name if c.pool.has(str(id)) else str(id))
+	return ", ".join(names)
+
+
+func _pick_loadout(i: int) -> void:
+	var s: Dictionary = slots()[i]
+	var cid := str(s["creature"])
+	if Content.creature(cid) == null:
+		Audio.sfx("ui_error")
+		return
+	App.push("loadout", {"creature": cid, "loadout": slot_loadout(s), "title": "Fighter %d moves" % (i + 1),
+		"on_done": func(lo: Array) -> void:
+			s["loadout"] = lo.duplicate()
+			if str(s.get("kind", "")) == "player":
+				var all = Profiles.current.get("loadouts", {})
+				var d: Dictionary = all if typeof(all) == TYPE_DICTIONARY else {}
+				d[cid] = lo.duplicate()
+				Profiles.current["loadouts"] = d
+				Profiles.save()
+			_rebuild("moves%d" % i)})
 
 
 func _add_slot() -> void:
@@ -449,6 +510,8 @@ func build_config() -> Dictionary:
 			n += 1
 		used[nm] = true
 		var fd := {"creature": cid, "team": i if ffa else int(s["team"]), "kind": kind, "name": nm}
+		if movesets() and cid == str(s["creature"]):
+			fd["loadout"] = slot_loadout(s)
 		if kind == "bot":
 			fd["difficulty"] = BotTiers.brain_tier(str(s["tier"]))
 		fighters.append(fd)

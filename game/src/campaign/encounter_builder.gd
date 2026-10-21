@@ -482,8 +482,10 @@ static func build_match(catalog: CampaignCatalog, state: Dictionary, plan_d: Dic
 	CampaignModes.ensure_registered()
 	# no_record: the campaign credits whole runs itself (CampaignProgression), so App does not
 	# also count each campaign fight as a versus match
+	# the run's combat style (v0.9.18: Movesets unless the run was started as Classic)
+	var combat := "classic" if str(state.get("combat", "moves")) == "classic" else "moves"
 	var config := {"arena": arena, "rules": {"rounds": 1, "round_time": float(r.get("round_time", 150.0)), "mode": mode.id(),
-		"friendly_fire": false, "lives": 1}, "seed": seed_value, "mode": mode, "fighters": fighters, "no_record": true,
+		"friendly_fire": false, "lives": 1, "combat": combat}, "seed": seed_value, "mode": mode, "fighters": fighters, "no_record": true,
 		"context": {"campaign": true, "variant": plan_d.get("variant", ""), "encounter": plan_d.get("encounter", ""),
 			"rule_tags": plan_d.get("rule_tags", []), "dark": _any_dark(players)}}
 	return {"config": config, "errors": errors, "warnings": warnings, "roles": roles}

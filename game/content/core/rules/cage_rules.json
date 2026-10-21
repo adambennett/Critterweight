@@ -3,6 +3,7 @@
   "name": "Cage Rules",
   "mode": "standard",
   "format": "duel",
+  "combat": "moves",
   "teams": 2,
   "players": [
     2,

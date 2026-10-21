@@ -77,7 +77,7 @@ func start(parent: Node, it: Dictionary, policy: PolicyData) -> String:
 	var round_time := float(ep.get("round_time", 10.0))
 	# standard rules for one round; the cosmetic intro shrinks to a short settle and a timeout
 	# tie is a draw (no sudden death), so every episode has a bounded length
-	var rules := {"rounds": 1, "round_time": round_time, "lives": 1, "intro_time": float(SETTLE_TICKS) / float(Engine.physics_ticks_per_second),
+	var rules := {"rounds": 1, "round_time": round_time, "lives": 1, "combat": "classic", "intro_time": float(SETTLE_TICKS) / float(Engine.physics_ticks_per_second),
 		"sudden_death": false}
 	sim.setup({"arena": LabScenarios.arena_for(ep), "rules": rules, "seed": seed_value,
 		"fighters": [{"creature": c_learner, "team": 0, "source": src, "name": "Learner", "kind": "policy"},

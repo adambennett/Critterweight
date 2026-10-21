@@ -69,8 +69,13 @@ func temp_dir(name_: String) -> String:
 
 
 ## Builds a headless MatchSim (no views) with the given fighters and returns it; the caller
-## steps it with `step_sim`. fighters: [{creature: CreatureDef|id, team, source}]
+## steps it with `step_sim`. fighters: [{creature: CreatureDef|id, team, source, loadout}]
+## Rules without a "combat" key run Classic here: the kit and mechanics tests written before v0.9.18
+## are the Classic coverage. Movesets tests pass {"combat": "moves"} (the game's own default).
 func make_sim(arena_id := "the_gullet", rules := {"rounds": 1, "round_time": 0}, fighters := [], seed_value := 1) -> MatchSim:
+	if not rules.has("combat"):
+		rules = rules.duplicate()
+		rules["combat"] = "classic"
 	var sim := MatchSim.new()
 	sim.running = false
 	fresh_world().add_child(sim)

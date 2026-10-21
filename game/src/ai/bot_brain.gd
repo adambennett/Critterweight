@@ -120,7 +120,11 @@ func _pv(k: String, def := 0.0) -> float:
 
 func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
 	var before := f.input.press_count.duplicate()
+	_mv_direct.clear()
 	_poll_standard(f, sim, dt)
+	if f.combat_style == "moves" and not f.creature.tags.has("martial"):
+		_translate_moves(f, before)
+		return
 	if not f.creature.tags.has("martial") or f.state in [Fighter.State.HELD, Fighter.State.GRABBING]:
 		return
 	for hand in [FighterInput.LIGHT, FighterInput.HEAVY]:
@@ -414,6 +418,9 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	# ---- JUICE ----
 	if f.hype >= 100.0 and rng.randf() < float(p["juice"]) * 0.5 and _kit_juice_ok(f, tgt, dist, dir, per):
 		f.input.press(FighterInput.JUICE)
+		return
+	# ---- Movesets: the loadout's own moves (streams, blasts, volleys...) by their hints ----
+	if f.combat_style == "moves" and not c.tags.has("martial") and _moves_think(f, tgt, dist, dir, per, false):
 		return
 	# ---- abilities ----
 	if _kit_ability(f, tgt, dist, dir, per, false):   # kit hints from the creature "ai" block
@@ -840,12 +847,15 @@ static func _armor_through(m: MoveDef) -> bool:
 ## The bot's own answers: [{btn, slot, startup, reach, value, armored}], read from its kit.
 func _own_options(f: Fighter) -> Array:
 	var c := f.creature
-	if _own_cache.has(c.id):
-		return _own_cache[c.id]
+	var key := c.id + "|" + ",".join(f.loadout)
+	if _own_cache.has(key):
+		return _own_cache[key]
 	var out: Array = []
 	var first_light := str(c.light_string[0]) if not c.light_string.is_empty() else "l1"
 	for pair in [[FighterInput.LIGHT, first_light], [FighterInput.HEAVY, "heavy"], [FighterInput.GRAB, "grab"]]:
 		var slot := str(pair[1])
+		if f.combat_style == "moves" and int(pair[0]) != FighterInput.GRAB and _mv_classic_button(f, int(pair[0])) < 0:
+			continue     # Movesets: that Classic strike is not in the loadout
 		var m: MoveDef = c.moves.get(slot)
 		if m == null or (m.windows.is_empty() and m.effects.is_empty()):
 			continue
@@ -860,7 +870,7 @@ func _own_options(f: Fighter) -> Array:
 				dmg += float(e.get("damage", 0.0))
 		out.append({"btn": int(pair[0]), "slot": slot, "startup": _first_threat(m), "reach": reach_of(c, slot),
 			"value": dmg * (1.0 + stun), "armored": _armor_through(m)})
-	_own_cache[c.id] = out
+	_own_cache[key] = out
 	return out
 
 
@@ -1138,6 +1148,8 @@ func _choose_answer(f: Fighter, tgt: Fighter, per: Dictionary, info: Dictionary,
 	# a parry tap already planned for this hit (after blocking the one before it) stands
 	if light and _tap_at > _t and _tap_at - _t < 0.3:
 		return "parry"
+	if f.combat_style == "moves" and not f.creature.tags.has("martial") and _moves_think(f, tgt, dist, dir, per, true):
+		return "counter"      # Movesets: a reactive move (counters, deflects)
 	if _kit_ability(f, tgt, dist, dir, per, true):   # kit hint: reactive abilities (counters, armor)
 		return "counter"
 	var sidestep := not (light and mash and rng.randf() < _pv("read"))   # a read masher is blocked, not sidestepped
@@ -1888,3 +1900,150 @@ func _kit_pack_hold(f: Fighter, dist: float, dir: Vector3, attacking: bool, thei
 			_guard = true
 			_guard_until = _t + 0.5
 			f.input.press(FighterInput.GUARD)
+
+
+# =====================================================================================
+# Movesets (v0.9.18, docs/design/MOVESET_COMBAT.md §9). The Classic brain above still decides its
+# strikes, punishes, guard and footwork; its Light / Heavy / Ability presses are translated to the
+# loadout slots holding those moves (dropped when they are not equipped). The loadout's other moves
+# (streams, blasts, volleys, rushes, control, supports, counters) are used here from each move's
+# `ai` hints (or category defaults): range band to the target's body, conditions, how long a
+# charge or a sustain is held; a stream is kept aimed at the target while it pours.
+# =====================================================================================
+
+var _mv_hold := {}                   ## move input -> bot clock until which it stays held
+var _mv_direct := {}                 ## move inputs pressed by the moves layer this poll (never translated)
+
+## Defaults by category for moves without an `ai` block. min/max: distance to the target's body.
+const MOVE_AI_DEFAULTS := {
+	"projectile": {"min": 1.8, "max": 8.0, "chance": 1.0},
+	"volley": {"min": 1.4, "max": 7.0, "chance": 1.0},
+	"stream": {"min": 0.4, "max": 2.8, "chance": 1.3, "hold": [0.8, 1.7]},
+	"blast": {"min": 0.6, "max": 4.5, "chance": 0.9, "hold": [0.3, 1.0]},
+	"rush": {"min": 1.6, "max": 5.5, "chance": 0.8},
+	"control": {"min": 0.4, "max": 4.0, "chance": 0.6},
+	"counter": {"chance": 1.2, "when": [{"target_winding": true, "max": 2.2}]},
+	"support": {"max": 99.0, "chance": 0.45},
+	"utility": {"max": 6.0, "chance": 0.45},
+	"strike": {"max": 1.5, "chance": 1.0, "hold": [0.2, 0.8]},
+}
+
+
+## A pool move's bot hint: category defaults, then the v0.9.17 hint of the ability it is built on,
+## then its own `ai` block ("range": [min, max] is shorthand for min/max).
+func _move_hint(c: CreatureDef, pm: PoolMove) -> Dictionary:
+	var h: Dictionary = (MOVE_AI_DEFAULTS.get(pm.category, {}) as Dictionary).duplicate(true)
+	if pm.use != "":
+		h.merge(_kit_hint_for(c, pm.use), true)
+	h.merge(pm.ai, true)
+	var rg = h.get("range", null)
+	if typeof(rg) == TYPE_ARRAY and (rg as Array).size() >= 2:
+		h["min"] = float(rg[0])
+		h["max"] = float(rg[1])
+	return h
+
+
+## The loadout input holding the move a Classic input meant (Light -> the basic strike, Heavy -> the
+## move built on the heavy, Ability 1/2 -> the move built on that ability), or -1.
+func _mv_classic_button(f: Fighter, classic: int) -> int:
+	for i in f.loadout.size():
+		var pm: PoolMove = f.creature.pool.get(str(f.loadout[i]))
+		if pm == null:
+			continue
+		match classic:
+			FighterInput.LIGHT:
+				if pm.role == "basic":
+					return Fighter.MOVE_BUTTONS[i]
+			FighterInput.HEAVY:
+				if pm.use == "heavy":
+					return Fighter.MOVE_BUTTONS[i]
+			FighterInput.AB1:
+				if pm.use == "ability1":
+					return Fighter.MOVE_BUTTONS[i]
+			FighterInput.AB2:
+				if pm.use == "ability2":
+					return Fighter.MOVE_BUTTONS[i]
+	return -1
+
+
+## Rewrites this poll's Classic-meaning presses and holds onto the loadout (see above). Grabbing,
+## held, down and getting up read the raw inputs in both styles (throws, mashing, wake-ups).
+func _translate_moves(f: Fighter, before: PackedByteArray) -> void:
+	var raw := f.state in [Fighter.State.GRABBING, Fighter.State.HELD, Fighter.State.DOWN, Fighter.State.KNOCKDOWN, Fighter.State.GETUP]
+	var heavy_hold := _t < _heavy_hold_until
+	if not raw:
+		var presses := {}
+		for b in Fighter.MOVE_BUTTONS:
+			var n := (int(f.input.press_count[b]) - int(before[b])) & 0xFF
+			if n > 0 and not _mv_direct.has(b):
+				presses[b] = n
+				f.input.press_count[b] = before[b]
+		for b in presses:
+			var to := _mv_classic_button(f, int(b))
+			if to < 0:
+				_tally("mv_dropped")
+				continue
+			for k in int(presses[b]):
+				f.input.press(to)
+	var heavy_to := _mv_classic_button(f, FighterInput.HEAVY) if not raw else FighterInput.HEAVY
+	for b in Fighter.MOVE_BUTTONS:
+		var hold: bool = _t < float(_mv_hold.get(b, -1.0)) or (heavy_hold and b == heavy_to)
+		if raw and b == FighterInput.HEAVY:
+			hold = heavy_hold
+		f.input.set_held(b, hold)
+
+
+## Uses one of the loadout's own moves when its hint says so. reactive: answering an attack seen
+## begin (counters and deflects only). Returns true when it pressed something (or is pouring a stream).
+func _moves_think(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary, reactive: bool) -> bool:
+	if f.sustaining:
+		_move = dir      # keep the stream on the target (the stick aims it)
+		return true
+	if not f.state in [Fighter.State.NEUTRAL, Fighter.State.GUARD]:
+		return false
+	var order: Array = []
+	for i in f.loadout.size():
+		order.append(i)
+	for k in range(order.size() - 1, 0, -1):
+		var j := rng.randi_range(0, k)
+		var tmp = order[k]
+		order[k] = order[j]
+		order[j] = tmp
+	var body_dist := maxf(0.0, dist - maxf(_bulk - REF_BULK, 0.0))
+	for i in order:
+		var slot: String = Fighter.MOVE_SLOTS[i]
+		var pm := f.slot_move(slot)
+		if pm == null or pm.role == "basic" or pm.use != "":
+			continue     # basic strings and moves built on Classic slots: the Classic brain uses them
+		if int(f.charges_left.get(slot, 1)) <= 0 or f.stamina < pm.stamina_cost():
+			continue
+		var h := _move_hint(f.creature, pm)
+		if reactive and not (pm.category in ["counter", "blast", "utility"] or h.has("reactive")):
+			continue
+		var gate := float(p["ability"]) * (0.8 if reactive else 0.35) * float(h.get("chance", 1.0))
+		if rng.randf() >= gate:
+			continue
+		if body_dist < float(h.get("min", 0.0)) or body_dist > float(h.get("max", 99.0)):
+			continue
+		var whens = h.get("when", [])
+		var ok: bool = (typeof(whens) != TYPE_ARRAY or (whens as Array).is_empty()) and not reactive
+		if typeof(whens) == TYPE_ARRAY:
+			for w in whens:
+				if typeof(w) == TYPE_DICTIONARY and _kit_when(f, tgt, dist, dir, per, w as Dictionary, reactive):
+					ok = true
+					break
+		if not ok:
+			continue
+		_kit_stick(h, dir)
+		var b: int = Fighter.MOVE_BUTTONS[i]
+		f.input.press(b)
+		_mv_direct[b] = true
+		if pm.hold != "":
+			var hr: Array = h.get("hold", [0.4, 1.0])
+			_mv_hold[b] = _t + rng.randf_range(float(hr[0]), float(hr[1])) * lerpf(0.7, 1.0, clampf(float(p["combo"]), 0.0, 1.0))
+		if pm.aim_turn > 0.0 or pm.category in ["projectile", "volley", "stream", "blast"]:
+			_move = dir * 0.2
+		_guard_until = minf(_guard_until, _t)
+		_tally("mv_" + pm.category)
+		return true
+	return false

@@ -357,15 +357,18 @@ func _on_event(ev: Dictionary) -> void:
 				vfx.emit("spark", p, n, col, HitFeel.spark_scale(dmg, involved))
 				if dmg >= (6.0 if involved else 10.0):
 					vfx.ring(p, 0.8, Color(1, 1, 1, 0.8), 0.25, false)
-			camera.add_trauma(HitFeel.trauma(dmg, involved))
-			camera.punch(HitFeel.punch(dmg, blocked, involved))
-			hit_pause(HitFeel.hit_pause(dmg, blocked, counter, involved))
+			# a stream's repeating ticks (Movesets): a light touch each, no hit pause or punch
+			var tick := bool(ev.get("tick", false))
+			camera.add_trauma(HitFeel.trauma(dmg, involved) * (0.15 if tick else 1.0))
+			if not tick:
+				camera.punch(HitFeel.punch(dmg, blocked, involved))
+				hit_pause(HitFeel.hit_pause(dmg, blocked, counter, involved))
 			if counter:
 				vfx.word(p + Vector3.UP * 0.3, "COUNTER!", Color(1.0, 0.75, 0.2))
-			if ti == player_index or int(ev["fighter"]) == player_index:
+			if (ti == player_index or int(ev["fighter"]) == player_index) and not tick:
 				var r := HitFeel.rumble(dmg, blocked)
 				Controls.rumble(r[0], r[1], r[2])
-			if bool(Settings.get_value("gameplay.damage_numbers")) and dmg >= 0.5:
+			if bool(Settings.get_value("gameplay.damage_numbers")) and dmg >= 0.5 and not tick:
 				vfx.word(p + Vector3.UP * 0.25, "%d" % roundi(dmg), Color(0.75, 0.85, 1.0) if bool(ev["blocked"]) else Color(1.0, 0.95, 0.8), 40)
 		"parry":
 			var pp: Vector3 = ev.get("pos", sim.fighters[int(ev["fighter"])].pos())
@@ -489,6 +492,9 @@ func _on_event(ev: Dictionary) -> void:
 			Audio.announce_trigger("mode", {"mode": "spotlight"})
 		"sudden_death":
 			hud.callout("SUDDEN DEATH", 1.8, Color(1.0, 0.35, 0.3))
+		"move_denied":
+			if int(ev.get("fighter", -1)) == player_index:
+				hud.move_denied(str(ev.get("slot", "")), str(ev.get("why", "")))
 			# the booth calls it from the event itself (CommentaryDirector)
 
 

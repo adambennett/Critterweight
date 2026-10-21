@@ -12,14 +12,24 @@ extends RefCounted
 ## projectile.arrive_y (lob: height above the floor at which the arc reaches the target point),
 ## charge.bounce / bounce_distance (see Fighter._charge_bounce), leap / spring pad "ballistic" (the
 ## flight is not braked by the ground drive near the floor, see Rig.ballistic).
+## Movesets (v0.9.18, docs/design/MOVESET_COMBAT.md §3.3), on any effect of a move:
+##   every (s) + until ("release" = while the move is sustained | seconds after the first firing) and/or
+##   count: fire again on the move's own clock (streams, bubble emitters, dart bursts); their hits are
+##   tick hits ("repeat_hit"; Fighter/Combat throttle hype, stun, stamina refund and combo scaling).
+##   charge_scale {damage, radius, speed, knockback, strength, length, width}: multipliers reached at
+##   full charge (Fighter.move_charge), so a held blast grows.
+##   type "recoil" {speed, up}: pushes the user back along its facing (Hydro Cannon).
 
 const TYPES := ["projectile", "area", "zone", "buff", "debuff", "heal", "shield", "dash", "leap", "hover",
 	"charge", "counter_stance", "reflect", "pull", "push", "blink", "prop", "delayed", "destroy_projectiles",
-	"chain_arc", "self_damage", "cleanse", "hype", "juice_state"]
+	"chain_arc", "self_damage", "cleanse", "hype", "juice_state", "recoil"]
+## Effect fields charge_scale may grow.
+const CHARGE_FIELDS := ["damage", "radius", "speed", "knockback", "strength", "length", "width", "launch", "range"]
 
 var sim: MatchSim
 var entities: Array = []         ## projectiles, zones, props, delayed strikes (Dictionaries)
 var _fired := {}                 ## fighter index -> PackedByteArray of fired effect indices
+var _repeat := {}                ## fighter index -> {effect index: {next, n, first}} (repeating effects)
 var _next_id := 1
 var _zone_count := 0
 
@@ -39,6 +49,7 @@ func begin_move(f: Fighter, m: MoveDef) -> void:
 	var fired := PackedByteArray()
 	fired.resize(m.effects.size())
 	_fired[f.index] = fired
+	_repeat[f.index] = {}
 
 
 func tick_move(f: Fighter, m: MoveDef, t: float, _dt: float) -> void:
@@ -46,15 +57,44 @@ func tick_move(f: Fighter, m: MoveDef, t: float, _dt: float) -> void:
 	if fired.size() != m.effects.size():
 		begin_move(f, m)
 		fired = _fired[f.index]
+	var reps: Dictionary = _repeat.get(f.index, {})
 	for i in m.effects.size():
-		if fired[i] == 0 and t >= float(m.effects[i].get("t", 0.0)):
+		var e: Dictionary = m.effects[i]
+		if fired[i] == 0 and t >= float(e.get("t", 0.0)):
 			fired[i] = 1
-			fire(f, m.effects[i], m)
+			fire(f, e, m)
+			if float(e.get("every", 0.0)) > 0.0:
+				reps[i] = {"next": f.move_clock + float(e["every"]), "n": 1, "first": f.move_clock}
+		elif reps.has(i):
+			var r: Dictionary = reps[i]
+			if f.move_clock < float(r["next"]):
+				continue
+			if not _repeat_on(f, e, r):
+				reps.erase(i)
+				continue
+			r["next"] = float(r["next"]) + float(e["every"])
+			r["n"] = int(r["n"]) + 1
+			fire(f, e, m)
 	_fired[f.index] = fired
+	_repeat[f.index] = reps
+
+
+## Whether a repeating effect fires again now: "release" = while the move is sustained (the input
+## held), a number = seconds after its first firing; `count` caps the total.
+func _repeat_on(f: Fighter, e: Dictionary, r: Dictionary) -> bool:
+	if e.has("count") and int(r["n"]) >= int(e["count"]):
+		return false
+	var until = e.get("until", null)
+	if typeof(until) == TYPE_STRING and str(until) == "release":
+		return f.sustaining
+	if typeof(until) == TYPE_FLOAT or typeof(until) == TYPE_INT:
+		return f.move_clock - float(r["first"]) <= float(until) + 1e-4
+	return e.has("count")
 
 
 func end_move(f: Fighter, _m: MoveDef) -> void:
 	_fired.erase(f.index)
+	_repeat.erase(f.index)
 
 
 # =====================================================================================
@@ -68,6 +108,21 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 	if f and f.mods.has("effect_element") and str(e.get("element", "")) != "" and t in ["projectile", "area", "chain_arc", "delayed"]:
 		e = e.duplicate()
 		e["element"] = str(f.mods["effect_element"])
+	if f and f.combat_style == "moves" and f.move_pool_id != "" and not e.has("pool"):
+		# Movesets attribution: every hit of this effect (now or later, from its projectile or zone)
+		# knows which pool move made it; repeating effects hit as throttled ticks
+		e = e.duplicate()
+		e["pool"] = f.move_pool_id
+		var pmv: PoolMove = f.creature.pool.get(f.move_pool_id)
+		e["cat"] = pmv.category if pmv else ""
+		if float(e.get("every", 0.0)) > 0.0:
+			e["repeat_hit"] = true     # ("tick" is a zone's tick interval)
+	if f and f.move_charge > 0.0 and typeof(e.get("charge_scale", null)) == TYPE_DICTIONARY:
+		e = e.duplicate()
+		var cs: Dictionary = e["charge_scale"]
+		for k in CHARGE_FIELDS:
+			if cs.has(k) and (typeof(e.get(k)) == TYPE_FLOAT or typeof(e.get(k)) == TYPE_INT):
+				e[k] = float(e[k]) * lerpf(1.0, float(cs[k]), clampf(f.move_charge, 0.0, 1.0))
 	var p := _point(f, e)
 	match t:
 		"projectile":
@@ -147,6 +202,9 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 			f.hype = clampf(f.hype + float(e.get("amount", 10.0)), 0.0, 100.0)
 		"juice_state":
 			f.apply_juice_state(e)
+		"recoil":
+			var back := -f.forward() * float(e.get("speed", 3.0)) + Vector3.UP * float(e.get("up", 0.0))
+			f.rig.apply_body_impulse(back * f.rig.total_mass)
 	var ev := {"type": "effect", "fighter": f.index, "effect": t, "pos": p, "element": e.get("element", ""),
 		"vfx": e.get("vfx", t), "radius": float(e.get("radius", 0.0)), "shape": str(e.get("shape", "circle")),
 		"yaw": f.facing_yaw, "move": m.id if m else ""}
@@ -158,6 +216,10 @@ func fire(f: Fighter, e: Dictionary, m: MoveDef = null) -> void:
 			ev[k] = float(v)
 	if t == "area" and str(e.get("shape", "circle")) in ["cone", "cone_back", "line"]:
 		ev["origin"] = f.ground_pos()
+	if e.has("pool"):
+		ev["pool"] = str(e["pool"])
+		if bool(e.get("repeat_hit", false)):
+			ev["tick"] = true
 	sim.emit_event(ev)
 
 
@@ -271,9 +333,11 @@ func effect_hit(f: Fighter, o: Fighter, e: Dictionary, from: Vector3, guard_from
 		"normal": -away, "seg": 0, "part": "core", "blocked": false, "parried": false, "counter": false,
 		"knockback": kb_dir * float(e.get("knockback", 0.0)) * mass_k + Vector3.UP * float(e.get("launch", 0.0)),
 		"local_impulse": Vector3.ZERO, "stun": float(e.get("stun", 0.2)), "poise": float(e.get("poise", 8.0)),
-		"knockdown": bool(e.get("knockdown", false)), "hype_mult": 1.0, "guard_drain": float(e.get("damage", 0.0)) * Tuning.v("guard_stamina_per_damage"),
+		"knockdown": bool(e.get("knockdown", false)), "hype_mult": 1.0,
+		"guard_drain": float(e.get("damage", 0.0)) * Tuning.v("guard_stamina_per_damage") * float(e.get("guard_break", 1.0)),
 		"element": str(e.get("element", "")), "buildup": float(e.get("buildup", 0.0)), "quality": 1.0,
 		"move": str(e.get("id", e.get("type", "effect"))), "slot": "effect", "move_class": str(e.get("class", "ability")),
+		"pool": str(e.get("pool", "")), "cat": str(e.get("cat", "")), "tick": bool(e.get("repeat_hit", false)),
 		"unblockable": bool(e.get("unblockable", false)), "parryable": bool(e.get("parryable", false)),
 		"from": from, "status": e.get("status", {}), "splat": e.get("splat", {}), "melee": false,
 		"no_otg_limit": false, "ally": f != null and not sim.are_enemies(f, o)}
@@ -809,13 +873,22 @@ func _expire(ent: Dictionary) -> void:
 		return
 	# "burst_on_hit": false keeps on_expire for timeouts/walls/floor only (not a fighter hit)
 	if e.has("on_expire") and not (bool(ent.get("consumed", false)) and not bool(e.get("burst_on_hit", true))):
-		var ex: Dictionary = e["on_expire"]
-		var et := str(ex.get("type", "area"))
-		if et == "area" and f:
-			area(f, ex, ent["pos"])
-		elif et == "zone":
-			spawn_zone(f, ex, Vector3(ent["pos"].x, 0, ent["pos"].z))
-		sim.emit_event({"type": "effect", "fighter": int(ent["owner"]), "effect": et, "pos": ent["pos"], "element": ex.get("element", e.get("element", "")), "vfx": ex.get("vfx", "burst"), "radius": float(ex.get("radius", 1.0)), "shape": "circle", "yaw": 0.0, "move": ""})
+		# one effect, or (v0.9.18) a list of them: a burst and the burning ground it leaves
+		var exs: Array = e["on_expire"] if typeof(e["on_expire"]) == TYPE_ARRAY else [e["on_expire"]]
+		for exv in exs:
+			if typeof(exv) != TYPE_DICTIONARY:
+				continue
+			var ex: Dictionary = exv
+			if e.has("pool") and not ex.has("pool"):
+				ex = ex.duplicate()
+				ex["pool"] = e["pool"]
+				ex["cat"] = e.get("cat", "")
+			var et := str(ex.get("type", "area"))
+			if et == "area" and f:
+				area(f, ex, ent["pos"])
+			elif et == "zone":
+				spawn_zone(f, ex, Vector3(ent["pos"].x, 0, ent["pos"].z))
+			sim.emit_event({"type": "effect", "fighter": int(ent["owner"]), "effect": et, "pos": ent["pos"], "element": ex.get("element", e.get("element", "")), "vfx": ex.get("vfx", "burst"), "radius": float(ex.get("radius", 1.0)), "shape": "circle", "yaw": 0.0, "move": "", "pool": str(ex.get("pool", ""))})
 
 
 # =====================================================================================

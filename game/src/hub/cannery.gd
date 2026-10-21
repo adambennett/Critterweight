@@ -9,7 +9,7 @@ extends RefCounted
 ## id to walk with (default: the Locker's choice, else the first roster fighter), from = "run" |
 ## "spar" | "tutorial" | "menu" (only changes the welcome line), result = a sparring result.
 
-const RULES := {"id": "hub", "name": "The Cannery", "mode": "hub", "round_time": 0.0, "rounds": 1, "intro_time": 0.0}
+const RULES := {"id": "hub", "name": "The Cannery", "mode": "hub", "combat": "moves", "round_time": 0.0, "rounds": 1, "intro_time": 0.0}
 
 
 static func enter(params := {}) -> void:

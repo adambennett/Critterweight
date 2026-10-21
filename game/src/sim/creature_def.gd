@@ -32,6 +32,9 @@ var art := {}                   ## model path, palette, gore piece
 var audio := {}                 ## voice/impact palette
 var ai := {}                    ## bot personality weights
 var tags: PackedStringArray = PackedStringArray()
+var pool := {}                  ## Movesets: move id -> PoolMove (docs/design/MOVESET_COMBAT.md)
+var loadouts := {}              ## loadout id -> {name, moves: [4 pool ids]}
+var default_loadout := ""       ## the loadout a fighter gets when nothing else is chosen
 var npc_only := false
 var source := ""                ## content package id that defined this creature
 var errors: PackedStringArray = PackedStringArray()
@@ -104,7 +107,90 @@ static func from_dict(d: Dictionary, body_lookup: Callable = Callable(), src := 
 	c.art = d.get("art", {})
 	c.audio = d.get("audio", {})
 	c.ai = d.get("ai", {})
+	var mp = d.get("movepool", null)
+	if typeof(mp) == TYPE_DICTIONARY and not (mp as Dictionary).is_empty():
+		for key in mp:
+			if typeof(mp[key]) == TYPE_DICTIONARY:
+				c.pool[str(key)] = PoolMove.parse(c, str(key), mp[key], c.errors)
+		var lo = d.get("loadouts", {})
+		if typeof(lo) == TYPE_DICTIONARY:
+			for lk in lo:
+				var entry = lo[lk]
+				var ids: Array = entry.get("moves", []) if typeof(entry) == TYPE_DICTIONARY else []
+				var problem := c.loadout_problem(ids)
+				if problem != "":
+					c.errors.append("%s: loadout '%s': %s" % [c.id, lk, problem])
+				c.loadouts[str(lk)] = {"name": str(entry.get("name", str(lk).capitalize())) if typeof(entry) == TYPE_DICTIONARY else str(lk), "moves": ids.duplicate()}
+		c.default_loadout = str(d.get("default_loadout", c.loadouts.keys()[0] if not c.loadouts.is_empty() else ""))
+		if c.default_loadout != "" and not c.loadouts.has(c.default_loadout):
+			c.errors.append("%s: default_loadout '%s' is not a loadout" % [c.id, c.default_loadout])
+	else:
+		c.derive_pool()
 	return c
+
+
+## Movesets for a creature without a `movepool` (NPCs, bosses, mods written before v0.9.18): its
+## Classic kit as four moves (the light string with finisher and dash strike, the heavy with its
+## charged follow-up, the two abilities), equipped in that order. Its fights play like Classic.
+func derive_pool() -> void:
+	pool.clear()
+	loadouts.clear()
+	var ids: Array = []
+	if not light_string.is_empty() and moves.has(str(light_string[0])):
+		var string: Array = light_string.duplicate()
+		if moves.has("finisher"):
+			string.append("finisher")
+		var basic := {"name": str((moves[str(light_string[0])] as MoveDef).display_name), "category": "strike", "role": "basic", "string": string}
+		if moves.has("dash_attack"):
+			basic["dash"] = "dash_attack"
+		pool["basic"] = PoolMove.parse(self, "basic", basic, errors)
+		ids.append("basic")
+	if moves.has("heavy"):
+		var heavy := {"name": str((moves["heavy"] as MoveDef).display_name), "category": "strike", "role": "heavy", "use": "heavy"}
+		var hm: MoveDef = moves["heavy"]
+		if hm.charge_time > 0.0:
+			heavy["hold"] = "charge"
+		if moves.has("heavy_charged"):
+			heavy["charged"] = "heavy_charged"
+		pool["heavy"] = PoolMove.parse(self, "heavy", heavy, errors)
+		ids.append("heavy")
+	for slot in ["ability1", "ability2"]:
+		if abilities.has(slot):
+			pool[slot] = PoolMove.parse(self, slot, {"name": str((abilities[slot] as MoveDef).display_name), "category": "control", "role": "special", "use": slot}, errors)
+			ids.append(slot)
+	for pm: PoolMove in pool.values():
+		pm.derived = true
+	loadouts["classic"] = {"name": "Classic kit", "moves": ids}
+	default_loadout = "classic"
+
+
+## Why a list of pool ids is not a valid loadout ("" when it is): 1-4 known, distinct moves with at
+## least one basic strike (a fighter must always have something to do).
+func loadout_problem(ids: Array) -> String:
+	if ids.is_empty() or ids.size() > 4:
+		return "a loadout has 1 to 4 moves"
+	var seen := {}
+	var basic := false
+	for id in ids:
+		var k := str(id)
+		if not pool.has(k):
+			return "unknown move '%s'" % k
+		if seen.has(k):
+			return "'%s' is equipped twice" % k
+		seen[k] = true
+		basic = basic or (pool[k] as PoolMove).role == "basic"
+	if not basic:
+		return "a loadout needs a basic move"
+	return ""
+
+
+## The loadout to fight with: `wanted` when it is valid, else the default loadout.
+func resolve_loadout(wanted: Array) -> Array:
+	if not wanted.is_empty() and loadout_problem(wanted) == "":
+		return wanted.duplicate()
+	if loadouts.has(default_loadout):
+		return (loadouts[default_loadout]["moves"] as Array).duplicate()
+	return []
 
 
 static func load_json(path: String) -> CreatureDef:

@@ -575,14 +575,16 @@ func _on_event(ev: Dictionary) -> void:
 				vfx.emit("spark", p, n, col, HitFeel.spark_scale(dmg, mine))
 				if dmg >= (6.0 if mine else 10.0):
 					vfx.ring(p, 0.8, Color(1, 1, 1, 0.8), 0.25, false)
-			camera.add_trauma(HitFeel.trauma(dmg, mine))
-			camera.punch(HitFeel.punch(dmg, blocked, mine))
+			var tick := bool(ev.get("tick", false))
+			camera.add_trauma(HitFeel.trauma(dmg, mine) * (0.15 if tick else 1.0))
+			if not tick:
+				camera.punch(HitFeel.punch(dmg, blocked, mine))
 			if bool(ev.get("counter", false)):
 				vfx.word(p + Vector3.UP * 0.3, "COUNTER!", Color(1.0, 0.75, 0.2))
-			if mine:
+			if mine and not tick:
 				var r := HitFeel.rumble(dmg, blocked)
 				Controls.rumble(r[0], r[1], r[2])
-			if bool(Settings.get_value("gameplay.damage_numbers")) and dmg >= 0.5:
+			if bool(Settings.get_value("gameplay.damage_numbers")) and dmg >= 0.5 and not tick:
 				vfx.word(p + Vector3.UP * 0.25, "%d" % roundi(dmg), Color(0.75, 0.85, 1.0) if bool(ev.get("blocked", false)) else Color(1.0, 0.95, 0.8), 40)
 		"parry":
 			var pp: Vector3 = ev.get("pos", root_pos(fi))
@@ -685,6 +687,9 @@ func _on_event(ev: Dictionary) -> void:
 				Audio.announce_trigger("mode", {"mode": "rush_headliner"}, {"o": _display_name(fi)})
 		"spotlight_swing":
 			Audio.announce_trigger("mode", {"mode": "spotlight"})
+		"move_denied":
+			if fi == my_index:
+				hud.move_denied(str(ev.get("slot", "")), str(ev.get("why", "")))
 		"sudden_death":
 			hud.callout("SUDDEN DEATH", 1.8, Color(1.0, 0.35, 0.3))
 			# the booth calls it from the event itself (CommentaryDirector)

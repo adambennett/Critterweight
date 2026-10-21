@@ -3,6 +3,7 @@
   "name": "Spotlight Hog (Teams)",
   "mode": "spotlight_hog",
   "format": "teams",
+  "combat": "moves",
   "teams": 2,
   "players": [
     4,

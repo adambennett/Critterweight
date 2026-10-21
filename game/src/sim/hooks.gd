@@ -142,10 +142,13 @@ func _conditions(c: Dictionary, ctx: Dictionary) -> bool:
 			continue
 		match k:
 			"slot":
-				if str(ctx.get("slot", "")) != str(v):
+				if not _slot_matches(ctx, str(v)):
 					return false
 			"slots":
-				if not (v as Array).has(str(ctx.get("slot", ""))):
+				var any_slot := false
+				for sv in (v as Array):
+					any_slot = any_slot or _slot_matches(ctx, str(sv))
+				if not any_slot:
 					return false
 			"move_class":
 				if str(ctx.get("move_class", "")) != str(v):
@@ -219,6 +222,32 @@ func _conditions(c: Dictionary, ctx: Dictionary) -> bool:
 				if hp == null or str(hp.get("part", "")) != str(v):
 					return false
 	return true
+
+
+## Whether the context's move answers a Classic slot name. Movesets (docs/design/MOVESET_COMBAT.md
+## §7): a pool move answers the slots it is built on, and a basic or heavy move also answers the
+## generic light-string and heavy slots, so upgrades written for "heavy" reach Hydro Cannon too.
+func _slot_matches(ctx: Dictionary, want: String) -> bool:
+	var s := str(ctx.get("slot", ""))
+	if s == want:
+		return true
+	var f = fighter
+	if f == null or f.combat_style != "moves":
+		return false
+	var pool_id := str(ctx.get("pool", ""))
+	var hit = ctx.get("hit")
+	if pool_id == "" and hit != null:
+		pool_id = str(hit.get("pool", ""))
+	if pool_id == "" and s.begins_with("mv."):
+		pool_id = s.substr(3)
+	if pool_id == "":
+		return false
+	# the move belongs to the hook's owner, or (hit_taken, pre_hit_taken) to the other fighter
+	var pm: PoolMove = f.creature.pool.get(pool_id)
+	var other = ctx.get("other")
+	if pm == null and other is Fighter:
+		pm = (other as Fighter).creature.pool.get(pool_id)
+	return pm != null and pm.answers_slot(want)
 
 
 func _run(h: Dictionary, ctx: Dictionary) -> void:
@@ -315,14 +344,18 @@ func _act(a: Dictionary, ctx: Dictionary) -> void:
 func _act_cooldown(a: Dictionary) -> void:
 	var f = fighter
 	var slot := str(a.get("slot", ""))
-	if not f.creature.abilities.has(slot):
+	if f.combat_style == "moves":
+		slot = f.resolve_slot(slot)       # Movesets: the loadout slot holding that ability
+		if f.slot_move(slot) == null:
+			return
+	elif not f.creature.abilities.has(slot):
 		return
 	var left := float(f.cooldown_left.get(slot, 0.0))
 	left = float(a["set"]) if a.has("set") else left + float(a.get("add", 0.0))
 	left = maxf(0.0, left)
 	f.cooldown_left[slot] = left
 	if left <= 0.0:
-		f.charges_left[slot] = int(f.creature.ability_charges.get(slot, 1))
+		f.charges_left[slot] = f.slot_max_charges(slot)
 
 
 # =====================================================================================

@@ -8,7 +8,7 @@ class_name NetSnapshot
 ##     [u8 state][u8 flags][vec3q root position][u8 segment count][quat32 rotation] x segments
 ##     [u16 health*10][u16 max_health*10][u16 stamina*10][u16 max_stamina*10]
 ##     [u16 poise*10][u16 max_poise*10][u8 hype*2.55][i8 lives][i8 target]
-##     [u8 cooldown count] ([str slot][u16 seconds*100]) x n
+##     [u8 cooldown count] ([str slot][u16 seconds*100][u8 charges]) x n
 ##     [u8 status count]  ([str id][str element][u16 seconds*100]) x n
 ##   [u8 entity count] per entity: [u16 id][u8 kind code (255: str kind)][str zone_kind/prop]
 ##                     [str vfx][vec3q pos][u16 radius*100][str element][i8 team]
@@ -170,8 +170,12 @@ static func _encode_fighter(w: NetWriter, f: Fighter) -> void:
 	w.i8(f.lives)
 	w.i8(f.target.index if f.target != null and is_instance_valid(f.target) else -1)
 	var cds: Array = []
+	if f.combat_style == "moves":
+		for i in f.loadout.size():
+			cds.append(str(Fighter.MOVE_SLOTS[i]))       # Movesets: the loadout slots m1..m4
 	for slot in f.creature.cooldowns.keys():
-		cds.append(str(slot))
+		if f.combat_style != "moves" and not cds.has(str(slot)):
+			cds.append(str(slot))
 	for slot in f.cooldown_left.keys():
 		if not cds.has(str(slot)):
 			cds.append(str(slot))
@@ -180,6 +184,8 @@ static func _encode_fighter(w: NetWriter, f: Fighter) -> void:
 	for slot: String in cds:
 		w.text(slot, 32)
 		w.u16(clampi(roundi(float(f.cooldown_left.get(slot, 0.0)) * 100.0), 0, 65535))
+		# charges left (v0.9.18): an ability with a charge is usable even while its cooldown runs
+		w.u8(clampi(int(f.charges_left.get(slot, 1)), 0, 255))
 	var sts: Array = f.statuses.summary()
 	var ns := mini(sts.size(), MAX_STATUSES)
 	w.u8(ns)
@@ -268,11 +274,14 @@ static func decode_body(r: NetReader) -> Dictionary:
 		fd["lives"] = r.i8()
 		fd["target"] = r.i8()
 		var cds := {}
+		var chs := {}
 		var nc := r.count(MAX_COOLDOWNS)
 		for k in nc:
 			var slot := r.text(32)
 			cds[slot] = r.u16() / 100.0
+			chs[slot] = r.u8()
 		fd["cooldowns"] = cds
+		fd["charges"] = chs
 		var sts: Array = []
 		var nst := r.count(MAX_STATUSES)
 		for k in nst:
@@ -358,7 +367,8 @@ static func fk(body: BodyDef, root: Vector3, rots: Array[Quaternion]) -> Array[T
 # ---- roster (reliable): which creature/body occupies each slot ----
 
 ## entries: [{slot, gen, creature, scale, team, name, kind, despawned, tags: [names of true
-## boolean fighter flags, e.g. "headliner", "boss", "resting"]}]
+## boolean fighter flags, e.g. "headliner", "boss", "resting"], combat ("moves" | "classic"),
+## loadout: [pool move ids]}]
 static func encode_roster(w: NetWriter, entries: Array) -> void:
 	var n := mini(entries.size(), NetProtocol.MAX_SLOTS)
 	w.u8(n)
@@ -377,6 +387,12 @@ static func encode_roster(w: NetWriter, entries: Array) -> void:
 		w.u8(nt)
 		for k in nt:
 			w.text(str(tags[k]), 24)
+		w.u8(1 if str(e.get("combat", "classic")) == "moves" else 0)
+		var lo: Array = e.get("loadout", [])
+		var nl := mini(lo.size(), 4)
+		w.u8(nl)
+		for k in nl:
+			w.text(str(lo[k]), 40)
 
 
 ## Names of a fighter's true boolean flags (presentation hints; "_private" ones excluded).
@@ -411,6 +427,12 @@ static func decode_roster(r: NetReader) -> Array:
 		for k in nt:
 			tags.append(r.text(24))
 		e["tags"] = tags
+		e["combat"] = "moves" if r.u8() == 1 else "classic"
+		var lo: Array = []
+		var nl := r.count(4)
+		for k in nl:
+			lo.append(r.text(40))
+		e["loadout"] = lo
 		if not r.ok or int(e["slot"]) >= NetProtocol.MAX_SLOTS:
 			r.fail("bad roster entry")
 			return []

@@ -5,7 +5,8 @@ class_name RulePresets
 ## (moved aside, never destroyed) / export (a plain shareable .rules.json) / import.
 
 const KIND := "rules_preset"
-const VERSION := 1
+## 2 (v0.9.18): presets name their combat style ("combat": "moves" | "classic"), see _migrate.
+const VERSION := 2
 const PREFIX := "user:"
 const MAX_IMPORT_BYTES := 256 * 1024
 
@@ -38,8 +39,17 @@ static func list() -> Array:
 	return out
 
 
-static func _migrate(data, _from_version: int):
-	return data
+## v1 -> v2 (v0.9.18, docs/design/MOVESET_COMBAT.md §1): a preset written before the combat-style
+## rule existed gets Movesets, the new default, and keeps every field it set; `migrated_from`
+## records where it came from (the Rules Editor offers Classic on the same row).
+static func _migrate(data, from_version: int):
+	if typeof(data) != TYPE_DICTIONARY:
+		return data
+	var d: Dictionary = data
+	if from_version < 2 and not d.has("combat"):
+		d["combat"] = "moves"
+		d["migrated_from"] = "rules_preset v%d" % from_version
+	return d
 
 
 ## Registers every user preset into Content (call after each Content.reload()).
@@ -169,6 +179,8 @@ static func import_preset(path: String) -> Dictionary:
 	if not d.has("mode"):
 		return {"ok": false, "id": "", "problems": [{"field": "mode", "severity": "error", "text": "%s has no 'mode'; it is not a rules preset." % path.get_file()}]}
 	d.erase("id")
+	if not d.has("combat"):
+		d = _migrate(d, int(d.get("critterweight_rules", 1)))     # a file shared by an older build
 	d.erase("critterweight_rules")
 	d["version"] = 0
 	return save(d, "")

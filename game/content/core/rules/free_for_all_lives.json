@@ -3,6 +3,7 @@
   "name": "Free-for-All (3 Lives)",
   "mode": "standard",
   "format": "ffa",
+  "combat": "moves",
   "teams": 0,
   "players": [
     3,

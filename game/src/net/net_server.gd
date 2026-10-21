@@ -2039,7 +2039,8 @@ func _check_roster() -> Array:
 		var cur := {"obj": f.get_instance_id(), "rig": f.rig.get_instance_id() if f.rig else 0,
 			"creature": f.creature.id if f.creature else "", "scale": f.creature.body.scale if f.creature else 1.0,
 			"despawned": NetSnapshot.is_despawned(f), "team": f.team, "name": f.display_name,
-			"kind": f.controller_kind, "player": int(owners.get(i, 0)), "tags": NetSnapshot.flag_tags(f)}
+			"kind": f.controller_kind, "player": int(owners.get(i, 0)), "tags": NetSnapshot.flag_tags(f),
+			"combat": f.combat_style, "loadout": f.loadout.duplicate()}
 		if i >= _roster.size():
 			cur["gen"] = 1
 			_roster.append(cur)
@@ -2049,7 +2050,8 @@ func _check_roster() -> Array:
 			var body_changed: bool = old["obj"] != cur["obj"] or old["rig"] != cur["rig"] or old["creature"] != cur["creature"] \
 				or absf(float(old["scale"]) - float(cur["scale"])) > 0.0001 or old["despawned"] != cur["despawned"]
 			var info_changed: bool = old["team"] != cur["team"] or old["name"] != cur["name"] or old["kind"] != cur["kind"] \
-				or old["player"] != cur["player"] or old["tags"] != cur["tags"]
+				or old["player"] != cur["player"] or old["tags"] != cur["tags"] or old["combat"] != cur["combat"] \
+				or old["loadout"] != cur["loadout"]
 			if body_changed or info_changed:
 				cur["gen"] = (int(old["gen"]) % 255) + 1 if body_changed else int(old["gen"])
 				_roster[i] = cur
@@ -2065,7 +2067,7 @@ func _roster_public() -> Array:
 		var e: Dictionary = _roster[i]
 		out.append({"index": i, "slot": i, "gen": e["gen"], "player": e["player"], "name": e["name"],
 			"creature": e["creature"], "scale": e["scale"], "team": e["team"], "kind": e["kind"], "despawned": e["despawned"],
-			"tags": e["tags"]})
+			"tags": e["tags"], "combat": e["combat"], "loadout": e["loadout"]})
 	return out
 
 
@@ -2074,7 +2076,8 @@ func _send_roster(slots: Array) -> void:
 	for i in slots:
 		var e: Dictionary = _roster[int(i)]
 		entries.append({"slot": int(i), "gen": e["gen"], "creature": e["creature"], "scale": e["scale"], "team": e["team"],
-			"name": e["name"], "kind": e["kind"], "despawned": e["despawned"], "tags": e["tags"]})
+			"name": e["name"], "kind": e["kind"], "despawned": e["despawned"], "tags": e["tags"], "combat": e["combat"],
+			"loadout": e["loadout"]})
 	var w := NetWriter.new(NetProtocol.S_ROSTER)
 	w.u32(sim.tick_count)
 	NetSnapshot.encode_roster(w, entries)

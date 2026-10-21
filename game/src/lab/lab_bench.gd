@@ -49,7 +49,7 @@ func _start_inference() -> void:
 		var src := PolicyInputSource.create(p, k + 1, k)
 		sources.append(src)
 		fighters.append({"creature": c, "team": k, "source": src})
-	sim.setup({"arena": ArenaDef.from_dict({"id": "bench", "base": "octagon", "radius": 6.0}), "rules": {"rounds": 1, "round_time": 0}, "seed": 5, "fighters": fighters})
+	sim.setup({"arena": ArenaDef.from_dict({"id": "bench", "base": "octagon", "radius": 6.0}), "rules": {"rounds": 1, "round_time": 0, "combat": "classic"}, "seed": 5, "fighters": fighters})
 	sim.mode.phase = MatchMode.Phase.FIGHT
 	sim.input_enabled = true
 	set_physics_process(true)

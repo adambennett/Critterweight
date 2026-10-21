@@ -3,6 +3,7 @@
   "name": "Allied Brawl",
   "mode": "standard",
   "format": "coop",
+  "combat": "moves",
   "teams": 2,
   "players": [
     2,

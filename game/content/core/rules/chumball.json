@@ -3,6 +3,7 @@
   "name": "Chumball",
   "mode": "chumball",
   "format": "teams",
+  "combat": "moves",
   "teams": 2,
   "players": [
     2,

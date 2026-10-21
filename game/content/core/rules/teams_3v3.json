@@ -3,6 +3,7 @@
   "name": "Teams 3v3",
   "mode": "standard",
   "format": "teams",
+  "combat": "moves",
   "teams": 2,
   "players": [
     6,
