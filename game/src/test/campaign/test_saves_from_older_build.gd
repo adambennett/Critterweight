@@ -151,8 +151,13 @@ func test_settings_and_rules_preset_from_v0916_load() -> void:
 	var files := DirAccess.get_files_at(pdir)
 	check(files.size() >= 1, "the user preset is there")
 	for f in files:
-		var rd := Saves.read_json(pdir.path_join(f), RulePresets.KIND, RulePresets.VERSION)
+		# rules_preset v1 -> v2 (v0.9.18, MOVESET_COMBAT.md §1): read through the presets' own migration
+		var rd := Saves.read_json(pdir.path_join(f), RulePresets.KIND, RulePresets.VERSION, Callable(RulePresets, "_migrate"))
 		if check(bool(rd["ok"]), "%s reads: %s" % [f, str(rd.get("error", ""))]):
+			check(bool(rd["migrated"]) and int(rd["version"]) == 1, "%s is a v1 preset, migrated on read" % f)
 			var data: Dictionary = rd["data"]
 			check_eq(str(data.get("name", "")), "Fixture Duel", "preset name kept")
+			check_eq(int(data.get("rounds", 0)), 2, "its own fields kept")
+			check_eq(str(data.get("combat", "")), "moves", "a preset written before the combat rule plays Movesets")
+			check_eq(str(data.get("migrated_from", "")), "rules_preset v1", "and records its migration")
 			check(not RulesValidator.has_errors(RulesValidator.validate(RulesValidator.normalize(data))), "the preset still validates")
