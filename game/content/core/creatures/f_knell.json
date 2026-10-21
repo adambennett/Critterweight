@@ -1564,5 +1564,177 @@
   },
   "juice": {
     "duration": 6
-  }
+  },
+  "movepool": {
+    "sounding_jab": {"name": "Sounding Jab", "category": "strike", "role": "basic", "string": ["l1", "l2", "l3", "finisher"], "dash": "dash_attack",
+      "short": "Jab, Port Hook, Deadweight, then the Rising Bell",
+      "desc": "Knell's salvage-yard boxing: the Sounding Jab, the Port Hook and the heavy Deadweight, every blow building Haunted. Press again to keep the string going; the fourth press is the Rising Bell uppercut, which knocks the target down. Out of a dodge it is the Wake Breaker shoulder charge.",
+      "styles": {
+        "deep_sounding": {"name": "Deep Sounding", "desc": "Every punch builds half again as much Haunted.", "patch": [
+          {"op": "mul", "path": "moves.l1.buildup", "value": 1.5}, {"op": "mul", "path": "moves.l2.buildup", "value": 1.5}, {"op": "mul", "path": "moves.l3.buildup", "value": 1.5},
+          {"op": "mul", "path": "moves.finisher.buildup", "value": 1.5}]},
+        "undertow_hook": {"name": "Undertow Hook", "desc": "The Deadweight drags the target a step in instead of knocking it away, so the Rising Bell is always in reach.", "patch": [
+          {"op": "set", "path": "moves.l3.pull", "value": 0.6}]}},
+      "ai": {"range": [0.0, 1.3]}},
+    "anchor_fist": {"name": "Anchor Fist", "category": "strike", "role": "heavy", "use": "heavy", "charged": "heavy_charged", "hold": "charge",
+      "short": "A weighted right hand; hold it to drop the Deep Anchor",
+      "desc": "A slow right hand with the whole suit's ballast behind it. Hold the button to keep winding it up and release into the Deep Anchor, which hits harder the longer it was held. Neither swing cancels into anything unless it lands, so a whiff is a long, honest opening.",
+      "styles": {
+        "lead_weight": {"name": "Lead Weight", "desc": "The Deep Anchor knocks the target down.", "patch": [
+          {"op": "set", "path": "moves.heavy_charged.knockdown", "value": true}]},
+        "divers_brace": {"name": "Diver's Brace", "desc": "Both swings shrug off light hits on the way in.", "patch": [
+          {"op": "set", "path": "moves.heavy.armor", "value": [[0.12, 0.4]]}, {"op": "set", "path": "moves.heavy.armor_level", "value": "lights"},
+          {"op": "set", "path": "moves.heavy_charged.armor", "value": [[0.0, 0.4]]}, {"op": "set", "path": "moves.heavy_charged.armor_level", "value": "lights"}]}},
+      "ai": {"range": [0.0, 1.5], "hold": [0.3, 0.9]}},
+    "ghost_light": {"name": "Ghost Light", "category": "projectile", "use": "ability1",
+      "short": "A slow lantern flame that follows its mark",
+      "desc": "Knell lets a lantern flame go from his hand. It drifts at walking pace but turns after its target for over two seconds, and builds Haunted when it lands. Out-walk it sideways, guard it, or close in while it is still on its way.",
+      "styles": {
+        "long_wick": {"name": "Long Wick", "desc": "The flame burns twice as long and turns harder after its mark.", "patch": [
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].life", "value": 4.4},
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].homing_deg", "value": 95}]},
+        "grave_lantern": {"name": "Grave Lantern", "desc": "The flame bursts where it ends, Haunting everyone within 1.4 metres.", "patch": [
+          {"op": "set", "path": "abilities.ability1.effects[type=projectile].on_expire", "value": {"type": "area", "radius": 1.4, "damage": 3, "knockback": 1.5,
+            "stun": 0.1, "poise": 4, "element": "spectral", "buildup": 20}}]}},
+      "ai": {"range": [2.5, 7.5]}},
+    "through_the_veil": {"name": "Through the Veil", "category": "utility", "use": "ability2",
+      "short": "Sink through the floor and rise 3.2 m away in a pulse",
+      "desc": "Knell sinks out of the world and resurfaces 3.2 metres away in the direction of the stick, untouchable while he is gone, then rises in a spectral pulse that shoves and Haunts anyone close. It escapes a corner or a beating; a fighter who reads where he will come up can be waiting there.",
+      "styles": {
+        "long_haul": {"name": "Long Haul", "desc": "Knell travels five metres instead of 3.2.", "patch": [
+          {"op": "set", "path": "abilities.ability2.effects[type=blink].distance", "value": 5.0}]},
+        "riptide": {"name": "Riptide", "desc": "The resurfacing pulse is wider and drags fighters in toward Knell instead of shoving them away.", "patch": [
+          {"op": "set", "path": "abilities.ability2.effects[type=area].kb_dir", "value": "toward"},
+          {"op": "set", "path": "abilities.ability2.effects[type=area].radius", "value": 2.2}]}},
+      "ai": {"range": [0.0, 2.4], "when": [{"self_poise_below": 0.35}, {"self_health_below": 0.3, "chance": 0.5}], "stick": "away"}},
+    "night_shade": {"name": "Night Shade", "category": "stream", "hold": "sustain", "max_hold": 2.2, "drain": 11, "aim": {"turn_rate": 1.8},
+      "cooldown": 7, "cost": 6,
+      "short": "Hold to shine a slowing ghost-beam; steer it with the stick",
+      "desc": "Knell turns his porthole on the target and a violet beam five metres long pours out of it for as long as the button is held (up to 2.2 seconds); the stick sweeps it, slowly. Everything it touches is slowed and builds Haunted, and a guard soaking it keeps losing stamina. It is narrow: step sideways out of it, or get in close and around it.",
+      "move": {"duration": 0.95, "sustain": [0.32, 0.62], "stamina": 6, "move_mult": 0.08, "turn_rate": 1.8, "speed": 1.2, "element": "spectral",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.12, "chains": {"arm_l": {"target": [0.3, 1.5, 0.12], "pole": [0.9, -0.4, -0.3]}, "arm_r": {"target": [-0.3, 1.5, 0.12], "pole": [-0.9, -0.4, -0.3]}},
+            "joints": {"chest": [-8, 0, 0], "head": [-16, 0, 0]}, "lean": [-5, 0, 0]},
+          {"t": 0.24, "chains": {"arm_l": {"target": [0.3, 1.46, 0.22], "pole": [0.9, -0.4, -0.2]}, "arm_r": {"target": [-0.3, 1.46, 0.22], "pole": [-0.9, -0.4, -0.2]}},
+            "joints": {"chest": [10, 0, 0], "head": [-8, 0, 0]}, "lean": [6, 0, 0], "height": -0.05},
+          {"t": 0.32, "chains": {"arm_l": {"target": [0.3, 1.44, 0.25], "pole": [0.9, -0.4, -0.2]}, "arm_r": {"target": [-0.3, 1.44, 0.25], "pole": [-0.9, -0.4, -0.2]}},
+            "joints": {"chest": [12, 0, 0], "head": [-11, 0, 0]}, "lean": [8, 0, 0], "height": -0.07},
+          {"t": 0.47, "chains": {"arm_l": {"target": [0.31, 1.45, 0.24], "pole": [0.9, -0.4, -0.2]}, "arm_r": {"target": [-0.29, 1.43, 0.26], "pole": [-0.9, -0.4, -0.2]}},
+            "joints": {"chest": [13, 3, 0], "head": [-12, -2, 0]}, "lean": [9, 0, 0], "height": -0.08},
+          {"t": 0.62, "chains": {"arm_l": {"target": [0.3, 1.44, 0.25], "pole": [0.9, -0.4, -0.2]}, "arm_r": {"target": [-0.3, 1.44, 0.25], "pole": [-0.9, -0.4, -0.2]}},
+            "joints": {"chest": [12, 0, 0], "head": [-11, 0, 0]}, "lean": [8, 0, 0], "height": -0.07},
+          {"t": 0.78, "chains": {"arm_l": {"target": [0.24, 1.28, 0.3], "pole": [0.8, -0.4, -0.4]}, "arm_r": {"target": [-0.22, 1.24, 0.27], "pole": [-0.8, -0.4, -0.4]}},
+            "joints": {"chest": [6, 0, 0], "head": [-4, 0, 0]}, "lean": [3, 0, 0], "height": -0.03},
+          {"t": 0.95}],
+        "effects": [
+          {"t": 0.32, "type": "area", "shape": "line", "length": 5.0, "width": 0.7, "damage": 1.5, "knockback": 0.3, "stun": 0.1, "poise": 1.5,
+           "element": "spectral", "buildup": 6, "guard_break": 2.5, "status": {"id": "night_shaded", "name": "Night Shade", "duration": 0.6, "speed": 0.7},
+           "every": 0.12, "until": "release", "vfx": "knell_night_shade"}]},
+      "styles": {
+        "deep_lamp": {"name": "Deep Lamp", "desc": "A pencil-thin beam seven metres long that turns even slower: a light for picking fighters off across the cage.", "patch": [
+          {"op": "set", "path": "movepool.night_shade.move.effects[type=area].length", "value": 7.0},
+          {"op": "set", "path": "movepool.night_shade.move.effects[type=area].width", "value": 0.45},
+          {"op": "set", "path": "movepool.night_shade.aim.turn_rate", "value": 1.3}]},
+        "undertow_beam": {"name": "Undertow Beam", "desc": "The beam drags what it touches toward Knell instead of only slowing it.", "patch": [
+          {"op": "set", "path": "movepool.night_shade.move.effects[type=area].kb_dir", "value": "toward"},
+          {"op": "set", "path": "movepool.night_shade.move.effects[type=area].knockback", "value": 2.5}]}},
+      "ai": {"range": [0.6, 4.6], "hold": [0.9, 1.9]}},
+    "hex_chain": {"name": "Hex Chain", "category": "control", "cooldown": 9, "cost": 10,
+      "short": "A spectral chain that yanks its target closer and slows it",
+      "desc": "Knell whips a ghostly chain at his target, up to six metres away. If it bites, it drags them a couple of metres toward him and the hex holds for two and a half seconds: they move at 60% speed and their dodges fall short. Sidestep, guard or parry the chain as it flies; a missed cast leaves Knell hauling in nothing.",
+      "move": {"duration": 0.85, "stamina": 10, "move_mult": 0.0, "turn_rate": 6.0, "speed": 1.5, "element": "spectral",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.1, "chains": {"arm_l": {"target": [0.52, 1.28, -0.22], "pole": [0.5, -0.3, -0.9]}, "arm_r": {"target": [-0.16, 1.3, 0.3], "pole": [-0.8, -0.4, -0.4]}},
+            "joints": {"chest": [-4, 26, 0], "head": [0, -16, 0]}, "lean": [-4, 0, 0]},
+          {"t": 0.2, "chains": {"arm_l": {"target": [0.3, 1.46, 0.5], "pole": [0.7, 0.3, -0.5]}, "arm_r": {"target": [-0.18, 1.24, 0.22], "pole": [-0.8, -0.4, -0.4]}},
+            "joints": {"chest": [4, -6, 0], "head": [0, 4, 0]}, "lean": [4, 0, 0]},
+          {"t": 0.27, "chains": {"arm_l": {"target": [0.08, 1.38, 0.82], "pole": [0.6, -0.5, -0.3]}, "arm_r": {"target": [-0.2, 1.2, 0.18], "pole": [-0.8, -0.4, -0.4]}},
+            "joints": {"chest": [8, -28, 0], "head": [0, 14, 0]}, "lean": [8, 0, 0]},
+          {"t": 0.4, "chains": {"arm_l": {"target": [0.12, 1.3, 0.62], "pole": [0.8, -0.4, -0.3]}, "arm_r": {"target": [-0.1, 1.28, 0.56], "pole": [-0.8, -0.4, -0.3]}},
+            "joints": {"chest": [6, -8, 0], "head": [0, 4, 0]}, "lean": [3, 0, 0]},
+          {"t": 0.55, "chains": {"arm_l": {"target": [0.24, 1.12, 0.08], "pole": [0.8, -0.5, -0.4]}, "arm_r": {"target": [-0.12, 1.3, 0.5], "pole": [-0.8, -0.4, -0.3]}},
+            "joints": {"chest": [-6, 14, 0], "head": [-4, -6, 0]}, "lean": [-8, 0, 0], "height": -0.04},
+          {"t": 0.7, "chains": {"arm_l": {"target": [0.12, 1.3, 0.5], "pole": [0.8, -0.4, -0.3]}, "arm_r": {"target": [-0.24, 1.12, 0.08], "pole": [-0.8, -0.5, -0.4]}},
+            "joints": {"chest": [-6, -14, 0], "head": [-4, 6, 0]}, "lean": [-8, 0, 0], "height": -0.04},
+          {"t": 0.85}],
+        "effects": [
+          {"t": 0.27, "type": "projectile", "from": "fist_l", "aim": "target", "speed": 16, "life": 0.4, "radius": 0.3, "damage": 4,
+           "knockback": 7.0, "kb_dir": "toward", "stun": 0.45, "poise": 10, "element": "spectral", "buildup": 20, "parryable": true,
+           "status": {"id": "hexed", "name": "Hexed", "duration": 2.5, "speed": 0.6, "dash": 0.6}, "vfx": "knell_hex_chain"}]},
+      "styles": {
+        "shackle": {"name": "Shackle", "desc": "The chain binds instead of hauling: no yank, but the hex holds for three and a half seconds at 45% speed.", "patch": [
+          {"op": "set", "path": "movepool.hex_chain.move.effects[type=projectile].knockback", "value": 0.0},
+          {"op": "set", "path": "movepool.hex_chain.move.effects[type=projectile].status", "value": {"id": "hexed", "name": "Hexed", "duration": 3.5, "speed": 0.45, "dash": 0.5}}]},
+        "grave_haul": {"name": "Grave Haul", "desc": "A shorter, heavier chain (4.8 metres) that hauls its catch right into Knell's reach and holds it there a moment longer.", "patch": [
+          {"op": "set", "path": "movepool.hex_chain.move.effects[type=projectile].life", "value": 0.3},
+          {"op": "set", "path": "movepool.hex_chain.move.effects[type=projectile].knockback", "value": 10.5},
+          {"op": "set", "path": "movepool.hex_chain.move.effects[type=projectile].stun", "value": 0.65}]}},
+      "ai": {"range": [2.0, 5.8], "when": [{"target_ranged": true}, {"chance": 0.7}]}},
+    "lantern_swarm": {"name": "Lantern Swarm", "category": "volley", "cooldown": 8, "cost": 10,
+      "short": "Three homing wisps fan out and close in from three sides",
+      "desc": "Knell throws his arms open and three lantern wisps pour out of the gauge on his chest in a wide fan, then curl in on his target from three sides. Each is weak, slow and parryable, but together they are hard to sidestep and build Haunted quickly. Guard the front, parry them one by one, or dodge through them as they converge.",
+      "move": {"duration": 0.72, "stamina": 10, "move_mult": 0.25, "turn_rate": 5.0, "speed": 1.3, "element": "spectral",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.14, "chains": {"arm_l": {"target": [0.09, 1.16, 0.34], "pole": [0.8, -0.5, -0.3]}, "arm_r": {"target": [-0.09, 1.16, 0.34], "pole": [-0.8, -0.5, -0.3]}},
+            "joints": {"chest": [12, 0, 0], "head": [10, 0, 0]}, "height": -0.06},
+          {"t": 0.24, "chains": {"arm_l": {"target": [0.12, 1.3, 0.42], "pole": [0.8, -0.5, -0.3]}, "arm_r": {"target": [-0.12, 1.3, 0.42], "pole": [-0.8, -0.5, -0.3]}},
+            "joints": {"chest": [4, 0, 0], "head": [-2, 0, 0]}, "height": -0.02},
+          {"t": 0.32, "chains": {"arm_l": {"target": [0.56, 1.42, 0.3], "pole": [0.5, -0.6, -0.5]}, "arm_r": {"target": [-0.56, 1.42, 0.3], "pole": [-0.5, -0.6, -0.5]}},
+            "joints": {"chest": [-8, 0, 0], "head": [-10, 0, 0]}, "lean": [-4, 0, 0]},
+          {"t": 0.48, "chains": {"arm_l": {"target": [0.54, 1.38, 0.28], "pole": [0.5, -0.6, -0.5]}, "arm_r": {"target": [-0.54, 1.38, 0.28], "pole": [-0.5, -0.6, -0.5]}},
+            "joints": {"chest": [-6, 0, 0], "head": [-8, 0, 0]}, "lean": [-3, 0, 0]},
+          {"t": 0.72}],
+        "effects": [
+          {"t": 0.3, "type": "projectile", "from": "shoulder", "aim": "target", "count": 3, "spread_deg": 84, "speed": 6.0, "life": 2.2,
+           "radius": 0.2, "homing_deg": 140, "damage": 4.5, "knockback": 1.2, "stun": 0.18, "poise": 4, "element": "spectral", "buildup": 18,
+           "parryable": true, "vfx": "knell_lantern_wisp"}]},
+      "styles": {
+        "corpse_candles": {"name": "Corpse Candles", "desc": "Five smaller wisps in a wider fan.", "patch": [
+          {"op": "set", "path": "movepool.lantern_swarm.move.effects[type=projectile].count", "value": 5},
+          {"op": "set", "path": "movepool.lantern_swarm.move.effects[type=projectile].spread_deg", "value": 110},
+          {"op": "mul", "path": "movepool.lantern_swarm.move.effects[type=projectile].damage", "value": 0.65},
+          {"op": "mul", "path": "movepool.lantern_swarm.move.effects[type=projectile].buildup", "value": 0.7}]},
+        "ward_lights": {"name": "Ward Lights", "desc": "Slower wisps that snuff out any enemy projectile they touch on the way, going out with it.", "patch": [
+          {"op": "set", "path": "movepool.lantern_swarm.move.effects[type=projectile].intercept", "value": true},
+          {"op": "mul", "path": "movepool.lantern_swarm.move.effects[type=projectile].speed", "value": 0.75},
+          {"op": "set", "path": "movepool.lantern_swarm.move.effects[type=projectile].life", "value": 2.8}]}},
+      "ai": {"range": [2.2, 7.0]}},
+    "toll": {"name": "Toll", "category": "counter", "cooldown": 10, "cost": 10,
+      "short": "Ring the bell: cleanse, armour, and a shock for the next hit",
+      "desc": "Knell claps his bronze gauntlets together over his helmet and the whole suit tolls like a bell. The ring shakes every elemental status and build-up off him, and for the next second he stands armoured in its echo: the first fighter to strike him is thrown back by a counter-shock that builds Haunted. Grapple him, wait the echo out, or hit him from range.",
+      "move": {"duration": 1.25, "stamina": 10, "move_mult": 0.0, "turn_rate": 3.0, "speed": 1.6, "element": "spectral",
+        "keys": [
+          {"t": 0.0},
+          {"t": 0.1, "chains": {"arm_l": {"target": [0.62, 1.7, 0.05], "pole": [0.5, -0.6, -0.6]}, "arm_r": {"target": [-0.62, 1.7, 0.05], "pole": [-0.5, -0.6, -0.6]}},
+            "joints": {"chest": [-8, 0, 0], "head": [-10, 0, 0]}, "lean": [-3, 0, 0]},
+          {"t": 0.18, "chains": {"arm_l": {"target": [0.05, 1.86, 0.2], "pole": [0.7, -0.3, -0.6]}, "arm_r": {"target": [-0.05, 1.86, 0.2], "pole": [-0.7, -0.3, -0.6]}},
+            "joints": {"chest": [2, 0, 0], "head": [6, 0, 0]}, "height": -0.02},
+          {"t": 0.28, "chains": {"arm_l": {"target": [0.2, 1.74, 0.24], "pole": [0.7, -0.4, -0.5]}, "arm_r": {"target": [-0.2, 1.74, 0.24], "pole": [-0.7, -0.4, -0.5]}},
+            "joints": {"chest": [-2, 0, 0], "head": [-4, 0, 6]}, "height": -0.03},
+          {"t": 0.42, "chains": {"arm_l": {"target": [0.42, 1.08, 0.28], "pole": [0.7, -0.6, -0.4]}, "arm_r": {"target": [-0.42, 1.08, 0.28], "pole": [-0.7, -0.6, -0.4]}},
+            "joints": {"chest": [4, 0, 0], "head": [-6, 0, 0]}, "height": -0.08},
+          {"t": 1.05, "chains": {"arm_l": {"target": [0.42, 1.08, 0.28], "pole": [0.7, -0.6, -0.4]}, "arm_r": {"target": [-0.42, 1.08, 0.28], "pole": [-0.7, -0.6, -0.4]}},
+            "joints": {"chest": [4, 0, 0], "head": [-6, 0, 0]}, "height": -0.08},
+          {"t": 1.25}],
+        "effects": [
+          {"t": 0.2, "type": "cleanse", "vfx": "knell_toll_ring"},
+          {"t": 0.2, "type": "counter_stance", "duration": 1.0, "knockback_taken": 0.4, "vfx": "knell_toll_echo",
+           "counter": {"damage": 9, "poise": 28, "knockback": 5.5, "stun": 0.5, "element": "spectral", "buildup": 30, "pool": "toll", "cat": "counter"}}]},
+      "styles": {
+        "great_bell": {"name": "Great Bell", "desc": "The counter-shock knocks the attacker down and builds twice the Haunted.", "patch": [
+          {"op": "set", "path": "movepool.toll.move.effects[type=counter_stance].counter.knockdown", "value": true},
+          {"op": "mul", "path": "movepool.toll.move.effects[type=counter_stance].counter.buildup", "value": 2.0}]},
+        "sanctuary_bell": {"name": "Sanctuary Bell", "desc": "The toll also mends 8 health, but its echo lasts only half a second.", "patch": [
+          {"op": "append", "path": "movepool.toll.move.effects", "value": {"t": 0.2, "type": "heal", "amount": 8}},
+          {"op": "set", "path": "movepool.toll.move.effects[type=counter_stance].duration", "value": 0.5}]}},
+      "ai": {"range": [0.0, 2.0], "when": [{"target_winding": true, "max": 2.0}, {"in_enemy_zone": true, "chance": 0.5}]}}
+  },
+  "loadouts": {
+    "lamplighter": {"name": "Lamplighter", "moves": ["sounding_jab", "night_shade", "ghost_light", "through_the_veil"]},
+    "undertow": {"name": "Undertow", "moves": ["sounding_jab", "anchor_fist", "hex_chain", "lantern_swarm"]}
+  },
+  "default_loadout": "lamplighter"
 }
