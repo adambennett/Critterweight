@@ -32,6 +32,20 @@ $lock = $null
 $lockPath = Join-Path $env:TEMP "critterweight_full_suite.lock"
 $deadline = (Get-Date).AddMinutes($WaitMinutes)
 $announced = $false
+# release jobs (full suites, the commentary audit, benches, captures) reserve the machine while they
+# wait for and hold the lock: filtered runs hold back while the reservation is fresh (< 6 h old), so
+# a stream of short runs cannot starve a long job
+$reserve = Join-Path $env:TEMP "critterweight_release.reserve"
+if ($Filter -eq "") {
+	Set-Content -LiteralPath $reserve -Value "full suite $PID"
+} else {
+	$held = $false
+	while ((Test-Path $reserve) -and ((Get-Date) - (Get-Item $reserve).LastWriteTime).TotalHours -lt 6) {
+		if (-not $held) { Write-Host "a release job has reserved the machine; waiting"; $held = $true }
+		if ((Get-Date) -gt $deadline) { Write-Host "gave up waiting for the reservation"; exit 99 }
+		Start-Sleep -Seconds 10
+	}
+}
 while ($null -eq $lock) {
 	try { $lock = [System.IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') }
 	catch {
@@ -64,5 +78,6 @@ try {
 	$code = $LASTEXITCODE
 } finally {
 	if ($null -ne $lock) { $lock.Close() }
+	if ($Filter -eq "") { Remove-Item -LiteralPath $reserve -ErrorAction SilentlyContinue }
 }
 exit $code
