@@ -459,3 +459,36 @@ reliable saves), first in the Campaign menu, without grappling (2026-10-19).
   art).
 - Tests: test_career_state, test_career_progression, test_career_build, test_career_fights,
   test_career_ui.
+
+## D-049 Movesets: named moves on four buttons by default, Classic as a rule (v0.9.18)
+
+The owner asked (2026-10-20) for customizable creature movesets to replace Light / Heavy / Grab as
+the default combat in every built-in mode, preset, campaign, Career, Bookie fight, playlist and
+dedicated server, simple controls for the ordinary roster, advanced techniques for Varga, and the
+0.9.17 combat kept as an optional, real Classic rule. Design: docs/design/MOVESET_COMBAT.md.
+
+- **One rule field.** `combat: "moves" | "classic"` lives in the rules, so it is saved with presets,
+  shown before a fight, carried to online clients in MATCH_START, validated, and applied by the one
+  simulation. A missing field reads as Movesets; every built-in preset says so explicitly. Saved
+  0.9.17 presets migrate to `rules_preset` 2 with `combat: "moves"` (players choose Classic again in
+  the editor), because the owner asked for the new combat as the default everywhere.
+- **Moves are data over the existing engine.** A pool move is either a 0.9.17 move or ability
+  (`use`, so its animation, hit windows, upgrades and techniques carry over) or a new MoveDef; the
+  engine gained only general mechanisms (sustain, charge for any move, repeating effects, recoil,
+  intercepting projectiles, attribution, tick throttles, denied presses) instead of per-move code.
+  New moves are balanced by the same knobs as the old ones and tested per fighter.
+- **Four buttons, not ten.** The ordinary roster's loadout maps to Light, Heavy, Ability 1 and
+  Ability 2; guard, dodge, grapple (B), taunt and JUICE keep their buttons, so rebinding, the
+  tutorial's basics and every mode that intercepts buttons (Chumball, the hub, revive) are
+  unchanged. A loadout needs a basic strike so a fighter can always fight.
+- **Varga stays deep.** His Cage Rules limb/modifier/stance scheme is kept; Movesets attach a
+  fighting-type technique to each strike group (one per group) instead of a four-move loadout.
+- **Upgrades never go silent.** Upgrades, techniques and hooks written for the old slots translate
+  by role (basic, heavy) or by the slot a move is built on; anything that cannot apply says so.
+- **Bots** translate the Classic brain's presses to the loadout and use the loadout's own moves from
+  per-move hints. **AI Lab policies stay Classic** (their action space is the Classic buttons), and a
+  policy slot in a Movesets match falls back to a scripted bot with a log line.
+- **Online:** protocol 7; the server validates every requested loadout against the creature and
+  falls back to the recommended one, so a stale request can never break a match.
+- **Judging:** a repeating hit (stream, zone) is credited as landed once per second of contact per
+  target; damage points are unchanged.
