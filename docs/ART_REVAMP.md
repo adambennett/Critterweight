@@ -132,8 +132,9 @@ KO piece, passes `audit_models.js` (30k budget) and the art tests (`test_new_fig
 
 The legacy Varga skin is the untouched v0.9.16 model (`f_varga_legacy.glb`, sha256 `4fa78a8a…0460fc`).
 
-Known limitations (from the per-fighter reviews): springs swing in two directions only, so upright
-fins and tentacles can lean into sudden moves and dip briefly into the body; face animation was
+The post-review spring rig follows each link's actual 3D rest direction and gravity; upright fins
+and hanging chains now respond in the appropriate direction. Springs remain visual and do not
+collide with the body, so they can briefly intersect it during abrupt motion. Face animation was
 checked in stills, sandbox frames and posed previews, not watched as video; Dredge's four-lobed
 outline and Dozer's barrel body follow their locked collision shapes; Knell's hose rides the head
 bone; Jitters' rigged lids read heavy from the high front camera; Varga's rest pose sits 17.5 cm

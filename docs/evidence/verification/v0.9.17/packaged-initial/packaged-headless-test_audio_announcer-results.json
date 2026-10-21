@@ -1,0 +1,64 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_all_lines_have_ids_subtitles_and_triggers"
+		},
+		{
+			"errors": [],
+			"ms": 11,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_announce_emits_subtitle_and_substitutes_names"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_babble_plan"
+		},
+		{
+			"errors": [],
+			"ms": 568,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_color_commentary_paces_and_interrupts_a_rare_conversation"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_priority_interrupt_and_queue_rules"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_sim_event_mapping"
+		},
+		{
+			"errors": [],
+			"ms": 34,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_ten_point_and_referee_event_mapping"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_trigger_picks_specific_fresh_lines_deterministically"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_varga_and_knell_ability_uses_get_specific_announcer_calls"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 9 run, 0 failed, 9 passed, 0 skipped in 4.9 s",
+	"time": "2026-10-21T16:22:05",
+	"total": 9,
+	"version": "0.9.17"
+}

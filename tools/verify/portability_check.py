@@ -26,6 +26,9 @@ GAME = os.path.join(ROOT, "game")
 RES_RE = re.compile(r"res://[A-Za-z0-9_\-./]+")
 # paths tests use on purpose because they must not exist (rejection tests)
 EXPECTED_MISSING = {"res://evil.gd"}
+# package.ps1 writes this stamp into the export and removes it from the checkout afterwards.
+# BuildInfo explicitly supports its absence in source runs; casing must still match this exact path.
+GENERATED_RES = {"res://build_info.json"}
 SKIP_DIRS = {".godot", ".import", "node_modules"}
 
 
@@ -58,7 +61,7 @@ def check_res_paths():
         text = open(path, encoding="utf-8", errors="replace").read()
         for m in RES_RE.finditer(text):
             lit = m.group(0).rstrip(". /")
-            if lit in EXPECTED_MISSING:
+            if lit in EXPECTED_MISSING or lit in GENERATED_RES:
                 continue
             rel = lit[len("res://"):]
             if not rel or rel.endswith("/") or "%" in rel or rel.startswith("."):

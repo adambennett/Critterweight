@@ -1,0 +1,118 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 5665,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_airbursts_draw_their_area_on_the_floor"
+		},
+		{
+			"errors": [],
+			"ms": 1263,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_area_warnings_track_the_fighter_until_contact"
+		},
+		{
+			"errors": [],
+			"ms": 478,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_box_bursts_run_along_their_line"
+		},
+		{
+			"errors": [],
+			"ms": 1517,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_build_up_glows_share_the_light_cap"
+		},
+		{
+			"errors": [],
+			"ms": 1819,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_build_ups_last_until_the_first_effect"
+		},
+		{
+			"errors": [],
+			"ms": 1101,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_cone_back_is_drawn_from_its_point"
+		},
+		{
+			"errors": [],
+			"ms": 1106,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_cut_the_angle_draws_the_real_dash"
+		},
+		{
+			"errors": [],
+			"ms": 1954,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_downdraft_lasts_as_long_as_the_hover"
+		},
+		{
+			"errors": [],
+			"ms": 7867,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_effect_events_carry_the_true_footprint"
+		},
+		{
+			"errors": [],
+			"ms": 6726,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_every_fighter_event_and_entity_is_drawn_and_cleaned_up"
+		},
+		{
+			"errors": [],
+			"ms": 1600,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_fighter_looks_stay_with_their_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_footprint_fields_reach_online_clients"
+		},
+		{
+			"errors": [],
+			"ms": 502,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_footprints_draw_the_exact_area"
+		},
+		{
+			"errors": [],
+			"ms": 1482,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_heavy_charge_glow_only_while_charging"
+		},
+		{
+			"errors": [],
+			"ms": 501,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_only_static_strikes_call_lightning"
+		},
+		{
+			"errors": [],
+			"ms": 1001,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_quality_and_reduced_flashing"
+		},
+		{
+			"errors": [],
+			"ms": 499,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_reduce_flashing_slows_the_static_floor_flicker"
+		},
+		{
+			"errors": [],
+			"ms": 534,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_zone_decals_follow_the_zone_radius"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 18 run, 0 failed, 18 passed, 0 skipped in 45.0 s",
+	"time": "2026-10-21T16:36:30",
+	"total": 18,
+	"version": "0.9.17"
+}

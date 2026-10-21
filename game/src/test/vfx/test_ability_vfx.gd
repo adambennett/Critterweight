@@ -218,7 +218,7 @@ func test_every_fighter_event_and_entity_is_drawn_and_cleaned_up() -> void:
 	fx.sync_entities([])
 	check_eq(fx._ents.size(), 0, "entities retired")
 	# 6 s of effects time: everything transient dissipates and frees itself
-	await wait_frames(int(6.0 * Engine.physics_ticks_per_second))
+	await _wait_s(6.0)
 	var left := []
 	for n in fx.get_children():
 		if n is GPUParticles3D and (n as GPUParticles3D).one_shot:
@@ -257,7 +257,7 @@ func test_quality_and_reduced_flashing() -> void:
 	var l := _lights(fx)
 	if check_eq(l.size(), 1, "light flash on High"):
 		check_near((l[0] as OmniLight3D).light_energy, 3.0, 0.01, "full flash")
-	await wait_frames(int(0.5 * Engine.physics_ticks_per_second))
+	await _wait_s(0.5)
 	fx.configure(2, true)
 	fx.flash_light(Vector3.ZERO, Color.WHITE, 3.0, 3.0, 0.3)
 	l = _lights(fx)
@@ -325,7 +325,10 @@ func _free(fx: AbilityVfx, views: Array) -> void:
 
 
 func _wait_s(seconds: float) -> void:
-	await wait_frames(ceili(seconds * Engine.physics_ticks_per_second))
+	# AbilityVfx advances in _process(delta), not physics ticks. Counting process frames as
+	# 120 Hz doubled these waits in a 60 Hz packaged window and expired a valid build-up.
+	# A process timer uses the same engine delta as the effects, including fixed-fps test runs.
+	await get_tree().create_timer(seconds, false, false).timeout
 
 
 ## Frees every drawn piece (pooled emitters stay) so a check sees only what the next event draws.

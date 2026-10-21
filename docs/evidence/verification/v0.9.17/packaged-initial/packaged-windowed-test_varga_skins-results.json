@@ -1,0 +1,53 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 198,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_a_swap_keeps_a_popped_tooth_out_and_a_resend_rebuilds_nothing"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"skipped": "the source GLB is not shipped inside exported builds (checked in the source suite)",
+			"test": "res://src/test/core/test_varga_skins.gd::test_legacy_asset_is_the_original"
+		},
+		{
+			"errors": [],
+			"ms": 134,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_live_swap_keeps_the_rig_and_the_gameplay"
+		},
+		{
+			"errors": [],
+			"ms": 11,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_model_choice_follows_the_setting_for_varga_only"
+		},
+		{
+			"errors": [],
+			"ms": 51,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_previews_stand_every_fighter_on_the_floor"
+		},
+		{
+			"errors": [],
+			"ms": 39,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_setting_is_a_persisted_graphics_option"
+		},
+		{
+			"errors": [],
+			"ms": 25,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_setting_row_works_from_a_controller"
+		}
+	],
+	"skipped": 1,
+	"summary": "tests: 7 run, 0 failed, 6 passed, 1 skipped in 4.2 s",
+	"time": "2026-10-21T16:31:54",
+	"total": 7,
+	"version": "0.9.17"
+}

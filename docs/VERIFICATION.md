@@ -1,5 +1,14 @@
 # Verification report
 
+**v0.9.17 verification in progress, 2026-10-21.** The [release report](evidence/verification/v0.9.17/README.md)
+holds the commentary comparison, roster/VFX captures, saved-game checks, matched performance and
+source results. The continuation run passed the two earlier failures; its short-soak failure is
+retained beside a passing ten-minute soak. All eight current models pass the contract audit and
+byte-identical saved-source export check; all 521 new speech clips match their catalog hashes and
+PCM format. The candidate packages pass the focused feature checks and packaged loopback session.
+A final clean-commit full run with `-SoakMinutes 10` and verified publication are still required.
+See [the continuation record](releases/v0.9.17-takeover.md).
+
 **Release 0.9.16, 2026-10-20.** [The v0.9.16 report](evidence/verification/v0.9.16/README.md): Career,
 10-point scoring, the referee and the Cage Rules preset. 437 scripts; full source suite on the release
 commit 862 run, 861 passed, 0 failed, 1 graphical-audio skip. Packaged: boot to the title in 4.4 s,
@@ -51,7 +60,12 @@ below-normal priority, one full run at a time on the machine. It covers:
 - UI navigation;
 - the audio bank.
 
-About 38 minutes. A release needs a green run of the exact commit.
+The v0.9.17 source run took about 42 minutes with the default two-minute network soak. For final
+release verification, use `-SoakMinutes 10`: the short soak can compare differently sized live
+matches and mistake bounded match allocations for growth. The longer run retains the original
+memory-slope criterion, with more rotations and a five-minute measurement window. A release needs
+a green run of the exact commit. Publication evidence can be recorded in a later documentation
+commit while the verified release tag remains immutable.
 
 **2. Release smoke:** `tools/build/release.ps1`. On the packaged game it runs a script check and a boot to
 the title screen before anything is published. `-TestFilter` additionally runs matching tests with the

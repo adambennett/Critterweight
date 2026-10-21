@@ -1,0 +1,10 @@
+{
+  "baseline_commit": "0465a050ae5dc204a8671ed7e12a8f52c8665122",
+  "candidate_base": "1161cfea452579add4c9b03cb5c0420c2484fb5b",
+  "candidate_dirty": true,
+  "camera_sha256": "988f2b5c0035aeb28bf59042735bb88c6e5e25f0d7ffe358e0fc13dcac80c253",
+  "bench_sha256": "92af60a7a4a3b2745774b47b735b99bb438fc9ad12ab25c4192f449438b47d47",
+  "benchmark_order": "before,after,after,before",
+  "other_active_application": "ReclaimerServerMonitor observed at 44.4 and 72.5 percent of one core in two separate five-second samples; causal attribution of frame spikes is unproven",
+  "completed": "2026-10-21T17:03:00"
+}

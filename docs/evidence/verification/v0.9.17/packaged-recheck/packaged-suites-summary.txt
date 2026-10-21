@@ -1,0 +1,4 @@
+windowed test_ability_vfx: 18 run, 0 failed, 0 skipped (exit 0)
+windowed test_varga_skins: 7 run, 0 failed, 1 skipped (exit 0)
+windowed test_recorded_speech: 9 run, 0 failed, 0 skipped (exit 0)
+windowed test_playtest: 20 run, 0 failed, 0 skipped (exit 0)

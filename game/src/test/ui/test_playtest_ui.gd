@@ -202,9 +202,19 @@ func test_dropdown_keeps_music_and_rapid_ambience_switches_settle() -> void:
 	check(not pickers.is_empty(), "AI Lab has a dropdown")
 	if pickers.is_empty():
 		return
+	# This checks transfer within a foreground application. A hidden/background test launch
+	# must establish that precondition: muting while another application owns focus is correct.
+	var main_window := get_window()
+	main_window.grab_focus()
+	var focus_deadline := Time.get_ticks_msec() + 2000
+	while not DisplayServer.window_is_focused(main_window.get_window_id()) and Time.get_ticks_msec() < focus_deadline:
+		await wait_frames(1)
+	if not check(DisplayServer.window_is_focused(main_window.get_window_id()), "the game has native focus before opening its dropdown"):
+		return
 	Settings.values["audio.mute_in_background"] = true
 	var picker := pickers[0] as OptionButton
 	picker.show_popup()
+	picker.get_popup().grab_focus()
 	await wait_frames(10)
 	check(picker.get_popup().visible, "the actual native popup is open")
 	check(Settings.application_focused(), "a game popup counts as application focus")

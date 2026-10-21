@@ -1,5 +1,25 @@
 # Progress
 
+## Status (2026-10-21) - v0.9.17 final verification; v0.9.18 work preserved
+
+The owner authorized Codex to continue Claude's interrupted two-release goal. v0.9.17's commentary,
+eight-fighter art pass, Legacy Varga skin and ability VFX are implemented on
+`feature/v0.9.17-commentary-art` (`1161cfe` at takeover). The fresh suite resolved the two previous
+failures and exposed a short-soak workload comparison; a ten-minute soak passes. Four candidate
+packages, the feature suites, saved-source art exports and packaged loopback checks are verified.
+A rendered capture exposed opaque raised rails and post caps; the completed fading fix passes
+the focused tests. The final candidate passes 27 rendered checks and seven loopback checks.
+A clean-commit full suite, final performance repeat and GitHub publication remain.
+The newest published release is still v0.9.16.
+See [the continuation record](releases/v0.9.17-takeover.md),
+[acceptance checklist](releases/v0.9.17-v0.9.18-checklist.md), and
+[v0.9.17 evidence](evidence/verification/v0.9.17/README.md).
+
+Claude's existing v0.9.18 implementation is preserved in `B:\Critterweight-work\wt\v0918` on
+`feature/v0.9.18-movesets` (`7eba366`). Finish and publish v0.9.17 before continuing that branch.
+Both releases are authorized for autonomous GitHub publication. Combined Breeze spending in the
+latest saved report is 4,425.0 / 10,000 credits; 5,575.0 remain across the entire goal.
+
 ## Status (2026-10-20) — v0.9.16: Career, 10-point scoring, referee, Cage Rules preset
 
 v0.9.15 is published (2026-10-19, tag `v0.9.15` at `f8e4bbb`). v0.9.16 adds the owner-requested

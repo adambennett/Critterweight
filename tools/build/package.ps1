@@ -70,7 +70,7 @@ foreach ($t in $Targets) {
 	New-Item -ItemType Directory -Force $dest | Out-Null
 	$exe = Join-Path $dest $l.file
 	Step "Exporting $t -> $exe"
-	& $Godot --headless --path $game --log-file (Join-Path $buildLogs ($l.dir + ".log")) --export-release $t $exe 2>&1 | Where-Object { $_ -match "ERROR|error|WARNING" } | ForEach-Object { Write-Host "   $_" }
+	& $Godot --headless --path $game --log-file (Join-Path $buildLogs ($l.dir + ".log")) --export-release $t $exe 2>&1 | Where-Object { $_ -match '\b(?:ERROR|WARNING):|SCRIPT ERROR|Parse Error' } | ForEach-Object { Write-Host "   $_" }
 	if ($LASTEXITCODE -ne 0) { throw "Export of '$t' failed ($LASTEXITCODE)" }
 	if (-not (Test-Path $exe)) { throw "Export of '$t' produced no binary" }
 	# documentation and licences shipped with every package

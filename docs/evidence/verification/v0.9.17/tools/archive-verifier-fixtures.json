@@ -1,0 +1,22 @@
+[
+  {
+    "case": "valid four-target archives",
+    "passed": true,
+    "detail": "accepted"
+  },
+  {
+    "case": "dirty release rejected",
+    "passed": true,
+    "detail": "Release source is dirty"
+  },
+  {
+    "case": "member digest mismatch rejected",
+    "passed": true,
+    "detail": "Member digest: target0/game"
+  },
+  {
+    "case": "archive digest mismatch rejected",
+    "passed": true,
+    "detail": "Archive digest: target1.tar.gz"
+  }
+]

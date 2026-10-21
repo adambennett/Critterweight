@@ -28,7 +28,9 @@ param(
 	# machine like a full suite instead of holding back for a reservation
 	[switch]$Release,
 	# wall-clock limit of a filtered run (the full suite has none)
-	[int]$FilterTimeoutMinutes = 60
+	[int]$FilterTimeoutMinutes = 60,
+	# Explicit longer soak evidence without bypassing this wrapper's shared lock.
+	[ValidateRange(0, 1440)][int]$SoakMinutes = 0
 )
 $ErrorActionPreference = "Continue"
 try { (Get-Process -Id $PID).PriorityClass = 'BelowNormal' } catch {}
@@ -78,6 +80,7 @@ try {
 	$a = @("--headless", "--path", $GamePath, "--log-file", (Join-Path $UserRoot 'engine.log'), "--fixed-fps", "120")
 	$a += @("--", "--user-root", $UserRoot, "--test")
 	if ($Filter -ne "") { $a += $Filter }
+	if ($SoakMinutes -gt 0) { $a += @("--soak-minutes", "$SoakMinutes") }
 	if ($Filter -eq "") {
 		if ($Log -ne "") { & $Godot @a *> $Log } else { & $Godot @a }
 		$code = $LASTEXITCODE
@@ -88,7 +91,8 @@ try {
 		# test waits on real time, e.g. the network tests' child processes)
 		$out = if ($Log -ne "") { $Log } else { Join-Path $UserRoot 'filtered_run.log' }
 		$quoted = $a | ForEach-Object { if ($_ -match '\s') { '"' + $_ + '"' } else { $_ } }
-		$p = Start-Process -FilePath $Godot -ArgumentList $quoted -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError ($out + ".err")
+		$p = Start-Process -FilePath $Godot -ArgumentList $quoted -WindowStyle Hidden -PassThru -RedirectStandardOutput $out -RedirectStandardError ($out + ".err")
+		$null = $p.Handle
 		try { $p.PriorityClass = 'BelowNormal' } catch {}
 		if ($p.WaitForExit($FilterTimeoutMinutes * 60 * 1000)) {
 			$code = $p.ExitCode

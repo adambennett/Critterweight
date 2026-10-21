@@ -1,0 +1,28 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_fx_rig.gd::test_a_tipped_body_lets_its_links_droop"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_fx_rig.gd::test_every_link_trails_a_forward_push_whichever_way_it_points"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_fx_rig.gd::test_links_rest_in_their_modelled_pose"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 3 run, 0 failed, 3 passed, 0 skipped in 4.0 s",
+	"time": "2026-10-21T16:32:55",
+	"total": 3,
+	"version": "0.9.17"
+}

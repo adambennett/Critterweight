@@ -1,7 +1,7 @@
 # Releases and versioning
 
 Builds are published as GitHub Releases of this repository
-(https://github.com/adambennett/PokeMMA/releases). Each release is one git tag and one set of files
+(https://github.com/adambennett/Critterweight/releases). Each release is one git tag and one set of files
 built from exactly that commit.
 
 ## Download and play (testers)
@@ -20,8 +20,13 @@ Other files in a release: the dedicated server (`-server-windows-x64.zip`, `-ser
 the Linux game (`-linux-x86_64.tar.gz`, not runtime-tested on Linux yet), `BUILD_MANIFEST.json`
 (per-file SHA-256 of the packages) and `SHA256SUMS.txt`.
 
-The repository is private: a tester needs to be added as a collaborator (or the repository made
-public) to see its releases.
+The repository is public (verified 2026-10-21); testers can download the published release assets.
+
+After publishing, verify the immutable annotated tag and all seven actual downloads with
+`python -B tools/verify/published_release.py --version <version> --commit <full tested commit>
+--downloads <B: download directory> --out <verification report.json>`. This read-only remote check
+also validates the checksum list, every archived file and the standalone Windows executable
+against the manifest. Release smoke-test logs and profiles stay under `dist/verification/`.
 
 ## Versioning
 

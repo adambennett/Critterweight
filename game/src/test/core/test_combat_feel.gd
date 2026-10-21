@@ -97,6 +97,25 @@ func test_a_wall_between_the_camera_and_the_fight_fades() -> void:
 	root.queue_free()
 
 
+func test_a_thin_raised_rail_between_camera_and_fighter_fades() -> void:
+	var root := Node3D.new()
+	add_child(root)
+	var rail := _box(root, Vector3(6, 0.16, 0.16), Vector3(0, 2.5, 4))
+	var cap := _box(root, Vector3(0.4, 0.14, 0.4), Vector3(0, 2.8, 4)) # actual cage-cap dimensions
+	_box(root, Vector3(6, 0.16, 0.16), Vector3(0, 0.2, 3)) # floor trim stays solid
+	_box(root, Vector3(0.1, 0.1, 0.1), Vector3(0, 2.5, 3)) # tiny decoration is ignored
+	var occ := CameraOccluders.new()
+	occ.collect(root)
+	check_eq(occ.size(), 2, "thin raised rails and post caps can both block")
+	occ.update(Vector3(0, 4, 8), [Vector3(0, 1, 0)], true)
+	check(occ.blocking() == 1 and rail.transparency >= 0.7, "a rail across the fighter fades")
+	occ.update(Vector3(0, 4.6, 8), [Vector3(0, 1, 0)], true)
+	check(occ.blocking() == 1 and cap.transparency >= 0.7, "a small cap close to the camera also fades")
+	occ.update(Vector3(0, 6, 8), [Vector3(0, 1, 0)], true)
+	check(occ.blocking() == 0 and is_zero_approx(rail.transparency) and is_zero_approx(cap.transparency), "rail and cap return when clear")
+	root.queue_free()
+
+
 func test_crowd_figures_in_the_line_of_sight_shrink_away() -> void:
 	var root := Node3D.new()
 	add_child(root)

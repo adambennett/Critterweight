@@ -18,6 +18,7 @@ param(
 )
 $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
+$Out = [System.IO.Path]::GetFullPath($Out)
 if ($Exe -eq "") { $Exe = Join-Path $root "dist\Critterweight-windows-x64\Critterweight.exe" }
 if (-not (Test-Path $Exe)) { Write-Host "packaged_suites: no exported game at $Exe"; exit 2 }
 try { (Get-Process -Id $PID).PriorityClass = 'BelowNormal' } catch {}
@@ -38,25 +39,32 @@ try {
 	foreach ($s in ($Windowed | ForEach-Object { $_.Split(",") } | Where-Object { $_ -ne "" })) { $jobs += ,@("windowed", $s) }
 	foreach ($j in $jobs) {
 		$mode = $j[0]; $suite = $j[1]
-		$user = Join-Path $env:TEMP ("critterweight-packaged-{0}-{1}" -f $suite, (Get-Date -Format "HHmmssfff"))
+		# Keep captures and test data beside the evidence (on B: for release work).
+		$user = Join-Path $Out ("users\{0}-{1}" -f $suite, (Get-Date -Format "HHmmssfff"))
 		New-Item -ItemType Directory -Force $user | Out-Null
 		$res = Join-Path $Out ("packaged-{0}-{1}-results.json" -f $mode, $suite)
 		$log = Join-Path $Out ("packaged-{0}-{1}.log" -f $mode, $suite)
 		$a = @()
 		if ($mode -eq "headless") { $a += "--headless" }
 		$a += @("--", "--user-root", $user, "--test", $suite, "--test-out", $res)
+		$quoted = $a | ForEach-Object { if ($_ -match '\s') { '"' + $_ + '"' } else { $_ } }
+		# Each result belongs to this invocation; a crashed run must not inherit an earlier pass.
+		if (Test-Path -LiteralPath $res) { Remove-Item -LiteralPath $res }
 		Write-Host "==> $mode $suite"
-		$p = Start-Process -FilePath $Exe -ArgumentList $a -NoNewWindow -PassThru -RedirectStandardOutput $log -RedirectStandardError ($log + ".err")
+		$p = Start-Process -FilePath $Exe -ArgumentList $quoted -WindowStyle Hidden -PassThru -RedirectStandardOutput $log -RedirectStandardError ($log + ".err")
+		$null = $p.Handle # Keep the native handle alive so .ExitCode remains available after WaitForExit.
 		try { $p.PriorityClass = 'BelowNormal' } catch {}
 		if (-not $p.WaitForExit($TimeoutMinutes * 60 * 1000)) { $p.Kill(); Write-Host "    timed out"; $failed++; $summary += "$mode $suite TIMEOUT"; continue }
 		$code = $p.ExitCode
+		if ($code -ne 0) { $failed++ }
 		$line = "$mode $suite exit $code"
 		if (Test-Path $res) {
 			$j2 = Get-Content $res -Raw | ConvertFrom-Json
-			$line = "{0} {1}: {2} run, {3} failed, {4} skipped" -f $mode, $suite, $j2.total, $j2.failed, $j2.skipped
+			$line = "{0} {1}: {2} run, {3} failed, {4} skipped (exit {5})" -f $mode, $suite, $j2.total, $j2.failed, $j2.skipped, $code
 			if ([int]$j2.failed -gt 0 -or [int]$j2.total -eq 0) { $failed++ }
 		} else { $failed++; $line += " (no results file)" }
-		$errs = Select-String -Path $log -Pattern "SCRIPT ERROR|Parse Error" -SimpleMatch:$false -ErrorAction SilentlyContinue
+		# Godot writes many parse/runtime errors to stderr, including after a results file was saved.
+		$errs = Select-String -Path @($log, ($log + ".err")) -Pattern "SCRIPT ERROR|Parse Error" -SimpleMatch:$false -ErrorAction SilentlyContinue
 		if ($errs) { $line += " ; script errors in the log: $($errs.Count)"; $failed++ }
 		Write-Host "    $line"
 		$summary += $line

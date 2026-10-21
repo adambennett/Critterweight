@@ -15,7 +15,8 @@ param(
 	[string]$Dist = "",
 	[string]$Out = "",
 	[string]$UserRoot = "",
-	[int]$Port = 0
+	[int]$Port = 0,
+	[switch]$ShowWindows
 )
 $ErrorActionPreference = "Continue"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
@@ -43,11 +44,11 @@ function Finish() {
 
 function Q([string]$s) { if ($s -match '\s') { '"' + $s + '"' } else { $s } }
 
-## Starts a packaged executable (arguments quoted when needed); -Visible keeps its window.
+## Background verification stays hidden; interactive users can request the spectator with -ShowWindows.
 function Start-Game($file, $argList, [switch]$Visible) {
 	$quoted = @($argList | ForEach-Object { Q ([string]$_) })
-	if ($Visible) { $p = Start-Process -FilePath $file -ArgumentList $quoted -PassThru }
-	else { $p = Start-Process -FilePath $file -ArgumentList $quoted -PassThru -NoNewWindow }
+	if ($Visible -and $ShowWindows) { $p = Start-Process -FilePath $file -ArgumentList $quoted -PassThru }
+	else { $p = Start-Process -FilePath $file -ArgumentList $quoted -PassThru -WindowStyle Hidden }
 	$null = $p.Handle   # keeps the handle open so ExitCode is available after the process exits
 	$script:procs += $p
 	return $p
@@ -151,19 +152,21 @@ $deadline = (Get-Date).AddSeconds(200)
 while ((Get-Date) -lt $deadline -and @($clients | Where-Object { -not $_.HasExited }).Count -gt 0) { Start-Sleep -Milliseconds 500 }
 $ra = ReadJson (Join-Path $Out "alice.json")
 $rb = ReadJson (Join-Path $Out "bob.json")
-if ($ra -and $rb -and $ra.connected -and $rb.connected -and @($ra.results).Count -eq 1 -and @($rb.results).Count -eq 1) {
+$clientsClean = @($clients | Where-Object { -not $_.HasExited -or $_.ExitCode -ne 0 }).Count -eq 0
+if ($clientsClean -and $ra -and $rb -and $ra.connected -and $rb.connected -and @($ra.results).Count -eq 1 -and @($rb.results).Count -eq 1 -and
+	[int]$ra.results[0].winner_team -eq [int]$rb.results[0].winner_team) {
 	$you = [int]$ra.matches[0].you
 	$won = ([int]$ra.results[0].winner_team -eq [int]$ra.results[0].fighters[$you].team)
 	Step "online duel, 2 packaged clients (LOOPBACK)" "pass" ("authoritative result reached both; attacker won: {0}; Alice hits {1}; Bob lowest health {2}; {3:N1} snapshots/s, interpolation {4:N0} ms, RTT {5:N1} ms" -f `
 		$won, $ra.hits_dealt, $rb.my_health_min, [double]$ra.stats.snapshot_rate, [double]$ra.stats.interp_delay_ms, [double]$ra.stats.rtt_ms)
 } else {
-	Step "online duel, 2 packaged clients (LOOPBACK)" "fail" ("connected {0}/{1}, results {2}/{3}; see alice.log, bob.log, server.log" -f `
-		$(if ($ra) { $ra.connected } else { "no result" }), $(if ($rb) { $rb.connected } else { "no result" }), @($ra.results).Count, @($rb.results).Count)
+	Step "online duel, 2 packaged clients (LOOPBACK)" "fail" ("connected {0}/{1}, results {2}/{3}, clean exits {4}; see alice.log, bob.log, server.log" -f `
+		$(if ($ra) { $ra.connected } else { "no result" }), $(if ($rb) { $rb.connected } else { "no result" }), @($ra.results).Count, @($rb.results).Count, $clientsClean)
 }
 $vd = (Get-Date).AddSeconds(60)
 while ((Get-Date) -lt $vd -and -not $viewer.HasExited) { Start-Sleep -Milliseconds 500 }
 $joined = (Test-Path (Join-Path $Out "viewer.log")) -and (Select-String -Path (Join-Path $Out "viewer.log") -Pattern "joined '" -Quiet)
-if ((Test-Path $png) -and $joined) { Step "online spectator frame (windowed packaged client)" "pass" (Split-Path $png -Leaf) }
+if ((Test-Path $png) -and $joined -and $viewer.HasExited -and $viewer.ExitCode -eq 0) { Step "online spectator frame (windowed packaged client)" "pass" (Split-Path $png -Leaf) }
 else { Step "online spectator frame (windowed packaged client)" "fail" "capture $(Test-Path $png), joined $joined (exit $($viewer.ExitCode))" }
 
 # 3. token-authenticated TCP admin (127.0.0.1 only) and graceful shutdown

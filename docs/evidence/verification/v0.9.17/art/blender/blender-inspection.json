@@ -1,0 +1,74 @@
+[
+  {
+    "fighter": "f_stoke",
+    "source_sha256": "884f241d8b5422ace2788f0cb0e2d0c70666cbd6363b318e6f48ad8d4d48a9d2",
+    "source_unchanged": true,
+    "body_objects": 152,
+    "view_bones": 13,
+    "image": "f_stoke-blender.png",
+    "image_sha256": "de59a6ea5093d3f4ccafea9bc16ecec1a46a847d384df946a7a72eaa1e2a6ef5"
+  },
+  {
+    "fighter": "f_dredge",
+    "source_sha256": "3119b18c181492fb9a21485ea7353820fdf3de48d1643d102a1707af2b5ba1dd",
+    "source_unchanged": true,
+    "body_objects": 183,
+    "view_bones": 19,
+    "image": "f_dredge-blender.png",
+    "image_sha256": "86ab74326c04348dd135a6061a0def885c325aa4a789597389cb08915144c822"
+  },
+  {
+    "fighter": "f_gusto",
+    "source_sha256": "ad9b588b5c3d9dd25007443e199cb8403dd3c69d82907dfc1556987f956217a2",
+    "source_unchanged": true,
+    "body_objects": 238,
+    "view_bones": 22,
+    "image": "f_gusto-blender.png",
+    "image_sha256": "21c3498d6b1e52c7800fca550452274f8c2a4802d7b5bfef2d209ba2b327af38"
+  },
+  {
+    "fighter": "f_dozer",
+    "source_sha256": "049bc2b3df3614008454beb6d6ba311285f558236125f94b6288b5119a6d4104",
+    "source_unchanged": true,
+    "body_objects": 168,
+    "view_bones": 13,
+    "image": "f_dozer-blender.png",
+    "image_sha256": "15acdbc0ecff6dbf1c9b9cb85bed8b8d194cb75119d0f4ea2b3c92fca2ffe55f"
+  },
+  {
+    "fighter": "f_slurry",
+    "source_sha256": "5acf4906108f67e5c3beadd1914b1533e502657359b5e6c36d74ee6cf8b82904",
+    "source_unchanged": true,
+    "body_objects": 190,
+    "view_bones": 35,
+    "image": "f_slurry-blender.png",
+    "image_sha256": "3db9e0a74a4b4c295124f862798f983fd72b389036310346ac142b465e47678f"
+  },
+  {
+    "fighter": "f_jitters",
+    "source_sha256": "5afb33fb935e73931e7afd0b3ca55cb9deed2b8a926e92041ce932d5240291f9",
+    "source_unchanged": true,
+    "body_objects": 96,
+    "view_bones": 31,
+    "image": "f_jitters-blender.png",
+    "image_sha256": "e3372d2694c8976796e9e31e44b5cc389a5def9bb6b44523e6928f6ce4a2177c"
+  },
+  {
+    "fighter": "f_varga",
+    "source_sha256": "32617f36a5b03e112028380ce6162086d0bfd309044bd28fbe3f05f1369954aa",
+    "source_unchanged": true,
+    "body_objects": 197,
+    "view_bones": 13,
+    "image": "f_varga-blender.png",
+    "image_sha256": "694dbd33f2e73f70700b67d1e9629779bc6a170d1dd7817b6878d329aadd14e9"
+  },
+  {
+    "fighter": "f_knell",
+    "source_sha256": "41dd23b347ccefacc0b613017538dd9eaab2654ad5d44a9ededddf0a1f6659af",
+    "source_unchanged": true,
+    "body_objects": 214,
+    "view_bones": 19,
+    "image": "f_knell-blender.png",
+    "image_sha256": "8ada37baf3f1c781c94ac110c597b2c5c59d1fda942a64d5333a1b2b8b36f293"
+  }
+]

@@ -1,0 +1,71 @@
+{
+  "checks": [
+    {
+      "name": "case-exact res:// paths",
+      "ok": true,
+      "detail": "3401 references checked",
+      "problems": []
+    },
+    {
+      "name": "no Windows-only constructs in game code",
+      "ok": true,
+      "problems": []
+    },
+    {
+      "name": "linux binary Critterweight.x86_64",
+      "ok": true,
+      "detail": {
+        "path": "..\\..\\Critterweight-work\\v0.9.17\\codex-package2-20261021\\Critterweight-linux-x86_64\\Critterweight.x86_64",
+        "bytes": 296748712,
+        "class": "ELF64",
+        "endian": "little",
+        "machine": "x86-64",
+        "needed": [
+          "librt.so.1",
+          "libpthread.so.0",
+          "libdl.so.2",
+          "libm.so.6",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "glibc_max": "GLIBC_2.28",
+        "pck_embedded": true
+      }
+    },
+    {
+      "name": "linux binary CritterweightServer.x86_64",
+      "ok": true,
+      "detail": {
+        "path": "..\\..\\Critterweight-work\\v0.9.17\\codex-package2-20261021\\Critterweight-server-linux-x86_64\\CritterweightServer.x86_64",
+        "bytes": 141823536,
+        "class": "ELF64",
+        "endian": "little",
+        "machine": "x86-64",
+        "needed": [
+          "librt.so.1",
+          "libpthread.so.0",
+          "libdl.so.2",
+          "libm.so.6",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ],
+        "glibc_max": "GLIBC_2.28",
+        "pck_embedded": true
+      }
+    },
+    {
+      "name": "exec bit in Critterweight-linux-x86_64.tar.gz",
+      "ok": true,
+      "detail": [
+        "Critterweight-linux-x86_64/Critterweight.x86_64 755"
+      ]
+    },
+    {
+      "name": "exec bit in Critterweight-server-linux-x86_64.tar.gz",
+      "ok": true,
+      "detail": [
+        "Critterweight-server-linux-x86_64/CritterweightServer.x86_64 755"
+      ]
+    }
+  ]
+}
