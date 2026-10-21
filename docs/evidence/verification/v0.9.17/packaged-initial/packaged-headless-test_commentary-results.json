@@ -1,0 +1,130 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_a_second_interrupt_inside_the_fade_keeps_the_new_line"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_an_ability_that_hits_is_never_called_a_miss"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_career_bout_context_reaches_the_booth"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_ceremonial_winner_names_never_replace_other_names"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_clock_decisions_and_sudden_death_name_the_real_winner"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_count_scorecard_and_first_of_the_night_lines_fit_the_moment"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_director_detects_whiffs_exchanges_and_pressure"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_director_distinguishes_knockdown_stoppage_knockout_and_decisions"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_director_does_not_spam_repeated_abilities"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_director_paces_lulls_with_observations_and_color"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_history_persists_across_restarts_and_stays_bounded"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_interrupts_fade_and_low_lines_wait_for_room"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_lull_pressure_needs_recent_unanswered_hits"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_names_follow_the_players_corner"
+		},
+		{
+			"errors": [],
+			"ms": 304,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_queue_expires_stale_calls_and_results_invalidate"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_selector_prefers_specific_fresh_lines_but_never_traps_on_them"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_selector_spaces_joke_families"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_spectating_never_addresses_a_player"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_stoppage_in_a_best_of_ends_only_the_round"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_talk_budget_recovers_after_interrupted_and_stopped_lines"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 20 run, 0 failed, 20 passed, 0 skipped in 4.7 s",
+	"time": "2026-10-21T16:21:57",
+	"total": 20,
+	"version": "0.9.17"
+}

@@ -66,6 +66,9 @@ def extract(objects, bone_ids, skinned):
                 groups=[dict(material=k, indices=v) for k, v in groups.items()])
 
 def export(out_path, scratch=None):
+    # legacy skins (f_varga_legacy.glb: the v0.9.16 model kept byte for byte) are never written here
+    if pathlib.Path(out_path).resolve().name.lower().endswith('_legacy.glb'):
+        raise ValueError(f'refusing to export over a legacy skin: {out_path}')
     scene = bpy.context.scene
     manifest=json.loads((ROOT/'tools/blender/model_manifest.json').read_text(encoding='utf-8-sig'))
     entry=next(e for e in manifest if e['id']==scene['cw_id'])

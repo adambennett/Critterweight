@@ -1,0 +1,64 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 50047,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_cards_are_deterministic_and_survive_saves"
+		},
+		{
+			"errors": [],
+			"ms": 20942,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_drawn_cards_and_sudden_death_resolve_without_a_round_4"
+		},
+		{
+			"errors": [],
+			"ms": 19330,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_drawn_cards_without_sudden_death_are_a_draw_after_exactly_n_rounds"
+		},
+		{
+			"errors": [],
+			"ms": 24955,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_every_round_is_fought_and_nobody_is_knocked_out"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_judge_math_is_pure_and_matches_the_documented_rules"
+		},
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_officials_only_run_in_a_timed_standard_duel"
+		},
+		{
+			"errors": [],
+			"ms": 24071,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_rules_without_the_keys_play_exactly_as_before"
+		},
+		{
+			"errors": [],
+			"ms": 597,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_tally_counts_only_what_a_side_did_to_the_other"
+		},
+		{
+			"errors": [],
+			"ms": 606,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_unlimited_health_keeps_the_knockdown_of_a_huge_blow"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 9 run, 0 failed, 9 passed, 0 skipped in 144.3 s",
+	"time": "2026-10-21T16:25:22",
+	"total": 9,
+	"version": "0.9.17"
+}

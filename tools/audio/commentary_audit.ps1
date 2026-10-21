@@ -16,6 +16,17 @@ param(
 )
 $ErrorActionPreference = "Stop"
 try { (Get-Process -Id $PID).PriorityClass = 'BelowNormal' } catch {}
+# the machine-wide test lock (tools/dev/run_suite.ps1): a real-time audit must not share the CPU
+# with test runs (its timings are what it measures)
+$lock = $null
+$lockPath = Join-Path $env:TEMP "critterweight_full_suite.lock"
+# reserve the machine (tools/dev/run_suite.ps1): filtered test runs hold back until we are done
+$reserve = Join-Path $env:TEMP "critterweight_release.reserve"
+Set-Content -LiteralPath $reserve -Value "commentary audit $PID"
+while ($null -eq $lock) {
+	try { $lock = [System.IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') }
+	catch { Write-Host "waiting for the test lock"; Set-Content -LiteralPath $reserve -Value "commentary audit $PID"; Start-Sleep -Seconds 10 }
+}
 New-Item -ItemType Directory -Force $Out | Out-Null
 $root = Join-Path $Out "user_root"
 if (Test-Path $root) { Remove-Item -LiteralPath $root -Recurse -Force }
@@ -31,6 +42,13 @@ foreach ($s in $sessions) {
 		"--bench", "commentary", "--out", $json, "--label", "$Label/$($s.name)") + $s.args
 	Write-Host ("==> session {0}: {1}" -f $s.name, ($s.args -join " "))
 	& $Godot @a *> $log
-	if ($LASTEXITCODE -ne 0 -or -not (Test-Path $json)) { Write-Host "session $($s.name) failed (exit $LASTEXITCODE); see $log"; exit 1 }
+	if ($LASTEXITCODE -ne 0 -or -not (Test-Path $json)) {
+		Write-Host "session $($s.name) failed (exit $LASTEXITCODE); see $log"
+		$lock.Close()
+		Remove-Item -LiteralPath $reserve -ErrorAction SilentlyContinue
+		exit 1
+	}
 }
+$lock.Close()
+Remove-Item -LiteralPath $reserve -ErrorAction SilentlyContinue
 Write-Host "done: $Out"

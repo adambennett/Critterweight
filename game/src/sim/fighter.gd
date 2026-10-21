@@ -953,7 +953,10 @@ func _st_move(dt: float) -> void:
 		var aim_from := float(m.sustain[0]) * 0.5 if not m.sustain.is_empty() else m.first_active() * 0.5
 		if pma != null and pma.hold == "charge" and m.charge_time > 0.0:
 			aim_from = minf(aim_from, m.charge_start())
-		if pma != null and pma.aim_turn > 0.0 and t >= aim_from:
+		# A held charge rewinds the animation by one tick, which can leave `t` just below
+		# charge_start. Once charging has begun, its aim must keep running on every tick.
+		var aim_ready := t >= aim_from or (_charging and move_charge > 0.0)
+		if pma != null and pma.aim_turn > 0.0 and aim_ready:
 			# an aimed move (streams, beams): the stick steers it, else it tracks the target, at the
 			# move's own turn rate (a flamethrower sweeps; it does not snap)
 			if input.move.length() > 0.3:

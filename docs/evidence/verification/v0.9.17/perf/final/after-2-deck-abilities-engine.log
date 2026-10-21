@@ -1,0 +1,10 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti SUPER
+
+2026-10-21 16:57:01 [INFO] paths: user data root: B:/Critterweight-work/v0.9.17/codex-perf-final-20261021/user-deck
+2026-10-21 16:57:02 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:57:02 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-21 16:57:02 [INFO] toast: [success] XInput Controller connected.
+2026-10-21 16:57:02 [INFO] match: start free_for_all_lives on the_gullet: f_dozer/t0/bot, f_dredge/t1/bot, f_gusto/t2/bot, f_jitters/t3/bot, f_knell/t4/bot, f_slurry/t5/bot, f_stoke/t6/bot, f_varga/t7/bot
+BENCH {"abilities_every_s":3.0,"ability_bursts":10,"alive_fighters_end":8,"bench":"busy","boot_ms":7871,"cores":8,"cpu":"Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz","date":"2026-10-21T16:57:02","draw_calls":{"max":818.0,"mean":760.952,"min":605.0,"n":4315,"p50":783.0,"p95":803.0,"p99":814.0},"engine":"4.5.1-stable (official)","fighters":8,"fps_avg":143.822810297713,"frame_ms":{"max":737.038,"mean":6.953,"min":2.293,"n":4315,"p50":5.946,"p95":10.974,"p99":18.063},"frames":4315,"frames_over_16_7ms":56,"frames_over_16_7ms_pct":1.29779837775203,"game_version":"0.9.17","headless":false,"hits":71,"match_load_ms":377.122,"memory_growth_mb":30.9457263946533,"memory_static_mb":357.840834617615,"objects":10351.0,"os":"Windows","physics_frame_ms":{"max":12.863,"mean":3.423,"min":1.425,"n":4315,"p50":1.827,"p95":9.39,"p99":12.863},"preset":"deck","primitives":{"max":820190.0,"mean":723911.702,"min":606652.0,"n":4315,"p50":728561.0,"p95":733289.0,"p99":801446.0},"process_frame_ms":{"max":48.706,"mean":11.569,"min":7.796,"n":4315,"p50":10.452,"p95":21.047,"p99":26.006},"process_rss_mb":357.84107875824,"renderer":"NVIDIA GeForce RTX 4070 Ti SUPER","resolution":[1280,800],"total_ms":43226,"video_mem_mb":147.968231201172}
+BENCH_REPORT B:\Critterweight-work\v0.9.17\codex-perf-final-20261021\after-2-deck-abilities.json

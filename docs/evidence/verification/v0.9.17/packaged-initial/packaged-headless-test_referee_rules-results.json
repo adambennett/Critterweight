@@ -1,0 +1,52 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 7624,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_downed_fighter_is_protected_counted_and_waved_up"
+		},
+		{
+			"errors": [],
+			"ms": 598,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_hit_rules_on_a_downed_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 25457,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_knockdown_limit_ends_only_the_round_under_health_scoring"
+		},
+		{
+			"errors": [],
+			"ms": 14248,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_knockdown_limit_stops_a_ten_point_fight"
+		},
+		{
+			"errors": [],
+			"ms": 3139,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_nothing_is_counted_outside_the_live_round"
+		},
+		{
+			"errors": [],
+			"ms": 295,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_referee_reads_every_event_with_a_full_event_ring"
+		},
+		{
+			"errors": [],
+			"ms": 12175,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_throw_and_hazard_knockdowns_are_never_counted"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 7 run, 0 failed, 7 passed, 0 skipped in 67.5 s",
+	"time": "2026-10-21T16:26:32",
+	"total": 7,
+	"version": "0.9.17"
+}

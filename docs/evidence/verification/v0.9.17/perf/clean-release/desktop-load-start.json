@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-21T18:21:13",
+  "seconds": 5,
+  "tam_running": false,
+  "processes": [
+    {
+      "name": "Godot_v4.5.1-stable_win64",
+      "pid": 37356,
+      "one_core_percent": 116.6
+    },
+    {
+      "name": "ChatGPT",
+      "pid": 22800,
+      "one_core_percent": 5.0
+    },
+    {
+      "name": "ChatGPT",
+      "pid": 34648,
+      "one_core_percent": 4.4
+    },
+    {
+      "name": "pwsh",
+      "pid": 33844,
+      "one_core_percent": 2.5
+    },
+    {
+      "name": "node",
+      "pid": 38172,
+      "one_core_percent": 0.0
+    },
+    {
+      "name": "node",
+      "pid": 37004,
+      "one_core_percent": 0.0
+    },
+    {
+      "name": "node",
+      "pid": 36996,
+      "one_core_percent": 0.0
+    }
+  ]
+}

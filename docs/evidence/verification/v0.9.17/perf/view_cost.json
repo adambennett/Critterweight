@@ -1,0 +1,26 @@
+{
+ "perf-1": {
+  "render_ms_per_frame_all8": 1.424,
+  "materials_ms_per_frame_all8": 0.086
+ },
+ "perf-2": {
+  "render_ms_per_frame_all8": 1.623,
+  "materials_ms_per_frame_all8": 0.1
+ },
+ "v0916-1": {
+  "render_ms_per_frame_all8": 0.512,
+  "materials_ms_per_frame_all8": 0.179
+ },
+ "v0916-2": {
+  "render_ms_per_frame_all8": 0.384,
+  "materials_ms_per_frame_all8": 0.127
+ },
+ "v0917-1": {
+  "render_ms_per_frame_all8": 2.475,
+  "materials_ms_per_frame_all8": 0.157
+ },
+ "v0917-2": {
+  "render_ms_per_frame_all8": 2.064,
+  "materials_ms_per_frame_all8": 0.13
+ }
+}

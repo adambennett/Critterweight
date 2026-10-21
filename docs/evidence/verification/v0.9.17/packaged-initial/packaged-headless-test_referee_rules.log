@@ -1,0 +1,13 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 16:25:24 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-packaged-test_referee_rules-162522221
+2026-10-21 16:25:25 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:25:25 [INFO] app: Critterweight 0.9.17+1161cfe.dirty (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/core/test_referee_rules.gd::test_downed_fighter_is_protected_counted_and_waved_up (7624 ms)
+ok    res://src/test/core/test_referee_rules.gd::test_hit_rules_on_a_downed_fighter (598 ms)
+ok    res://src/test/core/test_referee_rules.gd::test_knockdown_limit_ends_only_the_round_under_health_scoring (25457 ms)
+ok    res://src/test/core/test_referee_rules.gd::test_knockdown_limit_stops_a_ten_point_fight (14248 ms)
+ok    res://src/test/core/test_referee_rules.gd::test_nothing_is_counted_outside_the_live_round (3139 ms)
+ok    res://src/test/core/test_referee_rules.gd::test_referee_reads_every_event_with_a_full_event_ring (295 ms)
+ok    res://src/test/core/test_referee_rules.gd::test_throw_and_hazard_knockdowns_are_never_counted (12175 ms)
+tests: 7 run, 0 failed, 7 passed, 0 skipped in 67.5 s

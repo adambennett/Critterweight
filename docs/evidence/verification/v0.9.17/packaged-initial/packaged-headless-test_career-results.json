@@ -1,0 +1,322 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_career_bout_context_reaches_the_booth"
+		},
+		{
+			"errors": [],
+			"ms": 88,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_career_builds_never_leak"
+		},
+		{
+			"errors": [],
+			"ms": 48,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_chin_raises_poise_and_getup_never_the_poise_multiplier"
+		},
+		{
+			"errors": [],
+			"ms": 42,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_clinch_improves_the_grab_game"
+		},
+		{
+			"errors": [],
+			"ms": 43,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_defence_improves_guard_parry_dodge_never_damage_taken"
+		},
+		{
+			"errors": [],
+			"ms": 41,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_injuries_handicap_poise_stamina_and_footwork"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_mid_stats_are_the_base_kit"
+		},
+		{
+			"errors": [],
+			"ms": 41,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_power_raises_damage_and_knockdown_force"
+		},
+		{
+			"errors": [],
+			"ms": 41,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_speed_raises_footwork_and_tempo"
+		},
+		{
+			"errors": [],
+			"ms": 55,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_stamina_raises_tank_and_regen"
+		},
+		{
+			"errors": [],
+			"ms": 100,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_fights.gd::test_bout_config_shape"
+		},
+		{
+			"errors": [],
+			"ms": 32645,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_fights.gd::test_headless_career_bout_end_to_end"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_diminishing_returns_and_cap"
+		},
+		{
+			"errors": [],
+			"ms": 35,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_duplicate_result_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 33,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_gym_upgrades"
+		},
+		{
+			"errors": [],
+			"ms": 34,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_healing_and_rest"
+		},
+		{
+			"errors": [],
+			"ms": 203,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_interrupted_fight_is_refought_with_the_same_seed"
+		},
+		{
+			"errors": [],
+			"ms": 7,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_names_are_original"
+		},
+		{
+			"errors": [],
+			"ms": 71,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_offer_pool_follows_popularity"
+		},
+		{
+			"errors": [],
+			"ms": 50,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_offers_are_deterministic_per_seed_and_week"
+		},
+		{
+			"errors": [],
+			"ms": 42,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_opponents_follow_the_org_band_and_d5_tiers"
+		},
+		{
+			"errors": [],
+			"ms": 57,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_popularity_deltas_match_cage_rules"
+		},
+		{
+			"errors": [],
+			"ms": 72,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_purse_and_bonus_formulas"
+		},
+		{
+			"errors": [],
+			"ms": 36,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_record_buckets_streak_and_pay"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_standing_danger_and_hints"
+		},
+		{
+			"errors": [],
+			"ms": 36,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_title_shot_champion_defences_and_belt_loss"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_training_gain_matches_cage_rules"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_weeks_and_idle_popularity"
+		},
+		{
+			"errors": [],
+			"ms": 97,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_withdraw"
+		},
+		{
+			"errors": [],
+			"ms": 112,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_career_files_are_never_listed_as_runs"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_check_reports_invariants"
+		},
+		{
+			"errors": [],
+			"ms": 96,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_content_block_and_defaults"
+		},
+		{
+			"errors": [],
+			"ms": 114,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_create_save_load_round_trip_is_identical"
+		},
+		{
+			"errors": [],
+			"ms": 61,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_damaged_main_recovers_from_backup"
+		},
+		{
+			"errors": [],
+			"ms": 54,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_damaged_newer_missing_saves_are_reported_and_kept"
+		},
+		{
+			"errors": [],
+			"ms": 129,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_missing_content_handling"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_new_career_basics"
+		},
+		{
+			"errors": [],
+			"ms": 109,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_retire_frees_the_slot_and_never_resurrects"
+		},
+		{
+			"errors": [],
+			"ms": 60,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_slot_rules"
+		},
+		{
+			"errors": [],
+			"ms": 29,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_starting_stats_follow_the_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 226,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_campaign_menu_lists_career_first"
+		},
+		{
+			"errors": [],
+			"ms": 483,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_create_a_career_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 611,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_every_career_screen_has_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 221,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_fight_through_career_flow_to_the_result_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 375,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_hub_pull_out_is_a_confirmed_withdrawal"
+		},
+		{
+			"errors": [],
+			"ms": 186,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_interrupted_bout_is_offered_again"
+		},
+		{
+			"errors": [],
+			"ms": 867,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 524,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_menu_quit_pulls_out_of_a_career_bout"
+		},
+		{
+			"errors": [],
+			"ms": 2574,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_quit_after_the_decision_books_the_result"
+		},
+		{
+			"errors": [],
+			"ms": 342,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_retire_and_move_aside_free_the_slot"
+		},
+		{
+			"errors": [],
+			"ms": 473,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_walk_weeks_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 77,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_career_from_v0916_loads_and_books_the_next_bout"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 52 run, 0 failed, 52 passed, 0 skipped in 45.5 s",
+	"time": "2026-10-21T16:22:54",
+	"total": 52,
+	"version": "0.9.17"
+}

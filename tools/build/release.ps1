@@ -30,7 +30,7 @@ param(
 	[string]$TestFilter = "",
 	[switch]$DryRun,
 	[switch]$Alt,
-	[string]$Repo = "adambennett/PokeMMA",
+	[string]$Repo = "adambennett/Critterweight",
 	[string]$Godot = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe",
 	[string]$Gh = "C:\Program Files\GitHub CLI\gh.exe"
 )
@@ -98,15 +98,16 @@ $exe = Join-Path $dist "Critterweight-windows-x64\Critterweight.exe"
 if (-not (Test-Path $exe)) { Fail "no Windows executable in dist" }
 
 Step "Smoke-testing the packaged game"
-$tempRoot = [System.IO.Path]::GetFullPath($env:TEMP)
-$smoke = [System.IO.Path]::GetFullPath((Join-Path $tempRoot "critterweight-release-$Version"))
-if (-not $smoke.StartsWith($tempRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) { Fail "smoke directory escapes temporary root: $smoke" }
+# Keep release captures, logs and test profiles with the build output (B: in this project).
+$verificationRoot = [System.IO.Path]::GetFullPath((Join-Path $dist "verification"))
+$smoke = [System.IO.Path]::GetFullPath((Join-Path $verificationRoot "critterweight-release-$Version"))
+if (-not $smoke.StartsWith($verificationRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) { Fail "smoke directory escapes verification root: $smoke" }
 if (Test-Path -LiteralPath $smoke) { Remove-Item -LiteralPath $smoke -Recurse -Force }
 New-Item -ItemType Directory -Force $smoke | Out-Null
 $p = Start-Process -FilePath $exe -ArgumentList @("--headless", "--log-file", ('"{0}"' -f (Join-Path $smoke "check-engine.log")), "--", "--user-root", ('"{0}"' -f $smoke), "--check") -PassThru -Wait -WindowStyle Hidden -RedirectStandardOutput (Join-Path $smoke "check.log") -RedirectStandardError (Join-Path $smoke "check.err")
 if ($p.ExitCode -ne 0) { Fail "packaged script check failed (exit $($p.ExitCode))" }
 $boot = Join-Path $smoke "boot.json"
-$p = Start-Process -FilePath $exe -ArgumentList @("--log-file", ('"{0}"' -f (Join-Path $smoke "boot-engine.log")), "--", "--user-root", ('"{0}"' -f $smoke), "--windowed", "--size", "1280x720", "--boot-report", ('"{0}"' -f $boot)) -PassThru -Wait
+$p = Start-Process -FilePath $exe -ArgumentList @("--log-file", ('"{0}"' -f (Join-Path $smoke "boot-engine.log")), "--", "--user-root", ('"{0}"' -f $smoke), "--windowed", "--size", "1280x720", "--boot-report", ('"{0}"' -f $boot)) -PassThru -Wait -WindowStyle Hidden
 if ($p.ExitCode -ne 0 -or -not (Test-Path $boot)) { Fail "packaged game did not boot to a menu (exit $($p.ExitCode))" }
 $br = Get-Content $boot | ConvertFrom-Json
 Write-Host ("   booted to '{0}' in {1} ms" -f $br.screen, $br.ms_since_start)
@@ -115,7 +116,7 @@ if ($TestFilter -ne "") {
 	Step "Running packaged regressions: $TestFilter"
 	$testResult = Join-Path $smoke "test_results.json"
 	$testLog = Join-Path $smoke "test-engine.log"
-	$p = Start-Process -FilePath $exe -ArgumentList @("--log-file", ('"{0}"' -f $testLog), "--", "--user-root", ('"{0}"' -f $smoke), "--windowed", "--size", "1280x720", "--test", $TestFilter, "--test-out", ('"{0}"' -f $testResult)) -PassThru -Wait -RedirectStandardOutput (Join-Path $smoke "test.log") -RedirectStandardError (Join-Path $smoke "test.err")
+	$p = Start-Process -FilePath $exe -ArgumentList @("--log-file", ('"{0}"' -f $testLog), "--", "--user-root", ('"{0}"' -f $smoke), "--windowed", "--size", "1280x720", "--test", $TestFilter, "--test-out", ('"{0}"' -f $testResult)) -PassThru -Wait -WindowStyle Hidden -RedirectStandardOutput (Join-Path $smoke "test.log") -RedirectStandardError (Join-Path $smoke "test.err")
 	if ($p.ExitCode -ne 0 -or -not (Test-Path $testResult)) { Fail "packaged regressions failed (exit $($p.ExitCode))" }
 	$tr = Get-Content $testResult -Raw | ConvertFrom-Json
 	if ($tr.total -le 0 -or $tr.failed -ne 0 -or $tr.skipped -ne 0) { Fail "packaged regressions did not all run: $($tr.summary)" }

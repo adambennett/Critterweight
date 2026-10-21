@@ -1,0 +1,5561 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 986,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_all_four_canvas_ledges_trigger_real_ringouts"
+		},
+		{
+			"errors": [],
+			"ms": 50,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_canvas_dressing_keeps_the_platform_clear"
+		},
+		{
+			"errors": [],
+			"ms": 117,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_canvas_uses_rooftop_audio_and_rectangular_policy_boundary"
+		},
+		{
+			"errors": [],
+			"ms": 839,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_editor_controls_resize_rectangle_and_reach_outer_coordinates"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_floor_collision_and_ringout_switch"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_large_canvas_fight_camera_frames_separated_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 68,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_resize_undo_preserves_props_and_reports_outside_items"
+		},
+		{
+			"errors": [],
+			"ms": 172,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_saved_canvas_and_exported_package_are_playable"
+		},
+		{
+			"errors": [],
+			"ms": 209,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_canvas.gd::test_template_is_editor_only_and_valid_at_supported_sizes"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_base_arenas_ship_required_markers"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_base_geometry_and_dimensions"
+		},
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_catalog_has_full_palette"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_context_variant_changes_only_the_look"
+		},
+		{
+			"errors": [],
+			"ms": 91,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_every_base_and_layout_loads_and_validates"
+		},
+		{
+			"errors": [],
+			"ms": 51,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_example_layout_budgets_match_spec"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_format1_mod_arena_still_loads"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_round_trip_to_dict_from_dict"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_schema_accepts_layouts_and_rejects_bad_base"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_spanning_edge_builtins_lie_along_their_edge"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_spawn_point_spreads_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 11,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_command_stack_undo_redo_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 223,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_malicious_packages_are_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 60,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_package_export_import_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 32,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_save_load_round_trip_and_migration"
+		},
+		{
+			"errors": [],
+			"ms": 252,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_saved_layouts_are_playable_in_normal_matches"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor.gd::test_stack_is_bounded_and_tracks_dirty"
+		},
+		{
+			"errors": [],
+			"ms": 175,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_controller_carry_moves_items"
+		},
+		{
+			"errors": [],
+			"ms": 349,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_controller_place_rotate_delete_undo"
+		},
+		{
+			"errors": [],
+			"ms": 133,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 424,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_mouse_select_drag_and_keyboard"
+		},
+		{
+			"errors": [],
+			"ms": 288,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_editor_screen.gd::test_test_play_round_trip_restores_session"
+		},
+		{
+			"errors": [],
+			"ms": 504,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_campaign_style_modes_own_the_hazards"
+		},
+		{
+			"errors": [],
+			"ms": 329,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_crane_hook_lifts_then_drops"
+		},
+		{
+			"errors": [],
+			"ms": 160,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_crane_magnet_pulls_and_drops_a_scrap_bundle"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_destructible_props_break_into_their_zones"
+		},
+		{
+			"errors": [],
+			"ms": 29,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_drain_pair_teleports_with_cooldown"
+		},
+		{
+			"errors": [],
+			"ms": 55,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_electrified_plate_zaps_and_mats_insulate"
+		},
+		{
+			"errors": [],
+			"ms": 175,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_fan_and_wind_push_but_hover_ignores_wind"
+		},
+		{
+			"errors": [],
+			"ms": 1446,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_hazards_cycle_deterministically_for_a_seed"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_mode_ringout_override_is_honoured"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_pickups_heal_hype_and_respawn"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_props_take_damage_before_breaking"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_ringout_eliminates_rule"
+		},
+		{
+			"errors": [],
+			"ms": 233,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_rooftop_ringout_respawns_at_nearest_edge_marker"
+		},
+		{
+			"errors": [],
+			"ms": 507,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_rules_switch_hazards_timers_and_ringouts"
+		},
+		{
+			"errors": [],
+			"ms": 25,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_solid_props_without_splat_stop_projectiles"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_team_matches_start_in_team_clusters"
+		},
+		{
+			"errors": [],
+			"ms": 75,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_tidal_gutter_soaks_fighters_in_it"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_hazards.gd::test_weapons_damage_low_props_without_proxies"
+		},
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_blocked_spawn_points_at_the_spawn"
+		},
+		{
+			"errors": [],
+			"ms": 82,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_clean_base_layouts_pass"
+		},
+		{
+			"errors": [],
+			"ms": 33,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_hazard_and_pickup_caps"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_issue_refs_carry_editor_uids"
+		},
+		{
+			"errors": [],
+			"ms": 23,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_missing_mode_markers"
+		},
+		{
+			"errors": [],
+			"ms": 43,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_over_budget"
+		},
+		{
+			"errors": [],
+			"ms": 33,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_spawn_near_pit_or_open_edge"
+		},
+		{
+			"errors": [],
+			"ms": 21,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_team_clusters_and_bounds"
+		},
+		{
+			"errors": [],
+			"ms": 30,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_too_little_clear_floor"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_all_lines_have_ids_subtitles_and_triggers"
+		},
+		{
+			"errors": [],
+			"ms": 8,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_announce_emits_subtitle_and_substitutes_names"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_babble_plan"
+		},
+		{
+			"errors": [],
+			"ms": 9,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_color_commentary_paces_and_interrupts_a_rare_conversation"
+		},
+		{
+			"errors": [],
+			"ms": 8,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_priority_interrupt_and_queue_rules"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_sim_event_mapping"
+		},
+		{
+			"errors": [],
+			"ms": 29,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_ten_point_and_referee_event_mapping"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_trigger_picks_specific_fresh_lines_deterministically"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_announcer.gd::test_varga_and_knell_ability_uses_get_specific_announcer_calls"
+		},
+		{
+			"errors": [],
+			"ms": 1341,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_babble.gd::test_babble_speaks_a_line_headless"
+		},
+		{
+			"errors": [],
+			"ms": 564,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_bank_loads_and_every_id_resolves"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_every_creature_has_a_voice_in_the_bank"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_frequent_sounds_have_variations"
+		},
+		{
+			"errors": [],
+			"ms": 117,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_literal_ids_in_code_exist"
+		},
+		{
+			"errors": [],
+			"ms": 732,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_manifest_matches_files_on_disk"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_menu_focus_uses_soft_interface_ticks"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_music_tracks_loops_and_layers"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_no_file_peaks_above_minus_one_dbfs"
+		},
+		{
+			"errors": [],
+			"ms": 292,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_replacement_assets_are_present_and_hashed"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_required_ids_present"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_size_budget"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_a_second_interrupt_inside_the_fade_keeps_the_new_line"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_an_ability_that_hits_is_never_called_a_miss"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_career_bout_context_reaches_the_booth"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_ceremonial_winner_names_never_replace_other_names"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_clock_decisions_and_sudden_death_name_the_real_winner"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_count_scorecard_and_first_of_the_night_lines_fit_the_moment"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_director_detects_whiffs_exchanges_and_pressure"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_director_distinguishes_knockdown_stoppage_knockout_and_decisions"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_director_does_not_spam_repeated_abilities"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_director_paces_lulls_with_observations_and_color"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_history_persists_across_restarts_and_stays_bounded"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_interrupts_fade_and_low_lines_wait_for_room"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_lull_pressure_needs_recent_unanswered_hits"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_names_follow_the_players_corner"
+		},
+		{
+			"errors": [],
+			"ms": 300,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_queue_expires_stale_calls_and_results_invalidate"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_selector_prefers_specific_fresh_lines_but_never_traps_on_them"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_selector_spaces_joke_families"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_spectating_never_addresses_a_player"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_stoppage_in_a_best_of_ends_only_the_round"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_talk_budget_recovers_after_interrupted_and_stopped_lines"
+		},
+		{
+			"errors": [],
+			"ms": 275,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_all_announcer_and_hub_templates_resolve_without_babble"
+		},
+		{
+			"errors": [],
+			"ms": 103,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_bubble_pacing_uses_recorded_duration"
+		},
+		{
+			"errors": [],
+			"ms": 101,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_custom_names_use_slot_audio_while_subtitles_keep_the_name"
+		},
+		{
+			"errors": [],
+			"ms": 113,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_dynamic_recaps_and_first_lesson_compositions_resolve"
+		},
+		{
+			"errors": [],
+			"ms": 3626,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_every_authored_voice_clip_is_installed_and_decodable"
+		},
+		{
+			"errors": [],
+			"ms": 102,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_live_control_bindings_share_natural_action_audio"
+		},
+		{
+			"errors": [],
+			"ms": 98,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_owner_player_names_and_spelling_aliases_use_recordings_in_every_voice"
+		},
+		{
+			"errors": [],
+			"ms": 99,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_recorded_player_uses_full_clips_and_completion_signals"
+		},
+		{
+			"errors": [],
+			"ms": 102,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_recorded_priority_queue_stop_and_unknown_mod_fallback"
+		},
+		{
+			"errors": [],
+			"ms": 52,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_bookie.gd::test_pause_and_take_over"
+		},
+		{
+			"errors": [],
+			"ms": 50533,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_bookie.gd::test_unattended_three_complete_runs"
+		},
+		{
+			"errors": [],
+			"ms": 337,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_disconnect_bot_takes_over_then_rejoin"
+		},
+		{
+			"errors": [],
+			"ms": 280,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_everyone_leaves_run_suspended_and_resumable"
+		},
+		{
+			"errors": [],
+			"ms": 259,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_group_event_vote_never_loops"
+		},
+		{
+			"errors": [],
+			"ms": 180,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_host_change_only_from_the_elected_successor"
+		},
+		{
+			"errors": [],
+			"ms": 231,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_host_departure_resumes_from_member_replica"
+		},
+		{
+			"errors": [],
+			"ms": 65,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_host_dose_clamped_to_own_ladder"
+		},
+		{
+			"errors": [],
+			"ms": 1387,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_host_results_must_follow_their_log"
+		},
+		{
+			"errors": [],
+			"ms": 227,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_member_choice_on_group_event_is_a_vote"
+		},
+		{
+			"errors": [],
+			"ms": 187,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_members_ignore_host_messages_from_other_members"
+		},
+		{
+			"errors": [],
+			"ms": 3328,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_party_slots_cleared_at_run_end"
+		},
+		{
+			"errors": [],
+			"ms": 175,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_party_vote_drives_the_route"
+		},
+		{
+			"errors": [],
+			"ms": 118,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_party_vote_tie_goes_to_captain"
+		},
+		{
+			"errors": [],
+			"ms": 118,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_pause_budget_per_player"
+		},
+		{
+			"errors": [],
+			"ms": 187,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_per_player_picks_without_duplication"
+		},
+		{
+			"errors": [],
+			"ms": 1267,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_progression_credited_per_player"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_route_vote_rules"
+		},
+		{
+			"errors": [],
+			"ms": 71,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_tag_team_format"
+		},
+		{
+			"errors": [],
+			"ms": 177,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_vote_timer_with_abstainers"
+		},
+		{
+			"errors": [],
+			"ms": 57,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_boss_cannot_skip_phase_two"
+		},
+		{
+			"errors": [],
+			"ms": 2901,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_boss_fights_two_phases_telegraphs_and_daze"
+		},
+		{
+			"errors": [],
+			"ms": 72,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_downed_and_revive_in_coop"
+		},
+		{
+			"errors": [],
+			"ms": 210,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_knockouts_before_the_bell_end_the_fight"
+		},
+		{
+			"errors": [],
+			"ms": 1909,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_plain_fight_runs_and_reports"
+		},
+		{
+			"errors": [],
+			"ms": 62,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_poise_break_dazes_the_boss_and_only_then_grabbable"
+		},
+		{
+			"errors": [],
+			"ms": 77,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_rematch_elite_is_phase_one_only"
+		},
+		{
+			"errors": [],
+			"ms": 69,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_ringout_return_is_not_a_defeat"
+		},
+		{
+			"errors": [],
+			"ms": 69,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_sudden_death_judges_time_up_health_and_keeps_hp"
+		},
+		{
+			"errors": [],
+			"ms": 1990,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_tag_bout_swaps_and_regenerates"
+		},
+		{
+			"errors": [],
+			"ms": 13556,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_fights.gd::test_waves_and_timer_fight"
+		},
+		{
+			"errors": [],
+			"ms": 9194,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_full_runs.gd::test_fight_camp_defeat_at_the_act_one_boss"
+		},
+		{
+			"errors": [],
+			"ms": 57798,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_full_runs.gd::test_fight_camp_victory_with_real_fights"
+		},
+		{
+			"errors": [],
+			"ms": 1196,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_full_runs.gd::test_off_the_street_defeat_with_real_fights"
+		},
+		{
+			"errors": [],
+			"ms": 53742,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_full_runs.gd::test_off_the_street_victory_with_real_fights"
+		},
+		{
+			"errors": [],
+			"ms": 45,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_generation.gd::test_dose10_forces_commissioners_cut"
+		},
+		{
+			"errors": [],
+			"ms": 500,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_generation.gd::test_every_node_resolves_to_valid_content"
+		},
+		{
+			"errors": [],
+			"ms": 7726,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_generation.gd::test_map_validity_500_seeds"
+		},
+		{
+			"errors": [],
+			"ms": 121,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_generation.gd::test_rarity_guarantees_and_distinct_offers"
+		},
+		{
+			"errors": [],
+			"ms": 70,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_generation.gd::test_same_seed_same_card"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_generation.gd::test_seed_text_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_generation.gd::test_streams_independent_of_call_order"
+		},
+		{
+			"errors": [],
+			"ms": 361,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_generation.gd::test_synergy_weights_favor_owned_tags"
+		},
+		{
+			"errors": [],
+			"ms": 266,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_generation.gd::test_varied_cards"
+		},
+		{
+			"errors": [],
+			"ms": 118,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_damaged_main_file_recovers_from_backup"
+		},
+		{
+			"errors": [],
+			"ms": 39,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_damaged_save_reported_and_kept"
+		},
+		{
+			"errors": [],
+			"ms": 82,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_fight_in_progress_reruns_from_start"
+		},
+		{
+			"errors": [],
+			"ms": 103,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_floats_json_cannot_round_trip_still_save_and_travel"
+		},
+		{
+			"errors": [],
+			"ms": 116,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_fresh_seed_run_resumes_identically"
+		},
+		{
+			"errors": [],
+			"ms": 82,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_inconsistent_state_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 78,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_migration_from_v0"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_missing_save"
+		},
+		{
+			"errors": [],
+			"ms": 70,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_newer_format_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 85,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_no_duplicate_rewards_across_resume"
+		},
+		{
+			"errors": [],
+			"ms": 66,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_party_ticket_integrity"
+		},
+		{
+			"errors": [],
+			"ms": 94,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_removed_content_blocks_resume_non_destructively"
+		},
+		{
+			"errors": [],
+			"ms": 136,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_resume_after_crash_during_write"
+		},
+		{
+			"errors": [],
+			"ms": 134,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_slots_with_only_tmp_or_bak_are_listed"
+		},
+		{
+			"errors": [],
+			"ms": 162,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_persistence.gd::test_suspend_and_resume_mid_run"
+		},
+		{
+			"errors": [],
+			"ms": 75,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_boss_own_phase_two_threshold_is_used"
+		},
+		{
+			"errors": [],
+			"ms": 63,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_coop_scaling_plan"
+		},
+		{
+			"errors": [],
+			"ms": 164,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_custom_fight_camp_runs_set_no_camp_milestones"
+		},
+		{
+			"errors": [],
+			"ms": 158,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_custom_runs_keep_stats_but_no_records"
+		},
+		{
+			"errors": [],
+			"ms": 56,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_difficulty_and_dose_modifiers"
+		},
+		{
+			"errors": [],
+			"ms": 172,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_dose_credit_needs_the_profiles_own_ladder"
+		},
+		{
+			"errors": [],
+			"ms": 51,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_duplicate_rewards_are_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 51,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_event_choice_and_outcome"
+		},
+		{
+			"errors": [],
+			"ms": 67,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_fight_camp_meta_applies_only_in_fight_camp"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_fight_rewards_and_hp_carry"
+		},
+		{
+			"errors": [],
+			"ms": 98,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_finish_run_progression_off_the_street"
+		},
+		{
+			"errors": [],
+			"ms": 69,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_group_event_choices_need_the_whole_party_to_pay"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_ladder_unlock_rule"
+		},
+		{
+			"errors": [],
+			"ms": 155,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_replay_reproduces_the_run"
+		},
+		{
+			"errors": [],
+			"ms": 52,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_reroll_costs_and_limits"
+		},
+		{
+			"errors": [],
+			"ms": 45,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_rest_train_pick_completes_the_node"
+		},
+		{
+			"errors": [],
+			"ms": 65,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_shop_rest_event_flows"
+		},
+		{
+			"errors": [],
+			"ms": 54,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_spar_copy_is_sixty_percent_and_unscaled"
+		},
+		{
+			"errors": [],
+			"ms": 50,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_synthetic_defeat_ends_run"
+		},
+		{
+			"errors": [],
+			"ms": 95,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_synthetic_run_to_victory"
+		},
+		{
+			"errors": [],
+			"ms": 165,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_title_contender_counts_fight_camp_doses"
+		},
+		{
+			"errors": [],
+			"ms": 630,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_verify_rebuilds_runs_and_rejects_tampering"
+		},
+		{
+			"errors": [],
+			"ms": 108,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_attended_rest_train_opens_the_pick"
+		},
+		{
+			"errors": [],
+			"ms": 318,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_camera_preset_holds_for_every_presented_fight"
+		},
+		{
+			"errors": [],
+			"ms": 259,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_screen_setup_live_and_stop"
+		},
+		{
+			"errors": [],
+			"ms": 225,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_speed_holds_for_every_presented_fight"
+		},
+		{
+			"errors": [],
+			"ms": 100,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_camp_ledger_buys_with_clout"
+		},
+		{
+			"errors": [],
+			"ms": 4971,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_controller_walks_the_map_and_screens_to_the_summary"
+		},
+		{
+			"errors": [],
+			"ms": 326,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_custom_rechecked_at_each_fight"
+		},
+		{
+			"errors": [],
+			"ms": 186,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_every_decision_screen_builds_with_focus"
+		},
+		{
+			"errors": [],
+			"ms": 1593,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_fight_time_counts_once"
+		},
+		{
+			"errors": [],
+			"ms": 403,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_asks_before_replacing_a_suspended_run"
+		},
+		{
+			"errors": [],
+			"ms": 53,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_offers_no_dose_on_sparring"
+		},
+		{
+			"errors": [],
+			"ms": 290,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_asks_before_replacing_a_suspended_run"
+		},
+		{
+			"errors": [],
+			"ms": 251,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_never_deals_over_a_newer_versions_run"
+		},
+		{
+			"errors": [],
+			"ms": 200,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_never_resumes_a_party_run_solo"
+		},
+		{
+			"errors": [],
+			"ms": 143,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_starts_a_run_and_shows_the_map"
+		},
+		{
+			"errors": [],
+			"ms": 260,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_rest_train_opens_the_pick_without_a_loop"
+		},
+		{
+			"errors": [],
+			"ms": 186,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_creation_clamps_the_dose"
+		},
+		{
+			"errors": [],
+			"ms": 248,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_it_back_rechecks_custom"
+		},
+		{
+			"errors": [],
+			"ms": 113,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_map_modal_traps_focus_and_back_closes_it"
+		},
+		{
+			"errors": [],
+			"ms": 198,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_stuck_rest_save_resumes_into_the_pick"
+		},
+		{
+			"errors": [],
+			"ms": 42,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_unbuildable_fight_offers_forfeit"
+		},
+		{
+			"errors": [],
+			"ms": 102,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_career_builds_never_leak"
+		},
+		{
+			"errors": [],
+			"ms": 50,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_chin_raises_poise_and_getup_never_the_poise_multiplier"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_clinch_improves_the_grab_game"
+		},
+		{
+			"errors": [],
+			"ms": 50,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_defence_improves_guard_parry_dodge_never_damage_taken"
+		},
+		{
+			"errors": [],
+			"ms": 51,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_injuries_handicap_poise_stamina_and_footwork"
+		},
+		{
+			"errors": [],
+			"ms": 39,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_mid_stats_are_the_base_kit"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_power_raises_damage_and_knockdown_force"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_speed_raises_footwork_and_tempo"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_stamina_raises_tank_and_regen"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_fights.gd::test_bout_config_shape"
+		},
+		{
+			"errors": [],
+			"ms": 31692,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_fights.gd::test_headless_career_bout_end_to_end"
+		},
+		{
+			"errors": [],
+			"ms": 39,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_diminishing_returns_and_cap"
+		},
+		{
+			"errors": [],
+			"ms": 44,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_duplicate_result_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_gym_upgrades"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_healing_and_rest"
+		},
+		{
+			"errors": [],
+			"ms": 196,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_interrupted_fight_is_refought_with_the_same_seed"
+		},
+		{
+			"errors": [],
+			"ms": 8,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_names_are_original"
+		},
+		{
+			"errors": [],
+			"ms": 84,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_offer_pool_follows_popularity"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_offers_are_deterministic_per_seed_and_week"
+		},
+		{
+			"errors": [],
+			"ms": 51,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_opponents_follow_the_org_band_and_d5_tiers"
+		},
+		{
+			"errors": [],
+			"ms": 67,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_popularity_deltas_match_cage_rules"
+		},
+		{
+			"errors": [],
+			"ms": 86,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_purse_and_bonus_formulas"
+		},
+		{
+			"errors": [],
+			"ms": 44,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_record_buckets_streak_and_pay"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_standing_danger_and_hints"
+		},
+		{
+			"errors": [],
+			"ms": 45,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_title_shot_champion_defences_and_belt_loss"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_training_gain_matches_cage_rules"
+		},
+		{
+			"errors": [],
+			"ms": 40,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_weeks_and_idle_popularity"
+		},
+		{
+			"errors": [],
+			"ms": 99,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_progression.gd::test_withdraw"
+		},
+		{
+			"errors": [],
+			"ms": 112,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_career_files_are_never_listed_as_runs"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_check_reports_invariants"
+		},
+		{
+			"errors": [],
+			"ms": 116,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_content_block_and_defaults"
+		},
+		{
+			"errors": [],
+			"ms": 112,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_create_save_load_round_trip_is_identical"
+		},
+		{
+			"errors": [],
+			"ms": 64,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_damaged_main_recovers_from_backup"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_damaged_newer_missing_saves_are_reported_and_kept"
+		},
+		{
+			"errors": [],
+			"ms": 128,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_missing_content_handling"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_new_career_basics"
+		},
+		{
+			"errors": [],
+			"ms": 109,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_retire_frees_the_slot_and_never_resurrects"
+		},
+		{
+			"errors": [],
+			"ms": 65,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_slot_rules"
+		},
+		{
+			"errors": [],
+			"ms": 37,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_state.gd::test_starting_stats_follow_the_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 172,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_campaign_menu_lists_career_first"
+		},
+		{
+			"errors": [],
+			"ms": 288,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_create_a_career_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 258,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_every_career_screen_has_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 154,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_fight_through_career_flow_to_the_result_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 124,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_hub_pull_out_is_a_confirmed_withdrawal"
+		},
+		{
+			"errors": [],
+			"ms": 148,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_interrupted_bout_is_offered_again"
+		},
+		{
+			"errors": [],
+			"ms": 613,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 674,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_menu_quit_pulls_out_of_a_career_bout"
+		},
+		{
+			"errors": [],
+			"ms": 640,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_quit_after_the_decision_books_the_result"
+		},
+		{
+			"errors": [],
+			"ms": 93,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_retire_and_move_aside_free_the_slot"
+		},
+		{
+			"errors": [],
+			"ms": 226,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_walk_weeks_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 1058,
+			"ok": true,
+			"test": "res://src/test/campaign/test_playtest_campaign.gd::test_bookie_default_setup_reaches_a_visible_live_fight"
+		},
+		{
+			"errors": [],
+			"ms": 293,
+			"ok": true,
+			"test": "res://src/test/campaign/test_playtest_campaign.gd::test_campaign_flow_survives_its_map_and_resumes_reward"
+		},
+		{
+			"errors": [],
+			"ms": 60,
+			"ok": true,
+			"test": "res://src/test/campaign/test_playtest_campaign.gd::test_campaign_lobby_back_pops_without_recursing"
+		},
+		{
+			"errors": [],
+			"ms": 179,
+			"ok": true,
+			"test": "res://src/test/campaign/test_playtest_campaign.gd::test_suspended_run_is_reachable_from_bookie_with_dpad"
+		},
+		{
+			"errors": [],
+			"ms": 86,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_career_from_v0916_loads_and_books_the_next_bout"
+		},
+		{
+			"errors": [],
+			"ms": 182,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_run_from_v0916_resumes_verifies_and_finishes"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_settings_and_rules_preset_from_v0916_load"
+		},
+		{
+			"errors": [],
+			"ms": 41,
+			"ok": true,
+			"test": "res://src/test/campaign/test_technique_lint.gd::test_minion_loadout_patches_hit_their_base_bodies"
+		},
+		{
+			"errors": [],
+			"ms": 91,
+			"ok": true,
+			"test": "res://src/test/campaign/test_technique_lint.gd::test_technique_patches_and_hooks_hit_their_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/campaign/test_zz_save_fixture_writer.gd::test_zz_write_save_fixtures"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_build_info.gd::test_label_formats"
+		},
+		{
+			"errors": [],
+			"ms": 75,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_a_hit_pause_freezes_the_match_then_restores_its_speed"
+		},
+		{
+			"errors": [],
+			"ms": 11,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_a_pit_wall_fades_in_a_real_arena"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_a_thin_raised_rail_between_camera_and_fighter_fades"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_a_wall_between_the_camera_and_the_fight_fades"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_crowd_figures_in_the_line_of_sight_shrink_away"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_hit_feedback_scales_with_damage_and_involvement"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_the_damage_chunk_stays_lit_then_drains"
+		},
+		{
+			"errors": [],
+			"ms": 15279,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_rules.gd::test_fixed_step_runs_are_reproducible_across_processes"
+		},
+		{
+			"errors": [],
+			"ms": 332,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_rules.gd::test_out_of_range_strikes_never_damage"
+		},
+		{
+			"errors": [],
+			"ms": 899,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_rules.gd::test_strikes_in_range_land_and_guard_reduces_damage"
+		},
+		{
+			"errors": [],
+			"ms": 1057,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_rules.gd::test_stun_budget_breaks_infinite_pressure"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/core/test_containment.gd::test_bots_steer_away_from_open_edges"
+		},
+		{
+			"errors": [],
+			"ms": 5664,
+			"ok": true,
+			"test": "res://src/test/core/test_containment.gd::test_spawned_minions_start_inside_and_stay_inside"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/core/test_content_audit.gd::test_arenas_have_safe_spawns_inside_bounds"
+		},
+		{
+			"errors": [],
+			"ms": 11,
+			"ok": true,
+			"test": "res://src/test/core/test_content_audit.gd::test_bundled_example_mods_validate"
+		},
+		{
+			"errors": [],
+			"ms": 463,
+			"ok": true,
+			"test": "res://src/test/core/test_content_audit.gd::test_core_package_loads_without_errors"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/core/test_content_audit.gd::test_every_creature_parses_and_assets_exist"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_content_audit.gd::test_tutorial_achievements_and_presets_complete"
+		},
+		{
+			"errors": [],
+			"ms": 7,
+			"ok": true,
+			"test": "res://src/test/core/test_content_targets.gd::test_arena_bases_and_example_layouts"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/core/test_content_targets.gd::test_audio_and_lab_targets"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_content_targets.gd::test_campaign_content"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_content_targets.gd::test_difficulty_ladder_and_bot_tiers"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_content_targets.gd::test_eight_playable_fighters_and_npc_cast"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_content_targets.gd::test_elements_and_reactions"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_content_targets.gd::test_fight_camp_upgrades_and_bonus_modes"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_finish.gd::test_a_material_that_sets_none_of_it_is_the_v0916_shader"
+		},
+		{
+			"errors": [],
+			"ms": 56,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_finish.gd::test_only_the_upgraded_roster_gets_the_finish"
+		},
+		{
+			"errors": [],
+			"ms": 7,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_finish.gd::test_the_gore_piece_keeps_its_models_finish"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_fx_rig.gd::test_a_tipped_body_lets_its_links_droop"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_fx_rig.gd::test_every_link_trails_a_forward_push_whichever_way_it_points"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_fx_rig.gd::test_links_rest_in_their_modelled_pose"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_cross_build_fights.gd::test_zz_cross_build_fights"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/core/test_elements.gd::test_buildup_triggers_status_at_threshold"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/core/test_elements.gd::test_effect_element_override_follows_the_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_elements.gd::test_matchup_matrix_is_mild_and_cyclic"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/core/test_elements.gd::test_max_three_element_statuses"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/core/test_elements.gd::test_reaction_short_out_consumes_soaked_and_damages"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/core/test_elements.gd::test_self_element_immunity_from_own_attacks"
+		},
+		{
+			"errors": [],
+			"ms": 211,
+			"ok": true,
+			"test": "res://src/test/core/test_kit_engine_ext.gd::test_bot_ability_rules_fire_on_conditions"
+		},
+		{
+			"errors": [],
+			"ms": 35,
+			"ok": true,
+			"test": "res://src/test/core/test_kit_engine_ext.gd::test_bot_heavy_tap_and_charge_rule"
+		},
+		{
+			"errors": [],
+			"ms": 184,
+			"ok": true,
+			"test": "res://src/test/core/test_kit_engine_ext.gd::test_hover_lifts_then_lands_and_replants"
+		},
+		{
+			"errors": [],
+			"ms": 35,
+			"ok": true,
+			"test": "res://src/test/core/test_kit_engine_ext.gd::test_throw_hook_slot_and_throw_stun"
+		},
+		{
+			"errors": [],
+			"ms": 198,
+			"ok": true,
+			"test": "res://src/test/core/test_kit_engine_ext.gd::test_zones_ignore_hovering_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 2846,
+			"ok": true,
+			"test": "res://src/test/core/test_modes.gd::test_absolute_unit_is_crowned_scaled_and_scores"
+		},
+		{
+			"errors": [],
+			"ms": 28,
+			"ok": true,
+			"test": "res://src/test/core/test_modes.gd::test_chum_rush_supplements_change_the_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 5237,
+			"ok": true,
+			"test": "res://src/test/core/test_modes.gd::test_chum_rush_waves_spawn_and_slots_are_reused"
+		},
+		{
+			"errors": [],
+			"ms": 4392,
+			"ok": true,
+			"test": "res://src/test/core/test_modes.gd::test_chumball_ball_moves_and_scores_or_times_out"
+		},
+		{
+			"errors": [],
+			"ms": 1793,
+			"ok": true,
+			"test": "res://src/test/core/test_modes.gd::test_chumball_knockouts_never_score"
+		},
+		{
+			"errors": [],
+			"ms": 3735,
+			"ok": true,
+			"test": "res://src/test/core/test_modes.gd::test_score_mode_presets_respawn_knocked_out_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 10859,
+			"ok": true,
+			"test": "res://src/test/core/test_modes.gd::test_spotlight_hog_scores_and_swings"
+		},
+		{
+			"errors": [],
+			"ms": 633,
+			"ok": true,
+			"test": "res://src/test/core/test_modes_extra.gd::test_practice_refills_and_dummy_guards"
+		},
+		{
+			"errors": [],
+			"ms": 613,
+			"ok": true,
+			"test": "res://src/test/core/test_modes_extra.gd::test_tag_team_swaps_and_resting_partner_regenerates"
+		},
+		{
+			"errors": [],
+			"ms": 41432,
+			"ok": true,
+			"test": "res://src/test/core/test_naive_play.gd::test_a_button_masher_beats_the_punching_bag"
+		},
+		{
+			"errors": [],
+			"ms": 22097,
+			"ok": true,
+			"test": "res://src/test/core/test_naive_play.gd::test_the_masher_mostly_loses_to_a_hall_of_famer"
+		},
+		{
+			"errors": [],
+			"ms": 24762,
+			"ok": true,
+			"test": "res://src/test/core/test_naive_play.gd::test_the_masher_mostly_loses_to_a_headliner"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_naive_play.gd::test_zz_a_journeyman_is_about_even_with_the_masher"
+		},
+		{
+			"errors": [],
+			"ms": 16,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_checksums_do_not_depend_on_float_text"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_damaged_main_falls_back_to_backup"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_interrupted_write_recovers_newest_valid_copy"
+		},
+		{
+			"errors": [],
+			"ms": 7,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_migration_runs_for_older_versions"
+		},
+		{
+			"errors": [],
+			"ms": 9,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_newer_version_is_left_untouched"
+		},
+		{
+			"errors": [],
+			"ms": 7,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_round_trip_preserves_data"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_settings_coercion_and_presets"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_tampered_checksum_is_detected"
+		},
+		{
+			"errors": [],
+			"ms": 9,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence.gd::test_unicode_and_space_paths"
+		},
+		{
+			"errors": [],
+			"ms": 46,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence_safety.gd::test_a_write_never_deletes_the_only_valid_copy"
+		},
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence_safety.gd::test_newer_campaign_runs_are_never_moved_or_deleted"
+		},
+		{
+			"errors": [],
+			"ms": 94,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence_safety.gd::test_profiles_from_a_newer_version_are_never_overwritten"
+		},
+		{
+			"errors": [],
+			"ms": 30,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence_safety.gd::test_recovery_follows_the_write_order_not_the_clock"
+		},
+		{
+			"errors": [],
+			"ms": 33,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence_safety.gd::test_saves_never_overwrite_a_newer_format"
+		},
+		{
+			"errors": [],
+			"ms": 27,
+			"ok": true,
+			"test": "res://src/test/core/test_persistence_safety.gd::test_settings_from_a_newer_version_are_left_untouched"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_playtest_input.gd::test_legacy_you_name_is_a_rookie_until_renamed"
+		},
+		{
+			"errors": [],
+			"ms": 146,
+			"ok": true,
+			"test": "res://src/test/core/test_playtest_input.gd::test_right_bumper_starts_ability_two_for_every_roster_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 129,
+			"ok": true,
+			"test": "res://src/test/core/test_playtest_input.gd::test_small_team_hud_leaves_no_orphan_containers"
+		},
+		{
+			"errors": [],
+			"ms": 64,
+			"ok": true,
+			"test": "res://src/test/core/test_playtest_input.gd::test_spectator_has_follow_locked_and_free_flight"
+		},
+		{
+			"errors": [],
+			"ms": 562,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_downed_fighter_is_protected_counted_and_waved_up"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_hit_rules_on_a_downed_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 1608,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_knockdown_limit_ends_only_the_round_under_health_scoring"
+		},
+		{
+			"errors": [],
+			"ms": 894,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_knockdown_limit_stops_a_ten_point_fight"
+		},
+		{
+			"errors": [],
+			"ms": 198,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_nothing_is_counted_outside_the_live_round"
+		},
+		{
+			"errors": [],
+			"ms": 23,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_referee_reads_every_event_with_a_full_event_ring"
+		},
+		{
+			"errors": [],
+			"ms": 774,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_rules.gd::test_throw_and_hazard_knockdowns_are_never_counted"
+		},
+		{
+			"errors": [],
+			"ms": 36,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_break_between_rounds_goes_to_the_centre_facing_the_camera"
+		},
+		{
+			"errors": [],
+			"ms": 63,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_draw_raises_both_arms_and_decision_waits_for_the_cards"
+		},
+		{
+			"errors": [],
+			"ms": 229,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_fight_neutral_spot_is_a_far_side_t_and_never_between_them"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_intro_between_the_fighters_on_the_far_side_then_go"
+		},
+		{
+			"errors": [],
+			"ms": 65,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_knockdown_hold_off_watch_and_wave_up"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_pose_port_reproduces_the_cage_rules_baked_transforms"
+		},
+		{
+			"errors": [],
+			"ms": 251,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_rect_arena_with_props_and_large_fighters_keeps_him_clear"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_referee_model_binds_every_segment_and_is_view_only"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_state_from_sim_and_from_the_net_mirror"
+		},
+		{
+			"errors": [],
+			"ms": 68,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_stoppage_wave_off_then_the_winners_arm_goes_up"
+		},
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/core/test_referee_view.gd::test_voluntary_get_up_is_watched_not_waved"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_roster_lint.gd::test_complete_kits"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_roster_lint.gd::test_distinct_elements_and_three_builds"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/core/test_roster_lint.gd::test_melee_reach_cap"
+		},
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_hardening.gd::test_fighter_mods_are_whitelisted_and_clamped"
+		},
+		{
+			"errors": [],
+			"ms": 20,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_hardening.gd::test_match_sim_clamps_rule_modifiers_at_use"
+		},
+		{
+			"errors": [],
+			"ms": 23,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_hardening.gd::test_preset_import_checks_the_size_before_reading"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_cage_rules_preset_is_the_standard_duel_with_officials"
+		},
+		{
+			"errors": [],
+			"ms": 46,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_custom_preset_drives_a_match"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_every_core_preset_and_mode_default_validates"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_invalid_combinations_are_explained"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_normalize_clamps_and_keeps_unknown_keys"
+		},
+		{
+			"errors": [],
+			"ms": 315,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_presets_save_version_duplicate_rename_export_import_delete"
+		},
+		{
+			"errors": [],
+			"ms": 88,
+			"ok": true,
+			"test": "res://src/test/core/test_rules_presets.gd::test_scoring_and_referee_fields_validate_and_default_to_the_old_rules"
+		},
+		{
+			"errors": [],
+			"ms": 1946,
+			"ok": true,
+			"test": "res://src/test/core/test_save_floats.gd::test_53_bit_integers_round_trip_exactly"
+		},
+		{
+			"errors": [],
+			"ms": 1965,
+			"ok": true,
+			"test": "res://src/test/core/test_save_floats.gd::test_random_doubles_round_trip_through_saves"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_schema.gd::test_invalid_arena_reports_paths"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_schema.gd::test_manifest_requires_semver"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_schema.gd::test_valid_arena_passes"
+		},
+		{
+			"errors": [],
+			"ms": 15,
+			"ok": true,
+			"test": "res://src/test/core/test_spectator.gd::test_director_cuts_to_big_moments_and_varies_shots"
+		},
+		{
+			"errors": [],
+			"ms": 56,
+			"ok": true,
+			"test": "res://src/test/core/test_spectator.gd::test_viewer_lock_cycles_and_returns_to_auto"
+		},
+		{
+			"errors": [],
+			"ms": 3942,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_cards_are_deterministic_and_survive_saves"
+		},
+		{
+			"errors": [],
+			"ms": 1408,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_drawn_cards_and_sudden_death_resolve_without_a_round_4"
+		},
+		{
+			"errors": [],
+			"ms": 1284,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_drawn_cards_without_sudden_death_are_a_draw_after_exactly_n_rounds"
+		},
+		{
+			"errors": [],
+			"ms": 1793,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_every_round_is_fought_and_nobody_is_knocked_out"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_judge_math_is_pure_and_matches_the_documented_rules"
+		},
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_officials_only_run_in_a_timed_standard_duel"
+		},
+		{
+			"errors": [],
+			"ms": 2180,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_rules_without_the_keys_play_exactly_as_before"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_tally_counts_only_what_a_side_did_to_the_other"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/core/test_ten_point_scoring.gd::test_unlimited_health_keeps_the_knockdown_of_a_huge_blow"
+		},
+		{
+			"errors": [],
+			"ms": 86,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_ability_connects"
+		},
+		{
+			"errors": [],
+			"ms": 393,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_dodge_drill_heavy_is_a_real_threat"
+		},
+		{
+			"errors": [],
+			"ms": 369,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_dodge_then_dash_attack"
+		},
+		{
+			"errors": [],
+			"ms": 967,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_exercises_adapt_to_missing_slots"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_exercises_load_with_live_prompts"
+		},
+		{
+			"errors": [],
+			"ms": 1158,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_finisher_then_juice"
+		},
+		{
+			"errors": [],
+			"ms": 460,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_footwork"
+		},
+		{
+			"errors": [],
+			"ms": 3156,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_freestyle_round_can_be_won"
+		},
+		{
+			"errors": [],
+			"ms": 86,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_grab_and_throw_through_guard"
+		},
+		{
+			"errors": [],
+			"ms": 340,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_guard_string"
+		},
+		{
+			"errors": [],
+			"ms": 211,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_heavy_then_charged"
+		},
+		{
+			"errors": [],
+			"ms": 140,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_light_string"
+		},
+		{
+			"errors": [],
+			"ms": 481,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_parries"
+		},
+		{
+			"errors": [],
+			"ms": 16,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_partner_fits_every_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 1466,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_retry_skip_and_progress_saved"
+		},
+		{
+			"errors": [],
+			"ms": 296,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_rushed_string_gets_rhythm_advice"
+		},
+		{
+			"errors": [],
+			"ms": 85,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_a_swap_keeps_a_popped_tooth_out_and_a_resend_rebuilds_nothing"
+		},
+		{
+			"errors": [],
+			"ms": 24,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_legacy_asset_is_the_original"
+		},
+		{
+			"errors": [],
+			"ms": 33,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_live_swap_keeps_the_rig_and_the_gameplay"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_model_choice_follows_the_setting_for_varga_only"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_previews_stand_every_fighter_on_the_floor"
+		},
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_setting_is_a_persisted_graphics_option"
+		},
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_setting_row_works_from_a_controller"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_view_cost.gd::test_zz_view_cost"
+		},
+		{
+			"errors": [],
+			"ms": 1741,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_activities.gd::test_bag_challenge_scores_real_hits_and_pays_clout"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_activities.gd::test_bag_points_formula"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_activities.gd::test_bag_tier_belongs_to_who_started_it"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_activities.gd::test_bag_tiers_are_per_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 914,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_activities.gd::test_chum_drill_counts_dodges_guards_and_hits"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_activities.gd::test_chum_drill_parry_and_dodge"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_activities.gd::test_crate_toss_foul_and_jitters_hint"
+		},
+		{
+			"errors": [],
+			"ms": 560,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_activities.gd::test_crate_toss_scores_rings_and_pays_tiers"
+		},
+		{
+			"errors": [],
+			"ms": 44,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_activities.gd::test_ring_sparring_config"
+		},
+		{
+			"errors": [],
+			"ms": 281,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_attachments_fit_every_body_and_follow_it"
+		},
+		{
+			"errors": [],
+			"ms": 131,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_fished_cans_sit_on_the_locker_shelf"
+		},
+		{
+			"errors": [],
+			"ms": 495,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_only_the_profile_owner_is_dressed_in_a_match"
+		},
+		{
+			"errors": [],
+			"ms": 130,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_sizzle_is_stoke_only_and_frames_show_on_results_and_profile"
+		},
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_the_gold_tooth_is_the_gag_piece"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_the_locker_only_offers_what_shows"
+		},
+		{
+			"errors": [],
+			"ms": 4208,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_boards_freeze_the_hubs_clocks"
+		},
+		{
+			"errors": [],
+			"ms": 554,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_campaign_menu_from_the_desk_goes_back_to_the_hub"
+		},
+		{
+			"errors": [],
+			"ms": 178,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_dev_stand_ins_apply_to_one_sign_up_only"
+		},
+		{
+			"errors": [],
+			"ms": 469,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_lessons_return_by_a_route_not_a_stored_lambda"
+		},
+		{
+			"errors": [],
+			"ms": 1150,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_match_audio_survives_every_hub_scene_swap"
+		},
+		{
+			"errors": [],
+			"ms": 124,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_pet_none_hides_the_blister"
+		},
+		{
+			"errors": [],
+			"ms": 668,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_restart_fight_restarts_the_spar_and_walks_back_in"
+		},
+		{
+			"errors": [],
+			"ms": 315,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_rooftop_practice_walks_back_onto_the_roof"
+		},
+		{
+			"errors": [],
+			"ms": 577,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_switching_fighters_calls_off_the_challenge"
+		},
+		{
+			"errors": [],
+			"ms": 149,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_the_fighters_face_follows_the_hub"
+		},
+		{
+			"errors": [],
+			"ms": 267,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_the_hub_is_not_an_online_match"
+		},
+		{
+			"errors": [],
+			"ms": 199,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_flow.gd::test_the_tapes_challenger_is_a_plain_silhouette"
+		},
+		{
+			"errors": [],
+			"ms": 7071,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_geometry.gd::test_every_space_reachable_on_foot"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_geometry.gd::test_layout_data_is_consistent"
+		},
+		{
+			"errors": [],
+			"ms": 570,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_geometry.gd::test_stairs_reach_the_office_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_geometry.gd::test_thrown_crate_flies_over_the_dock_edge"
+		},
+		{
+			"errors": [],
+			"ms": 814,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_geometry.gd::test_walls_and_blockers_hold"
+		},
+		{
+			"errors": [],
+			"ms": 73,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_interactions.gd::test_a_press_interacts_instead_of_dodging"
+		},
+		{
+			"errors": [],
+			"ms": 868,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_interactions.gd::test_every_interactable_fires"
+		},
+		{
+			"errors": [],
+			"ms": 501,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_interactions.gd::test_grab_carry_and_heave_a_crate"
+		},
+		{
+			"errors": [],
+			"ms": 276,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_interactions.gd::test_hits_on_npcs_are_shrugged_off_and_nobody_goes_down"
+		},
+		{
+			"errors": [],
+			"ms": 29,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_interactions.gd::test_throw_distance_follows_the_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 98,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_interactions.gd::test_transitions_and_fast_walk"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_random_fighter.gd::test_fight_camp_random_choice_becomes_a_concrete_fighter_before_start"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_random_fighter.gd::test_hub_spar_random_opponent_resolves_before_match_build"
+		},
+		{
+			"errors": [],
+			"ms": 193,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_01_02_loose_panel_and_crawlspace_tooth"
+		},
+		{
+			"errors": [],
+			"ms": 385,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_03_sleeping_scrapling_wakes_and_is_caught"
+		},
+		{
+			"errors": [],
+			"ms": 391,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_04_belt_case_taunts"
+		},
+		{
+			"errors": [],
+			"ms": 39,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_05_booth_tape_while_crouched"
+		},
+		{
+			"errors": [],
+			"ms": 99,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_06_freight_elevator_parts"
+		},
+		{
+			"errors": [],
+			"ms": 46,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_07_roof_sign_letter"
+		},
+		{
+			"errors": [],
+			"ms": 2253,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_08_pier_ladder_splash_and_fishing"
+		},
+		{
+			"errors": [],
+			"ms": 403,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_09_boiler_face_scorch_hits"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_09b_non_scorch_hits_do_not_count"
+		},
+		{
+			"errors": [],
+			"ms": 1672,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_10_ice_bath"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_found_secrets_persist_into_the_world"
+		},
+		{
+			"errors": [],
+			"ms": 48,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_hidden_items_are_not_solid"
+		},
+		{
+			"errors": [],
+			"ms": 211,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_lost_letter_and_parts_come_back"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_secrets.gd::test_ludlow_hints_one_per_visit"
+		},
+		{
+			"errors": [],
+			"ms": 437,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_boiler_room_key_trains_against_saved_builds"
+		},
+		{
+			"errors": [],
+			"ms": 396,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_bookie_table_and_lab_terminal_for_real"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_every_station_lists_its_upgrades"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_injected_backend_is_used"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_purchase_flow_spends_clout_and_respects_gates"
+		},
+		{
+			"errors": [],
+			"ms": 92,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_purchases_change_the_world"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_snappington_run_options_and_config"
+		},
+		{
+			"errors": [],
+			"ms": 75,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_start_run_hands_over_to_the_campaign"
+		},
+		{
+			"errors": [],
+			"ms": 471,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_ui.gd::test_boards_and_hud_fit_and_read_at_1280x800"
+		},
+		{
+			"errors": [],
+			"ms": 1337,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_ui.gd::test_every_board_has_focus_and_b_returns_to_walking"
+		},
+		{
+			"errors": [],
+			"ms": 870,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_ui.gd::test_first_secret_unlocks_confidant"
+		},
+		{
+			"errors": [],
+			"ms": 282,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_ui.gd::test_interact_talks_instead_of_dodging"
+		},
+		{
+			"errors": [],
+			"ms": 121,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_unlocks.gd::test_dev_stand_ins_stay_hidden_in_normal_play"
+		},
+		{
+			"errors": [],
+			"ms": 122,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_unlocks.gd::test_kid_lamprey_switches_to_his_real_kit_automatically"
+		},
+		{
+			"errors": [],
+			"ms": 155,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_unlocks.gd::test_pier_night_is_a_hidden_chum_rush_look"
+		},
+		{
+			"errors": [],
+			"ms": 30,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_unlocks.gd::test_rooftop_full_neon_replaces_the_night_look_once_unlocked"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_unlocks.gd::test_vintage_bellows_calls_matches_when_selected"
+		},
+		{
+			"errors": [],
+			"ms": 62960,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/hub/test_playtest_hub.gd::test_called_crate_shots_reward_variety_and_reset_the_dock"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/hub/test_playtest_hub.gd::test_camera_controls_match_every_frame_of_a_room_turn"
+		},
+		{
+			"errors": [],
+			"ms": 25,
+			"ok": true,
+			"test": "res://src/test/hub/test_playtest_hub.gd::test_cannon_difficulties_speed_and_tracking"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/hub/test_playtest_hub.gd::test_crate_pickup_cannot_reach_through_main_floor_wall"
+		},
+		{
+			"errors": [],
+			"ms": 579,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_armor_shrugs_lights_in_startup"
+		},
+		{
+			"errors": [],
+			"ms": 27816,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_balance_vs_roster"
+		},
+		{
+			"errors": [],
+			"ms": 943,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_bilge_signature_moves"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_boss_kits_complete_and_valid"
+		},
+		{
+			"errors": [],
+			"ms": 483,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_boss_mode_contract"
+		},
+		{
+			"errors": [],
+			"ms": 748,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_conduit_signature_moves"
+		},
+		{
+			"errors": [],
+			"ms": 9462,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 1387,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_snappington_signature_moves"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_zz_campaign_warnings"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_zz_debug_bout"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_zz_debug_move"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_zz_heights"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_zz_quick_balance"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_zz_report_ranges"
+		},
+		{
+			"errors": [],
+			"ms": 180,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_airborne_flag_and_spring_pad_skip"
+		},
+		{
+			"errors": [],
+			"ms": 267,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_ballistic_flights_not_ground_braked"
+		},
+		{
+			"errors": [],
+			"ms": 26,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_bot_avoid_zones_hint"
+		},
+		{
+			"errors": [],
+			"ms": 27,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_bot_kit_hints"
+		},
+		{
+			"errors": [],
+			"ms": 27,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_bot_range_needs_tools_hint"
+		},
+		{
+			"errors": [],
+			"ms": 28,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_charge_bounce"
+		},
+		{
+			"errors": [],
+			"ms": 26,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_debuff_require_status"
+		},
+		{
+			"errors": [],
+			"ms": 54,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_hook_emerge_event"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_hook_hit_part_condition"
+		},
+		{
+			"errors": [],
+			"ms": 39,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_keyed_joints_skip_gait_wave"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_kit_trait_stats"
+		},
+		{
+			"errors": [],
+			"ms": 133,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_lob_arrive_height"
+		},
+		{
+			"errors": [],
+			"ms": 358,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_projectile_burst_on_hit_option"
+		},
+		{
+			"errors": [],
+			"ms": 611,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_bulldoze_carry_splat_bonk_recovery"
+		},
+		{
+			"errors": [],
+			"ms": 625,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_bulldoze_cooldown_and_armor"
+		},
+		{
+			"errors": [],
+			"ms": 192,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_bulldoze_splat_ko_ends_round_cleanly"
+		},
+		{
+			"errors": [],
+			"ms": 83,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_charge_hold_is_stationary"
+		},
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_cooldown_hook_action"
+		},
+		{
+			"errors": [],
+			"ms": 434,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_dust_bowl"
+		},
+		{
+			"errors": [],
+			"ms": 2060,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_every_move_is_physically_sane"
+		},
+		{
+			"errors": [],
+			"ms": 818,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_grab_reach_pummel_and_throws"
+		},
+		{
+			"errors": [],
+			"ms": 331,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_gravel_toss_cone"
+		},
+		{
+			"errors": [],
+			"ms": 291,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_hoof_stomp_pulse"
+		},
+		{
+			"errors": [],
+			"ms": 694,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_horn_lunge_armor_and_reach"
+		},
+		{
+			"errors": [],
+			"ms": 965,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_juice_landslide"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_kit_is_complete_and_clean"
+		},
+		{
+			"errors": [],
+			"ms": 203,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_light_string_and_finisher_via_input"
+		},
+		{
+			"errors": [],
+			"ms": 1892,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 116,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_pummel_interval"
+		},
+		{
+			"errors": [],
+			"ms": 790,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_quarry_ram"
+		},
+		{
+			"errors": [],
+			"ms": 156,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_scoop_launches"
+		},
+		{
+			"errors": [],
+			"ms": 144,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_shoulder_barge"
+		},
+		{
+			"errors": [],
+			"ms": 151,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_taunt_hype"
+		},
+		{
+			"errors": [],
+			"ms": 1684,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_zy_measure_table"
+		},
+		{
+			"errors": [],
+			"ms": 12199,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_zz_balance"
+		},
+		{
+			"errors": [],
+			"ms": 1170,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_anchor_drop_counter_armor_and_grab"
+		},
+		{
+			"errors": [],
+			"ms": 375,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_bilge_pump_shoves_into_wall_for_splat"
+		},
+		{
+			"errors": [],
+			"ms": 93,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_charge_hold_is_stationary"
+		},
+		{
+			"errors": [],
+			"ms": 703,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_charged_heavy_hull_breaker"
+		},
+		{
+			"errors": [],
+			"ms": 938,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_crusher_slam_armor_and_wave_line"
+		},
+		{
+			"errors": [],
+			"ms": 374,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_double_clamp_hold_on_soaked"
+		},
+		{
+			"errors": [],
+			"ms": 2301,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_every_move_is_physically_sane"
+		},
+		{
+			"errors": [],
+			"ms": 846,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_grab_reach_pummel_and_throws"
+		},
+		{
+			"errors": [],
+			"ms": 226,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_heavy_variant_still_charges"
+		},
+		{
+			"errors": [],
+			"ms": 866,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_juice_high_tide"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_kit_is_complete_and_clean"
+		},
+		{
+			"errors": [],
+			"ms": 217,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_light_string_and_finisher_via_input"
+		},
+		{
+			"errors": [],
+			"ms": 2524,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 305,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_scuttle_check_forward_and_sideways"
+		},
+		{
+			"errors": [],
+			"ms": 136,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_side_dash_is_longer_and_flags"
+		},
+		{
+			"errors": [],
+			"ms": 117,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_side_walk_is_faster"
+		},
+		{
+			"errors": [],
+			"ms": 114,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_taunt_hype_and_no_armor"
+		},
+		{
+			"errors": [],
+			"ms": 764,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_tide_spit_projectile_puddle_cooldown"
+		},
+		{
+			"errors": [],
+			"ms": 1733,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_zy_measure_table"
+		},
+		{
+			"errors": [],
+			"ms": 30974,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_zz_balance"
+		},
+		{
+			"errors": [],
+			"ms": 521,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_downdraft_leap_direct_hit_and_landing_area"
+		},
+		{
+			"errors": [],
+			"ms": 1084,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_gust_bomb_projectile_burst_and_reflect"
+		},
+		{
+			"errors": [],
+			"ms": 1189,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_hang_time_hover_zone_immunity_and_aerials"
+		},
+		{
+			"errors": [],
+			"ms": 583,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_hurricane_strut_juice"
+		},
+		{
+			"errors": [],
+			"ms": 697,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_multi_hits_and_wind_push"
+		},
+		{
+			"errors": [],
+			"ms": 212,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_skid_kick_from_dodge_and_cheap_dodges"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_stats_slots_and_data"
+		},
+		{
+			"errors": [],
+			"ms": 6069,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_strikes_connect_in_range_and_miss_beyond"
+		},
+		{
+			"errors": [],
+			"ms": 1063,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_talon_snatch_pecks_and_throws"
+		},
+		{
+			"errors": [],
+			"ms": 718,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_taunt_guard_and_parry"
+		},
+		{
+			"errors": [],
+			"ms": 951,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_winded_follow_ups_launch_and_trip"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_zz_lab"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_zz_showcase"
+		},
+		{
+			"errors": [],
+			"ms": 485,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_arc_lash_homing_pulse_cooldown"
+		},
+		{
+			"errors": [],
+			"ms": 911,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_bot_pest_uses_kit"
+		},
+		{
+			"errors": [],
+			"ms": 1038,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_campaign_techniques_deliver"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_creature_parses_cleanly"
+		},
+		{
+			"errors": [],
+			"ms": 481,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_guard_and_parry"
+		},
+		{
+			"errors": [],
+			"ms": 92,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_headbonk_bounces_back"
+		},
+		{
+			"errors": [],
+			"ms": 4314,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_moves_connect_in_range_and_whiff_outside"
+		},
+		{
+			"errors": [],
+			"ms": 586,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_overcharge_activation_and_end"
+		},
+		{
+			"errors": [],
+			"ms": 387,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_overcharge_state_effects"
+		},
+		{
+			"errors": [],
+			"ms": 257,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_pad_squash_slam_connects"
+		},
+		{
+			"errors": [],
+			"ms": 257,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_pinball_wall_bounce_and_pad_bonus"
+		},
+		{
+			"errors": [],
+			"ms": 683,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_slippery_hold_and_quick_getup"
+		},
+		{
+			"errors": [],
+			"ms": 268,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_spring_pad_launches"
+		},
+		{
+			"errors": [],
+			"ms": 276,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_squash_landing_circle"
+		},
+		{
+			"errors": [],
+			"ms": 181,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_static_cling_jolt_hype"
+		},
+		{
+			"errors": [],
+			"ms": 641,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_suction_hug_zaps_and_throws"
+		},
+		{
+			"errors": [],
+			"ms": 599,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_super_squash_launch_crush_landing"
+		},
+		{
+			"errors": [],
+			"ms": 139,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_taunt"
+		},
+		{
+			"errors": [],
+			"ms": 869,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_bot_trapper_uses_kit"
+		},
+		{
+			"errors": [],
+			"ms": 889,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_campaign_techniques_deliver"
+		},
+		{
+			"errors": [],
+			"ms": 745,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_coil_grab_pummel_and_throws"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_creature_parses_cleanly"
+		},
+		{
+			"errors": [],
+			"ms": 294,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_drain_dive_invuln_distance_refund"
+		},
+		{
+			"errors": [],
+			"ms": 202,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_head_butt_guard_and_parry"
+		},
+		{
+			"errors": [],
+			"ms": 5385,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_moves_connect_in_range_and_whiff_outside"
+		},
+		{
+			"errors": [],
+			"ms": 505,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_overflow_juice_activation_and_end"
+		},
+		{
+			"errors": [],
+			"ms": 239,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_overflow_state_spit_and_heal"
+		},
+		{
+			"errors": [],
+			"ms": 673,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_rear_and_crash_armor_puddle_guard_crush"
+		},
+		{
+			"errors": [],
+			"ms": 183,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_slither_strike_puddle_bonus"
+		},
+		{
+			"errors": [],
+			"ms": 640,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_sludge_lob_charges_cooldown_and_puddle"
+		},
+		{
+			"errors": [],
+			"ms": 514,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_tail_sweep_multi_target_and_gunked_trip"
+		},
+		{
+			"errors": [],
+			"ms": 255,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_taunt"
+		},
+		{
+			"errors": [],
+			"ms": 420,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_venom_spit_reflect_guard_no_parry"
+		},
+		{
+			"errors": [],
+			"ms": 280,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_charged_heavy_hold_armor_and_overhand_armor"
+		},
+		{
+			"errors": [],
+			"ms": 843,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_clinch_pummel_and_throws"
+		},
+		{
+			"errors": [],
+			"ms": 376,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_gut_furnace_feeds_on_sizzle"
+		},
+		{
+			"errors": [],
+			"ms": 773,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_haymaker_guard_crush_and_sizzle_knock_up"
+		},
+		{
+			"errors": [],
+			"ms": 1012,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_knockback_scale_side_shove_and_turn"
+		},
+		{
+			"errors": [],
+			"ms": 447,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_light_string_and_finisher"
+		},
+		{
+			"errors": [],
+			"ms": 509,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_meltdown_juice"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_stats_slots_and_data"
+		},
+		{
+			"errors": [],
+			"ms": 1004,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_steam_vent_cone_push_projectiles_and_cooldown"
+		},
+		{
+			"errors": [],
+			"ms": 155,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_stoke_step_from_dodge_launches"
+		},
+		{
+			"errors": [],
+			"ms": 1562,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_stoke_the_fire_buff"
+		},
+		{
+			"errors": [],
+			"ms": 5643,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_strikes_connect_in_range_and_miss_beyond"
+		},
+		{
+			"errors": [],
+			"ms": 729,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_taunt_guard_and_parry"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_zz_balance"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_zz_lab"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_zz_showcase"
+		},
+		{
+			"errors": [],
+			"ms": 215,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_blister_death_pop"
+		},
+		{
+			"errors": [],
+			"ms": 135,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_blister_inflate_and_pop"
+		},
+		{
+			"errors": [],
+			"ms": 690,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_blister_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 844,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_blisters_never_inflate_side_by_side"
+		},
+		{
+			"errors": [],
+			"ms": 101,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_campaign_loadouts_really_differ"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_chum_rush_resolves_pelter_variant"
+		},
+		{
+			"errors": [],
+			"ms": 551,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_lid_up_shields_only_the_front"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_minion_kits_complete_and_valid"
+		},
+		{
+			"errors": [],
+			"ms": 881,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_pelter_lobs_bolts_and_keeps_distance"
+		},
+		{
+			"errors": [],
+			"ms": 5585,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_scrapling_dies_in_a_few_clean_hits"
+		},
+		{
+			"errors": [],
+			"ms": 1785,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_scrapling_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 1533,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_scrapling_pack_takes_turns"
+		},
+		{
+			"errors": [],
+			"ms": 347,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_thrown_blister_is_a_live_bomb"
+		},
+		{
+			"errors": [],
+			"ms": 332,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_thrown_scrapling_is_a_projectile"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_zz_debug_contacts"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_zz_debug_lid"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_minions.gd::test_zz_report_ranges"
+		},
+		{
+			"errors": [],
+			"ms": 1494,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_extensions.gd::test_bot_hints_rest_bulky_and_keep_distance"
+		},
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_extensions.gd::test_hook_events_validate_and_not_condition"
+		},
+		{
+			"errors": [],
+			"ms": 67,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_extensions.gd::test_knocked_out_hook_fires_unless_vetoed"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_extensions.gd::test_self_damage_lethal_only_when_asked"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_extensions.gd::test_shield_status_guards_its_arc"
+		},
+		{
+			"errors": [],
+			"ms": 128,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_extensions.gd::test_thrown_hook_acts_for_the_thrower_at_the_landing"
+		},
+		{
+			"errors": [],
+			"ms": 900,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_abilities_cooldowns_and_counter_stance"
+		},
+		{
+			"errors": [],
+			"ms": 9707,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_balance_vs_roster"
+		},
+		{
+			"errors": [],
+			"ms": 242,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_charged_heavy_armor_shrugs_lights"
+		},
+		{
+			"errors": [],
+			"ms": 883,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_grab_pummel_and_throws"
+		},
+		{
+			"errors": [],
+			"ms": 714,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_guard_blocks_and_parry_staggers"
+		},
+		{
+			"errors": [],
+			"ms": 641,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_juice_feeding_frenzy"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_kit_is_complete_and_valid"
+		},
+		{
+			"errors": [],
+			"ms": 3606,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 634,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_string_shove_launch_and_stun"
+		},
+		{
+			"errors": [],
+			"ms": 147,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_taunt_builds_hype"
+		},
+		{
+			"errors": [],
+			"ms": 7702,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_tutorial_partner_behaviours"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_debug_contacts"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_debug_tutorial"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_quick_balance"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_report_ranges"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_string_contacts"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_every_limb_modifier_has_a_move_in_both_stances"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_extended_inputs_roundtrip_with_high_held_bits_and_wrap"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_guard_shove_requires_its_stamina_cost"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_guest_dodge_lesson_does_not_require_standard_dash_attack"
+		},
+		{
+			"errors": [],
+			"ms": 3640,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_guest_tutorial_teaches_completable_inputs"
+		},
+		{
+			"errors": [],
+			"ms": 2481,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_imported_strikes_connect_and_stay_physically_stable"
+		},
+		{
+			"errors": [],
+			"ms": 370,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_knell_blink_and_last_bell_have_real_effects"
+		},
+		{
+			"errors": [],
+			"ms": 288,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_knell_normal_string_and_spectral_projectile"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_live_input_context_isolated_and_opponent_relative"
+		},
+		{
+			"errors": [],
+			"ms": 59,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_low_check_cannot_block_unblockable_hits"
+		},
+		{
+			"errors": [],
+			"ms": 130,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_martial_buffer_remembers_modifier_and_stance_switches"
+		},
+		{
+			"errors": [],
+			"ms": 60,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_models_have_every_segment_and_playable_campaign_kits"
+		},
+		{
+			"errors": [],
+			"ms": 2401,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_new_bots_finish_bout_and_varga_varies_strikes"
+		},
+		{
+			"errors": [],
+			"ms": 140,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_new_statuses_and_reaction"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_online_footwork_uses_selected_target_not_nearest_enemy"
+		},
+		{
+			"errors": [],
+			"ms": 3860,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_southpaw_physical_strikes_recover_and_keep_reach"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_tutorial_kid_does_not_retain_a_finished_course"
+		},
+		{
+			"errors": [],
+			"ms": 366,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_varga_abilities_and_juice"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_view_target_chord_does_not_switch_stance_or_fire_juice"
+		},
+		{
+			"errors": [],
+			"ms": 952,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_bc.gd::test_bc_generalises_on_held_out_episodes"
+		},
+		{
+			"errors": [],
+			"ms": 272,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_bc.gd::test_bc_job_reports_test_episode_accuracy"
+		},
+		{
+			"errors": [],
+			"ms": 1429,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_bc.gd::test_bc_overfits_a_tiny_dataset"
+		},
+		{
+			"errors": [],
+			"ms": 24,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_bc.gd::test_bc_refuses_datasets_with_too_few_episodes"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_bc.gd::test_bc_split_is_by_whole_episodes_three_ways"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_bc.gd::test_dataset_shards_round_trip_and_validation"
+		},
+		{
+			"errors": [],
+			"ms": 27,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_datasets.gd::test_copies_of_a_seeded_episode_share_a_split"
+		},
+		{
+			"errors": [],
+			"ms": 24,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_datasets.gd::test_identical_rerecordings_are_loaded_once"
+		},
+		{
+			"errors": [],
+			"ms": 34891,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_datasets.gd::test_recording_again_adds_new_episodes"
+		},
+		{
+			"errors": [],
+			"ms": 23,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_docs.gd::test_documented_commands_resolve_from_the_game_folder"
+		},
+		{
+			"errors": [],
+			"ms": 128,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_recording.gd::test_nothing_is_recorded_when_disabled"
+		},
+		{
+			"errors": [],
+			"ms": 793,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_recording.gd::test_player_matches_are_recorded_when_enabled"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_stats.gd::test_paired_test_uses_episode_pairs"
+		},
+		{
+			"errors": [],
+			"ms": 21,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_stats.gd::test_spawns_follow_the_seed_and_the_layout"
+		},
+		{
+			"errors": [],
+			"ms": 1615,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_stats.gd::test_standard_spawn_episodes_are_not_repeats"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_stats.gd::test_student_t_intervals_for_small_samples"
+		},
+		{
+			"errors": [],
+			"ms": 40509,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker.gd::test_crash_and_resume_from_checkpoint"
+		},
+		{
+			"errors": [],
+			"ms": 71010,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker.gd::test_es_improves_on_the_drill_task"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker.gd::test_helper_heartbeat_rule"
+		},
+		{
+			"errors": [],
+			"ms": 15385,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker.gd::test_pause_resume_cancel"
+		},
+		{
+			"errors": [],
+			"ms": 154,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker.gd::test_silent_worker_with_a_live_process_is_not_resumed"
+		},
+		{
+			"errors": [],
+			"ms": 17702,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_a_helper_that_never_delivers_cannot_hang_the_run"
+		},
+		{
+			"errors": [],
+			"ms": 20808,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_an_idle_helper_backs_off"
+		},
+		{
+			"errors": [],
+			"ms": 14361,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_bc_starts_helpers_only_for_the_rollouts"
+		},
+		{
+			"errors": [],
+			"ms": 41,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_cpu_throttle_keeps_the_long_run_share"
+		},
+		{
+			"errors": [],
+			"ms": 15331,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_es_validates_the_last_generations_before_selecting"
+		},
+		{
+			"errors": [],
+			"ms": 17930,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_evaluation_and_recording_stop_at_the_time_limit"
+		},
+		{
+			"errors": [],
+			"ms": 18,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_evaluation_plays_the_policy_as_saved"
+		},
+		{
+			"errors": [],
+			"ms": 28027,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_helpers_exit_when_the_coordinator_dies"
+		},
+		{
+			"errors": [],
+			"ms": 1653,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_idle_helper_scans_back_off"
+		},
+		{
+			"errors": [],
+			"ms": 41782,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_long_pause_keeps_the_helpers"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_resume_grants_a_heartbeat_grace_period"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/lab/test_lab_worker_faults.gd::test_straggler_deadline_rule"
+		},
+		{
+			"errors": [],
+			"ms": 18,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_action_apply_and_classify_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_feature_names_match_size"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_masks_and_choice"
+		},
+		{
+			"errors": [],
+			"ms": 69,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_observation_shape_bounds_and_determinism"
+		},
+		{
+			"errors": [],
+			"ms": 42,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_only_perceivable_state_is_observed"
+		},
+		{
+			"errors": [],
+			"ms": 29,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_perception_lag_uses_previous_snapshot"
+		},
+		{
+			"errors": [],
+			"ms": 296,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_recorder_reproduces_policy_actions"
+		},
+		{
+			"errors": [],
+			"ms": 35,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_target_seen_in_fighter_space"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_contract.gd::test_wall_rays_see_the_cage"
+		},
+		{
+			"errors": [],
+			"ms": 717,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_inference.gd::test_eight_policy_fighters_fit_the_budget"
+		},
+		{
+			"errors": [],
+			"ms": 18,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_content_policies_are_size_capped_before_reading"
+		},
+		{
+			"errors": [],
+			"ms": 33,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_invalid_user_files_can_be_renamed_and_deleted"
+		},
+		{
+			"errors": [],
+			"ms": 67,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_library_operations"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_loading_never_executes_code"
+		},
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_match_hook_falls_back_safely"
+		},
+		{
+			"errors": [],
+			"ms": 25,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_recovers_from_backup_when_main_file_is_damaged"
+		},
+		{
+			"errors": [],
+			"ms": 42,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_rejects_damaged_files"
+		},
+		{
+			"errors": [],
+			"ms": 24,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_rejects_incompatible_or_malformed_contents"
+		},
+		{
+			"errors": [],
+			"ms": 11,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_rejects_oversized_file_before_parsing"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_io.gd::test_round_trip_is_exact"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_mlp.gd::test_backward_matches_finite_differences"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_mlp.gd::test_centered_ranks"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_mlp.gd::test_es_noise_is_reproducible"
+		},
+		{
+			"errors": [],
+			"ms": 27,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_mlp.gd::test_es_optimises_a_synthetic_objective"
+		},
+		{
+			"errors": [],
+			"ms": 8,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_mlp.gd::test_fast_forward_matches_reference"
+		},
+		{
+			"errors": [],
+			"ms": 2,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_mlp.gd::test_init_is_deterministic_from_seed"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_mlp.gd::test_param_count_and_layout"
+		},
+		{
+			"errors": [],
+			"ms": 3328,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_samples.gd::test_drill_sample_hits_a_standing_dummy"
+		},
+		{
+			"errors": [],
+			"ms": 18,
+			"ok": true,
+			"test": "res://src/test/lab/test_policy_samples.gd::test_shipped_policies_validate"
+		},
+		{
+			"errors": [],
+			"ms": 1231,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_client_only_packages_cannot_carry_gameplay_in_any_spelling"
+		},
+		{
+			"errors": [],
+			"ms": 1151,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_core_override_needs_consent_even_when_declared"
+		},
+		{
+			"errors": [],
+			"ms": 727,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_core_override_without_declared_capability_is_refused"
+		},
+		{
+			"errors": [],
+			"ms": 758,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_folder_links_are_never_followed_validated_copied_exported_or_loaded"
+		},
+		{
+			"errors": [],
+			"ms": 781,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_ids_and_versions_with_whitespace_or_control_characters_are_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 1010,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_import_never_leaves_the_installed_mod_uninstalled"
+		},
+		{
+			"errors": [],
+			"ms": 720,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_mod_asset_paths_must_be_validated_package_files"
+		},
+		{
+			"errors": [],
+			"ms": 568,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_mod_text_cannot_restyle_or_hide_the_mods_screen"
+		},
+		{
+			"errors": [],
+			"ms": 959,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_mod_tuning_is_undone_when_the_mod_is_disabled"
+		},
+		{
+			"errors": [],
+			"ms": 820,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_mods_never_replace_other_mods_or_player_entries"
+		},
+		{
+			"errors": [],
+			"ms": 474,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_newer_mod_sets_file_is_left_untouched"
+		},
+		{
+			"errors": [],
+			"ms": 583,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_unportable_entry_names_are_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 533,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_walker_skips_links_and_import_copies_only_validated_files"
+		},
+		{
+			"errors": [],
+			"ms": 754,
+			"ok": true,
+			"test": "res://src/test/mods/test_mod_hardening.gd::test_zip_directory_and_zip_reader_must_agree"
+		},
+		{
+			"errors": [],
+			"ms": 511,
+			"ok": true,
+			"test": "res://src/test/mods/test_mods.gd::test_bundled_examples_validate_and_load"
+		},
+		{
+			"errors": [],
+			"ms": 762,
+			"ok": true,
+			"test": "res://src/test/mods/test_mods.gd::test_client_only_mods_do_not_affect_compatibility"
+		},
+		{
+			"errors": [],
+			"ms": 728,
+			"ok": true,
+			"test": "res://src/test/mods/test_mods.gd::test_core_override_needs_consent_and_changes_hash"
+		},
+		{
+			"errors": [],
+			"ms": 491,
+			"ok": true,
+			"test": "res://src/test/mods/test_mods.gd::test_creature_extends_merges_and_validates"
+		},
+		{
+			"errors": [],
+			"ms": 405,
+			"ok": true,
+			"test": "res://src/test/mods/test_mods.gd::test_dependencies_order_cycles_and_versions"
+		},
+		{
+			"errors": [],
+			"ms": 1450,
+			"ok": true,
+			"test": "res://src/test/mods/test_mods.gd::test_install_upgrade_downgrade_remove_and_recover"
+		},
+		{
+			"errors": [],
+			"ms": 380,
+			"ok": true,
+			"test": "res://src/test/mods/test_mods.gd::test_rule_hooks_mods_and_gravity_reach_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 587,
+			"ok": true,
+			"test": "res://src/test/mods/test_mods.gd::test_unsafe_and_invalid_packages_are_rejected"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_assist_level_on_the_wire"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_beacon_codec"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_content_verdict"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_event_codec_roundtrip"
+		},
+		{
+			"errors": [],
+			"ms": 156,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_event_codec_survives_garbage"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_guest_input_redundancy_stays_inside_bandwidth_budget"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_input_sample_codec_is_strict"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_lan_compatibility_lines"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_mixed_core_and_guest_input_samples_preserve_packet_boundaries"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_package_list_codec"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_parse_address"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_password_proof_never_contains_password"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_payload_sanitizer"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_position_quantization_and_clamp"
+		},
+		{
+			"errors": [],
+			"ms": 15,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_quaternion_quantization_error"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_rate_limiter"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_reader_never_reads_past_end"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_reason_texts_are_ui_ready"
+		},
+		{
+			"errors": [],
+			"ms": 201,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_recent_servers_list"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_remote_input_redundancy_and_jitter_buffer"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_server_config_parser"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_server_mods_config"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_text_truncates_on_character_boundary"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_writer_reader_roundtrip"
+		},
+		{
+			"errors": [],
+			"ms": 100,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_arena_checks_before_the_match"
+		},
+		{
+			"errors": [],
+			"ms": 3067,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_assist_reaches_server_fighter_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 53,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_content_check_on_server_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 3076,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_cosmetics_travel_with_players_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_host_leaving_ends_session"
+		},
+		{
+			"errors": [],
+			"ms": 2086,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_host_scene_removed_mid_match"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_kick_ban_and_violations_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 11,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_lan_discovery_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 3590,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_mode_picks_for_remote_players_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 283,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_network_settings_apply_live"
+		},
+		{
+			"errors": [],
+			"ms": 74,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_oversized_and_flood_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 108,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_party_new_run_from_the_lobby_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 212,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_party_relay_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 178,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_party_run_member_checks"
+		},
+		{
+			"errors": [],
+			"ms": 272,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_party_seats_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 3080,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_policy_bots_and_rules_validation_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_rejections_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 9878,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_session_flow_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 5032,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_timeout_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 84053,
+			"ok": true,
+			"test": "res://src/test/net/test_net_measure.gd::test_measure_duel_and_ffa8"
+		},
+		{
+			"errors": [],
+			"ms": 80993,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_bonus_modes_over_network"
+		},
+		{
+			"errors": [],
+			"ms": 19531,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_client_cannot_inject_damage"
+		},
+		{
+			"errors": [],
+			"ms": 48671,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_conditioner_profile_still_completes_match"
+		},
+		{
+			"errors": [],
+			"ms": 43470,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_dedicated_match_two_clients"
+		},
+		{
+			"errors": [],
+			"ms": 143033,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_disconnect_and_rejoin"
+		},
+		{
+			"errors": [],
+			"ms": 24024,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_handshake_rejections"
+		},
+		{
+			"errors": [],
+			"ms": 7384,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_lan_discovery_between_processes"
+		},
+		{
+			"errors": [],
+			"ms": 33428,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_listen_host_with_remote_client"
+		},
+		{
+			"errors": [],
+			"ms": 16845,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_party_run_resumed_through_the_lobby"
+		},
+		{
+			"errors": [],
+			"ms": 71357,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_playlist_rotation_voting_and_restart"
+		},
+		{
+			"errors": [],
+			"ms": 74525,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_server_mods_and_join_compare"
+		},
+		{
+			"errors": [],
+			"ms": 15062,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_shutdown_via_console_is_announced"
+		},
+		{
+			"errors": [],
+			"ms": 29381,
+			"ok": true,
+			"test": "res://src/test/net/test_net_multiprocess.gd::test_tcp_admin_is_local_and_authenticated"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/net/test_net_parity.gd::test_codec_knows_emitted_event_types"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_parity.gd::test_net_scene_handles_every_local_event"
+		},
+		{
+			"errors": [],
+			"ms": 114866,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_campaign.gd::test_party_run_fight_camp_tag_saved_and_resumed"
+		},
+		{
+			"errors": [],
+			"ms": 160518,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_campaign.gd::test_party_run_four_players_captain_breaks_tie"
+		},
+		{
+			"errors": [],
+			"ms": 136155,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_campaign.gd::test_party_run_off_the_street_simultaneous"
+		},
+		{
+			"errors": [],
+			"ms": 130104,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_campaign.gd::test_party_run_three_players_majority_route"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_play.gd::test_campaign_match_checks"
+		},
+		{
+			"errors": [],
+			"ms": 375,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_play.gd::test_coop_session_views_on_every_machine"
+		},
+		{
+			"errors": [],
+			"ms": 11686,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_play.gd::test_party_fight_replayed_when_the_hosts_match_is_lost_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 14694,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_play.gd::test_party_fight_simultaneous_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 10247,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_play.gd::test_party_fight_tag_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 8457,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_play.gd::test_party_member_drop_and_rejoin_mid_fight_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 14672,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_play.gd::test_party_member_revives_a_downed_ally_inprocess"
+		},
+		{
+			"errors": [],
+			"ms": 131,
+			"ok": true,
+			"test": "res://src/test/net/test_net_party_play.gd::test_party_payloads_travel_packed"
+		},
+		{
+			"errors": [],
+			"ms": 18,
+			"ok": true,
+			"test": "res://src/test/net/test_net_playlist.gd::test_candidates_are_distinct_and_avoid_repeats"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/net/test_net_playlist.gd::test_invalid_entries_are_reported_and_skipped"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_playlist.gd::test_min_players_and_bot_fill"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/net/test_net_playlist.gd::test_shipped_playlists_are_valid"
+		},
+		{
+			"errors": [],
+			"ms": 15,
+			"ok": true,
+			"test": "res://src/test/net/test_net_playlist.gd::test_state_persists_across_restarts"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_playlist.gd::test_vote_resolution_rules"
+		},
+		{
+			"errors": [],
+			"ms": 515,
+			"ok": true,
+			"test": "res://src/test/net/test_net_playlist.gd::test_weights_are_relative_probabilities"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/net/test_net_server_examples.gd::test_example_configs_parse_and_resolve_playlists"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/net/test_net_server_examples.gd::test_playlist_template_is_valid"
+		},
+		{
+			"errors": [],
+			"ms": 17,
+			"ok": true,
+			"test": "res://src/test/net/test_net_server_examples.gd::test_write_example_config"
+		},
+		{
+			"errors": [],
+			"ms": 61,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_charging_flag_rides_in_the_flags_byte"
+		},
+		{
+			"errors": [],
+			"ms": 649,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_fk_reconstruction_matches_simulation"
+		},
+		{
+			"errors": [],
+			"ms": 14,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_hud_mirror_drives_real_fight_hud"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_replica_interpolation_teleports_and_events"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_roster_codec_and_generations"
+		},
+		{
+			"errors": [],
+			"ms": 3093,
+			"ok": true,
+			"test": "res://src/test/net/test_net_snapshot.gd::test_snapshot_sizes_fit_one_packet"
+		},
+		{
+			"errors": [],
+			"ms": 613310,
+			"ok": true,
+			"test": "res://src/test/net/test_net_soak.gd::test_soak_server_with_bots"
+		},
+		{
+			"errors": [],
+			"ms": 491,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_dedicated_server_lobby_vote_and_ready"
+		},
+		{
+			"errors": [],
+			"ms": 12831,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_host_lobby_match_and_back_to_lobby"
+		},
+		{
+			"errors": [],
+			"ms": 6978,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_join_errors_and_kick_show_reasons"
+		},
+		{
+			"errors": [],
+			"ms": 29665,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_join_other_process_through_screens"
+		},
+		{
+			"errors": [],
+			"ms": 60,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_lan_tab_lists_sessions_and_asks_for_password"
+		},
+		{
+			"errors": [],
+			"ms": 1227,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_online_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 237,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_online_screen_tabs_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/ui/test_fighter_selection.gd::test_fixed_and_invalid_choices_have_stable_fallbacks"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/ui/test_fighter_selection.gd::test_random_is_offered_for_empty_single_and_full_rosters"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/ui/test_fighter_selection.gd::test_random_options_are_unique_and_stay_out_of_playable_ids"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/ui/test_fighter_selection.gd::test_random_resolves_to_a_valid_fighter_and_seed_is_repeatable"
+		},
+		{
+			"errors": [],
+			"ms": 297,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_cannery_boards_fit_and_lessons_reveal_the_final_button"
+		},
+		{
+			"errors": [],
+			"ms": 1186,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_compendium_roster_models_and_all_sections"
+		},
+		{
+			"errors": [],
+			"ms": 14,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_dialog_options_fit_and_are_reachable"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"skipped": "Requires the graphical audio backend",
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_dropdown_keeps_music_and_rapid_ambience_switches_settle"
+		},
+		{
+			"errors": [],
+			"ms": 300,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_editor_lock_and_device_layout"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_main_menu_has_no_scroll_and_keeps_submenu"
+		},
+		{
+			"errors": [],
+			"ms": 53,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_resolution_dropdown_and_fps_toggle"
+		},
+		{
+			"errors": [],
+			"ms": 54,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_last_button_and_text_panel_scrolls"
+		},
+		{
+			"errors": [],
+			"ms": 87,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_all_health_cards_above_subtitles_and_glyph_cooldowns"
+		},
+		{
+			"errors": [],
+			"ms": 208,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_bookie_abandon_targets_new_card_after_loss"
+		},
+		{
+			"errors": [],
+			"ms": 303,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_character_panel_scroll_and_shared_stats_glyphs"
+		},
+		{
+			"errors": [],
+			"ms": 163,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_compendium_custom_arena_actions_require_confirmation"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_crate_foul_line_and_invert_default"
+		},
+		{
+			"errors": [],
+			"ms": 358,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_editor_popup_keeps_controller_focus_and_share_toggles_all_controls"
+		},
+		{
+			"errors": [],
+			"ms": 649,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_editor_unique_default_and_overwrite_confirmation"
+		},
+		{
+			"errors": [],
+			"ms": 2651,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_every_event_has_art_visible_stats_and_accessible_choices"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_jukebox_order_shuffle_repeat_and_independent_contexts"
+		},
+		{
+			"errors": [],
+			"ms": 144,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_jukebox_persists_and_menu_stops_environment"
+		},
+		{
+			"errors": [],
+			"ms": 43,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_jukebox_preview_button_stops_previous_track"
+		},
+		{
+			"errors": [],
+			"ms": 167,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_map_has_scroll_room_no_intro_and_modal_blocks_nodes"
+		},
+		{
+			"errors": [],
+			"ms": 137,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_rules_picker_has_hidden_cancel_and_patch_notes_archive"
+		},
+		{
+			"errors": [],
+			"ms": 373,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_team_setup_compact_cards_fit_and_keep_slot_identity"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_display_changes_confirm_or_roll_back"
+		},
+		{
+			"errors": [],
+			"ms": 397,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_every_visible_setting_is_read_somewhere"
+		},
+		{
+			"errors": [],
+			"ms": 23,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_selected_monitor_persists_across_settings_reload"
+		},
+		{
+			"errors": [],
+			"ms": 45,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_between_rounds_scorecard_and_decision_banner"
+		},
+		{
+			"errors": [],
+			"ms": 888,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_hud_hides_health_and_shows_round_and_cards_locally"
+		},
+		{
+			"errors": [],
+			"ms": 66,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_hud_on_the_net_mirror_cards_count_and_sudden_death"
+		},
+		{
+			"errors": [],
+			"ms": 4859,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_match_scene_referee_framing_and_ten_point_callouts"
+		},
+		{
+			"errors": [],
+			"ms": 208,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_net_scene_referee_cards_and_decision_from_replicated_data"
+		},
+		{
+			"errors": [],
+			"ms": 292,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_results_show_method_cards_and_fit"
+		},
+		{
+			"errors": [],
+			"ms": 43,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_results_without_scoring_are_unchanged"
+		},
+		{
+			"errors": [],
+			"ms": 920,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_every_screen_has_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 1861,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 928,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_menu_settings_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 227,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_online_match_does_not_pause"
+		},
+		{
+			"errors": [],
+			"ms": 72,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_stick_keyboard_mouse_and_prompts"
+		},
+		{
+			"errors": [],
+			"ms": 56,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_text_and_ui_scale_apply_live"
+		},
+		{
+			"errors": [],
+			"ms": 136,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_text_entry_with_controller"
+		},
+		{
+			"errors": [],
+			"ms": 610,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_versus_pause_disconnect_and_quit"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_airbursts_draw_their_area_on_the_floor"
+		},
+		{
+			"errors": [],
+			"ms": 23,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_area_warnings_track_the_fighter_until_contact"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_box_bursts_run_along_their_line"
+		},
+		{
+			"errors": [],
+			"ms": 28,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_build_up_glows_share_the_light_cap"
+		},
+		{
+			"errors": [],
+			"ms": 38,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_build_ups_last_until_the_first_effect"
+		},
+		{
+			"errors": [],
+			"ms": 91,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_cone_back_is_drawn_from_its_point"
+		},
+		{
+			"errors": [],
+			"ms": 102,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_cut_the_angle_draws_the_real_dash"
+		},
+		{
+			"errors": [],
+			"ms": 132,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_downdraft_lasts_as_long_as_the_hover"
+		},
+		{
+			"errors": [],
+			"ms": 1543,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_effect_events_carry_the_true_footprint"
+		},
+		{
+			"errors": [],
+			"ms": 555,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_every_fighter_event_and_entity_is_drawn_and_cleaned_up"
+		},
+		{
+			"errors": [],
+			"ms": 50,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_fighter_looks_stay_with_their_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_footprint_fields_reach_online_clients"
+		},
+		{
+			"errors": [],
+			"ms": 8,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_footprints_draw_the_exact_area"
+		},
+		{
+			"errors": [],
+			"ms": 23,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_heavy_charge_glow_only_while_charging"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_only_static_strikes_call_lightning"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_quality_and_reduced_flashing"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_reduce_flashing_slows_the_static_floor_flicker"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_zone_decals_follow_the_zone_radius"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/vfx/test_varga_skin_capture.gd::test_zz_varga_skin_capture"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/vfx/test_vfx_showcase.gd::test_zz_vfx_showcase"
+		}
+	],
+	"skipped": 1,
+	"summary": "tests: 925 run, 0 failed, 924 passed, 1 skipped in 3139.6 s",
+	"time": "2026-10-21T18:08:22",
+	"total": 925,
+	"version": "0.9.17"
+}

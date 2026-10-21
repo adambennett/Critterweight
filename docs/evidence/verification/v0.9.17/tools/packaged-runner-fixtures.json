@@ -1,0 +1,32 @@
+﻿[
+    {
+        "case":  "success",
+        "expected_success":  true,
+        "exit_code":  0,
+        "passed":  true
+    },
+    {
+        "case":  "exit",
+        "expected_success":  false,
+        "exit_code":  1,
+        "passed":  true
+    },
+    {
+        "case":  "stderr",
+        "expected_success":  false,
+        "exit_code":  1,
+        "passed":  true
+    },
+    {
+        "case":  "stale",
+        "expected_success":  false,
+        "exit_code":  1,
+        "passed":  true
+    },
+    {
+        "case":  "empty",
+        "expected_success":  false,
+        "exit_code":  1,
+        "passed":  true
+    }
+]

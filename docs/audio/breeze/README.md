@@ -71,4 +71,7 @@ Installed: 521 clips (426 Devon, 93 Kendall, 2 Coach Buck), 33.7 minutes, 97,067
 installed WAV matches its catalog SHA-256. Raw masters: `B:\Critterweight-work\v0.9.17\breeze-raw`.
 Spend: 541 completed requests, 3,255.8 credits (3,132.2 for the main batch, 123.6 for retakes); the
 provider reports 3,255.8 used, zero reserved and 6,744.2 remaining of the 10,000 allowance
-(`v0.9.17/budget-final.json`). Physical listening approval remains with the owner.
+(`v0.9.17/budget-final.json`). This was the provider balance at the end of the v0.9.17 batch.
+At the 2026-10-21 takeover, Claude had also generated v0.9.18 commentary and tutorial recordings:
+the combined saved ledger is 4,425.0 credits spent and 5,575.0 remaining across both releases.
+No human listening review has been performed; publication is authorized by the owner.

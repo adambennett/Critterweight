@@ -1,0 +1,52 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 365,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_a_hit_pause_freezes_the_match_then_restores_its_speed"
+		},
+		{
+			"errors": [],
+			"ms": 28,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_a_pit_wall_fades_in_a_real_arena"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_a_thin_raised_rail_between_camera_and_fighter_fades"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_a_wall_between_the_camera_and_the_fight_fades"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_crowd_figures_in_the_line_of_sight_shrink_away"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_hit_feedback_scales_with_damage_and_involvement"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_combat_feel.gd::test_the_damage_chunk_stays_lit_then_drains"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 7 run, 0 failed, 7 passed, 0 skipped in 4.1 s",
+	"time": "2026-10-21T17:04:08",
+	"total": 7,
+	"version": "0.9.17"
+}

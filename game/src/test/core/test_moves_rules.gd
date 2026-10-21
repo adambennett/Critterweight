@@ -116,19 +116,26 @@ func test_mode_buttons_come_before_moves() -> void:
 	fresh_world().add_child(sim)
 	var entries := []
 	for i in 4:
-		entries.append({"creature": Content.creature("f_stoke"), "team": i % 2, "source": null, "kind": "bot"})
+		entries.append({"creature": Content.creature("f_varga" if i == 1 else "f_stoke"), "team": i % 2, "source": null, "kind": "bot"})
 	sim.setup({"arena": Content.arena("the_gullet"), "rules": rules, "seed": 5, "fighters": entries, "mode": ModeRegistry.create("chumball")})
-	await step_sim(sim, 1.0)
+	await _to_fight(sim)
 	var mode: ChumballMode = sim.mode
-	var f := sim.fighters[0]
-	check_eq(f.combat_style, "moves", "Chumball plays Movesets by default")
-	mode.ball.linear_velocity = Vector3.ZERO
-	mode.ball.global_position = f.pos() + f.forward() * 0.5 + Vector3.UP * 0.3
-	check(mode.on_grab_pressed(f), "Grapple picks the ball up")
-	var seq0 := sim.event_seq
-	f.input.press(FighterInput.LIGHT)          # move 1 (Ember Jab) while carrying
-	await step_sim(sim, 0.1)
-	var thrown := sim.events.any(func(e: Dictionary) -> bool: return int(e["seq"]) > seq0 and str(e["type"]) == "ball_throw")
-	var jabbed := sim.events.any(func(e: Dictionary) -> bool:
-		return int(e["seq"]) > seq0 and str(e["type"]) == "move_start" and int(e.get("fighter", -1)) == 0)
-	check(thrown and not jabbed, "the carrier's move button throws the ball instead of starting a move")
+	for fi in 2:
+		var f := sim.fighters[fi]
+		check_eq(f.combat_style, "moves", "Chumball plays Movesets by default")
+		var buttons := [FighterInput.LIGHT, FighterInput.HEAVY, FighterInput.AB1, FighterInput.AB2, FighterInput.GRAB]
+		if f.creature.tags.has("martial"):
+			buttons.append_array([FighterInput.MMA_LL, FighterInput.MMA_RL])
+		for button: int in buttons:
+			mode.ball.linear_velocity = Vector3.ZERO
+			mode.ball.global_position = f.pos() + f.forward() * 0.5 + Vector3.UP * 0.3
+			if not check(mode.on_grab_pressed(f), "Grapple picks the ball up for %s input %d" % [f.creature.id, button]):
+				continue
+			var seq0 := sim.event_seq
+			f.input.press(button)
+			await step_sim(sim, 0.1)
+			f.input.set_held(button, false)
+			var thrown := sim.events.any(func(e: Dictionary) -> bool: return int(e["seq"]) > seq0 and str(e["type"]) == "ball_throw")
+			var attacked := sim.events.any(func(e: Dictionary) -> bool:
+				return int(e["seq"]) > seq0 and str(e["type"]) == "move_start" and int(e.get("fighter", -1)) == fi)
+			check(thrown and not attacked, "%s input %d throws the ball instead of starting a move" % [f.creature.id, button])

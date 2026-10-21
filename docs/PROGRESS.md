@@ -1,5 +1,26 @@
 # Progress
 
+## Status (2026-10-21) - v0.9.17 released; continuing v0.9.18
+
+[v0.9.17 is published](https://github.com/adambennett/Critterweight/releases/tag/v0.9.17) at
+`e2870289c69c721024ac4ed200a5e6eda7ae4288`: commentary, eight-fighter art, Legacy Varga skin,
+ability VFX and the completed raised-rail/cap fading repair. The clean-commit full suite passed
+924 checks with one expected graphical-audio skip and no failures, including a ten-minute soak.
+The tagged build passed 455 script checks and all 20 rendered playtests. All seven actual downloads,
+the annotated tag, every archived member and the checksums were verified. The downloaded standalone
+Windows game reached its title in 5.7 seconds. The 16-run final performance comparison and its
+frame-time limitations are recorded in the report; Linux runtime and Steam Deck hardware remain
+unverified. The v0.9.17 milestone has been reported to the owner.
+See [the continuation record](releases/v0.9.17-takeover.md),
+[acceptance checklist](releases/v0.9.17-v0.9.18-checklist.md), and
+[v0.9.17 evidence](evidence/verification/v0.9.17/README.md).
+
+Claude's existing v0.9.18 implementation is preserved in `B:\Critterweight-work\wt\v0918` on
+`feature/v0.9.18-movesets` (`7eba366` at takeover). Next: merge the shipped base, audit the full
+combat/progression/UI/network scope, finish and verify the implementation, then publish v0.9.18.
+Both releases are authorized for autonomous GitHub publication. Combined Breeze spending in the
+latest saved report is 4,425.0 / 10,000 credits; 5,575.0 remain across the entire goal.
+
 ## Status (2026-10-20) — v0.9.16: Career, 10-point scoring, referee, Cage Rules preset
 
 v0.9.15 is published (2026-10-19, tag `v0.9.15` at `f8e4bbb`). v0.9.16 adds the owner-requested

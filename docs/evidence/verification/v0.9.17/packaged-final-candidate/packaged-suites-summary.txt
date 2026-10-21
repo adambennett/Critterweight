@@ -1,0 +1,2 @@
+windowed test_combat_feel: 7 run, 0 failed, 0 skipped (exit 0)
+windowed test_playtest: 20 run, 0 failed, 0 skipped (exit 0)

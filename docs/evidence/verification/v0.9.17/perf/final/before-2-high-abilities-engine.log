@@ -1,0 +1,10 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti SUPER
+
+2026-10-21 17:01:24 [INFO] paths: user data root: B:/Critterweight-work/v0.9.17/codex-perf-final-20261021/user-high
+2026-10-21 17:01:25 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 17:01:25 [INFO] app: Critterweight 0.9.16-dev (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-21 17:01:25 [INFO] toast: [success] XInput Controller connected.
+2026-10-21 17:01:25 [INFO] match: start free_for_all_lives on the_gullet: f_dozer/t0/bot, f_dredge/t1/bot, f_gusto/t2/bot, f_jitters/t3/bot, f_knell/t4/bot, f_slurry/t5/bot, f_stoke/t6/bot, f_varga/t7/bot
+BENCH {"abilities_every_s":3.0,"ability_bursts":10,"alive_fighters_end":8,"bench":"busy","boot_ms":7766,"cores":8,"cpu":"Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz","date":"2026-10-21T17:01:25","draw_calls":{"max":1321.0,"mean":1023.591,"min":850.0,"n":4535,"p50":976.0,"p95":1272.0,"p99":1310.0},"engine":"4.5.1-stable (official)","fighters":8,"fps_avg":151.148730350665,"frame_ms":{"max":106.148,"mean":6.616,"min":2.787,"n":4535,"p50":6.92,"p95":8.902,"p99":11.218},"frames":4535,"frames_over_16_7ms":22,"frames_over_16_7ms_pct":0.485115766262404,"game_version":"0.9.16","headless":false,"hits":52,"match_load_ms":341.852,"memory_growth_mb":13.5671663284302,"memory_static_mb":322.354265213013,"objects":8939.0,"os":"Windows","physics_frame_ms":{"max":12.781,"mean":6.264,"min":4.456,"n":4535,"p50":5.62,"p95":9.356,"p99":12.781},"preset":"high","primitives":{"max":858282.0,"mean":753268.084,"min":630712.0,"n":4535,"p50":757886.0,"p95":798214.0,"p99":823082.0},"process_frame_ms":{"max":29.988,"mean":7.252,"min":5.003,"n":4535,"p50":6.295,"p95":13.293,"p99":13.565},"process_rss_mb":322.354509353638,"renderer":"NVIDIA GeForce RTX 4070 Ti SUPER","resolution":[1920,1080],"total_ms":43083,"video_mem_mb":326.70881652832}
+BENCH_REPORT B:\Critterweight-work\v0.9.17\codex-perf-final-20261021\before-2-high-abilities.json

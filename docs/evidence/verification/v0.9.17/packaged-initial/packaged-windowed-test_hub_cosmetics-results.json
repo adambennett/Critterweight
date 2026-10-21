@@ -1,0 +1,46 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 399,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_attachments_fit_every_body_and_follow_it"
+		},
+		{
+			"errors": [],
+			"ms": 287,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_fished_cans_sit_on_the_locker_shelf"
+		},
+		{
+			"errors": [],
+			"ms": 3171,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_only_the_profile_owner_is_dressed_in_a_match"
+		},
+		{
+			"errors": [],
+			"ms": 404,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_sizzle_is_stoke_only_and_frames_show_on_results_and_profile"
+		},
+		{
+			"errors": [],
+			"ms": 54,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_the_gold_tooth_is_the_gag_piece"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_cosmetics.gd::test_the_locker_only_offers_what_shows"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 6 run, 0 failed, 6 passed, 0 skipped in 7.8 s",
+	"time": "2026-10-21T16:34:17",
+	"total": 6,
+	"version": "0.9.17"
+}

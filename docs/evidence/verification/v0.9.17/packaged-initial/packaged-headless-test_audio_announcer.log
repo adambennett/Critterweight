@@ -1,0 +1,16 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 16:22:00 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-packaged-test_audio_announcer-162157286
+2026-10-21 16:22:00 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:22:00 [INFO] app: Critterweight 0.9.17+1161cfe.dirty (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/audio/test_audio_announcer.gd::test_all_lines_have_ids_subtitles_and_triggers (10 ms)
+2026-10-21 16:22:00 [WARN] audio: unknown sound id 'line:no_such_line'
+ok    res://src/test/audio/test_audio_announcer.gd::test_announce_emits_subtitle_and_substitutes_names (11 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_babble_plan (1 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_color_commentary_paces_and_interrupts_a_rare_conversation (568 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_priority_interrupt_and_queue_rules (13 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_sim_event_mapping (12 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_ten_point_and_referee_event_mapping (34 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_trigger_picks_specific_fresh_lines_deterministically (3 ms)
+ok    res://src/test/audio/test_audio_announcer.gd::test_varga_and_knell_ability_uses_get_specific_announcer_calls (2 ms)
+tests: 9 run, 0 failed, 9 passed, 0 skipped in 4.9 s

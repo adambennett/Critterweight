@@ -1,0 +1,9 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 16:26:35 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-packaged-test_saves_from_older_build-162632846
+2026-10-21 16:26:35 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:26:35 [INFO] app: Critterweight 0.9.17+1161cfe.dirty (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/campaign/test_saves_from_older_build.gd::test_career_from_v0916_loads_and_books_the_next_bout (90 ms)
+ok    res://src/test/campaign/test_saves_from_older_build.gd::test_run_from_v0916_resumes_verifies_and_finishes (187 ms)
+ok    res://src/test/campaign/test_saves_from_older_build.gd::test_settings_and_rules_preset_from_v0916_load (18 ms)
+tests: 3 run, 0 failed, 3 passed, 0 skipped in 3.9 s

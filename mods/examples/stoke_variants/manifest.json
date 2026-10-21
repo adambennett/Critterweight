@@ -2,7 +2,7 @@
   "id": "stoke_variants",
   "name": "Stoke Variants",
   "version": "1.0.0",
-  "game_version": "0.9.16",
+  "game_version": "0.9.17",
   "api": 1,
   "author": "Critterweight examples",
   "description": "Fighter-customization example: 'Overheated Stoke' extends the core Stoke with a hotter palette, a meaner Overhand Boiler, and a passive that turns parries into scorch build-up. Only the changed fields are written; everything else is inherited.",

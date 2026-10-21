@@ -10,7 +10,7 @@ extends RefCounted
 
 const FADE := 0.78            ## transparency of a blocking mesh
 const SPEED := 7.0            ## transparency change per second
-const MIN_HEIGHT := 0.6       ## shorter meshes never cover a fighter
+const MIN_SPAN := 0.15        ## ignore tiny decorations, but include raised rails, post caps and bands
 const MIN_TOP := 1.0          ## nor do meshes that end below the fighters' chests
 const INTERVAL_US := 33000    ## re-test at most ~30 times a second (fades are eased anyway)
 
@@ -65,7 +65,7 @@ func collect(root: Node, moving: Node = null, centre := Vector2.ZERO) -> void:
 			continue
 		var xf := gi.global_transform
 		var g := xf * local
-		if g.size.y < MIN_HEIGHT or g.end.y < MIN_TOP:
+		if maxf(g.size.x, maxf(g.size.y, g.size.z)) < MIN_SPAN or g.end.y < MIN_TOP:
 			continue
 		if centre.x > g.position.x and centre.x < g.end.x and centre.y > g.position.z and centre.y < g.end.z:
 			continue

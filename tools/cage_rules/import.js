@@ -114,7 +114,7 @@ if(fs.existsSync(vargaPath)){
 fs.writeFileSync(vargaPath,JSON.stringify(c,null,2)+'\n');
 // Flatten the original continuous skinned mesh AND the original face/gloves into the game's segment rig.
 const bones=names.map(n=>({id:n,pivot:pivots[n]})), sourceBones=names.concat(['lFoot','rFoot']);
-function exportGlb(model,id,rel,generator,doubleSided){
+function exportGlb(model,id,rel,generator,doubleSided,outPath){
 const out={positions:[],normals:[],colors:[],joints:[],weights:[],groups:[]},materials={};
 function append(mesh,rigid){
  const g=mesh.geometry, idx=g.index?Array.from(g.index.array):Array.from({length:g.attributes.position.count},(_,i)=>i);
@@ -138,24 +138,28 @@ function append(mesh,rigid){
 }
 append(model.skinMesh);
 for(const name of names)model.segs[name].traverse(m=>{if(m.isMesh&&m.visible)append(m,names.indexOf(name));});
-writeGlb(path.join(root,'game/assets/models',rel),{name:id,bones,materials,mesh:{
+writeGlb(outPath||path.join(root,'game/assets/models',rel),{name:id,bones,materials,mesh:{
  positions:Float32Array.from(out.positions),normals:Float32Array.from(out.normals),colors:Float32Array.from(out.colors),
  joints:Uint8Array.from(out.joints),weights:Float32Array.from(out.weights),groups:out.groups},generator});
 return out.positions.length/3;
 }
 // v0.9.17: this adapter's Varga is the LEGACY skin ("Legacy Varga skin" in Settings). It is written to
 // f_varga_legacy.glb only (f_varga.glb is the upgraded Blender-owned default) and must stay byte-identical to the
-// v0.9.16 original: a different result is refused (restored) unless --allow-legacy-change is passed deliberately.
+// v0.9.16 original: the model is written to a temporary file first and replaces f_varga_legacy.glb only when its
+// hash matches (or --allow-legacy-change is passed deliberately); otherwise the temporary file is deleted and the
+// legacy file (present or not) is left exactly as it was.
 const LEGACY_SHA256='4fa78a8a66cb46739b793bc095501e3957a5aed27bafe1901141ba4c90d460fc';
 const legacyPath=path.join(root,'game/assets/models/creatures/f_varga_legacy.glb');
-const legacyBefore=fs.existsSync(legacyPath)?fs.readFileSync(legacyPath):null;
-const vargaVerts=exportGlb(model,'f_varga','creatures/f_varga_legacy.glb','Cage Rules original procedural fighter, adapted by tools/cage_rules/import.js');
-{
- const got=require('crypto').createHash('sha256').update(fs.readFileSync(legacyPath)).digest('hex');
- if(got!==LEGACY_SHA256&&!process.argv.includes('--allow-legacy-change')){
-  if(legacyBefore)fs.writeFileSync(legacyPath,legacyBefore);
-  throw new Error('f_varga_legacy.glb would change ('+got+' != '+LEGACY_SHA256+'); restored. Pass --allow-legacy-change only to replace the legacy skin on purpose.');
- }
+const legacyTmp=legacyPath+'.'+process.pid+'.tmp';
+let vargaVerts;
+try{
+ vargaVerts=exportGlb(model,'f_varga','creatures/f_varga_legacy.glb','Cage Rules original procedural fighter, adapted by tools/cage_rules/import.js',undefined,legacyTmp);
+ const got=require('crypto').createHash('sha256').update(fs.readFileSync(legacyTmp)).digest('hex');
+ if(got!==LEGACY_SHA256&&!process.argv.includes('--allow-legacy-change'))
+  throw new Error('f_varga_legacy.glb would change ('+got+' != '+LEGACY_SHA256+'); nothing was written. Pass --allow-legacy-change only to replace the legacy skin on purpose.');
+ fs.renameSync(legacyTmp,legacyPath);
+}finally{
+ fs.rmSync(legacyTmp,{force:true});
 }
 
 // ---- The original referee (render.js class Referee). He is the same procedural body and bind skeleton as the

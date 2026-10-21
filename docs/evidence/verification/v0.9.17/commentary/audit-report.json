@@ -1,0 +1,470 @@
+[
+ {
+  "label": "baseline",
+  "dir": "B:/Critterweight-work/v0.9.17/audit/baseline",
+  "segments": [
+   {
+    "segment": "A:sequence_duel",
+    "kind": "sequence",
+    "seconds": 163.3,
+    "lines": 29,
+    "per_min": 10.65,
+    "talk_share": 0.501,
+    "cut_offs": 4
+   },
+   {
+    "segment": "A:sequence_ten_point",
+    "kind": "sequence",
+    "seconds": 73,
+    "lines": 13,
+    "per_min": 10.68,
+    "talk_share": 0.552,
+    "cut_offs": 1
+   },
+   {
+    "segment": "A:bout_00",
+    "kind": "duel",
+    "a": "f_stoke",
+    "b": "f_dredge",
+    "seconds": 255.2,
+    "lines": 28,
+    "per_min": 6.58,
+    "talk_share": 0.363,
+    "cut_offs": 1
+   },
+   {
+    "segment": "A:bout_01",
+    "kind": "duel",
+    "a": "f_stoke",
+    "b": "f_dredge",
+    "seconds": 240.1,
+    "lines": 35,
+    "per_min": 8.75,
+    "talk_share": 0.457,
+    "cut_offs": 5
+   },
+   {
+    "segment": "A:bout_02",
+    "kind": "duel",
+    "a": "f_gusto",
+    "b": "f_jitters",
+    "seconds": 191,
+    "lines": 24,
+    "per_min": 7.54,
+    "talk_share": 0.406,
+    "cut_offs": 3
+   },
+   {
+    "segment": "A:bout_03",
+    "kind": "career",
+    "a": "f_varga",
+    "b": "f_knell",
+    "seconds": 317.2,
+    "lines": 69,
+    "per_min": 13.05,
+    "talk_share": 0.702,
+    "cut_offs": 0
+   },
+   {
+    "segment": "A:bout_04",
+    "kind": "duel",
+    "a": "f_slurry",
+    "b": "f_dozer",
+    "seconds": 102.3,
+    "lines": 16,
+    "per_min": 9.39,
+    "talk_share": 0.531,
+    "cut_offs": 2
+   },
+   {
+    "segment": "A:bout_05",
+    "kind": "duel",
+    "a": "f_stoke",
+    "b": "f_dredge",
+    "seconds": 267.1,
+    "lines": 36,
+    "per_min": 8.09,
+    "talk_share": 0.421,
+    "cut_offs": 4
+   },
+   {
+    "segment": "B:bout_06",
+    "kind": "duel",
+    "a": "f_jitters",
+    "b": "f_gusto",
+    "seconds": 194.2,
+    "lines": 25,
+    "per_min": 7.72,
+    "talk_share": 0.436,
+    "cut_offs": 1
+   },
+   {
+    "segment": "B:bout_07",
+    "kind": "duel",
+    "a": "f_knell",
+    "b": "f_stoke",
+    "seconds": 182,
+    "lines": 33,
+    "per_min": 10.88,
+    "talk_share": 0.564,
+    "cut_offs": 2
+   },
+   {
+    "segment": "B:bout_08",
+    "kind": "career",
+    "a": "f_varga",
+    "b": "f_dozer",
+    "seconds": 324.7,
+    "lines": 52,
+    "per_min": 9.61,
+    "talk_share": 0.561,
+    "cut_offs": 1
+   },
+   {
+    "segment": "B:bout_09",
+    "kind": "duel",
+    "a": "f_dredge",
+    "b": "f_slurry",
+    "seconds": 80.1,
+    "lines": 12,
+    "per_min": 8.98,
+    "talk_share": 0.506,
+    "cut_offs": 1
+   },
+   {
+    "segment": "B:bout_10",
+    "kind": "duel",
+    "a": "f_gusto",
+    "b": "f_jitters",
+    "seconds": 117.2,
+    "lines": 10,
+    "per_min": 5.12,
+    "talk_share": 0.28,
+    "cut_offs": 0
+   },
+   {
+    "segment": "B:bout_11",
+    "kind": "career",
+    "a": "f_varga",
+    "b": "f_knell",
+    "seconds": 318.6,
+    "lines": 67,
+    "per_min": 12.62,
+    "talk_share": 0.685,
+    "cut_offs": 1
+   }
+  ],
+  "totals": {
+   "bouts": 12,
+   "lines": 449,
+   "live_minutes": 47.1,
+   "lines_per_min": 9.53,
+   "talk_share": 0.514,
+   "gap_s": {
+    "p10": 0,
+    "median": 1.86,
+    "p90": 7.19,
+    "max": 34.88
+   },
+   "cut_offs": 26,
+   "distinct_lines": 125,
+   "repeats_within_bout": 137,
+   "repeats_in_next_two_bouts": 106,
+   "repeats_across_restart": 32,
+   "family_repeat_in_a_row": 91,
+   "consecutive_pairs": 435,
+   "lull_lines": 74,
+   "lull_lines_claiming_a_situation": 15,
+   "lull_claims_backed": 2,
+   "situational_checked": 267,
+   "situational_supported": 250,
+   "situational_accuracy": 0.936,
+   "stale_knockdown_calls": 0,
+   "result_calls": {
+    "ko_said_over_but_round_only": 0,
+    "stoppage_called_as_ko": 1,
+    "stoppage_called": 0,
+    "decision_called": 3,
+    "decisions": 3,
+    "stoppages": 1,
+    "kos": 26
+   },
+   "most_played": [
+    {
+     "id": "ann_exp_0751",
+     "n": 28,
+     "text": "Cut the Angle gives Varga a quick dash and a short damage boost."
+    },
+    {
+     "id": "ann_exp_0752",
+     "n": 26,
+     "text": "There's the Cut the Angle dash. Varga is already setting up the next e"
+    },
+    {
+     "id": "ann_big_08",
+     "n": 20,
+     "text": "Oof. Okay. That's gonna be a photo on the wall, Stoke."
+    },
+    {
+     "id": "ann_big_09",
+     "n": 18,
+     "text": "Caught him WINDING UP! That's a counter, folks, that's reading the mai"
+    },
+    {
+     "id": "ann_combo_01",
+     "n": 16,
+     "text": "One, two, THREE! That's arithmetic, folks!"
+    },
+    {
+     "id": "ann_parry_03",
+     "n": 14,
+     "text": "Stoke slaps it away! Now hit him back, kid, he's wide open!"
+    },
+    {
+     "id": "ann_big_10",
+     "n": 14,
+     "text": "Fifteen-plus! The commissioner is pretending not to look!"
+    },
+    {
+     "id": "ann_ko_08",
+     "n": 14,
+     "text": "AND THERE GOES A PIECE OF HIM! Somebody grab that, it's a souvenir!"
+    }
+   ]
+  }
+ },
+ {
+  "label": "revised",
+  "dir": "B:/Critterweight-work/v0.9.17/audit/revised",
+  "segments": [
+   {
+    "segment": "A:sequence_duel",
+    "kind": "sequence",
+    "seconds": 163.3,
+    "lines": 31,
+    "per_min": 11.39,
+    "talk_share": 0.658,
+    "cut_offs": 5
+   },
+   {
+    "segment": "A:sequence_ten_point",
+    "kind": "sequence",
+    "seconds": 73,
+    "lines": 15,
+    "per_min": 12.33,
+    "talk_share": 0.727,
+    "cut_offs": 2
+   },
+   {
+    "segment": "A:bout_00",
+    "kind": "duel",
+    "a": "f_stoke",
+    "b": "f_dredge",
+    "seconds": 293.2,
+    "lines": 51,
+    "per_min": 10.43,
+    "talk_share": 0.615,
+    "cut_offs": 4
+   },
+   {
+    "segment": "A:bout_01",
+    "kind": "duel",
+    "a": "f_stoke",
+    "b": "f_dredge",
+    "seconds": 152.2,
+    "lines": 28,
+    "per_min": 11.04,
+    "talk_share": 0.654,
+    "cut_offs": 2
+   },
+   {
+    "segment": "A:bout_02",
+    "kind": "duel",
+    "a": "f_gusto",
+    "b": "f_jitters",
+    "seconds": 230.6,
+    "lines": 43,
+    "per_min": 11.19,
+    "talk_share": 0.654,
+    "cut_offs": 2
+   },
+   {
+    "segment": "A:bout_03",
+    "kind": "career",
+    "a": "f_varga",
+    "b": "f_knell",
+    "seconds": 319.4,
+    "lines": 55,
+    "per_min": 10.33,
+    "talk_share": 0.618,
+    "cut_offs": 2
+   },
+   {
+    "segment": "A:bout_04",
+    "kind": "duel",
+    "a": "f_slurry",
+    "b": "f_dozer",
+    "seconds": 104.7,
+    "lines": 19,
+    "per_min": 10.89,
+    "talk_share": 0.69,
+    "cut_offs": 1
+   },
+   {
+    "segment": "A:bout_05",
+    "kind": "duel",
+    "a": "f_stoke",
+    "b": "f_dredge",
+    "seconds": 268.2,
+    "lines": 46,
+    "per_min": 10.29,
+    "talk_share": 0.646,
+    "cut_offs": 2
+   },
+   {
+    "segment": "B:bout_06",
+    "kind": "duel",
+    "a": "f_jitters",
+    "b": "f_gusto",
+    "seconds": 135.2,
+    "lines": 27,
+    "per_min": 11.98,
+    "talk_share": 0.701,
+    "cut_offs": 3
+   },
+   {
+    "segment": "B:bout_07",
+    "kind": "duel",
+    "a": "f_knell",
+    "b": "f_stoke",
+    "seconds": 170.2,
+    "lines": 35,
+    "per_min": 12.34,
+    "talk_share": 0.745,
+    "cut_offs": 2
+   },
+   {
+    "segment": "B:bout_08",
+    "kind": "career",
+    "a": "f_varga",
+    "b": "f_dozer",
+    "seconds": 339.7,
+    "lines": 52,
+    "per_min": 9.19,
+    "talk_share": 0.536,
+    "cut_offs": 2
+   },
+   {
+    "segment": "B:bout_09",
+    "kind": "duel",
+    "a": "f_dredge",
+    "b": "f_slurry",
+    "seconds": 91.8,
+    "lines": 19,
+    "per_min": 12.42,
+    "talk_share": 0.694,
+    "cut_offs": 2
+   },
+   {
+    "segment": "B:bout_10",
+    "kind": "duel",
+    "a": "f_gusto",
+    "b": "f_jitters",
+    "seconds": 143.3,
+    "lines": 27,
+    "per_min": 11.3,
+    "talk_share": 0.678,
+    "cut_offs": 2
+   },
+   {
+    "segment": "B:bout_11",
+    "kind": "career",
+    "a": "f_varga",
+    "b": "f_knell",
+    "seconds": 326.3,
+    "lines": 58,
+    "per_min": 10.66,
+    "talk_share": 0.63,
+    "cut_offs": 1
+   }
+  ],
+  "totals": {
+   "bouts": 12,
+   "lines": 506,
+   "live_minutes": 46.9,
+   "lines_per_min": 10.8,
+   "talk_share": 0.642,
+   "gap_s": {
+    "p10": 0,
+    "median": 1.11,
+    "p90": 5.26,
+    "max": 22.76
+   },
+   "cut_offs": 32,
+   "distinct_lines": 338,
+   "repeats_within_bout": 15,
+   "repeats_in_next_two_bouts": 7,
+   "repeats_across_restart": 10,
+   "family_repeat_in_a_row": 9,
+   "consecutive_pairs": 492,
+   "lull_lines": 10,
+   "lull_lines_claiming_a_situation": 0,
+   "lull_claims_backed": 0,
+   "situational_checked": 213,
+   "situational_supported": 204,
+   "situational_accuracy": 0.958,
+   "stale_knockdown_calls": 0,
+   "result_calls": {
+    "ko_said_over_but_round_only": 0,
+    "stoppage_called_as_ko": 0,
+    "stoppage_called": 1,
+    "decision_called": 3,
+    "decisions": 3,
+    "stoppages": 1,
+    "kos": 24
+   },
+   "most_played": [
+    {
+     "id": "cmt17_0131",
+     "n": 7,
+     "text": "The Gust Bomb hits home! Blown back by a stiff breeze with opinions!"
+    },
+    {
+     "id": "cmt17_0136",
+     "n": 6,
+     "text": "Arc Lash finds its mark! Zap, crackle, and a very surprised opponent!"
+    },
+    {
+     "id": "cmt17_0132",
+     "n": 5,
+     "text": "That wind hit harder than my umbrella ever survived."
+    },
+    {
+     "id": "cmt17_0139",
+     "n": 5,
+     "text": "Out of the veil and into the target! Knell rings them on arrival!"
+    },
+    {
+     "id": "ann_round_01",
+     "n": 4,
+     "text": "Touch gloves, claws, beaks, whatever you've got, and FIGHT!"
+    },
+    {
+     "id": "cmt17_0242",
+     "n": 4,
+     "text": "Next round! Fresh bell, same fighters, brand-new problems!"
+    },
+    {
+     "id": "ann_kd_03",
+     "n": 4,
+     "text": "Legs said no! The rest of him agreed!"
+    },
+    {
+     "id": "cmt17_0243",
+     "n": 4,
+     "text": "Here we go again! The bell rings, the critters swing!"
+    }
+   ]
+  }
+ }
+]

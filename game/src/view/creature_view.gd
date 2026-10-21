@@ -25,9 +25,10 @@ const DEFAULT_JUICE := Color(1.0, 0.55, 0.1)
 const VARGA_MODEL := "res://assets/models/creatures/f_varga.glb"
 const VARGA_LEGACY_MODEL := "res://assets/models/creatures/f_varga_legacy.glb"
 const LEGACY_VARGA_SETTING := "cosmetic.legacy_varga"
-## v0.9.17 finish: surfaces are shaded by material class (creature.gdshader material_kind) chosen from
-## the model's material names; glowing surfaces animate by glow mode (the model's extras.look, else
-## this table: the fighter's "Hype feature" character).
+## v0.9.17 finish (models whose extras carry `look`; every other model keeps the v0.9.16 shading):
+## surfaces are shaded by material class (creature.gdshader material_kind) chosen from the model's
+## material names; glowing surfaces animate by glow mode (the model's extras.look, else this table:
+## the fighter's "Hype feature" character).
 const MATERIAL_KINDS := {"skin": 0, "hide": 0, "cloth": 1, "team": 1, "wrap": 1, "metal": 2, "iron": 2, "brass": 2, "eye": 3,
 	"jelly": 4, "shell": 5, "lacquer": 5, "chitin": 5, "enamel": 5, "glass": 5, "ghost": 6, "spectral": 6, "ember": 0, "lamp": 5, "coil": 4}
 const GLOW_MODES := {"steady": 0, "flicker": 1, "pulse": 2, "shimmer": 3, "lamp": 4}
@@ -52,6 +53,7 @@ var _gore_mesh: Mesh = null
 var _bruises: Array = []                  ## [{seg, local: Vector3, s: float}]
 var _flash := 0.0
 const JOLT_TIME := 0.2           ## seconds a struck body shakes (real time)
+const SCREEN_HEIGHT_M := 1.6     ## a fighter's height for its on-screen size (spring level of detail)
 const JOLT_AMP := 0.05           ## metres at full strength
 var _jolt_dir := Vector3.ZERO
 var _jolt_amp := 0.0
@@ -75,8 +77,20 @@ var _point_sources: Array = []             ## [[MeshInstance3D, model root Node]
 var _cosmetic_items: Array = []            ## the dress last applied (re-fitted after a model swap)
 var _fx: CreatureFxRig = null              ## expressions/secondary motion when the model has fx_* bones
 var _look := {}                            ## the model's extras (look: glow mode, fx parameters)
-var _finish := 1.0                         ## 0: the model keeps the pre-v0.9.17 shading (legacy skins)
-## Set by the match scenes each frame (view only): the fighter's expression and what it looks at.
+## 1: the v0.9.17 finish, only for models made for it (their extras carry `look`: the upgraded roster);
+## 0: the exact pre-v0.9.17 shading (the legacy Varga, bosses, NPCs, the referee, mods' older models,
+## the built-in segment look).
+var _finish := 0.0
+var _last_alpha := 1.0                     ## the interpolation the last render() used
+var _fx_frame := -1                        ## the process frame the face rig last stepped in
+# per-frame caches (the skeleton and materials of a loaded model do not change until the next load)
+var _bone_parent := PackedInt32Array()     ## bone -> parent bone
+var _bone_rest: Array[Transform3D] = []    ## bone -> rest pose
+var _fx_bone := PackedByteArray()          ## bone -> 1 when the face rig drives it
+var _fx_scaled := PackedByteArray()        ## face-rig bones whose pose scales (eyelids squash)
+var _mat_state: Array = []                 ## material values written last frame [flash, juice, status, bruised, glow]; [] = write all
+## Set by the match scenes and the hub each frame (view only): the fighter's expression and what it
+## looks at.
 var fx_mood := "neutral"
 var fx_look := Vector3.INF
 
@@ -108,21 +122,42 @@ static func model_path_for(c: CreatureDef, legacy = null) -> String:
 
 
 func _on_setting_changed(key: String, _v) -> void:
-	if key == LEGACY_VARGA_SETTING and creature != null:
+	# Settings re-sends keys that did not change (Reset Graphics sends them all): swap only when the
+	# model this player should see is not the one drawn
+	if key == LEGACY_VARGA_SETTING and creature != null and model_path_for(creature) != loaded_model_path():
 		reload_model()
 
 
+## The model file this view draws (the creature_model meta of its loaded instance); "" when it shows
+## the built-in segment look.
+func loaded_model_path() -> String:
+	for child in get_children():
+		if child.has_meta("creature_model") and not child.is_queued_for_deletion():
+			return str(child.get_meta("creature_model"))
+	return ""
+
+
 ## Swaps the drawn model in place (the Legacy Varga skin toggled mid-match): same bones, so the
-## pose, cosmetics and effects carry over from the next rendered frame.
+## pose, cosmetics and effects carry over. A view that already has a pose is re-posed at once
+## (fighter previews render a single time).
 func reload_model() -> void:
+	# a piece that already popped off this round (the gold tooth gag) stays off on the new model
+	var popped := {}
+	for a in _attachments:
+		if bool(a["popped"]):
+			popped[str(a["id"])] = true
 	for child in get_children():
 		if child is Node3D and child.has_meta("creature_model"):
+			remove_child(child)
 			child.queue_free()
 	for n in _seg_nodes:
 		if is_instance_valid(n):
+			remove_child(n)
 			n.queue_free()
 	_seg_nodes.clear()
 	_skeleton = null
+	_fx = null
+	_look = {}
 	_materials.clear()
 	_glow_materials.clear()
 	_gore_mesh = null
@@ -134,6 +169,11 @@ func reload_model() -> void:
 	set_juice_style(juice_color, glow_color)
 	if not _cosmetic_items.is_empty():
 		set_cosmetics(_cosmetic_items)
+		for a in _attachments:
+			a["popped"] = popped.has(str(a["id"]))
+		_update_attachments()
+	if is_inside_tree() and not _curr.is_empty() and _curr[0] != Transform3D():
+		render(_last_alpha)
 
 
 func _exit_tree() -> void:
@@ -155,11 +195,19 @@ func _palette(key: String, fallback: Color) -> Color:
 	return fallback
 
 
+## The shader's material class for a model material name (MATERIAL_KINDS by its first word): hide
+## when unknown, and always without the v0.9.17 finish.
+func _material_kind(mat_name: String) -> int:
+	if _finish <= 0.0:
+		return 0
+	return int(MATERIAL_KINDS.get(mat_name.trim_prefix("detail_").get_slice("_", 0), 0))
+
+
 func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := false, outlined := true, mat_name := "") -> ShaderMaterial:
 	var m := Materials.creature_material()
 	m.set_shader_parameter("tint", color)
 	var key := mat_name.trim_prefix("detail_").get_slice("_", 0)
-	m.set_shader_parameter("material_kind", int(MATERIAL_KINDS.get(key, 0)) if _finish > 0.0 else 0)
+	m.set_shader_parameter("material_kind", _material_kind(mat_name))
 	m.set_shader_parameter("glow_mode", int(MATERIAL_GLOW.get(key, _look_glow_mode())))
 	m.set_shader_parameter("finish", _finish)
 	m.set_shader_parameter("roughness_v", float(creature.art.get("roughness", 0.65)) if roughness < 0.0 else roughness)
@@ -169,6 +217,7 @@ func _make_material(color: Color, roughness := -1.0, metallic := 0.0, glow := fa
 	if outlined:
 		m.next_pass = Materials.outline_material(float(creature.art.get("outline", 0.012)))
 	_materials.append(m)
+	_mat_state = []
 	if glow:
 		_glow_materials.append(m)
 	return m
@@ -189,13 +238,14 @@ func _try_load_model(path: String) -> bool:
 		return false
 	var inst := scene.instantiate()
 	inst.set_meta("creature_model", path)
-	_finish = 0.0 if path == VARGA_LEGACY_MODEL else 1.0
 	_look = {}
 	for c0 in inst.get_children():
 		if c0.has_meta("extras") and typeof(c0.get_meta("extras")) == TYPE_DICTIONARY:
 			_look = c0.get_meta("extras")
 	if inst.has_meta("extras") and typeof(inst.get_meta("extras")) == TYPE_DICTIONARY:
 		_look = inst.get_meta("extras")
+	# the v0.9.17 finish belongs to the art made for it (extras.look); never the original Varga
+	_finish = 1.0 if _look.has("look") and path != VARGA_LEGACY_MODEL else 0.0
 	add_child(inst)
 	_skeleton = _find_skeleton(inst)
 	if _skeleton == null:
@@ -218,8 +268,24 @@ func _try_load_model(path: String) -> bool:
 	_fx = CreatureFxRig.new(_skeleton, _look, hash(creature.id) + get_instance_id())
 	if not _fx.has_bones():
 		_fx = null
+	_bone_parent.resize(nb)
+	_bone_rest.resize(nb)
+	_fx_bone.resize(nb)
+	_fx_bone.fill(0)
+	_fx_scaled.resize(nb)
+	_fx_scaled.fill(0)
+	for b0 in nb:
+		_bone_parent[b0] = _skeleton.get_bone_parent(b0)
+		_bone_rest[b0] = _skeleton.get_bone_rest(b0)
+		if _fx != null and _fx.is_fx_bone(b0):
+			_fx_bone[b0] = 1
+	if _fx != null:
+		for lb in _fx.bones.get("lid", []):
+			_fx_scaled[int(lb)] = 1
+	_mat_state = []
 	# parents-first bone order so hierarchical skeletons (any importer layout) pose correctly
 	_bone_order = PackedInt32Array()
+	_bone_global.clear()          # nothing carries over from a swapped-out model's bones
 	_bone_global.resize(nb)
 	var pending: Array[int] = []
 	for b in _skeleton.get_parentless_bones():
@@ -335,8 +401,9 @@ func _find_meshes(n: Node) -> Array[MeshInstance3D]:
 	return out
 
 
-## Stylized fallback: smooth primitive per shape, coloured by body part.
+## Stylized fallback: smooth primitive per shape, coloured by body part (pre-v0.9.17 shading).
 func _build_fallback() -> void:
+	_finish = 0.0
 	var primary := _palette("primary", Color(0.85, 0.55, 0.3))
 	var secondary := _palette("secondary", primary.darkened(0.25))
 	var accent := _palette("accent", Color(0.95, 0.85, 0.7))
@@ -448,6 +515,7 @@ func _jolt_offset() -> Vector3:
 
 
 func render(alpha: float) -> void:
+	_last_alpha = alpha
 	var n := _curr.size()
 	var off := _jolt_offset()
 	if _skeleton:
@@ -455,10 +523,10 @@ func render(alpha: float) -> void:
 		# (the skeleton sits at the world origin). Converted to parent-relative poses parents-first,
 		# so both flat and nested bone layouts end up with the same world placement.
 		for bi in _bone_order:
-			if _fx != null and _fx.is_fx_bone(bi):
+			if _fx_bone[bi] == 1:
 				continue      # placed below, after the segment bones it hangs from
 			var si := _seg_of_bone[bi]
-			var parent := _skeleton.get_bone_parent(bi)
+			var parent := _bone_parent[bi]
 			var parent_global := _bone_global[parent] if parent >= 0 else Transform3D.IDENTITY
 			var global: Transform3D
 			if si >= 0 and si < n:
@@ -466,7 +534,7 @@ func render(alpha: float) -> void:
 				var b := _curr[si]
 				global = Transform3D(Basis(a.basis.get_rotation_quaternion().slerp(b.basis.get_rotation_quaternion(), alpha)), a.origin.lerp(b.origin, alpha) + off)
 			else:
-				global = parent_global * _skeleton.get_bone_rest(bi)
+				global = parent_global * _bone_rest[bi]
 			_bone_global[bi] = global
 			if si >= 0 and si < n:
 				_seg_global[si] = global
@@ -475,18 +543,24 @@ func render(alpha: float) -> void:
 			_skeleton.set_bone_pose_rotation(bi, local.basis.get_rotation_quaternion())
 		if _fx != null:
 			_fx.mood = fx_mood
+			_fx.spring_every = _spring_every()
 			_fx.look_target = fx_look
-			_fx.update(get_process_delta_time(), _bone_global_of)
+			# a second render in one frame (the model swapped mid-frame) poses the face without
+			# stepping it: the springs would read the repeat as a sudden stop
+			var frame := Engine.get_process_frames()
+			_fx.update(get_process_delta_time() if frame != _fx_frame else 0.0, _bone_global_of)
+			_fx_frame = frame
 			for bi2 in _bone_order:
-				if not _fx.is_fx_bone(bi2):
+				if _fx_bone[bi2] == 0:
 					continue
-				var parent2 := _skeleton.get_bone_parent(bi2)
+				var parent2 := _bone_parent[bi2]
 				var pg := _bone_global[parent2] if parent2 >= 0 else Transform3D.IDENTITY
 				var fx_local: Transform3D = (_fx.rest[bi2] as Transform3D) * (_fx.local[bi2] as Transform3D)
 				_bone_global[bi2] = pg * fx_local
 				_skeleton.set_bone_pose_position(bi2, fx_local.origin)
 				_skeleton.set_bone_pose_rotation(bi2, fx_local.basis.get_rotation_quaternion())
-				_skeleton.set_bone_pose_scale(bi2, fx_local.basis.get_scale())     # lids squash and stretch
+				if _fx_scaled[bi2] == 1:
+					_skeleton.set_bone_pose_scale(bi2, fx_local.basis.get_scale())     # lids squash and stretch
 	else:
 		for i in n:
 			var a := _prev[i]
@@ -497,6 +571,21 @@ func render(alpha: float) -> void:
 			_seg_global[i] = t
 	_update_attachments()
 	_update_materials()
+
+
+## How often the face rig's springs step: every frame on a fighter that fills a good part of the
+## screen, every second frame when it is small (a crowded brawl seen from afar), every fourth when
+## tiny, where a crest's swing cannot be seen (CreatureFxRig.spring_every).
+func _spring_every() -> int:
+	var vp := get_viewport() if is_inside_tree() else null
+	var cam := vp.get_camera_3d() if vp != null else null
+	if cam == null or _seg_global.is_empty():
+		return 1
+	var d := cam.global_position.distance_to(_seg_global[0].origin)
+	if d < 0.5 or cam.projection != Camera3D.PROJECTION_PERSPECTIVE:
+		return 1
+	var px := vp.get_visible_rect().size.y * SCREEN_HEIGHT_M * body.scale / (2.0 * d * tan(deg_to_rad(cam.fov) * 0.5))
+	return 1 if px >= 220.0 else (2 if px >= 110.0 else 4)
 
 
 ## Metres a body's REST pose reaches below its floor (y = 0 of fighter space), 0 when it does not.
@@ -624,24 +713,38 @@ func clear_bruises() -> void:
 func _update_materials() -> void:
 	var dt := get_process_delta_time()
 	_flash = maxf(0.0, _flash - dt * 6.0)
-	var arr: Array[Vector4] = []
-	arr.resize(MAX_BRUISES)
-	for i in MAX_BRUISES:
-		if i < _bruises.size() and gore_level > 0:
-			var b: Dictionary = _bruises[i]
-			var p: Vector3 = _curr[int(b["seg"])] * (b["local"] as Vector3)
-			arr[i] = Vector4(p.x, p.y, p.z, float(b["s"]))
-		else:
-			arr[i] = Vector4.ZERO
-	for m in _materials:
-		m.set_shader_parameter("flash", _flash)
-		m.set_shader_parameter("juice", juice_amount)
-		m.set_shader_parameter("status_color", status_color)
-		m.set_shader_parameter("bruises", arr)
 	# ART_DIRECTION §4: emissive accents run 0.3 at 0 Hype -> 1.0 at 100 Hype (full while juiced)
 	var glow := 0.3 + 0.7 * clampf(maxf(hype, juice_amount), 0.0, 1.0)
-	for g in _glow_materials:
-		g.set_shader_parameter("vertex_glow", glow)
+	var bruised := gore_level > 0 and not _bruises.is_empty()
+	# Only values that changed are written (every fighter has a dozen surfaces, and setting a shader
+	# parameter is not free); bruises follow the body, so they are rewritten every frame while there
+	# are any, and a cleared list once.
+	var all := _mat_state.is_empty()
+	if all or _flash != float(_mat_state[0]):
+		for m in _materials:
+			m.set_shader_parameter("flash", _flash)
+	if all or juice_amount != float(_mat_state[1]):
+		for m in _materials:
+			m.set_shader_parameter("juice", juice_amount)
+	if all or status_color != (_mat_state[2] as Color):
+		for m in _materials:
+			m.set_shader_parameter("status_color", status_color)
+	if all or bruised or bool(_mat_state[3]):
+		var arr: Array[Vector4] = []
+		arr.resize(MAX_BRUISES)
+		for i in MAX_BRUISES:
+			if i < _bruises.size() and gore_level > 0:
+				var b: Dictionary = _bruises[i]
+				var p: Vector3 = _curr[int(b["seg"])] * (b["local"] as Vector3)
+				arr[i] = Vector4(p.x, p.y, p.z, float(b["s"]))
+			else:
+				arr[i] = Vector4.ZERO
+		for m in _materials:
+			m.set_shader_parameter("bruises", arr)
+	if all or glow != float(_mat_state[4]):
+		for g in _glow_materials:
+			g.set_shader_parameter("vertex_glow", glow)
+	_mat_state = [_flash, juice_amount, status_color, bruised, glow]
 
 
 ## The cosmetic end-of-fight gag: a creature-specific piece pops off and bounces away.
@@ -674,6 +777,10 @@ func detach_piece(impulse_dir: Vector3) -> RigidBody3D:
 		var pm := Materials.creature_material()
 		pm.set_shader_parameter("tint", Color.WHITE)
 		pm.set_shader_parameter("roughness_v", 0.35)
+		# the finish of the model it came off, shaded as its own material class (Dozer's shell chip)
+		var gm: Material = _gore_mesh.surface_get_material(0) if _gore_mesh.get_surface_count() > 0 else null
+		pm.set_shader_parameter("finish", _finish)
+		pm.set_shader_parameter("material_kind", _material_kind(gm.resource_name if gm != null else ""))
 		pm.next_pass = Materials.outline_material(float(creature.art.get("outline", 0.012)) * 0.6)
 		mi.material_override = pm
 	else:

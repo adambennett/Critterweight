@@ -1,0 +1,10 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti SUPER
+
+2026-10-21 16:55:32 [INFO] paths: user data root: B:/Critterweight-work/v0.9.17/codex-perf-final-20261021/user-high
+2026-10-21 16:55:33 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:55:33 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-21 16:55:34 [INFO] toast: [success] XInput Controller connected.
+2026-10-21 16:55:34 [INFO] match: start free_for_all_lives on the_gullet: f_dozer/t0/bot, f_dredge/t1/bot, f_gusto/t2/bot, f_jitters/t3/bot, f_knell/t4/bot, f_slurry/t5/bot, f_stoke/t6/bot, f_varga/t7/bot
+BENCH {"abilities_every_s":3.0,"ability_bursts":10,"alive_fighters_end":8,"bench":"busy","boot_ms":8243,"cores":8,"cpu":"Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz","date":"2026-10-21T16:55:34","draw_calls":{"max":1376.0,"mean":1172.936,"min":1003.0,"n":2290,"p50":1164.0,"p95":1318.0,"p99":1351.0},"engine":"4.5.1-stable (official)","fighters":8,"fps_avg":76.283469372187,"frame_ms":{"max":72.669,"mean":13.109,"min":7.294,"n":2290,"p50":12.162,"p95":22.087,"p99":28.955},"frames":2290,"frames_over_16_7ms":361,"frames_over_16_7ms_pct":15.764192139738,"game_version":"0.9.17","headless":false,"hits":77,"match_load_ms":402.128,"memory_growth_mb":15.0820398330688,"memory_static_mb":339.054660797119,"objects":10225.0,"os":"Windows","physics_frame_ms":{"max":11.13,"mean":7.878,"min":4.646,"n":2290,"p50":7.936,"p95":10.651,"p99":11.13},"preset":"high","primitives":{"max":1269376.0,"mean":1160914.814,"min":979988.0,"n":2290,"p50":1180332.0,"p95":1256900.0,"p99":1265492.0},"process_frame_ms":{"max":28.908,"mean":13.642,"min":9.011,"n":2290,"p50":13.317,"p95":23.937,"p99":28.908},"process_rss_mb":339.054904937744,"renderer":"NVIDIA GeForce RTX 4070 Ti SUPER","resolution":[1920,1080],"total_ms":43659,"video_mem_mb":331.645797729492}
+BENCH_REPORT B:\Critterweight-work\v0.9.17\codex-perf-final-20261021\after-1-high-abilities.json

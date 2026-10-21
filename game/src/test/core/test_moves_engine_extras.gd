@@ -26,13 +26,15 @@ func test_grounded_areas_skip_hovering_fighters() -> void:
 	var a := sim.fighters[0]
 	var b := sim.fighters[1]
 	var quake := {"type": "area", "shape": "circle", "radius": 2.5, "damage": 5.0, "knockdown": true, "grounded": true}
-	b.set_flag("hovering", 1.0)
+	b.start_hover(0.6, 1.0, 1.0)
+	check(b.has_flag("hovering") and not b.is_down(), "the real hover state is active before the quake")
 	var hp := b.health
 	sim.effects.fire(a, quake.duplicate())
 	await step_sim(sim, 0.1)
 	check(is_equal_approx(b.health, hp) and not b.is_down(), "a hovering fighter is not tripped by a quake")
-	b.flags.erase("hovering")
+	b.start_hover(0.0, 0.0, 1.0)
 	await step_sim(sim, 0.3)
+	check(not b.has_flag("hovering"), "the hover has ended before the ground hit")
 	sim.effects.fire(a, quake.duplicate())
 	await step_sim(sim, 0.1)
 	check(b.health < hp, "one standing on the floor is (%.1f -> %.1f)" % [hp, b.health])

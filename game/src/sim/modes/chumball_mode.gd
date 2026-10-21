@@ -96,7 +96,14 @@ func intercept_actions(f: Fighter) -> bool:
 		return false
 	# the carrier cannot attack: any attack/grab press throws the ball
 	var throw_now := false
-	for b in [FighterInput.GRAB, FighterInput.LIGHT, FighterInput.HEAVY]:
+	var throw_buttons := [FighterInput.GRAB, FighterInput.LIGHT, FighterInput.HEAVY]
+	if f.combat_style == "moves":
+		# All four named moves are offensive inputs, including the slots that used to be
+		# abilities. Varga also throws with his two leg inputs instead of kicking the ball.
+		throw_buttons.append_array([FighterInput.AB1, FighterInput.AB2])
+		if f.creature.tags.has("martial"):
+			throw_buttons.append_array([FighterInput.MMA_LL, FighterInput.MMA_RL])
+	for b in throw_buttons:
 		if f._consume(b):
 			throw_now = true
 	if throw_now:

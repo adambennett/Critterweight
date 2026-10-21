@@ -1,0 +1,124 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 8,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_every_limb_modifier_has_a_move_in_both_stances"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_extended_inputs_roundtrip_with_high_held_bits_and_wrap"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_guard_shove_requires_its_stamina_cost"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_guest_dodge_lesson_does_not_require_standard_dash_attack"
+		},
+		{
+			"errors": [],
+			"ms": 48139,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_guest_tutorial_teaches_completable_inputs"
+		},
+		{
+			"errors": [],
+			"ms": 34458,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_imported_strikes_connect_and_stay_physically_stable"
+		},
+		{
+			"errors": [],
+			"ms": 5291,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_knell_blink_and_last_bell_have_real_effects"
+		},
+		{
+			"errors": [],
+			"ms": 4147,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_knell_normal_string_and_spectral_projectile"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_live_input_context_isolated_and_opponent_relative"
+		},
+		{
+			"errors": [],
+			"ms": 800,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_low_check_cannot_block_unblockable_hits"
+		},
+		{
+			"errors": [],
+			"ms": 1799,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_martial_buffer_remembers_modifier_and_stance_switches"
+		},
+		{
+			"errors": [],
+			"ms": 53,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_models_have_every_segment_and_playable_campaign_kits"
+		},
+		{
+			"errors": [],
+			"ms": 28340,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_new_bots_finish_bout_and_varga_varies_strikes"
+		},
+		{
+			"errors": [],
+			"ms": 2102,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_new_statuses_and_reaction"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_online_footwork_uses_selected_target_not_nearest_enemy"
+		},
+		{
+			"errors": [],
+			"ms": 52805,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_southpaw_physical_strikes_recover_and_keep_reach"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_tutorial_kid_does_not_retain_a_finished_course"
+		},
+		{
+			"errors": [],
+			"ms": 5292,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_varga_abilities_and_juice"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_view_target_chord_does_not_switch_stance_or_fire_juice"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 19 run, 0 failed, 19 passed, 0 skipped in 186.8 s",
+	"time": "2026-10-21T16:30:14",
+	"total": 19,
+	"version": "0.9.17"
+}

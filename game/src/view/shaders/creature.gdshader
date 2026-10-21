@@ -7,7 +7,10 @@ shader_type spatial;
 // glossy eyes with a crisp catchlight, jelly with a soft inner glow, lacquered shell with a clearcoat
 // highlight, spectral glow surfaces), cool shadow sides, and animated emission per glow_mode (fire
 // flicker, bioluminescent pulse, ghostly shimmer, steady lamp). Same uniforms as before plus these;
-// a material that sets none of them looks like the v0.9.16 shader.
+// a material that sets none of them looks like the v0.9.16 shader (finish defaults to 0: CreatureView
+// sets 1 only on models made for it). Finish terms that do not come from the albedo follow `tint`
+// (env reflections, the shadow tint; highlight boosts by its brightness), so a surface tinted dark
+// (the 1973 tape's silhouette) stays dark.
 
 uniform vec4 tint : source_color = vec4(1.0);
 uniform float roughness_v : hint_range(0.0, 1.0) = 0.65;
@@ -32,7 +35,7 @@ uniform vec4 glow_color : source_color = vec4(1.0, 1.0, 1.0, 0.0);
 // v0.9.17
 uniform int material_kind = 0;   // 0 hide/skin, 1 cloth, 2 metal, 3 eye, 4 jelly, 5 lacquer (shell, enamel, glass), 6 spectral
 uniform int glow_mode = 0;       // 0 steady, 1 flicker (fire), 2 pulse (charge, bioluminescence), 3 shimmer (spectral), 4 lamp
-uniform float finish = 1.0;      // 0 = the v0.9.16 look (legacy skins keep their original finish)
+uniform float finish = 0.0;      // 0 = the v0.9.16 look; 1 = the v0.9.17 finish (the upgraded roster's models)
 uniform vec4 terminator_color : source_color = vec4(1.0, 0.42, 0.28, 1.0);   // warm light bleeding past the shadow line
 uniform vec4 shadow_tint : source_color = vec4(0.17, 0.19, 0.27, 1.0);        // ART_DIRECTION: shadows are cool, never black
 uniform vec4 env_top : source_color = vec4(1.0, 0.9, 0.74, 1.0);              // fake reflection: the arena lights above
@@ -92,10 +95,10 @@ void fragment() {
 			metal = max(metal, 0.5 * finish);
 			rough = mix(rough, min(rough, 0.45), finish);
 		} else if (material_kind == 5) {
-			extra += env * (0.06 + 0.22 * fres) * finish;
+			extra += env * tint.rgb * (0.06 + 0.22 * fres) * finish;
 			rough = mix(rough, min(rough, 0.3), finish);
 		} else if (material_kind == 3) {
-			extra += env * 0.08 * fres * finish;
+			extra += env * tint.rgb * 0.08 * fres * finish;
 			rough = mix(rough, 0.12, finish);
 		} else if (material_kind == 4) {
 			// jelly: light seems to come through the thin edges and from inside
@@ -109,7 +112,7 @@ void fragment() {
 			rough = mix(rough, max(rough, 0.85), finish);
 		}
 		// cool shadow sides: a touch of ambient tint so unlit areas never go muddy
-		extra += shadow_tint.rgb * 0.05 * finish;
+		extra += shadow_tint.rgb * tint.rgb * 0.05 * finish;
 	}
 	ALBEDO = base;
 	ROUGHNESS = rough;
@@ -150,22 +153,25 @@ void light() {
 	float strength = (1.0 - roughness_v) * 0.35;
 	vec3 spec_col = vec3(1.0);
 	if (finish > 0.0) {
+		// the finish's brighter highlights scale with the tint's brightness (a black tint keeps the
+		// v0.9.16 strength)
+		float boost = finish * max(tint.r, max(tint.g, tint.b));
 		if (material_kind == 2) {
 			band = smoothstep(0.2, 0.65, pow(ndh, mix(16.0, 120.0, 1.0 - roughness_v)));
-			strength = mix(strength, 0.85, finish);
+			strength = mix(strength, 0.85, boost);
 			spec_col = mix(vec3(1.0), ALBEDO * 1.6 + 0.15, 0.7 * finish);
 		} else if (material_kind == 3) {
 			band = smoothstep(0.55, 0.6, pow(ndh, 260.0));
-			strength = mix(strength, 1.4, finish);
+			strength = mix(strength, 1.4, boost);
 		} else if (material_kind == 5) {
 			// clearcoat: a soft, roughness-aware highlight (a crisp 110-power toon dot turned the
 			// arena's four spotlights into polka dots on big shells)
 			float coat = pow(ndh, mix(24.0, 90.0, 1.0 - roughness_v));
 			band = max(band * 0.5, smoothstep(0.3, 0.8, coat) * 0.85);
-			strength = mix(strength, 0.5, finish);
+			strength = mix(strength, 0.5, boost);
 		} else if (material_kind == 4) {
 			band = smoothstep(0.42, 0.5, pow(ndh, 70.0));
-			strength = mix(strength, 0.7, finish);
+			strength = mix(strength, 0.7, boost);
 		} else if (material_kind == 0) {
 			// soft sheen on hide, not plastic
 			band = smoothstep(0.3, 0.7, spec) * 0.6;

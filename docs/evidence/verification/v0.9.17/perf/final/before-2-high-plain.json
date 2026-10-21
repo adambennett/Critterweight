@@ -1,0 +1,78 @@
+{
+  "abilities_every_s": 0.0,
+  "ability_bursts": 0,
+  "alive_fighters_end": 8,
+  "bench": "busy",
+  "boot_ms": 8199,
+  "cores": 8,
+  "cpu": "Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz",
+  "date": "2026-10-21T17:00:41",
+  "draw_calls": {
+    "max": 992.0,
+    "mean": 931.058,
+    "min": 835.0,
+    "n": 5156,
+    "p50": 944.0,
+    "p95": 968.0,
+    "p99": 987.0
+  },
+  "engine": "4.5.1-stable (official)",
+  "fighters": 8,
+  "fps_avg": 171.850833476542,
+  "frame_ms": {
+    "max": 670.298,
+    "mean": 5.819,
+    "min": 2.785,
+    "n": 5156,
+    "p50": 4.586,
+    "p95": 9.041,
+    "p99": 28.027
+  },
+  "frames": 5156,
+  "frames_over_16_7ms": 98,
+  "frames_over_16_7ms_pct": 1.90069821567106,
+  "game_version": "0.9.16",
+  "headless": false,
+  "hits": 82,
+  "match_load_ms": 326.069,
+  "memory_growth_mb": 25.1279640197754,
+  "memory_static_mb": 333.930050849915,
+  "objects": 8978.0,
+  "os": "Windows",
+  "physics_frame_ms": {
+    "max": 11.847,
+    "mean": 3.574,
+    "min": 1.476,
+    "n": 5156,
+    "p50": 2.057,
+    "p95": 9.168,
+    "p99": 11.409
+  },
+  "preset": "high",
+  "primitives": {
+    "max": 780546.0,
+    "mean": 758368.642,
+    "min": 629550.0,
+    "n": 5156,
+    "p50": 769601.0,
+    "p95": 770369.0,
+    "p99": 770982.0
+  },
+  "process_frame_ms": {
+    "max": 79.438,
+    "mean": 11.8,
+    "min": 5.214,
+    "n": 5156,
+    "p50": 8.362,
+    "p95": 46.957,
+    "p99": 79.438
+  },
+  "process_rss_mb": 333.93029499054,
+  "renderer": "NVIDIA GeForce RTX 4070 Ti SUPER",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "total_ms": 43529,
+  "video_mem_mb": 323.371215820313
+}

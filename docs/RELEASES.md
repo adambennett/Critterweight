@@ -1,7 +1,7 @@
 # Releases and versioning
 
 Builds are published as GitHub Releases of this repository
-(https://github.com/adambennett/PokeMMA/releases). Each release is one git tag and one set of files
+(https://github.com/adambennett/Critterweight/releases). Each release is one git tag and one set of files
 built from exactly that commit.
 
 ## Download and play (testers)
@@ -20,8 +20,13 @@ Other files in a release: the dedicated server (`-server-windows-x64.zip`, `-ser
 the Linux game (`-linux-x86_64.tar.gz`, not runtime-tested on Linux yet), `BUILD_MANIFEST.json`
 (per-file SHA-256 of the packages) and `SHA256SUMS.txt`.
 
-The repository is private: a tester needs to be added as a collaborator (or the repository made
-public) to see its releases.
+The repository is public (verified 2026-10-21); testers can download the published release assets.
+
+After publishing, verify the immutable annotated tag and all seven actual downloads with
+`python -B tools/verify/published_release.py --version <version> --commit <full tested commit>
+--downloads <B: download directory> --out <verification report.json>`. This read-only remote check
+also validates the checksum list, every archived file and the standalone Windows executable
+against the manifest. Release smoke-test logs and profiles stay under `dist/verification/`.
 
 ## Versioning
 
@@ -79,6 +84,7 @@ and 0.9.10 ships it. `alt/creature-art` is retired.
 
 | Version | Tag | Date | Notes |
 |---|---|---|---|
+| 0.9.17 (preview, commentary + roster art/VFX) | [v0.9.17](https://github.com/adambennett/Critterweight/releases/tag/v0.9.17) -> e287028 | 2026-10-21 | Commentary history/variety/recordings, all eight fighter models, Legacy Varga skin, ability VFX, raised-rail/cap fading; source 924 passed / 1 graphical-audio skip / 0 failed; tagged Windows 455 scripts and 20/20 rendered playtests; all seven actual downloads, annotated tag, hashes and archived members verified; [notes](releases/v0.9.17.md), [evidence](evidence/verification/v0.9.17/README.md) |
 | 0.9.16 (preview, Career + Cage Rules scoring) | [v0.9.16](https://github.com/adambennett/Critterweight/releases/tag/v0.9.16) -> a5af0d1 | 2026-10-20 | Career (persistent fighter, first in Campaign), optional 10-point must scoring and referee for the duel, Jeremy's Cage Rules referee, built-in Cage Rules preset, v0.9.15 patch note restored; source suite 862 run / 861 passed / 1 graphical-audio skip / 0 failed; packaged 96 headless + 26 rendered + 20 rendered playtests, 0 failed, 0 skipped; [release notes](releases/v0.9.16.md), [verification](evidence/verification/v0.9.16/README.md) |
 | 0.9.15 (combined preview) | [v0.9.15](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.15) | 2026-10-19 | Varga and Knell, Rooftop Canvas, expanded Devon/Kendall commentary, eight soundtrack tracks and Jukebox, campaign and controller improvements; source suite 774 passed / 1 graphical-audio skip / 0 failed; package suite 70 passed / 2 source-only skips / 0 failed; [release notes](releases/v0.9.15.md), [verification](evidence/verification/v0.9.15-combined/summary.json) |
 | 0.9.14 (preview, menu audio polish) | [v0.9.14](https://github.com/adambennett/PokeMMA/releases/tag/v0.9.14) -> 95c857a | 2026-10-18 | Menu focus now uses quieter Kenney CC0 ticks at -14 dB; source audio 20/20; packaged audio 18 passed / 2 source-only skips / 0 failed; 394 scripts checked; tagged Windows build reached title in 5.7 s and passed 20/20 rendered regressions; four targets built; all seven uploaded asset digests verified; [verification](evidence/verification/v0.9.14/README.md), [release notes](releases/v0.9.14.md) |

@@ -5,7 +5,9 @@
 //   pacing      lines per live minute, share of time talking, silences, cut-offs
 //   repetition  exact repeats within a bout, in the next two bouts (rematches, the next campaign
 //               bout), across the restart between session A and B; joke-family repeats in a row
-//   accuracy    situational lines checked against the events that preceded them; result calls
+//   accuracy    situational lines checked against the events that preceded them (when the run logged
+//               the director's requests, against the request that picked the line: a line tagged
+//               for several situations is judged by the one it was played for); result calls
 //               (KO / stoppage / decision) checked against what really happened; stale calls
 //   spread      distinct lines, the most-played lines, never-played share of the eligible bank
 // Usage: node tools/audio/commentary_report.js <run dir> [<run dir> ...] [--md out.md] [--json out.json]
@@ -40,6 +42,7 @@ const SITUATIONAL = {
   big_hit: { pred: (e) => (e.type === 'hit' && !e.blocked && e.damage >= 10) || e.type === 'slam', window: 3 },
   clean_hit: { pred: (e) => e.type === 'hit' && !e.blocked && e.damage >= 4, window: 2.5 },
   grab_throw: { types: ['throw', 'grab'], window: 3 },
+  escape: { types: ['grab'], window: 5 },
   wall: { types: ['slam'], window: 3 },
   ability: { types: ['ability'], window: 3 },
   juice: { types: ['juice'], window: 4 },
@@ -93,6 +96,12 @@ function analyse(label, dir) {
     for (const seg of s.segments) {
       const lines = s.lines.filter((l) => l.segment === seg.segment);
       const events = s.events.filter((e) => e.segment === seg.segment);
+      const requests = (s.commentary || []).filter((c) => c.segment === seg.segment && c.kind === 'request' && c.picked);
+      for (const l of lines) {
+        let req = null;
+        for (const c of requests) if (c.picked === l.id && c.t <= l.t + 0.05) req = c;
+        if (req) l.request = req.trigger;
+      }
       const dur = seg.duration || (events.length ? events[events.length - 1].t + 5 : 0) || (lines.length ? lines[lines.length - 1].t + 5 : 0);
       segOrder.push({ key: s.name + ':' + seg.segment, session: s.name, seg, lines, events, dur });
       allLines = allLines.concat(lines.map((l) => Object.assign({ session: s.name, segkey: s.name + ':' + seg.segment }, l)));
@@ -111,7 +120,8 @@ function analyse(label, dir) {
     for (let i = 1; i < lines.length; i++) gaps.push(lines[i].t - (lines[i - 1].end || lines[i - 1].t));
     for (const l of lines) {
       const m = meta[l.id] || {};
-      const sit = (l.trigger === 'color' || l.trigger === 'conversation_turn' || l.trigger === 'color_conversation_start') ? (m.situation || 'generic') : (SITUATIONAL[l.trigger] ? l.trigger : (SITUATIONAL[m.situation] && l.trigger === m.situation ? m.situation : null));
+      const trig = l.request || l.trigger;      // what the line was played for
+      const sit = (trig === 'color' || trig === 'conversation_turn' || trig === 'color_conversation_start' || trig === 'color_conversation') ? (m.situation || 'generic') : (SITUATIONAL[trig] ? trig : (SITUATIONAL[m.situation] && trig === m.situation ? m.situation : null));
       const ev = sit ? evidence(sit, l, events) : null;
       if (ev !== null) { sitTotal += 1; if (ev) sitOk += 1; }
       // lines played as lull chatter (colour) that actually claim a situation
@@ -145,7 +155,8 @@ function analyse(label, dir) {
         resultChecks.kos += 1;
         const end = events.find((x) => x.type === 'round_end' && Math.abs(x.t - e.t) < 0.2);
         const decided = events.some((x) => x.type === 'match_end' && x.t >= e.t && x.t - e.t < 8);
-        if (end && !decided && after.some((l) => l.trigger === 'ko' && /over|goodnight|refunds|the night|the fight/i.test(l.said || l.text))) resultChecks.ko_said_over_but_round_only += 1;
+        const claimsEnd = (x) => /over|goodnight|refunds|the night|the fight/i.test(x) && !/\b(isn't|is not|not|ain't|far from) over\b/i.test(x);
+        if (end && !decided && after.some((l) => l.trigger === 'ko' && claimsEnd(l.said || l.text))) resultChecks.ko_said_over_but_round_only += 1;
       }
     }
     out.segments.push({ segment: g.key, kind: g.seg.kind, a: g.seg.a, b: g.seg.b, seconds: +g.dur.toFixed(1), lines: lines.length,

@@ -1,0 +1,37 @@
+[
+    {
+        "name":  "dedicated server start (server package)",
+        "status":  "pass",
+        "detail":  "\u0027Verification Server\u0027 on UDP 47212, playlist verify_duel, pid 33832"
+    },
+    {
+        "name":  "online duel, 2 packaged clients (LOOPBACK)",
+        "status":  "pass",
+        "detail":  "authoritative result reached both; attacker won: True; Alice hits 14; Bob lowest health 0.0; 29.8 snapshots/s, interpolation 49 ms, RTT 10.0 ms"
+    },
+    {
+        "name":  "online spectator frame (windowed packaged client)",
+        "status":  "pass",
+        "detail":  "capture_online_spectator.png"
+    },
+    {
+        "name":  "server TCP admin (token, 127.0.0.1)",
+        "status":  "pass",
+        "detail":  "Verification Server | phase results | up 32s | players 0/4 (+0 reserved) | spectators 0"
+    },
+    {
+        "name":  "server TCP admin refuses a wrong token",
+        "status":  "pass",
+        "detail":  "ERR auth"
+    },
+    {
+        "name":  "server graceful shutdown",
+        "status":  "pass",
+        "detail":  "exit code 0"
+    },
+    {
+        "name":  "no errors logged (server, clients, spectator)",
+        "status":  "pass",
+        "detail":  "5 logs scanned"
+    }
+]

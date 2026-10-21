@@ -135,3 +135,13 @@ Outputs generated while a paid subscription is active may be used commercially, 
 public-library voices; permission survives subscription cancellation. The output-rights grant
 does not cover the voice models or provider technology. These are commercially usable generated
 outputs, not public-domain or CC0 assets. No voice model, API key or provider SDK ships.
+
+## v0.9.17 recorded dialogue (2026-10-20)
+
+The same approved Devon, Kendall and Coach Buck voices and `breeze-tts-2` workflow were used for
+the commentary expansion. Original writing, exact generation instructions, per-request credit
+charges, source/processed hashes and retakes are recorded under `docs/audio/breeze/v0.9.17/`.
+The 521 installed mono 16-bit 24 kHz clips and their catalog ship in `assets/audio/speech/v0917/`;
+raw masters remain on B:. This release used 3,255.8 credits from the owner's single 10,000-credit
+allowance for v0.9.17 and v0.9.18. The existing output-rights provenance above applies; no voice
+model or credential is distributed.

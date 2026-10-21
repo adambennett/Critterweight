@@ -1,0 +1,28 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 7,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_finish.gd::test_a_material_that_sets_none_of_it_is_the_v0916_shader"
+		},
+		{
+			"errors": [],
+			"ms": 140,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_finish.gd::test_only_the_upgraded_roster_gets_the_finish"
+		},
+		{
+			"errors": [],
+			"ms": 21,
+			"ok": true,
+			"test": "res://src/test/core/test_creature_finish.gd::test_the_gore_piece_keeps_its_models_finish"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 3 run, 0 failed, 3 passed, 0 skipped in 3.8 s",
+	"time": "2026-10-21T16:33:05",
+	"total": 3,
+	"version": "0.9.17"
+}

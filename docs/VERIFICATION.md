@@ -1,8 +1,18 @@
 # Verification report
 
+**v0.9.17 released and verified, 2026-10-21.** The [release report](evidence/verification/v0.9.17/README.md)
+records the exact clean release commit `e287028`, 925 source checks (924 passed, one expected
+graphical-audio skip, zero failed), a passing ten-minute soak, all eight source-model exports,
+521 speech-clip hashes, rendered roster/VFX/skin evidence and packaged loopback checks. The tagged
+build passes 455 scripts and all 20 rendered playtests. All seven actual downloads, annotated tag,
+checksums and archived members are verified; the downloaded Windows game boots in 5.7 seconds.
+Final paired performance: 107-129 FPS plain and 85-104 FPS with simultaneous abilities on this PC;
+the heaviest 1080p case has 6-7% of frames over 16.7 ms. This is not a constant-60-FPS or Deck claim.
+
 **Release 0.9.16, 2026-10-20.** [The v0.9.16 report](evidence/verification/v0.9.16/README.md): Career,
 10-point scoring, the referee and the Cage Rules preset. 437 scripts; full source suite on the release
-commit 862 run, 861 passed, 0 failed, 1 graphical-audio skip. PACKAGED
+commit 862 run, 861 passed, 0 failed, 1 graphical-audio skip. Packaged: boot to the title in 4.4 s,
+rendered playtest regressions 20/20, new-feature suites 96 headless + 26 rendered, 0 failed, 0 skipped.
 
 **Local v0.9.15 fighters preview, 2026-10-18.** [Fighter build report](releases/v0.9.15-fighters-preview.md): Varga (Scrap) and Knell (Spectral), 406 scripts compile, 130 focused source tests and 62 packaged tests pass with zero failures/skips. The Windows export includes the concurrent announcer expansion. The earlier changing-source full run is diagnostic only; physical controller, visual presentation and balance await the owner. No graphical launch or release publication.
 
@@ -22,7 +32,8 @@ dedicated servers, the Linux game, `BUILD_MANIFEST.json` and `SHA256SUMS.txt` (`
 
 | Version | Commit | Source suite before release | Packaged checks |
 |---|---|---|---|
-| 0.9.16 | `a5af0d1` (`v0.9.16`; suite on `9d0a29c`, docs-only after) | 862 run: 861 passed, 0 failed, 1 graphical-only skip | PACKAGED |
+| 0.9.17 | `e287028` (`v0.9.17`) | 925 run: 924 passed, 0 failed, 1 graphical-audio skip; ten-minute soak | Tagged Windows: 455 scripts, title in 5.5 s, 20/20 rendered playtests; all seven actual downloads and archived members verified; downloaded title in 5.7 s; [report](evidence/verification/v0.9.17/README.md) |
+| 0.9.16 | `a5af0d1` (`v0.9.16`; suite on `9d0a29c`, docs-only after) | 862 run: 861 passed, 0 failed, 1 graphical-only skip | Windows export of `9d0a29c`: title in 4.4 s, rendered playtests 20/20, new-feature suites 96 headless + 26 rendered, 0 failed, 0 skipped |
 | 0.9.15 | `f8e4bbb` (`v0.9.15`) | 775 run: 774 passed, 0 failed, 1 graphical-only skip (combined build `8f9baff`) | combined preview package 72 checks: 70 passed, 2 source-only skips; release smoke: 406 scripts, title boot 4.3 s (no rendered filter) |
 | 0.9.14 | `95c857a` (`v0.9.14`) | focused audio suite 20/20 (full suite not rerun for the menu-audio mix) | Tagged Windows: 394 scripts, title in 5.7 s, 20/20 rendered; packaged audio 18 passed, 2 source-only skips |
 | 0.9.13 | `cdacbcf` (`v0.9.13`) | 718 run: 717 passed, 0 failed, 1 graphical-only skip; fighter selection 24/24, AI Lab picker 8/8, source audio 10/10 | Tagged Windows: 394 scripts, title in 4.5 s, 20/20 rendered; packaged audio 8 passed, 0 failed, 2 source-only skips; four targets built; seven uploaded asset digests verified; [report](evidence/verification/v0.9.13/README.md) |
@@ -50,7 +61,12 @@ below-normal priority, one full run at a time on the machine. It covers:
 - UI navigation;
 - the audio bank.
 
-About 38 minutes. A release needs a green run of the exact commit.
+The v0.9.17 source run took about 42 minutes with the default two-minute network soak. For final
+release verification, use `-SoakMinutes 10`: the short soak can compare differently sized live
+matches and mistake bounded match allocations for growth. The longer run retains the original
+memory-slope criterion, with more rotations and a five-minute measurement window. A release needs
+a green run of the exact commit. Publication evidence can be recorded in a later documentation
+commit while the verified release tag remains immutable.
 
 **2. Release smoke:** `tools/build/release.ps1`. On the packaged game it runs a script check and a boot to
 the title screen before anything is published. `-TestFilter` additionally runs matching tests with the

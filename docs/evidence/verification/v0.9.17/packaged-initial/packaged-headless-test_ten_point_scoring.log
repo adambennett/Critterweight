@@ -1,0 +1,17 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 16:22:57 [INFO] paths: user data root: C:/Users/eX_Di/AppData/Local/Temp/critterweight-packaged-test_ten_point_scoring-162254841
+2026-10-21 16:22:57 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 16:22:57 [INFO] app: Critterweight 0.9.17+1161cfe.dirty (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/core/test_ten_point_scoring.gd::test_cards_are_deterministic_and_survive_saves (50047 ms)
+ok    res://src/test/core/test_ten_point_scoring.gd::test_drawn_cards_and_sudden_death_resolve_without_a_round_4 (20942 ms)
+ok    res://src/test/core/test_ten_point_scoring.gd::test_drawn_cards_without_sudden_death_are_a_draw_after_exactly_n_rounds (19330 ms)
+ok    res://src/test/core/test_ten_point_scoring.gd::test_every_round_is_fought_and_nobody_is_knocked_out (24955 ms)
+ok    res://src/test/core/test_ten_point_scoring.gd::test_judge_math_is_pure_and_matches_the_documented_rules (0 ms)
+2026-10-21 16:24:54 [WARN] sim: 10-point scoring / referee need a timed 1v1 duel (3 fighters, 3 teams): playing plain HP rules
+2026-10-21 16:24:54 [WARN] sim: 10-point scoring / referee need a timed 1v1 duel (2 fighters, 2 teams): playing plain HP rules
+ok    res://src/test/core/test_ten_point_scoring.gd::test_officials_only_run_in_a_timed_standard_duel (19 ms)
+ok    res://src/test/core/test_ten_point_scoring.gd::test_rules_without_the_keys_play_exactly_as_before (24071 ms)
+ok    res://src/test/core/test_ten_point_scoring.gd::test_tally_counts_only_what_a_side_did_to_the_other (597 ms)
+ok    res://src/test/core/test_ten_point_scoring.gd::test_unlimited_health_keeps_the_knockdown_of_a_huge_blow (606 ms)
+tests: 9 run, 0 failed, 9 passed, 0 skipped in 144.3 s

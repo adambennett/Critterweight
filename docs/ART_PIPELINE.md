@@ -176,20 +176,28 @@ Without a model it falls back to the segment-shape primitives.
   (`CreatureView.MATERIAL_KINDS`: hide, cloth/team/wrap, metal/brass/iron, eye, jelly, lacquer/shell,
   ghost/spectral) with its own response (cloth sheen, metal specular, wet eye highlight, jelly
   translucency, spectral fresnel), and the Hype glow animates per fighter (`glow_mode`: steady,
-  flicker, pulse, shimmer, lamp). `finish` 0 keeps the exact pre-v0.9.17 shading; the legacy Varga
-  model uses it.
+  flicker, pulse, shimmer, lamp). `finish` 0 (the shader default) keeps the exact pre-v0.9.17
+  shading: `CreatureView` sets 1 only for models whose glb extras carry `look` (the upgraded roster),
+  never for the legacy Varga, so bosses, NPCs, the referee, the built-in segment look and mods' older
+  models keep the v0.9.16 look. Finish terms not derived from the albedo follow the material's `tint`
+  (a surface tinted black, like the 1973 tape's silhouette, gains no reflections or highlights).
 * **Face and secondary motion** (`creature_fx_rig.gd`, `CreatureFxRig`): models may carry view-only
   bones under the segment bones: `fx_eye_l/r` (pupils follow the opponent), `fx_lid_l/r` (blinks,
   squash by scale), `fx_brow_l/r`, `fx_jaw` (mood: neutral, attack, hurt, surprised, KO, guard, taunt,
   happy, tired) and chains `fx_spring_<name>_<n>` (damped springs: crests, fins, chains, tails,
-  drips). The rig only poses those bones after the segment bones are placed; it never moves a segment
-  bone or anything the simulation reads. Parameters come from the glb's node extras
+  drips). View bones carry no direction of their own (a fixed +Y tail), so a link's direction comes
+  from the rest layout (toward its first child, else on from its parent's pivot through its own
+  head) and it tilts toward the pseudo-force it feels: its head's inertia plus the change of gravity
+  since upright rest. Matches and the hub set the mood and look target every frame. The rig only
+  poses those bones after the segment bones are placed; it never moves a segment bone or anything
+  the simulation reads. Parameters come from the glb's node extras
   (`look`: `glow_mode`, `fx.pupil_reach`, `jaw_deg`, `brow_drop`, `lid_rest`, `spring_gain`,
   `spring_stiffness`), written by `Studio.set_look()`.
 * **Legacy Varga skin**: `CreatureView.model_path_for()` serves `f_varga_legacy.glb` (the v0.9.16
   model, byte for byte, sha256 `4fa78a8a…0460fc`) when Settings › Graphics › "Legacy Varga skin" is
   on, in every view (fighter previews, matches, practice, Career, spectating, online, hub), and swaps
-  live when the setting changes. Both models bind the same body; gameplay data is identical.
+  live when the drawn model would change (a popped gold tooth stays popped; a static preview is
+  re-posed at once). Both models bind the same body; gameplay data is identical.
 
 ## 6. Tools
 
@@ -257,12 +265,14 @@ one fighter's source and model:
 & B:\Blender\blender.exe -b -t 2 --python-exit-code 1 --python tools/blender/build_creatures.py -- f_dredge --reference-root B:\Critterweight-work\art\ref --out-source tools/blender/f_dredge.blend --out-glb game/assets/models/creatures/f_dredge.glb
 ```
 
-`--v16` builds the previous generation instead. `export_creature.py` validates view bones (names,
-parents under segment bones) and writes the `look` extras. Guards against overwriting the original
-Varga: `build_creatures.py` refuses any `*_legacy.glb` output, and `tools/cage_rules/import.js`
-writes only `f_varga_legacy.glb` (never the upgraded `f_varga.glb`), and a regeneration that would
-produce different bytes from the v0.9.16 original is refused and the previous file restored, unless
-`--allow-legacy-change` is passed deliberately.
+`--v16` builds the previous generation instead, for comparison only: it requires both
+`--out-source` and `--out-glb`, outside the repository. `export_creature.py` validates view bones
+(names, parents under segment bones) and writes the `look` extras. Guards against overwriting the
+original Varga: `build_creatures.py` and `export_creature.py` refuse any `*_legacy.glb` output (any
+letter case), and `tools/cage_rules/import.js` writes only `f_varga_legacy.glb` (never the upgraded
+`f_varga.glb`), through a temporary file that replaces it only when the bytes match the v0.9.16
+original (otherwise it is deleted and nothing is written), unless `--allow-legacy-change` is passed
+deliberately.
 
 `audit_models.js` counts **body plus detachable gore triangles**, checks the skeleton/binds/weights,
 colour/normal data, team/gore/glow contracts and texture/animation absence. View-only `fx_*` bones
