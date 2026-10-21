@@ -70,10 +70,12 @@ func test_bubble_stream_soaks_while_held_and_stops_on_release() -> void:
 	var n := _puffs(sim)
 	var hits := pool_events(sim, "hit", "bubble_stream")
 	check(hits.size() >= 4, "the bubbles pop on the fighter in front (%d)" % hits.size())
-	check(hits.all(func(e: Dictionary) -> bool: return bool(e.get("tick", false)) and str(e.get("cat", "")) == "stream"), "as throttled stream ticks")
+	check(hits.all(func(e: Dictionary) -> bool: return str(e.get("cat", "")) == "stream"), "attributed to the stream")
 	check(foe.health < hp, "they sting (%.1f)" % (hp - foe.health))
 	check(foe.statuses.has_element("brine") or float(foe.statuses.buildup.get("brine", 0.0)) > 30.0, "and soak him")
-	check(d.hype < 15.0, "a stream builds little hype (%.1f)" % d.hype)
+	# the pops are throttled stream ticks: 30% of a hit's hype each (a hit event's "tick" field holds
+	# its sim tick stamp, so the hype is the proof)
+	check(d.hype < 0.5 * 3.0 * hits.size(), "a stream builds little hype (%.1f from %d pops)" % [d.hype, hits.size()])
 	print("DREDGE bubble stream: %d puffs in 1.6 s held, %d pops on Stoke for %.1f damage, brine %.0f%s, stamina %.0f -> %.0f, hype %.1f" % [puffs,
 		hits.size(), hp - foe.health, float(foe.statuses.buildup.get("brine", 0.0)), " (Soaked)" if foe.statuses.has_element("brine") else "", st0, d.stamina, d.hype])
 	await step_sim(sim, 1.2)
@@ -132,7 +134,8 @@ func test_hydro_cannon_charges_into_a_long_beam_and_recoils() -> void:
 	check(foe.pos().z - fz > tap_push + 1.0, "and blasts him down the cage (%.2f m vs %.2f)" % [foe.pos().z - fz, tap_push])
 	check(d.pos().z < z0 - 0.4, "the recoil slides Dredge back (%.2f m)" % (z0 - d.pos().z))
 	var hits := pool_events(sim, "hit", "hydro_cannon")
-	check(hits.size() == 1 and str(hits[0].get("cat", "")) == "blast" and not bool(hits[0].get("tick", false)), "one blast hit, attributed (%s)" % str(hits))
+	check(hits.size() == 1 and str(hits[0].get("cat", "")) == "blast", "one blast hit, attributed (%s)" % str(hits))
+	check(d.hype >= 2.5, "a full hit, not a stream tick: it earns its whole hype (%.1f)" % d.hype)
 	check(float(d.cooldown_left.get("m3", 0.0)) > 0.0, "and the cannon cools down")
 	print("DREDGE hydro cannon: tap %.1f m jet, %.1f damage, %.2f m push; full charge %.1f m beam, %.1f damage, %.2f m push, recoil slide %.2f m" % [
 		float(jet[0].get("length", 0.0)) if not jet.is_empty() else 0.0, tap_dmg, tap_push,
