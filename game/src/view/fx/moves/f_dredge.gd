@@ -304,7 +304,7 @@ func _tick_cannons(delta: float) -> void:
 			var swell := clampf(t / 0.3, 0.0, 1.0)
 			var wob := 1.0 + 0.07 * sin(t * 21.0) + 0.04 * sin(t * 33.0)
 			orb.global_position = fx.anchor(fi, "claw_crusher", Vector3(0, 0, 0.08))
-			orb.scale = Vector3.ONE * (0.06 + 0.1 * swell + 0.14 * level) * wob
+			orb.scale = Vector3.ONE * (0.05 + 0.07 * swell + 0.1 * level) * wob     # up to ~0.45 m across, the claw's size
 			orb.rotation = Vector3(t * 5.0, t * 7.0, 0.0)
 			(c["mat"] as ShaderMaterial).set_shader_parameter("alpha", swell * (0.85 if fx.reduce_flashes else 1.0))
 		var scope: MeshInstance3D = c["scope"]
@@ -470,13 +470,14 @@ func _whirlpool(e: Dictionary) -> Dictionary:
 	var fmat := fp.material_override as ShaderMaterial
 	fmat.set_shader_parameter("pulse", 1.0)
 	fmat.set_shader_parameter("progress", 0.0)
+	# (the spiral's band stands upright, so it is made tall enough to read from the raised camera)
 	var funnel := MeshInstance3D.new()
-	funnel.mesh = FxKit.spiral_mesh(2.5, 0.12, 1.0, 0.16)
+	funnel.mesh = FxKit.spiral_mesh(2.5, 0.12, 1.0, 0.35)
 	var smat := FxKit.flow_material(WATER, FOAM, {"additive": 0.2, "scroll": Vector2(-1.8, 0.0), "noise_scale": Vector2(8.0, 1.5),
 		"edge_v": 0.45, "core": 0.6, "core_width": 0.3, "bands": 3.0, "alpha": 0.0})
 	funnel.material_override = smat
 	funnel.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	funnel.scale = Vector3(r * 0.95, 0.3, r * 0.95)
+	funnel.scale = Vector3(r * 0.95, 0.45, r * 0.95)
 	funnel.position = Vector3.UP * 0.02
 	root.add_child(funnel)
 	var rim := MeshInstance3D.new()
@@ -512,7 +513,7 @@ func _whirlpool(e: Dictionary) -> Dictionary:
 			cur["r"] = nr
 			fmat.set_shader_parameter("radius", nr)
 			AbilityVfx._fit_footprint(fp, nr)
-			funnel.scale = Vector3(nr * 0.95, 0.3, nr * 0.95)
+			funnel.scale = Vector3(nr * 0.95, 0.45, nr * 0.95)
 			rim.scale = Vector3(nr, 0.22, nr)
 	en["end"] = func() -> void:
 		for gp: GPUParticles3D in [spray, eye]:
