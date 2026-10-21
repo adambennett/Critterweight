@@ -300,7 +300,10 @@ func area(f: Fighter, e: Dictionary, p: Vector3) -> void:
 	var origin := p
 	if shape in ["cone", "line"]:
 		origin = f.ground_pos()
+	var grounded_only := bool(e.get("grounded", false))     # a quake: only what stands on the floor
 	for o: Fighter in enemies_in(f, origin if shape != "circle" else p, r + 1.0, bool(e.get("affects_allies", false))):
+		if grounded_only and (zone_ignores(o) or o.is_airborne()):
+			continue
 		var to: Vector3 = o.pos() - origin
 		to.y = 0.0
 		match shape:
@@ -534,7 +537,7 @@ func _spawn_prop(f: Fighter, e: Dictionary, p: Vector3) -> void:
 			_remove_prop(old)
 	var ent := {"id": _next_id, "kind": "prop", "prop": kind, "owner": f.index if f else -1, "team": f.team if f else -1,
 		"pos": Vector3(p.x, 0.0, p.z), "radius": float(e.get("radius", 1.0)), "life": float(e.get("duration", 10.0)),
-		"age": 0.0, "hp": float(e.get("hp", 0.0)), "e": e, "element": "", "vfx": kind, "body": null, "cool": {}}
+		"age": 0.0, "hp": float(e.get("hp", 0.0)), "e": e, "element": "", "vfx": str(e.get("vfx", kind)), "body": null, "cool": {}}
 	_next_id += 1
 	if kind in ["boulder", "rubble"]:
 		var sb := StaticBody3D.new()

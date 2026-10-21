@@ -241,7 +241,9 @@ under either rule.
   of firings, `"repeats"`; a projectile's own `count` is how many fly each time). Hits from repeating effects are throttled (30% hype, no stamina refund, at most one
   stun per 0.5 s per target, no hit pause), so a stream cannot stun-lock. New effect type
   `recoil` {`speed`, `up`} pushes the user back; projectiles take `intercept` (they stop enemy
-  projectiles) and `on_expire` (a list of effects fired where they land or burst).
+  projectiles) and `on_expire` (a list of effects fired where they land or burst); an area with
+  `grounded: true` (a quake) skips fighters who are airborne or hovering; a prop keeps its effect's
+  `vfx`.
 - `styles`: two named variants per move; a style is a list of ContentPatch operations on the
   fighter's own definition (`set`, `mul`, `add`, `time_scale`, paths such as
   `abilities.ability1.effects[type=area].cone_deg`). Runs and Career choose one per move.

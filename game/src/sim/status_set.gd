@@ -68,8 +68,10 @@ func element_status(el: String) -> Dictionary:
 
 ## Adds elemental build-up from `source` (Fighter or null). `scale` already includes guard (0.5)
 ## and resist/weak multipliers when called from Combat.
-func add_buildup(element: String, amount: float, source, scale := 1.0) -> void:
-	if element == "" or amount <= 0.0 or fighter.is_out() or fighter.is_down():
+## allow_down: the hit that just knocked this fighter down (its build-up still applies; later hits on
+## a downed fighter build nothing).
+func add_buildup(element: String, amount: float, source, scale := 1.0, allow_down := false) -> void:
+	if element == "" or amount <= 0.0 or fighter.is_out() or (fighter.is_down() and not allow_down):
 		return
 	if not Elements.defs.has(element):
 		return

@@ -203,16 +203,11 @@ the quake's cracked disc, radial cracks and earth wave out to the true ring; Iro
 iron sheen; the cover boulders' cracked footing and rubble skirt (crumbling with the boulder);
 scree patches. Pieces scale with the Effects quality and flashes dim under Reduce flashing.
 
-### Known gaps (Movesets)
+### Engine notes (Movesets)
 
-- "Trips anything not airborne": areas have no grounded-only filter, so a hovering or leaping
-  fighter inside the ring is tripped too (a dodge still passes through it). A generic fix: an
-  area field `"grounded": true` skipping targets that `EffectsSystem.zone_ignores` (hovering) or
-  that `Fighter.is_airborne()`.
-- The cover boulders keep the v0.9.17 prop look: a prop entity's vfx is its prop kind
-  ("boulder"), so a kit cannot draw it. A generic fix: `EffectsSystem._spawn_prop` keeps the
-  effect's `vfx` for the entity (`AbilityVfx._make_prop` already reads the kind from `prop`).
-- A hit that knocks down builds no Caked: `Combat.deliver` adds build-up after `receive_hit`, and
-  `StatusSet.add_buildup` ignores a downed fighter, so the Quake Stomp trip and a direct Boulder
-  Toss (like the v0.9.17 Landslide) lose their build-up. A generic fix: let the build-up of the
-  hit that caused the knockdown through (the target was not down before `receive_hit`).
+- Quake Stomp's ring is a grounded area (`"grounded": true`): a hovering or airborne fighter is
+  not tripped (a dodge still passes through it).
+- The blow that knocks a fighter down still applies its build-up (the Quake Stomp trip and a direct
+  Boulder Toss build Caked, as does the Classic Landslide); later hits on a downed fighter build none.
+- The cover boulders keep the v0.9.17 boulder look; a prop now keeps its effect's `vfx`, so a kit
+  can give them their own.

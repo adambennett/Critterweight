@@ -677,7 +677,7 @@
           {
             "t": 0.48, "type": "area", "shape": "ring", "radius": 2.4, "inner": 0, "damage": 5, "knockback": 1.2,
             "knockdown": true, "unblockable": true, "stun": 0.4, "poise": 20, "element": "grit", "buildup": 20,
-            "vfx": "dozer_quake"
+            "vfx": "dozer_quake", "grounded": true
           }
         ]
       },

@@ -286,20 +286,22 @@ func deliver(a: Fighter, b: Fighter, h: Dictionary) -> void:
 	if not bool(h["blocked"]) and not bool(h["parried"]) and a and not bool(h.get("tick", false)):
 		# (repeating stream / emitter ticks refund nothing: a stream must not pay for itself)
 		a.stamina = minf(a.max_stamina, a.stamina + (a.move.stamina if a.move else 0.0) * Tuning.v("hit_stamina_refund"))
+	var up_before := not b.is_down()
 	b.receive_hit(h)
 	if bool(h.get("counter_triggered", false)):
 		b.fire_counter(a)
-	# element build-up (guard halves, parry zeroes, resist/weak scales)
+	# element build-up (guard halves, parry zeroes, resist/weak scales); the blow that knocks a
+	# fighter down still builds (it was standing when it landed)
 	var el := str(h.get("element", ""))
 	if not bool(h["parried"]) and not ally:
 		var scale := 0.5 if bool(h["blocked"]) else 1.0
 		scale *= Elements.damage_mult(el, b.creature.element)
 		if el != "" and float(h.get("buildup", 0.0)) > 0.0:
-			b.statuses.add_buildup(el, float(h["buildup"]), a, scale)
+			b.statuses.add_buildup(el, float(h["buildup"]), a, scale, up_before)
 		if not bool(h["blocked"]):
 			var bonus := b.statuses.hit_buildup_bonus()
 			for bel in bonus:
-				b.statuses.add_buildup(str(bel), float(bonus[bel]), a, 1.0)
+				b.statuses.add_buildup(str(bel), float(bonus[bel]), a, 1.0, up_before)
 			var st: Dictionary = h.get("status", {})
 			if not st.is_empty():
 				var stc := st.duplicate()
