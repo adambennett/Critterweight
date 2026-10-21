@@ -561,11 +561,7 @@ func set_creature(id: String) -> void:
 ## The loadout this profile last chose for a fighter in versus (Profiles "loadouts"), or [] for the
 ## fighter's recommended one.
 static func saved_loadout(creature_id: String) -> Array:
-	var all = Profiles.current.get("loadouts", {}) if typeof(Profiles.current) == TYPE_DICTIONARY else {}
-	if typeof(all) != TYPE_DICTIONARY:
-		return []
-	var lo = (all as Dictionary).get(creature_id, [])
-	return (lo as Array).duplicate() if typeof(lo) == TYPE_ARRAY else []
+	return Profiles.saved_loadout(creature_id)
 
 
 ## Movesets: the moves this player equips in the next matches.

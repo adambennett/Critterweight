@@ -34,6 +34,8 @@ func _init(action_ := "", pad_ := false) -> void:
 	help_text = "%s binding. Select it, then press the new %s within %d seconds (Esc cancels). The new input becomes the primary one; if another action used it, that action loses it and is marked Unbound." % [
 		what.capitalize(), "button, trigger or stick direction" if pad else "key or mouse button", int(BindingsFlow.CAPTURE_SECONDS)]
 	help_extra = "X / Delete: restore this action's default bindings."
+	if BindingsFlow.help_of(action_) != "":
+		help_extra = BindingsFlow.help_of(action_) + "\n" + help_extra
 
 
 func _ready() -> void:

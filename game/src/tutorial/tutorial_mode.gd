@@ -10,6 +10,15 @@ extends MatchMode
 ##
 ## Every check reads the player's real kit and every drill works for every body: see
 ## docs/design/ANNOUNCER_AND_TUTORIAL.md §2.3 (partner choice, how the Kid drills, adaptations).
+##
+## Courses (v0.9.18, Tutorial.course_for): a player fighting with Movesets takes the "moves" course,
+## which teaches the equipped loadout (Tutorial.moves_kit): footwork, the basic string with its
+## finisher, the hold-to-charge move, the sustained move held and steered with the stick, landing a
+## special, guard, dodge and the basic's dash strike, grapple and throw, parry, the Ultimate and the
+## freestyle round. A lesson whose move the loadout lacks is skipped with a short note ("adapt"
+## "skip"). Its checks read the pool move each event carries ("pool"/"cat"). The Classic rule (and
+## Varga) take the v0.9.17 "classic" course, whose checks and lines are unchanged. Kid Lamprey drills
+## with his Classic kit in both courses (his drills press Light and Heavy).
 
 const SUCCESS_PAUSE := 3.2
 const HINT_IDLE := 20.0
@@ -32,6 +41,8 @@ var data := {}                       ## per-exercise tracking
 var completed: Array = []
 var single := false                  ## replaying one exercise from the list: stop after it
 var kid: KidScript
+var course := "classic"              ## "moves" | "classic" (Tutorial.course_for the player's fighter)
+var kit := {}                        ## Movesets: the equipped moves the lessons teach (Tutorial.moves_kit)
 var _cursor := 0
 
 
@@ -46,11 +57,15 @@ func setup(match_sim) -> void:
 	super.setup(match_sim)
 	if rules.has("tutorial_start"):
 		start_index = int(rules["tutorial_start"])
-	list = Tutorial.exercises()
+	course = Tutorial.course_for(player().creature, player().combat_style)
+	list = Tutorial.exercises(course)
 	completed = Tutorial.completed_ids().duplicate()
 	kid = KidScript.new(self)
 	if sim.fighters.size() > 1:
 		sim.set_input_source(1, kid)
+		# the Kid's drills press Light and Heavy: he keeps his Classic kit in both courses
+		if partner().combat_style != "classic":
+			partner().set_combat("classic")
 	_cursor = sim.event_seq
 	start_exercise(clampi(start_index, 0, maxi(0, list.size() - 1)), start_index > 0)
 
@@ -86,7 +101,8 @@ func start_exercise(i: int, only_this := false) -> void:
 		f.mods.erase("move_speed")
 	var ex := current()
 	var p := player()
-	if str(ex.get("check", "")) == "finisher_juice":
+	kit = Tutorial.moves_kit(p.creature, p.loadout) if course == "moves" else {}
+	if str(ex.get("check", "")) in ["finisher_juice", "ultimate"]:
 		p.mods["hype_gain"] = 2.0      # the tutorial fills Hype faster so the lesson stays short
 	if str(ex.get("check", "")) == "win_round":
 		round_timer = float((ex.get("params", {}) as Dictionary).get("time", 60.0))
@@ -97,7 +113,9 @@ func start_exercise(i: int, only_this := false) -> void:
 		var jab := Tutorial.jab_for(p.creature.id)
 		if jab != "":
 			intro = jab + " " + intro
-	_say("intro", intro)
+	# a Movesets lesson the loadout can't do goes straight to its short note (the next tick)
+	if not (course == "moves" and adapted("skip")):
+		_say("intro", intro)
 	sim.emit_event({"type": "tutorial_exercise", "index": index, "id": str(ex.get("id", ""))})
 
 
@@ -112,10 +130,12 @@ func skip() -> void:
 		_finish_all()
 
 
-## Which parts of an exercise this fighter's kit cannot do (a fighter may lack a slot): flag ->
-## true, only for the flags that apply. Those parts are skipped, and the exercise's "adapt" block
-## (exercises.json) says so: its intro / goal / hint / success replace the normal lines (see
-## exercise_text()). "skip": nothing of the exercise is possible; its success line is the explanation.
+## Which parts of an exercise this fighter's kit cannot do (a fighter may lack a slot, a loadout a
+## kind of move): flag -> true, only for the flags that apply. Those parts are skipped, and the
+## exercise's "adapt" block (exercises.json) says so: its intro / goal / hint / success replace the
+## normal lines (see exercise_text()). "skip": nothing of the exercise is possible; its success line
+## is the explanation. Movesets "use_only": the special is a counter / support / utility move, which
+## is used rather than landed. (The Movesets checks read `kit`, set by start_exercise first.)
 func _adaptation(ex: Dictionary, c: CreatureDef) -> Dictionary:
 	var a := {}
 	match str(ex.get("check", "")):
@@ -123,8 +143,28 @@ func _adaptation(ex: Dictionary, c: CreatureDef) -> Dictionary:
 			if c.tags.has("martial") or (not c.moves.has("heavy_charged") and (not c.moves.has("heavy") or (c.moves["heavy"] as MoveDef).charge_time <= 0.0)):
 				a["no_charge"] = true
 		"dodge_then_dash":
-			if c.tags.has("martial") or not c.moves.has("dash_attack"):
+			if course == "moves":
+				if _dash_slot() == "" or not c.moves.has(_dash_slot()):
+					a["no_dash"] = true
+			elif c.tags.has("martial") or not c.moves.has("dash_attack"):
 				a["no_dash"] = true
+		"basic_string":
+			if not kit.has("basic"):
+				a["skip"] = true
+		"charge_move":
+			if not kit.has("charge"):
+				a["skip"] = true
+		"sustain_aim":
+			if not kit.has("sustain"):
+				a["skip"] = true
+		"special_connect":
+			if not kit.has("special"):
+				a["skip"] = true
+			elif not (kit_move("special").category in MovesUi.OFFENSIVE) or kit_move("special").role == "support":
+				a["use_only"] = true
+		"ultimate":
+			if not c.abilities.has("juice"):
+				a["skip"] = true
 		"ability_connect":
 			if not c.abilities.has(str((ex.get("params", {}) as Dictionary).get("slot", "ability1"))):
 				a["skip"] = true
@@ -161,8 +201,36 @@ func adapted(flag: String) -> bool:
 	return bool((data.get("adapt", {}) as Dictionary).get(flag, false))
 
 
+## Movesets: the pool move a lesson teaches ("basic", "charge", "sustain", "special"), or null.
+func kit_move(which: String) -> PoolMove:
+	var e = kit.get(which, {})
+	if typeof(e) != TYPE_DICTIONARY or not (e as Dictionary).has("pm"):
+		return null
+	return (e as Dictionary)["pm"] as PoolMove
+
+
+## Movesets: the pool move id a lesson teaches ("" when the loadout lacks it).
+func kit_id(which: String) -> String:
+	var pm := kit_move(which)
+	return pm.id if pm else ""
+
+
+## The dash strike the dodge lesson asks for: the basic's dash (Movesets) or the Classic slot.
+func _dash_slot() -> String:
+	if course == "moves":
+		var bp := kit_move("basic")
+		return bp.dash if bp else ""
+	return "dash_attack"
+
+
+## Fills a line's tokens for the player's fighter (Movesets: its equipped loadout).
+func fill_line(raw: String) -> String:
+	var p := player()
+	return Tutorial.fill(raw, p.creature, p.loadout if course == "moves" else [])
+
+
 func _say(kind: String, raw: String) -> void:
-	var line := Tutorial.fill(raw, player().creature)
+	var line := fill_line(raw)
 	coach = {"kind": kind, "text": line}
 	sim.emit_event({"type": "tutorial_line", "kind": kind, "text": line, "index": index})
 	if kind != "hint":
@@ -171,7 +239,7 @@ func _say(kind: String, raw: String) -> void:
 
 
 func objective() -> String:
-	return Tutorial.fill(exercise_text("goal"), player().creature)
+	return fill_line(exercise_text("goal"))
 
 
 func tick_fight(dt: float) -> void:
@@ -234,7 +302,8 @@ func _succeed() -> void:
 func _barnaby_kind(check: String) -> String:
 	return {"footwork": "start", "light_string": "string", "heavy_then_charged": "heavy", "guard_string": "guard",
 		"dodge_then_dash": "dodge", "ability_connect": "ability", "grab_throw": "string", "parries": "parry",
-		"finisher_juice": "ability", "win_round": "complete"}.get(check, "start")
+		"finisher_juice": "ability", "win_round": "complete", "basic_string": "string", "charge_move": "heavy",
+		"sustain_aim": "ability", "special_connect": "ability", "ultimate": "ability"}.get(check, "start")
 
 
 func _finish_all() -> void:
@@ -377,7 +446,7 @@ func _check(dt: float, evs: Array) -> void:
 						data["dodged"] = true
 					elif t == "hit" and int(ev["fighter"]) == 1 and int(ev["target"]) == 0:
 						data["hit"] = true
-				elif t == "hit" and int(ev["fighter"]) == 0 and int(ev["target"]) == 1 and _hit_slot(evs, i, p) == "dash_attack":
+				elif t == "hit" and int(ev["fighter"]) == 0 and int(ev["target"]) == 1 and _hit_slot(evs, i, p) == _dash_slot():
 					_succeed()
 					return
 			if stage == 0 and bool(data.get("kid_heavy", false)) and k.state != Fighter.State.ATTACK:
@@ -388,7 +457,10 @@ func _check(dt: float, evs: Array) -> void:
 					if adapted("no_dash"):
 						_succeed()
 						return
-					_say("hint", "Nothing hits what isn't there. Now press {light} while you're dodging — dash attack.")
+					if course == "moves":
+						_say("hint", exercise_text("stage"))       # the lesson's own line (exercises.json)
+					else:
+						_say("hint", "Nothing hits what isn't there. Now press {light} while you're dodging — dash attack.")
 				elif bool(data.get("hit", false)):
 					_hint()
 		"ability_connect":
@@ -451,6 +523,151 @@ func _check(dt: float, evs: Array) -> void:
 					_succeed()
 				else:
 					_fail()
+		# ---- Movesets course: the equipped moves (events carry the pool move, "pool") ----
+		"basic_string":
+			_check_basic_string(prm, evs)
+		"charge_move":
+			_check_charge_move(evs)
+		"sustain_aim":
+			_check_sustain(prm, evs, dt)
+		"special_connect":
+			_check_special(prm, evs)
+		"ultimate":
+			for ev in evs:
+				if ev["type"] == "juice" and int(ev["fighter"]) == 0:
+					_succeed()
+					return
+			if p.hype > float(data.get("hype_seen", 0.0)) + 5.0:
+				data["hype_seen"] = p.hype
+				_progress()
+
+
+## Movesets: the basic strike's whole string in order, the finisher included: hits of the basic
+## pool move whose string step (the move slot that landed) is the next one.
+func _check_basic_string(prm: Dictionary, evs: Array) -> void:
+	var p := player()
+	var k := partner()
+	var bp := kit_move("basic")
+	var string: Array = bp.string
+	if int(data.get("step", 0)) > 0 and sim.time - float(data.get("t", 0.0)) > float(prm.get("gap", 1.2)):
+		data["step"] = 0           # the chain went cold: start over
+		kid.hold_dist = -1.0
+	for i in evs.size():
+		var ev: Dictionary = evs[i]
+		if ev["type"] == "move_start" and int(ev["fighter"]) == 0:
+			_note_swing(_tutorial_slot(str(ev.get("slot", "")), p.creature), string)
+			continue
+		if ev["type"] != "hit" or int(ev["fighter"]) != 0 or int(ev["target"]) != 1 or bool(ev["blocked"]):
+			continue
+		if str(ev.get("pool", "")) != bp.id:
+			continue
+		var slot := _hit_slot(evs, i, p)
+		var swing: Dictionary = data.get("swing", {})
+		if slot == str(swing.get("slot", "")):
+			swing["landed"] = true
+		var step := int(data.get("step", 0))
+		if step < string.size() and slot == str(string[step]):
+			step += 1
+			data["t"] = sim.time
+			_progress()
+		elif slot == str(string[0]):
+			step = 1
+			data["t"] = sim.time
+		else:
+			continue
+		data["step"] = step
+		if step == 1:
+			# the Kid holds his ground for the rest of the string (see KidScript.hold_dist)
+			kid.hold_dist = Vector2(k.pos().x - p.pos().x, k.pos().z - p.pos().z).length() + HOLD_MARGIN
+		if step >= string.size():
+			_succeed()
+			return
+
+
+## Movesets: land the hold-to-charge move once, then hold it and land it charged: its charged
+## follow-up, or a hold past CHARGED_FRACTION of its charge (the level of the current use is
+## tracked while it runs; the follow-up keeps it).
+func _check_charge_move(evs: Array) -> void:
+	var p := player()
+	var cpm := kit_move("charge")
+	if p.move_pool_id == cpm.id:
+		data["charge_max"] = maxf(float(data.get("charge_max", 0.0)), p.move_charge)
+	for i in evs.size():
+		var ev: Dictionary = evs[i]
+		if int(ev.get("fighter", -1)) != 0:
+			continue
+		if ev["type"] == "move_start" and str(ev.get("pool", "")) == cpm.id:
+			var follow_up := cpm.charged != null and str(ev.get("id", "")).begins_with(cpm.charged.id)
+			if not follow_up:
+				data["charge_max"] = 0.0
+			continue
+		if ev["type"] != "hit" or int(ev.get("target", -1)) != 1 or str(ev.get("pool", "")) != cpm.id:
+			continue
+		var charged := float(data.get("charge_max", 0.0)) >= CHARGED_FRACTION \
+			or (cpm.charged != null and str(ev.get("move", "")).begins_with(cpm.charged.id))
+		if stage == 0:
+			stage = 1
+			_progress()
+			_say("hint", exercise_text("stage"))
+		elif charged:
+			_succeed()
+			return
+
+
+## Movesets: hold the sustained move, steer it with the stick and keep it on the strafing Kid:
+## `hits` hits from one hold (or within a second of letting go), with the stick pushed for `steer`
+## seconds while it ran.
+func _check_sustain(prm: Dictionary, evs: Array, dt: float) -> void:
+	var p := player()
+	var sid := kit_id("sustain")
+	if p.sustaining and p.move_pool_id == sid:
+		data["held"] = float(data.get("held", 0.0)) + dt
+		if p.input.move.length() > 0.3:
+			data["steer"] = float(data.get("steer", 0.0)) + dt
+	for ev in evs:
+		if int(ev.get("fighter", -1)) != 0:
+			continue
+		var t := str(ev["type"])
+		if t == "sustain" and str(ev.get("pool", "")) == sid:
+			if str(ev.get("phase", "")) == "start":
+				data["hits"] = 0
+				data["held"] = 0.0
+				data["steer"] = 0.0
+				data.erase("ended")
+				_progress()
+			else:
+				data["ended"] = sim.time
+		elif t == "hit" and int(ev.get("target", -1)) == 1 and str(ev.get("pool", "")) == sid:
+			if not data.has("ended") or sim.time - float(data["ended"]) <= 1.0:
+				data["hits"] = int(data.get("hits", 0)) + 1
+				_progress()
+	if int(data.get("hits", 0)) >= int(prm.get("hits", 3)) and float(data.get("steer", 0.0)) >= float(prm.get("steer", 0.25)):
+		_succeed()
+
+
+## Movesets: use the special and make it connect: a hit of that pool move on the Kid, or its effect
+## within `window` s (his health, build-up, standing in its zone). A counter / support / utility
+## special ("use_only") only has to be used.
+func _check_special(prm: Dictionary, evs: Array) -> void:
+	var k := partner()
+	var sid := kit_id("special")
+	for ev in evs:
+		if int(ev.get("fighter", -1)) != 0:
+			continue
+		if ev["type"] == "move_start" and str(ev.get("pool", "")) == sid:
+			data["used_at"] = sim.time
+			data["kid_hp"] = k.health
+			data["kid_bu"] = _buildup_total(k)
+			_progress()
+			if adapted("use_only"):
+				_succeed()
+				return
+		elif ev["type"] == "hit" and int(ev.get("target", -1)) == 1 and str(ev.get("pool", "")) == sid:
+			_succeed()
+			return
+	if data.has("used_at") and sim.time - float(data["used_at"]) <= float(prm.get("window", 3.0)):
+		if k.health < float(data["kid_hp"]) - 0.5 or _buildup_total(k) > float(data["kid_bu"]) + 1.0 or _in_own_zone(k, 0):
+			_succeed()
 
 
 ## Hands drill feedback for mashing: a string Light that starts while the previous one was still
@@ -639,11 +856,28 @@ func progress_text() -> String:
 			return "   ".join(parts)
 		"win_round":
 			return "%d s   You %d%%  Kid %d%%" % [ceili(round_timer), int(player().health_frac() * 100.0), int(partner().health_frac() * 100.0)]
+		"basic_string":
+			var bp := kit_move("basic")
+			return "String %d / %d" % [int(data.get("step", 0)), bp.string.size() if bp else 0]
+		"charge_move":
+			var cn := kit_move("charge").display_name if kit_move("charge") else "Charge move"
+			return "%s %s   Charged –" % [cn, "✓" if stage >= 1 else "–"]
+		"sustain_aim":
+			return "Hits %d / %d   Steered %s" % [int(data.get("hits", 0)), int(prm.get("hits", 3)),
+				"✓" if float(data.get("steer", 0.0)) >= float(prm.get("steer", 0.25)) else "–"]
+		"special_connect":
+			var sn := kit_move("special").display_name if kit_move("special") else "Special"
+			return "%s %s" % [sn, "used" if data.has("used_at") else "–"]
+		"ultimate":
+			return "Hype %d / 100   Ultimate –" % int(player().hype)
 	return ""
 
 
 func hud_state() -> Dictionary:
-	return {"rows": [], "status": hud_status(), "highlight": str(current().get("highlight", ""))}
+	var hl := str(current().get("highlight", ""))
+	if course == "moves" and hl == "cooldown" and kit.has("special"):
+		hl = "cooldown:" + str((kit["special"] as Dictionary)["slot"])     # the special's own card
+	return {"rows": [], "status": hud_status(), "highlight": hl}
 
 
 func view_state() -> Dictionary:
@@ -752,6 +986,22 @@ class KidScript:
 					_bot.poll(f, sim, dt)
 			"string", "heavy", "parry_drill":
 				_attacker(f, p, to, dist, dt)
+			"strafe":
+				_strafe(f, to, dist)
+
+	## The sustain drill (Movesets): he walks a slow circle around the player at about STRAFE_DIST,
+	## turning back every few seconds, so a stream has to be steered to stay on him.
+	const STRAFE_DIST := 2.2
+
+	func _strafe(f: Fighter, to: Vector3, dist: float) -> void:
+		if dist < 0.05:
+			return
+		if _phase_t > 2.6:
+			_phase_t = 0.0
+			_alt = not _alt
+		var dir := to / dist
+		var side := Vector3(-dir.z, 0.0, dir.x) * (1.0 if _alt else -1.0)
+		f.input.move = side * 0.55 + dir * clampf((dist - STRAFE_DIST) * 0.8, -0.4, 0.4)
 
 	## The drills' attacks: rest, take up his spacing (walk in, or step back when he's crowding
 	## the player), throw it, rest again. Two rules keep every drill fair for every body:

@@ -234,7 +234,7 @@ func _build_gameplay_extras() -> void:
 			_section("Shortcuts")
 			any = true
 		var t := UiButton.new("Open the tutorial", "", "tutorial")
-		t.set_help("Tutorial", "Granny Haymaker's ten short lessons. You can replay or skip any of them.")
+		t.set_help("Tutorial", "Granny Haymaker's short lessons, taught with your own moves (or the Classic ones). You can replay or skip any of them.")
 		t.pressed.connect(func() -> void: App.push("tutorial_menu"))
 		_list.content.add_child(t)
 	if App.has_screen("profile"):

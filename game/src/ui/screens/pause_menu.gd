@@ -5,17 +5,29 @@ extends Screen
 ## In a career bout (the match scene carries meta "career_flow", design contract D4) there is no
 ## Restart, and quitting is pulling out of the fight: the confirmation says so ("No purse,
 ## popularity -4.") and the career's withdrawal is applied before returning to the main menu.
-## A quick reference shows the core actions with the CURRENT bindings for the active device.
+## A quick reference shows the core actions with the CURRENT bindings for the active device, for
+## the local fighter's kit: Movesets names the four equipped moves on their inputs and the
+## Ultimate, Classic the Classic actions, a martial fighter the Cage Rules layout.
+## Practice (the match carries a PracticeOverlay): a PRACTICE group with the dummy's behaviour,
+## record / stop, reset positions and, in Movesets, Change moves (the loadout screen over the paused
+## match; the new moves apply live). These are the controller route to the practice tools whenever
+## the overlay's shortcuts collide with the fighter's layout (Varga's Cage Rules pad layout uses
+## every button but Start).
 ## Start / Esc / B close it. params: {notice: String} (e.g. "Controller disconnected ...").
 
 const QUICK_REF := [["move_up", "Move", "left_stick"], ["light", "Light attack", ""], ["heavy", "Heavy (hold to charge)", ""],
 	["guard", "Guard (tap to parry)", ""], ["dodge", "Dodge", ""], ["grab", "Grab / throw", ""], ["ability1", "Ability 1", ""],
 	["ability2", "Ability 2", ""], ["juice", "JUICE", ""], ["taunt", "Taunt", ""], ["target", "Switch target", ""]]
+const MARTIAL_REF := [["move_up", "Move", "left_stick"], ["mma_lh", "Left hand", ""], ["mma_rh", "Right hand", ""], ["mma_ll", "Left leg", ""],
+	["mma_rl", "Right leg", ""], ["mma_mod1", "Hooks / body kicks", ""], ["mma_mod2", "Straights / head kicks", ""], ["mma_mod3", "Overhands / low kicks", ""],
+	["mma_guard", "Guard", ""], ["mma_dodge", "Slip", ""], ["mma_grab", "Takedown / throw", ""], ["mma_juice", "JUICE", ""]]
 
 var _online := false
 var _career: CareerFlow = null       ## the career bout's flow (null outside career bouts)
 var _resume: UiButton
 var _ref_box: VBoxContainer
+var _practice: Node = null           ## the match's PracticeOverlay (practice tools), null otherwise
+var _record_btn: UiButton = null
 
 
 func on_enter(p: Dictionary) -> void:
@@ -58,24 +70,36 @@ func on_enter(p: Dictionary) -> void:
 		banner.add_child(br)
 		lv.add_child(banner)
 	lv.add_child(UiTheme.spacer(false, 8))
-	_resume = _button(lv, "Resume", "fight", "resume", _resume_match)
+	_practice = _practice_overlay() if not _online else null
+	var holder: Container = lv
+	if _practice != null:
+		# practice adds a group of tools: the list scrolls (focus keeps the focused entry in view)
+		left.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		var fs := FocusScroll.new(UiTheme.GAP_S)
+		fs.name = "PauseList"
+		fs.custom_minimum_size = Vector2(600, 0)
+		lv.add_child(fs)
+		holder = fs.content
+	_resume = _button(holder, "Resume", "fight", "resume", _resume_match)
+	if _practice != null:
+		_practice_rows(holder)
 	if party_fight:
 		var pv: Dictionary = OnlineFlow.coop.session.pause_view()
 		if bool(pv.get("paused", false)) and str(pv.get("by", "")) == OnlineFlow.coop.me:
-			_button(lv, "End my ref timeout", "fight", "timeout", _end_timeout)
+			_button(holder, "End my ref timeout", "fight", "timeout", _end_timeout)
 		elif not bool(pv.get("paused", false)):
-			var tb := _button(lv, "Call a ref timeout", "info", "timeout", _call_timeout)
+			var tb := _button(holder, "Call a ref timeout", "info", "timeout", _call_timeout)
 			tb.disabled = OnlineFlow.coop.session.my_pause_budget() <= 0.0
 		if OnlineFlow.coop.is_host():
-			_button(lv, "Forfeit this fight", "close", "forfeit", _ask_forfeit)
+			_button(holder, "Forfeit this fight", "close", "forfeit", _ask_forfeit)
 	if not _online and not MatchFlow.last_config.is_empty() and _career == null:
-		_button(lv, "Restart fight", "restart", "restart", _ask_restart)
-	_button(lv, "Settings", "settings", "settings", func() -> void: App.push("settings", {"in_game": true}))
-	_button(lv, "Controls", "gamepad", "controls", func() -> void: App.push("controls", {"in_game": true}))
-	_button(lv, "Quit to main menu", "quit", "quit", _ask_quit)
+		_button(holder, "Restart fight", "restart", "restart", _ask_restart)
+	_button(holder, "Settings", "settings", "settings", func() -> void: App.push("settings", {"in_game": true}))
+	_button(holder, "Controls", "gamepad", "controls", func() -> void: App.push("controls", {"in_game": true}))
+	_button(holder, "Quit to main menu", "quit", "quit", _ask_quit)
 	var buttons: Array[Control] = []
-	for c in lv.get_children():
-		if c is UiButton:
+	for c in holder.get_children():
+		if c is UiButton or c is UiRow:
 			buttons.append(c)
 	for i in buttons.size():
 		var b := buttons[i]
@@ -109,14 +133,35 @@ func _on_device_changed(_kind: String) -> void:
 	_build_reference()
 
 
+## The quick reference rows for the local fighter's kit: [action, label, special].
+static func reference_rows(f: Fighter) -> Array:
+	if f != null and f.creature != null and f.creature.tags.has("martial"):
+		return MARTIAL_REF
+	if not MovesUi.movesets(f):
+		return QUICK_REF
+	var rows: Array = [["move_up", "Move (steers HOLD+AIM moves)", "left_stick"]]
+	for i in Fighter.MOVE_SLOTS.size():
+		var pm := f.slot_move(str(Fighter.MOVE_SLOTS[i]))
+		if pm != null:
+			var tag := MovesUi.hold_tag(pm)
+			rows.append([MovesUi.slot_action(i), pm.display_name + ("  (%s)" % tag if tag != "" else ""), ""])
+	rows.append_array([["guard", "Guard (tap to parry)", ""], ["dodge", "Dodge", ""], ["grab", "Grapple / throw", ""]])
+	var ult := "Ultimate"
+	if f.creature.abilities.has("juice"):
+		ult = "Ultimate: %s" % (f.creature.abilities["juice"] as MoveDef).display_name
+	rows.append_array([["juice", ult, ""], ["taunt", "Taunt", ""], ["target", "Switch target", ""]])
+	return rows
+
+
 func _build_reference() -> void:
 	for c in _ref_box.get_children():
 		c.queue_free()
 	_ref_box.add_child(UiTheme.label("CONTROLS", "Eyebrow"))
-	for e in QUICK_REF:
+	for e in reference_rows(MovesUi.local_fighter()):
 		var row := UiTheme.hbox(UiTheme.GAP_M)
 		var l := UiTheme.label(str(e[1]), "Body")
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		row.add_child(l)
 		var ev := PromptGlyph.event_for(str(e[0]))
 		if str(e[2]) == "left_stick" and PromptGlyph.wants_pad():
@@ -132,6 +177,60 @@ func _build_reference() -> void:
 
 func default_focus() -> Control:
 	return _resume
+
+
+## The running local match's practice overlay (practice_overlay.gd), or null.
+static func _practice_overlay() -> Node:
+	var ms := MatchFlow.current_match()
+	if ms == null or ms.hud_layer == null:
+		return null
+	var ov := ms.hud_layer.get_node_or_null("PracticeOverlay")
+	return ov if ov != null and ov.has_method("open_moves") else null
+
+
+## PRACTICE: the dummy's behaviour, record / stop, reset positions and (Movesets) Change moves.
+func _practice_rows(holder: Container) -> void:
+	holder.add_child(UiTheme.label("PRACTICE", "Eyebrow"))
+	var dummy := OptionRow.new("Dummy")
+	var ids: Array = PracticeMode.BEHAVIORS.duplicate()
+	var names: Array[String] = []
+	for b in ids:
+		names.append(str(_practice.call("behavior_label", str(b))))
+	dummy.setup(ids, names, str(_practice.call("current_behavior")))
+	dummy.key = "practice_dummy"
+	dummy.custom_minimum_size = Vector2(560, 70)
+	dummy.set_help("Dummy", "What the training dummy does: stand still, guard, parry, block and counter, replay your recording, or fight back as a bot.")
+	dummy.value_changed.connect(_practice_dummy)
+	holder.add_child(dummy)
+	var recording := bool(_practice.call("is_recording"))
+	_record_btn = _button(holder, "Stop recording" if recording else "Record a sequence", "practice", "practice_record", _practice_record)
+	_button(holder, "Reset positions", "restart", "practice_reset", _practice_reset)
+	if bool(_practice.call("can_change_moves")):
+		var mv := _button(holder, "Change moves", "edit", "change_moves", _practice_moves)
+		mv.set_help("Change moves", "Pick your four moves (a recommended loadout or your own). They apply at once and your fighter is refreshed.")
+
+
+func _practice_dummy(v) -> void:
+	if _practice != null and is_instance_valid(_practice):
+		_practice.call("set_behavior", str(v))
+
+
+func _practice_record() -> void:
+	if _practice != null and is_instance_valid(_practice):
+		_practice.call("toggle_record")
+	_resume_match()
+
+
+func _practice_reset() -> void:
+	if _practice != null and is_instance_valid(_practice):
+		_practice.call("reset_positions")
+	_resume_match()
+
+
+## Opens the loadout screen over this menu; Done applies the moves live and comes back here.
+func _practice_moves() -> void:
+	if _practice != null and is_instance_valid(_practice):
+		_practice.call("open_moves")
 
 
 func _resume_match() -> void:

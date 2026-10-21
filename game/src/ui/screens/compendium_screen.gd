@@ -1,5 +1,8 @@
 extends Screen
-## A browsable guide with real fighter models and content-derived mechanics.
+## A browsable guide with real fighter models and content-derived mechanics. A fighter's page is
+## the shared FighterInfo in its full form: the Movesets move pool, both recommended loadouts and
+## the Ultimate, then the Classic kit; the Guide's "Combat basics" explains Movesets and Classic.
+## Pages that show bindings (fighters, the guide) rebuild when the device or bindings change.
 const SECTIONS := ["fighters", "elements", "arenas", "rules", "field", "guide"]
 var tabs: TabStrip
 var list: FocusScroll
@@ -45,6 +48,7 @@ func on_enter(_p: Dictionary) -> void:
 	details = ScrollText.new()
 	information.add_child(details)
 	fighter_info = FighterInfo.new()
+	fighter_info.full = true
 	information.add_child(fighter_info)
 	(frame["prompts"] as PromptBar).set_prompts([
 		{"actions": ["ui_tab_prev", "ui_tab_next"], "text": "Sections"},
@@ -58,9 +62,9 @@ func _device_changed(_device: String) -> void:
 	_bindings_changed()
 
 func _bindings_changed() -> void:
-	if section == 0 and not rows.is_empty():
-		rows = CompendiumData.entries("fighters")
-		_select_entry(selected)
+	if section in [0, SECTIONS.find("guide")] and not rows.is_empty():
+		rows = CompendiumData.entries(SECTIONS[section])
+		_select_entry(clampi(selected, 0, rows.size() - 1))
 
 func _select_section(index: int) -> void:
 	section = index

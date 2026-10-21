@@ -258,21 +258,28 @@ func _ask_leave() -> void:
 
 func _build_lessons() -> void:
 	frame("Granny's corner", "Lessons", 980.0)
-	var list_ex := Tutorial.exercises()
+	# the course the lesson will run (Movesets teaches this fighter's moves; Varga keeps his own)
+	var c := Content.creature(_lesson_fighter())
+	var list_ex := Tutorial.exercises(Tutorial.course_for(c, "moves"))
 	var done: Array = Tutorial.completed_ids()
 	if list_ex.is_empty():
 		text_line("No lessons are installed.")
 	for i in list_ex.size():
 		var ex: Dictionary = list_ex[i]
 		var tick := "  ✓" if done.has(str(ex.get("id", ""))) else ""
-		button("%d.  %s%s" % [i + 1, str(ex.get("title", ex.get("id", ""))), tick], _start_lesson.bind(i), str(ex.get("title", "")), str(ex.get("goal", "")))
+		button("%d.  %s%s" % [i + 1, str(ex.get("title", ex.get("id", ""))), tick], _start_lesson.bind(i), str(ex.get("title", "")),
+			Tutorial.fill(str(ex.get("goal", "")), c, MovesUi.player_loadout(c) if c else []))
 	set_status("Lessons run in the practice cage with your current fighter. You come back here when you leave.")
 
 
+func _lesson_fighter() -> String:
+	if scene != null and scene.has_method("player") and scene.call("player") != null:
+		return scene.call("player").creature.id
+	return "f_stoke"
+
+
 func _start_lesson(i: int) -> void:
-	var fid := "f_stoke"
-	if scene != null:
-		fid = scene.call("player").creature.id
+	var fid := _lesson_fighter()
 	Profiles.save()
 	# a plain route back (App screen "hub"), never a lambda: the tutorial keeps it in a static
 	Tutorial.start(i, fid, {"screen": "hub", "params": {"spot": "main_floor", "from": "tutorial"}})

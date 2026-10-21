@@ -33,10 +33,26 @@ const ACTION_LABELS := {
 	"mma_juice": "Cage Rules: Championship Rounds",
 
 	"move_left": "Move left", "move_right": "Move right", "move_up": "Move forward", "move_down": "Move back",
-	"light": "Light attack", "heavy": "Heavy attack (hold to charge)", "guard": "Guard (tap to parry)",
-	"dodge": "Dodge", "grab": "Grab / throw", "ability1": "Ability 1", "ability2": "Ability 2",
-	"juice": "JUICE (ultimate)", "taunt": "Taunt / cheer", "target": "Switch target", "tag": "Tag partner", "cam_left": "Camera left",
+	# v0.9.18: the four move inputs carry the equipped moves in Movesets (the default) and the
+	# Classic actions in Classic (docs/design/MOVESET_COMBAT.md §2.1)
+	"light": "Move 1 (Light in Classic)", "heavy": "Move 2 (Heavy in Classic)", "guard": "Guard (tap to parry)",
+	"dodge": "Dodge", "grab": "Grapple (Grab in Classic)", "ability1": "Move 3 (Ability 1 in Classic)", "ability2": "Move 4 (Ability 2 in Classic)",
+	"juice": "Ultimate (JUICE)", "taunt": "Taunt / cheer", "target": "Switch target", "tag": "Tag partner", "cam_left": "Camera left",
 	"cam_right": "Camera right", "pause": "Pause menu", "scoreboard": "Scoreboard", "interact": "Interact",
+}
+## The Classic names of the actions whose label follows the combat style (Classic matches, the
+## Classic half of the Controls reference).
+const CLASSIC_LABELS := {"light": "Light attack", "heavy": "Heavy attack (hold to charge)", "grab": "Grab / throw",
+	"ability1": "Ability 1", "ability2": "Ability 2", "juice": "JUICE (ultimate)"}
+## What the style-dependent actions do in each style (Controls reference and rebinding help).
+const ACTION_HELP := {
+	"light": "Movesets: the move in slot 1 of your loadout (the basic strike in every recommended loadout). Classic: Light attack; press again to chain.",
+	"heavy": "Movesets: the move in slot 2 of your loadout; hold it if the move charges or keeps going. Classic: Heavy attack, hold to charge; Light, Light, Heavy is the finisher.",
+	"ability1": "Movesets: the move in slot 3 of your loadout. Classic: your fighter's first ability.",
+	"ability2": "Movesets: the move in slot 4 of your loadout. Classic: your fighter's second ability.",
+	"grab": "Grapple beats guard and counters: grab, then push a direction and press again to throw. Also picks up the ball, revives and interacts. (Grab in Classic.)",
+	"juice": "Your fighter's Ultimate, its JUICE: press at full Hype.",
+	"guard": "Hold to block the front; tap just as a hit lands to parry.",
 }
 ## Actions that are held (vs pressed) for the hold/toggle accessibility option.
 const TOGGLEABLE := ["guard"]

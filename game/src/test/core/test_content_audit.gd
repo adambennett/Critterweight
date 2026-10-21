@@ -5,7 +5,9 @@ extends TestCase
 ## mods validate. Grows as owners add kinds (campaign, arenas, playlists, policies).
 
 const TUTORIAL_CHECKS := ["footwork", "light_string", "heavy_then_charged", "guard_string", "dodge_then_dash",
-	"ability_connect", "grab_throw", "parries", "finisher_juice", "win_round"]
+	"ability_connect", "grab_throw", "parries", "finisher_juice", "win_round",
+	# v0.9.18 Movesets course
+	"basic_string", "charge_move", "sustain_aim", "special_connect", "ultimate"]
 
 
 func test_core_package_loads_without_errors() -> void:
@@ -62,8 +64,10 @@ func test_arenas_have_safe_spawns_inside_bounds() -> void:
 
 
 func test_tutorial_achievements_and_presets_complete() -> void:
-	for ex in Tutorial.exercises():
-		check(str(ex.get("check", "")) in TUTORIAL_CHECKS, "tutorial %s uses a known check" % ex.get("id", "?"))
+	for course in Tutorial.COURSES:
+		check(not Tutorial.exercises(str(course)).is_empty(), "the %s tutorial course has lessons" % course)
+		for ex in Tutorial.exercises(str(course)):
+			check(str(ex.get("check", "")) in TUTORIAL_CHECKS, "tutorial %s uses a known check" % ex.get("id", "?"))
 	var ach := Content.ids("achievements")
 	check(ach.size() >= 10, "achievements defined (%d)" % ach.size())
 	for id in ach:

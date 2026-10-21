@@ -8,10 +8,14 @@ extends Screen
 ##   styles     {move id: style id} drilled styles to show (campaign); optional
 ##   title      screen title ("Fighter 1 moves")
 ##   on_done    Callable(Array) called with the chosen loadout when the player confirms
-## Each slot is a row that cycles through the moves (left/right); the help panel describes the
-## focused move. The loadout must hold a basic strike and no move twice.
+##   in_game    opened over a running match (practice's Change moves): the match stays the 3D
+##              scene under a dimmer (also detected from MatchFlow.match_running())
+## Each slot is a row that cycles through the moves (left/right), "Empty" included; the help panel
+## describes the focused move (MovesUi.describe). The loadout must hold a basic strike and no move
+## twice.
 
-const SLOT_INPUTS := ["light", "heavy", "ability1", "ability2"]
+const SLOT_INPUTS := MovesUi.SLOT_ACTIONS
+const EMPTY := ""
 
 var _c: CreatureDef
 var _ids: Array = []              ## equippable pool ids, in pool order
@@ -22,11 +26,17 @@ var _scroll: FocusScroll
 var _help: HelpPanel
 var _error: Label
 var _rows: Array = []
+var _in_game := false
 
 
 func on_enter(p: Dictionary) -> void:
-	MenuBackdrop.ensure()
-	add_backdrop_gradient(0.97, 0.7)
+	_in_game = bool(p.get("in_game", false)) or MatchFlow.match_running()
+	if _in_game:
+		# over a running match: never swap the match out for the menu backdrop
+		add_dimmer(0.93)
+	else:
+		MenuBackdrop.ensure()
+		add_backdrop_gradient(0.97, 0.7)
 	_c = Content.creature(str(p.get("creature", "")))
 	_on_done = p.get("on_done", Callable())
 	_styles = p.get("styles", {}) if typeof(p.get("styles", {})) == TYPE_DICTIONARY else {}
@@ -77,9 +87,13 @@ func on_enter(p: Dictionary) -> void:
 	for id in _ids:
 		values.append(id)
 		names2.append(_move_label(id))
+	values.append(EMPTY)
+	names2.append("Empty")
 	for i in 4:
+		if not values.has(_slots[i]):
+			_slots[i] = EMPTY          # not equippable here (a campaign's unlearned move)
 		var row := OptionRow.new("Move %d  (%s)" % [i + 1, Controls.prompt_for(str(SLOT_INPUTS[i]))])
-		row.setup(values, names2, _slots[i] if _slots[i] != "" else values[0])
+		row.setup(values, names2, _slots[i])
 		row.set_meta("focus_key", "slot%d" % i)
 		_describe_row(row, str(_slots[i]))
 		row.value_changed.connect(_on_slot_changed.bind(i, row))
@@ -96,7 +110,19 @@ func on_enter(p: Dictionary) -> void:
 	c.add_child(done)
 	_validate()
 	_scroll.wrap_focus.call_deferred()
+	Controls.device_changed.connect(_on_device_changed)
+	Controls.bindings_changed.connect(_relabel_rows)
 	play_intro()
+
+
+func _on_device_changed(_kind: String) -> void:
+	_relabel_rows()
+
+
+## "Move 2  (K)": each row names its input with the current binding on the current device.
+func _relabel_rows() -> void:
+	for i in _rows.size():
+		(_rows[i] as UiRow).set_label("Move %d  (%s)" % [i + 1, Controls.prompt_for(str(SLOT_INPUTS[i]))])
 
 
 func default_focus() -> Control:
@@ -107,46 +133,34 @@ func _move_label(id: String) -> String:
 	var pm: PoolMove = _c.pool.get(id)
 	if pm == null:
 		return id
-	var tag := "basic" if pm.role == "basic" else pm.category
+	var tags := PackedStringArray(["basic" if pm.role == "basic" else MovesUi.category_name(pm.category).to_lower()])
+	if MovesUi.hold_tag(pm) != "":
+		tags.append(MovesUi.hold_tag(pm).to_lower())
 	var style := str(_styles.get(id, ""))
 	if style != "" and pm.styles.has(style):
-		return "%s · %s (%s)" % [pm.display_name, str((pm.styles[style] as Dictionary).get("name", style)), tag]
-	return "%s (%s)" % [pm.display_name, tag]
+		return "%s · %s (%s)" % [pm.display_name, str((pm.styles[style] as Dictionary).get("name", style)), ", ".join(tags)]
+	return "%s (%s)" % [pm.display_name, ", ".join(tags)]
 
 
-## The help text for a move: what it does, how to use it, what it costs.
-static func describe(pm: PoolMove) -> String:
-	var lines := PackedStringArray()
-	lines.append(pm.desc if pm.desc != "" else pm.short)
-	var how := "Tap"
-	match pm.hold:
-		"charge":
-			how = "Hold to charge, release to fire"
-		"sustain":
-			how = "Hold to keep it going (up to %.1f s)%s" % [pm.max_hold, ", aim with the stick" if pm.aim_turn > 0.0 else ""]
-	if pm.role == "basic":
-		how = "Press again to continue the string; the last press is the finisher; out of a dodge it is a dash strike"
-	lines.append(how + ".")
-	var facts := PackedStringArray()
-	facts.append(pm.category.capitalize())
-	if pm.element != "":
-		facts.append(pm.element.capitalize())
-	if pm.cooldown > 0.0:
-		facts.append("cooldown %.0f s" % pm.cooldown)
-	if pm.charges > 1:
-		facts.append("%d charges" % pm.charges)
-	if pm.stamina_cost() > 0.0:
-		facts.append("%d stamina" % roundi(pm.stamina_cost()))
-	if pm.drain > 0.0:
-		facts.append("+%d stamina/s held" % roundi(pm.drain))
-	lines.append(" · ".join(facts))
-	return "\n".join(lines)
+## The help text for a move: what it does, how to use it, what it costs (MovesUi.describe).
+static func describe(pm: PoolMove, c: CreatureDef = null) -> String:
+	return MovesUi.describe(pm, c)
 
 
 func _describe_row(row: OptionRow, id: String) -> void:
 	var pm: PoolMove = _c.pool.get(id)
 	if pm:
-		row.set_help(pm.display_name, describe(pm))
+		row.set_help(pm.display_name, describe(pm, _c))
+	else:
+		row.set_help("Empty", "Nothing on this input. A loadout needs a basic strike and up to four moves.")
+
+
+## Slot `i` (0..3) set to pool move `id` ("" = empty), as if picked on its row.
+func set_slot(i: int, id: String) -> void:
+	if i < 0 or i >= _rows.size():
+		return
+	(_rows[i] as OptionRow).set_value(id)
+	_on_slot_changed(id, i, _rows[i])
 
 
 func _on_slot_changed(v, i: int, row: OptionRow) -> void:
@@ -159,12 +173,22 @@ func _on_slot_changed(v, i: int, row: OptionRow) -> void:
 func _apply_preset(key: String) -> void:
 	var lo: Array = (_c.loadouts[key] as Dictionary)["moves"]
 	for i in 4:
-		_slots[i] = str(lo[i]) if i < lo.size() else ""
-		if i < _rows.size() and _slots[i] != "":
+		_slots[i] = str(lo[i]) if i < lo.size() else EMPTY
+		if i < _rows.size():
 			(_rows[i] as OptionRow).set_value(_slots[i])
 			_describe_row(_rows[i], _slots[i])
 	_validate()
 	Audio.sfx("ui_confirm")
+
+
+## The loadout the rows currently describe (empty slots dropped).
+func chosen() -> Array:
+	return _chosen()
+
+
+## Confirms the current rows (the Done button; tests and practice drive it too).
+func confirm() -> void:
+	_confirm()
 
 
 func _chosen() -> Array:
@@ -173,9 +197,24 @@ func _chosen() -> Array:
 
 func _validate() -> bool:
 	var problem := _c.loadout_problem(_chosen())
-	_error.text = "" if problem == "" else problem.capitalize() + "."
+	_error.text = problem_text(_c, problem)
 	_error.visible = problem != ""
 	return problem == ""
+
+
+## CreatureDef.loadout_problem() for the player: move names instead of pool ids, a sentence.
+static func problem_text(c: CreatureDef, problem: String) -> String:
+	if problem == "":
+		return ""
+	var t := problem
+	for id in c.pool:
+		t = t.replace("'%s'" % str(id), (c.pool[id] as PoolMove).display_name)
+	return t.substr(0, 1).to_upper() + t.substr(1) + "."
+
+
+## The validation message shown under the rows ("" when the loadout is valid).
+func problem_shown() -> String:
+	return _error.text if _error.visible else ""
 
 
 func _confirm() -> void:

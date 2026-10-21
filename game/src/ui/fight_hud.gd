@@ -17,6 +17,14 @@ extends Control
 ##    draw, method, the three totals). Both sit above the subtitle band, below the centre callout.
 ##  * Referee (view_state.referee): the counted fighter's card status shows "DOWN · n", a stopped
 ##    fighter "STOPPED", and the local player being counted gets a hint with the wave-up time.
+##
+## Movesets (docs/design/MOVESET_COMBAT.md §9): the local player's strip shows one MoveCard per
+## equipped move on its own input (name, HOLD / HOLD+AIM tag, charges, cooldown veil, a stamina-short
+## state, the denied-press flash) and the Ultimate; the generic hints (guard / dodge / grapple) form
+## a second row. The strip is rebuilt whenever the fighter's combat style or loadout changes
+## (practice's Change moves; a network client's roster update), and is as tall as its rows, with the
+## subtitles just above it. Every value comes from the fighter (cooldown_left, charges_left,
+## stamina, loadout), so a NetHudMirror client renders the same cards as the host.
 
 var sim: MatchSim
 var player_index := 0
@@ -56,6 +64,8 @@ var _hints_bottom := false
 var _bottom: GridContainer
 var _ability_prompts := {}
 var _bottom_inset := 0.0
+var _moves_strip := false          ## the strip holds Movesets move cards (sized to its rows)
+var _cards_sig := ""               ## combat style + loadout the strip was built for (rebuilt on change)
 
 
 func setup(match_sim: MatchSim, player_idx: int) -> void:
@@ -159,45 +169,96 @@ func setup(match_sim: MatchSim, player_idx: int) -> void:
 
 
 ## Settings › Gameplay › Control hints: the core actions with the live bindings (players only).
+## Movesets: the move cards (always shown) and, with control hints on, the generic actions.
 func _add_control_hints(_n: int) -> void:
 	if player_index < 0 or player_index >= sim.fighters.size() or sim.fighters[player_index].controller_kind != "player":
+		return
+	var fighter: Fighter = sim.fighters[player_index]
+	_cards_sig = move_signature(fighter)
+	if MovesUi.movesets(fighter):
+		_add_move_strip(fighter)
 		return
 	var bar := HFlowContainer.new()
 	bar.theme = UiTheme.get_theme()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bar.add_theme_constant_override("h_separation", 20)
 	bar.alignment = FlowContainer.ALIGNMENT_CENTER
-	var fighter: Fighter = sim.fighters[player_index]
-	var movesets := fighter.combat_style == "moves" and not fighter.creature.tags.has("martial")
 	if bool(Settings.get_value("gameplay.tutorial_prompts")):
 		var hints := [["light", "Light"], ["heavy", "Heavy"], ["guard", "Guard"], ["dodge", "Dodge"], ["grab", "Grab"]]
-		if movesets:
-			hints = [["guard", "Guard (tap: parry)"], ["dodge", "Dodge"], ["grab", "Grapple"]]
 		if fighter.creature.tags.has("martial"):
 			hints = [["mma_lh", "L hand"], ["mma_rh", "R hand"], ["mma_ll", "L leg"], ["mma_rl", "R leg"], ["mma_mod1", "Hooks"], ["mma_mod2", "Straights"], ["mma_mod3", "Overhands"], ["mma_guard", "Guard"], ["mma_grab", "Grapple"], ["mma_dodge", "Slip"]]
 		for item in hints:
 			var prompt := ButtonPrompt.new([item[0]], item[1], 36)
 			prompt.clickable = false
 			bar.add_child(prompt)
-	if movesets:
-		# Movesets: one card per equipped move, named after it, on its own input
-		for i in fighter.loadout.size():
-			var pm: PoolMove = fighter.creature.pool.get(str(fighter.loadout[i]))
-			if pm == null:
-				continue
-			var mslot: String = Fighter.MOVE_SLOTS[i]
-			var mprompt := CombatPrompt.new([MOVE_ACTIONS[i]], move_card_title(pm), 40)
-			bar.add_child(mprompt)
-			_ability_prompts[mslot] = mprompt
-	for slot in (["juice"] if movesets else ["ability1", "ability2", "juice"]):
+	for slot in ["ability1", "ability2", "juice"]:
 		if slot != "juice" and not fighter.creature.abilities.has(slot):
 			continue
 		var title := "JUICE" if slot == "juice" else ("Trick 1" if slot == "ability1" else "Trick 2")
-		if movesets:
-			title = "Ultimate"
 		var prompt := CombatPrompt.new([MartialControls.action(slot, fighter.creature)], title, 40)
 		bar.add_child(prompt)
 		_ability_prompts[slot] = prompt
+	var strip := _strip_panel()
+	strip.add_child(bar)
+	strip.offset_top = -116 if fighter.creature.tags.has("martial") else -78
+	strip.offset_bottom = -16
+	add_child(strip)
+	if fighter.creature.tags.has("martial"):
+		_sub.offset_top = -224
+		_sub.offset_bottom = -124
+	_hints = strip
+	_hints_bottom = true
+
+
+## Movesets: row one is a MoveCard per equipped move on its own input, then the Ultimate; row two
+## (control hints on) guard, dodge and grapple. The strip grows upward to fit both rows.
+func _add_move_strip(fighter: Fighter) -> void:
+	var col := VBoxContainer.new()
+	col.theme = UiTheme.get_theme()
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_theme_constant_override("separation", 6)
+	var row := HBoxContainer.new()
+	row.name = "MoveCards"
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", 26)
+	col.add_child(row)
+	for i in mini(fighter.loadout.size(), Fighter.MOVE_SLOTS.size()):
+		var pm: PoolMove = fighter.creature.pool.get(str(fighter.loadout[i]))
+		if pm == null:
+			continue
+		var mslot: String = Fighter.MOVE_SLOTS[i]
+		var card := MoveCard.new(str(MOVE_ACTIONS[i]), pm, mslot, 40)
+		row.add_child(card)
+		_ability_prompts[mslot] = card
+	var ult := CombatPrompt.new([MartialControls.action("juice", fighter.creature)], "Ultimate", 40)
+	ult.name = "UltimateCard"
+	row.add_child(ult)
+	_ability_prompts["juice"] = ult
+	if bool(Settings.get_value("gameplay.tutorial_prompts")):
+		var hints := HBoxContainer.new()
+		hints.name = "BasicHints"
+		hints.alignment = BoxContainer.ALIGNMENT_CENTER
+		hints.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hints.add_theme_constant_override("separation", 26)
+		for item in [["guard", "Guard (tap: parry)"], ["dodge", "Dodge"], ["grab", "Grapple"]]:
+			var prompt := ButtonPrompt.new([item[0]], str(item[1]), 32)
+			prompt.clickable = false
+			hints.add_child(prompt)
+		col.add_child(hints)
+	var strip := _strip_panel()
+	strip.name = "ControlHints"
+	strip.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	strip.add_child(col)
+	add_child(strip)
+	_hints = strip
+	_hints_bottom = true
+	_moves_strip = true
+	strip.minimum_size_changed.connect(_layout_bottom)
+	_layout_bottom()
+
+
+func _strip_panel() -> PanelContainer:
 	var strip := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.05, 0.03, 0.08, 0.75)
@@ -205,18 +266,47 @@ func _add_control_hints(_n: int) -> void:
 	sb.set_content_margin_all(8)
 	strip.add_theme_stylebox_override("panel", sb)
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	strip.add_child(bar)
 	strip.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	strip.offset_top = -116 if fighter.creature.tags.has("martial") else -78
-	strip.offset_bottom = -16
+	strip.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	strip.offset_left = -850
 	strip.offset_right = 850
-	add_child(strip)
-	if fighter.creature.tags.has("martial"):
-		_sub.offset_top = -224
-		_sub.offset_bottom = -124
-	_hints = strip
-	_hints_bottom = true
+	return strip
+
+
+## The combat style, creature and loadout the local strip shows ("" for nobody).
+static func move_signature(f: Fighter) -> String:
+	if f == null or f.creature == null:
+		return ""
+	return "%s|%s|%s" % [f.combat_style, f.creature.id, ",".join(PackedStringArray(f.loadout))]
+
+
+## Rebuilds the control-hint strip and its cards for the local fighter's current combat style and
+## loadout (practice's Change moves calls it; FightHud also notices a change by itself, e.g. a
+## network client's roster update).
+func refresh_move_cards() -> void:
+	if _hints != null and is_instance_valid(_hints):
+		if _hints.get_parent() == self:
+			remove_child(_hints)
+		_hints.queue_free()
+	_hints = null
+	_hints_bottom = false
+	_moves_strip = false
+	_ability_prompts.clear()
+	_add_control_hints(sim.fighters.size())
+	set_bottom_inset(_bottom_inset)
+
+
+## Movesets strip: as tall as its rows, 16 du above the bottom (plus the inset); the subtitles sit
+## just above it, the referee hint and the scorecards above them.
+func _layout_bottom() -> void:
+	if not _moves_strip or _hints == null or not is_instance_valid(_hints) or _sub == null:
+		return
+	var h := maxf(62.0, _hints.get_combined_minimum_size().y)
+	_hints.offset_bottom = -16.0 - _bottom_inset
+	_hints.offset_top = _hints.offset_bottom - h
+	_sub.offset_bottom = _hints.offset_top - 10.0
+	_sub.offset_top = _sub.offset_bottom - 92.0
+	_place_bottom_panels()
 
 
 ## Lifts subtitles and the control-hint strip by `px`, so a control
@@ -233,6 +323,7 @@ func set_bottom_inset(px: float) -> void:
 		_hints.offset_top = (-116.0 if martial else -78.0) - px
 		_hints.offset_bottom = -16.0 - px
 	_place_bottom_panels()
+	_layout_bottom()
 
 
 ## The referee hint and the scorecard / decision panels sit just above the subtitle band (which
@@ -366,6 +457,10 @@ func _process(dt: float) -> void:
 		if typeof(rv) == TYPE_DICTIONARY:
 			ref = rv
 	_ten = ten_point_of(mm, hs)
+	if player_index >= 0 and player_index < sim.fighters.size():
+		var me: Fighter = sim.fighters[player_index]
+		if me.controller_kind == "player" and move_signature(me) != _cards_sig:
+			refresh_move_cards()
 	for f in sim.fighters:
 		if not cards.has(f.index):
 			continue
@@ -394,6 +489,9 @@ func _process(dt: float) -> void:
 		(c["hype_l"] as Label).text = "JUICED!" if juiced else "HYPE"
 		if f.index == player_index and f.controller_kind == "player":
 			for slot in _ability_prompts:
+				if _ability_prompts[slot] is MoveCard:
+					(_ability_prompts[slot] as MoveCard).update_from(f, sim.rules)
+					continue
 				var left := float(f.cooldown_left.get(slot, 0.0))
 				var full := 1.0
 				if f.creature.abilities.has(slot) or f.slot_move(str(slot)) != null:
@@ -437,7 +535,8 @@ func _process(dt: float) -> void:
 		_sub.text = ""
 
 
-## Pulses one meter on the local player's card (tutorial: "stamina", "cooldown", "hype").
+## Pulses one meter on the local player's card (tutorial: "stamina", "cooldown", "hype";
+## "cooldown:m3" pulses that Movesets card).
 func _apply_highlight(which: String) -> void:
 	if not cards.has(player_index):
 		return
@@ -448,6 +547,11 @@ func _apply_highlight(which: String) -> void:
 		(c[key] as CanvasItem).modulate = Color.WHITE
 	for prompt: CanvasItem in _ability_prompts.values():
 		prompt.modulate = Color.WHITE
+	if which.begins_with("cooldown:"):
+		var p = _ability_prompts.get(which.substr(9))
+		if p is CanvasItem:
+			(p as CanvasItem).modulate = on
+		return
 	match which:
 		"stamina":
 			(c["st"] as CanvasItem).modulate = on
@@ -751,7 +855,8 @@ func show_decision(ev: Dictionary, round_no := 0) -> void:
 const MOVE_ACTIONS := ["light", "heavy", "ability1", "ability2"]
 
 
-## A move card's title: its name, and how to use it when that is not a tap.
+## A move's name with how to use it when that is not a tap (prompts and lists outside the HUD,
+## whose cards show the hold as a tag).
 static func move_card_title(pm: PoolMove) -> String:
 	match pm.hold:
 		"charge":
@@ -761,10 +866,21 @@ static func move_card_title(pm: PoolMove) -> String:
 	return pm.display_name
 
 
+## The local player's card of a loadout slot ("m1".."m4"), null when not shown.
+func move_card(slot: String) -> MoveCard:
+	var p = _ability_prompts.get(slot)
+	if p == null or not is_instance_valid(p) or not (p is MoveCard):
+		return null
+	return p as MoveCard
+
+
 ## A move press that could not start (Fighter `move_denied`: cooldown or stamina): the card flashes.
 func move_denied(slot: String, why: String) -> void:
 	var p = _ability_prompts.get(slot)
 	if p == null or not is_instance_valid(p):
+		return
+	if p is MoveCard:
+		(p as MoveCard).flash_denied(why)
 		return
 	var c := p as CanvasItem
 	c.modulate = Color(1.0, 0.35, 0.3) if why == "stamina" else Color(0.75, 0.75, 0.8)

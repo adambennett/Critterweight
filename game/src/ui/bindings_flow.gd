@@ -23,6 +23,30 @@ static func label_of(action: String) -> String:
 	return str(Controls.ACTION_LABELS.get(action, action.capitalize()))
 
 
+## What a style-dependent action does in Movesets and in Classic ("" for the others).
+static func help_of(action: String) -> String:
+	return str(Controls.ACTION_HELP.get(action, ""))
+
+
+## The action's label for a fighter in a match: in Movesets the four move inputs name the equipped
+## move ("Move 2: Flamethrower (hold, aim)"), in Classic the Classic action ("Heavy attack (hold to
+## charge)"); the generic label otherwise (no fighter, a martial fighter, other actions).
+static func label_for(action: String, f: Fighter) -> String:
+	if f == null or f.creature == null or f.creature.tags.has("martial"):
+		return label_of(action)
+	if MovesUi.movesets(f):
+		var i := MovesUi.SLOT_ACTIONS.find(action)
+		if i >= 0:
+			var pm := f.slot_move(Fighter.MOVE_SLOTS[i])
+			return ("Move %d: %s" % [i + 1, FightHud.move_card_title(pm)]) if pm else "Move %d: (empty)" % (i + 1)
+		if action == "juice" and f.creature.abilities.has("juice"):
+			return "Ultimate: %s" % (f.creature.abilities["juice"] as MoveDef).display_name
+		if action == "grab":
+			return "Grapple / throw"
+		return label_of(action)
+	return str(Controls.CLASSIC_LABELS.get(action, label_of(action)))
+
+
 ## Binds `ev` as the primary input of `action` for its device class. Returns the action the input
 ## was taken from ("" if it was free) so the caller can show a conflict notice.
 static func rebind(action: String, ev: InputEvent) -> String:
