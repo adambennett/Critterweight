@@ -20,7 +20,10 @@ param(
 	[string]$Log = "",
 	[int]$WaitMinutes = 240,
 	[string]$UserRoot = "",
-	[string]$Godot = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
+	[string]$Godot = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe",
+	# refresh the import and script-class caches first (a fresh worktree has no .godot folder, and a
+	# new class_name is unknown until the editor has scanned); done automatically when .godot is missing
+	[switch]$Import
 )
 $ErrorActionPreference = "Continue"
 try { (Get-Process -Id $PID).PriorityClass = 'BelowNormal' } catch {}
@@ -47,6 +50,10 @@ if ($Filter -eq "" -and (Test-Path $UserRoot)) { Remove-Item -LiteralPath $UserR
 New-Item -ItemType Directory -Force $UserRoot | Out-Null
 $code = 1
 try {
+	if ($Import -or -not (Test-Path (Join-Path $GamePath ".godot\global_script_class_cache.cfg"))) {
+		Write-Host "importing $GamePath (script classes and assets)"
+		& $Godot --headless --path $GamePath --import *> (Join-Path $UserRoot 'import.log')
+	}
 	$a = @("--headless", "--path", $GamePath, "--log-file", (Join-Path $UserRoot 'engine.log'), "--fixed-fps", "120", "--", "--user-root", $UserRoot, "--test")
 	if ($Filter -ne "") { $a += $Filter }
 	if ($Log -ne "") { & $Godot @a *> $Log } else { & $Godot @a }
