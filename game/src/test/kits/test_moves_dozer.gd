@@ -1,8 +1,8 @@
 extends MovesKitCase
 ## Dozer's v0.9.18 move pool (docs/kits/f_dozer.md "Movesets", docs/design/MOVESET_COMBAT.md §4):
-## every move does what its description says, in Movesets, against a standing Dredge; every style
-## patches real fields (two of them are played); the effects kit (src/view/fx/moves/f_dozer.gd)
-## draws and cleans up its moves headless.
+## every move does what its description says, in Movesets, against a standing Dredge; Classic still
+## plays the v0.9.17 kit; every style patches real fields (two of them are played); the effects kit
+## (src/view/fx/moves/f_dozer.gd) draws and cleans up its moves headless.
 
 const BULLDOZER := ["snout_jab", "rock_slide", "bulldoze", "dust_bowl"]
 const QUARRY := ["snout_jab", "quake_stomp", "boulder_toss", "iron_hide"]
@@ -241,6 +241,44 @@ func test_snout_jab_horn_lunge_and_the_v0917_abilities_carry_over() -> void:
 	await step_sim(h, 0.1)
 	check_eq(hs.move_slot, "heavy_charged", "release: the Quarry Ram")
 	await step_sim(h, 1.4)
+
+
+func test_classic_is_unchanged() -> void:
+	# the pool changes nothing in Classic: the v0.9.17 inputs reach the v0.9.17 moves
+	var sim := duel("f_dozer", [], "f_dredge", 1.6, {"combat": "classic"})
+	await step_sim(sim, 0.4)
+	var s := sim.fighters[0]
+	check(s.combat_style == "classic" and s.loadout.is_empty(), "Classic Dozer fights without a loadout")
+	var slots: Array = []
+	for b in [FighterInput.LIGHT, FighterInput.LIGHT, FighterInput.LIGHT, FighterInput.HEAVY]:
+		s.input.press(b)
+		await step_sim(sim, 0.03)
+		s.input.set_held(b, false)
+		slots.append(s.move_slot)
+		var guard := 0
+		while s.move != null and s.state_time < maxf(s.move.cancel_t0, s.move.last_active()) + 0.02 and guard < 240:
+			await step_sim(sim, DT)
+			guard += 1
+	check_eq(slots, ["l1", "l2", "l3", "finisher"], "Light, Light, Light, Heavy: the string into the Gravel Toss")
+	await step_sim(sim, 1.2)
+	s.input.press(FighterInput.HEAVY)
+	await step_sim(sim, 1.2)
+	s.input.set_held(FighterInput.HEAVY, false)
+	await step_sim(sim, 0.1)
+	check_eq(s.move_slot, "heavy_charged", "a held Heavy is the Quarry Ram")
+	await step_sim(sim, 1.6)
+	s.input.press(FighterInput.AB2)
+	await step_sim(sim, 0.05)
+	s.input.set_held(FighterInput.AB2, false)
+	check_eq(s.move_slot, "ability2", "Ability 2 is Dust Bowl")
+	await step_sim(sim, 0.4)
+	check(s.statuses.has("dust_bowl"), "and raises its cloud")
+	var tagged := sim.events.filter(func(e: Dictionary) -> bool: return int(e.get("fighter", -1)) == 0 and e.has("pool"))
+	check(tagged.is_empty(), "no Classic event carries a Movesets pool move (%d)" % tagged.size())
+	s.cooldown_left["ability2"] = 9.0
+	s.hooks.run_inline({"do": [{"type": "cooldown", "slot": "ability2", "add": -3.0}]}, {})
+	check_near(float(s.cooldown_left["ability2"]), 6.0, 0.001, "cooldown hooks act on the Classic ability slot")
+	await step_sim(sim, 0.6)
 
 
 func test_styles_patch_real_fields() -> void:
