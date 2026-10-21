@@ -586,7 +586,18 @@ func _destroy_projectiles(f: Fighter, p: Vector3, r: float, cone_deg: float) -> 
 
 
 func _chain_arc(f: Fighter, e: Dictionary, p: Vector3) -> void:
-	var src: Fighter = f.target if f.target and not f.target.is_out() else null
+	# the jump starts from the fighter that was struck (an effect fired from a hit carries the hit's
+	# point), else from the attacker's target
+	var src: Fighter = null
+	if e.has("at_point"):
+		var near := 1.2
+		for o: Fighter in enemies_in(f, p, near):
+			var dd := Vector2(o.pos().x - p.x, o.pos().z - p.z).length()
+			if dd <= near:
+				near = dd
+				src = o
+	elif f.target and not f.target.is_out():
+		src = f.target
 	var origin := src.pos() if src else p
 	var best: Fighter = null
 	var bd := float(e.get("range", 2.0))
@@ -828,7 +839,11 @@ func _update_zone(ent: Dictionary, dt: float) -> void:
 	if e.has("random_bolt"):
 		var rb: Dictionary = e["random_bolt"]
 		var off := Vector3(sim.rng.randf_range(-r, r), 0, sim.rng.randf_range(-r, r)) * 0.7
-		_spawn_delayed(f, {"radius": float(rb.get("radius", 0.8)), "delay": 0.25, "damage": rb.get("damage", 6), "poise": rb.get("poise", 12), "element": "static", "buildup": float(rb.get("buildup", {}).get("static", 25))}, Vector3(ent["pos"]) + off)
+		var bolt := {"radius": float(rb.get("radius", 0.8)), "delay": 0.25, "damage": rb.get("damage", 6), "poise": rb.get("poise", 12), "element": "static", "buildup": float(rb.get("buildup", {}).get("static", 25))}
+		if e.has("pool"):
+			bolt["pool"] = e["pool"]
+			bolt["cat"] = e.get("cat", "")
+		_spawn_delayed(f, bolt, Vector3(ent["pos"]) + off)
 
 
 ## Owner-element and ally rules for zones (ELEMENTS.md §5/§7).
