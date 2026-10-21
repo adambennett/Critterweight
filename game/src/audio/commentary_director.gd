@@ -200,8 +200,29 @@ static func ability_key(name_: String, fallback: String) -> String:
 
 
 ## Whether an ability deals damage (a miss is only worth calling for an attack).
-func _ability_damages(i: int, slot: String) -> bool:
-	var a := _ability_def(i, slot)
+## A Movesets pool move's MoveDef dictionary from content ({} when unknown): its inline `move`, or
+## the Classic slot it is built on.
+func _pool_move_def(i: int, pool: String) -> Dictionary:
+	var entry: Dictionary = Content.creature_entry(_creature(i))
+	var mp = entry.get("movepool", {})
+	if typeof(mp) != TYPE_DICTIONARY or not (mp as Dictionary).has(pool):
+		return {}
+	var pm: Dictionary = mp[pool]
+	if typeof(pm.get("move", null)) == TYPE_DICTIONARY:
+		return pm["move"]
+	var use := str(pm.get("use", ""))
+	if use != "":
+		var abs_ = entry.get("abilities", {})
+		if typeof(abs_) == TYPE_DICTIONARY and (abs_ as Dictionary).has(use):
+			return (abs_ as Dictionary)[use]
+		var mv = entry.get("moves", {})
+		if typeof(mv) == TYPE_DICTIONARY and (mv as Dictionary).has(use):
+			return (mv as Dictionary)[use]
+	return {}
+
+
+func _ability_damages(i: int, slot: String, pool := "") -> bool:
+	var a := _pool_move_def(i, pool) if pool != "" else _ability_def(i, slot)
 	if float(a.get("damage", 0.0)) > 0.0:
 		return true
 	for e in a.get("effects", []):
@@ -550,7 +571,7 @@ func _on_hit(ev: Dictionary, info: Dictionary) -> Array:
 	# an ability that touched someone (landed, blocked or parried) did not miss: resolve its pending
 	# check first, whatever is called below (each cast has its own entry)
 	var landed_ability := {}
-	if slot.begins_with("ability") or slot == "effect":
+	if slot.begins_with("ability") or slot == "effect" or slot.begins_with("mv."):
 		for p in _pending:
 			if str(p["kind"]) == "ability" and int(p["fighter"]) == fi and not bool(p.get("cancel", false)):
 				p["cancel"] = true
@@ -615,7 +636,10 @@ func _on_hit(ev: Dictionary, info: Dictionary) -> Array:
 		var aid := str(landed_ability["id"])
 		if _ready("ability_hit:" + aid):
 			_cool_for("ability_hit:" + aid, 22.0)
-			out.append(_req("ability_hit", {"creature": _creature(fi), "id": aid}, "medium", names, {"ttl": 1.6}))
+			var ch := {"creature": _creature(fi), "id": aid}
+			if str(landed_ability.get("cat", "")) != "":
+				ch["cat"] = str(landed_ability["cat"])
+			out.append(_req("ability_hit", ch, "medium", names, {"ttl": 1.6}))
 		return out
 	# 3. big moments
 	var kinds: Array = []
@@ -777,14 +801,22 @@ func _on_ability(ev: Dictionary) -> Array:
 	var out: Array = []
 	var fi := int(ev.get("fighter", -1))
 	var slot := str(ev.get("slot", ""))
-	var aid := ability_key(str(_ability_def(fi, slot).get("name", "")), str(ev.get("id", "")))
+	# Movesets (v0.9.18): a pool move is called by its own id ("flamethrower"; a move built on a
+	# v0.9.17 ability keeps that ability's id, "steam_vent") and its category ("stream", "blast"...):
+	# lines for the move first, then lines for its kind of move
+	var pool := str(ev.get("pool", ""))
+	var aid := pool if pool != "" else ability_key(str(_ability_def(fi, slot).get("name", "")), str(ev.get("id", "")))
+	var cat := str(ev.get("cat", ""))
 	_action(t)
-	_pending.append({"at": t + 2.6, "kind": "ability", "fighter": fi, "id": aid, "damaging": _ability_damages(fi, slot)})
+	_pending.append({"at": t + 2.6, "kind": "ability", "fighter": fi, "id": aid, "cat": cat, "damaging": _ability_damages(fi, slot, pool)})
 	# the cast itself is called now and then (every ability fires every few seconds)
 	if _ready("ability:" + aid) and _ready("ability_any"):
 		_cool_for("ability:" + aid, 28.0)
 		_cool_for("ability_any", 7.0)
-		out.append(_req("ability", {"creature": _creature(fi), "slot": str(ev.get("slot", "")), "id": aid}, "low", _vars(fi, -1),
+		var ca := {"creature": _creature(fi), "slot": slot, "id": aid}
+		if cat != "":
+			ca["cat"] = cat
+		out.append(_req("ability", ca, "low", _vars(fi, -1),
 			{"ttl": 1.5, "follow": {"trigger": "ability_follow", "ctx": {"creature": _creature(fi), "id": aid}, "class": "color", "ttl": 3.0}}))
 	return out
 
@@ -1002,8 +1034,10 @@ func on_tick(health: Array, time_left: float, dt: float, info := {}) -> Array:
 			"ability":
 				if bool(p.get("damaging", false)) and _ready("ability_miss") and t - last_line_end_t > 1.0:
 					_cool_for("ability_miss", 30.0)
-					out.append(_req("ability_miss", {"creature": _creature(int(p["fighter"])), "id": str(p["id"])}, "low",
-						_vars(int(p["fighter"]), -1), {"ttl": 1.4}))
+					var cm := {"creature": _creature(int(p["fighter"])), "id": str(p["id"])}
+					if str(p.get("cat", "")) != "":
+						cm["cat"] = str(p["cat"])
+					out.append(_req("ability_miss", cm, "low", _vars(int(p["fighter"]), -1), {"ttl": 1.4}))
 			"throw":
 				if _ready("grab_throw"):
 					_cool_for("grab_throw", 14.0)
