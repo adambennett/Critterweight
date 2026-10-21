@@ -11,6 +11,7 @@ assets and records the choices in retakes-installed.json.
     python -B tools/audio/breeze/prepare_retakes_v0918.py               # write the retake plan
     python -B tools/audio/breeze/generate.py --plan docs/audio/breeze/v0.9.18/plan-retakes.json ...
     python -B tools/audio/breeze/prepare_retakes_v0918.py --install     # switch the catalog
+    --set tutorial: the same for Granny's Movesets lessons (plan-tutorial.json, tutorial_catalog.json)
 """
 import argparse, audioop, hashlib, json, wave
 from pathlib import Path
@@ -36,6 +37,19 @@ RETAKES = {
 # round 2: the first retake still ended abruptly (0119) or came out with a long pause and a cut-off
 # ending (0002)
 RETAKES_R2 = {'cmt18_0119': ['ending'], 'cmt18_0002': ['pace', 'pause', 'ending']}
+
+# Granny's Movesets lessons (--set tutorial), from the measurements of 2026-10-21: cut-off endings at
+# the end of a line and the briskest deliveries (> 26 characters per second)
+TUTORIAL_RETAKES = {
+    'tut18_tut_m_dodge_intro_b': 'ending', 'tut18_tut_m_dodge_hint_c': 'ending', 'tut18_tut_m_special_success': 'ending',
+    'tut18_tok_your_special': 'ending',
+    'tut18_tut_m_charge_intro_a': 'pace', 'tut18_tut_m_charge_hint_b': 'pace', 'tut18_tut_m_sustain_intro_a': 'pace',
+    'tut18_tut_m_special_use_only_success': 'pace', 'tut18_tut_m_dodge_success': 'pace', 'tut18_tut_m_dodge_no_dash_intro_a': 'pace',
+    'tut18_tut_m_dodge_no_dash_success': 'pace', 'tut18_tut_m_grapple_hint_b': 'pace', 'tut18_tut_m_ultimate_success': 'pace',
+}
+# round 2: the first retake of the no-dash dodge intro came out with a cut-off ending
+TUTORIAL_RETAKES_R2 = {'tut18_tut_m_dodge_no_dash_intro_a': ['pace', 'ending']}
+TUTORIAL_REJECT = {'tut18_tut_m_dodge_no_dash_intro_a_r1'}
 # takes measured and judged unusable (kept journaled with their raw masters, never installed)
 REJECT = {'cmt18_0119_r1', 'cmt18_0002_r1'}
 # takes installed after trimming a stray sound that follows the line after >= 0.3 s of digital silence
@@ -52,8 +66,19 @@ def _retake(plan: dict, cid: str, reasons: list) -> dict:
     return src
 
 
+SET = {'plan': 'plan.json', 'retakes': 'plan-retakes.json', 'catalog': 'retake-catalog.json', 'installed': 'retakes-installed.json',
+       'speech': 'catalog.json'}
+
+
+def use_tutorial_set():
+    global RETAKES, RETAKES_R2, REJECT
+    SET.update({'plan': 'plan-tutorial.json', 'retakes': 'plan-tutorial-retakes.json', 'catalog': 'retake-tutorial-catalog.json',
+                'installed': 'retakes-tutorial-installed.json', 'speech': 'tutorial_catalog.json'})
+    RETAKES, RETAKES_R2, REJECT = TUTORIAL_RETAKES, TUTORIAL_RETAKES_R2, TUTORIAL_REJECT
+
+
 def build_plan():
-    plan = json.loads((DOCS / 'plan.json').read_text(encoding='utf-8'))
+    plan = json.loads((DOCS / SET['plan']).read_text(encoding='utf-8'))
     out = {k: plan[k] for k in ['version', 'release', 'model_id', 'voices', 'cast'] if k in plan}
     out['purpose'] = 'v0.9.18 retakes of clips flagged by the technical speech audit (see RETAKES in prepare_retakes_v0918.py)'
     out['authorized_credits'] = plan.get('authorized_credits')
@@ -64,7 +89,7 @@ def build_plan():
         clips[cid + '_r2'] = _retake(plan, cid, reasons)
     out['clips'] = clips
     out['estimated_characters'] = sum(len(c['text']) for c in clips.values())
-    (DOCS / 'plan-retakes.json').write_text(json.dumps(out, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    (DOCS / SET['retakes']).write_text(json.dumps(out, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('retakes: %d clips, %d characters, ~%.1f credits' % (len(clips), out['estimated_characters'], out['estimated_characters'] / 10))
 
 
@@ -93,9 +118,9 @@ def _trim_tail(path: Path):
 
 
 def install():
-    retake = json.loads((DOCS / 'retake-catalog.json').read_text(encoding='utf-8'))
-    plan = json.loads((DOCS / 'plan-retakes.json').read_text(encoding='utf-8'))
-    cat_path = SPEECH / 'catalog.json'
+    retake = json.loads((DOCS / SET['catalog']).read_text(encoding='utf-8'))
+    plan = json.loads((DOCS / SET['retakes']).read_text(encoding='utf-8'))
+    cat_path = SPEECH / SET['speech']
     cat = json.loads(cat_path.read_text(encoding='utf-8'))
     # each original line ends up with its latest usable retake
     chosen = {}
@@ -116,6 +141,12 @@ def install():
                 if part.get('clip') == old_id:
                     part['clip'] = new_id
                     switched += 1
+        # a recorded word (a vocabulary token) points at its retake too
+        for vocab in (cat.get('tokens') or {}).values():
+            for word, cid in list(vocab.items()):
+                if cid == old_id:
+                    vocab[word] = new_id
+                    switched += 1
         cat['clips'][new_id] = entry
         cat['clips'].pop(old_id, None)
         for f in [SPEECH / (old_id + '.wav'), SPEECH / (old_id + '.wav.import')]:
@@ -126,7 +157,7 @@ def install():
             if f.exists():
                 f.unlink()
     cat_path.write_text(json.dumps(cat, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    (DOCS / 'retakes-installed.json').write_text(json.dumps({'chosen': chosen, 'rejected': sorted(REJECT), 'processing': processing},
+    (DOCS / SET['installed']).write_text(json.dumps({'chosen': chosen, 'rejected': sorted(REJECT), 'processing': processing},
                                                             indent=2) + '\n', encoding='utf-8')
     print('installed %d retakes (%d line parts switched); rejected %s' % (len(chosen), switched, sorted(REJECT)))
 
@@ -134,5 +165,8 @@ def install():
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--install', action='store_true')
+    ap.add_argument('--set', default='commentary', choices=['commentary', 'tutorial'])
     a = ap.parse_args()
+    if a.set == 'tutorial':
+        use_tutorial_set()
     install() if a.install else build_plan()

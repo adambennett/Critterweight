@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "voices": {
+    "devon": "voc_g53htd8kmjsj",
+    "kendall": "voc_j66xnnsxfeet",
+    "coach_buck": "voc_b36c5rxpfuzb"
+  },
+  "cast": {
+    "granny": "coach_buck"
+  },
+  "clips": {
+    "tut18_tut_m_dodge_intro_b_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_intro_b_r1.wav",
+      "seconds": 1.155,
+      "sha256": "26b3289657ff369ef14d3680c6f3d081f68f1c1592a511a7ccf856d482b82030",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_hint_c_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_hint_c_r1.wav",
+      "seconds": 0.885,
+      "sha256": "916da2932b25cf7c0ba4a5e9dfa3cc41f360898c97d9c97f03d957ce8cc94cbc",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_success_r1.wav",
+      "seconds": 3.005,
+      "sha256": "710a7bb10f4aa11517d62a877ae5faa5566d1cba6faad9f50e34d915af9d28ad",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_your_special_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_your_special_r1.wav",
+      "seconds": 0.865,
+      "sha256": "50c8f1843744e5dccaa85aa823878f42d791cd99fde99ed56502cdef90ce97b4",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_charge_intro_a_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_charge_intro_a_r1.wav",
+      "seconds": 3.925,
+      "sha256": "13d7e515e8a699e2e3bfd032933b5e8704ed313727f6a7a94e2f17c622787982",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_charge_hint_b_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_charge_hint_b_r1.wav",
+      "seconds": 4.51,
+      "sha256": "89480d61db9ff5ee0846bc6f1993cf3bca1ace36707cf4fb9611c098f1d581e7",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_sustain_intro_a_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_sustain_intro_a_r1.wav",
+      "seconds": 3.015,
+      "sha256": "668f905c898e0015321e78e31578d7649e4c4cad900a477b46c260d9d2329e76",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_use_only_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_use_only_success_r1.wav",
+      "seconds": 2.735,
+      "sha256": "6869fa2c14d8bcabaa7e3de4d8f6fb88b194975c1db1bec6c8c24244b7c70ce7",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_success_r1.wav",
+      "seconds": 2.895,
+      "sha256": "075670509f76f6ce20185a1364505441eba21b822cf09a2af7890492ce6cbe8e",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_no_dash_intro_a_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_no_dash_intro_a_r1.wav",
+      "seconds": 5.04,
+      "sha256": "d542aa270d61a158fa24669231c623c1ae8523b3b14f84c8dc8a911e69a188a3",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_no_dash_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_no_dash_success_r1.wav",
+      "seconds": 3.445,
+      "sha256": "0d249fc90c9822d156f8bc915b1ddab99d05dfa7203463a492d728f15f81ee95",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_grapple_hint_b_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_grapple_hint_b_r1.wav",
+      "seconds": 1.095,
+      "sha256": "a99da99becb9c05d79f414fc0a2c1d78ba3b6a28b1ef33ab9fbff0c1fdef5ffd",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_ultimate_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_ultimate_success_r1.wav",
+      "seconds": 2.945,
+      "sha256": "02ee700d1a9578ecc4a0f6f9a1bc3eb5368fc79b4d58b02c778280227d302b7a",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_no_dash_intro_a_r2": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_no_dash_intro_a_r2.wav",
+      "seconds": 4.355,
+      "sha256": "f757347274dd6620025810089e80f2a8a8e9cddbfcd75cf27f419c0762d76e7a",
+      "voice": "coach_buck"
+    }
+  }
+}

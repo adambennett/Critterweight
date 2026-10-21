@@ -1,0 +1,1373 @@
+{
+  "version": 1,
+  "voices": {
+    "devon": "voc_g53htd8kmjsj",
+    "kendall": "voc_j66xnnsxfeet",
+    "coach_buck": "voc_b36c5rxpfuzb"
+  },
+  "cast": {
+    "granny": "coach_buck"
+  },
+  "fixed_tokens": {
+    "basic": "that button",
+    "charge": "that button",
+    "sustain": "that button",
+    "special": "that button",
+    "basic_name": "your basic strike",
+    "charge_name": "your charge move",
+    "sustain_name": "your held move",
+    "special_name": "your special",
+    "ultimate_name": "your ultimate"
+  },
+  "tokens": {
+    "coach_buck": {
+      "acid spray": "tut18_tok_acid_spray",
+      "air slash": "tut18_tok_air_slash",
+      "anchor drop": "tut18_tok_anchor_drop",
+      "anchor fist": "tut18_tok_anchor_fist",
+      "arc lash": "tut18_tok_arc_lash",
+      "boulder toss": "tut18_tok_boulder_toss",
+      "bubble stream": "tut18_tok_bubble_stream",
+      "bulldoze": "tut18_tok_bulldoze",
+      "chain lightning": "tut18_tok_chain_lightning",
+      "cinder shot": "tut18_tok_cinder_shot",
+      "claw snap": "tut18_tok_claw_snap",
+      "coil crush": "tut18_tok_coil_crush",
+      "crosswind slash": "tut18_tok_crosswind_slash",
+      "crusher slam": "tut18_tok_crusher_slam",
+      "discharge": "tut18_tok_discharge",
+      "drain dive": "tut18_tok_drain_dive",
+      "dust bowl": "tut18_tok_dust_bowl",
+      "ember jab": "tut18_tok_ember_jab",
+      "feather darts": "tut18_tok_feather_darts",
+      "fire spin": "tut18_tok_fire_spin",
+      "flamethrower": "tut18_tok_flamethrower",
+      "flare rush": "tut18_tok_flare_rush",
+      "furnace haymaker": "tut18_tok_furnace_haymaker",
+      "ghost light": "tut18_tok_ghost_light",
+      "gust bomb": "tut18_tok_gust_bomb",
+      "hang time": "tut18_tok_hang_time",
+      "hex chain": "tut18_tok_hex_chain",
+      "high tide": "tut18_tok_high_tide",
+      "horn lunge": "tut18_tok_horn_lunge",
+      "hurricane strut": "tut18_tok_hurricane_strut",
+      "hydro cannon": "tut18_tok_hydro_cannon",
+      "iron hide": "tut18_tok_iron_hide",
+      "landslide": "tut18_tok_landslide",
+      "lantern swarm": "tut18_tok_lantern_swarm",
+      "last bell": "tut18_tok_last_bell",
+      "meltdown": "tut18_tok_meltdown",
+      "night shade": "tut18_tok_night_shade",
+      "overcharge": "tut18_tok_overcharge",
+      "overflow": "tut18_tok_overflow",
+      "poison darts": "tut18_tok_poison_darts",
+      "quake stomp": "tut18_tok_quake_stomp",
+      "rock slide": "tut18_tok_rock_slide",
+      "shed skin": "tut18_tok_shed_skin",
+      "shell brace": "tut18_tok_shell_brace",
+      "slap": "tut18_tok_slap",
+      "sludge lob": "tut18_tok_sludge_lob",
+      "snout jab": "tut18_tok_snout_jab",
+      "sounding jab": "tut18_tok_sounding_jab",
+      "spring pad": "tut18_tok_spring_pad",
+      "squash": "tut18_tok_squash",
+      "static field": "tut18_tok_static_field",
+      "steam vent": "tut18_tok_steam_vent",
+      "stoke the fire": "tut18_tok_stoke_the_fire",
+      "tail sweep": "tut18_tok_tail_sweep",
+      "tailwind": "tut18_tok_tailwind",
+      "that button": "tut18_tok_that_button",
+      "through the veil": "tut18_tok_through_the_veil",
+      "thunder jolt": "tut18_tok_thunder_jolt",
+      "tide spit": "tut18_tok_tide_spit",
+      "toll": "tut18_tok_toll",
+      "twister": "tut18_tok_twister",
+      "venom fangs": "tut18_tok_venom_fangs",
+      "whirlpool": "tut18_tok_whirlpool",
+      "wing snap": "tut18_tok_wing_snap",
+      "your basic strike": "tut18_tok_your_basic_strike",
+      "your charge move": "tut18_tok_your_charge_move",
+      "your held move": "tut18_tok_your_held_move",
+      "your special": "tut18_tok_your_special_r1"
+    }
+  },
+  "lines": [
+    {
+      "id": "tut18_tut_m_string_intro",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "{basic}: {basic_name}. Press again as each one lands. The last one's the finisher.",
+      "parts": [
+        {
+          "token": "basic"
+        },
+        {
+          "token": "basic_name"
+        },
+        {
+          "clip": "tut18_tut_m_string_intro_a"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_string_hint",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Plant your feet. Tap {basic}, let it land, tap again, all the way to the finisher.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_string_hint_a"
+        },
+        {
+          "token": "basic"
+        },
+        {
+          "clip": "tut18_tut_m_string_hint_b"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_string_rush",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Easy. Tap, let it land, tap again. Rush it and the next one cancels the last.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_string_rush"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_string_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "That's your string, finisher and all. When in doubt, do that.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_string_success"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_string_skip_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "No basic strike in your loadout. Moving on.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_string_skip_success"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_charge_intro",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "{charge}: {charge_name}. Tap it for the quick one. Hold it to wind up the big one.",
+      "parts": [
+        {
+          "token": "charge"
+        },
+        {
+          "token": "charge_name"
+        },
+        {
+          "clip": "tut18_tut_m_charge_intro_a_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_charge_hint",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Tap {charge} with him in front of you. Then hold it, and let go with him in range.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_charge_hint_a"
+        },
+        {
+          "token": "charge"
+        },
+        {
+          "clip": "tut18_tut_m_charge_hint_b_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_charge_stage",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Good. Now hold {charge} till you're wound up, and let go with him in range.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_charge_stage_a"
+        },
+        {
+          "token": "charge"
+        },
+        {
+          "clip": "tut18_tut_m_charge_stage_b"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_charge_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "That one ends arguments. It's also the one you'll miss most.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_charge_success"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_charge_skip_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "No hold-to-charge move in your loadout. Moving on.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_charge_skip_success"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_sustain_intro",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "{sustain}: {sustain_name}. It keeps going while you hold it. Steer it with the stick.",
+      "parts": [
+        {
+          "token": "sustain"
+        },
+        {
+          "token": "sustain_name"
+        },
+        {
+          "clip": "tut18_tut_m_sustain_intro_a_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_sustain_hint",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Get close and hold {sustain}. Push the stick at him as he walks. It turns slow.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_sustain_hint_a"
+        },
+        {
+          "token": "sustain"
+        },
+        {
+          "clip": "tut18_tut_m_sustain_hint_b"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_sustain_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "That's pressure. Mind your stamina: run it dry and you've got nothing.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_sustain_success"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_sustain_skip_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "No hold-and-aim move in your loadout. Moving on.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_sustain_skip_success"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_special_intro",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "{special}: {special_name}. Specials cost stamina and cool down. Watch its card.",
+      "parts": [
+        {
+          "token": "special"
+        },
+        {
+          "token": "special_name"
+        },
+        {
+          "clip": "tut18_tut_m_special_intro_a"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_special_hint",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Press {special} when he's in range. When its card lights up, it's ready again.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_special_hint_a"
+        },
+        {
+          "token": "special"
+        },
+        {
+          "clip": "tut18_tut_m_special_hint_b"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_special_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "That's what makes you you. Everything else, everyone's got.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_special_success_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_special_use_only_intro",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "{special}: {special_name}. It doesn't hit, it sets you up. Use it and watch its card.",
+      "parts": [
+        {
+          "token": "special"
+        },
+        {
+          "token": "special_name"
+        },
+        {
+          "clip": "tut18_tut_m_special_use_only_intro_a"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_special_use_only_hint",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Press {special}. That one works on you, not on him.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_special_use_only_hint_a"
+        },
+        {
+          "token": "special"
+        },
+        {
+          "clip": "tut18_tut_m_special_use_only_hint_b"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_special_use_only_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "That's your setup move. Use it before you need it.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_special_use_only_success_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_special_skip_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "No special in your loadout. Moving on.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_special_skip_success"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_dodge_intro",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "{dodge} plus a direction, and nothing can touch you. Press {basic} mid-dodge to strike.",
+      "parts": [
+        {
+          "token": "dodge"
+        },
+        {
+          "clip": "tut18_tut_m_dodge_intro_a"
+        },
+        {
+          "token": "basic"
+        },
+        {
+          "clip": "tut18_tut_m_dodge_intro_b_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_dodge_hint",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Wait for his big wind-up, then {dodge} sideways. Then {basic} while you slide.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_dodge_hint_a"
+        },
+        {
+          "token": "dodge"
+        },
+        {
+          "clip": "tut18_tut_m_dodge_hint_b"
+        },
+        {
+          "token": "basic"
+        },
+        {
+          "clip": "tut18_tut_m_dodge_hint_c_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_dodge_stage",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Nothing hits what isn't there. Now press {basic} while you're dodging.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_dodge_stage_a"
+        },
+        {
+          "token": "basic"
+        },
+        {
+          "clip": "tut18_tut_m_dodge_stage_b"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_dodge_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Nothing hits what isn't there. Come back swinging.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_dodge_success_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_dodge_no_dash_intro",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "{dodge} plus a direction, and nothing can touch you. That's the whole lesson.",
+      "parts": [
+        {
+          "token": "dodge"
+        },
+        {
+          "clip": "tut18_tut_m_dodge_no_dash_intro_a_r2"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_dodge_no_dash_hint",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Wait for his big wind-up, then {dodge} sideways.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_dodge_no_dash_hint_a"
+        },
+        {
+          "token": "dodge"
+        },
+        {
+          "clip": "tut18_tut_m_dodge_no_dash_hint_b"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_dodge_no_dash_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Nothing hits what isn't there. Come back with your hands.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_dodge_no_dash_success_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_grapple_intro",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "He's guarding. Grapple beats guard. {grab} to grab, a direction and {grab} to throw.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_grapple_intro_a"
+        },
+        {
+          "token": "grab"
+        },
+        {
+          "clip": "tut18_tut_m_grapple_intro_b"
+        },
+        {
+          "token": "grab"
+        },
+        {
+          "clip": "tut18_tut_m_grapple_intro_c"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_grapple_hint",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Walk up while his guard's up and press {grab}. Push toward the wall, {grab} again.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_grapple_hint_a"
+        },
+        {
+          "token": "grab"
+        },
+        {
+          "clip": "tut18_tut_m_grapple_hint_b_r1"
+        },
+        {
+          "token": "grab"
+        },
+        {
+          "clip": "tut18_tut_m_grapple_hint_c"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_grapple_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Strikes beat grapples, grapples beat guard, guard beats strikes. Your triangle.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_grapple_success"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_grapple_skip_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "No grapple in your kit. Work around his guard. Moving on.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_grapple_skip_success"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_ultimate_intro",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Hits fill Hype. So does taunting, {taunt}. Full meter, {juice}: your Ultimate.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_ultimate_intro_a"
+        },
+        {
+          "token": "taunt"
+        },
+        {
+          "clip": "tut18_tut_m_ultimate_intro_b"
+        },
+        {
+          "token": "juice"
+        },
+        {
+          "clip": "tut18_tut_m_ultimate_intro_c"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_ultimate_hint",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "Hit him, or taunt with {taunt} when he's far off. Full meter? Press {juice}.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_ultimate_hint_a"
+        },
+        {
+          "token": "taunt"
+        },
+        {
+          "clip": "tut18_tut_m_ultimate_hint_b"
+        },
+        {
+          "token": "juice"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_ultimate_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "That's the whole kit. Everything after this is timing.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_ultimate_success_r1"
+        }
+      ]
+    },
+    {
+      "id": "tut18_tut_m_ultimate_skip_success",
+      "speaker": "granny",
+      "voice": "coach_buck",
+      "template": "No Ultimate in your kit. Moving on.",
+      "parts": [
+        {
+          "clip": "tut18_tut_m_ultimate_skip_success"
+        }
+      ]
+    }
+  ],
+  "clips": {
+    "tut18_tut_m_string_intro_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_string_intro_a.wav",
+      "seconds": 3.105,
+      "sha256": "d077eef33a0c2fe237034a7620fe4a06c331f71b7f5d5dd80cba9117b655966b",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_string_hint_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_string_hint_a.wav",
+      "seconds": 1.535,
+      "sha256": "36d59e45651174be3d673db76724666370c82c7f840e009075e9b1a84c3e8637",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_string_hint_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_string_hint_b.wav",
+      "seconds": 3.025,
+      "sha256": "55260efc1556a1806c8def7921414c936b29611ebfa0aed48694b1239fceac1c",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_string_rush": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_string_rush.wav",
+      "seconds": 4.515,
+      "sha256": "d521e250b6600f70757cfe0c17a2de35b515f7d2c9f5b365941eebd815082116",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_string_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_string_success.wav",
+      "seconds": 3.865,
+      "sha256": "a351c748eddeb8c60a4aea35d6a9848c59586c3068b0e4ec73dd6f7988f08fd1",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_string_skip_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_string_skip_success.wav",
+      "seconds": 2.385,
+      "sha256": "4b5491fc89dcb3498b34b5374c50c1d6b55896613a21a92f416b2c92b8a26469",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_charge_hint_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_charge_hint_a.wav",
+      "seconds": 0.325,
+      "sha256": "15ad68b59aaeab5c76f064f8693c52575378d1c2b0de595d34713af5fd2b3bf3",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_charge_stage_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_charge_stage_a.wav",
+      "seconds": 1.015,
+      "sha256": "bc2cfe16a09944463525b7ea8d58fef6421ecf546617fe0c064056ed975be42c",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_charge_stage_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_charge_stage_b.wav",
+      "seconds": 2.855,
+      "sha256": "2ff531e422b801d9f339226a098d86e36436ccc3356d86722eb36c6492acf83d",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_charge_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_charge_success.wav",
+      "seconds": 2.925,
+      "sha256": "af12d299382237e0ae37dc9babed4b5afbbc226778ac7007a013d086e2d9713f",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_charge_skip_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_charge_skip_success.wav",
+      "seconds": 2.985,
+      "sha256": "dfed7dd33daab59e7ba1122ceb38e7dcf42afb08cc20a3f5b383a6dd077695e6",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_sustain_hint_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_sustain_hint_a.wav",
+      "seconds": 0.915,
+      "sha256": "5dc75bda0e4703a642ac844bebd09f8793b6d71cd6c6445a8f464e9e9d0ee7de",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_sustain_hint_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_sustain_hint_b.wav",
+      "seconds": 2.575,
+      "sha256": "401c6bd284d01f7a55b04dbbb25f3fb0b6615622eff67da813c7b5ed2c4457bf",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_sustain_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_sustain_success.wav",
+      "seconds": 4.395,
+      "sha256": "4e7e6e5806a9f36d06f432164e794b28f6ceb68ee45ce33b5c632e48bad544ad",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_sustain_skip_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_sustain_skip_success.wav",
+      "seconds": 3.04,
+      "sha256": "d8c9239576f919b47a451037ea972b879601f39710b1d5e0bf137c6b1f1fed67",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_intro_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_intro_a.wav",
+      "seconds": 3.625,
+      "sha256": "f92800a9f2628ec9fd201453e27abbe244e7d15a0c627b7cb6d98b2faa25da48",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_hint_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_hint_a.wav",
+      "seconds": 0.535,
+      "sha256": "159cb73fe5c77deec1499765a61478e990c1008f1878ebcc8ddde1f79a9dec82",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_hint_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_hint_b.wav",
+      "seconds": 3.195,
+      "sha256": "353b7798993e123775c6e43f56d935a15d0c0e9e08cfa7ecda1c66ee1beca6ca",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_use_only_intro_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_use_only_intro_a.wav",
+      "seconds": 3.655,
+      "sha256": "854d4165b488dfa82ceb9af8d9bb9c1c76bb5b6b44a321805e13ac85a33a64a7",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_use_only_hint_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_use_only_hint_a.wav",
+      "seconds": 0.465,
+      "sha256": "68b86edef5b09615bd9e18f2398e3c92526041e69fc22372d6fa4488415f6b2f",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_use_only_hint_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_use_only_hint_b.wav",
+      "seconds": 1.985,
+      "sha256": "9fca59710bb5200a35ea694eb431021490f089b32a85ff68344dd87dfaafb19d",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_skip_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_skip_success.wav",
+      "seconds": 2.155,
+      "sha256": "ba9c94de9eb1a63c2a9a9b3e0c65f23c20028871cab77221f266a897da52bc91",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_intro_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_intro_a.wav",
+      "seconds": 2.905,
+      "sha256": "bf980b53981646835cf04a25d68996d9d7486c5cb6ccc781c7753d4c757f3aea",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_hint_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_hint_a.wav",
+      "seconds": 2.08,
+      "sha256": "778222216d7ad821f233230c9b5c0ac40736113a63691d42ebcd517db2b4c4a1",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_hint_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_hint_b.wav",
+      "seconds": 1.925,
+      "sha256": "f859ead1b373c7dc3d6da04a0621865ed5962a7ee0d6d969bb80385f05297813",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_stage_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_stage_a.wav",
+      "seconds": 2.64,
+      "sha256": "aaa7975fb28c352413259408d0ec45cbc9650ecf0a1d1436fd862f10360a3668",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_stage_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_stage_b.wav",
+      "seconds": 1.505,
+      "sha256": "ef20b3599901d5bee64f6d87ca17db88f556f58d37e0ca2441cd92d307c6c691",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_no_dash_hint_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_no_dash_hint_a.wav",
+      "seconds": 1.84,
+      "sha256": "a6dad21f10fac5aac542ec3d1b4c0642ad89a86e2f6e3ac6f9c39a449b0c1561",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_no_dash_hint_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_no_dash_hint_b.wav",
+      "seconds": 0.825,
+      "sha256": "2c58a3bf0144479674850c91e598b875d2712e517dffd1bf59f285cf28a0a119",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_grapple_intro_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_grapple_intro_a.wav",
+      "seconds": 2.005,
+      "sha256": "5fbcfef1295e89e862814cfa03e1c5c2e402379a184731142ccedb31d4a710b1",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_grapple_intro_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_grapple_intro_b.wav",
+      "seconds": 1.92,
+      "sha256": "e963a88bd6660eee4d2ca605cfdb416e36761c8706e1a8c82f4dfeccc313de19",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_grapple_intro_c": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_grapple_intro_c.wav",
+      "seconds": 0.505,
+      "sha256": "a0c69aed07d0acc5735ccd0621f58eca3ad72420b312801723f7d4f281cad111",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_grapple_hint_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_grapple_hint_a.wav",
+      "seconds": 2.105,
+      "sha256": "8c00c2b940153fb963edd523deb877560802e5c06e4b78b33edf7edf067df647",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_grapple_hint_c": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_grapple_hint_c.wav",
+      "seconds": 0.495,
+      "sha256": "bc796544d1c144cb6f15bcab61abc0d0267a3f74c7a260261266a5ad11d9f5d6",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_grapple_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_grapple_success.wav",
+      "seconds": 4.735,
+      "sha256": "e423c5af54ef2de8e7f478e1dd3177068d5cc15ac664cbe025e28fa4b8902ba5",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_grapple_skip_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_grapple_skip_success.wav",
+      "seconds": 3.915,
+      "sha256": "3e5f2590f800795153e09c55f9af01f8a709fa4a6a828c5d1767e07a8669e4cf",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_ultimate_intro_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_ultimate_intro_a.wav",
+      "seconds": 1.855,
+      "sha256": "5fbf4c411458d33dc4970107db61eeb3544b2edd5d790bb26a60233c17253f34",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_ultimate_intro_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_ultimate_intro_b.wav",
+      "seconds": 0.635,
+      "sha256": "d5e497bba6f8660372288a96b502d045b30be12528622289af782c6ac531e23e",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_ultimate_intro_c": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_ultimate_intro_c.wav",
+      "seconds": 0.705,
+      "sha256": "4a090221cf5a5eca5062664dc616af4c9f703f79855823179393f89dfa1e1d68",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_ultimate_hint_a": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_ultimate_hint_a.wav",
+      "seconds": 1.265,
+      "sha256": "44407499be4f6d8e9d9a69b26e6536f9d0a553d94ffcdad8030b4ebe5c7e3726",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_ultimate_hint_b": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_ultimate_hint_b.wav",
+      "seconds": 2.455,
+      "sha256": "f81f189577f421820667050341d204bfb1184d12dbd2008eaddae5730e82f98c",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_ultimate_skip_success": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_ultimate_skip_success.wav",
+      "seconds": 2.235,
+      "sha256": "5fc967b081cf375272d4ccd76f891f9a05388fdb3311b30004acfe8d843d0628",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_acid_spray": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_acid_spray.wav",
+      "seconds": 0.88,
+      "sha256": "4c17c9198a37a4acfcdb36f56990bd106df6a635aa38a3cce1776efa4f530891",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_air_slash": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_air_slash.wav",
+      "seconds": 0.8,
+      "sha256": "585eca76069a346b63266392e2feac192171c96fbd5c7b4c36c1570d97315807",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_anchor_drop": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_anchor_drop.wav",
+      "seconds": 0.745,
+      "sha256": "5543ebce608a7586366543011d41d8cedeee2847ba0f8e701e146a58ecfcc5c8",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_anchor_fist": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_anchor_fist.wav",
+      "seconds": 0.765,
+      "sha256": "58f27cf49937491f834f865b3fbd5c8e0e85ef92306d6be777ec808f0c5d9194",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_arc_lash": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_arc_lash.wav",
+      "seconds": 0.72,
+      "sha256": "e73d1422cd5515b3900c822281fb2433c376dac81e9190dd10a498476c182fad",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_boulder_toss": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_boulder_toss.wav",
+      "seconds": 0.935,
+      "sha256": "24757cabe009815ee09c14ff89cc5ce42c61d34a4cb39f5bcff0ba00e58b1d9a",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_bubble_stream": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_bubble_stream.wav",
+      "seconds": 0.785,
+      "sha256": "3623dd186ef9755d2a076f849fead075ffbc79fb0415c05b1d65945c4bd6e5de",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_bulldoze": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_bulldoze.wav",
+      "seconds": 0.625,
+      "sha256": "058450f0c5d68d1b311d8bcf65a5cb6d7963b4cd862a7a9e8564cc8674977d62",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_chain_lightning": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_chain_lightning.wav",
+      "seconds": 0.735,
+      "sha256": "e7e15f6bf65730aa0ecc6f03323514507c2d18d4ce0159a8792722e44a091aa3",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_cinder_shot": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_cinder_shot.wav",
+      "seconds": 0.575,
+      "sha256": "f3d0ae22d77fb66fa5739cb2bdf1d01d2408bc287e2b3773476cd53e03ec949a",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_claw_snap": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_claw_snap.wav",
+      "seconds": 0.715,
+      "sha256": "213a3b3eb81adcfa23e63bcc65b49e6d580b377c58d2ab2974920ba8b0052b86",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_coil_crush": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_coil_crush.wav",
+      "seconds": 0.88,
+      "sha256": "c3253776843d94e792427153935b15afc5f9dd670f9f7f0798716c292d38822f",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_crosswind_slash": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_crosswind_slash.wav",
+      "seconds": 1.305,
+      "sha256": "50e1d246958238a2f6e069c2529e3d7942b15fc1b23cecdd0d0e8dc4068a4538",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_crusher_slam": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_crusher_slam.wav",
+      "seconds": 0.845,
+      "sha256": "7850febed9de4b9216a580a9f6dd48c95a723cbcd0510f71861033300d9e7cd1",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_discharge": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_discharge.wav",
+      "seconds": 0.56,
+      "sha256": "75e987e1836faced1c64ef53fa5ef8cbe677ea65af007c5976832edd7e92ac26",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_drain_dive": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_drain_dive.wav",
+      "seconds": 0.715,
+      "sha256": "4348f9230d3af6989afa31c66c49e66a3954e01a7bf0352fe1980e38e6199571",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_dust_bowl": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_dust_bowl.wav",
+      "seconds": 0.64,
+      "sha256": "cb318701eb3befc6607a5204bce2e9dba63806ccad8746b8c32b535db9ea6d9e",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_ember_jab": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_ember_jab.wav",
+      "seconds": 0.665,
+      "sha256": "9e291393eac9f14ac10f812530679f7c9283043b7db9e1a66520e392b6d422a0",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_feather_darts": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_feather_darts.wav",
+      "seconds": 0.835,
+      "sha256": "9e1abeab3a589bb7f022d597bbc7604082dcccdf28b9af2137a0b154d16339bf",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_fire_spin": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_fire_spin.wav",
+      "seconds": 0.775,
+      "sha256": "5ba818ce213511c95e17752367d60e4011a351c18d7753d676cc1be3e97534e6",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_flamethrower": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_flamethrower.wav",
+      "seconds": 0.835,
+      "sha256": "9bb091dc00e736e79d5437d5e1e77f0dd47f74abde1e7218125fe0d98c95bacf",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_flare_rush": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_flare_rush.wav",
+      "seconds": 0.685,
+      "sha256": "7f618fd39110f32fbc39dc2138c4209834131bcaeb1cff8906dc46b0e98e3a12",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_furnace_haymaker": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_furnace_haymaker.wav",
+      "seconds": 0.92,
+      "sha256": "f1b7b7fbad24c8d4070f77a286130ae0d2cf91089af2ca8bbaeae3d3bcee7968",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_ghost_light": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_ghost_light.wav",
+      "seconds": 0.625,
+      "sha256": "91d48d8602a13dc68ff0d98122a0e650cf217bee7cac0c2c861b2e3c7a09df96",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_gust_bomb": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_gust_bomb.wav",
+      "seconds": 0.72,
+      "sha256": "540f0d1287b02640bc00fbce4bd3b59f64fdbf33018c0bc34d0887f196e8378c",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_hang_time": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_hang_time.wav",
+      "seconds": 0.625,
+      "sha256": "959174a78fd77d9d1c412f73c27a9b87799c3dea80f50624842f684391103700",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_hex_chain": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_hex_chain.wav",
+      "seconds": 0.695,
+      "sha256": "8131a80f15c4e5119dc7f66dda527bb46ce8fcd53328636978bda15fc9dae0dc",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_high_tide": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_high_tide.wav",
+      "seconds": 0.755,
+      "sha256": "c7378e0e17177e78db2cdf217203ee64301774fd3e7ce229542e68ce9826ccb6",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_horn_lunge": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_horn_lunge.wav",
+      "seconds": 1.04,
+      "sha256": "2211d93edf33d5749b985fed1f2a2a463f4bcecae3dc68441e756a0840b4095f",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_hurricane_strut": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_hurricane_strut.wav",
+      "seconds": 0.845,
+      "sha256": "2a2c20feaf666bb0e9838495a19e0cfb0d4dddda3f50e032e70f9fba92662556",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_hydro_cannon": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_hydro_cannon.wav",
+      "seconds": 0.88,
+      "sha256": "497a17492f437a680c648b756c9aff85124adca24f5668bf55882e81edfb8fca",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_iron_hide": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_iron_hide.wav",
+      "seconds": 0.935,
+      "sha256": "7689a90850782a582f4c329705947a3e66c3bff72984dac55f6ae58c5089af57",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_landslide": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_landslide.wav",
+      "seconds": 0.695,
+      "sha256": "5e66d543ca9b71bec2925b44e9a3b6770c01130a8077982e648252ef79641268",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_lantern_swarm": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_lantern_swarm.wav",
+      "seconds": 1.04,
+      "sha256": "9a1a2dc0e1149f2e2f89f8a37aaeb6765617c4fd852ced16a8f0ff8f4b97f530",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_last_bell": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_last_bell.wav",
+      "seconds": 0.855,
+      "sha256": "a6a4c9d4124edcdfe23360a99f7dfa70833df2a969df5d170637dc0df82e77b4",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_meltdown": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_meltdown.wav",
+      "seconds": 0.785,
+      "sha256": "6139c199efc9d508fa80e01eb134405009324c21fb33e5bde3eda7c03501cb91",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_night_shade": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_night_shade.wav",
+      "seconds": 0.765,
+      "sha256": "af60585831aaad195dfc325f8578b021332ea0fed57f52e08274ec8417f65a02",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_overcharge": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_overcharge.wav",
+      "seconds": 0.755,
+      "sha256": "b8f83ecc4afbdf22228d625dd92bf283583a8c6c5ae417de7ac7ad84bff07d0c",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_overflow": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_overflow.wav",
+      "seconds": 0.72,
+      "sha256": "5f78ddbb6df8c541e4df180318ab8783cafaa3fe3c19ee65b676f7cbd4dea38d",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_poison_darts": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_poison_darts.wav",
+      "seconds": 0.955,
+      "sha256": "b776d423cbff649cc3f654daea334dda253cc34b2e217f4670d8da3696e18a3f",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_quake_stomp": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_quake_stomp.wav",
+      "seconds": 0.685,
+      "sha256": "85a6d128f517a8de392131cac93f00f883c746563e1ab173e78aea9f8a442e54",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_rock_slide": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_rock_slide.wav",
+      "seconds": 0.665,
+      "sha256": "35e43d6b7ebc47341788151728bfd3f7db5714a8e6163d647fbc18210dde25c5",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_shed_skin": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_shed_skin.wav",
+      "seconds": 0.685,
+      "sha256": "0076c64378691f77260d66b5417752c6b5ee8b0c930ce2a72608d5c1c3bb92d8",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_shell_brace": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_shell_brace.wav",
+      "seconds": 0.875,
+      "sha256": "076e2b6ad004cccd14f9368fe168ed9845b17222b830d0460e55cee96a98dee9",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_slap": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_slap.wav",
+      "seconds": 0.415,
+      "sha256": "17e75fd9957c628515bdf2425896af7dfd8666e624443a2d9182e1e1230ff4bc",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_sludge_lob": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_sludge_lob.wav",
+      "seconds": 1.2,
+      "sha256": "15b9476240dbd0badaefc2e6e70df20284e0856136288fd3d0f09ae2fa4bb0a7",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_snout_jab": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_snout_jab.wav",
+      "seconds": 0.88,
+      "sha256": "d56d621d96e5bea308255296f8186a742b6065b5ed71cb4843cacb756483e9b2",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_sounding_jab": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_sounding_jab.wav",
+      "seconds": 0.875,
+      "sha256": "d17f7c1576f29e6f1a8acce391b147421ffa33fb30f116dd871927187e8862fc",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_spring_pad": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_spring_pad.wav",
+      "seconds": 0.885,
+      "sha256": "a822480071134c6938bb9de9dada4cdbdcb2ec0373a3af6d402d9d2277eb7ff4",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_squash": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_squash.wav",
+      "seconds": 0.72,
+      "sha256": "c8cfd0de8ce35c27eb4dfe82641d41662c6e889a02c438f5cee9ad870b5d1bac",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_static_field": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_static_field.wav",
+      "seconds": 0.88,
+      "sha256": "d5a30513d12e0c0e1db49ff10b499037a6f14862142513a9b7a0a726cec85c57",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_steam_vent": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_steam_vent.wav",
+      "seconds": 0.615,
+      "sha256": "49db50c1afc53411bb3d1f26164896b6c87842a36561536683a958c42b3aafa9",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_stoke_the_fire": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_stoke_the_fire.wav",
+      "seconds": 0.835,
+      "sha256": "85891b768341c04199ac987e6cde1f85d55e4abb1183722c9f93ea67cba24dd8",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_tail_sweep": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_tail_sweep.wav",
+      "seconds": 0.655,
+      "sha256": "fbce3c4b531b616893cca36812ba5fefa86150321c237878c2f42dd58e773018",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_tailwind": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_tailwind.wav",
+      "seconds": 0.685,
+      "sha256": "67511c9ef99ab864c858dffd7c6b82a9fcf9cb503575ffa176b1d628cbf89b38",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_that_button": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_that_button.wav",
+      "seconds": 0.635,
+      "sha256": "20617a5a877a2c9734b8f77bad21b6f06d66cd42868c40d50b48b9946d5c1695",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_through_the_veil": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_through_the_veil.wav",
+      "seconds": 0.755,
+      "sha256": "04e984857577d6f59c7d98199579a5f8000edbc9850f0dcfec49235df0fd5cbb",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_thunder_jolt": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_thunder_jolt.wav",
+      "seconds": 0.715,
+      "sha256": "956e7259d30bbf1f3153efca2e0678c4a90cf2eb2f22bb0445db13254e2573d4",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_tide_spit": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_tide_spit.wav",
+      "seconds": 0.605,
+      "sha256": "e8ccbe81fb306f2c632da3ac0fd72eafa58680f1f1e580250ee8992055c07f1b",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_toll": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_toll.wav",
+      "seconds": 0.325,
+      "sha256": "7f52447d731349ee76904d6b3d14cd2b15f8130e156330f3f79432498b349c41",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_twister": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_twister.wav",
+      "seconds": 0.545,
+      "sha256": "ce05047af8c4c994cd2472dc124e0562108534c479dc3256814931b0017a1ba7",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_venom_fangs": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_venom_fangs.wav",
+      "seconds": 1.04,
+      "sha256": "625e763cd541fabfff983cd14ca8fcf358a681fdb6cc87eef821b1a9446f43c7",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_whirlpool": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_whirlpool.wav",
+      "seconds": 0.855,
+      "sha256": "2baf5623c15b18a311da77c3f79f4d276af8288d031b7a467a981a79c9dd7d3d",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_wing_snap": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_wing_snap.wav",
+      "seconds": 0.705,
+      "sha256": "d2e047d850af996d149bc9ff1577b3433b52222d4df27a9737e0d9aac7765cd2",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_your_basic_strike": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_your_basic_strike.wav",
+      "seconds": 1.155,
+      "sha256": "4d6beb262dcf973eea6df6cbd223719f03bd724f55bcdab5e4bb170a927db9bb",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_your_charge_move": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_your_charge_move.wav",
+      "seconds": 0.955,
+      "sha256": "b396b46f95eddac78f93ca396e9846a3d4d8ce4a1ced3348508e07cd497f9654",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_your_held_move": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_your_held_move.wav",
+      "seconds": 0.965,
+      "sha256": "8b40a3e619c5d83495df59b74402f921a88566bcefc7ae0a1cdc5656dd30e88b",
+      "voice": "coach_buck"
+    },
+    "tut18_tok_your_special_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tok_your_special_r1.wav",
+      "seconds": 0.865,
+      "sha256": "50c8f1843744e5dccaa85aa823878f42d791cd99fde99ed56502cdef90ce97b4",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_charge_hint_b_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_charge_hint_b_r1.wav",
+      "seconds": 4.51,
+      "sha256": "89480d61db9ff5ee0846bc6f1993cf3bca1ace36707cf4fb9611c098f1d581e7",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_charge_intro_a_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_charge_intro_a_r1.wav",
+      "seconds": 3.925,
+      "sha256": "13d7e515e8a699e2e3bfd032933b5e8704ed313727f6a7a94e2f17c622787982",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_hint_c_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_hint_c_r1.wav",
+      "seconds": 0.885,
+      "sha256": "916da2932b25cf7c0ba4a5e9dfa3cc41f360898c97d9c97f03d957ce8cc94cbc",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_intro_b_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_intro_b_r1.wav",
+      "seconds": 1.155,
+      "sha256": "26b3289657ff369ef14d3680c6f3d081f68f1c1592a511a7ccf856d482b82030",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_no_dash_intro_a_r2": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_no_dash_intro_a_r2.wav",
+      "seconds": 4.355,
+      "sha256": "f757347274dd6620025810089e80f2a8a8e9cddbfcd75cf27f419c0762d76e7a",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_no_dash_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_no_dash_success_r1.wav",
+      "seconds": 3.445,
+      "sha256": "0d249fc90c9822d156f8bc915b1ddab99d05dfa7203463a492d728f15f81ee95",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_dodge_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_dodge_success_r1.wav",
+      "seconds": 2.895,
+      "sha256": "075670509f76f6ce20185a1364505441eba21b822cf09a2af7890492ce6cbe8e",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_grapple_hint_b_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_grapple_hint_b_r1.wav",
+      "seconds": 1.095,
+      "sha256": "a99da99becb9c05d79f414fc0a2c1d78ba3b6a28b1ef33ab9fbff0c1fdef5ffd",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_success_r1.wav",
+      "seconds": 3.005,
+      "sha256": "710a7bb10f4aa11517d62a877ae5faa5566d1cba6faad9f50e34d915af9d28ad",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_special_use_only_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_special_use_only_success_r1.wav",
+      "seconds": 2.735,
+      "sha256": "6869fa2c14d8bcabaa7e3de4d8f6fb88b194975c1db1bec6c8c24244b7c70ce7",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_sustain_intro_a_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_sustain_intro_a_r1.wav",
+      "seconds": 3.015,
+      "sha256": "668f905c898e0015321e78e31578d7649e4c4cad900a477b46c260d9d2329e76",
+      "voice": "coach_buck"
+    },
+    "tut18_tut_m_ultimate_success_r1": {
+      "path": "res://assets/audio/speech/v0918/tut18_tut_m_ultimate_success_r1.wav",
+      "seconds": 2.945,
+      "sha256": "02ee700d1a9578ecc4a0f6f9a1bc3eb5368fc79b4d58b02c778280227d302b7a",
+      "voice": "coach_buck"
+    }
+  }
+}

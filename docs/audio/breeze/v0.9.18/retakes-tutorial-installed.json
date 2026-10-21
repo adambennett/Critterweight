@@ -1,0 +1,21 @@
+{
+  "chosen": {
+    "tut18_tok_your_special": "tut18_tok_your_special_r1",
+    "tut18_tut_m_charge_hint_b": "tut18_tut_m_charge_hint_b_r1",
+    "tut18_tut_m_charge_intro_a": "tut18_tut_m_charge_intro_a_r1",
+    "tut18_tut_m_dodge_hint_c": "tut18_tut_m_dodge_hint_c_r1",
+    "tut18_tut_m_dodge_intro_b": "tut18_tut_m_dodge_intro_b_r1",
+    "tut18_tut_m_dodge_no_dash_intro_a": "tut18_tut_m_dodge_no_dash_intro_a_r2",
+    "tut18_tut_m_dodge_no_dash_success": "tut18_tut_m_dodge_no_dash_success_r1",
+    "tut18_tut_m_dodge_success": "tut18_tut_m_dodge_success_r1",
+    "tut18_tut_m_grapple_hint_b": "tut18_tut_m_grapple_hint_b_r1",
+    "tut18_tut_m_special_success": "tut18_tut_m_special_success_r1",
+    "tut18_tut_m_special_use_only_success": "tut18_tut_m_special_use_only_success_r1",
+    "tut18_tut_m_sustain_intro_a": "tut18_tut_m_sustain_intro_a_r1",
+    "tut18_tut_m_ultimate_success": "tut18_tut_m_ultimate_success_r1"
+  },
+  "rejected": [
+    "tut18_tut_m_dodge_no_dash_intro_a_r1"
+  ],
+  "processing": {}
+}

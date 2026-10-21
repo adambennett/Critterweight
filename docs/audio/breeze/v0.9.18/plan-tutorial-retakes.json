@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "release": "0.9.18",
+  "model_id": "breeze-tts-2",
+  "voices": {
+    "devon": "voc_g53htd8kmjsj",
+    "kendall": "voc_j66xnnsxfeet",
+    "coach_buck": "voc_b36c5rxpfuzb"
+  },
+  "cast": {
+    "granny": "coach_buck"
+  },
+  "purpose": "v0.9.18 retakes of clips flagged by the technical speech audit (see RETAKES in prepare_retakes_v0918.py)",
+  "authorized_credits": 10000,
+  "clips": {
+    "tut18_tut_m_dodge_intro_b_r1": {
+      "text": "mid-dodge to strike.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 2.0,
+      "retake_of": "tut18_tut_m_dodge_intro_b",
+      "retake_reason": "ending"
+    },
+    "tut18_tut_m_dodge_hint_c_r1": {
+      "text": "while you slide.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 1.6,
+      "retake_of": "tut18_tut_m_dodge_hint_c",
+      "retake_reason": "ending"
+    },
+    "tut18_tut_m_special_success_r1": {
+      "text": "That's what makes you you. Everything else, everyone's got.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 5.9,
+      "retake_of": "tut18_tut_m_special_success",
+      "retake_reason": "ending"
+    },
+    "tut18_tok_your_special_r1": {
+      "text": "your special",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "Say this short name or phrase clearly as part of a sentence, with natural neutral inflection. No introduction. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 1.2,
+      "vocabulary": "coach_buck",
+      "retake_of": "tut18_tok_your_special",
+      "retake_reason": "ending"
+    },
+    "tut18_tut_m_charge_intro_a_r1": {
+      "text": ". Tap it for the quick one. Hold it to wind up the big one.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 5.9,
+      "retake_of": "tut18_tut_m_charge_intro_a",
+      "retake_reason": "pace"
+    },
+    "tut18_tut_m_charge_hint_b_r1": {
+      "text": "with him in front of you. Then hold it, and let go with him in range.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 6.9,
+      "retake_of": "tut18_tut_m_charge_hint_b",
+      "retake_reason": "pace"
+    },
+    "tut18_tut_m_sustain_intro_a_r1": {
+      "text": ". It keeps going while you hold it. Steer it with the stick.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 6.0,
+      "retake_of": "tut18_tut_m_sustain_intro_a",
+      "retake_reason": "pace"
+    },
+    "tut18_tut_m_special_use_only_success_r1": {
+      "text": "That's your setup move. Use it before you need it.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 5.0,
+      "retake_of": "tut18_tut_m_special_use_only_success",
+      "retake_reason": "pace"
+    },
+    "tut18_tut_m_dodge_success_r1": {
+      "text": "Nothing hits what isn't there. Come back swinging.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 5.0,
+      "retake_of": "tut18_tut_m_dodge_success",
+      "retake_reason": "pace"
+    },
+    "tut18_tut_m_dodge_no_dash_intro_a_r1": {
+      "text": "plus a direction, and nothing can touch you. That's the whole lesson.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 6.9,
+      "retake_of": "tut18_tut_m_dodge_no_dash_intro_a",
+      "retake_reason": "pace"
+    },
+    "tut18_tut_m_dodge_no_dash_success_r1": {
+      "text": "Nothing hits what isn't there. Come back with your hands.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 5.7,
+      "retake_of": "tut18_tut_m_dodge_no_dash_success",
+      "retake_reason": "pace"
+    },
+    "tut18_tut_m_grapple_hint_b_r1": {
+      "text": ". Push toward the wall,",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase leads straight into a word that is added right after it: keep it flowing and do not finish the sentence. This phrase continues right after a word said just before it: start mid-flow, no pause before it. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 2.3,
+      "retake_of": "tut18_tut_m_grapple_hint_b",
+      "retake_reason": "pace"
+    },
+    "tut18_tut_m_ultimate_success_r1": {
+      "text": "That's the whole kit. Everything after this is timing.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment.",
+      "estimated_credits": 5.4,
+      "retake_of": "tut18_tut_m_ultimate_success",
+      "retake_reason": "pace"
+    },
+    "tut18_tut_m_dodge_no_dash_intro_a_r2": {
+      "text": "plus a direction, and nothing can touch you. That's the whole lesson.",
+      "voice": "coach_buck",
+      "voice_id": "voc_b36c5rxpfuzb",
+      "instructions": "A gruff veteran boxing coach. Warm tough love, crisp practical instructions, dry wit. Natural speech, no shouting. This phrase continues right after a word said just before it: start mid-flow, no pause before it. Slightly slower and very clearly articulated so every word is easy to understand, still lively and in the moment. Deliver the whole line and land the final word completely, then stop cleanly: no extra words, breath or sound after the last word.",
+      "estimated_credits": 6.9,
+      "retake_of": "tut18_tut_m_dodge_no_dash_intro_a",
+      "retake_reason": "pace+ending"
+    }
+  },
+  "estimated_characters": 667
+}
