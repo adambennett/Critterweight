@@ -503,3 +503,18 @@ func test_a_second_interrupt_inside_the_fade_keeps_the_new_line() -> void:
 	Audio._speech_player_b = keep_b
 	live.queue_free()
 	fading.queue_free()
+
+
+func test_lull_pressure_needs_recent_unanswered_hits() -> void:
+	var d := _director()
+	d.on_event({"type": "round_start", "round": 1}, {"time": 0.0})
+	for k in 3:
+		d.on_event({"type": "hit", "fighter": 0, "target": 1, "damage": 3.0, "slot": "l1"}, {"time": 1.0 + 0.4 * k})
+	# a long quiet stretch afterwards: those three hits are history, not pressure
+	var late: Array = []
+	for k2 in 120:
+		var reqs := d.on_tick([0.9, 0.8], 80.0, 0.25)
+		if k2 * 0.25 > 8.0:
+			late.append_array(reqs)
+	check(late.filter(func(r: Dictionary) -> bool: return str(r["trigger"]) == "pressure").is_empty(),
+		"no 'pressure' call long after the last unanswered hit (%s)" % str(late.map(func(r): return r["trigger"])))

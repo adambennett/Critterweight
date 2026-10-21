@@ -1157,7 +1157,9 @@ func _observation(health: Array, time_left: float, info: Dictionary) -> Dictiona
 		ce["kind"] = str(info.get("edge_kind", "cage"))
 		cands.append(_req("edge", ce, "low", _vars(edge, -1), {"ttl": 2.0}))
 	for fi in (_st["unanswered"] as Dictionary):
-		if ((_st["unanswered"] as Dictionary)[fi] as Array).size() >= 3:
+		# only recent unanswered hits: the list is pruned when a fighter lands, not in a lull
+		var recent := ((_st["unanswered"] as Dictionary)[fi] as Array).filter(func(x: float) -> bool: return t - x < PRESSURE_WINDOW)
+		if recent.size() >= 3:
 			cands.append(_req("pressure", _who(int(fi), -1), "low", _vars(int(fi), -1), {"ttl": 2.0}))
 			break
 	if cands.is_empty():

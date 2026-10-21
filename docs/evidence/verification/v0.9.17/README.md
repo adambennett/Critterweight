@@ -17,7 +17,24 @@ Networking is loopback on this PC.
 
 ## Commentary
 
-COMMENTARY_RESULTS
+The same twelve seeded bouts and two scripted sequences were played in real time on the untouched
+v0.9.16 checkout and on this branch (`33134f2`), across a game restart, with every line logged
+(`tools/audio/commentary_audit.ps1`; details and the full table in docs/audio/COMMENTARY.md §8;
+logs and metrics in [commentary/](commentary/)).
+
+| | v0.9.16 | v0.9.17 |
+|---|---:|---:|
+| Distinct lines heard | 125 | 338 |
+| Exact repeats in a bout / in the next two bouts / across the restart | 137 / 106 / 32 | 15 / 7 / 10 |
+| Same joke family twice in a row | 91 | 9 |
+| Situational lines backed by a matching event | 94% | 96% |
+| Referee stoppage called as a stoppage | no (called a KO) | yes |
+| Decisions announced | 3 / 3 | 3 / 3 |
+| Lines per live minute / share of time talking | 9.5 / 51% | 10.8 / 64% |
+
+One defect found by the audit was fixed afterwards: lull "pressure" observations could use hits
+older than the pressure window (four lines); the observation now counts only recent unanswered
+hits (`test_commentary`).
 
 ## Recorded speech
 
@@ -38,14 +55,21 @@ All eight playable fighters were rebuilt (docs/ART_REVAMP.md, v0.9.17 section): 
 the unchanged segment skeleton, passes `audit_models.js` (30k budget: 26.4k–29.8k triangles), the
 art tests (`test_new_fighters`, `test_hub_cosmetics`, `test_content_audit`) and rebuilds
 byte-identically from its committed source. Before/after images: [art/](art/) (front and back
-comparisons and face close-ups per fighter). ROSTER_WALL
+comparisons and face close-ups per fighter). The whole roster side by side, the same
+camera, light and pose in both builds: [art/roster_front.jpg](art/roster_front.jpg) and
+[art/roster_back.jpg](art/roster_back.jpg) (v0.9.16 above, v0.9.17 below; `tools/vfx/roster_wall.ps1`,
+`tools/vfx/roster_compare.ps1`), and [art/f_stoke_cmp.jpg](art/f_stoke_cmp.jpg) for the pilot fighter
+(before and after, front and back).
 
 ## Legacy Varga skin
 
 `test_varga_skins` (6/6): the legacy model is the v0.9.16 file byte for byte
 (sha256 `4fa78a8a…0460fc`), the upgraded model is the default, the setting persists, its Settings row
 is a controller focus stop that toggles with A, previews/matches swap live with the same body, and
-Varga's gameplay data and the content hash are identical under both skins. VARGA_CAPTURES
+Varga's gameplay data and the content hash are identical under both skins. [varga/varga_skins.jpg](varga/varga_skins.jpg): one moment of a Varga mirror bout with the default
+look, then the same bout after the option was switched on mid-fight (the models swap live, the fight
+carries on; `test_varga_skin_capture`). [varga/settings_graphics.jpg](varga/settings_graphics.jpg):
+the Settings › Graphics tab with the "Legacy Varga skin" row (captured in the game at 1920x1080).
 
 ## Ability effects
 
@@ -55,7 +79,12 @@ events and entities are drawn and cleaned up; JUICE auras follow JUICE; Low qual
 flashes and thins particles; Reduce flashing dims flashes; the new event fields reach online
 clients. Before/after showcase: 40 shots (five per fighter: both abilities, JUICE, the charged heavy
 or Varga's heavy, an elemental reaction), each at the same simulation times in v0.9.16 and v0.9.17:
-[vfx/](vfx/) holds one overview strip per fighter. VFX_NOTES
+[vfx/](vfx/) holds one overview strip per fighter. The final frames were captured in one reserved batch (`tools/vfx/release_captures.ps1`) from the
+release branch and reviewed shot by shot: every ability, JUICE, charged heavy and reaction shows a
+build-up, a strike, motion and a fade in its fighter's style, nothing is drawn where nothing happens,
+and no frame is missing or broken. The strips show the frame the sheet picks for each shot; a few
+effects peak later in the shot (Jitters' Stormfront reaction marks its target and strikes 0.6 s after
+contact, which the later frames of the full capture show).
 
 ## Saves
 

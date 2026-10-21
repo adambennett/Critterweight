@@ -114,7 +114,59 @@ time across a game restart (sessions A and B share one user-data root, so histor
 every line with its trigger, speaker, text, timing and what cut it off. `tools/audio/commentary_report.js`
 turns the logs into the metrics below.
 
-RESULTS_TABLE
+Results, 2026-10-20/21: the baseline is the untouched v0.9.16 checkout (`0465a05`), the revised run
+is this branch at `33134f2` (no game files changed after it); both played the same two scripted
+sequences and the same twelve seeded bouts (nine duels, among them Stoke vs Dredge and Gusto vs
+Jitters three times each, and three Career Cage Rules bouts, Varga vs Knell twice) across a game
+restart between bouts 6 and 7.
+
+| Metric | baseline | revised |
+|---|---:|---:|
+| Bouts (+ scripted sequences) | 12 | 12 |
+| Lines played | 449 | 506 |
+| Lines per live minute | 9.53 | 10.8 |
+| Share of time talking | 51.4% | 64.2% |
+| Silence between lines, median / p90 (s) | 1.86 / 7.19 | 1.11 / 5.26 |
+| Lines cut off by another line | 26 | 32 |
+| Distinct lines | 125 | 338 |
+| Exact repeats within a bout | 137 | 15 |
+| Exact repeats in the next two bouts | 106 | 7 |
+| Exact repeats across the restart | 32 | 10 |
+| Same joke family twice in a row | 91 / 435 | 9 / 492 |
+| Lull lines that claim a situation (backed by an event) | 15 of 74 (2 backed) | 0 of 10 (0 backed) |
+| Situational lines backed by an event | 250 / 267 (94%) | 204 / 213 (96%) |
+| Stale knockdown calls after the result | 0 | 0 |
+| Stoppages called as stoppages | 0 / 1 | 1 / 1 |
+| Stoppages called as knockouts | 1 | 0 |
+| Decisions announced | 3 / 3 | 3 / 3 |
+| Round-only KOs called as the end of the fight | 0 | 0 |
+
+* **Repetition** fell by an order of magnitude: exact repeats inside a bout 137 to 15, in the next
+  two bouts (rematches) 106 to 7, across the restart 32 to 10, and the same joke family twice in a
+  row 91 to 9, while the booth used 338 distinct lines instead of 125. The baseline's most played
+  lines were two Cut the Angle explanations (28 and 26 plays); the revised maximum is 7 (a Gust Bomb
+  hit call).
+* **Accuracy:** the referee stoppage is now called as a stoppage (the baseline called it a
+  knockout), every decision was announced, no knockdown was called after a result, and no lull line
+  claimed a situation that was not happening (the baseline's colour played 15 situational lines in
+  lulls, 13 of them unfounded). Situational lines were backed by a matching event 96% of the time
+  (204 of 213; baseline 94%). Lines tagged for several situations are judged by the request they
+  were played for (the run logs the director's requests). Of the nine unbacked lines, four were
+  lull "pressure" observations built from hits older than the pressure window (fixed after the
+  audit: the observation now counts only recent unanswered hits, `test_commentary`); the others
+  meet the director's definition of a big hit, combo or hurt fighter but not the report's stricter
+  one.
+* **Pacing:** commentary did not thin out: 10.8 lines per live minute (baseline 9.5), median silence
+  1.1 s and 90th percentile 5.3 s. The booth talks 64% of the time (baseline 51%) because more
+  fight calls are made; colour and observations yield once the booth has talked for 55% of the
+  last 30 s (the talk budget, §2), so quiet stretches still get breathing room. 32 lines were cut off by a bigger call (baseline 26).
+* The real-time bouts are not tick-identical between runs of the same build (round transitions
+  follow the presentation's pace), so later rounds of some bouts played out differently in the two
+  runs; the metrics are totals over the same matchups and seeds. Gameplay identity between v0.9.16
+  and v0.9.17 is checked separately with fixed-step headless fights (docs/evidence/verification/v0.9.17).
+* Evidence: `docs/evidence/verification/v0.9.17/commentary/` (report, JSON metrics and both runs'
+  session logs, gzipped; `node tools/audio/commentary_report.js <baseline dir> <revised dir>` rebuilds
+  the table from unpacked logs).
 
 ## 9. Tests
 
