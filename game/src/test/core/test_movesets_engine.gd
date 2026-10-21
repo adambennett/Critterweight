@@ -25,6 +25,9 @@ static func kit(extra := {}) -> CreatureDef:
 					"knockback": 4.0, "element": "brine", "charge_scale": {"damage": 2.0, "length": 1.4, "knockback": 2.0}},
 					{"t": 0.45, "type": "recoil", "speed": 3.0}]}},
 		"vent": {"name": "Steam Vent", "category": "blast", "use": "ability1"},
+		"beam": {"name": "Test Beam", "category": "blast", "role": "special", "hold": "charge", "aim": {"turn_rate": 2.5}, "cooldown": 6.0,
+			"move": {"duration": 1.0, "charge_time": 1.0, "charge_at": 0.2, "stamina": 8.0, "element": "brine",
+				"effects": [{"t": 0.4, "type": "area", "shape": "line", "length": 4.0, "width": 0.5, "radius": 1.0, "damage": 5.0, "element": "brine"}]}},
 	}
 	d["loadouts"] = {"a": {"name": "Test A", "moves": ["jab", "stream", "blast", "vent"]}, "b": {"name": "Test B", "moves": ["jab", "haymaker"]}}
 	d["default_loadout"] = "a"
@@ -223,3 +226,20 @@ func test_single_blows_are_not_repeats() -> void:
 	check(not hits.is_empty(), "the jab lands")
 	check(hits.all(func(e: Dictionary) -> bool: return not bool(e.get("repeat", false)) and typeof(e.get("tick")) == TYPE_INT),
 		"a single blow is not a repeat, and its tick is the simulation tick")
+
+
+func test_a_charge_is_aimed_while_it_charges() -> void:
+	# an aimed charge move (Hydro Cannon) is lined up with the stick during its charge
+	var sim := _sim("moves", ["jab", "beam"])
+	await step_sim(sim, 0.4)
+	var a := sim.fighters[0]
+	var yaw0 := a.facing_yaw
+	a.input.press(FighterInput.HEAVY)
+	await step_sim(sim, 0.3)               # into the charge
+	check(a.move_pool_id == "beam" and a.move_charge > 0.0, "the beam charges (%.2f)" % a.move_charge)
+	a.input.move = a.forward().rotated(Vector3.UP, PI * 0.5)
+	await step_sim(sim, 0.5)
+	check(absf(wrapf(a.facing_yaw - yaw0, -PI, PI)) > 0.6, "the stick turned the charging beam (%.2f rad)" % absf(wrapf(a.facing_yaw - yaw0, -PI, PI)))
+	a.input.move = Vector3.ZERO
+	_release_all(a)
+	await step_sim(sim, 1.0)

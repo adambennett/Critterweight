@@ -945,8 +945,11 @@ func _st_move(dt: float) -> void:
 		rig.desired_vel = mv * spd + forward() * lunge
 		rig.max_accel = eff("accel") * (1.6 if lunge > 0.0 else 1.0)
 		var pma: PoolMove = creature.pool.get(move_pool_id) if move_pool_id != "" else null
-		# aimed moves steer from their sustain (or half their wind-up) on
+		# aimed moves steer from their sustain (or half their wind-up) on; a held charge steers while
+		# it charges (Hydro Cannon is lined up during its charge)
 		var aim_from := float(m.sustain[0]) * 0.5 if not m.sustain.is_empty() else m.first_active() * 0.5
+		if pma != null and pma.hold == "charge" and m.charge_time > 0.0:
+			aim_from = minf(aim_from, m.charge_start())
 		if pma != null and pma.aim_turn > 0.0 and t >= aim_from:
 			# an aimed move (streams, beams): the stick steers it, else it tracks the target, at the
 			# move's own turn rate (a flamethrower sweeps; it does not snap)
