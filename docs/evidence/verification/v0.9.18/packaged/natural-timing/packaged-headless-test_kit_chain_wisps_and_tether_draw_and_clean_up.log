@@ -1,0 +1,8 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 01:17:34 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-natural-timing-2/users/test_kit_chain_wisps_and_tether_draw_and_clean_up-011731018
+2026-10-22 01:17:34 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 01:17:34 [INFO] app: Critterweight 0.9.18+8eea02c (Windows x86_64, Godot 4.5.1-stable (official))
+VFX_LIFETIME knell tether: 3.010 engine seconds
+ok    res://src/test/kits/test_moves_knell.gd::test_kit_chain_wisps_and_tether_draw_and_clean_up (3836 ms)
+tests: 1 run, 0 failed, 1 passed, 0 skipped in 8.3 s

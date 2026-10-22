@@ -1,21 +1,17 @@
 # Verification report
 
-**v0.9.18 integration in progress, 2026-10-21.** The [release report](evidence/verification/v0.9.18/README.md)
-records 499 compiling scripts, focused engine/kit/progression/migration/loopback checks, rendered
-combat across all eight fighters, all four Varga skin/combat combinations and actual campaign
-learn/drill menus. All 254 new speech clips pass their journal/catalog and PCM integrity audit.
-The 112-bout comparison exposed a bot readiness defect; its correction reduced denied attempts
-by 87.8% in a 56-bout repeat. Matched performance and its longer 1080p confirmation are retained
-with frame-time limitations. The integrated suite, packages and publication
-remain separate gates; this paragraph does not claim that v0.9.18 is released.
-The second integrated attempt completed 1,122 checks with three failures and one expected
-graphical-audio skip; its ten-minute soak passed. The report retains those failures and the
-focused cover, policy, walking-driver and focus-navigation repairs. The third clean run passed
-1,125/1,126 with one expected skip, zero failures/unexpected engine errors and a ten-minute soak.
-The first package matrix completed 361 checks with two effect-lifetime test-clock failures,
-356 passes and three source-only skips; all rendered groups passed. The timing repairs passed
-172/172 across fixed, natural headless and rendered execution. Final clean verification and
-publication remain open; the report retains all original and follow-up evidence.
+**v0.9.18 released and verified, 2026-10-22.** [Release](https://github.com/adambennett/Critterweight/releases/tag/v0.9.18), clean commit `8eea02c`.
+The [evidence report](evidence/verification/v0.9.18/README.md) records 1,126 full-source
+checks (1,125 passed, one expected graphical-audio skip, zero failures and
+zero unexpected engine errors), a ten-minute loopback soak with 13 matches
+and zero orphans, four target archives, 358/361 packaged checks with three source-only
+skips, two extra natural-timing VFX checks and seven actual packaged server/client/spectator steps.
+The tagged rebuild checks 499 scripts and passes 21 rendered playtests. All seven actual downloads,
+annotated tag, exact commit, manifests, checksums and archive members are verified; the downloaded
+standalone reaches its title in 6824 ms with a clean exit and no engine errors. Original failures
+and repairs are retained. The report includes all-fighter rendered combat, campaign navigation,
+both skins/styles, old-save migrations, 254 new-clip integrity checks and matched performance.
+Hardware/controller, human listening/playtesting, Linux runtime and internet testing remain unverified.
 
 **v0.9.17 released and verified, 2026-10-21.** The [release report](evidence/verification/v0.9.17/README.md)
 records the exact clean release commit `e287028`, 925 source checks (924 passed, one expected

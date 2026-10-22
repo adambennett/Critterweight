@@ -1,0 +1,37 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 01:11:11 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-candidate-2/users/test_net_moves-011108538
+2026-10-22 01:11:11 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 01:11:11 [INFO] app: Critterweight 0.9.18+8eea02c (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-22 01:11:15 [INFO] net: dedicated server 'Moves integration' listening on UDP *:47166 (protocol 7, game 0.9.18, content ca9a54ae374c)
+2026-10-22 01:11:15 [INFO] net: connecting to 127.0.0.1:47166
+2026-10-22 01:11:15 [INFO] net: connecting to 127.0.0.1:47166
+2026-10-22 01:11:15 [INFO] net: player 2 'f_stoke' joined from 127.0.0.1
+2026-10-22 01:11:15 [INFO] net: player 3 'f_varga' joined from 127.0.0.1
+2026-10-22 01:11:15 [INFO] net: joined 'Moves integration' as player 2
+2026-10-22 01:11:15 [INFO] net: joined 'Moves integration' as player 3
+2026-10-22 01:11:18 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-22 01:11:18 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-22 01:11:18 [INFO] net: server closing (server_shutdown)
+2026-10-22 01:11:18 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_moves.gd::test_classic_rule_survives_the_same_loopback_setup (3135 ms)
+2026-10-22 01:11:18 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-22 01:11:18 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-22 01:11:18 [INFO] net: dedicated server 'Moves integration' listening on UDP *:47156 (protocol 7, game 0.9.18, content ca9a54ae374c)
+2026-10-22 01:11:18 [INFO] net: connecting to 127.0.0.1:47156
+2026-10-22 01:11:18 [INFO] net: connecting to 127.0.0.1:47156
+2026-10-22 01:11:18 [INFO] net: player 2 'f_stoke' joined from 127.0.0.1
+2026-10-22 01:11:18 [INFO] net: player 3 'f_varga' joined from 127.0.0.1
+2026-10-22 01:11:18 [INFO] net: joined 'Moves integration' as player 2
+2026-10-22 01:11:18 [INFO] net: joined 'Moves integration' as player 3
+2026-10-22 01:11:21 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-22 01:11:21 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-22 01:11:21 [INFO] net: server closing (server_shutdown)
+2026-10-22 01:11:21 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_moves.gd::test_custom_loadouts_streams_and_martial_inputs_over_loopback (3342 ms)
+2026-10-22 01:11:21 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-22 01:11:21 [INFO] net: client closed: server_shutdown - The server shut down.
+ok    res://src/test/net/test_net_moves.gd::test_loadout_requests_are_cleaned (0 ms)
+ok    res://src/test/net/test_net_moves.gd::test_roster_carries_combat_style_and_loadout (0 ms)
+ok    res://src/test/net/test_net_moves.gd::test_snapshot_carries_charges_and_the_mirror_shows_the_loadout (22 ms)
+tests: 5 run, 0 failed, 5 passed, 0 skipped in 11.0 s

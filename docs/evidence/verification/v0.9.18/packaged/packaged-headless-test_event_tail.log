@@ -1,0 +1,8 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 01:10:45 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-candidate-2/users/test_event_tail-011042948
+2026-10-22 01:10:46 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 01:10:46 [INFO] app: Critterweight 0.9.18+8eea02c (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/core/test_event_tail.gd::test_event_tail_handles_empty_and_sparse_sequences (0 ms)
+ok    res://src/test/core/test_event_tail.gd::test_event_tail_matches_full_scan_after_history_rollover (3 ms)
+tests: 2 run, 0 failed, 2 passed, 0 skipped in 4.5 s

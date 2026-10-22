@@ -1,44 +1,30 @@
 # Progress
 
-## Status (2026-10-21) - v0.9.17 released; continuing v0.9.18
+## Status (2026-10-22) - v0.9.17 and v0.9.18 released and verified
 
-[v0.9.17 is published](https://github.com/adambennett/Critterweight/releases/tag/v0.9.17) at
-`e2870289c69c721024ac4ed200a5e6eda7ae4288`: commentary, eight-fighter art, Legacy Varga skin,
-ability VFX and the completed raised-rail/cap fading repair. The clean-commit full suite passed
-924 checks with one expected graphical-audio skip and no failures, including a ten-minute soak.
-The tagged build passed 455 script checks and all 20 rendered playtests. All seven actual downloads,
-the annotated tag, every archived member and the checksums were verified. The downloaded standalone
-Windows game reached its title in 5.7 seconds. The 16-run final performance comparison and its
-frame-time limitations are recorded in the report; Linux runtime and Steam Deck hardware remain
-unverified. The v0.9.17 milestone has been reported to the owner.
-See [the continuation record](releases/v0.9.17-takeover.md),
-[acceptance checklist](releases/v0.9.17-v0.9.18-checklist.md), and
-[v0.9.17 evidence](evidence/verification/v0.9.17/README.md).
+[v0.9.17](https://github.com/adambennett/Critterweight/releases/tag/v0.9.17) is published at
+`e2870289c69c721024ac4ed200a5e6eda7ae4288`: commentary, full-roster art, ability VFX and the independent
+Legacy Varga skin setting. Its 925 source checks completed with 924 passes, one expected skip and
+zero failures; packaged checks, ten-minute soak and all seven downloaded artifacts are verified.
+Its source-log patch-note defect is recorded and fixed in v18; the immutable v17 assets are unchanged.
 
-Claude's existing v0.9.18 implementation is preserved in `B:\Critterweight-work\wt\v0918` on
-`feature/v0.9.18-movesets` (`7eba366` at takeover). The shipped base and the separate completed
-campaign progression branch are integrated (`6e891f7`, `6b6329a`). Focused move, progression,
-upgrade, UI, tutorial and real ENet loopback checks pass. The full roster has been rendered;
-Flamethrower's visual refinement, real-input Varga captures and published v0.9.17 save migrations
-pass. Rendered learn/equip/drill flows cover all three campaigns; Varga can change techniques in
-Practice. The 112-bout comparison and 56-bout bot-fix repeat completed; equipped-charge lookup
-reduced denied bot moves by 87.8%. All 254 v18 recordings pass their integrity audit. The patch-note
-archive now checks actual displayed bodies. Final matched performance and the longer 1080p
-confirmation are recorded with active-fight guards and slow-frame limits. Next: the clean integrated
-source suite/ten-minute soak and packaged suites, then publish v0.9.18.
-The second full run retained three failures despite a passing ten-minute soak. Follow-ups repaired
-spectral shots blocked by authored tire-stack cover, an unused policy hash advertised to Movesets
-clients, and clipped/overscrolled focus cards. The aiming and wandering test drivers now exercise
-their intended paths; the hub-secret input check waits for actual simulated recovery. Original
-failures and focused follow-ups are retained. The third clean full run passed 1,125/1,126 with
-one expected graphical-audio skip, zero failures or unexpected engine errors, and a passing
-ten-minute soak. The first packaged matrix completed 361 checks: 356 passed, two VFX test-clock
-failures and three source-only skips. All rendered groups passed. The test-only timing repairs
-then passed 172 checks across fixed, natural headless and rendered clocks. Final clean source
-and packaged verification will run again before publication; original evidence is retained.
-See `releases/v0.9.18-takeover.md` and the v18 verification report for exact evidence.
-Both releases are authorized for autonomous GitHub publication. Combined Breeze spending in the
-latest saved report is 4,425.0 / 10,000 credits; 5,575.0 remain across the entire goal.
+[v0.9.18](https://github.com/adambennett/Critterweight/releases/tag/v0.9.18) is published at `8eea02cccd14d2b4977c8fe3a12f1548851a1db7`. All eight fighters have distinct
+customizable movesets and two recommended builds, all three campaigns learn/equip/drill, Varga keeps
+his advanced inputs, and all built-in modes default to Movesets with Classic available as a rule.
+The final clean source run passed 1,125/1,126 with one expected skip,
+zero failures/unexpected engine errors and a ten-minute soak (13 matches,
+zero orphans). The final package matrix passed 358/361 with three source-only skips;
+two natural-timing VFX checks and seven packaged loopback steps also pass. The tagged rebuild
+passes 499 scripts and 21 rendered playtests. All seven actual downloads and the annotated tag
+are verified; the downloaded Windows game reaches its title in 6824 ms with no engine errors.
+
+Both authorized release goals are complete. Combined saved Breeze spending is **4,425.0 / 10,000**;
+5,575.0 of that goal allowance remains, with no additional takeover spending. Heavy-effects means
+stay within about 3% of v17 in the matched runs; variable frame-time spikes remain documented.
+No human listening/playtest, physical-controller, Linux runtime, Steam Deck hardware or external-
+network claim is made. See the [acceptance checklist](releases/v0.9.17-v0.9.18-checklist.md),
+[v17 evidence](evidence/verification/v0.9.17/README.md),
+[v18 evidence](evidence/verification/v0.9.18/README.md), and [player guide](PLAYER_GUIDE.md).
 
 ## Status (2026-10-20) — v0.9.16: Career, 10-point scoring, referee, Cage Rules preset
 

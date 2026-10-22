@@ -1,0 +1,14 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 01:11:35 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-candidate-2/users/test_hub_wander-011132511
+2026-10-22 01:11:36 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 01:11:36 [INFO] app: Critterweight 0.9.18+8eea02c (Windows x86_64, Godot 4.5.1-stable (official))
+wander f_stoke: 21 legs, 13 reached, 0 timed out, 2 waypoints skipped, 4 rides, visits { "main_floor": 9, "med_bay": 1, "loading_dock": 3, "locker_room": 3, "pier": 1, "boiler_room": 2, "booth": 1, "crawlspace": 1 }, min root y 0.54 at (-1.202975, 0.540048, -4.711864), longest outside 0.00 s, longest down 0.00 s
+wander f_dredge: 18 legs, 11 reached, 0 timed out, 1 waypoints skipped, 3 rides, visits { "main_floor": 6, "med_bay": 1, "locker_room": 2, "booth": 1, "loading_dock": 2, "pier": 1, "juice_bar": 1, "boiler_room": 1 }, min root y 0.41 at (3.728338, 0.409072, 2.772694), longest outside 0.00 s, longest down 0.00 s
+wander f_dozer: 18 legs, 11 reached, 0 timed out, 1 waypoints skipped, 3 rides, visits { "main_floor": 8, "med_bay": 1, "juice_bar": 1, "crawlspace": 1, "boiler_room": 1, "loading_dock": 2, "pier": 1, "roof": 1, "office": 1 }, min root y 0.66 at (-5.128418, 0.655189, -1.320767), longest outside 0.00 s, longest down 0.00 s
+wander f_gusto: 28 legs, 19 reached, 0 timed out, 3 waypoints skipped, 4 rides, visits { "main_floor": 10, "med_bay": 1, "juice_bar": 2, "office": 1, "loading_dock": 2, "pier": 1, "boiler_room": 1, "crawlspace": 1, "locker_room": 2, "booth": 1, "roof": 1 }, min root y 0.98 at (10.40182, 0.975329, -4.538305), longest outside 0.00 s, longest down 0.00 s
+wander f_slurry: 20 legs, 14 reached, 0 timed out, 4 waypoints skipped, 3 rides, visits { "main_floor": 8, "med_bay": 1, "juice_bar": 1, "crawlspace": 1, "loading_dock": 1, "locker_room": 2, "booth": 1, "roof": 1, "boiler_room": 1 }, min root y 0.16 at (10.62234, 0.159881, -2.558272), longest outside 0.00 s, longest down 0.00 s
+wander f_jitters: 29 legs, 18 reached, 0 timed out, 2 waypoints skipped, 5 rides, visits { "main_floor": 10, "med_bay": 2, "crawlspace": 1, "locker_room": 2, "booth": 1, "roof": 2, "office": 1, "loading_dock": 2, "pier": 1, "juice_bar": 1, "boiler_room": 1 }, min root y 0.36 at (42.67591, 0.36, 3.004605), longest outside 0.00 s, longest down 0.00 s
+ok    res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world (53259 ms)
+ok    res://src/test/hub/test_hub_wander.gd::test_wander_planner_reaches_transport_when_coverage_is_due (89 ms)
+tests: 2 run, 0 failed, 2 passed, 0 skipped in 57.9 s

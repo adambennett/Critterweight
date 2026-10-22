@@ -1,0 +1,25 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 01:17:59 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-loopback-2/users/server
+2026-10-22 01:18:00 [INFO] app: Critterweight 0.9.18+8eea02c (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-22 01:18:00 [INFO] server: content: core 1.0.0; gameplay hash ca9a54ae374c
+2026-10-22 01:18:00 [INFO] playlist: no saved playlist state (first run)
+2026-10-22 01:18:00 [INFO] net: dedicated server 'Verification Server' listening on UDP *:47544 (protocol 7, game 0.9.18, content ca9a54ae374c)
+2026-10-22 01:18:00 [INFO] server: TCP admin listening on 127.0.0.1:47545 (token required)
+2026-10-22 01:18:00 [INFO] server: ready: 'Verification Server' on UDP 47544, 4 players max, playlist 'Verification duel' (1 valid entries)
+2026-10-22 01:18:04 [INFO] net: player 2 'Alice' joined from 127.0.0.1
+2026-10-22 01:18:04 [INFO] net: player 3 'Bob' joined from 127.0.0.1
+2026-10-22 01:18:06 [INFO] net: player 4 'Viewer' joined from 127.0.0.1 as spectator
+2026-10-22 01:18:07 [INFO] net: playlist pick: duel (no votes: highest weight)
+2026-10-22 01:18:07 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-22 01:18:19 [INFO] net: player 4 'Viewer' removed (server_shutdown)
+2026-10-22 01:18:25 [INFO] net: match 1 finished: winner team 0
+2026-10-22 01:18:27 [INFO] admin: TCP admin authenticated from 127.0.0.1
+2026-10-22 01:18:27 [INFO] admin: [tcp] status
+2026-10-22 01:18:27 [WARN] admin: TCP admin authentication failed
+2026-10-22 01:18:27 [INFO] admin: TCP admin authenticated from 127.0.0.1
+2026-10-22 01:18:27 [INFO] admin: [tcp] shutdown Verification finished
+2026-10-22 01:18:27 [WARN] server: shutdown requested: Verification finished
+2026-10-22 01:18:27 [INFO] net: server closing (server_shutdown): Verification finished
+2026-10-22 01:18:30 [INFO] net: server closed (server_shutdown): Verification finished
+2026-10-22 01:18:30 [WARN] server: server stopped

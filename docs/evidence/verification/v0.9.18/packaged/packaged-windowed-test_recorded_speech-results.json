@@ -1,0 +1,64 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 279,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_all_announcer_and_hub_templates_resolve_without_babble"
+		},
+		{
+			"errors": [],
+			"ms": 102,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_bubble_pacing_uses_recorded_duration"
+		},
+		{
+			"errors": [],
+			"ms": 108,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_custom_names_use_slot_audio_while_subtitles_keep_the_name"
+		},
+		{
+			"errors": [],
+			"ms": 110,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_dynamic_recaps_and_first_lesson_compositions_resolve"
+		},
+		{
+			"errors": [],
+			"ms": 1072,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_every_authored_voice_clip_is_installed_and_decodable"
+		},
+		{
+			"errors": [],
+			"ms": 101,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_live_control_bindings_share_natural_action_audio"
+		},
+		{
+			"errors": [],
+			"ms": 102,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_owner_player_names_and_spelling_aliases_use_recordings_in_every_voice"
+		},
+		{
+			"errors": [],
+			"ms": 134,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_recorded_player_uses_full_clips_and_completion_signals"
+		},
+		{
+			"errors": [],
+			"ms": 112,
+			"ok": true,
+			"test": "res://src/test/audio/test_recorded_speech.gd::test_recorded_priority_queue_stop_and_unknown_mod_fallback"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 9 run, 0 failed, 9 passed, 0 skipped in 7.0 s",
+	"time": "2026-10-22T01:14:30",
+	"total": 9,
+	"version": "0.9.18"
+}

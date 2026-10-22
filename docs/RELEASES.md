@@ -28,6 +28,17 @@ After publishing, verify the immutable annotated tag and all seven actual downlo
 also validates the checksum list, every archived file and the standalone Windows executable
 against the manifest. Release smoke-test logs and profiles stay under `dist/verification/`.
 
+## Current 0.9.x prereleases (verified 2026-10-22)
+
+- [v0.9.18](https://github.com/adambennett/Critterweight/releases/tag/v0.9.18): creature movesets, campaign customization and Classic rules;
+  `8eea02cccd14d2b4977c8fe3a12f1548851a1db7`. Four target archives and seven actual downloads verified; downloaded Windows boot passes.
+- [v0.9.17](https://github.com/adambennett/Critterweight/releases/tag/v0.9.17): commentary,
+  fighter art, ability effects and Legacy Varga skin; `e2870289c69c721024ac4ed200a5e6eda7ae4288`.
+
+These are published prereleases; GitHub's separate **Latest** label may point to an older stable release.
+Evidence and testing limitations: `docs/evidence/verification/v0.9.17/README.md` and
+`docs/evidence/verification/v0.9.18/README.md`.
+
 ## Versioning
 
 - **Single source of truth:** `application/config/version` in `game/project.godot`. The game uses it for

@@ -1,0 +1,58 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_additive_damage_on_a_stream_becomes_a_multiplier"
+		},
+		{
+			"errors": [],
+			"ms": 3879,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_every_upgrade_reaches_each_recommended_loadout_and_the_classic_kit"
+		},
+		{
+			"errors": [],
+			"ms": 62,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_heavy_upgrades_fall_back_to_the_finisher_without_a_heavy_move"
+		},
+		{
+			"errors": [],
+			"ms": 95,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_hook_slot_conditions_match_pool_moves"
+		},
+		{
+			"errors": [],
+			"ms": 59,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_movesets_effects_and_string_translation"
+		},
+		{
+			"errors": [],
+			"ms": 57,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_multipliers_reach_inline_moves_once"
+		},
+		{
+			"errors": [],
+			"ms": 63,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_texts_and_offer_weights_follow_the_loadout"
+		},
+		{
+			"errors": [],
+			"ms": 329,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_translated_builds_stay_valid_fighters"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 8 run, 0 failed, 8 passed, 0 skipped in 9.1 s",
+	"time": "2026-10-22T01:09:00",
+	"total": 8,
+	"version": "0.9.18"
+}

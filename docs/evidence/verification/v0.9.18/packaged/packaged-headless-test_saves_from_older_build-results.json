@@ -1,0 +1,46 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 25586,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_career_from_published_v0917_migrates_books_and_plays_the_next_bout"
+		},
+		{
+			"errors": [],
+			"ms": 24558,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_career_from_v0916_migrates_books_and_plays_the_next_bout"
+		},
+		{
+			"errors": [],
+			"ms": 394,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_run_from_published_v0917_resumes_verifies_and_finishes"
+		},
+		{
+			"errors": [],
+			"ms": 414,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_run_from_v0916_resumes_verifies_and_finishes"
+		},
+		{
+			"errors": [],
+			"ms": 20,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_settings_and_rules_preset_from_published_v0917_load"
+		},
+		{
+			"errors": [],
+			"ms": 18,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_settings_and_rules_preset_from_v0916_load"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 6 run, 0 failed, 6 passed, 0 skipped in 55.5 s",
+	"time": "2026-10-22T01:10:25",
+	"total": 6,
+	"version": "0.9.18"
+}

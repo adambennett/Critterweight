@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 3836,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_kit_chain_wisps_and_tether_draw_and_clean_up"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 8.3 s",
+	"time": "2026-10-22T01:17:42",
+	"total": 1,
+	"version": "0.9.18"
+}

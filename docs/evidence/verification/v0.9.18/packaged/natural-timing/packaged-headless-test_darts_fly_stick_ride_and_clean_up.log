@@ -1,0 +1,8 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 01:17:46 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-natural-timing-2/users/test_darts_fly_stick_ride_and_clean_up-011743159
+2026-10-22 01:17:46 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 01:17:46 [INFO] app: Critterweight 0.9.18+8eea02c (Windows x86_64, Godot 4.5.1-stable (official))
+VFX_LIFETIME slurry dart: 3.028 engine seconds
+ok    res://src/test/kits/test_moves_slurry.gd::test_darts_fly_stick_ride_and_clean_up (3442 ms)
+tests: 1 run, 0 failed, 1 passed, 0 skipped in 8.6 s

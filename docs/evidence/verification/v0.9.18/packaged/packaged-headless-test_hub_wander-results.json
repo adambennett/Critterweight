@@ -1,0 +1,22 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 53259,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world"
+		},
+		{
+			"errors": [],
+			"ms": 89,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_wander.gd::test_wander_planner_reaches_transport_when_coverage_is_due"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 2 run, 0 failed, 2 passed, 0 skipped in 57.9 s",
+	"time": "2026-10-22T01:12:34",
+	"total": 2,
+	"version": "0.9.18"
+}

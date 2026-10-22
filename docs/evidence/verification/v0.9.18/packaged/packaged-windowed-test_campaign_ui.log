@@ -1,0 +1,40 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti SUPER
+
+2026-10-22 01:13:17 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-candidate-2/users/test_campaign_ui-011312667
+2026-10-22 01:13:17 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 01:13:17 [INFO] app: Critterweight 0.9.18+8eea02c (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/campaign/test_campaign_ui.gd::test_bookie_attended_rest_train_opens_the_pick (378 ms)
+2026-10-22 01:13:19 [INFO] match: start ? on arena_gullet: f_stoke/t0/campaign_bot, f_knell/t1/npc, f_dozer/t1/npc
+2026-10-22 01:13:20 [INFO] match: start ? on arena_gullet: f_stoke/t0/campaign_bot, f_knell/t1/npc, f_dozer/t1/npc
+ok    res://src/test/campaign/test_campaign_ui.gd::test_bookie_camera_preset_holds_for_every_presented_fight (1247 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_bookie_screen_setup_live_and_stop (644 ms)
+2026-10-22 01:13:21 [INFO] match: start ? on arena_gullet: f_stoke/t0/campaign_bot, f_knell/t1/npc, f_dozer/t1/npc
+2026-10-22 01:13:21 [INFO] match: start ? on arena_gullet: f_stoke/t0/campaign_bot, f_knell/t1/npc, f_dozer/t1/npc
+ok    res://src/test/campaign/test_campaign_ui.gd::test_bookie_speed_holds_for_every_presented_fight (327 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_camp_ledger_buys_with_clout (115 ms)
+2026-10-22 01:13:26 [INFO] platform: achievement unlocked: Off the Street
+2026-10-22 01:13:26 [INFO] toast: [success] Achievement: Off the Street
+2026-10-22 01:13:26 [INFO] platform: achievement unlocked: Order in the Court
+2026-10-22 01:13:26 [INFO] toast: [success] Achievement: Order in the Court
+ui walk visited: ["reward", "run_map", "shop", "event", "rest"]
+ok    res://src/test/campaign/test_campaign_ui.gd::test_controller_walks_the_map_and_screens_to_the_summary (5017 ms)
+2026-10-22 01:13:26 [INFO] match: start ? on arena_drydock: f_stoke/t0/player, blister_sludge/t1/npc, blister_sludge/t1/npc, blister_sludge/t1/npc, scrapling_basic/t1/npc, scrapling_basic/t1/npc
+ok    res://src/test/campaign/test_campaign_ui.gd::test_custom_rechecked_at_each_fight (444 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_every_decision_screen_builds_with_focus (334 ms)
+2026-10-22 01:13:27 [INFO] match: start ? on arena_gullet: f_stoke/t0/player, scrapling_pelter/t1/npc, scrapling_pelter/t1/npc, scrapling_pelter/t1/npc, scrapling_basic/t1/npc
+ok    res://src/test/campaign/test_campaign_ui.gd::test_fight_time_counts_once (1642 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_asks_before_replacing_a_suspended_run (501 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_offers_no_dose_on_sparring (62 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_menu_asks_before_replacing_a_suspended_run (413 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_menu_never_deals_over_a_newer_versions_run (204 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_menu_never_resumes_a_party_run_solo (286 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_menu_starts_a_run_and_shows_the_map (243 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_rest_train_opens_the_pick_without_a_loop (293 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_run_creation_clamps_the_dose (194 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_run_it_back_rechecks_custom (223 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_run_map_modal_traps_focus_and_back_closes_it (241 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_run_moves_screens_equip_learn_and_drill (2936 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_stuck_rest_save_resumes_into_the_pick (256 ms)
+ok    res://src/test/campaign/test_campaign_ui.gd::test_unbuildable_fight_offers_forfeit (52 ms)
+tests: 22 run, 0 failed, 22 passed, 0 skipped in 20.9 s

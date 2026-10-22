@@ -1,0 +1,52 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 500,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_between_rounds_scorecard_and_decision_banner"
+		},
+		{
+			"errors": [],
+			"ms": 3650,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_hud_hides_health_and_shows_round_and_cards_locally"
+		},
+		{
+			"errors": [],
+			"ms": 250,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_hud_on_the_net_mirror_cards_count_and_sudden_death"
+		},
+		{
+			"errors": [],
+			"ms": 8867,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_match_scene_referee_framing_and_ten_point_callouts"
+		},
+		{
+			"errors": [],
+			"ms": 236,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_net_scene_referee_cards_and_decision_from_replicated_data"
+		},
+		{
+			"errors": [],
+			"ms": 1165,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_results_show_method_cards_and_fit"
+		},
+		{
+			"errors": [],
+			"ms": 267,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_results_without_scoring_are_unchanged"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 7 run, 0 failed, 7 passed, 0 skipped in 20.0 s",
+	"time": "2026-10-22T01:15:07",
+	"total": 7,
+	"version": "0.9.18"
+}

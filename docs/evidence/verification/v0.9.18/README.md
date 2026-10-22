@@ -1,16 +1,53 @@
-# v0.9.18 release verification — in progress
+# Critterweight v0.9.18 release verification
 
 Owner scope: `Version 17 and 18 Updates.md`, second release. v0.9.17 was published and verified
 first at `e2870289c69c721024ac4ed200a5e6eda7ae4288`. This integration began from Claude's `7eba366`,
 merged the shipped base in `6e891f7`, then completed the separate progression branch in `6b6329a`.
-This report is not a claim that v0.9.18 is already released.
+Both releases are now published and their downloaded artifacts are verified.
 
-## Focused source checks
+## Published release
 
-All 499 GDScript files compile. Passing checks so far: moves 123; commentary 22; campaign moves 13;
+[v0.9.18](https://github.com/adambennett/Critterweight/releases/tag/v0.9.18) was published at **2026-10-22T05:24:40Z** from the clean,
+tested commit `8eea02cccd14d2b4977c8fe3a12f1548851a1db7`. Annotated tag: `de68ef30dc3b577a1e68852b8f73150c429e02af`.
+
+- Final integrated source: **1,126 run, 1,125 passed, zero failed,
+  1 expected graphical-audio skip**. No unexpected engine errors; the four decoder
+  rejection errors are from explicit negative tests. Source remained clean and unchanged.
+  [Run metadata](full-source-run.json), [results](full-source-results.json), [raw log](source/full-source.log).
+- Ten-minute server/client loopback soak: **13 matches, zero orphan nodes**,
+  clean server exit. Second-half static/working-set slopes:
+  **0.019/0.077 MB/min**.
+  [Raw report](soak/final-ten-minute-report.json).
+- Four clean-source game/server archives verified. The final exported-game matrix completed
+  **361 checks in 26 groups: 358 passed, zero failed, 3 source-only skips**.
+  Headless simulation groups use a 120-FPS engine clock; all ten rendered groups use normal timing.
+  Both repaired VFX lifetime checks additionally pass in the package at natural headless timing.
+  The source-only skips inspect GDScript literals, source WAVs and the legacy GLB, covered by source.
+  [Matrix](packaged/packaged-suites-summary.txt), [natural timing](packaged/natural-timing/packaged-suites-summary.txt).
+- Seven packaged dedicated-server/two-client/spectator/admin loopback checks pass.
+  [Steps](packaged/loopback/steps.json). These are local loopback checks, not an internet playtest.
+  The saved spectator frame was inspected: its low automatic camera angle partly obscures the
+  fighters behind the near cage rail. It proves the connected view renders, not clear sightlines
+  from every spectator angle; the separate combat sheets show the reviewed move effects.
+- The normal tagged release rebuild checks **499 scripts and 21/21 rendered playtests**.
+  All seven actual GitHub downloads, checksums, annotated tag, exact commit, archived members,
+  Linux executable bits and the standalone Windows EXE match the manifest.
+  [Publication verification](publication/verification.json).
+- The downloaded standalone Windows game reaches its title in **6824 ms**, exits cleanly and
+  logs no engine errors. [Downloaded smoke](publication/downloaded-smoke/run.json).
+
+Playable local copy: `B:\Critterweight-work\v0.9.18\published\Critterweight-0.9.18-windows-x64.exe`.
+The final evidence documentation is committed after the immutable release tag, without rebuilding
+or changing the published assets. Both release objectives are complete. Physical-controller,
+human listening/playtesting, Linux runtime, Steam Deck hardware and external-network checks remain
+unperformed; the scripted Windows evidence and performance limits below describe what was checked.
+
+## Implementation and focused-check history
+
+All 499 GDScript files compile. Initial focused passes: moves 123; commentary 22; campaign moves 13;
 upgrade translation 8 (2,212 upgrade/build/style combinations); co-op 19; Career 62; hub services 8;
 Movesets UI 10; tutorials 12; profile loadouts 5; older saves 6; network moves 5; move VFX 8. The
-final integrated run will supersede these intermediate totals. The expanded rules suite passes
+final integrated run above supersedes these intermediate totals. The expanded rules suite passes
 6/6, running all 16 built-in presets with their actual mode implementations and attack inputs,
 including Chum Rush's first spawned wave. Benchmark input checks pass 2/2: a bot cannot cancel
 the injected sustained hold, and the same driver exercises Classic abilities.
@@ -123,14 +160,14 @@ fragments, 671.405 seconds). Every WAV matches its catalog and completed request
 as mono 24 kHz PCM16, has a matching duration, is non-silent and peaks at or below -3 dBFS.
 The retained retake selections comprise ten commentary and thirteen tutorial replacements.
 
-## Remaining gates
+## Integration history and repairs
 
 The first clean integrated attempt (`6dccf14`, `source-attempt-1/`) was stopped after finding two
 failures. The loadout screen requested the nonexistent `ui_confirm`; it now uses `ui_accept`.
 The stream-audio test incorrectly included `line:` commentary actions in its impact count. It now
 counts sound IDs only, requires exactly one impact across eight rapid ticks, and additionally checks
 independent per-target cooldowns and audible recovery after the interval. Commentary still receives
-every event; no playback was removed to satisfy that test. A fresh full run follows these repairs.
+every event; no playback was removed to satisfy that test. Subsequent full runs are recorded below.
 
 The second clean full run (`ae6aa78`, `source-attempt-2/`) completed: **1,122 run, 1,118 passed,
 three failed, one graphical-audio skip**, in 3,222.2 seconds. Its ten-minute loopback soak passed
@@ -183,9 +220,9 @@ Knell/Slurry and rendered Knell/Slurry (`focused/vfx-timing/`). Cleanup occurs a
 engine seconds and both effects are also checked before expiry. All 499 scripts compile.
 `source-attempt-3/` retains the preceding passing full suite and soak.
 
-Finish the fresh integrated and packaged checks after these test repairs, then publication and
-download verification. Exact final commits and raw results will be recorded here. No physical-
-controller, human listening/playtesting, Deck, Linux runtime or external-network claim is made.
+The final clean `8eea02c` run, second package candidate and publication checks all passed;
+the Published release section records their exact totals and links. No physical-controller,
+human listening/playtesting, Deck, Linux runtime or external-network claim is made.
 
 Working evidence and full-resolution originals: `B:\Critterweight-work\v0.9.18\takeover`.
 

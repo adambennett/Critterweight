@@ -1,0 +1,8 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 01:18:03 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-loopback-2/users/alice
+2026-10-22 01:18:04 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 01:18:04 [INFO] app: Critterweight 0.9.18+8eea02c (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-22 01:18:04 [INFO] net: connecting to 127.0.0.1:47544
+2026-10-22 01:18:04 [INFO] net: joined 'Verification Server' as player 2
+2026-10-22 01:18:26 [INFO] net: client closed: left - You left the session.

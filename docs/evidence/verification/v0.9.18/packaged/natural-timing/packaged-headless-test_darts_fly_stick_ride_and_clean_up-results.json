@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 3442,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_darts_fly_stick_ride_and_clean_up"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 8.6 s",
+	"time": "2026-10-22T01:17:55",
+	"total": 1,
+	"version": "0.9.18"
+}

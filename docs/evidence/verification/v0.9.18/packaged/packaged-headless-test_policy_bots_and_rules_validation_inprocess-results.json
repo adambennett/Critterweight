@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 3113,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_policy_bots_and_rules_validation_inprocess"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 7.6 s",
+	"time": "2026-10-22T01:12:45",
+	"total": 1,
+	"version": "0.9.18"
+}
