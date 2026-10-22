@@ -1,0 +1,15 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 21:59:16 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/source-regressions-before/test_type_traits
+2026-10-21 21:59:16 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 21:59:16 [INFO] app: Critterweight 0.9.18-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/core/test_type_traits.gd::test_bell_ringer_grave_chill_and_crack_guard_apply (120 ms)
+FAIL  res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover (1263 ms)
+        res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover: classic spectral projectile through prop_tire_stack: contact expected true, got false
+        res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover: classic spectral projectile through prop_tire_stack: damage expected true, got false
+        res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover: moves spectral projectile through prop_tire_stack: contact expected true, got false
+        res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover: moves spectral projectile through prop_tire_stack: damage expected true, got false
+ok    res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_cover (1395 ms)
+tests: 3 run, 1 failed, 2 passed, 0 skipped in 12.2 s
+WARNING: Jolt Physics job system exceeded the maximum number of jobs. This should not happen. Please report this. Waiting for jobs to become available...
+   at: CreateJob (modules/jolt_physics/spaces/jolt_job_system.cpp:125)

@@ -323,16 +323,26 @@ func _on_focus_changed(f: Control) -> void:
 static func reveal_focus(f: Control) -> void:
 	if not is_instance_valid(f) or not f.is_inside_tree() or not f.has_focus():
 		return
+	# follow_focus and help text can both queue container sorting. Measure after that settles;
+	# ensure_control_visible followed by another correction used stale positions and scrolled twice.
+	var tree := f.get_tree()
+	await tree.process_frame
+	await tree.process_frame
+	if not is_instance_valid(f) or not f.is_inside_tree() or not f.has_focus():
+		return
 	var n := f.get_parent()
 	while n != null:
 		if n is ScrollContainer:
 			var sc := n as ScrollContainer
-			sc.ensure_control_visible(f)
-			# Godot only reveals the unscaled rectangle. Reserve room for the
-			# gold focus ring and scale tween, including the final row's padding.
-			var top := f.global_position.y - sc.global_position.y - 16.0
-			var bottom := f.global_position.y + f.size.y - sc.global_position.y + 16.0
-			if bottom > sc.size.y:
+			# Use scroll-local coordinates, including the focused card's scale and its gold ring.
+			var to_scroll := sc.get_global_transform().affine_inverse() * f.get_global_transform()
+			var rect := to_scroll * Rect2(Vector2.ZERO, f.size)
+			var top := rect.position.y - 16.0
+			var bottom := rect.end.y + 16.0
+			if rect.size.y + 32.0 > sc.size.y:
+				# Oversized information cards start at their heading; the right stick reads the rest.
+				sc.scroll_vertical += floori(top)
+			elif bottom > sc.size.y:
 				sc.scroll_vertical += ceili(bottom - sc.size.y)
 			elif top < 0.0:
 				sc.scroll_vertical += floori(top)

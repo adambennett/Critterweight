@@ -1,0 +1,88 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 237,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_campaign_menu_lists_career_first"
+		},
+		{
+			"errors": [],
+			"ms": 390,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_create_a_career_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 334,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_every_career_screen_has_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 199,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_fight_through_career_flow_to_the_result_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 186,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_hub_pull_out_is_a_confirmed_withdrawal"
+		},
+		{
+			"errors": [],
+			"ms": 195,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_interrupted_bout_is_offered_again"
+		},
+		{
+			"errors": [],
+			"ms": 675,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 227,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_learn_and_drill_a_move_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 1388,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_menu_quit_pulls_out_of_a_career_bout"
+		},
+		{
+			"errors": [],
+			"ms": 798,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_quit_after_the_decision_books_the_result"
+		},
+		{
+			"errors": [],
+			"ms": 272,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pre_bout_loadout_change_persists"
+		},
+		{
+			"errors": [],
+			"ms": 131,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_retire_and_move_aside_free_the_slot"
+		},
+		{
+			"errors": [],
+			"ms": 283,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_walk_weeks_with_real_input"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 13 run, 0 failed, 13 passed, 0 skipped in 14.4 s",
+	"time": "2026-10-21T22:08:11",
+	"total": 13,
+	"version": "0.9.18"
+}

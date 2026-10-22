@@ -141,6 +141,29 @@ func test_scroll_reveals_last_button_and_text_panel_scrolls() -> void:
 	UiNav.ensure().scroll_focused(300)
 	check(text.scroll.scroll_vertical > 0, "shared right-stick scrolling reaches text")
 
+
+func test_scroll_reveals_middle_cards_in_both_directions() -> void:
+	var s := App.goto("main_menu")
+	var scroll := FocusScroll.new()
+	s.add_child(scroll)
+	scroll.position = Vector2(800, 200)
+	scroll.size = Vector2(500, 350)
+	var cards: Array[Control] = []
+	for i in 12:
+		var card := CareerUi.ActionCard.new("card%d" % i, Vector2(0, 140))
+		card.body.add_child(UiTheme.label("Training choice %d" % i, "H3"))
+		scroll.content.add_child(card)
+		cards.append(card)
+	await wait_frames(4)
+	for i in [0, 3, 6, 9, 11, 7, 4, 1]:
+		cards[i].grab_focus()
+		await wait_frames(8)
+		var bounds := cards[i].get_global_rect()
+		var viewport := scroll.get_global_rect()
+		check(bounds.position.y >= viewport.position.y + 8, "card %d heading and upper focus ring visible: %s in %s" % [i, bounds, viewport])
+		check(bounds.end.y <= viewport.end.y - 8, "card %d lower focus ring visible: %s in %s" % [i, bounds, viewport])
+
+
 func test_cannery_boards_fit_and_lessons_reveal_the_final_button() -> void:
 	App.goto("main_menu")
 	for kind in ["drill", "shop", "lessons"]:

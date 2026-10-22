@@ -1,0 +1,18 @@
+{
+	"failed": 1,
+	"results": [
+		{
+			"errors": [
+				"res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world: f_slurry: took hatches, ladders or the elevator on the way (1)"
+			],
+			"ms": 63683,
+			"ok": false,
+			"test": "res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 1 failed, 0 passed, 0 skipped in 72.9 s",
+	"time": "2026-10-21T22:06:51",
+	"total": 1,
+	"version": "0.9.18"
+}

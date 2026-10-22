@@ -26,6 +26,11 @@ reduced denied bot moves by 87.8%. All 254 v18 recordings pass their integrity a
 archive now checks actual displayed bodies. Final matched performance and the longer 1080p
 confirmation are recorded with active-fight guards and slow-frame limits. Next: the clean integrated
 source suite/ten-minute soak and packaged suites, then publish v0.9.18.
+The second full run retained three failures despite a passing ten-minute soak. Follow-ups repaired
+spectral shots blocked by authored tire-stack cover, an unused policy hash advertised to Movesets
+clients, and clipped/overscrolled focus cards. The aiming and wandering test drivers now exercise
+their intended paths; the hub-secret input check waits for actual simulated recovery. Original
+failures and focused follow-ups are retained. A clean full rerun must pass before packaging.
 See `releases/v0.9.18-takeover.md` and the v18 verification report for exact evidence.
 Both releases are authorized for autonomous GitHub publication. Combined Breeze spending in the
 latest saved report is 4,425.0 / 10,000 credits; 5,575.0 remain across the entire goal.

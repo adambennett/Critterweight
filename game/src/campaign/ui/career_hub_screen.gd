@@ -247,15 +247,13 @@ func _focus_route(route: String) -> void:
 		_settle_scroll(t)
 
 
-## The list was rebuilt this frame, so follow_focus measured stale positions: once the containers
-## have sorted, scroll from the top just far enough to show the focused control (the fight card
-## above the first action stays visible whenever it fits).
+## The list was rebuilt this frame. Let the shared focus reveal measure the final layout and
+## reserve the same focus-ring clearance as ordinary navigation.
 func _settle_scroll(t: Control) -> void:
 	await get_tree().process_frame
 	if not is_instance_valid(t) or not t.is_inside_tree() or _scroll == null:
 		return
-	_scroll.scroll_vertical = 0
-	_scroll.ensure_control_visible(t)
+	UiNav.reveal_focus(t)
 
 
 ## The focusable control with this route (cards and buttons), or null.

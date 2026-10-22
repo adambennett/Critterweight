@@ -23,6 +23,7 @@ class PathDriver:
 		_best = INF
 		_since = 0.0
 		_blocked = 0.0
+		_side = 0.0
 
 	func done() -> bool:
 		return index >= points.size()
@@ -31,6 +32,7 @@ class PathDriver:
 	var _since := 0.0
 	var _blocked := 0.0
 	var _side := 0.0
+	var _side_dir := Vector3.ZERO
 
 	func poll(f: Fighter, _sim, dt: float) -> void:
 		f.input.move = Vector3.ZERO
@@ -60,13 +62,16 @@ class PathDriver:
 			else:
 				_since += dt
 				_blocked += dt
-			if _since > 1.5:
-				_side = 0.45
-				_since = 0.0
 			var dir := to.normalized()
+			if _since > 1.5:
+				# A broad fighter needs a real sidestep around an NPC. A short diagonal shove
+				# continually steered Dredge back into Ludlow without ever clearing his body.
+				_side = 0.9 if lenient else 0.45
+				_side_dir = dir.cross(Vector3.UP)
+				_since = 0.0
 			if _side > 0.0:
 				_side -= dt
-				dir = (dir + dir.cross(Vector3.UP) * 1.2).normalized()
+				dir = _side_dir if lenient else (dir + dir.cross(Vector3.UP) * 1.2).normalized()
 			f.input.move = dir
 			return
 

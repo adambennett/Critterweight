@@ -1,0 +1,33 @@
+{
+	"failed": 1,
+	"results": [
+		{
+			"errors": [],
+			"ms": 120,
+			"ok": true,
+			"test": "res://src/test/core/test_type_traits.gd::test_bell_ringer_grave_chill_and_crack_guard_apply"
+		},
+		{
+			"errors": [
+				"res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover: classic spectral projectile through prop_tire_stack: contact expected true, got false",
+				"res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover: classic spectral projectile through prop_tire_stack: damage expected true, got false",
+				"res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover: moves spectral projectile through prop_tire_stack: contact expected true, got false",
+				"res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover: moves spectral projectile through prop_tire_stack: damage expected true, got false"
+			],
+			"ms": 1263,
+			"ok": false,
+			"test": "res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover"
+		},
+		{
+			"errors": [],
+			"ms": 1395,
+			"ok": true,
+			"test": "res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_cover"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 3 run, 1 failed, 2 passed, 0 skipped in 12.2 s",
+	"time": "2026-10-21T21:59:28",
+	"total": 3,
+	"version": "0.9.18"
+}

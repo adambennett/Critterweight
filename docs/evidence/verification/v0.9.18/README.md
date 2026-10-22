@@ -132,6 +132,42 @@ counts sound IDs only, requires exactly one impact across eight rapid ticks, and
 independent per-target cooldowns and audible recovery after the interval. Commentary still receives
 every event; no playback was removed to satisfy that test. A fresh full run follows these repairs.
 
+The second clean full run (`ae6aa78`, `source-attempt-2/`) completed: **1,122 run, 1,118 passed,
+three failed, one graphical-audio skip**, in 3,222.2 seconds. Its ten-minute loopback soak passed
+with thirteen matches, zero orphaned nodes and clean shutdown; static/working-set slopes were
+0.139/0.149 MB per minute. The three failures and a rendered focus defect led to these repairs:
+
+- The spectral-cover fixture now updates logical aim when placing the rig and includes an
+  unobstructed control. Expanded tests exposed a real gap: spectral shots bypassed summoned rocks
+  and splat proxies but were stopped by other solid arena props. Both cover paths now honor the
+  trait. Three focused checks pass in Classic and Movesets, including damage and actual contact.
+- The network policy check now explicitly selects Classic. A new real ENet check proves that the
+  new preset uses a fallback bot and no longer advertises the unused Classic policy's hash.
+  Both policy paths pass.
+- Shared focus reveal no longer scrolls twice from stale container positions. It waits for layout,
+  measures the scaled card in scroll-local coordinates and reserves focus-ring clearance. The
+  middle-card regression, thirteen Career UI checks and the other headless UI checks pass.
+  Real Career learn/drill navigation passes at 1600×900 and 1280×800; both captures were reviewed.
+- Dredge's walking driver was repeatedly pushing diagonally into Ludlow. A full sidestep clears
+  him. The wandering planner deliberately visits transport-only rooms in its second half if
+  random exploration has not covered them yet. Duration, required progress, transport visits,
+  allowed blockage and all safety limits remain unchanged. Both harness checks pass; all six
+  walkers finish with no timeouts or floor/knockdown failures.
+
+The broad rendered `ui` substring filter also selects built-in modes and other matching checks.
+Its first follow-up ran 165 tests: 164 passed and the hub-secret test failed after its wall-clock
+delay sent a taunt before recovery. The test now waits for the actual fighter cooldown
+and neutral state, retains exactly three real key presses, and asserts each press produces one
+taunt and recovery takes less than three simulated seconds. No cooldown or game behavior changed.
+The complete rendered rerun passes **165/165**, with no skips or engine/script errors, in 516.3 s.
+Both resolution-specific Career checks also pass again. The rerun is retained separately from
+the failed attempt, which includes a Jolt worker-pool warning.
+
+Original failed diagnostics and passing follow-ups are in `focused/source-regressions/`.
+The original clipped `ui/career-drill-move.jpg` remains as historical evidence; the reviewed
+full frames after repair are `ui/career-drill-move-final-1600.png` and
+`ui/career-drill-move-final-1280.png`, with their own hash provenance.
+
 Finish the full integrated suite and ten-minute soak, four-target packages and packaged checks, and publication/
 download verification. Exact final commits and raw results will be recorded here. No physical-
 controller, human listening/playtesting, Deck, Linux runtime or external-network claim is made.

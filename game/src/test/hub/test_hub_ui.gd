@@ -267,7 +267,18 @@ func test_first_secret_unlocks_confidant() -> void:
 	var s0 := sc.sim.event_seq
 	for i in 3:
 		await key(KEY_T, 2)
-		await seconds(2.3)          # the taunt plays out and its cooldown passes
+		# A SceneTree timer with ignore_time_scale does not measure the fighter's
+		# fixed-step clock (especially after accelerated Bookie's fights). Wait for
+		# the actual recovery, without bypassing it or sending extra taunt presses.
+		var recovery_start := f.time
+		var budget := Engine.physics_ticks_per_second * 10
+		while (f._taunt_cd > 0.0 or f.state != Fighter.State.NEUTRAL) and budget > 0:
+			await wait_physics(1)
+			budget -= 1
+		check(budget > 0, "taunt %d recovers without stalling" % (i + 1))
+		check(f.time - recovery_start < 3.0, "taunt %d recovers within three simulated seconds" % (i + 1))
+		var seen := sc.sim.events_since(s0).filter(func(ev): return str(ev["type"]) == "taunt")
+		check_eq(seen.size(), i + 1, "each T press starts exactly one taunt")
 	var taunts := sc.sim.events_since(s0).filter(func(ev): return str(ev["type"]) == "taunt")
 	check_eq(taunts.size(), 3, "three taunts from the T key")
 	await wait_physics(10)

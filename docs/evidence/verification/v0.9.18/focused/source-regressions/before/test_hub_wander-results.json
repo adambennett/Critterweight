@@ -1,0 +1,21 @@
+{
+	"failed": 1,
+	"results": [
+		{
+			"errors": [
+				"res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world: f_dredge: kept getting where it was going (3 legs reached)",
+				"res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world: f_dredge: rarely blocked (10 waypoints given up on)",
+				"res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world: f_dredge: took hatches, ladders or the elevator on the way (0)",
+				"res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world: f_dredge: visited most of the Cannery (4 spaces: [\"main_floor\", \"med_bay\", \"locker_room\", \"loading_dock\"])"
+			],
+			"ms": 62354,
+			"ok": false,
+			"test": "res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 1 failed, 0 passed, 0 skipped in 71.4 s",
+	"time": "2026-10-21T22:01:54",
+	"total": 1,
+	"version": "0.9.18"
+}

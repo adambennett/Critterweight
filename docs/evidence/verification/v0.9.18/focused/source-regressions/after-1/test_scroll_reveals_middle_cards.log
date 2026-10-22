@@ -1,0 +1,7 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 22:05:02 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/source-regressions-after-1/test_scroll_reveals_middle_cards
+2026-10-21 22:05:03 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 22:05:03 [INFO] app: Critterweight 0.9.18-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_middle_cards_in_both_directions (124 ms)
+tests: 1 run, 0 failed, 1 passed, 0 skipped in 9.7 s

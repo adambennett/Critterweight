@@ -1751,7 +1751,7 @@ func start_match(rules_id: String, rules: Dictionary, arena_id: String, lo: int,
 			e2["name"] = "%s %d" % [pol.name if pol != null and pol.name != "" else "Lab bot", b + 1]
 			# the exact network is identified by its checksum ("" = missing or incompatible: the
 			# scripted bot PolicyInputSource.for_match falls back to fights instead)
-			var usable := pol != null and PolicyLibrary.compatibility(pol, cdef.id) == ""
+			var usable := str(rules.get("combat", MatchSim.default_combat)) == "classic" and pol != null and PolicyLibrary.compatibility(pol, cdef.id) == ""
 			policy_list.append({"fighter": idx, "id": pid, "name": str(e2["name"]), "hash": _policy_hash(pol) if usable else ""})
 		if dedicated:
 			if pid != "":

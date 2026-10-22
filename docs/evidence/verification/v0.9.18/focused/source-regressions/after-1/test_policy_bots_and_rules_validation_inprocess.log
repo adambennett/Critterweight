@@ -1,0 +1,18 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 22:06:58 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/source-regressions-after-1/test_policy_bots_and_rules_validation_inprocess
+2026-10-21 22:06:58 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 22:06:58 [INFO] app: Critterweight 0.9.18-dev (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-21 22:07:06 [INFO] net: dedicated server 'Loop' listening on UDP *:43442 (protocol 7, game 0.9.18, content ca9a54ae374c)
+2026-10-21 22:07:06 [INFO] net: connecting to 127.0.0.1:43442
+2026-10-21 22:07:06 [INFO] net: player 2 'Solo' joined from 127.0.0.1
+2026-10-21 22:07:06 [INFO] net: joined 'Loop' as player 2
+2026-10-21 22:07:09 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-21 22:07:09 [WARN] policy: dev_biped has changed since this policy was trained; it still works but may play worse
+2026-10-21 22:07:09 [INFO] net: fighter 1: AI Lab policy 'dev_biped_es_drill' 82e1e217cce5fcc0
+2026-10-21 22:07:09 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (1 humans, 1 bots)
+2026-10-21 22:07:09 [INFO] net: server closing (server_shutdown)
+2026-10-21 22:07:09 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_loopback.gd::test_policy_bots_and_rules_validation_inprocess (3126 ms)
+2026-10-21 22:07:09 [INFO] net: client closed: server_shutdown - The server shut down.
+tests: 1 run, 0 failed, 1 passed, 0 skipped in 13.1 s

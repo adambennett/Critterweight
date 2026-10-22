@@ -1,0 +1,1000 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_base_arenas_ship_required_markers"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_content.gd::test_spanning_edge_builtins_lie_along_their_edge"
+		},
+		{
+			"errors": [],
+			"ms": 20,
+			"ok": true,
+			"test": "res://src/test/arena/test_arena_validation.gd::test_issue_refs_carry_editor_uids"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_bank.gd::test_required_ids_present"
+		},
+		{
+			"errors": [],
+			"ms": 15,
+			"ok": true,
+			"test": "res://src/test/audio/test_audio_moves.gd::test_streams_hold_a_loop_and_ticks_stay_quiet"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_director_distinguishes_knockdown_stoppage_knockout_and_decisions"
+		},
+		{
+			"errors": [],
+			"ms": 399,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_members_learn_equip_and_drill_through_the_host"
+		},
+		{
+			"errors": [],
+			"ms": 89,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_moves.gd::test_autopilot_learns_drills_and_equips_sensibly"
+		},
+		{
+			"errors": [],
+			"ms": 130,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_moves.gd::test_equip_is_a_logged_decision_with_loadout_rules"
+		},
+		{
+			"errors": [],
+			"ms": 93,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_moves.gd::test_fights_bring_the_equipped_moves_as_drilled"
+		},
+		{
+			"errors": [],
+			"ms": 281,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_moves.gd::test_new_runs_learn_both_loadouts_and_equip_the_default"
+		},
+		{
+			"errors": [],
+			"ms": 967,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_run.gd::test_verify_rebuilds_runs_and_rejects_tampering"
+		},
+		{
+			"errors": [],
+			"ms": 315,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_attended_rest_train_opens_the_pick"
+		},
+		{
+			"errors": [],
+			"ms": 1302,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_camera_preset_holds_for_every_presented_fight"
+		},
+		{
+			"errors": [],
+			"ms": 706,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_screen_setup_live_and_stop"
+		},
+		{
+			"errors": [],
+			"ms": 376,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_speed_holds_for_every_presented_fight"
+		},
+		{
+			"errors": [],
+			"ms": 146,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_camp_ledger_buys_with_clout"
+		},
+		{
+			"errors": [],
+			"ms": 6669,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_controller_walks_the_map_and_screens_to_the_summary"
+		},
+		{
+			"errors": [],
+			"ms": 483,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_custom_rechecked_at_each_fight"
+		},
+		{
+			"errors": [],
+			"ms": 336,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_every_decision_screen_builds_with_focus"
+		},
+		{
+			"errors": [],
+			"ms": 1681,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_fight_time_counts_once"
+		},
+		{
+			"errors": [],
+			"ms": 546,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_asks_before_replacing_a_suspended_run"
+		},
+		{
+			"errors": [],
+			"ms": 78,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_offers_no_dose_on_sparring"
+		},
+		{
+			"errors": [],
+			"ms": 460,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_asks_before_replacing_a_suspended_run"
+		},
+		{
+			"errors": [],
+			"ms": 210,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_never_deals_over_a_newer_versions_run"
+		},
+		{
+			"errors": [],
+			"ms": 312,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_never_resumes_a_party_run_solo"
+		},
+		{
+			"errors": [],
+			"ms": 252,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_starts_a_run_and_shows_the_map"
+		},
+		{
+			"errors": [],
+			"ms": 330,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_rest_train_opens_the_pick_without_a_loop"
+		},
+		{
+			"errors": [],
+			"ms": 228,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_creation_clamps_the_dose"
+		},
+		{
+			"errors": [],
+			"ms": 282,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_it_back_rechecks_custom"
+		},
+		{
+			"errors": [],
+			"ms": 258,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_map_modal_traps_focus_and_back_closes_it"
+		},
+		{
+			"errors": [],
+			"ms": 3269,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_moves_screens_equip_learn_and_drill"
+		},
+		{
+			"errors": [],
+			"ms": 281,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_stuck_rest_save_resumes_into_the_pick"
+		},
+		{
+			"errors": [],
+			"ms": 64,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_unbuildable_fight_offers_forfeit"
+		},
+		{
+			"errors": [],
+			"ms": 182,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_career_builds_never_leak"
+		},
+		{
+			"errors": [],
+			"ms": 80,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_chin_raises_poise_and_getup_never_the_poise_multiplier"
+		},
+		{
+			"errors": [],
+			"ms": 77,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_clinch_improves_the_grab_game"
+		},
+		{
+			"errors": [],
+			"ms": 81,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_defence_improves_guard_parry_dodge_never_damage_taken"
+		},
+		{
+			"errors": [],
+			"ms": 79,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_injuries_handicap_poise_stamina_and_footwork"
+		},
+		{
+			"errors": [],
+			"ms": 67,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_mid_stats_are_the_base_kit"
+		},
+		{
+			"errors": [],
+			"ms": 79,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_power_raises_damage_and_knockdown_force"
+		},
+		{
+			"errors": [],
+			"ms": 79,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_speed_raises_footwork_and_tempo"
+		},
+		{
+			"errors": [],
+			"ms": 78,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_build.gd::test_stamina_raises_tank_and_regen"
+		},
+		{
+			"errors": [],
+			"ms": 520,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_campaign_menu_lists_career_first"
+		},
+		{
+			"errors": [],
+			"ms": 1097,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_create_a_career_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 1350,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_every_career_screen_has_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 437,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_fight_through_career_flow_to_the_result_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 946,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_hub_pull_out_is_a_confirmed_withdrawal"
+		},
+		{
+			"errors": [],
+			"ms": 321,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_interrupted_bout_is_offered_again"
+		},
+		{
+			"errors": [],
+			"ms": 1864,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 1361,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_learn_and_drill_a_move_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 1080,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_menu_quit_pulls_out_of_a_career_bout"
+		},
+		{
+			"errors": [],
+			"ms": 2941,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pause_quit_after_the_decision_books_the_result"
+		},
+		{
+			"errors": [],
+			"ms": 930,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pre_bout_loadout_change_persists"
+		},
+		{
+			"errors": [],
+			"ms": 785,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_retire_and_move_aside_free_the_slot"
+		},
+		{
+			"errors": [],
+			"ms": 1008,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_walk_weeks_with_real_input"
+		},
+		{
+			"errors": [],
+			"ms": 32759,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_career_from_published_v0917_migrates_books_and_plays_the_next_bout"
+		},
+		{
+			"errors": [],
+			"ms": 32433,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_career_from_v0916_migrates_books_and_plays_the_next_bout"
+		},
+		{
+			"errors": [],
+			"ms": 508,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_run_from_published_v0917_resumes_verifies_and_finishes"
+		},
+		{
+			"errors": [],
+			"ms": 529,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_run_from_v0916_resumes_verifies_and_finishes"
+		},
+		{
+			"errors": [],
+			"ms": 20,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_settings_and_rules_preset_from_published_v0917_load"
+		},
+		{
+			"errors": [],
+			"ms": 21,
+			"ok": true,
+			"test": "res://src/test/campaign/test_saves_from_older_build.gd::test_settings_and_rules_preset_from_v0916_load"
+		},
+		{
+			"errors": [],
+			"ms": 449,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_translated_builds_stay_valid_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/core/test_bot_moves_ready.gd::test_mapped_ability_uses_equipped_charges"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/core/test_bot_moves_ready.gd::test_unequipped_abilities_cannot_occupy_a_bot_decision"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_build_info.gd::test_label_formats"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_cross_build_fights.gd::test_zz_cross_build_fights"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/core/test_elements.gd::test_buildup_triggers_status_at_threshold"
+		},
+		{
+			"errors": [],
+			"ms": 592,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_engine_extras.gd::test_the_knockdown_blow_builds_its_status"
+		},
+		{
+			"errors": [],
+			"ms": 559,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_built_in_presets_and_playlists_default_to_movesets"
+		},
+		{
+			"errors": [],
+			"ms": 140543,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_every_built_in_preset_runs_its_mode_with_movesets"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/core/test_roster_lint.gd::test_distinct_elements_and_three_builds"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_schema.gd::test_manifest_requires_semver"
+		},
+		{
+			"errors": [],
+			"ms": 15711,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial.gd::test_finisher_then_juice"
+		},
+		{
+			"errors": [],
+			"ms": 225,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_lines_name_the_equipped_moves_and_their_inputs"
+		},
+		{
+			"errors": [],
+			"ms": 157,
+			"ok": true,
+			"test": "res://src/test/core/test_varga_skins.gd::test_a_swap_keeps_a_popped_tooth_out_and_a_resend_rebuilds_nothing"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_random_fighter.gd::test_hub_spar_random_opponent_resolves_before_match_build"
+		},
+		{
+			"errors": [],
+			"ms": 518,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_boiler_room_key_trains_against_saved_builds"
+		},
+		{
+			"errors": [],
+			"ms": 3528,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_ui.gd::test_boards_and_hud_fit_and_read_at_1280x800"
+		},
+		{
+			"errors": [],
+			"ms": 13142,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_ui.gd::test_every_board_has_focus_and_b_returns_to_walking"
+		},
+		{
+			"errors": [],
+			"ms": 6897,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_ui.gd::test_first_secret_unlocks_confidant"
+		},
+		{
+			"errors": [],
+			"ms": 1603,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_ui.gd::test_interact_talks_instead_of_dodging"
+		},
+		{
+			"errors": [],
+			"ms": 11157,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_conduit_signature_moves"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_zz_quick_balance"
+		},
+		{
+			"errors": [],
+			"ms": 263,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_debuff_require_status"
+		},
+		{
+			"errors": [],
+			"ms": 12390,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_juice_landslide"
+		},
+		{
+			"errors": [],
+			"ms": 12360,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_juice_high_tide"
+		},
+		{
+			"errors": [],
+			"ms": 8672,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_gusto.gd::test_hurricane_strut_juice"
+		},
+		{
+			"errors": [],
+			"ms": 12400,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_slippery_hold_and_quick_getup"
+		},
+		{
+			"errors": [],
+			"ms": 7418,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_overflow_juice_activation_and_end"
+		},
+		{
+			"errors": [],
+			"ms": 7534,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_stoke.gd::test_meltdown_juice"
+		},
+		{
+			"errors": [],
+			"ms": 8378,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_juice_feeding_frenzy"
+		},
+		{
+			"errors": [],
+			"ms": 1995,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_taunt_builds_hype"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_zz_quick_balance"
+		},
+		{
+			"errors": [],
+			"ms": 1060,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_feather_darts_fan_out_and_build_winded"
+		},
+		{
+			"errors": [],
+			"ms": 1188,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_equipping_a_technique_changes_only_its_group"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_guard_shove_requires_its_stamina_cost"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_guest_dodge_lesson_does_not_require_standard_dash_attack"
+		},
+		{
+			"errors": [],
+			"ms": 5320,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_varga_abilities_and_juice"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_new_fighters.gd::test_view_target_chord_does_not_switch_stance_or_fire_juice"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/net/test_net_codec.gd::test_reason_texts_are_ui_ready"
+		},
+		{
+			"errors": [],
+			"ms": 1416,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_dedicated_server_lobby_vote_and_ready"
+		},
+		{
+			"errors": [],
+			"ms": 27427,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_host_lobby_match_and_back_to_lobby"
+		},
+		{
+			"errors": [],
+			"ms": 7949,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_join_errors_and_kick_show_reasons"
+		},
+		{
+			"errors": [],
+			"ms": 25402,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_join_other_process_through_screens"
+		},
+		{
+			"errors": [],
+			"ms": 347,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_lan_tab_lists_sessions_and_asks_for_password"
+		},
+		{
+			"errors": [],
+			"ms": 3187,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_online_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 1094,
+			"ok": true,
+			"test": "res://src/test/net/test_online_ui.gd::test_online_screen_tabs_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/ui/test_fighter_selection.gd::test_fixed_and_invalid_choices_have_stable_fallbacks"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/ui/test_fighter_selection.gd::test_random_is_offered_for_empty_single_and_full_rosters"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/ui/test_fighter_selection.gd::test_random_options_are_unique_and_stay_out_of_playable_ids"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/ui/test_fighter_selection.gd::test_random_resolves_to_a_valid_fighter_and_seed_is_repeatable"
+		},
+		{
+			"errors": [],
+			"ms": 544,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_character_select_sheet_follows_the_combat_style"
+		},
+		{
+			"errors": [],
+			"ms": 438,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_compendium_lists_the_pool_loadouts_and_combat_basics"
+		},
+		{
+			"errors": [],
+			"ms": 682,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_hud_move_cards_hold_charges_stamina_and_denied_flash"
+		},
+		{
+			"errors": [],
+			"ms": 385,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_loadout_screen_validates_and_applies"
+		},
+		{
+			"errors": [],
+			"ms": 85,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_online_mirror_renders_the_same_cards"
+		},
+		{
+			"errors": [],
+			"ms": 543,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_practice_change_moves_applies_live_through_the_pause_menu"
+		},
+		{
+			"errors": [],
+			"ms": 607,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_practice_shortcuts_never_collide_with_the_fighter_layout"
+		},
+		{
+			"errors": [],
+			"ms": 653,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_rebinding_labels_and_controls_reference_explain_both_styles"
+		},
+		{
+			"errors": [],
+			"ms": 139,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_varga_loadout_names_techniques_without_claiming_generic_move_buttons"
+		},
+		{
+			"errors": [],
+			"ms": 408,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_versus_setup_moves_row_opens_the_loadout_and_keeps_the_pick"
+		},
+		{
+			"errors": [],
+			"ms": 1948,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_cannery_boards_fit_and_lessons_reveal_the_final_button"
+		},
+		{
+			"errors": [],
+			"ms": 1915,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_compendium_roster_models_and_all_sections"
+		},
+		{
+			"errors": [],
+			"ms": 396,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_dialog_options_fit_and_are_reachable"
+		},
+		{
+			"errors": [],
+			"ms": 624,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_dropdown_keeps_music_and_rapid_ambience_switches_settle"
+		},
+		{
+			"errors": [],
+			"ms": 1506,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_editor_lock_and_device_layout"
+		},
+		{
+			"errors": [],
+			"ms": 571,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_main_menu_has_no_scroll_and_keeps_submenu"
+		},
+		{
+			"errors": [],
+			"ms": 467,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_resolution_dropdown_and_fps_toggle"
+		},
+		{
+			"errors": [],
+			"ms": 264,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_last_button_and_text_panel_scrolls"
+		},
+		{
+			"errors": [],
+			"ms": 1134,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_middle_cards_in_both_directions"
+		},
+		{
+			"errors": [],
+			"ms": 109,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_all_health_cards_above_subtitles_and_glyph_cooldowns"
+		},
+		{
+			"errors": [],
+			"ms": 167,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_bookie_abandon_targets_new_card_after_loss"
+		},
+		{
+			"errors": [],
+			"ms": 447,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_character_panel_scroll_and_shared_stats_glyphs"
+		},
+		{
+			"errors": [],
+			"ms": 592,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_compendium_custom_arena_actions_require_confirmation"
+		},
+		{
+			"errors": [],
+			"ms": 163,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_crate_foul_line_and_invert_default"
+		},
+		{
+			"errors": [],
+			"ms": 872,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_editor_popup_keeps_controller_focus_and_share_toggles_all_controls"
+		},
+		{
+			"errors": [],
+			"ms": 573,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_editor_unique_default_and_overwrite_confirmation"
+		},
+		{
+			"errors": [],
+			"ms": 4527,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_every_event_has_art_visible_stats_and_accessible_choices"
+		},
+		{
+			"errors": [],
+			"ms": 59,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_jukebox_order_shuffle_repeat_and_independent_contexts"
+		},
+		{
+			"errors": [],
+			"ms": 254,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_jukebox_persists_and_menu_stops_environment"
+		},
+		{
+			"errors": [],
+			"ms": 194,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_jukebox_preview_button_stops_previous_track"
+		},
+		{
+			"errors": [],
+			"ms": 354,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_map_has_scroll_room_no_intro_and_modal_blocks_nodes"
+		},
+		{
+			"errors": [],
+			"ms": 362,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_rules_picker_has_hidden_cancel_and_patch_notes_archive"
+		},
+		{
+			"errors": [],
+			"ms": 818,
+			"ok": true,
+			"test": "res://src/test/ui/test_preview_0915.gd::test_team_setup_compact_cards_fit_and_keep_slot_identity"
+		},
+		{
+			"errors": [],
+			"ms": 300,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_display_changes_confirm_or_roll_back"
+		},
+		{
+			"errors": [],
+			"ms": 164,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_every_visible_setting_is_read_somewhere"
+		},
+		{
+			"errors": [],
+			"ms": 18,
+			"ok": true,
+			"test": "res://src/test/ui/test_settings_wired.gd::test_selected_monitor_persists_across_settings_reload"
+		},
+		{
+			"errors": [],
+			"ms": 300,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_between_rounds_scorecard_and_decision_banner"
+		},
+		{
+			"errors": [],
+			"ms": 3422,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_hud_hides_health_and_shows_round_and_cards_locally"
+		},
+		{
+			"errors": [],
+			"ms": 247,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_hud_on_the_net_mirror_cards_count_and_sudden_death"
+		},
+		{
+			"errors": [],
+			"ms": 8616,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_match_scene_referee_framing_and_ten_point_callouts"
+		},
+		{
+			"errors": [],
+			"ms": 333,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_net_scene_referee_cards_and_decision_from_replicated_data"
+		},
+		{
+			"errors": [],
+			"ms": 1120,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_results_show_method_cards_and_fit"
+		},
+		{
+			"errors": [],
+			"ms": 225,
+			"ok": true,
+			"test": "res://src/test/ui/test_ten_point_ui.gd::test_results_without_scoring_are_unchanged"
+		},
+		{
+			"errors": [],
+			"ms": 4174,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_every_screen_has_focus_and_back"
+		},
+		{
+			"errors": [],
+			"ms": 4549,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_layout_fits_and_text_is_readable"
+		},
+		{
+			"errors": [],
+			"ms": 4756,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_menu_settings_round_trip"
+		},
+		{
+			"errors": [],
+			"ms": 633,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_online_match_does_not_pause"
+		},
+		{
+			"errors": [],
+			"ms": 1333,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_stick_keyboard_mouse_and_prompts"
+		},
+		{
+			"errors": [],
+			"ms": 373,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_text_and_ui_scale_apply_live"
+		},
+		{
+			"errors": [],
+			"ms": 1463,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_text_entry_with_controller"
+		},
+		{
+			"errors": [],
+			"ms": 2758,
+			"ok": true,
+			"test": "res://src/test/ui/test_ui_navigation.gd::test_versus_pause_disconnect_and_quit"
+		},
+		{
+			"errors": [],
+			"ms": 1450,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_build_up_glows_share_the_light_cap"
+		},
+		{
+			"errors": [],
+			"ms": 1817,
+			"ok": true,
+			"test": "res://src/test/vfx/test_ability_vfx.gd::test_build_ups_last_until_the_first_effect"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 165 run, 0 failed, 165 passed, 0 skipped in 516.3 s",
+	"time": "2026-10-21T22:35:04",
+	"total": 165,
+	"version": "0.9.18"
+}

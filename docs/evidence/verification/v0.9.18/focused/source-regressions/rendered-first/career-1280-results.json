@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 2135,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_learn_and_drill_a_move_with_real_input"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 11.5 s",
+	"time": "2026-10-21T22:12:09",
+	"total": 1,
+	"version": "0.9.18"
+}

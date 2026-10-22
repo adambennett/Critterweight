@@ -1,0 +1,65 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 263,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_cannery_boards_fit_and_lessons_reveal_the_final_button"
+		},
+		{
+			"errors": [],
+			"ms": 1103,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_compendium_roster_models_and_all_sections"
+		},
+		{
+			"errors": [],
+			"ms": 27,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_dialog_options_fit_and_are_reachable"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"skipped": "Requires the graphical audio backend",
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_dropdown_keeps_music_and_rapid_ambience_switches_settle"
+		},
+		{
+			"errors": [],
+			"ms": 369,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_editor_lock_and_device_layout"
+		},
+		{
+			"errors": [],
+			"ms": 33,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_main_menu_has_no_scroll_and_keeps_submenu"
+		},
+		{
+			"errors": [],
+			"ms": 107,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_resolution_dropdown_and_fps_toggle"
+		},
+		{
+			"errors": [],
+			"ms": 18,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_last_button_and_text_panel_scrolls"
+		},
+		{
+			"errors": [],
+			"ms": 13,
+			"ok": true,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_middle_cards_in_both_directions"
+		}
+	],
+	"skipped": 1,
+	"summary": "tests: 9 run, 0 failed, 8 passed, 1 skipped in 11.4 s",
+	"time": "2026-10-21T22:07:50",
+	"total": 9,
+	"version": "0.9.18"
+}

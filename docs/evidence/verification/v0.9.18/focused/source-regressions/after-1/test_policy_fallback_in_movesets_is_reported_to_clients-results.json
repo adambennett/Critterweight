@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 3111,
+			"ok": true,
+			"test": "res://src/test/net/test_net_loopback.gd::test_policy_fallback_in_movesets_is_reported_to_clients"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 12.5 s",
+	"time": "2026-10-21T22:07:31",
+	"total": 1,
+	"version": "0.9.18"
+}

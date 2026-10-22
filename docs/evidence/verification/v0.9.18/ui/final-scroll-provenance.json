@@ -1,0 +1,16 @@
+[
+  {
+    "file": "career-drill-move-final-1600.png",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\scroll-rendered-final\\career-1600-frames\\career-drill-move.png",
+    "sha256": "c14cc4899ecfd869dca8e2885287b1d711c2be9792b2d903b91404d4c126a959",
+    "reviewed": true,
+    "description": "Full rendered frame after the focus-scroll repair; selected card heading, description and border are visible."
+  },
+  {
+    "file": "career-drill-move-final-1280.png",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\scroll-rendered-final\\career-1280-frames\\career-drill-move.png",
+    "sha256": "706474f3e65f39bb1c6886cce74cf0529cbabe7f1a866ba515733ddce5687fc5",
+    "reviewed": true,
+    "description": "Full rendered frame after the focus-scroll repair; selected card heading, description and border are visible."
+  }
+]

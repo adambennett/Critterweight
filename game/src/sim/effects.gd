@@ -737,7 +737,7 @@ func _update_projectile(ent: Dictionary, dt: float) -> void:
 			if Vector2(p.x - pr["pos"].x, p.z - pr["pos"].z).length() < float(pr["radius"]) + float(ent["radius"]) and p.y < 1.0:
 				ent["life"] = 0.0
 				_damage_prop(pr, float(ent["e"].get("damage", 4.0)))
-	if sim.hazards is ArenaHazards and float(ent["life"]) > 0.0:
+	if sim.hazards is ArenaHazards and float(ent["life"]) > 0.0 and str(ent["element"]) != "spectral":
 		var hz := sim.hazards as ArenaHazards
 		var bi := hz.blocking_prop(p, float(ent["radius"]))
 		if bi >= 0:

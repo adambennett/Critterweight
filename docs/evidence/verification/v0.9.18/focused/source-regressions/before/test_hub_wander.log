@@ -1,0 +1,22 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 22:00:42 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/source-regressions-before/test_hub_wander
+2026-10-21 22:00:42 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 22:00:42 [INFO] app: Critterweight 0.9.18-dev (Windows x86_64, Godot 4.5.1-stable (official))
+wander f_stoke: 17 legs, 10 reached, 0 timed out, 4 waypoints skipped, 3 rides, visits { "main_floor": 7, "med_bay": 1, "loading_dock": 3, "locker_room": 2, "booth": 1, "pier": 1, "crawlspace": 1, "boiler_room": 1 }, min root y 0.59 at (-1.930114, 0.59321, -13.22556), longest outside 0.00 s, longest down 0.00 s
+wander f_dredge: leg to @pier_down timed out at (-8.240554, 0.55602, -11.25165) [loading_dock]
+  state 0 idx 12/13 next (-7.1, 0.0, -17.8) hold [] carry  act  ludlow (-8.0, 0.0, -12.2) focus npc_ludlow
+  near ["crate@(-7.880012, 0.309994, -9.599953)", "crate@(-7.199987, 0.309977, -9.599962)", "crate@(-6.52, 0.31, -9.599999)", "crate@(-7.880006, 0.929954, -9.39986)", "crate@(-7.199996, 0.929962, -9.399787)", "crate@(-7.879996, 0.309964, -8.899987)"] vel (0.085506, 0.005191, 0.020211) touching ["Floor_yard", "Npc_ludlow"]
+wander f_dredge: 5 legs, 3 reached, 1 timed out, 10 waypoints skipped, 0 rides, visits { "main_floor": 3, "med_bay": 1, "locker_room": 1, "loading_dock": 1 }, min root y 0.39 at (-5.6646, 0.391523, 1.556896), longest outside 0.00 s, longest down 0.00 s
+wander f_dozer: 14 legs, 9 reached, 0 timed out, 2 waypoints skipped, 2 rides, visits { "main_floor": 7, "med_bay": 1, "juice_bar": 1, "crawlspace": 1, "loading_dock": 2, "pier": 1, "roof": 1, "office": 1 }, min root y 0.66 at (-5.128418, 0.655189, -1.320767), longest outside 0.00 s, longest down 0.00 s
+wander f_gusto: 24 legs, 15 reached, 0 timed out, 1 waypoints skipped, 4 rides, visits { "main_floor": 9, "med_bay": 1, "juice_bar": 1, "office": 1, "loading_dock": 3, "boiler_room": 1, "crawlspace": 1, "roof": 1, "locker_room": 2, "booth": 1, "pier": 1 }, min root y 0.98 at (8.264155, 0.975351, 5.357103), longest outside 0.00 s, longest down 0.00 s
+wander f_slurry: 20 legs, 13 reached, 0 timed out, 2 waypoints skipped, 3 rides, visits { "main_floor": 8, "med_bay": 1, "juice_bar": 1, "crawlspace": 1, "loading_dock": 3, "locker_room": 3, "pier": 1, "roof": 1, "booth": 1 }, min root y 0.16 at (10.62234, 0.159881, -2.558272), longest outside 0.00 s, longest down 0.00 s
+wander f_jitters: 24 legs, 15 reached, 0 timed out, 2 waypoints skipped, 4 rides, visits { "main_floor": 9, "med_bay": 1, "crawlspace": 1, "locker_room": 2, "booth": 1, "roof": 1, "office": 1, "boiler_room": 1, "loading_dock": 3, "pier": 1, "juice_bar": 1 }, min root y 0.40 at (0.699877, 0.396225, -9.561426), longest outside 0.00 s, longest down 0.00 s
+FAIL  res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world (62354 ms)
+        res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world: f_dredge: kept getting where it was going (3 legs reached)
+        res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world: f_dredge: rarely blocked (10 waypoints given up on)
+        res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world: f_dredge: took hatches, ladders or the elevator on the way (0)
+        res://src/test/hub/test_hub_wander.gd::test_two_minutes_of_wandering_stays_in_the_world: f_dredge: visited most of the Cannery (4 spaces: ["main_floor", "med_bay", "locker_room", "loading_dock"])
+tests: 1 run, 1 failed, 0 passed, 0 skipped in 71.4 s
+WARNING: Jolt Physics job system exceeded the maximum number of jobs. This should not happen. Please report this. Waiting for jobs to become available...
+   at: CreateJob (modules/jolt_physics/spaces/jolt_job_system.cpp:125)

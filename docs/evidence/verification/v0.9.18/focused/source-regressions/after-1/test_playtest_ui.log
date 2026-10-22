@@ -1,0 +1,15 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 22:07:38 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/source-regressions-after-1/test_playtest_ui
+2026-10-21 22:07:38 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 22:07:38 [INFO] app: Critterweight 0.9.18-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/ui/test_playtest_ui.gd::test_cannery_boards_fit_and_lessons_reveal_the_final_button (263 ms)
+ok    res://src/test/ui/test_playtest_ui.gd::test_compendium_roster_models_and_all_sections (1103 ms)
+ok    res://src/test/ui/test_playtest_ui.gd::test_dialog_options_fit_and_are_reachable (27 ms)
+skip  res://src/test/ui/test_playtest_ui.gd::test_dropdown_keeps_music_and_rapid_ambience_switches_settle (Requires the graphical audio backend)
+ok    res://src/test/ui/test_playtest_ui.gd::test_editor_lock_and_device_layout (369 ms)
+ok    res://src/test/ui/test_playtest_ui.gd::test_main_menu_has_no_scroll_and_keeps_submenu (33 ms)
+ok    res://src/test/ui/test_playtest_ui.gd::test_resolution_dropdown_and_fps_toggle (107 ms)
+ok    res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_last_button_and_text_panel_scrolls (18 ms)
+ok    res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_middle_cards_in_both_directions (13 ms)
+tests: 9 run, 0 failed, 8 passed, 1 skipped in 11.4 s

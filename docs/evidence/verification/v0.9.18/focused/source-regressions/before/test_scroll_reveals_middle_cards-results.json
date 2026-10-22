@@ -1,0 +1,21 @@
+{
+	"failed": 1,
+	"results": [
+		{
+			"errors": [
+				"res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_middle_cards_in_both_directions: card 3 heading and upper focus ring visible: [P: (817.56, -107.4), S: (452.88, 142.8)] in [P: (800.0, 200.0), S: (500.0, 350.0)]",
+				"res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_middle_cards_in_both_directions: card 9 heading and upper focus ring visible: [P: (817.56, 84.59998), S: (452.88, 142.8)] in [P: (800.0, 200.0), S: (500.0, 350.0)]",
+				"res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_middle_cards_in_both_directions: card 7 lower focus ring visible: [P: (817.56, 1046.6), S: (452.88, 142.8)] in [P: (800.0, 200.0), S: (500.0, 350.0)]",
+				"res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_middle_cards_in_both_directions: card 4 heading and upper focus ring visible: [P: (817.56, 16.59998), S: (452.88, 142.8)] in [P: (800.0, 200.0), S: (500.0, 350.0)]"
+			],
+			"ms": 112,
+			"ok": false,
+			"test": "res://src/test/ui/test_playtest_ui.gd::test_scroll_reveals_middle_cards_in_both_directions"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 1 failed, 0 passed, 0 skipped in 9.2 s",
+	"time": "2026-10-21T21:59:56",
+	"total": 1,
+	"version": "0.9.18"
+}

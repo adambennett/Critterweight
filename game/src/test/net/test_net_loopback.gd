@@ -751,7 +751,7 @@ func test_policy_bots_and_rules_validation_inprocess() -> void:
 	var port := _port()
 	var pid := "dev_biped_es_drill"
 	var server := _server(port, {}, [{"rules": "duel", "arena": "the_gullet", "weight": 1, "min_players": 2,
-		"bot_policy": pid, "rules_override": {"rounds": 1, "round_time": 30}}])
+		"bot_policy": pid, "rules_override": {"combat": "classic", "rounds": 1, "round_time": 30}}])
 	var pol := PolicyLibrary.get_policy(pid)
 	check(pol != null, "built-in policy available: %s" % PolicyLibrary.last_error(pid))
 	var a := _client(port, {"name": "Solo"})
@@ -781,6 +781,28 @@ func test_policy_bots_and_rules_validation_inprocess() -> void:
 	var err := server.start_match("broken", bad, "the_gullet", 2, 2, 1, "regular", {})
 	check(err.begins_with("invalid rules"), "invalid rules refused: %s" % err)
 	check(NetProtocol.rules_problem(Content.get_entry("rules", "duel")) == "", "shipped presets validate")
+
+
+## C18-11: an old action-model policy cannot drive Movesets. The dedicated server uses a bot
+## without claiming that the requested network's hash actually produced those decisions.
+func test_policy_fallback_in_movesets_is_reported_to_clients() -> void:
+	var port := _port()
+	var pid := "f_stoke_es_drill"
+	var server := _server(port, {}, [{"rules": "duel", "arena": "the_gullet", "weight": 1, "min_players": 2,
+		"bot_policy": pid, "rules_override": {"rounds": 1, "round_time": 30}}])
+	var a := _client(port, {"name": "Movesets"})
+	if not check(await _until(func() -> bool: return a.state == NetClient.State.LOBBY, 6.0), "admitted"):
+		return
+	a.send_lobby(NetProtocol.LQ_READY, true)
+	if not check(await _until(func() -> bool: return server.sim != null and a.my_fighter >= 0, 15.0), "Movesets match with a bot started"):
+		return
+	var bot := 1 - a.my_fighter
+	check_eq(server.sim.fighters[bot].combat_style, "moves", "the built-in preset stays Movesets")
+	check_eq(server.sim.fighters[bot].creature.id, "f_stoke", "the selected policy's fighter is preserved")
+	check(server.sim.input_sources[bot] is BotBrain, "the authority uses the compatible scripted bot")
+	var listed: Array = a.match_info.get("policies", [])
+	check(listed.size() == 1 and str(listed[0].get("id", "")) == pid, "the requested policy is identified")
+	check(listed.size() == 1 and str(listed[0].get("hash", "not-empty")) == "", "an unused Classic policy is advertised as unavailable, without its hash")
 
 
 ## MOD-05 authority: the server repeats the content check on hello, so a client that lies about

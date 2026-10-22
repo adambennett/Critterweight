@@ -8,6 +8,10 @@ The 112-bout comparison exposed a bot readiness defect; its correction reduced d
 by 87.8% in a 56-bout repeat. Matched performance and its longer 1080p confirmation are retained
 with frame-time limitations. The integrated suite, packages and publication
 remain separate gates; this paragraph does not claim that v0.9.18 is released.
+The second integrated attempt completed 1,122 checks with three failures and one expected
+graphical-audio skip; its ten-minute soak passed. The report retains those failures and the
+focused cover, policy, walking-driver and focus-navigation repairs. Final clean verification
+must run again from the committed repairs.
 
 **v0.9.17 released and verified, 2026-10-21.** The [release report](evidence/verification/v0.9.17/README.md)
 records the exact clean release commit `e287028`, 925 source checks (924 passed, one expected

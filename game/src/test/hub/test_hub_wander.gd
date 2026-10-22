@@ -20,7 +20,7 @@ func _space_of_nav(n: String) -> String:
 
 ## Picks the next leg: {target, points}. Mostly heads for the least-visited place it can reach (a
 ## space on foot, or a hatch/ladder/elevator ride), sometimes just strolls inside the current space.
-func _plan(rng: RandomNumberGenerator, visits: Dictionary) -> Dictionary:
+func _plan(rng: RandomNumberGenerator, visits: Dictionary, need_ride := false) -> Dictionary:
 	var from := HubLayout.nearest_nav(player().pos())
 	var here := mode.current_space
 	var by_space := {}
@@ -41,7 +41,14 @@ func _plan(rng: RandomNumberGenerator, visits: Dictionary) -> Dictionary:
 			continue
 		if by_space.has(_space_of_nav(HubLayout.nearest_nav(tr["from"]))) and not HubLayout.nav_path(from, HubLayout.nearest_nav(tr["from"])).is_empty():
 			options.append({"ride": str(tid), "visits": int(visits.get(str(tr["dest"]), 0))})
-	if options.is_empty() or (by_space.has(here) and rng.randf() < 0.2):
+	# The test requires transport coverage, so spend the second half deliberately reaching it
+	# if random strolling has not done so. Keep the same duration and all movement/safety limits.
+	if need_ride:
+		var transports := options.filter(func(o: Dictionary) -> bool:
+			return o.has("ride") and str(HubLayout.TRANSITIONS[str(o["ride"])]["dest"]) in ["boiler_room", "booth", "roof", "pier"])
+		if not transports.is_empty():
+			options = transports
+	if options.is_empty() or (not need_ride and by_space.has(here) and rng.randf() < 0.2):
 		var inside: Array = by_space.get(here, by_space.values()[0])
 		var stroll := str(inside[rng.randi() % inside.size()])
 		return {"target": stroll, "points": HubLayout.nav_path(from, stroll).map(func(n): return HubLayout.NAV[n])}
@@ -77,6 +84,19 @@ func test_two_minutes_of_wandering_stays_in_the_world() -> void:
 		if only != "" and fid != only:
 			continue
 		await _wander(str(fid))
+
+
+func test_wander_planner_reaches_transport_when_coverage_is_due() -> void:
+	make_hub()
+	var rng := RandomNumberGenerator.new()
+	for seed_value in range(1, 13):
+		rng.seed = seed_value
+		var leg := _plan(rng, {}, true)
+		var target := str(leg["target"])
+		check(target.begins_with("@"), "required coverage chooses a transport route (seed %d)" % seed_value)
+		if target.begins_with("@"):
+			var destination := str(HubLayout.TRANSITIONS[target.substr(1)]["dest"])
+			check(destination in ["boiler_room", "booth", "roof", "pier"], "the route reaches a transport-only space")
 
 
 ## Diagnostics: level geometry / props within reach of the fighter's body.
@@ -169,7 +189,7 @@ func _wander(fighter: String) -> void:
 				target = "~"
 				settle = 0.0
 			else:
-				var leg := _plan(rng, visits)
+				var leg := _plan(rng, visits, rides < 2 and t >= DURATION * 0.5)
 				driver.set_path(leg["points"])
 				target = str(leg["target"])
 				# time allowed: the walk at a slow 1 m/s (guarding, attacks and big slow bodies) plus slack

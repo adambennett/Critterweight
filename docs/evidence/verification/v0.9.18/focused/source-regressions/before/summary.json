@@ -1,0 +1,30 @@
+﻿[
+    {
+        "filter":  "test_type_traits",
+        "exit_code":  1,
+        "total":  3,
+        "failed":  1,
+        "summary":  "tests: 3 run, 1 failed, 2 passed, 0 skipped in 12.2 s"
+    },
+    {
+        "filter":  "test_scroll_reveals_middle_cards",
+        "exit_code":  1,
+        "total":  1,
+        "failed":  1,
+        "summary":  "tests: 1 run, 1 failed, 0 passed, 0 skipped in 9.2 s"
+    },
+    {
+        "filter":  "test_learn_and_drill_a_move_with_real_input",
+        "exit_code":  0,
+        "total":  1,
+        "failed":  0,
+        "summary":  "tests: 1 run, 0 failed, 1 passed, 0 skipped in 9.5 s"
+    },
+    {
+        "filter":  "test_hub_wander",
+        "exit_code":  1,
+        "total":  1,
+        "failed":  1,
+        "summary":  "tests: 1 run, 1 failed, 0 passed, 0 skipped in 71.4 s"
+    }
+]
