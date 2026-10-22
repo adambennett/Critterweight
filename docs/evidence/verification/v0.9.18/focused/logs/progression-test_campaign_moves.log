@@ -1,0 +1,24 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 18:55:09 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/progression-test_campaign_moves
+2026-10-21 18:55:10 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 18:55:10 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/campaign/test_campaign_moves.gd::test_autopilot_learns_drills_and_equips_sensibly (106 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_drill_picks_and_claim_routing (110 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_elite_and_boss_wins_bring_a_move_tutor (284 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_equip_is_a_logged_decision_with_loadout_rules (148 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_fight_camp_sparring_partner_and_film_study (219 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_fights_bring_the_equipped_moves_as_drilled (125 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_new_runs_learn_both_loadouts_and_equip_the_default (209 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_rest_learn_and_drill_are_logged_decisions (431 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_scripts_with_moves_screens_compile (487 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_the_rest_stop_event_teaches_a_move (98 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_the_shop_sells_a_move_scroll (256 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_v0_saves_migrate_through_v1 (67 ms)
+ok    res://src/test/campaign/test_campaign_moves.gd::test_v1_runs_migrate_and_keep_their_log (367 ms)
+tests: 13 run, 0 failed, 13 passed, 0 skipped in 11.5 s
+SCRIPT ERROR: Invalid access to property or key 'classic' on a base object of type 'Dictionary'.
+   at: test_new_runs_learn_both_loadouts_and_equip_the_default (res://src/test/campaign/test_campaign_moves.gd:96)
+   GDScript backtrace (most recent call first):
+       [0] test_new_runs_learn_both_loadouts_and_equip_the_default (res://src/test/campaign/test_campaign_moves.gd:96)
+       [1] run (res://src/test/test_runner.gd:43)

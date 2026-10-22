@@ -1,0 +1,38 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 19:12:19 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/moves-loopback
+2026-10-21 19:12:20 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 19:12:20 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+2026-10-21 19:12:27 [INFO] net: dedicated server 'Moves integration' listening on UDP *:47818 (protocol 7, game 0.9.17, content ca9a54ae374c)
+2026-10-21 19:12:27 [INFO] net: connecting to 127.0.0.1:47818
+2026-10-21 19:12:27 [INFO] net: connecting to 127.0.0.1:47818
+2026-10-21 19:12:27 [INFO] net: player 2 'f_stoke' joined from 127.0.0.1
+2026-10-21 19:12:27 [INFO] net: player 3 'f_varga' joined from 127.0.0.1
+2026-10-21 19:12:27 [INFO] net: joined 'Moves integration' as player 2
+2026-10-21 19:12:27 [INFO] net: joined 'Moves integration' as player 3
+2026-10-21 19:12:30 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-21 19:12:30 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-21 19:12:30 [INFO] net: server closing (server_shutdown)
+2026-10-21 19:12:30 [INFO] net: server closed (server_shutdown)
+ok    res://src/test/net/test_net_moves.gd::test_classic_rule_survives_the_same_loopback_setup (3154 ms)
+2026-10-21 19:12:30 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-21 19:12:30 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-21 19:12:30 [INFO] net: dedicated server 'Moves integration' listening on UDP *:47808 (protocol 7, game 0.9.17, content ca9a54ae374c)
+2026-10-21 19:12:30 [INFO] net: connecting to 127.0.0.1:47808
+2026-10-21 19:12:30 [INFO] net: connecting to 127.0.0.1:47808
+2026-10-21 19:12:30 [INFO] net: player 2 'f_stoke' joined from 127.0.0.1
+2026-10-21 19:12:30 [INFO] net: player 3 'f_varga' joined from 127.0.0.1
+2026-10-21 19:12:30 [INFO] net: joined 'Moves integration' as player 2
+2026-10-21 19:12:30 [INFO] net: joined 'Moves integration' as player 3
+2026-10-21 19:12:33 [INFO] net: playlist pick: duel@the_gullet (no votes: highest weight)
+2026-10-21 19:12:33 [INFO] net: match 1 started: duel on the_gullet, 2 fighters (2 humans, 0 bots)
+2026-10-21 19:12:42 [INFO] net: server closing (server_shutdown)
+2026-10-21 19:12:42 [INFO] net: server closed (server_shutdown)
+FAIL  res://src/test/net/test_net_moves.gd::test_custom_loadouts_streams_and_martial_inputs_over_loopback (11426 ms)
+        res://src/test/net/test_net_moves.gd::test_custom_loadouts_streams_and_martial_inputs_over_loopback: the actual modifier-plus-limb input selects the equipped Force Palm and replicates its effect
+2026-10-21 19:12:42 [INFO] net: client closed: server_shutdown - The server shut down.
+2026-10-21 19:12:42 [INFO] net: client closed: server_shutdown - The server shut down.
+ok    res://src/test/net/test_net_moves.gd::test_loadout_requests_are_cleaned (0 ms)
+ok    res://src/test/net/test_net_moves.gd::test_roster_carries_combat_style_and_loadout (0 ms)
+ok    res://src/test/net/test_net_moves.gd::test_snapshot_carries_charges_and_the_mirror_shows_the_loadout (27 ms)
+tests: 5 run, 1 failed, 4 passed, 0 skipped in 24.0 s

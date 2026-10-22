@@ -1,0 +1,3 @@
+# Raw diagnostic output and hashed records retain their captured bytes.
+*.log -text -whitespace
+*.json -text -whitespace

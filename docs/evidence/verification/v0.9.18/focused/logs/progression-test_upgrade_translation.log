@@ -1,0 +1,37 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 18:55:28 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/progression-test_upgrade_translation
+2026-10-21 18:55:28 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 18:55:28 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/campaign/test_upgrade_translation.gd::test_additive_damage_on_a_stream_becomes_a_multiplier (1 ms)
+upgrade translation lint: 2212 checks, 1054 fighter-wide, 10 not offered: sup_flavor_pack_grit (f_dozer, Classic), sup_projectile_polish (f_dozer, Classic), sup_flavor_pack_brine (f_dredge, Movesets), sup_flavor_pack_brine (f_dredge, Classic), sup_flavor_pack_static (f_jitters, Movesets), sup_flavor_pack_static (f_jitters, Movesets), sup_flavor_pack_static (f_jitters, Classic), sup_flavor_pack_scorch (f_stoke, Movesets), sup_flavor_pack_scorch (f_stoke, Classic), sup_projectile_polish (f_stoke, Classic)
+FAIL  res://src/test/campaign/test_upgrade_translation.gd::test_every_upgrade_reaches_each_recommended_loadout_and_the_classic_kit (4316 ms)
+        res://src/test/campaign/test_upgrade_translation.gd::test_every_upgrade_reaches_each_recommended_loadout_and_the_classic_kit: 20 upgrades miss a loadout:
+technique tech_dozer_quarry_legs reaches no move of f_dozer's bulldozer loadout in Movesets (it changes: horn_lunge)
+technique tech_dozer_quarry_legs reaches no move of f_dozer's quarry loadout in Movesets (it changes: horn_lunge)
+supplement sup_projectile_polish reaches no move of f_dozer's bulldozer loadout in Movesets (it changes: boulder_toss)
+event evt_headlamp.battery#0.run_patches reaches no move of f_dozer's quarry loadout in Movesets (it changes: bulldoze)
+technique tech_dredge_molting_season reaches no move of f_dredge's breakwater loadout in Movesets (it changes: anchor_drop)
+technique tech_dredge_undertow reaches no move of f_dredge's tidecaller loadout in Movesets (it changes: crusher_slam, tide_spit)
+supplement sup_projectile_polish reaches no move of f_dredge's breakwater loadout in Movesets (it changes: tide_spit, bubble_stream)
+event evt_molting.hold#0.next_fight reaches no move of f_dredge's breakwater loadout in Movesets (it changes: anchor_drop)
+technique tech_gusto_tailwind reaches no move of f_gusto's skyhook loadout in Movesets (it changes: gust_bomb)
+technique tech_jitters_bouncy_castle reaches no move of f_jitters's overload loadout in Movesets (it changes: spring_pad)
+technique tech_jitters_short_fuse reaches no move of f_jitters's overload loadout in Movesets (it changes: arc_lash)
+technique tech_knell_echo reaches no move of f_knell's undertow loadout in Movesets (it changes: through_the_veil)
+technique tech_knell_glow reaches no move of f_knell's undertow loadout in Movesets (it changes: ghost_light)
+technique tech_knell_seam reaches no move of f_knell's undertow loadout in Movesets (it changes: through_the_veil)
+technique tech_knell_wick reaches no move of f_knell's undertow loadout in Movesets (it changes: ghost_light)
+technique tech_slurry_double_dip reaches no move of f_slurry's swamp loadout in Movesets (it changes: sludge_lob, drain_dive)
+technique tech_slurry_grease_trap reaches no move of f_slurry's swamp loadout in Movesets (it changes: tail_sweep, sludge_lob)
+supplement sup_flavor_pack_sludge reaches no move of f_slurry's venomous loadout in Movesets (it changes: tail_sweep)
+supplement sup_flavor_pack_sludge reaches no move of f_slurry's swamp loadout in Movesets (it changes: tail_sweep)
+event evt_drain_backup.clear#0.run_patches reaches no move of f_slurry's swamp loadout in Movesets (it changes: drain_dive)
+ok    res://src/test/campaign/test_upgrade_translation.gd::test_heavy_upgrades_fall_back_to_the_finisher_without_a_heavy_move (77 ms)
+ok    res://src/test/campaign/test_upgrade_translation.gd::test_hook_slot_conditions_match_pool_moves (113 ms)
+ok    res://src/test/campaign/test_upgrade_translation.gd::test_movesets_effects_and_string_translation (73 ms)
+ok    res://src/test/campaign/test_upgrade_translation.gd::test_multipliers_reach_inline_moves_once (70 ms)
+FAIL  res://src/test/campaign/test_upgrade_translation.gd::test_texts_and_offer_weights_follow_the_loadout (75 ms)
+        res://src/test/campaign/test_upgrade_translation.gd::test_texts_and_offer_weights_follow_the_loadout: Projectile Polish is never offered to a fighter without projectiles or streams expected 0.0000 ± 0.0001, got 0.6000
+ok    res://src/test/campaign/test_upgrade_translation.gd::test_translated_builds_stay_valid_fighters (408 ms)
+tests: 8 run, 2 failed, 6 passed, 0 skipped in 14.1 s

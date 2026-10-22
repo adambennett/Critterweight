@@ -1,0 +1,27 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 19:07:46 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/visual-fixed-test_tutorial_movesets
+2026-10-21 19:07:47 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 19:07:47 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+    tut_m_string with f_stoke ["flamethrower", "ember_jab", "cinder_shot", "fire_spin"]: success after 3.25 s
+ok    res://src/test/core/test_tutorial_movesets.gd::test_basic_string_on_a_custom_input (290 ms)
+    tut_m_string with f_stoke ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]: success after 3.25 s
+ok    res://src/test/core/test_tutorial_movesets.gd::test_basic_string_to_its_finisher (279 ms)
+ok    res://src/test/core/test_tutorial_movesets.gd::test_charge_move_tapped_then_charged (3898 ms)
+ok    res://src/test/core/test_tutorial_movesets.gd::test_courses_and_who_takes_them (432 ms)
+    tut_m_dodge with f_stoke ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]: success after 5.00 s
+ok    res://src/test/core/test_tutorial_movesets.gd::test_dodge_then_the_basics_dash_strike (673 ms)
+    tut_footwork with f_stoke ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]: success after 6.00 s
+    tut_guard with f_stoke ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]: success after 4.50 s
+ok    res://src/test/core/test_tutorial_movesets.gd::test_footwork_and_guard_in_the_moves_course (3298 ms)
+    tut_m_grapple with f_stoke ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]: success after 1.00 s
+ok    res://src/test/core/test_tutorial_movesets.gd::test_grapple_and_throw_through_guard (128 ms)
+ok    res://src/test/core/test_tutorial_movesets.gd::test_lessons_the_loadout_lacks_are_skipped_with_a_note (77 ms)
+ok    res://src/test/core/test_tutorial_movesets.gd::test_lines_name_the_equipped_moves_and_their_inputs (334 ms)
+    tut_m_special with f_stoke ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]: success after 0.75 s
+ok    res://src/test/core/test_tutorial_movesets.gd::test_special_connects_and_only_its_own_hits_count (486 ms)
+    tut_m_sustain with f_stoke ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]: success after 3.75 s
+ok    res://src/test/core/test_tutorial_movesets.gd::test_sustained_move_held_and_steered (1032 ms)
+    tut_m_ultimate with f_stoke ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]: success after 14.50 s
+ok    res://src/test/core/test_tutorial_movesets.gd::test_ultimate_after_filling_hype (1897 ms)
+tests: 12 run, 0 failed, 12 passed, 0 skipped in 27.8 s

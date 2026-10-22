@@ -1,0 +1,19 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 18:58:36 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/progression-test_hub_services
+2026-10-21 18:58:36 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 18:58:36 [INFO] app: Critterweight 0.9.17-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/hub/test_hub_services.gd::test_boiler_room_key_trains_against_saved_builds (600 ms)
+2026-10-21 18:58:42 [INFO] hub: sim build ms: 5
+2026-10-21 18:58:42 [INFO] hub: view build ms: structure 9 dressing 40 commit 3 water+npcs 113 props+upgrades 21 ambient 52; batch verts 35052
+2026-10-21 18:58:43 [INFO] hub: sim build ms: 5
+2026-10-21 18:58:43 [INFO] hub: view build ms: structure 8 dressing 32 commit 2 water+npcs 15 props+upgrades 19 ambient 10; batch verts 35052
+ok    res://src/test/hub/test_hub_services.gd::test_bookie_table_and_lab_terminal_for_real (1322 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_every_station_lists_its_upgrades (6 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_injected_backend_is_used (5 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_purchase_flow_spends_clout_and_respects_gates (5 ms)
+2026-10-21 18:58:43 [INFO] hub: view build ms: structure 8 dressing 33 commit 2 water+npcs 14 props+upgrades 19 ambient 9; batch verts 35052
+ok    res://src/test/hub/test_hub_services.gd::test_purchases_change_the_world (96 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_snappington_run_options_and_config (5 ms)
+ok    res://src/test/hub/test_hub_services.gd::test_start_run_hands_over_to_the_campaign (248 ms)
+tests: 8 run, 0 failed, 8 passed, 0 skipped in 11.0 s
