@@ -125,6 +125,13 @@ The retained retake selections comprise ten commentary and thirteen tutorial rep
 
 ## Remaining gates
 
+The first clean integrated attempt (`6dccf14`, `source-attempt-1/`) was stopped after finding two
+failures. The loadout screen requested the nonexistent `ui_confirm`; it now uses `ui_accept`.
+The stream-audio test incorrectly included `line:` commentary actions in its impact count. It now
+counts sound IDs only, requires exactly one impact across eight rapid ticks, and additionally checks
+independent per-target cooldowns and audible recovery after the interval. Commentary still receives
+every event; no playback was removed to satisfy that test. A fresh full run follows these repairs.
+
 Finish the full integrated suite and ten-minute soak, four-target packages and packaged checks, and publication/
 download verification. Exact final commits and raw results will be recorded here. No physical-
 controller, human listening/playtesting, Deck, Linux runtime or external-network claim is made.

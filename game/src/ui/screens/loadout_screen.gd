@@ -190,7 +190,7 @@ func _apply_preset(key: String) -> void:
 		var row := focused as OptionRow
 		_help.show_help(row.help_title, row.help_text)
 	_validate()
-	Audio.sfx("ui_confirm")
+	Audio.sfx("ui_accept")
 
 
 ## The loadout the rows currently describe (empty slots dropped).
