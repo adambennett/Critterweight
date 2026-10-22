@@ -1,0 +1,22 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 186,
+			"ok": true,
+			"test": "res://src/test/core/test_bench_effect_bursts.gd::test_stress_driver_holds_a_stream_after_bot_input"
+		},
+		{
+			"errors": [],
+			"ms": 84,
+			"ok": true,
+			"test": "res://src/test/core/test_bench_effect_bursts.gd::test_stress_driver_keeps_classic_ability_buttons"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 2 run, 0 failed, 2 passed, 0 skipped in 9.4 s",
+	"time": "2026-10-21T19:40:36",
+	"total": 2,
+	"version": "0.9.17"
+}

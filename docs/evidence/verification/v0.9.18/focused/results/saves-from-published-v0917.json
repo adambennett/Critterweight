@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 191,
+			"ok": true,
+			"test": "res://src/test/campaign/test_zz_save_fixture_writer.gd::test_zz_write_save_fixtures"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 4.5 s",
+	"time": "2026-10-21T19:17:04",
+	"total": 1,
+	"version": "0.9.17"
+}

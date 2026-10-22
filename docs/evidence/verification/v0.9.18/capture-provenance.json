@@ -1,0 +1,1434 @@
+[
+  {
+    "sheet": "stoke.jpg",
+    "move": "cinder_shot",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_cinder_shot_1_contact.png",
+    "sha256": "7f644d101b4cee013f9f7019ca3a9b89310680e402af6d091ff9f6f29d793831"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "cinder_shot",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_cinder_shot_2_motion.png",
+    "sha256": "06fb85f14bec923c3fdf8a79ff02526da725d210c0cd37cf18e2ba46c9963052"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "cinder_shot",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_cinder_shot_3_after.png",
+    "sha256": "bd8d680e2a7e105630cb87ecffe61ff7a0e27694b5f2762e30ca074dbb3654a8"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "fire_spin",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_fire_spin_1_contact.png",
+    "sha256": "971f2696371a6a0e0e8815a6d614b9d2885ac1525a3f013f72a0fd0d73054980"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "fire_spin",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_fire_spin_2_motion.png",
+    "sha256": "6c420e0d1457647768726bc7a7e67ada6f21508c66aac6b534b40e3cae5d67d7"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "fire_spin",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_fire_spin_3_after.png",
+    "sha256": "0618da85ed639bfc021050e2a943134f0f6a55ab8bab473a078aa2ceb5ae8043"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "flamethrower",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_stoke_flamethrower_1_pour.png",
+    "sha256": "c320dbcfeb4b1ed55caf74e80506771a177b3874ece1c7d9817047da226471b3"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "flamethrower",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_stoke_flamethrower_2_pour2.png",
+    "sha256": "1475febed4b4a1ece411ac1d872d941ad79b4839db8ad572a5dc38f037ad2a36"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "flamethrower",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_stoke_flamethrower_3_swept.png",
+    "sha256": "828159e81bb08c1497cd3c620b7f2e504b1dcff54f3cb8be02d633699cf504db"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "flare_rush",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_flare_rush_1_contact.png",
+    "sha256": "336efcfbb1ad8ae0fbd6acdc473e05101e1b7c4ead41f5a6ce0de8fca6d81600"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "flare_rush",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_flare_rush_2_motion.png",
+    "sha256": "7e439f448eba007dcb5122c3e20c2bffef2dc22e3109c20a22bd33f4e64b6ce6"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "flare_rush",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_flare_rush_3_after.png",
+    "sha256": "60cddc90a9b959a7a848059c64990bcc6f3d6b428689da5ab0efe5bc54ed0c03"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "furnace_haymaker",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_furnace_haymaker_1_release.png",
+    "sha256": "a0a99bfc76c2352656c6c9fd52fb96cd240356c476df9b130c70a5e44ab05da8"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "furnace_haymaker",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_furnace_haymaker_2_contact.png",
+    "sha256": "a539ba181243b902fda60f67dcc0a442731b0876a9bc1862f9608c71b057e09b"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "furnace_haymaker",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_furnace_haymaker_3_after.png",
+    "sha256": "493cb447b5c663f650b324bf112c3d891cf7a0af3f9bba281042bfc967d3773a"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "steam_vent",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_steam_vent_1_contact.png",
+    "sha256": "1efdd652c282153f553fce4d5afdb88674fe9115f1d27ff9acf2edd8e936b5ac"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "steam_vent",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_steam_vent_2_motion.png",
+    "sha256": "e548a25b43b32f48b7c1f6b7d1274d36524f42bf19f04775e82517ed5c348422"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "steam_vent",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_steam_vent_3_after.png",
+    "sha256": "9d481eee50bb673238829e8f212a12da3bd294d75e9b9e4069225184d841360c"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "stoke_the_fire",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_stoke_the_fire_1_contact.png",
+    "sha256": "3e97879f1602d7f5276581b28c7f9e5bce9382ce857e9214adc6216f61af7b4d"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "stoke_the_fire",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_stoke_the_fire_2_motion.png",
+    "sha256": "d69d8bf35b9e868c0b46a58e2dff9efac28db2acce70c62cb35bff3df3a6543f"
+  },
+  {
+    "sheet": "stoke.jpg",
+    "move": "stoke_the_fire",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_stoke_stoke_the_fire_3_after.png",
+    "sha256": "668d0ba816e483c71243b0f233b287747e07c94feb2f9bf3a83676473567e2f3"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "anchor_drop",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_anchor_drop_1_contact.png",
+    "sha256": "92656e6218de4963df3ee3af9f790d3707a0adb3b6aeaf5e7a99a77848d96ea5"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "anchor_drop",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_anchor_drop_2_motion.png",
+    "sha256": "0b36d1d97ee48040727918046606984f3868efbc3ed2c8b916e0c8d1f31c1525"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "anchor_drop",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_anchor_drop_3_after.png",
+    "sha256": "52e0b1c167766e05493ee48aa1fc2196bff0bc0eae0f01a587bb5a4d6d948f13"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "bubble_stream",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_bubble_stream_1_pour.png",
+    "sha256": "e3ba0b3a2fd645fb61f5b022c8b0269c4e5cac40b15fdcbc2699863c98762c44"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "bubble_stream",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_bubble_stream_2_pour2.png",
+    "sha256": "8262f21effbfd7586b92e8d742862eeb5ec2be88b35719ce6538b82283c0d430"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "bubble_stream",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_bubble_stream_3_swept.png",
+    "sha256": "74aa1c87a58e9d7a010ad5a653c0c34d263ec7934d45a90ec16ae86f3e5e3129"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "crusher_slam",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_crusher_slam_1_release.png",
+    "sha256": "4919a474e513237a5ef226a32b99169c61b79d24f1e544f0f62223bd1d35bd4d"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "crusher_slam",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_crusher_slam_2_contact.png",
+    "sha256": "aa1c1b4ddaab57e15fd82e4447cd2983da89583b3b4451abe405ab1d6aa3bb3f"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "crusher_slam",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_crusher_slam_3_after.png",
+    "sha256": "f0accd5515c654c568d2ef811f704277a0e1748760d48b9b45efb725376a23bf"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "hydro_cannon",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_hydro_cannon_1_release.png",
+    "sha256": "a2ebece3a98fc4d64c609c403c2bca54147b619130697e96cea64e830a6d561f"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "hydro_cannon",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_hydro_cannon_2_contact.png",
+    "sha256": "5d4e8f76bc36370ec660cebfc7df9ecd7d37cb84382cca2a9010b3750bb5186b"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "hydro_cannon",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_hydro_cannon_3_after.png",
+    "sha256": "cedf20b3074b51f924c2593edede455513ff95b5f054b4bea39b4c466ebd7b98"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "shell_brace",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_shell_brace_1_contact.png",
+    "sha256": "1217daf2edf533e9a86e7d53b5652fdb53b68dfdb215e69581907562ebc4fb40"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "shell_brace",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_shell_brace_2_motion.png",
+    "sha256": "ecde3c329544cb0a6d348ee4ec4e4f498f3c7211ba0a6fa0edf26aadd53ce489"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "shell_brace",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_shell_brace_3_after.png",
+    "sha256": "852db602a41ea7794b62e27ee9363c524f182184a37bb1cf1ffc34bafe9a9922"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "tide_spit",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_tide_spit_1_contact.png",
+    "sha256": "7b2eb3cd06432a49e408328acba996bccd67f3ca8f55dca6c4d8b8f2a5574e6f"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "tide_spit",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_tide_spit_2_motion.png",
+    "sha256": "0c40616edd0c73265f6bb285a9db1f21486d7844fafc573ab8cd628bc5da74dc"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "tide_spit",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_tide_spit_3_after.png",
+    "sha256": "d807e68c281db282fb04f9d16f65b281bc93a56366c2dd2146c7abed1786547c"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "whirlpool",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_whirlpool_1_contact.png",
+    "sha256": "ea3ba1c144876b58be84c3e1ea50b18b143a6c1e30719244d4a12eb99879946a"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "whirlpool",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_whirlpool_2_motion.png",
+    "sha256": "3ab3cfe2c06ddfd3d2d4d189d04183d382ddff140216c721255ceb3e4eca0185"
+  },
+  {
+    "sheet": "dredge.jpg",
+    "move": "whirlpool",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dredge_whirlpool_3_after.png",
+    "sha256": "179dc16423b5f8bec7b8fff857dabbbf35641988ae734ce2116007995b378d0f"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "air_slash",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_air_slash_1_contact.png",
+    "sha256": "0f39890774fd2d88f94b507dec764efa1ca6ed793673ef311d0a09f9d5b75b17"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "air_slash",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_air_slash_2_motion.png",
+    "sha256": "127d8454b4edff8b355bb00190e8a61947c341d5e05dff5fa31c581224617eb8"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "air_slash",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_air_slash_3_after.png",
+    "sha256": "f3e392ff3aed811d8f131ca55db51fea523665eef4d8af62271b847d2dae0092"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "crosswind_slash",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_crosswind_slash_1_release.png",
+    "sha256": "91dd4f96d23ff563e9967b3b55ab88f8d8c8a721e6225eb41a82e8b6de00a9ec"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "crosswind_slash",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_crosswind_slash_2_contact.png",
+    "sha256": "65df355798779295c0039f736d4ae0766cb04ee2fa046ab00544f4781d776c33"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "crosswind_slash",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_crosswind_slash_3_after.png",
+    "sha256": "7b18e8386d73abc38e698f23f4009bc5adcaa1aa3db1f30cb85c1362ca1405be"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "feather_darts",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_feather_darts_1_contact.png",
+    "sha256": "1d29dc0ca16f8f29b4a0218946444e9e66c0aa29b08e8ad68e4c43a5072e4415"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "feather_darts",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_feather_darts_2_motion.png",
+    "sha256": "a184d95c70d5aa5c72d862b47bb1d240191fc47f84fb5eddcf59a5430478bbad"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "feather_darts",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_feather_darts_3_after.png",
+    "sha256": "b0b8ab8797c73f8e94ae87a4b0a57b1bfe31e0ec919ccebfd90ca9f50fcf92c0"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "gust_bomb",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_gust_bomb_1_contact.png",
+    "sha256": "95e623a4adb676166e67cc3ea31973b4d2b8bd3567a89314fd99af6a10c81d4d"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "gust_bomb",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_gust_bomb_2_motion.png",
+    "sha256": "b3f087b862221269e3d5dda50edac5de6448453eb537c03f68b079c1f4103cd1"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "gust_bomb",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_gust_bomb_3_after.png",
+    "sha256": "a2b5edea7e44deac4531375b5ac70e0b8f8873a4029f9d4557f9cbd7c5453556"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "hang_time",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_hang_time_1_contact.png",
+    "sha256": "1a67dfe20b68040bec795985b9f337b3bf6ad96d6703dfaf3b542fd2dd0cecc7"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "hang_time",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_hang_time_2_motion.png",
+    "sha256": "688c7d0ce6b755a8222a5da0fe28ce6d6ebed7f84452af120feb1d010f71b76b"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "hang_time",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_hang_time_3_after.png",
+    "sha256": "e77fc1f3b615fbfc037472f53eee26d13ba5b10d7d817dd298f79c140029a183"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "tailwind",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_tailwind_1_contact.png",
+    "sha256": "baf3685135a34b34c87a131aed3c396e5a29078714747baf8c2338ff83d0fb74"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "tailwind",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_tailwind_2_motion.png",
+    "sha256": "c53181178a07f4a32f64f7425b20efc3d148f68189abbf01502fae0bd3d8c034"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "tailwind",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_tailwind_3_after.png",
+    "sha256": "111f429aa790cf1e37e86bc5e7bbdb9f0d1468cea4810376f3700988252fb910"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "twister",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_twister_1_contact.png",
+    "sha256": "a101b6847ddf929cfdbfac8079537da6288bbd7e06ef009809d9ef1f3cd36a2c"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "twister",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_twister_2_motion.png",
+    "sha256": "a8914bd43158c1c76d56a823c13751e066bfdea9e867ad16653bd5df06d69c7f"
+  },
+  {
+    "sheet": "gusto.jpg",
+    "move": "twister",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_gusto_twister_3_after.png",
+    "sha256": "b237e364d92b79bb19cf369011a0f9720a8c904a450bb7eaddcc16b75c7f5985"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "boulder_toss",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_boulder_toss_1_contact.png",
+    "sha256": "7970ad585674d410a22ca84ad82d9473d6761663f416c7b4ca4f4c0d19b92910"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "boulder_toss",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_boulder_toss_2_motion.png",
+    "sha256": "36ccf9b2eac8140e94902db67005ad0621130c3c608d95ea8eb9fee65056b21e"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "boulder_toss",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_boulder_toss_3_after.png",
+    "sha256": "a50b1e9728b0e65f4136326cf7907f3da3a8e554a002717dbd41a81bb87127a2"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "bulldoze",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_bulldoze_1_contact.png",
+    "sha256": "cf3fd586c48ef4e01b87cbe56dae84f29a4b146d6ad10bcca2135a9728cbc634"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "bulldoze",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_bulldoze_2_motion.png",
+    "sha256": "95b38c2fad69086c57661f97f30212df7cf0715adf2c80a6e4af4bb53f80673c"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "bulldoze",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_bulldoze_3_after.png",
+    "sha256": "dc69df223b0a66c359a7628b8fc1ff3f936c75c424487ce351b1a8b86246a1fa"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "dust_bowl",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_dust_bowl_1_contact.png",
+    "sha256": "9e4f4cbd85871928e1f18bc8663ea5b6e6aafb1d72179f3b84e91333d9336f3e"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "dust_bowl",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_dust_bowl_2_motion.png",
+    "sha256": "b151e3e5e4502d1c6821efe38c01856df9fce691a7257230ff34d7f7fd85a225"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "dust_bowl",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_dust_bowl_3_after.png",
+    "sha256": "f27971f445407c9d045556b24532728aa441ee0ddfcacc5d13bdd820ce5ba8f4"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "horn_lunge",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_horn_lunge_1_release.png",
+    "sha256": "fef1d1b9e8601ed07d57881358259248ad641edb5756fcb3c93b9cb73887f1aa"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "horn_lunge",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_horn_lunge_2_contact.png",
+    "sha256": "e2eb71832abd2d4de91960ebe899072fe1406461d66b7e223ef816a908208f1c"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "horn_lunge",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_horn_lunge_3_after.png",
+    "sha256": "5dfa70bccd0b86d1359020c36b161b29cdb942fd67701357810a76a0bab3d26a"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "iron_hide",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_iron_hide_1_contact.png",
+    "sha256": "e0241bc7c89a71509818b7e8541a14f5d904844b8b1fea4f66917744d02f9ddf"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "iron_hide",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_iron_hide_2_motion.png",
+    "sha256": "ab4eb7553be0c3c69819a4357fe9dacd73cd5a679abb2a53c13addec69202c87"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "iron_hide",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_iron_hide_3_after.png",
+    "sha256": "ceac8b3cdda5c559b652063756564c5662d309027abb3d87f1fb80d6913107c6"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "quake_stomp",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_quake_stomp_1_contact.png",
+    "sha256": "f1a32829559a89956114f2f2e3debace180d9cfbac66a221ae9bbeb028bac74c"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "quake_stomp",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_quake_stomp_2_motion.png",
+    "sha256": "84acf8577e44357a1e478fd9ced2da109164f23d829530a787bc6ac4932c7fb1"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "quake_stomp",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_quake_stomp_3_after.png",
+    "sha256": "7b6b427dcba81c59dd4227fdf12cef54a7a4204a6e89d448f5ec91c0a98884a3"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "rock_slide",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_rock_slide_1_contact.png",
+    "sha256": "e44e6bd39991d5257013a7fc98cc18fbfa77f0dbc5d4c143bebed69ef452428e"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "rock_slide",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_rock_slide_2_motion.png",
+    "sha256": "d11a036be7948b65031b683e26582af4b8be7439fc46cad98befae6e907e12bd"
+  },
+  {
+    "sheet": "dozer.jpg",
+    "move": "rock_slide",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_dozer_rock_slide_3_after.png",
+    "sha256": "a037dd65b155b85031e4b18b1d7928895a6eecdbff4453fe8117f03b95fe8b5b"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "acid_spray",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_acid_spray_1_pour.png",
+    "sha256": "4efab4f38bd73b7f22ed506252a5d1729e50c26ebe3a896fc28514a304527a95"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "acid_spray",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_acid_spray_2_pour2.png",
+    "sha256": "a2cc1c6a107c9ecf06516b709a647d77213d2dfc0a29fe17212b654a268ff73f"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "acid_spray",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_acid_spray_3_swept.png",
+    "sha256": "8c8e0fb3847346afb2058cbb678d472493076af11964a6bee6e68d420a681b46"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "coil_crush",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_coil_crush_1_contact.png",
+    "sha256": "ef9d106492db006e2ef2b826dffbecf73089ed27f7d6c3c5513c79c097601a43"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "coil_crush",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_coil_crush_2_motion.png",
+    "sha256": "6819d1433b0b39ea45538f7a242a82797e4b13bd6635cd41b5720eefa60396f8"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "coil_crush",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_coil_crush_3_after.png",
+    "sha256": "55133991d77d27e18d081bcc821ee730de54ed306098c691aa7be4b2843dfbe9"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "drain_dive",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_drain_dive_1_contact.png",
+    "sha256": "0a3a5e369d3e786fb73821164dd74454217ae3962047e87484c2bead5b1e491b"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "drain_dive",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_drain_dive_2_motion.png",
+    "sha256": "0610c9fef0405a4251fff7594e3f211e742057cca0f4c7f0a0d9d7f76fd03a39"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "drain_dive",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_drain_dive_3_after.png",
+    "sha256": "5b918c707e7cb4add9c6d19130f114744133e78a4645fe2c6e6ccca0a3f75edf"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "poison_darts",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_poison_darts_1_contact.png",
+    "sha256": "380140f9da09361e6253266962ee16755d5eb0b5f094af63c3064eda6dc5a07c"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "poison_darts",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_poison_darts_2_motion.png",
+    "sha256": "f590fbe745915ef7d1692c0e2e917cbd52642f34b69b499e506a8bfb32c59cff"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "poison_darts",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_poison_darts_3_after.png",
+    "sha256": "278527ccd60831a1ad31835df9938e653bb45b126a05da3dd9d787d4e15f0efd"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "shed_skin",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_shed_skin_1_contact.png",
+    "sha256": "13bc0486ce829809ac27e8d5df33aded038cbbebeaf85e74b617aafc030e762d"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "shed_skin",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_shed_skin_2_motion.png",
+    "sha256": "99849c33e5c8c757b310c9cbdb5efa242510c1aeaa0b17e4178067b23ceee27d"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "shed_skin",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_shed_skin_3_after.png",
+    "sha256": "384205692f90b0d62c7442f68fc23f5818f53d70607be5ab9c0cfadb669d614c"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "sludge_lob",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_sludge_lob_1_contact.png",
+    "sha256": "490b33ada712b63a93f92170a2bbb49fcecd94538bfca09505442dbc179152bf"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "sludge_lob",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_sludge_lob_2_motion.png",
+    "sha256": "809709385826534381a27b53ae98c161321b7162bc002fd1a49a4bb7b3800b5c"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "sludge_lob",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_sludge_lob_3_after.png",
+    "sha256": "1f47fe02a17d931987fbd617a10aaf013701bc4dfb41a5b1780674b48082b99a"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "tail_sweep",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_tail_sweep_1_release.png",
+    "sha256": "fec63e615f1762c468a30e779876936340ae794fbdc07a4f9827c211639dbe76"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "tail_sweep",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_tail_sweep_2_contact.png",
+    "sha256": "007e09d4982c02dabd91d225d9abfb4849b1cd82c73f8aeb6674261f1a38b1e1"
+  },
+  {
+    "sheet": "slurry.jpg",
+    "move": "tail_sweep",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_slurry_tail_sweep_3_after.png",
+    "sha256": "1c74b9b89cbdc8ea34a8819bf4c7227fe3cecdf401f61ee10b8e59911df56931"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "arc_lash",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_arc_lash_1_contact.png",
+    "sha256": "dd3956a2c8d244144654c4826c05cf48ec1cb8d0c9f91287b630b32e0c5196c6"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "arc_lash",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_arc_lash_2_motion.png",
+    "sha256": "553895eb12da039855cd1f8bbc22a38dbd08968183de637ddbc82cc2a7cffffa"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "arc_lash",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_arc_lash_3_after.png",
+    "sha256": "ad3721e5f41cea1685836c89a141c2ef41d42ce2f98031630a087e93d23dd1e1"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "chain_lightning",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_chain_lightning_1_contact.png",
+    "sha256": "22e0735186668dd9707a57e97f37d60d6c9a66d7c3dd7cdd2ff033458ecb4e12"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "chain_lightning",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_chain_lightning_2_motion.png",
+    "sha256": "92a5343df7ce0d979689d6b190ac1f426da4da31b31d699d01a8b2f7224d6ad6"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "chain_lightning",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_chain_lightning_3_after.png",
+    "sha256": "26b63eadb8a8b32f549acb241547b47a1ef6ea2ea27186645e615d2bfd1a6eb6"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "discharge",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_discharge_1_contact.png",
+    "sha256": "1fb85bbccf39fac051dd7a32447eeac477164e3b7e611d197d9343bea668b1e6"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "discharge",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_discharge_2_motion.png",
+    "sha256": "353bab4a636feb8d98c18f170f371a128fe970eb9805592f6e83767c08352fe2"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "discharge",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_discharge_3_after.png",
+    "sha256": "ebd218b91b276a3f432d2c565349fa26a2d32a930b733b20850615cdbae0a3d6"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "spring_pad",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_spring_pad_1_contact.png",
+    "sha256": "db59db368aac05417d5a2be692f6d20b4a508ddcd210189eaca7d2c5a7fd7569"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "spring_pad",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_spring_pad_2_motion.png",
+    "sha256": "3f6a1ba2486d19bd5190b2bff55777494fa75d30606f345567745903f30c78a7"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "spring_pad",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_spring_pad_3_after.png",
+    "sha256": "0b3d11b4b5dc6209169663332fd74c896f25ebe104ccd5574da653e48aaeddd3"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "squash",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_squash_1_release.png",
+    "sha256": "4f8c29f31d8b0a508cd9c969412c0b816804d49427c34498bc5d19e5c0f3d014"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "squash",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_squash_2_contact.png",
+    "sha256": "25a7c4934b31ef0122df1c27058f401159be11aa5a5bb9d72d5c7d9655ef5665"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "squash",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_squash_3_after.png",
+    "sha256": "347b0c199df88517c41d8a904486fec4e2214d939d13f51e15da89d707eb6763"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "static_field",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_static_field_1_contact.png",
+    "sha256": "562176063c259d17c9808550035cc29cba2d2582e67ca811c97fe27b4c9b8a11"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "static_field",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_static_field_2_motion.png",
+    "sha256": "8d3479014fb6c83fdfa153fde9710e142f92f6dc7fd8577b2f243962078f9b60"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "static_field",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_static_field_3_after.png",
+    "sha256": "349684651dbeb23745635a000e709f3712197ee606d890c0e6906dfe6b8fc079"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "thunder_jolt",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_thunder_jolt_1_contact.png",
+    "sha256": "aea04baae3ed5d131888bc88f8e999ce799be40cfd0b32b640adec9c7ed3c476"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "thunder_jolt",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_thunder_jolt_2_motion.png",
+    "sha256": "fcf983f48700a07491895d8c9284ad890f5e600ae6436056b26ee06a3b03c141"
+  },
+  {
+    "sheet": "jitters.jpg",
+    "move": "thunder_jolt",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_jitters_thunder_jolt_3_after.png",
+    "sha256": "0da9e56795e0ff0fb8fb212a7fe85bbe2f7d8db29005e591a6f038239a08b4e7"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "comet_hook",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_comet_hook_1_contact.png",
+    "sha256": "886fb6c18afe8d20871e041a2a4765eb8abfbe34bed73c66f95940239ebe277c"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "comet_hook",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_comet_hook_2_motion.png",
+    "sha256": "a3fd9f2723f91625a75140a248697b4bb590afcfe3206ab07173bf589d33feb3"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "comet_hook",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_comet_hook_3_after.png",
+    "sha256": "10696e8b267f1e25390d2d0086ee95304ea30ceae6c0a5594a85c1ab5fa028f3"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "force_palm",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_force_palm_1_contact.png",
+    "sha256": "5f159fe58f9035328b0fd3c73f7dc0c376f6e4f64dd882b413bbba200459c476"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "force_palm",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_force_palm_2_motion.png",
+    "sha256": "87ea014e41eae6a9240a73965b6cf9bdefaa4bca6eb50ebc16d4abcad9d0e4a7"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "force_palm",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_force_palm_3_after.png",
+    "sha256": "ebfe0f44c8e9c00edc0fa4963a3873f51c38fb52ba2af68bd8dafaa80330cce3"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "iron_shins",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_iron_shins_1_contact.png",
+    "sha256": "24fd8f2e879d35893a173c39ccfdc547473c864ff1eda71c82438e4571e387c0"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "iron_shins",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_iron_shins_2_motion.png",
+    "sha256": "5ff03f696f873687c2776fa4fee98779e610d2c2944809d2c4c4c4ba7613c39e"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "iron_shins",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_iron_shins_3_after.png",
+    "sha256": "9ee4c48fbe04721113c9bb915bbc5417c8edd58fa3cadf6ccd3b38693cc5e6ee"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "meteor_hammer",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_meteor_hammer_1_contact.png",
+    "sha256": "8b5751763aae250045a86cd483d96ebe5b01042f45bb2a2f1ddb1ee8c314d92e"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "meteor_hammer",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_meteor_hammer_2_motion.png",
+    "sha256": "4a01a1a50fd133fd533d8b01e877ae206833331b3a3f527f69eb2b1952de7278"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "meteor_hammer",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_meteor_hammer_3_after.png",
+    "sha256": "ee87e5103a5a32ea9407881bb1e7f30474c7c451383787159d1bb5ceaf6cd727"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "pressure_palm",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_pressure_palm_1_contact.png",
+    "sha256": "2e5ed1369a7ec901b6cb3e7de4b588e0bb14efd70e214f9f254806d298639691"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "pressure_palm",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_pressure_palm_2_motion.png",
+    "sha256": "63994db5c90cd3d94109765794eb5049354dc8e7663cfc0c766dbdb87525f8a2"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "pressure_palm",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_pressure_palm_3_after.png",
+    "sha256": "58caf72c770c819a80f8c76234bcf33b02d086a72a74d829180e26766f07fe38"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "shockwave_kicks",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_shockwave_kicks_1_contact.png",
+    "sha256": "ec2938c4e0b809d25bc316b27ef23b760febb8b9ff93a588b5faf2a4ad6abcef"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "shockwave_kicks",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_shockwave_kicks_2_motion.png",
+    "sha256": "ec540c31093b66aba06073e386d64ca96969007f438eb7cbe838dc4cc5e5b5b1"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "shockwave_kicks",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_shockwave_kicks_3_after.png",
+    "sha256": "669bf1314b23db0d018055a0d92bd8461b2c5c3792946e3108ef9deda0fcabc9"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "spiral_hook",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_spiral_hook_1_contact.png",
+    "sha256": "48e9d7f6a04dfbcfaf36f4539d904e57baf0814abe79f821c9fcb66125a949f3"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "spiral_hook",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_spiral_hook_2_motion.png",
+    "sha256": "a94e85d873a8639523ca741a7360543aa6455986cb544a97a7feb4c96d846c4d"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "spiral_hook",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_spiral_hook_3_after.png",
+    "sha256": "93ec65149388e83031b976272f83ea3e006db0f4052786f34d9032e19a829967"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "thunder_chop",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_thunder_chop_1_contact.png",
+    "sha256": "272e264469f59fb556a05b4a192d25b558a2e9f008af4b0911654f794a5ce626"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "thunder_chop",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_thunder_chop_2_motion.png",
+    "sha256": "9dcae3a231760fb0c8ebd7c62108f45f5ba134ca36f12d76943c3a65ae8a757f"
+  },
+  {
+    "sheet": "varga.jpg",
+    "move": "thunder_chop",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-real-input-captures\\f_varga_thunder_chop_3_after.png",
+    "sha256": "2b5943742a3aed2231efba4150cfcc558a8b8aeb3139f1b39a987df1a9188199"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "anchor_fist",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_anchor_fist_1_release.png",
+    "sha256": "eb42227235ddba228166934a068e3bf8a484e105dbae0e67c7b8e9f937d06487"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "anchor_fist",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_anchor_fist_2_contact.png",
+    "sha256": "dadaa8dc0c0a636eade2cafcc8e2c6767414ef7684a12efdfa86f72afcd17d1e"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "anchor_fist",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_anchor_fist_3_after.png",
+    "sha256": "70bb4bb70686a887d28311f1680e9e0701371de3188c4e662490d651bc40f26b"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "ghost_light",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_ghost_light_1_contact.png",
+    "sha256": "3ca2578cd1f37f73f4ff2852650f22b18385312fcf54b1e6bfb8b090c067978e"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "ghost_light",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_ghost_light_2_motion.png",
+    "sha256": "2a5bd8898a0222ad596336d6ccd9ecdd4020ada17827b8721a598f40dda6ead6"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "ghost_light",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_ghost_light_3_after.png",
+    "sha256": "1ee3b11029e80349c975f82ae6c9221023df4cad9f57302dc66423da5bf895b9"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "hex_chain",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_hex_chain_1_contact.png",
+    "sha256": "3c5e9a9cebc7fd7e75bc7c4cc578762aaab66ab79ffea04f6ba703c7a92c51df"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "hex_chain",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_hex_chain_2_motion.png",
+    "sha256": "b8d33987f739a6b8cb556ea5b50d81bf941c5cc5e7072ab6f2a4ff051e845bb0"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "hex_chain",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_hex_chain_3_after.png",
+    "sha256": "e0f1165150e17066a72b0be302402f73a8b28f3d062f93d6123233ed0b6d40e6"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "lantern_swarm",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_lantern_swarm_1_contact.png",
+    "sha256": "5a01aab1b868c736121a81f9de9121d02e89a7f90c90127dfd4d7f2597d0ba75"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "lantern_swarm",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_lantern_swarm_2_motion.png",
+    "sha256": "cac77342ad1c9e8b41e2b6d7b5f48b6627811510bd66ed565fb5baabc7bb5513"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "lantern_swarm",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_lantern_swarm_3_after.png",
+    "sha256": "e622ba4fae5ba62e54acc559befcb554df7d8085ff7f539059f1fcd884e206f8"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "night_shade",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_night_shade_1_pour.png",
+    "sha256": "82b71ae3861a154f743a5481f6bac624be1eeeb6fa4f3eec1e0b13e9a6b7d06d"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "night_shade",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_night_shade_2_pour2.png",
+    "sha256": "da4434d96cb7f4cbbd444d3750a71437155b62eac26d1e09260b2b666b060b4d"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "night_shade",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_night_shade_3_swept.png",
+    "sha256": "410c69d86acde23c10d4eb9e7eb0b97fe9ec1273f206017eeb83485e288c8794"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "through_the_veil",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_through_the_veil_1_contact.png",
+    "sha256": "8aaea38bf2f3b5fba96fbdf54fa6999f7964a1e766f6a789c31816013c5a97e3"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "through_the_veil",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_through_the_veil_2_motion.png",
+    "sha256": "43129912faa62e66f4ba1b676ea1d07b05ab1ae2bb3d60b577105b7b26fd02d4"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "through_the_veil",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_through_the_veil_3_after.png",
+    "sha256": "34b398ac7f3342fe28931a21dc0ab9083ba62e9e3025d2fb84b3267440fa58bc"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "toll",
+    "phase": 1,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_toll_1_contact.png",
+    "sha256": "4ea4b6f38bf429d0349525af1d71f67e227aab3695686524789d75017701f8a6"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "toll",
+    "phase": 2,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_toll_2_motion.png",
+    "sha256": "35703861ea994c4d54d8786a75eab4a2d1faa60294ee5e11968611a31335928a"
+  },
+  {
+    "sheet": "knell.jpg",
+    "move": "toll",
+    "phase": 3,
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-showcase\\f_knell_toll_3_after.png",
+    "sha256": "0c400356acd79ac3e2cc636448e68c456a15b9e5f42b4b6fa6db8856909aed87"
+  },
+  {
+    "image": "ui/career-drill-move.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\career-drill-move.png",
+    "sha256": "4cc9b6f1389fd62979492e349bda73cdf893f906d96da81d83eeb7197928aa8d"
+  },
+  {
+    "image": "ui/career-equipped-moves.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\career-equipped-moves.png",
+    "sha256": "4fda5b4d2405d9cc36f62eddb4655a7dadf36c5560877b27411751265a1ac3f0"
+  },
+  {
+    "image": "ui/career-learn-move.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\career-learn-move.png",
+    "sha256": "bd308d45a999e15aa01e6f7bf7dd7dca1a78b0f16843770f52e19a67cce9c121"
+  },
+  {
+    "image": "ui/fight_camp-drill-picker.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\fight_camp-drill-picker.png",
+    "sha256": "7335462940a64f4d43822b0014c978e770079b2b0f6fc72b0070969b25001b87"
+  },
+  {
+    "image": "ui/fight_camp-equipped-moves.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\fight_camp-equipped-moves.png",
+    "sha256": "67382749f40264d31d2e2cf21b7d5c444329a3cc9ee764ba2273dd292f74b266"
+  },
+  {
+    "image": "ui/fight_camp-learn-picker.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\fight_camp-learn-picker.png",
+    "sha256": "f4ae8da1c06ce99534975f87ac5cd990bb5e27fe1cf9e5bc0d3dd7020a1729ed"
+  },
+  {
+    "image": "ui/fight_camp-rest-drill.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\fight_camp-rest-drill.png",
+    "sha256": "249a4ff7e72f61611dbd289f5e4e4b70a085c373d3af4f13f83ab9ffae9e481f"
+  },
+  {
+    "image": "ui/fight_camp-rest-learn.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\fight_camp-rest-learn.png",
+    "sha256": "078af1e52ddc8671b18423b64d525e797f42b07db1677b8f0eddaa75e5ed9143"
+  },
+  {
+    "image": "ui/moves-loadout-validation.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\moves-loadout-validation.png",
+    "sha256": "d098d75bf8d6e57da155b94e52f5144fadca4b064e3682b1f7edc2fae457cc91"
+  },
+  {
+    "image": "ui/moves-ordinary-loadout.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\moves-ordinary-loadout.png",
+    "sha256": "b94242b07e52bf34072707c89247469b345ddf1d0b19ea26e8c950efc1da3ca2"
+  },
+  {
+    "image": "ui/moves-practice-live-brawler.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\moves-practice-live-brawler.png",
+    "sha256": "f1d47ee2495df81eda63d6113a9acd49eae12377a71ce8ba5f86af2774f0556f"
+  },
+  {
+    "image": "ui/moves-practice-varga-techniques.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\moves-practice-varga-techniques.png",
+    "sha256": "8a6573279084d497f7a9be41cf28f0c878271ce5410f373c0b97aab6438bb22f"
+  },
+  {
+    "image": "ui/moves-varga-techniques.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\moves-varga-techniques.png",
+    "sha256": "32f87d11039b7aa6c0d3d1d2afebbad1cf8da53521ea6879c2f70dd1b4f8c7d2"
+  },
+  {
+    "image": "ui/off_the_street-drill-picker.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\off_the_street-drill-picker.png",
+    "sha256": "7335462940a64f4d43822b0014c978e770079b2b0f6fc72b0070969b25001b87"
+  },
+  {
+    "image": "ui/off_the_street-equipped-moves.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\off_the_street-equipped-moves.png",
+    "sha256": "7b856a570ebcbe8dd72f34a3552b18c2ca92228589265c12347af9066491a51c"
+  },
+  {
+    "image": "ui/off_the_street-learn-picker.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\off_the_street-learn-picker.png",
+    "sha256": "f4ae8da1c06ce99534975f87ac5cd990bb5e27fe1cf9e5bc0d3dd7020a1729ed"
+  },
+  {
+    "image": "ui/off_the_street-rest-drill.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\off_the_street-rest-drill.png",
+    "sha256": "249a4ff7e72f61611dbd289f5e4e4b70a085c373d3af4f13f83ab9ffae9e481f"
+  },
+  {
+    "image": "ui/off_the_street-rest-learn.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-captures\\off_the_street-rest-learn.png",
+    "sha256": "078af1e52ddc8671b18423b64d525e797f42b07db1677b8f0eddaa75e5ed9143"
+  },
+  {
+    "image": "ui/moves-loadout-validation.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-final-captures\\moves-loadout-validation.png",
+    "sha256": "0ec7530eccc5893dd78ad437b2f0f0e1a9b88d884ffb802e5cc4e38f1c65e03a"
+  },
+  {
+    "image": "ui/moves-ordinary-loadout.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-final-captures\\moves-ordinary-loadout.png",
+    "sha256": "e10902b3cac7598b746dff1adae9c043fe9bf935af63398c4403a989c002acb5"
+  },
+  {
+    "image": "ui/moves-practice-live-brawler.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-final-captures\\moves-practice-live-brawler.png",
+    "sha256": "5b53a5feb2c049d97683e2c9fa1d867033fc3d6ce802cdcf5a6f0f91e98e9a58"
+  },
+  {
+    "image": "ui/moves-practice-varga-techniques.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-final-captures\\moves-practice-varga-techniques.png",
+    "sha256": "2f65fd3d34a809b89964b7ef69ada50a94bb4d37c9f688fee133e3437ef27eff"
+  },
+  {
+    "image": "ui/moves-varga-techniques.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\moves-ui-final-captures\\moves-varga-techniques.png",
+    "sha256": "352c58fb02bf1d2effac9b302b9e05dafe56d87bd7647b0ea74ecdb094fd2171"
+  },
+  {
+    "image": "combat/varga-four-combinations-varga_skin_classic_1_default.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-four-combinations\\varga_skin_classic_1_default.png",
+    "sha256": "872e2a6f98ce88c6de6f7e1eda7e0aa8001b4e534da903d1b068199c7d00ad04"
+  },
+  {
+    "image": "combat/varga-four-combinations-varga_skin_classic_2_legacy_live_swap.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-four-combinations\\varga_skin_classic_2_legacy_live_swap.png",
+    "sha256": "76186390e9dfc11897827a175401dc943c2f02ab4195ec6a804a8a911cacc586"
+  },
+  {
+    "image": "combat/varga-four-combinations-varga_skin_classic_3_legacy.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-four-combinations\\varga_skin_classic_3_legacy.png",
+    "sha256": "205c2d832e8cb99dae94dd9f70e599fcc7f71019548112edf36f3bf981532b97"
+  },
+  {
+    "image": "combat/varga-four-combinations-varga_skin_classic_4_default_again.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-four-combinations\\varga_skin_classic_4_default_again.png",
+    "sha256": "6fe4586e91fab4390819845f0c03a170cc774129cd334b0737f37e9f648cb76e"
+  },
+  {
+    "image": "combat/varga-four-combinations-varga_skin_moves_1_default.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-four-combinations\\varga_skin_moves_1_default.png",
+    "sha256": "55185b3c1c946867ee7525c160d9a3b3030051eb0d68116d08f809d8587d0fab"
+  },
+  {
+    "image": "combat/varga-four-combinations-varga_skin_moves_2_legacy_live_swap.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-four-combinations\\varga_skin_moves_2_legacy_live_swap.png",
+    "sha256": "5826fddd5768156ea088a78fc0db5dcfd5f551a0d086d2896636f32427b4a29b"
+  },
+  {
+    "image": "combat/varga-four-combinations-varga_skin_moves_3_legacy.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-four-combinations\\varga_skin_moves_3_legacy.png",
+    "sha256": "e5aa69ecb37ed268249cc8d45072d6fec9a0a4037b2f6f94fea4fcb0869e26a0"
+  },
+  {
+    "image": "combat/varga-four-combinations-varga_skin_moves_4_default_again.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\varga-four-combinations\\varga_skin_moves_4_default_again.png",
+    "sha256": "d3e738b083423e0071245e109ac2435bcf7f1c9f471bb5a53ac05e1d55bf235e"
+  },
+  {
+    "image": "combat/final-polish-captures-f_stoke_flamethrower_0_prep.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_stoke_flamethrower_0_prep.png",
+    "sha256": "bb8f3388a7f969c3153048605665bbc4111d218597b6e2dc888eb5dd779da7ea"
+  },
+  {
+    "image": "combat/final-polish-captures-f_stoke_flamethrower_1_pour.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_stoke_flamethrower_1_pour.png",
+    "sha256": "c320dbcfeb4b1ed55caf74e80506771a177b3874ece1c7d9817047da226471b3"
+  },
+  {
+    "image": "combat/final-polish-captures-f_stoke_flamethrower_2_pour2.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_stoke_flamethrower_2_pour2.png",
+    "sha256": "1475febed4b4a1ece411ac1d872d941ad79b4839db8ad572a5dc38f037ad2a36"
+  },
+  {
+    "image": "combat/final-polish-captures-f_stoke_flamethrower_3_swept.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_stoke_flamethrower_3_swept.png",
+    "sha256": "828159e81bb08c1497cd3c620b7f2e504b1dcff54f3cb8be02d633699cf504db"
+  },
+  {
+    "image": "combat/final-polish-captures-f_stoke_flamethrower_4_release.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_stoke_flamethrower_4_release.png",
+    "sha256": "d2d18e0ac270ee75a32c82701777f07eff7f4c9e445a9f308f77d8a002e6111e"
+  },
+  {
+    "image": "combat/final-polish-captures-f_stoke_flamethrower_5_linger.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_stoke_flamethrower_5_linger.png",
+    "sha256": "3d39a45d4ba5074ed53cca59791aa7d5b563f8165b227eea30b455fed75e3586"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_force_palm_0_prep.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_force_palm_0_prep.png",
+    "sha256": "2f0c792607151edb3bf3d03948704dd2aeec23daae6de771f7e874b8d6ee683e"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_force_palm_1_contact.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_force_palm_1_contact.png",
+    "sha256": "1bcb509612d27206670f9ff2f1cb735adb1d577b93aed071ab925d9947628017"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_force_palm_2_motion.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_force_palm_2_motion.png",
+    "sha256": "c0da5a44f67527dfa17a5c5c067cad3c03d5419f23a07716e2a980dacddaba30"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_force_palm_3_after.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_force_palm_3_after.png",
+    "sha256": "afd599857b035e71cad229f7a266c414ef53b93a3814a43d5953d45428678e61"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_force_palm_4_linger.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_force_palm_4_linger.png",
+    "sha256": "706dfb34ed5d1a31edae4c18c236d72edc72e642745c4714eca2a2cc35072bbe"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_thunder_chop_0_prep.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_thunder_chop_0_prep.png",
+    "sha256": "83d1cf0b37d87828c4fe14e2802644ca892202cd1180aecdcc51c052537e303d"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_thunder_chop_1_contact.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_thunder_chop_1_contact.png",
+    "sha256": "c614eb1c9a960e9dea12cbc88722bf80541cfeed6879d9596f496977a99ea51d"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_thunder_chop_2_motion.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_thunder_chop_2_motion.png",
+    "sha256": "080f7483b74e3f49178445bd62f7308cc9fcb5a16ce9af641bda572ba0b004c8"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_thunder_chop_3_after.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_thunder_chop_3_after.png",
+    "sha256": "f0730135bfb390039ba40e098db97105173c4749836e8e901b791b96453115e6"
+  },
+  {
+    "image": "combat/final-polish-captures-f_varga_thunder_chop_4_linger.jpg",
+    "original": "B:\\Critterweight-work\\v0.9.18\\takeover\\final-polish-captures\\f_varga_thunder_chop_4_linger.png",
+    "sha256": "55773462c8b5e38cbf71e1ee7cb5dedbf962f94a089c6411743a96cf59fc0107"
+  }
+]

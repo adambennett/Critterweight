@@ -225,6 +225,7 @@ func test_loadout_screen_validates_and_applies() -> void:
 	await wait_frames(4)
 	check_eq(s.chosen(), FURNACE, "the rows start on the current loadout")
 	check_eq(s.problem_shown(), "", "a valid loadout shows no problem")
+	await capture_ui_evidence("moves-ordinary-loadout")
 	var first: OptionRow = s.default_focus()
 	check_eq(first.label_text, "Move 1  (%s)" % Controls.prompt_for("light"), "each row names its input")
 	Controls.last_device = "gamepad"
@@ -243,6 +244,7 @@ func test_loadout_screen_validates_and_applies() -> void:
 	check(s.problem_shown().contains("Flamethrower") and s.problem_shown().contains("twice"), "a move equipped twice is refused by name: '%s'" % s.problem_shown())
 	s.set_slot(1, "cinder_shot")
 	check(s.problem_shown().contains("basic"), "a loadout without a basic strike is refused: '%s'" % s.problem_shown())
+	await capture_ui_evidence("moves-loadout-validation")
 	s.confirm()
 	await wait_frames(2)
 	check(got.is_empty() and App.top_screen() == s, "an invalid loadout is not applied")
@@ -271,6 +273,22 @@ func test_loadout_screen_validates_and_applies() -> void:
 
 
 # --- Versus setup -------------------------------------------------------------------------------
+
+func test_varga_loadout_names_techniques_without_claiming_generic_move_buttons() -> void:
+	var s = App.push("loadout", {"creature": "f_varga"})
+	await wait_frames(4)
+	var first: OptionRow = s.default_focus()
+	check_eq(first.label_text, "Technique 1", "Varga equips techniques, not an attack on a generic move button")
+	check(_has_text(s, "limb and modifier strikes"), "the panel explains how the techniques are used")
+	check_eq(s.problem_shown(), "", "the initial martial build is valid")
+	Controls.last_device = "gamepad"
+	Controls.device_changed.emit("gamepad")
+	check_eq(first.label_text, "Technique 1", "switching device preserves the martial explanation")
+	s.set_slot(0, "spiral_hook")
+	check_eq(s.problem_shown(), "", "a technique can be replaced within its group")
+	check(s.chosen().has("spiral_hook"), "the replacement is equipped")
+	await capture_ui_evidence("moves-varga-techniques")
+
 
 func test_versus_setup_moves_row_opens_the_loadout_and_keeps_the_pick() -> void:
 	var vs = App.goto("versus_setup", {"mode": "versus"})
@@ -356,6 +374,7 @@ func test_practice_change_moves_applies_live_through_the_pause_menu() -> void:
 	check_eq((MatchFlow.last_config["fighters"][0] as Dictionary).get("loadout", []), BRAWLER, "Restart fight keeps the new moves")
 	await _press_joy(JOY_BUTTON_START, 4)
 	check(App.top_screen() == null and not get_tree().paused, "Start resumes the fight")
+	await capture_ui_evidence("moves-practice-live-brawler")
 	MatchFlow.quit_to_menu()
 	await wait_frames(2)
 
@@ -424,7 +443,32 @@ func test_practice_shortcuts_never_collide_with_the_fighter_layout() -> void:
 		var b2: String = ov.current_behavior()
 		await _press_joy(JOY_BUTTON_DPAD_RIGHT)
 		check(ov.current_behavior() != b2, "the row changes the dummy with the controller")
-	check(not routes.has("change_moves"), "no Change moves for the Cage Rules layout")
+	check(routes.has("change_moves"), "Varga can change his equipped techniques from the practice menu")
+	var change: UiButton = null
+	for b in pause.find_children("*", "UiButton", true, false):
+		if (b as UiButton).route == "change_moves":
+			change = b
+	if not check(change != null, "the martial Change moves control is reachable"):
+		return
+	change.grab_focus()
+	await _press_joy(JOY_BUTTON_A, 4)
+	check_eq(App.top_screen().screen_name, "loadout", "Varga's practice menu opens his technique loadout")
+	var ls = App.top_screen()
+	var f: Fighter = ms.sim.fighters[0]
+	var alternate := str(f.creature.loadouts.keys()[1])
+	var expected: Array = f.creature.loadouts[alternate]["moves"]
+	ls._apply_preset(alternate)
+	var help: HelpPanel = ls.get("_help")
+	check_eq((help.get("_title") as Label).text, (f.creature.pool[expected[0]] as PoolMove).display_name,
+		"the focused technique description follows the alternate preset")
+	await capture_ui_evidence("moves-practice-varga-techniques")
+	ls.confirm()
+	await wait_frames(4)
+	check_eq(f.loadout, expected, "the alternate martial build applies live")
+	check(not f.move_overrides.is_empty(), "its limb techniques are rebuilt")
+	check_eq(MovesUi.saved_loadout("f_varga"), expected, "the practice selection is saved for Varga")
+	check_eq((MatchFlow.last_config["fighters"][0] as Dictionary).get("loadout", []), expected, "Restart fight retains the martial build")
+	check_eq(App.top_screen().screen_name, "pause", "Done returns to the paused practice match")
 	App.pop()
 	await wait_frames(2)
 	MatchFlow.quit_to_menu()

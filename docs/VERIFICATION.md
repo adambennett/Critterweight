@@ -1,5 +1,14 @@
 # Verification report
 
+**v0.9.18 integration in progress, 2026-10-21.** The [release report](evidence/verification/v0.9.18/README.md)
+records 499 compiling scripts, focused engine/kit/progression/migration/loopback checks, rendered
+combat across all eight fighters, all four Varga skin/combat combinations and actual campaign
+learn/drill menus. All 254 new speech clips pass their journal/catalog and PCM integrity audit.
+The 112-bout comparison exposed a bot readiness defect; its correction reduced denied attempts
+by 87.8% in a 56-bout repeat. Matched performance and its longer 1080p confirmation are retained
+with frame-time limitations. The integrated suite, packages and publication
+remain separate gates; this paragraph does not claim that v0.9.18 is released.
+
 **v0.9.17 released and verified, 2026-10-21.** The [release report](evidence/verification/v0.9.17/README.md)
 records the exact clean release commit `e287028`, 925 source checks (924 passed, one expected
 graphical-audio skip, zero failed), a passing ten-minute soak, all eight source-model exports,
@@ -8,6 +17,9 @@ build passes 455 scripts and all 20 rendered playtests. All seven actual downloa
 checksums and archived members are verified; the downloaded Windows game boots in 5.7 seconds.
 Final paired performance: 107-129 FPS plain and 85-104 FPS with simultaneous abilities on this PC;
 the heaviest 1080p case has 6-7% of frames over 16.7 ms. This is not a constant-60-FPS or Deck claim.
+Follow-up inspection found script errors in the source log from missing patch-note titles despite
+the passing test summary. v0.9.18 repairs the archive/screen and checks every rendered archive body;
+the published v0.9.17 assets remain unchanged. Its release report records this defect explicitly.
 
 **Release 0.9.16, 2026-10-20.** [The v0.9.16 report](evidence/verification/v0.9.16/README.md): Career,
 10-point scoring, the referee and the Cage Rules preset. 437 scripts; full source suite on the release

@@ -1,0 +1,22 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_event_tail.gd::test_event_tail_handles_empty_and_sparse_sequences"
+		},
+		{
+			"errors": [],
+			"ms": 3,
+			"ok": true,
+			"test": "res://src/test/core/test_event_tail.gd::test_event_tail_matches_full_scan_after_history_rollover"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 2 run, 0 failed, 2 passed, 0 skipped in 9.1 s",
+	"time": "2026-10-21T20:32:39",
+	"total": 2,
+	"version": "0.9.18"
+}

@@ -64,3 +64,11 @@ are original work built with Anthropic Claude under Adam Bennett's direction: ed
 sources (`tools/blender/fighters_v17*.py`, `tools/blender/*.blend`) on the same skeleton contract,
 and procedural shaders and particle programs (`game/src/view/fx/`, `game/src/view/shaders/fx_*`).
 No third-party character, texture, material or effect asset ships in this pass.
+
+## v0.9.18 creature movesets
+
+Original move design, animation, procedural effects, progression and recorded dialogue were built
+with Anthropic Claude under Adam Bennett's direction. OpenAI Codex completed integration, visual
+refinement, regression fixes, migration and release verification. The effects use editable native
+geometry, shaders and particle programs; no third-party attack art is included. Breeze speech uses
+the same owner-selected voices and offline asset/provenance workflow described above.

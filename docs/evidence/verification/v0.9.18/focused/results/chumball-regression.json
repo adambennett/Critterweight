@@ -1,0 +1,27 @@
+{
+	"failed": 1,
+	"results": [
+		{
+			"errors": [
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: f_stoke input 5 throws the ball instead of starting a move",
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: Grapple picks the ball up for f_stoke input 6",
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: Grapple picks the ball up for f_stoke input 4",
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: Grapple picks the ball up for f_varga input 0",
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: Grapple picks the ball up for f_varga input 1",
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: Grapple picks the ball up for f_varga input 5",
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: Grapple picks the ball up for f_varga input 6",
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: Grapple picks the ball up for f_varga input 4",
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: Grapple picks the ball up for f_varga input 11",
+				"res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves: Grapple picks the ball up for f_varga input 12"
+			],
+			"ms": 329,
+			"ok": false,
+			"test": "res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 1 failed, 0 passed, 0 skipped in 8.9 s",
+	"time": "2026-10-21T18:50:42",
+	"total": 1,
+	"version": "0.9.17"
+}

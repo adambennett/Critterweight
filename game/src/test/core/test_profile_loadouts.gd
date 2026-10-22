@@ -82,20 +82,28 @@ func test_v1_profiles_migrate_to_v2() -> void:
 
 
 func test_v0916_fixture_profile_migrates() -> void:
-	if not DirAccess.dir_exists_absolute(FIX):
+	_fixture_profile_migrates(FIX, "0.9.16")
+
+
+func test_published_v0917_fixture_profile_migrates() -> void:
+	_fixture_profile_migrates("res://src/test/fixtures/saves_v0917/profiles", "0.9.17")
+
+
+func _fixture_profile_migrates(fixture: String, version: String) -> void:
+	if not DirAccess.dir_exists_absolute(fixture):
 		skip("the save fixtures are source files (not exported with the game); checked in the source suite")
 		return
 	var root := dir.path_join("fixture")
-	_copy_dir(FIX, root)
+	_copy_dir(fixture, root)
 	var path := root.path_join("rookie").path_join("profile.json")
 	var before := Saves.read_json(path, "profile", 1)
-	check(bool(before["ok"]) and int(before["version"]) == 1, "the v0.9.16 profile is version 1")
+	check(bool(before["ok"]) and int(before["version"]) == 1, "the v%s profile is version 1" % version)
 	if not bool(before["ok"]):
 		return
 	var old: Dictionary = before["data"]
 	check(not old.has("loadouts"), "written before profiles had loadouts")
 	var p := _profiles_at(root)
-	check_eq(str(p.call("id")), "rookie", "the v0.9.16 profile opens")
+	check_eq(str(p.call("id")), "rookie", "the v%s profile opens" % version)
 	var cur: Dictionary = p.get("current")
 	check_eq(cur.get("loadouts"), {}, "custom loadouts start empty")
 	for k in old:

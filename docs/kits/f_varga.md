@@ -106,7 +106,7 @@ Checked in this order when a limb is pressed: Iron Counter, Thousand-Fist Flurry
 * Iron Counter is for strikers who keep pressing; it does nothing against a grab or a projectile from range.
 * Afterimage Rush closes distance through a projectile volley; switching stance first and slipping a moment later is the same rush.
 * In southpaw everything mirrors: the lead side changes, the techniques follow.
-* Bots: the current bot layer presses limbs with random modifiers, so a bot Varga uses whatever his loadout gives each group (it does not read the techniques' `ai` hints yet, and it holds limbs long enough to charge the lead Pressure Palm).
+* Bots: the current bot layer chooses limbs and modifiers heuristically, then uses the equipped hand technique's hold hint for charged attacks. It does not plan the full contextual-combination tree. The release's small round robin exposes a weak Varga bot; this is not a verdict on human competitive balance.
 
 ## What the engine adaptation preserves
 
@@ -114,7 +114,7 @@ The source fighter's mesh, limb choices, modifier scheme, strike poses/timing/co
 
 Grappling uses Critterweight's multiplayer-safe clinch, pummel and directional-throw rules: grapple to catch, press limb buttons to pummel, then grapple plus a direction to throw. The original ground-position and submission simulation is not included. Damage, reach, retargeting and several leg/arm poses are adapted for the differently sized creature roster and Jolt's 120 Hz rig, rather than running Jeremy's separate physics engine.
 
-Network protocol 6 carries the additional inputs. All players in a network match need this preview or a compatible later build.
+Network protocol 6 originally added the martial inputs; v0.9.18 uses protocol 7 for movesets and loadouts as well. All players in a v0.9.18 network match need v0.9.18.
 
 ## Verification
 

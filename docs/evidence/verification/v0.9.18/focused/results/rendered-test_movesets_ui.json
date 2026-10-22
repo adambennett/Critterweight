@@ -1,0 +1,70 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 879,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_character_select_sheet_follows_the_combat_style"
+		},
+		{
+			"errors": [],
+			"ms": 520,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_compendium_lists_the_pool_loadouts_and_combat_basics"
+		},
+		{
+			"errors": [],
+			"ms": 677,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_hud_move_cards_hold_charges_stamina_and_denied_flash"
+		},
+		{
+			"errors": [],
+			"ms": 786,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_loadout_screen_validates_and_applies"
+		},
+		{
+			"errors": [],
+			"ms": 75,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_online_mirror_renders_the_same_cards"
+		},
+		{
+			"errors": [],
+			"ms": 1734,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_practice_change_moves_applies_live_through_the_pause_menu"
+		},
+		{
+			"errors": [],
+			"ms": 788,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_practice_shortcuts_never_collide_with_the_fighter_layout"
+		},
+		{
+			"errors": [],
+			"ms": 646,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_rebinding_labels_and_controls_reference_explain_both_styles"
+		},
+		{
+			"errors": [],
+			"ms": 329,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_varga_loadout_names_techniques_without_claiming_generic_move_buttons"
+		},
+		{
+			"errors": [],
+			"ms": 418,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_versus_setup_moves_row_opens_the_loadout_and_keeps_the_pick"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 10 run, 0 failed, 10 passed, 0 skipped in 16.5 s",
+	"time": "2026-10-21T20:05:13",
+	"total": 10,
+	"version": "0.9.18"
+}

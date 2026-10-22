@@ -454,7 +454,7 @@ func _think(f: Fighter, sim: MatchSim) -> void:
 	if _kit_heavy_vs_windup(f, dist, per):   # kit hint: Heavy into a perceived long windup
 		return
 	for slot in ["ability1", "ability2"]:
-		if _kit_hint_for(c, slot).is_empty() and c.abilities.has(slot) and float(f.cooldown_left.get(slot, 0.0)) <= 0.0 and rng.randf() < float(p["ability"]) * 0.35:
+		if _kit_hint_for(c, slot).is_empty() and _kit_ability_ready(f, slot) and rng.randf() < float(p["ability"]) * 0.35:
 			var ar := reach_of(c, slot, true)
 			if dist <= ar and dist >= minf(1.2, ar * 0.3):
 				f.input.press(FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
@@ -1428,7 +1428,7 @@ func _kit_hint(slot: String) -> Dictionary:
 func _kit_ability(f: Fighter, tgt: Fighter, dist: float, dir: Vector3, per: Dictionary, reactive: bool) -> bool:
 	for slot in ["ability1", "ability2"]:
 		var h := _kit_hint_for(f.creature, slot)
-		if h.is_empty() or not f.creature.abilities.has(slot) or int(f.charges_left.get(slot, 1)) <= 0:
+		if h.is_empty() or not _kit_ability_ready(f, slot):
 			continue
 		var ab: MoveDef = f.creature.abilities[slot]
 		if f.stamina < ab.stamina * 0.5:
@@ -1882,6 +1882,14 @@ static func _kit_last_threat(m: MoveDef) -> float:
 
 
 func _kit_ability_ready(f: Fighter, slot: String) -> bool:
+	# Movesets spend charges on the equipped input, not on the old ability slot. Checking the
+	# latter repeatedly chose unavailable/unequipped moves and suppressed useful alternatives.
+	if f.combat_style == "moves" and not f.creature.tags.has("martial"):
+		var button := _mv_classic_button(f, FighterInput.AB1 if slot == "ability1" else FighterInput.AB2)
+		if button < 0:
+			return false
+		var equipped_slot: String = Fighter.MOVE_SLOTS[Fighter.MOVE_BUTTONS.find(button)]
+		return int(f.charges_left.get(equipped_slot, 1)) > 0 and not bool(f.mods.get("no_abilities", false))
 	return f.creature.abilities.has(slot) and int(f.charges_left.get(slot, 1)) > 0 and not bool(f.mods.get("no_abilities", false))
 
 

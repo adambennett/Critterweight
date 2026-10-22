@@ -1,0 +1,748 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/audio/test_commentary.gd::test_movesets_moves_are_called_by_name_and_kind"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/balance/test_moves_matchups.gd::test_zz_moves_matchups"
+		},
+		{
+			"errors": [],
+			"ms": 162,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_engine_extras.gd::test_counters_and_zones_are_credited_to_their_moves"
+		},
+		{
+			"errors": [],
+			"ms": 73,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_engine_extras.gd::test_grounded_areas_skip_hovering_fighters"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_engine_extras.gd::test_repeats_caps_a_repeating_effect"
+		},
+		{
+			"errors": [],
+			"ms": 46,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_engine_extras.gd::test_the_knockdown_blow_builds_its_status"
+		},
+		{
+			"errors": [],
+			"ms": 55,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_built_in_presets_and_playlists_default_to_movesets"
+		},
+		{
+			"errors": [],
+			"ms": 233,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_judges_credit_a_stream_per_second_of_contact"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_lab_policies_give_way_to_bots_in_movesets"
+		},
+		{
+			"errors": [],
+			"ms": 418,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves"
+		},
+		{
+			"errors": [],
+			"ms": 152,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_referee_keeps_movesets_attacks_off_a_downed_fighter"
+		},
+		{
+			"errors": [],
+			"ms": 154,
+			"ok": true,
+			"test": "res://src/test/core/test_movesets_engine.gd::test_a_charge_is_aimed_while_it_charges"
+		},
+		{
+			"errors": [],
+			"ms": 151,
+			"ok": true,
+			"test": "res://src/test/core/test_movesets_engine.gd::test_charged_blast_scales_and_recoils"
+		},
+		{
+			"errors": [],
+			"ms": 109,
+			"ok": true,
+			"test": "res://src/test/core/test_movesets_engine.gd::test_denied_presses_are_reported"
+		},
+		{
+			"errors": [],
+			"ms": 152,
+			"ok": true,
+			"test": "res://src/test/core/test_movesets_engine.gd::test_hooks_translate_classic_slots"
+		},
+		{
+			"errors": [],
+			"ms": 370,
+			"ok": true,
+			"test": "res://src/test/core/test_movesets_engine.gd::test_move_inputs_follow_the_style"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/core/test_movesets_engine.gd::test_pools_and_loadouts_validate"
+		},
+		{
+			"errors": [],
+			"ms": 84,
+			"ok": true,
+			"test": "res://src/test/core/test_movesets_engine.gd::test_single_blows_are_not_repeats"
+		},
+		{
+			"errors": [],
+			"ms": 149,
+			"ok": true,
+			"test": "res://src/test/core/test_movesets_engine.gd::test_sustained_stream_repeats_drains_and_ends_on_release"
+		},
+		{
+			"errors": [],
+			"ms": 9440,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_bosses.gd::test_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 1859,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dozer.gd::test_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 2456,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_dredge.gd::test_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 4172,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_jitters.gd::test_moves_connect_in_range_and_whiff_outside"
+		},
+		{
+			"errors": [],
+			"ms": 5070,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_f_slurry.gd::test_moves_connect_in_range_and_whiff_outside"
+		},
+		{
+			"errors": [],
+			"ms": 3543,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_moves_connect_in_range_and_miss_outside"
+		},
+		{
+			"errors": [],
+			"ms": 353,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_boulder_toss_flies_knocks_down_and_shatters"
+		},
+		{
+			"errors": [],
+			"ms": 522,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_classic_is_unchanged"
+		},
+		{
+			"errors": [],
+			"ms": 639,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_effects_kit_draws_and_cleans_up"
+		},
+		{
+			"errors": [],
+			"ms": 357,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_iron_hide_shrugs_off_light_hits"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_pool_and_loadouts"
+		},
+		{
+			"errors": [],
+			"ms": 175,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_quake_stomp_trips_through_a_guard"
+		},
+		{
+			"errors": [],
+			"ms": 357,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_rock_slide_boulders_stop_shots_for_three_seconds"
+		},
+		{
+			"errors": [],
+			"ms": 328,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_rock_slide_erupts_launches_and_raises_cover"
+		},
+		{
+			"errors": [],
+			"ms": 570,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_snout_jab_horn_lunge_and_the_v0917_abilities_carry_over"
+		},
+		{
+			"errors": [],
+			"ms": 345,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_styles_change_behaviour"
+		},
+		{
+			"errors": [],
+			"ms": 66,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dozer.gd::test_styles_patch_real_fields"
+		},
+		{
+			"errors": [],
+			"ms": 278,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_bubble_stream_soaks_while_held_and_stops_on_release"
+		},
+		{
+			"errors": [],
+			"ms": 207,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_bubbles_stop_shots"
+		},
+		{
+			"errors": [],
+			"ms": 733,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_classic_moves_carry_over"
+		},
+		{
+			"errors": [],
+			"ms": 387,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_drilled_styles_change_behaviour"
+		},
+		{
+			"errors": [],
+			"ms": 16,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_effects_follow_their_moves_and_clean_up"
+		},
+		{
+			"errors": [],
+			"ms": 19,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_effects_kit_is_registered_and_draws_its_vfx"
+		},
+		{
+			"errors": [],
+			"ms": 420,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_hydro_cannon_charges_into_a_long_beam_and_recoils"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_pool_and_loadouts"
+		},
+		{
+			"errors": [],
+			"ms": 427,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_shell_brace_hardens_and_slows"
+		},
+		{
+			"errors": [],
+			"ms": 50,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_styles_patch_their_moves"
+		},
+		{
+			"errors": [],
+			"ms": 196,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_dredge.gd::test_whirlpool_drags_in_and_soaks"
+		},
+		{
+			"errors": [],
+			"ms": 121,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_air_slash_flies_fast_and_cuts_through_a_line"
+		},
+		{
+			"errors": [],
+			"ms": 89,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_air_slash_is_parried_by_a_fresh_guard"
+		},
+		{
+			"errors": [],
+			"ms": 749,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_classic_moves_carry_over"
+		},
+		{
+			"errors": [],
+			"ms": 31,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_effects_kit_draws_and_cleans_up"
+		},
+		{
+			"errors": [],
+			"ms": 94,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_feather_darts_fan_out_and_build_winded"
+		},
+		{
+			"errors": [],
+			"ms": 152,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_pool_and_loadouts"
+		},
+		{
+			"errors": [],
+			"ms": 430,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_styles_change_how_moves_play"
+		},
+		{
+			"errors": [],
+			"ms": 537,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_tailwind_speeds_gusto_up_and_cheapens_dodges"
+		},
+		{
+			"errors": [],
+			"ms": 195,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_twister_rolls_out_lifts_and_leaves_a_whirl"
+		},
+		{
+			"errors": [],
+			"ms": 130,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_gusto.gd::test_twister_swallows_enemy_shots"
+		},
+		{
+			"errors": [],
+			"ms": 676,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_chain_lightning_jumps_to_a_second_foe"
+		},
+		{
+			"errors": [],
+			"ms": 522,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_classic_jitters_is_unchanged"
+		},
+		{
+			"errors": [],
+			"ms": 202,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_discharge_bursts_then_rings"
+		},
+		{
+			"errors": [],
+			"ms": 158,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_discharge_squash_armours_against_lights"
+		},
+		{
+			"errors": [],
+			"ms": 77,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_effects_kit_draws_and_cleans_up"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_pool_and_loadouts"
+		},
+		{
+			"errors": [],
+			"ms": 321,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_static_field_flinches_whoever_enters"
+		},
+		{
+			"errors": [],
+			"ms": 888,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_styles_in_a_duel"
+		},
+		{
+			"errors": [],
+			"ms": 61,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_styles_patch_cleanly"
+		},
+		{
+			"errors": [],
+			"ms": 67,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_thunder_jolt_crosses_the_cage_and_jolts"
+		},
+		{
+			"errors": [],
+			"ms": 144,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_thunder_jolt_parried_by_a_timed_guard"
+		},
+		{
+			"errors": [],
+			"ms": 394,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_jitters.gd::test_v0917_moves_carry_over"
+		},
+		{
+			"errors": [],
+			"ms": 926,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_basic_heavy_and_v0917_abilities_carry_over"
+		},
+		{
+			"errors": [],
+			"ms": 412,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_hex_chain_bites_yanks_and_hexes"
+		},
+		{
+			"errors": [],
+			"ms": 55,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_kit_chain_wisps_and_tether_draw_and_clean_up"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_kit_registers_and_draws_the_beam"
+		},
+		{
+			"errors": [],
+			"ms": 28,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_kit_toll_rings_echoes_and_breaks_on_the_counter"
+		},
+		{
+			"errors": [],
+			"ms": 198,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_lantern_swarm_fans_out_and_homes_in"
+		},
+		{
+			"errors": [],
+			"ms": 341,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_night_shade_pours_slows_haunts_and_stops_on_release"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_pool_and_loadouts"
+		},
+		{
+			"errors": [],
+			"ms": 634,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_styles_change_how_moves_play"
+		},
+		{
+			"errors": [],
+			"ms": 41,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_styles_patch_real_fields"
+		},
+		{
+			"errors": [],
+			"ms": 244,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_toll_cleanses_armours_and_counter_shocks"
+		},
+		{
+			"errors": [],
+			"ms": 319,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_acid_spray_hoses_while_held_and_gunks_fast"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_acid_spray_lives_while_sustained_and_dies_with_the_move"
+		},
+		{
+			"errors": [],
+			"ms": 334,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_coil_crush_ignores_guard_holds_and_crushes"
+		},
+		{
+			"errors": [],
+			"ms": 22,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_coils_wind_on_squeeze_crush_and_let_go"
+		},
+		{
+			"errors": [],
+			"ms": 37,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_darts_fly_stick_ride_and_clean_up"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_effects_kit_is_registered_under_its_names"
+		},
+		{
+			"errors": [],
+			"ms": 185,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_poison_darts_burst_stick_and_gunk"
+		},
+		{
+			"errors": [],
+			"ms": 52,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_pool_and_loadouts"
+		},
+		{
+			"errors": [],
+			"ms": 218,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_shed_skin_cleanses_evades_and_slips_back"
+		},
+		{
+			"errors": [],
+			"ms": 26,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_shed_skin_leaves_a_husk_that_flakes_away"
+		},
+		{
+			"errors": [],
+			"ms": 201,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_tail_sweep_charges_into_rear_and_crash"
+		},
+		{
+			"errors": [],
+			"ms": 336,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_slurry.gd::test_venom_fangs_lob_and_dive_carry_over"
+		},
+		{
+			"errors": [],
+			"ms": 187,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_stoke.gd::test_cinder_shot_lobs_bursts_and_leaves_fire"
+		},
+		{
+			"errors": [],
+			"ms": 83,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_stoke.gd::test_fire_spin_rings_and_follows"
+		},
+		{
+			"errors": [],
+			"ms": 444,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_stoke.gd::test_flamethrower_pours_aims_and_burns"
+		},
+		{
+			"errors": [],
+			"ms": 111,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_stoke.gd::test_flare_rush_lunges_explodes_and_recoils"
+		},
+		{
+			"errors": [],
+			"ms": 248,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_stoke.gd::test_heavy_charges_into_the_haymaker"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_stoke.gd::test_pool_and_loadouts"
+		},
+		{
+			"errors": [],
+			"ms": 145,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_stoke.gd::test_steam_vent_and_stoke_the_fire_carry_over"
+		},
+		{
+			"errors": [],
+			"ms": 1059,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_afterimage_rush_in_movesets_only"
+		},
+		{
+			"errors": [],
+			"ms": 749,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_classic_varga_is_unchanged"
+		},
+		{
+			"errors": [],
+			"ms": 133,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_effects_kit_draws_and_cleans_up"
+		},
+		{
+			"errors": [],
+			"ms": 168,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_equipping_a_technique_changes_only_its_group"
+		},
+		{
+			"errors": [],
+			"ms": 596,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_hook_techniques_from_the_limb_inputs"
+		},
+		{
+			"errors": [],
+			"ms": 93,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_iron_counter_answers_a_strike_in_movesets_only"
+		},
+		{
+			"errors": [],
+			"ms": 709,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_kick_techniques_from_the_limb_inputs"
+		},
+		{
+			"errors": [],
+			"ms": 2117,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_legacy_skin_never_touches_his_gameplay"
+		},
+		{
+			"errors": [],
+			"ms": 155,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_overhand_techniques_from_the_limb_inputs"
+		},
+		{
+			"errors": [],
+			"ms": 66,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_plain_strikes_flare_only_in_movesets"
+		},
+		{
+			"errors": [],
+			"ms": 131,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_shockwave_uppercut_in_movesets_only"
+		},
+		{
+			"errors": [],
+			"ms": 629,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_straight_techniques_from_the_limb_inputs"
+		},
+		{
+			"errors": [],
+			"ms": 516,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_technique_pool_and_loadouts"
+		},
+		{
+			"errors": [],
+			"ms": 251,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_varga.gd::test_thousand_fist_flurry_in_movesets_only"
+		},
+		{
+			"errors": [],
+			"ms": 205,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_character_select_sheet_follows_the_combat_style"
+		},
+		{
+			"errors": [],
+			"ms": 529,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_compendium_lists_the_pool_loadouts_and_combat_basics"
+		},
+		{
+			"errors": [],
+			"ms": 84,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_hud_move_cards_hold_charges_stamina_and_denied_flash"
+		},
+		{
+			"errors": [],
+			"ms": 63,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_loadout_screen_validates_and_applies"
+		},
+		{
+			"errors": [],
+			"ms": 20,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_online_mirror_renders_the_same_cards"
+		},
+		{
+			"errors": [],
+			"ms": 398,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_practice_change_moves_applies_live_through_the_pause_menu"
+		},
+		{
+			"errors": [],
+			"ms": 196,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_practice_shortcuts_never_collide_with_the_fighter_layout"
+		},
+		{
+			"errors": [],
+			"ms": 369,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_rebinding_labels_and_controls_reference_explain_both_styles"
+		},
+		{
+			"errors": [],
+			"ms": 92,
+			"ok": true,
+			"test": "res://src/test/ui/test_movesets_ui.gd::test_versus_setup_moves_row_opens_the_loadout_and_keeps_the_pick"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/vfx/test_moves_showcase.gd::test_zz_moves_showcase"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 123 run, 0 failed, 123 passed, 0 skipped in 65.7 s",
+	"time": "2026-10-21T18:52:59",
+	"total": 123,
+	"version": "0.9.17"
+}

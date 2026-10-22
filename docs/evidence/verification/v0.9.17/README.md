@@ -296,6 +296,14 @@ reported. 30 were confirmed and all were fixed with regression tests; none chang
 
 ## Not verified
 
+Follow-up during v0.9.18 verification: the v0.9.17 full-suite log contains two patch-notes screen
+script errors even though its test reported a pass. The generated v0.9.17 archive entry omitted
+`title`; the test checked version/focus without checking the displayed body. v0.9.18 repairs the
+generator and historical entry, adds a display fallback and asserts every archive body renders.
+The published v0.9.17 assets and immutable tag remain unchanged. Its full log also contains four
+expected native decoder errors from tests that deliberately reject serialized objects; these are
+distinct from the patch-note defect.
+
 - No human listening review of the new recordings and no human or physical-controller playtest.
 - Online play only over loopback.
 - Linux packages are built but not run.

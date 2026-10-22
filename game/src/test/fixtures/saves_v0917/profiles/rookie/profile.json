@@ -1,0 +1,77 @@
+{
+	"format": "critterweight",
+	"kind": "profile",
+	"version": 1,
+	"game_version": "0.9.17",
+	"saved_at": 1792624618.6070001,
+	"seq": 1,
+	"checksum": "de20577b73eb54e5c0fea955188d77ef82cc95799f85c3428d8671688520b432",
+	"data": {
+		"camp": {
+			"clout": 0,
+			"clout_total": 0,
+			"flags": {
+
+			},
+			"hub_spot": "locker_room",
+			"secrets": [],
+			"upgrades": {
+
+			}
+		},
+		"created": 1792624618,
+		"history": [],
+		"id": "rookie",
+		"ladder": {
+			"fight_camp": {
+				"cleared": 0,
+				"unlocked": 1
+			},
+			"off_the_street": {
+				"cleared": 0,
+				"unlocked": 1
+			}
+		},
+		"name": "Rookie",
+		"records": {
+			"best_win_streak": 0,
+			"fastest_ko": 0,
+			"runs": {
+				"fight_camp": {
+					"attempts": 0,
+					"best_dose": 0,
+					"clears": 0
+				},
+				"off_the_street": {
+					"attempts": 0,
+					"best_dose": 0,
+					"clears": 0
+				}
+			},
+			"win_streak": 0
+		},
+		"stats": {
+			"damage_dealt": 0,
+			"draws": 0,
+			"knockdowns": 0,
+			"kos": 0,
+			"losses": 0,
+			"matches": 0,
+			"per_fighter": {
+
+			},
+			"time_played": 0,
+			"wins": 0
+		},
+		"tutorial": {
+			"completed": false,
+			"skipped": false,
+			"times_offered": 0
+		},
+		"unlocks": {
+			"bookie_seats": 1,
+			"cosmetics": [],
+			"titles": []
+		}
+	}
+}

@@ -241,11 +241,13 @@ func emit_event(ev: Dictionary) -> void:
 
 ## Events with seq > after_seq (consumers keep their own cursor).
 func events_since(after_seq: int) -> Array:
-	var out := []
-	for ev in events:
-		if int(ev["seq"]) > after_seq:
-			out.append(ev)
-	return out
+	# Consumers usually need only this tick's tail. Streams fill the history quickly; avoid
+	# rescanning all 512 dictionaries for every audio, arena, match and network update.
+	# Sequence numbers are ordered (including the client mirror), but need not be contiguous.
+	var first := events.size()
+	while first > 0 and int(events[first - 1]["seq"]) > after_seq:
+		first -= 1
+	return events.slice(first)
 
 
 func _physics_process(dt: float) -> void:

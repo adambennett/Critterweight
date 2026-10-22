@@ -1,0 +1,28 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 9,
+			"ok": true,
+			"test": "res://src/test/core/test_bot_moves_ready.gd::test_classic_ability_readiness_keeps_original_slots"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/core/test_bot_moves_ready.gd::test_mapped_ability_uses_equipped_charges"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/core/test_bot_moves_ready.gd::test_unequipped_abilities_cannot_occupy_a_bot_decision"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 3 run, 0 failed, 3 passed, 0 skipped in 10.8 s",
+	"time": "2026-10-21T20:16:16",
+	"total": 3,
+	"version": "0.9.18"
+}

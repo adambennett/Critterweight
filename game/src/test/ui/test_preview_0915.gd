@@ -192,6 +192,17 @@ func test_rules_picker_has_hidden_cancel_and_patch_notes_archive() -> void:
 	check(archive.size() >= 15, "archive contains every published version")
 	check(archive.size() > 0 and str(archive[0].get("tag", "")) == "v" + str(ProjectSettings.get_setting("application/config/version")),
 		"the newest archive entry is this build's version")
+	for i in archive.size():
+		notes._show(i)
+		var text: String = (notes.get("notes") as ScrollText).rich.text
+		check(text.contains(str(archive[i]["body"])), "archive entry %d displays its actual body" % i)
+		check(str(archive[i].get("title", "")) != "", "archive entry %d has a title" % i)
+	# Older generated entries lacked title: keep their body readable instead of throwing.
+	var oldest: Dictionary = notes.releases[0].duplicate(true)
+	notes.releases[0].erase("title")
+	notes._show(0)
+	check((notes.get("notes") as ScrollText).rich.text.contains(str(oldest["body"])), "legacy title omission has a readable fallback")
+	notes.releases[0] = oldest
 
 func test_map_has_scroll_room_no_intro_and_modal_blocks_nodes() -> void:
 	var f := flow()

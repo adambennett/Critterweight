@@ -2,8 +2,59 @@
 
 Pressure boxer, Scorch, biped Scrapper. Spec: `docs/design/ROSTER.md` §1. Data:
 `game/content/core/creatures/f_stoke.json`. Tests: `game/src/test/kits/test_kit_f_stoke.gd`
-(shared harness `kit_harness_stoke_gusto.gd`). Body, art and model are unchanged except the fist
-hit spheres (see Deviations).
+(shared harness `kit_harness_stoke_gusto.gd`). The original Classic kit and its historical balance
+measurements are documented below. v0.9.17 replaced the art while preserving combat; v0.9.18 adds
+the move pool described next, using that improved appearance.
+
+## v0.9.18 Movesets
+
+Stoke is a pressure fighter with two distinct starting builds. **Furnace** equips Ember Jab,
+Flamethrower, Steam Vent and Stoke the Fire: pour a steered stream, maintain space with steam,
+then accelerate the next sequence. **Brawler** equips Ember Jab, Furnace Haymaker, Flare Rush
+and Cinder Shot: threaten a charged fist, close with a burning rush, and lob coals over space
+the opponent wants to retreat through. Fire Spin can replace a special for close-range control.
+The basic string always remains available without waiting for a cooldown.
+
+### Moves and drills
+
+- **Ember Jab:** the jab/cross/hook/Gut Furnace sequence. Bellows speeds it up at a stamina cost;
+  Coal Knuckles builds more Sizzle.
+- **Furnace Haymaker:** tap for Overhand Boiler, hold for the charged Haymaker. Pressure Valve
+  halves charge time; Slag Hammer makes the charged hit stronger and slower.
+- **Steam Vent:** a defensive cone that pushes opponents and destroys incoming projectiles.
+  Superheated widens it; Blowdown increases its push.
+- **Stoke the Fire:** a brief acceleration buff with a self-burn. Forced Draft extends it;
+  Banked Coals preserves some stamina regeneration.
+- **Flamethrower:** hold to pour a 3.2 m, 40-degree cone and steer it with movement. Its repeated
+  contacts spend stamina and build Sizzle; a target can circle the slow aim or interrupt Stoke.
+  Wide Nozzle trades reach for a 60-degree fan (2.4 m). Pressure Jet trades width for reach and
+  push (22 degrees, 4.2 m). The living flame cone, particles and floor footprint read the actual
+  authoritative dimensions, including range upgrades.
+- **Cinder Shot:** a lobbed burning coal with a burst and lingering scorch patch. Scatter Coals
+  trades one coal for three smaller ones; Magma Ball is slower with a wider burst.
+- **Flare Rush:** an advancing flame punch followed by an explosion that recoils Stoke.
+  Afterburner extends the lunge and leaves a trail; Backdraft enlarges the blast and recoil.
+- **Fire Spin:** an opening burst and a ring of burning ground that follows Stoke. Inferno Ring
+  trades into a wider, longer zone; Flash Spin comes out sooner with a stronger opening burst
+  and shorter lingering ring.
+
+### Integration and presentation
+
+The named moves occupy the four ordinary move inputs. The loadout screen, practice, campaign
+learning/drills and Career preparation use the same pool. Classic rules preserve the original
+light/heavy/ability layout. Existing heavy upgrades reach the basic finisher when no heavy move
+is equipped; additive stream damage upgrades are translated proportionally, avoiding a bonus on
+every tick. Bot hints specify ranges, holds and defensive conditions for the new moves.
+
+The effects kit draws a layered, animated flame jet, glowing tumbling coal with ember/smoke trails,
+the rush ignition and recoil blast, and a travelling fire ring. A received flame tick can reconstruct
+the jet for a late-joining spectator; interruption and release remove it. Graphics effects read
+simulation state and never change reach, damage or timing.
+
+Verification is tracked in `docs/releases/v0.9.18-takeover.md`: `test_moves_stoke`,
+`test_move_vfx`, campaign upgrade translation, move tutorials and UI checks. The gated
+`test_moves_showcase` captures actual rendered attack phases for review; a skipped showcase is
+not visual evidence. Historical bot results below describe Classic, not the new move balance.
 
 ## Stats (engine keys)
 

@@ -34,7 +34,7 @@ func on_enter(_p: Dictionary) -> void:
 func _show(index: int) -> void:
 	var release: Dictionary = releases[index]
 	# Release Markdown remains readable as plain text, including bullets and links.
-	notes.set_plain("%s\n%s\n\n%s" % [release["title"], str(release["date"]).left(10), release["body"]])
+	notes.set_plain("%s\n%s\n\n%s" % [release.get("title", release.get("tag", "Release")), str(release["date"]).left(10), release["body"]])
 	notes.focus_neighbor_left = notes.get_path_to(list.focusables()[index])
 
 func right_stick_scroll_target() -> Control:

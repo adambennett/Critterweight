@@ -41,6 +41,14 @@
 			]
 		},
 		{
+			"heading": "Creature movesets (v0.9.18)",
+			"lines": [
+				"Combat design, move pools, animation, effects and recorded dialogue developed with Anthropic Claude under the project lead's direction.",
+				"Completed and refined with OpenAI Codex: campaign progression, upgrade translation, flame effects, integration fixes and release verification.",
+				"Original procedural attack art; no third-party attack models or textures."
+			]
+		},
+		{
 			"heading": "Campaign event art",
 			"lines": [
 				"29 original event illustrations generated with OpenAI image_gen under the project lead's direction.",
@@ -85,7 +93,7 @@
 			"title": "BreezeBlue generated dialogue",
 			"license": "Commercial-use generated outputs under an active paid subscription",
 			"source": "https://breezeblue.ai/legal/terms",
-			"text": "Original Critterweight dialogue for v0.9.15 and v0.9.17 generated with BreezeBlue TTS 2 and library voices Devon, Kendall and Coach Buck. BreezeBlue Terms of Service, effective September 10, 2026, section 5: paid-subscription outputs may be used commercially; that permission survives cancellation. The outputs are not CC0 and this does not grant rights in Breeze models or voices. Generation text, voice IDs, instructions, hashes and budget evidence are retained in docs/audio/breeze/."
+			"text": "Original Critterweight dialogue for v0.9.15, v0.9.17 and v0.9.18 generated with BreezeBlue TTS 2 and library voices Devon, Kendall and Coach Buck. BreezeBlue Terms of Service, effective September 10, 2026, section 5: paid-subscription outputs may be used commercially; that permission survives cancellation. The outputs are not CC0 and this does not grant rights in Breeze models or voices. Generation text, voice IDs, instructions, hashes and budget evidence are retained in docs/audio/breeze/."
 		},
 		{
 			"title": "Barlow / Barlow Condensed",

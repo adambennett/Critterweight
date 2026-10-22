@@ -24,7 +24,10 @@ def main():
     body = a.notes.read_text(encoding='utf-8').strip() + '\n'
     date = (a.date or datetime.now(timezone.utc).strftime('%Y-%m-%d')) + 'T00:00:00Z'
     data = json.loads(ARCHIVE.read_text(encoding='utf-8'))
-    entry = {'date': date, 'tag': tag, 'body': body}
+    entry = {'date': date, 'tag': tag, 'title': 'Critterweight ' + a.version, 'body': body}
+    for previous in data:
+        if not previous.get('title'):
+            previous['title'] = 'Critterweight ' + str(previous.get('tag', '')).lstrip('v')
     if data and data[0].get('tag') == tag:
         entry['date'] = data[0].get('date', date) if not a.date else date
         data[0] = entry

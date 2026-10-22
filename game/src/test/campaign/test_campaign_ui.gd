@@ -361,6 +361,66 @@ func test_rest_train_opens_the_pick_without_a_loop() -> void:
 	check_eq(top().screen_name, "run_map", "back on the map")
 
 
+func test_run_moves_screens_equip_learn_and_drill() -> void:
+	for variant in ["off_the_street", "fight_camp"]:
+		for choice in ["learn", "drill"]:
+			var f := make_flow(run_cfg("f_stoke", {"seed": 4343, "variant": variant}))
+			f.intro_seen = {1: true, 2: true, 3: true}
+			f.show_current()
+			await wait_frames(4)
+			var button := find_exact(top(), "CHANGE MOVES")
+			if not check(button != null, "%s exposes the run loadout" % variant):
+				return
+			button.grab_focus()
+			await action("ui_accept")
+			check_eq(top().screen_name, "loadout", "the map opens the learned-move loadout")
+			var screen = top()
+			var before: Array = RunMoves.moves_of(f.ctrl.player("p0"))["equipped"].duplicate()
+			screen.set_slot(1, "cinder_shot")
+			await capture_ui_evidence(variant + "-equipped-moves")
+			screen.confirm()
+			await wait_frames(4)
+			var equipped: Array = RunMoves.moves_of(f.ctrl.player("p0"))["equipped"]
+			check(equipped != before and equipped[1] == "cinder_shot", "the UI equips Cinder Shot in this run")
+			check_eq(top().screen_name, "run_map", "Done returns to the map")
+			if not check(_walk_into_rest(f.ctrl), "reached a real rest stop"):
+				return
+			f.show_current()
+			await wait_frames(4)
+			check_eq(top().screen_name, "rest", "the actual rest screen")
+			var cards: Array = top().get("_cards")
+			var options := f.ctrl.rest_options("p0")
+			var index := -1
+			for i in options.size():
+				if str(options[i]["id"]) == choice:
+					index = i
+			if not check(index >= 0 and not (cards[index] as Button).disabled, "%s is available" % choice):
+				return
+			(cards[index] as Control).grab_focus()
+			await capture_ui_evidence(variant + "-rest-" + choice)
+			await action("ui_accept")
+			await wait_frames(3)
+			check_eq(top().screen_name, "reward", "rest opens the move choice")
+			var pending := f.ctrl.pending_for("p0")
+			if not check(not pending.is_empty(), "a move pick is pending"):
+				return
+			var picked := str(pending[0]["options"][0])
+			await capture_ui_evidence(variant + "-" + choice + "-picker")
+			top().default_focus().grab_focus()
+			await action("ui_accept")
+			await wait_frames(3)
+			var moves := RunMoves.moves_of(f.ctrl.player("p0"))
+			if choice == "learn":
+				check((moves["learned"] as Array).has(picked), "the UI learned its selected move")
+			else:
+				var parts := RunMoves.split_drill(picked)
+				check_eq(str((moves["drilled"] as Dictionary).get(str(parts[0]), "")), str(parts[1]), "the UI drilled its selected style")
+			check_eq(f.ctrl.phase(), "map", "the choice completes the rest")
+			check(bool(RunController.verify(cat(), RunStore.json_stable(f.ctrl.state))["ok"]), "the run's equip and training choices replay")
+			App.clear_screens()
+			await wait_frames(2)
+
+
 ## Walks a run (synthetic results) until a real rest stop is reachable and enters it.
 func _walk_into_rest(ctrl: RunController) -> bool:
 	for i in 40:

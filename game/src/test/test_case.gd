@@ -61,6 +61,22 @@ func wait_frames(frames: int) -> void:
 		await get_tree().process_frame
 
 
+## Optional real-window evidence at an asserted UI state. Normal/headless suites do no I/O.
+## --ui-evidence <directory> adds PNG captures to the same functional checks used in the suite.
+func capture_ui_evidence(label: String) -> void:
+	var args := OS.get_cmdline_user_args()
+	var at := args.find("--ui-evidence")
+	if at < 0 or at + 1 >= args.size() or DisplayServer.get_name() == "headless":
+		return
+	var folder := args[at + 1]
+	DirAccess.make_dir_recursive_absolute(folder)
+	await wait_frames(2)
+	await RenderingServer.frame_post_draw
+	var path := folder.path_join(label + ".png")
+	check_eq(get_viewport().get_texture().get_image().save_png(path), OK, "UI evidence saved: " + label)
+	print("UI_EVIDENCE ", path)
+
+
 ## A fresh temporary folder under the user-data root (cleaned by the runner at the end).
 func temp_dir(name_: String) -> String:
 	var d := Paths.dir("captures").path_join("tests").path_join(name_)

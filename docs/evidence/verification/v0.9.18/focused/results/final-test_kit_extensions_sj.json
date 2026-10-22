@@ -1,0 +1,88 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 146,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_airborne_flag_and_spring_pad_skip"
+		},
+		{
+			"errors": [],
+			"ms": 201,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_ballistic_flights_not_ground_braked"
+		},
+		{
+			"errors": [],
+			"ms": 23,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_bot_avoid_zones_hint"
+		},
+		{
+			"errors": [],
+			"ms": 24,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_bot_kit_hints"
+		},
+		{
+			"errors": [],
+			"ms": 24,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_bot_range_needs_tools_hint"
+		},
+		{
+			"errors": [],
+			"ms": 24,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_charge_bounce"
+		},
+		{
+			"errors": [],
+			"ms": 24,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_debuff_require_status"
+		},
+		{
+			"errors": [],
+			"ms": 46,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_hook_emerge_event"
+		},
+		{
+			"errors": [],
+			"ms": 4,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_hook_hit_part_condition"
+		},
+		{
+			"errors": [],
+			"ms": 29,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_keyed_joints_skip_gait_wave"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_kit_trait_stats"
+		},
+		{
+			"errors": [],
+			"ms": 105,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_lob_arrive_height"
+		},
+		{
+			"errors": [],
+			"ms": 291,
+			"ok": true,
+			"test": "res://src/test/kits/test_kit_extensions_sj.gd::test_projectile_burst_on_hit_option"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 13 run, 0 failed, 13 passed, 0 skipped in 10.1 s",
+	"time": "2026-10-21T20:16:33",
+	"total": 13,
+	"version": "0.9.18"
+}

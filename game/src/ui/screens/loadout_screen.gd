@@ -81,7 +81,9 @@ func on_enter(p: Dictionary) -> void:
 			b.pressed.connect(_apply_preset.bind(str(lk)))
 			c.add_child(b)
 		c.add_child(UiTheme.spacer(false, 6))
-	c.add_child(UiTheme.label("EQUIPPED", "Eyebrow"))
+	c.add_child(UiTheme.label("EQUIPPED TECHNIQUES" if _c.tags.has("martial") else "EQUIPPED", "Eyebrow"))
+	if _c.tags.has("martial"):
+		c.add_child(UiTheme.label("Techniques change your limb and modifier strikes. Their position here does not change the controls.", "Caption", true))
 	var names2: Array[String] = []
 	var values: Array = []
 	for id in _ids:
@@ -92,7 +94,7 @@ func on_enter(p: Dictionary) -> void:
 	for i in 4:
 		if not values.has(_slots[i]):
 			_slots[i] = EMPTY          # not equippable here (a campaign's unlearned move)
-		var row := OptionRow.new("Move %d  (%s)" % [i + 1, Controls.prompt_for(str(SLOT_INPUTS[i]))])
+		var row := OptionRow.new(_row_label(i))
 		row.setup(values, names2, _slots[i])
 		row.set_meta("focus_key", "slot%d" % i)
 		_describe_row(row, str(_slots[i]))
@@ -105,7 +107,7 @@ func on_enter(p: Dictionary) -> void:
 	c.add_child(UiTheme.spacer(false, 6))
 	var done := UiButton.new("Done", "PrimaryButton", "check")
 	done.route = "done"
-	done.set_help("Done", "Fight with these four moves.")
+	done.set_help("Done", "Fight with these techniques." if _c.tags.has("martial") else "Fight with these moves.")
 	done.pressed.connect(_confirm)
 	c.add_child(done)
 	_validate()
@@ -122,7 +124,13 @@ func _on_device_changed(_kind: String) -> void:
 ## "Move 2  (K)": each row names its input with the current binding on the current device.
 func _relabel_rows() -> void:
 	for i in _rows.size():
-		(_rows[i] as UiRow).set_label("Move %d  (%s)" % [i + 1, Controls.prompt_for(str(SLOT_INPUTS[i]))])
+		(_rows[i] as UiRow).set_label(_row_label(i))
+
+
+func _row_label(i: int) -> String:
+	if _c != null and _c.tags.has("martial"):
+		return "Technique %d" % (i + 1)
+	return "Move %d  (%s)" % [i + 1, Controls.prompt_for(str(SLOT_INPUTS[i]))]
 
 
 func default_focus() -> Control:
@@ -177,6 +185,10 @@ func _apply_preset(key: String) -> void:
 		if i < _rows.size():
 			(_rows[i] as OptionRow).set_value(_slots[i])
 			_describe_row(_rows[i], _slots[i])
+	var focused := get_viewport().gui_get_focus_owner()
+	if focused is OptionRow and _rows.has(focused):
+		var row := focused as OptionRow
+		_help.show_help(row.help_title, row.help_text)
 	_validate()
 	Audio.sfx("ui_confirm")
 

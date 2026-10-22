@@ -5,14 +5,17 @@ extends CareerTestCase
 ## a suspended Off the Street run four nodes in, a Career after one fought bout, and a user rules
 ## preset. Each is copied to a temporary folder, loaded, checked and played on.
 
-const FIX := "res://src/test/fixtures/saves_v0916"
 const PROFILE := "tester"
 
+var _fixture := "res://src/test/fixtures/saves_v0916"
+var _fixture_version := "0.9.16"
 var _root := ""
 var _saved_settings := {}
 
 
 func before_each() -> void:
+	_fixture = "res://src/test/fixtures/saves_v0916"
+	_fixture_version = "0.9.16"
 	_root = temp_dir("older_saves_%d" % Time.get_ticks_usec())
 	_saved_settings = {"values": Settings.values.duplicate(true), "path": Settings.path_override, "ro": Settings.read_only}
 
@@ -25,7 +28,7 @@ func after_each() -> void:
 
 
 func _have_fixtures() -> bool:
-	if not DirAccess.dir_exists_absolute(FIX):
+	if not DirAccess.dir_exists_absolute(_fixture):
 		skip("the save fixtures are source files (not exported with the game); checked in the source suite")
 		return false
 	return true
@@ -34,7 +37,7 @@ func _have_fixtures() -> bool:
 ## Copies a fixture folder (recursively) into the temporary root and returns its copy.
 func _copy(rel: String) -> String:
 	var dst := _root.path_join(rel)
-	_copy_dir(FIX.path_join(rel), dst)
+	_copy_dir(_fixture.path_join(rel), dst)
 	return dst
 
 
@@ -53,11 +56,25 @@ func _copy_dir(src: String, dst: String) -> void:
 
 
 func test_run_from_v0916_resumes_verifies_and_finishes() -> void:
+	await _run_resumes_verifies_and_finishes()
+
+
+func test_run_from_published_v0917_resumes_verifies_and_finishes() -> void:
+	_published_v0917()
+	await _run_resumes_verifies_and_finishes()
+
+
+func _published_v0917() -> void:
+	_fixture = "res://src/test/fixtures/saves_v0917"
+	_fixture_version = "0.9.17"
+
+
+func _run_resumes_verifies_and_finishes() -> void:
 	if not _have_fixtures():
 		return
 	var rs := RunStore.new(_copy("runs"))
 	var r := rs.load_slot(PROFILE, "off_the_street", cat())
-	if not check(bool(r["ok"]), "the v0.9.16 run loads: %s" % str(r.get("error", ""))):
+	if not check(bool(r["ok"]), "the v%s run loads: %s" % [_fixture_version, str(r.get("error", ""))]):
 		return
 	var v := RunController.verify(cat(), r["state"])
 	check(bool(v["ok"]), "its decision log still rebuilds it: %s" % str(v.get("error", "")))
@@ -86,6 +103,15 @@ func test_run_from_v0916_resumes_verifies_and_finishes() -> void:
 ## learned, the default one equipped, nothing drilled), books its next bout, plays it for real
 ## (headless, a bot in the career fighter's corner) with that loadout, and saves as version 2.
 func test_career_from_v0916_migrates_books_and_plays_the_next_bout() -> void:
+	await _career_migrates_books_and_plays_the_next_bout()
+
+
+func test_career_from_published_v0917_migrates_books_and_plays_the_next_bout() -> void:
+	_published_v0917()
+	await _career_migrates_books_and_plays_the_next_bout()
+
+
+func _career_migrates_books_and_plays_the_next_bout() -> void:
 	if not _have_fixtures():
 		return
 	var cs := CareerStore.new(_copy("careers"))
@@ -93,7 +119,7 @@ func test_career_from_v0916_migrates_books_and_plays_the_next_bout() -> void:
 	check(bool(raw["ok"]) and int(raw["version"]) == 1, "the fixture is a version 1 career")
 	check(typeof(raw["data"]) == TYPE_DICTIONARY and not (raw["data"] as Dictionary).has("moves"), "written before careers had moves")
 	var r := CareerController.load_career(cat(), cs, PROFILE, 1)
-	if not check(bool(r["ok"]), "the v0.9.16 career loads: %s" % str(r.get("error", ""))):
+	if not check(bool(r["ok"]), "the v%s career loads: %s" % [_fixture_version, str(r.get("error", ""))]):
 		return
 	check(bool(r["load"]["migrated"]), "through the v1 -> v2 migration")
 	var ctrl: CareerController = r["ctrl"]
@@ -149,13 +175,27 @@ func test_career_from_v0916_migrates_books_and_plays_the_next_bout() -> void:
 
 
 func test_settings_and_rules_preset_from_v0916_load() -> void:
+	_settings_and_rules_preset_load()
+
+
+func test_settings_and_rules_preset_from_published_v0917_load() -> void:
+	_published_v0917()
+	_settings_and_rules_preset_load()
+
+
+func _settings_and_rules_preset_load() -> void:
 	if not _have_fixtures():
 		return
 	var sdir := _copy("profiles")
 	Settings.path_override = sdir.path_join("settings.json")
 	Settings.read_only = false
 	var old_file := Saves.read_json(Settings.path_override, "settings", Settings.VERSION)
-	check(bool(old_file["ok"]) and not (old_file["data"] as Dictionary).has("cosmetic.legacy_varga"), "the v0.9.16 file predates the Legacy Varga option")
+	if not check(bool(old_file["ok"]), "v%s settings checksum is valid" % _fixture_version):
+		return
+	if _fixture_version == "0.9.16":
+		check(not (old_file["data"] as Dictionary).has("cosmetic.legacy_varga"), "the v0.9.16 file predates the Legacy Varga option")
+	else:
+		check((old_file["data"] as Dictionary).has("cosmetic.legacy_varga"), "the published v0.9.17 file already has the cosmetic choice")
 	# loaded the way the game starts (defaults first, then the file): a key the old file lacks must
 	# come from the defaults, never from whatever this process held before
 	Settings.values["cosmetic.legacy_varga"] = true
@@ -164,7 +204,8 @@ func test_settings_and_rules_preset_from_v0916_load() -> void:
 	check_eq(int(Settings.get_value("audio.master")), 60, "a changed volume is kept")
 	check_eq(str(Settings.get_value("access.subtitle_size")), "large", "a changed subtitle size is kept")
 	check_eq(int(Settings.get_value("graphics.effects")), 1, "a changed effects quality is kept")
-	check_eq(bool(Settings.get_value("cosmetic.legacy_varga")), false, "new options start at their defaults")
+	check_eq(bool(Settings.get_value("cosmetic.legacy_varga")), bool(old_file["data"].get("cosmetic.legacy_varga", false)),
+		"the existing cosmetic choice is kept; absent options use their defaults")
 	check(not Settings.read_only, "the older file is writable (not mistaken for a newer one)")
 	var pdir := _copy("presets/rules")
 	var files := DirAccess.get_files_at(pdir)

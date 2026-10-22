@@ -9,12 +9,12 @@ Settings › Controls) shows your live bindings, and **Tutorial** teaches the ba
 | Action | Xbox-style controller | Keyboard & mouse |
 |---|---|---|
 | Move | Left stick | W A S D / arrow keys |
-| Light attack (tap three times = string) | X | J / left mouse |
-| Heavy attack (hold to charge) | Y | K / right mouse |
+| Equipped move 1 | X | J / left mouse |
+| Equipped move 2 | Y | K / right mouse |
 | Guard (tap right before a hit = parry) | Left trigger | Shift / L |
-| Dodge (+ direction; Light during it = dash attack) | A | Space |
-| Grab / throw (+ direction to throw) | B | F / middle mouse |
-| Ability 1 / Ability 2 | LB / RB | Q / E |
+| Dodge (+ direction; basic move during it = dash strike) | A | Space |
+| Grapple / throw / objective interaction | B | F / middle mouse |
+| Equipped move 3 / Equipped move 4 | LB / RB | Q / E |
 | JUICE (needs full Hype) | Right trigger | R |
 | Taunt (fills Hype, risky) | D-pad up | T |
 | Switch target | Right stick click | Tab |
@@ -30,25 +30,37 @@ Use the **right stick** to scroll a focused text panel or list. The main menu us
 a scrollbar. Tutorial is under Fight; AI Lab and Mods are under Create; Controls and Credits are under
 Settings. Profile lets you rename Rookie; dialogue uses that name.
 
-**Compendium** explains each fighter's stats, abilities and cooldowns beside a rotatable 3D model. It also
-covers elemental statuses (including Brine/Soaked), reactions, arenas, objects and mode rules. Ability 2
-(RB/E) often sets up a defense or movement effect: Stoke buffs attacks, Dredge counters, Gusto hovers,
-Dozer raises a dust cloud, Slurry dives, and Jitters places a spring pad.
+**Movesets** is the default combat style. The four move buttons perform the named moves you equip;
+their current names, charges, cooldowns and live bindings appear on the HUD. Hold a stream to keep
+pouring, steer while it runs, or hold a charged attack and release to fire. All eight fighters have
+eight choices and two recommended builds. The **Loadout** button in Versus and the Practice pause
+menu let you choose moves. The **Compendium** explains the full pool, types, reactions and mode rules.
+
+**Varga has his own controls.** Four limb buttons, held modifiers and stance changes choose his
+martial techniques; his four equipped techniques replace groups of strikes, not four ordinary
+button slots. Use his Controls reference and tutorial for the current keyboard/controller bindings.
+
+**Classic** restores Light, Heavy and the two original abilities on those four buttons. Choose
+**Rules Editor › Fighters › Combat style › Classic**, save, then select that preset for a match.
 
 ## 2. Fighting basics
 
 - **Your body is real.** Hits land where a fist, claw, beak or tail actually touches, and harder when it is
   moving fast. Spacing and timing matter more than button speed.
-- **Light** strings are fast and safe; **Heavy** hits hard and shrugs off light hits while winding up;
-  **Heavy during a Light string** is your **Finisher**.
+- **Build around four named moves.** Every ordinary loadout keeps a cheap, cooldown-free basic
+  strike string, leaving three slots for streams, projectiles, charges, movement, counters or support.
+  A held attack commits stamina and recovery; interrupt it, evade its reach or punish the wind-up.
+  Basic strings include their finisher and dodge strike. In **Classic**, Light strings and Heavy
+  remain separate, with Heavy during a Light string selecting the finisher.
 - **Guard** absorbs most damage but costs stamina; **parry** (guard just before impact) staggers the
   attacker and gives you a free moment. **Grabs beat guard**, strikes beat grabs, guard beats strikes.
-- **Dodge** has a short invulnerable moment; press Light while dodging for a **dash attack**.
+- **Dodge** has a short invulnerable moment; press your equipped basic move while dodging for its
+  dash strike (Light in Classic).
 - **Stamina** (green bar) fuels everything; at low stamina your attacks slow down. **Poise** breaks into a
   knockdown if you keep getting hit. Getting up gives a short invulnerability.
 - **Hype** (orange bar) fills as you hit, get hit, parry and taunt; at 100 press **JUICE** for your
   fighter's ultimate state.
-- **Elements**: each fighter carries one of six elements (Scorch, Brine, Static, Sludge, Grit, Gale).
+- **Elements**: fighters carry Scorch, Brine, Static, Sludge, Grit, Gale, Scrap or Spectral.
   Repeated elemental hits build up a status (shown under the health bar with its name); two statuses
   together trigger a **reaction**. Element zones on the floor (puddles, fires, gusts) affect anyone inside.
 - **The cage**: slamming someone into the fence hurts extra (wall splat / cage slam). Some arenas have open
@@ -61,7 +73,7 @@ Dozer raises a dust cloud, Slurry dives, and Jitters places a spring pad.
 | Fight › Quick Fight / Versus | You against bots (up to 8 fighters, teams, any rules preset and arena) |
 | Fight › Practice | A dummy that stands, guards, parries, counters, replays your recording, or fights; hit telemetry |
 | Fight › Spectate | Bots only; Y cycles Follow / Locked / Free, LB/RB chooses a fighter, D-pad speed, X hides HUD |
-| Fight › Tutorial | Ten short exercises with Granny Haymaker; retry, skip or replay any of them |
+| Fight › Tutorial | Granny Haymaker teaches your equipped moves; Classic and Varga have their own lessons; retry, skip or replay |
 | Bonus modes (rules presets) | **Spotlight Hog** (hold the moving light), **Chumball** (knock the ball into the goal), **Absolute Unit** (KO the giant to become the giant), **Chum Rush** (co-op waves), **Tag Team** |
 | Campaign | **Career** (one persistent fighter: offers, training, purses, titles; three save slots), **Off the Street** (fresh runs, no permanent power) and **Fight Camp** (persistent upgrades, The Cannery hub), plus **The Bookie's Table** (watch AI fight your build); The Dosage difficulty ladder 1–10; co-op with friends |
 | Online | Host a game, join by address or LAN, or connect to a dedicated server with playlists |
@@ -73,6 +85,13 @@ Dozer raises a dust cloud, Slurry dives, and Jitters places a spring pad.
 
 Records: custom rules and mods are allowed everywhere single-player; results played with them are marked
 "custom" and kept separate from standard records. Online, everyone needs the same gameplay mods as the host.
+
+**Moves grow with your campaign.** Off the Street offers scrolls, move tutors, rest-stop learning
+and drills. Fight Camp has training and film study; Career retains learned moves and drills between
+bouts. Equip from the moves you know before fighting. Drills trade properties such as focus, spread,
+projectile behavior or control, so choose them to suit your build. Co-op choices belong to each
+player and are validated by the host. Earlier runs and Careers retain progress and receive a
+recommended Movesets loadout; an explicitly saved Classic choice is preserved.
 
 Free camera: LS/WASD moves, RS/right-drag looks, A/Space rises and LT/Shift descends. At the Bookie's Table,
 View/Tab switches between flying and its control bar. Watch fights shows actual combat at 1–4x; Skip ahead

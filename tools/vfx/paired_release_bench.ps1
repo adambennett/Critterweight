@@ -19,6 +19,9 @@ param(
 	[double]$AbilitiesEvery = 3.0,
 	[int]$Duration = 30,
 	[int]$Warmup = 5,
+	# A failed phase may be repeated into a fresh Out directory; retain and combine the raw results.
+	[ValidateSet('before-1', 'after-1', 'after-2', 'before-2')]
+	[string[]]$Phases = @('before-1', 'after-1', 'after-2', 'before-2'),
 	[string]$Godot = "C:\Program Files (x86)\Godot\Godot_v4.5.1-stable_win64_console.exe"
 )
 $ErrorActionPreference = "Stop"
@@ -41,8 +44,9 @@ while ($null -eq $lock) {
 }
 $results = @()
 try {
-	foreach ($phase in @('before-1', 'after-1', 'after-2', 'before-2')) {
+	foreach ($phase in $Phases) {
 		$root = if ($phase.StartsWith('before')) { $Before } else { $After }
+		$build = $phase.Split('-')[0]
 		foreach ($preset in @('deck', 'high')) {
 			$res = if ($preset -eq 'deck') { '1280x800' } else { '1920x1080' }
 			foreach ($load in @('plain', 'abilities')) {
@@ -50,16 +54,26 @@ try {
 				$json = Join-Path $Out "$name.json"
 				$a = @('--path', (Join-Path $root 'game'), '--resolution', $res, '--windowed', '--position', '40,40',
 					'--log-file', (Join-Path $Out "$name-engine.log"), '--',
-					'--user-root', (Join-Path $Out "user-$preset"), '--bench', 'busy', '--n', '8', '--preset', $preset,
+					'--user-root', (Join-Path $Out "user-$build-$preset"), '--bench', 'busy', '--n', '8', '--preset', $preset,
 					'--warmup', "$Warmup", '--duration', "$Duration", '--out', $json, '--windowed', '--size', $res)
 				if ($load -eq 'abilities') { $a += @('--abilities-every', "$AbilitiesEvery") }
+				# Native stderr may include blank console messages; check exit status and actual errors.
+				$ErrorActionPreference = 'Continue'
 				& $Godot @a *> (Join-Path $Out "$name.log")
-				if ($LASTEXITCODE -ne 0 -or -not (Test-Path $json)) { throw "$name failed (exit $LASTEXITCODE)" }
+				$code = $LASTEXITCODE
+				$ErrorActionPreference = 'Stop'
+				$errors = Select-String -LiteralPath (Join-Path $Out "$name.log") -Pattern 'SCRIPT ERROR|^ERROR:|\[ERROR\]|^FAIL '
+				if ($code -ne 0 -or -not (Test-Path $json) -or $errors) { throw "$name failed (exit $code); inspect its retained log" }
 				$b = Get-Content -Raw $json | ConvertFrom-Json
+				if ($b.paused_at_end -or [double]$b.sampled_live_seconds -lt ($Duration * 0.85) -or [int]$b.hits -le 0) {
+					throw "$name did not measure an active fight for the sample duration; inspect the retained report"
+				}
+				if ($load -eq 'abilities' -and [int]$b.effects -le 0) { throw "$name produced no attack effects" }
 				$row = [pscustomobject]@{ run = $name; phase = $phase; build = $phase.Split('-')[0]; preset = $preset; resolution = $res; load = $load;
 					fps = [Math]::Round($b.fps_avg, 1); p50 = $b.frame_ms.p50; p95 = $b.frame_ms.p95; p99 = $b.frame_ms.p99; max = $b.frame_ms.max;
 					over16 = [Math]::Round($b.frames_over_16_7ms_pct, 3); draws = $b.draw_calls.mean; prims = $b.primitives.mean;
-					vram = [Math]::Round($b.video_mem_mb, 1); bursts = $b.ability_bursts; window = ($b.resolution -join 'x') }
+					vram = [Math]::Round($b.video_mem_mb, 1); bursts = $b.ability_bursts; window = ($b.resolution -join 'x');
+					combat = $b.combat; effects = $b.effects; sustains = $b.sustain_starts; moves = $b.move_starts }
 				$results += $row
 				Write-Host ("{0}: {1} fps, p95 {2} ms, p99 {3} ms, >16.7 ms {4}%, draws {5}, bursts {6}" -f $name, $row.fps, $row.p95, $row.p99, $row.over16, $row.draws, $row.bursts)
 			}

@@ -1,0 +1,17 @@
+{
+	"career_week": 2,
+	"content_hash": "ab08811e097726e624197e2634fb68f9c16eac8681d4a0666331b250679413a0",
+	"game_version": "0.9.17",
+	"preset": {
+		"id": "user:fixture_duel",
+		"ok": true,
+		"problems": [
+			{
+				"field": "rounds",
+				"severity": "warning",
+				"text": "An even number of rounds can end in a tie (sudden death settles it if enabled)."
+			}
+		]
+	},
+	"run_phase": "map"
+}

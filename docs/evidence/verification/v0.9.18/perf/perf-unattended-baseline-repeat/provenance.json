@@ -1,0 +1,8 @@
+﻿{
+    "replaces":  "perf-unattended-final/before-1-deck-plain.json",
+    "reason":  "Original sample overlapped the release agent contact-sheet processing from 20:33:59 to 20:34:25 local time. Original retained and excluded.",
+    "baseline_commit":  "e2870289c69c721024ac4ed200a5e6eda7ae4288",
+    "harness_sha256":  "c9ad8075867ef421ebae02780052c5e7cca31691eacf138d7a8ac2e9beba7b66",
+    "repeat_report":  "B:\\Critterweight-work\\v0.9.18\\perf-unattended-baseline-repeat\\before-1-deck-plain.json",
+    "finished":  "2026-10-21T20:49:19"
+}

@@ -1,0 +1,46 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 586,
+			"ok": true,
+			"test": "res://src/test/vfx/test_move_vfx.gd::test_coal_and_ring_entities_draw_and_clean_up"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/vfx/test_move_vfx.gd::test_flame_cone_uses_the_actual_drilled_reach_and_width"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/vfx/test_move_vfx.gd::test_flame_tick_recovers_a_stream_without_its_start_event"
+		},
+		{
+			"errors": [],
+			"ms": 12,
+			"ok": true,
+			"test": "res://src/test/vfx/test_move_vfx.gd::test_flamethrower_lives_while_sustained_and_dies_when_cut_off"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/vfx/test_move_vfx.gd::test_kits_are_registered_by_creature_and_vfx_name"
+		},
+		{
+			"errors": [],
+			"ms": 48,
+			"ok": true,
+			"test": "res://src/test/vfx/test_move_vfx.gd::test_showcase_includes_every_varga_technique"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 6 run, 0 failed, 6 passed, 0 skipped in 9.4 s",
+	"time": "2026-10-21T19:07:20",
+	"total": 6,
+	"version": "0.9.17"
+}

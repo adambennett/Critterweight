@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 295681,
+			"ok": true,
+			"test": "res://src/test/balance/test_moves_matchups.gd::test_zz_moves_matchups"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 305.2 s",
+	"time": "2026-10-21T20:31:22",
+	"total": 1,
+	"version": "0.9.18"
+}

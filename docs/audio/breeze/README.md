@@ -75,3 +75,23 @@ provider reports 3,255.8 used, zero reserved and 6,744.2 remaining of the 10,000
 At the 2026-10-21 takeover, Claude had also generated v0.9.18 commentary and tutorial recordings:
 the combined saved ledger is 4,425.0 credits spent and 5,575.0 remaining across both releases.
 No human listening review has been performed; publication is authorized by the owner.
+
+## Movesets commentary and tutorials for v0.9.18
+
+The same 10,000-credit allowance funded 132 new commentary clips (103 Devon, 29 Kendall) and
+122 Coach Buck tutorial fragments composing 36 tutorial lines. Installed duration is 671.405
+seconds. Plans, request journals and catalogs are in `v0.9.18/`; the runtime catalogs and WAVs
+are in `game/assets/audio/speech/v0918/`. Raw masters remain under
+`B:\Critterweight-work\v0.9.18\breeze-raw`.
+
+The technical audit led to 26 retake requests: ten commentary and thirteen tutorial replacements
+were selected, with three rejected takes retained in the journal. See `retakes-installed.json`
+and `retakes-tutorial-installed.json`. The 2026-10-21 takeover integrity check verified all 254
+installed clips against both their catalog and completed request journal: SHA-256, duration,
+mono 24 kHz PCM16, non-silence and peaks at or below -3 dBFS. This is technical evidence, not a
+human listening verdict. All shipped speech plays offline.
+
+v0.9.18 spent 818.4 credits on commentary and 350.8 on tutorials. Combined with v0.9.17's
+3,255.8, the saved provider report records **4,425.0 used, zero reserved, 5,575.0 remaining**.
+No paid generation was added during takeover. `docs/evidence/verification/v0.9.18/audio/`
+retains the installed-file integrity report.

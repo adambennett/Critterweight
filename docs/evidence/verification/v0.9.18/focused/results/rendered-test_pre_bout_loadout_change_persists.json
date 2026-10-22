@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 1642,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_ui.gd::test_pre_bout_loadout_change_persists"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 10.7 s",
+	"time": "2026-10-21T20:06:15",
+	"total": 1,
+	"version": "0.9.18"
+}

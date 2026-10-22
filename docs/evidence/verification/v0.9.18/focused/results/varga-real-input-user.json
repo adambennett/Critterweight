@@ -1,0 +1,16 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 33918,
+			"ok": true,
+			"test": "res://src/test/vfx/test_moves_showcase.gd::test_zz_moves_showcase"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 1 run, 0 failed, 1 passed, 0 skipped in 43.0 s",
+	"time": "2026-10-21T19:50:39",
+	"total": 1,
+	"version": "0.9.18"
+}

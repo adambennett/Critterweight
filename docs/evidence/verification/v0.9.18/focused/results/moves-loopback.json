@@ -1,0 +1,42 @@
+{
+	"failed": 1,
+	"results": [
+		{
+			"errors": [],
+			"ms": 3154,
+			"ok": true,
+			"test": "res://src/test/net/test_net_moves.gd::test_classic_rule_survives_the_same_loopback_setup"
+		},
+		{
+			"errors": [
+				"res://src/test/net/test_net_moves.gd::test_custom_loadouts_streams_and_martial_inputs_over_loopback: the actual modifier-plus-limb input selects the equipped Force Palm and replicates its effect"
+			],
+			"ms": 11426,
+			"ok": false,
+			"test": "res://src/test/net/test_net_moves.gd::test_custom_loadouts_streams_and_martial_inputs_over_loopback"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_moves.gd::test_loadout_requests_are_cleaned"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/net/test_net_moves.gd::test_roster_carries_combat_style_and_loadout"
+		},
+		{
+			"errors": [],
+			"ms": 27,
+			"ok": true,
+			"test": "res://src/test/net/test_net_moves.gd::test_snapshot_carries_charges_and_the_mirror_shows_the_loadout"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 5 run, 1 failed, 4 passed, 0 skipped in 24.0 s",
+	"time": "2026-10-21T19:12:44",
+	"total": 5,
+	"version": "0.9.17"
+}

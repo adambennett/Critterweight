@@ -1,0 +1,70 @@
+{
+  "harness_sha256": "c9ad8075867ef421ebae02780052c5e7cca31691eacf138d7a8ac2e9beba7b66",
+  "baseline_commit": "e2870289c69c721024ac4ed200a5e6eda7ae4288",
+  "final_reports": [
+    {
+      "path": "perf-unattended-baseline-repeat/before-1-deck-plain.json",
+      "sha256": "94da1c43d5c8ffeed74d2e428c60bd05de599b33bd5ef9ded46e5ce7fa2b1949"
+    },
+    {
+      "path": "perf-unattended-final/before-1-deck-abilities.json",
+      "sha256": "85e74ca69b00025fa1c900e57283a254c1fe8901e6f626e96de34c7f48c8fa2a"
+    },
+    {
+      "path": "perf-unattended-final/before-1-high-plain.json",
+      "sha256": "ac911810bcc3282b16d9b20e9051db8a3bfab10ee5d30a86c1abf274891a6a78"
+    },
+    {
+      "path": "perf-unattended-final/before-1-high-abilities.json",
+      "sha256": "67b959f453ead324a07ff57c007bd0d9873e5816043f56edaab4b02a82c8a8e9"
+    },
+    {
+      "path": "perf-unattended-final/after-1-deck-plain.json",
+      "sha256": "bb99b607483163e37bf3613682870827cd87497748c680fbe1d5709d5099d6b2"
+    },
+    {
+      "path": "perf-unattended-final/after-1-deck-abilities.json",
+      "sha256": "860d9f5d5a657b1a8b6982fd3253c51816eb7042c016fb64b3ced882227450e2"
+    },
+    {
+      "path": "perf-unattended-final/after-1-high-plain.json",
+      "sha256": "9d3550696e54e032718bcb477f4e9c03c7cfaddf4c81cfb3a76ea782528aa232"
+    },
+    {
+      "path": "perf-unattended-final/after-1-high-abilities.json",
+      "sha256": "84365c6addc6d09bf0e0409e428e25cefa9f556ca0726d0ba3dea7ec4665db96"
+    },
+    {
+      "path": "perf-unattended-final/after-2-deck-plain.json",
+      "sha256": "d6ad90fd37bedec94f542374e58d02551cc4c3144bbbfb564c293534abaece5b"
+    },
+    {
+      "path": "perf-unattended-final/after-2-deck-abilities.json",
+      "sha256": "9d89c3dc95b9c7e84f2fb7acfdd5b399375c77c60572fbbd21eaf47ba3dc8fef"
+    },
+    {
+      "path": "perf-unattended-final/after-2-high-plain.json",
+      "sha256": "087af229729ab612dd51e82da59a9bbb0a772587ced21c4692b8663782eb8073"
+    },
+    {
+      "path": "perf-unattended-final/after-2-high-abilities.json",
+      "sha256": "f928ef175414d05e20e9255acdd6798b465e39532ae7e63d2ad43cb0bdabddd8"
+    },
+    {
+      "path": "perf-unattended-final/before-2-deck-plain.json",
+      "sha256": "920331984487d922d81757d46955f7ce6b4761993db04835036ce53a356ff9b9"
+    },
+    {
+      "path": "perf-unattended-final/before-2-deck-abilities.json",
+      "sha256": "8758d8e5779b20aeb6c23ff77670c9f5419f1e113871287c78e40351b387c14a"
+    },
+    {
+      "path": "perf-unattended-final/before-2-high-plain.json",
+      "sha256": "4751ac55fb605e61f8667ec73a58ece0c7354bbb3f44ac4ee9eac15a34db972a"
+    },
+    {
+      "path": "perf-unattended-final/before-2-high-abilities.json",
+      "sha256": "88f0a930b4d4ac95885985df02ec24aeb3a00c23320724a3188b0c1b8d784929"
+    }
+  ]
+}

@@ -5,8 +5,8 @@ flamethrowers, poison darts, bubble streams, hydro cannons, lightning and spectr
 in a real-time physical cage fight. This document is the design the implementation follows. The
 v0.9.17 combat survives whole as **Classic**, chosen by a match rule.
 
-Status: design, 2026-10-20. Numbers are starting values; balance changes are recorded in the kit
-docs (`docs/kits/`) and the release notes.
+Status: implemented and under integrated release verification, 2026-10-21. Balance changes and
+verification limits are recorded in the kit docs (`docs/kits/`) and the release report.
 
 ## 1. Two combat styles, one rule
 
@@ -322,20 +322,20 @@ and stance (the Cage Rules scheme). In Movesets each strike carries a fighting-t
 
 | Group | Technique A | Technique B |
 |---|---|---|
-| Hands, no modifier | **Aura Jab / Cross**: palms burst with gold aura on contact | – |
+| Hands, no modifier | **Aura Uppercut**: an uppercut with gold aura on contact | – |
 | Hands + hooks (LB) | **Comet Hook**: a trailing shockwave arc that clips a second target | **Spiral Hook**: a spinning aura that drags the target in |
 | Hands + straights (RB) | **Pressure Palm**: hold to charge an aura blast that flies | **Force Palm**: point-blank burst that breaks guard |
 | Hands + overhands (LT) | **Meteor Hammer**: an overhead that cracks the floor in a small ring | **Thunder Chop**: a fast overhead with a stun spark |
-| Legs, no modifier | **Pressure-Wave Teep**: a push kick that sends a pressure cone | – |
-| Legs + body (LB) | **Shockwave Roundhouse**: a wave arc at body height | **Iron Shin**: armoured kick through strikes |
-| Legs + head (RB) | **Crescent Moon Kick**: an arcing wave projectile | **Axe Kick**: a downward kick that knocks down |
-| Legs + low (LT) | **Sweep Quake**: a low kick whose quake trips | **Leg Breaker**: Rattled build-up, slows |
+| Legs, no modifier | **Pressure-Wave Teep / Aura Knee**: the lead push kick sends a pressure cone; the rear knee flares on contact | – |
+| Kicks (one equipped technique covers all three leg modifiers) | **Shockwave Kicks**: body = Shockwave Roundhouse arc; head = Crescent Moon projectile; low = Sweep Quake trip | **Iron Shins**: body = armoured Iron Shin; head = Axe Kick knockdown; low = Leg Breaker slow/Rattled |
 
-Contextual combinations: a completed three-hit string unlocks **Thousand-Fist Flurry** as its
-finisher; check + straight is **Iron Counter**; stance switch + dodge is **Afterimage Rush**; an
-uppercut on a nearby target is the **Shockwave Uppercut** launcher. His two D-pad abilities are
-chosen from Cut the Angle, Second Wind, Afterimage Rush, Iron Counter and Focus Aura. His loadout =
-one technique per modifier group + two abilities; A "Aura Boxer" and B "Shockwave Kicker". The guide
+Contextual combinations: after two connected chained strikes, a third hand press with no modifier
+selects **Thousand-Fist Flurry**; check + straight is **Iron Counter**; stance switch + slip within
+0.25 seconds is **Afterimage Rush**; an uppercut on a nearby target is the **Shockwave Uppercut**
+launcher. His two fixed D-pad abilities remain Cut the Angle and Second Wind. His loadout has one
+technique per group (hooks, straights, overhands, kicks), with two alternatives per group and two
+recommended builds: A "Aura Boxer" and B "Shockwave Kicker". Plain strikes and contextual combinations
+do not consume loadout slots. The guide
 (`docs/kits/f_varga.md`, Compendium) and his tutorial text describe the techniques. Classic Varga is
 the v0.9.17 Varga. Skins and combat styles are independent (all four combinations are tested).
 
@@ -364,7 +364,10 @@ the v0.9.17 Varga. Skins and combat styles are independent (all four combination
 | Career | career 1 | 2 | the fighter gets the same starting moves |
 | Profile | profile 1 | 2 | adds custom loadouts (empty) |
 
-Each migration is explicit, tested with v0.9.17 fixtures, and older builds refuse the newer files
+Each migration is explicit. Checks use v0.9.16 fixtures, synthetic v1 saves and fixtures written
+by the downloaded, published v0.9.17 executable. Both old Careers continue into a real next bout;
+runs replay their decision logs, and settings, profiles and user presets preserve their fields.
+The v0.9.17 fixture provenance records its executable and file hashes. Older builds refuse the newer files
 (the Saves version guard) instead of corrupting them.
 
 ## 9. Whole-game integration
@@ -394,8 +397,10 @@ Each migration is explicit, tested with v0.9.17 fixtures, and older builds refus
 * **Commentary**: the director calls moves by name and category (a stream that connects, a charged
   cannon, a counter that worked), reusing the v0.9.17 ability recordings where a move is a v0.9.17
   ability and recording new calls within the remaining Breeze allowance.
-* **Networking** (protocol 7): fighter entries carry the loadout and styles; snapshots carry
-  cooldowns and charges per slot and the stream/beam state; rules carry `combat`; the content hash
+* **Networking** (protocol 7): fighter entries carry the equipped loadout; campaign creature
+  definitions include the applied drills and upgrades. Snapshots carry cooldowns and charges per
+  slot; reliable tick-stamped events carry stream starts, ends and effect footprints. Rules carry
+  `combat`; the content hash
   covers move pools. **Mods**: the creature schema gains `movepool`, `loadouts` and styles; a creature
   without a pool gets one built from its Classic moves (basic string, heavy, abilities).
 

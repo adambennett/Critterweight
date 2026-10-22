@@ -10,6 +10,25 @@ const CAGE := {"mode": "standard", "format": "duel", "teams": 2, "players": [2, 
 const FURNACE := ["ember_jab", "flamethrower", "steam_vent", "stoke_the_fire"]
 
 
+class ModeProbeInput:
+	extends InputSource
+	var bot: InputSource
+	var elapsed := 0.0
+	var next_press := 1.0
+
+	func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
+		bot.poll(f, sim, dt)
+		if sim.mode.phase != MatchMode.Phase.FIGHT:
+			return
+		elapsed += dt
+		# Exercise a real input even while objective bots pursue a ball or await the first wave.
+		# Input interception still gets first refusal (a ball carrier throws, a resting tagger waits).
+		if elapsed >= next_press:
+			next_press += 2.0
+			f.input.set_held(FighterInput.GUARD, false)
+			f.input.press(FighterInput.LIGHT)
+
+
 ## Stoke (Furnace loadout: the Flamethrower on the second move button) against a standing Dredge,
 ## under Cage Rules (10-point judges and a referee).
 func _cage(gap := 1.6) -> MatchSim:
@@ -58,6 +77,50 @@ func test_built_in_presets_and_playlists_default_to_movesets() -> void:
 	var sim2 := make_sim("", {"rounds": 1, "round_time": 0, "intro_time": 0.2, "combat": "moves"}, [{"creature": "f_stoke", "team": 0}, {"creature": "f_dredge", "team": 1}])
 	await step_sim(sim2, 0.3)
 	check_eq(sim2.fighters[0].loadout, FURNACE, "Movesets fighters equip their recommended loadout")
+
+
+func test_every_built_in_preset_runs_its_mode_with_movesets() -> void:
+	var roster := ["f_stoke", "f_dredge", "f_gusto", "f_dozer", "f_slurry", "f_jitters", "f_varga", "f_knell"]
+	var preset_index := 0
+	for id in Content.ids("rules"):
+		var rules: Dictionary = Content.get_entry("rules", str(id)).duplicate(true)
+		var players: Array = rules.get("players", [2, 2])
+		var count := maxi(2, int(players[0]))
+		var teams := int(rules.get("teams", 0))
+		var entries := []
+		for i in count:
+			var c := Content.creature(str(roster[(preset_index + i) % roster.size()]))
+			var brain := BotBrain.new("pro", 113 + i)
+			brain.set_personality(c.ai)
+			var probe := ModeProbeInput.new()
+			probe.bot = brain
+			entries.append({"creature": c, "team": i % teams if teams > 0 else i, "source": probe, "kind": "bot"})
+		# Only shorten the presentation. Keep the actual built-in combat, scoring and objective rules.
+		rules["intro_time"] = 0.2
+		var sim := MatchSim.new()
+		sim.running = false
+		var world := fresh_world()
+		world.add_child(sim)
+		sim.setup({"arena": Content.arena("the_gullet"), "rules": rules, "seed": 113, "fighters": entries,
+			"mode": ModeRegistry.create(str(rules.get("mode", "standard")))})
+		await _to_fight(sim)
+		await step_sim(sim, 16.0 if str(id) == "chum_rush" else 8.0)
+		check_eq(sim.mode.id(), str(rules.get("mode", "standard")), "%s uses its actual objective mode" % id)
+		check_eq(sim.combat_style(), "moves", "%s runs Movesets" % id)
+		var played := sim.events.any(func(e: Dictionary) -> bool: return str(e.get("type", "")) == "move_start")
+		check(played, "%s accepts attack inputs in its live simulation" % id)
+		if str(id) == "chum_rush":
+			check(sim.fighters.size() > count, "Chum Rush spawned its first wave under Movesets")
+		for f: Fighter in sim.fighters:
+			check_eq(f.combat_style, "moves", "%s fighter %d keeps Movesets after mode setup" % [id, f.index])
+			if not f.creature.pool.is_empty():
+				check_eq(f.creature.loadout_problem(f.loadout), "", "%s %s has a valid equipped loadout" % [id, f.creature.id])
+				if roster.has(f.creature.id):
+					check_eq(f.loadout.size(), 4, "%s %s has four equipped moves" % [id, f.creature.id])
+		print("MOVESET_PRESET ", id, " ", sim.mode.id(), " fighters=", sim.fighters.size(), " attacked=", played)
+		world.queue_free()
+		await wait_physics(2)
+		preset_index += 1
 
 
 func test_judges_credit_a_stream_per_second_of_contact() -> void:

@@ -1,0 +1,37 @@
+{
+  "release": "https://github.com/adambennett/Critterweight/releases/tag/v0.9.17",
+  "commit": "e2870289c69c721024ac4ed200a5e6eda7ae4288",
+  "executable_sha256": "b17a82e1d69f54fb76752560758f81dc3675171c29033277ee8f2a1e678446d0",
+  "generated_by": "Downloaded published Windows executable, --headless --fixed-fps 120 --test test_zz_save_fixture_writer --write-save-fixtures",
+  "source_test": "game/src/test/campaign/test_zz_save_fixture_writer.gd",
+  "files": [
+    {
+      "path": "runs/tester/off_the_street.json",
+      "sha256": "5b4d8a95e098cc06192dc3036cf9d3abac31ee8e75020a978ab7a1498a10362e"
+    },
+    {
+      "path": "careers/tester/slot_1.json",
+      "sha256": "619559fb978addc58dcf69bbd0463b969a57364daf80d50409a07fae22998de6"
+    },
+    {
+      "path": "profiles/settings.json",
+      "sha256": "043e06bf568e14f6622b60cd80b404e339263b063c72ef6f134ff0804672159c"
+    },
+    {
+      "path": "profiles/index.json",
+      "sha256": "5156eed249075e43d97bac7efffce6fec4e8f52239801919e8165e3e946681b4"
+    },
+    {
+      "path": "profiles/rookie/profile.json",
+      "sha256": "bc154a9e8854daf38246cd22faffcac55197147b47c2a2f99a4da0b705b73c3e"
+    },
+    {
+      "path": "presets/rules/fixture_duel.json",
+      "sha256": "25fee6312aefbbd1ec25346c7eb991e18a41e490b26461d9f0a5d14ec809cf44"
+    },
+    {
+      "path": "fixture_info.json",
+      "sha256": "4c545616466c88c9d93a56601d0278079fd5c4b62480120e4077cfe7508b5510"
+    }
+  ]
+}

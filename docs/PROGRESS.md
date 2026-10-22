@@ -16,8 +16,17 @@ See [the continuation record](releases/v0.9.17-takeover.md),
 [v0.9.17 evidence](evidence/verification/v0.9.17/README.md).
 
 Claude's existing v0.9.18 implementation is preserved in `B:\Critterweight-work\wt\v0918` on
-`feature/v0.9.18-movesets` (`7eba366` at takeover). Next: merge the shipped base, audit the full
-combat/progression/UI/network scope, finish and verify the implementation, then publish v0.9.18.
+`feature/v0.9.18-movesets` (`7eba366` at takeover). The shipped base and the separate completed
+campaign progression branch are integrated (`6e891f7`, `6b6329a`). Focused move, progression,
+upgrade, UI, tutorial and real ENet loopback checks pass. The full roster has been rendered;
+Flamethrower's visual refinement, real-input Varga captures and published v0.9.17 save migrations
+pass. Rendered learn/equip/drill flows cover all three campaigns; Varga can change techniques in
+Practice. The 112-bout comparison and 56-bout bot-fix repeat completed; equipped-charge lookup
+reduced denied bot moves by 87.8%. All 254 v18 recordings pass their integrity audit. The patch-note
+archive now checks actual displayed bodies. Final matched performance and the longer 1080p
+confirmation are recorded with active-fight guards and slow-frame limits. Next: the clean integrated
+source suite/ten-minute soak and packaged suites, then publish v0.9.18.
+See `releases/v0.9.18-takeover.md` and the v18 verification report for exact evidence.
 Both releases are authorized for autonomous GitHub publication. Combined Breeze spending in the
 latest saved report is 4,425.0 / 10,000 credits; 5,575.0 remain across the entire goal.
 

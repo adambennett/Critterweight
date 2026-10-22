@@ -9,7 +9,7 @@ const FLAME_BODY := Color(1.0, 0.42, 0.08)
 const FLAME_EDGE := Color(0.78, 0.16, 0.04)
 const SMOKE := Color(0.24, 0.2, 0.18, 0.5)
 
-var _jets := {}          ## fighter -> {node, mat, len, age, ending, end_t}
+var _jets := {}          ## fighter -> {node, mat, inner_mat, len, full, cone_deg, age, ending, end_t}
 
 
 func vfx_names() -> Array:
@@ -68,13 +68,27 @@ func on_move_start(fi: int, ev: Dictionary) -> bool:
 func _start_jet(fi: int) -> void:
 	_end_jet(fi, true)
 	var mi := MeshInstance3D.new()
-	mi.mesh = FxKit.wall_mesh(32, 0.05)              # y = 0: the wide end, y = 1: the narrow apex
-	var mat := FxKit.flow_material(FLAME_BODY, FLAME_CORE, {"cover": 0.62, "glow_k": 1.1, "scroll": Vector2(0.25, 3.2),
-		"noise_scale": Vector2(5.0, 2.2), "edge_v": 0.22, "core": 0.8, "core_width": 0.3, "jag": 0.4, "alpha": 0.0})
+	mi.mesh = FxKit.flame_mesh()                  # subdivided so the flame can curl as it travels
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://src/view/shaders/fx_flame_jet.gdshader")
+	mat.set_shader_parameter("alpha", 0.0)
 	mi.material_override = mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	fx.add_child(mi)
-	_jets[fi] = {"node": mi, "mat": mat, "len": 0.2, "age": 0.0, "ending": false, "end_t": 0.0}
+	var inner_mat: ShaderMaterial = null
+	if fx.quality >= 1:
+		var core := MeshInstance3D.new()
+		core.mesh = mi.mesh
+		inner_mat = mat.duplicate() as ShaderMaterial
+		inner_mat.set_shader_parameter("inner", 1.0)
+		inner_mat.set_shader_parameter("seed", 3.4)
+		core.material_override = inner_mat
+		core.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.add_child(core)
+		core.scale = Vector3(0.46, 0.88, 0.46)
+		core.position.y = 0.12                  # both cones begin at the same mouth
+	_jets[fi] = {"node": mi, "mat": mat, "inner_mat": inner_mat, "len": 0.2, "full": 3.2, "cone_deg": 40.0,
+		"age": 0.0, "ending": false, "end_t": 0.0}
 	fx.flash_light(mouth(fi), FLAME_BODY, 2.5, 3.5, 0.25)
 
 
@@ -103,12 +117,16 @@ func process(delta: float) -> void:
 		if not bool(j["ending"]) and not is_acting(fi):
 			j["ending"] = true                       # interrupted (hit, knocked down): the jet dies
 		var mat: ShaderMaterial = j["mat"]
-		var full := 3.2
+		var inner_mat: ShaderMaterial = j["inner_mat"]
+		var full := float(j["full"])
 		if bool(j["ending"]):
 			j["end_t"] = float(j["end_t"]) + delta
 			var k := clampf(float(j["end_t"]) / 0.22, 0.0, 1.0)
 			mat.set_shader_parameter("dissolve", k)
 			mat.set_shader_parameter("alpha", 1.0 - k)
+			if inner_mat != null:
+				inner_mat.set_shader_parameter("dissolve", k)
+				inner_mat.set_shader_parameter("alpha", 1.0 - k)
 			if k >= 1.0:
 				mi.queue_free()
 				_jets.erase(fi)
@@ -116,14 +134,16 @@ func process(delta: float) -> void:
 		else:
 			j["len"] = move_toward(float(j["len"]), full, delta * 14.0)      # it surges out to its reach
 			mat.set_shader_parameter("alpha", clampf(float(j["age"]) / 0.08, 0.0, 1.0) * (0.85 if fx.reduce_flashes else 1.0))
+			if inner_mat != null:
+				inner_mat.set_shader_parameter("alpha", mat.get_shader_parameter("alpha"))
 		var l: float = j["len"]
 		var d := aim_dir(fi, -0.12)
 		var x := d.cross(Vector3.UP).normalized()
 		var y := -d
 		var z := x.cross(y).normalized()
-		# the cone's half-width at its end follows the 40° area; a fast flutter keeps it alive
+		# Follow the authoritative cone, including drills/upgrades; flutter gives the fire motion.
 		var flutter := 1.0 + 0.08 * sin(float(j["age"]) * 31.0) + 0.05 * sin(float(j["age"]) * 47.0)
-		var r := l * tan(deg_to_rad(20.0)) * flutter
+		var r := l * tan(deg_to_rad(float(j["cone_deg"]) * 0.5)) * flutter
 		mi.global_transform = Transform3D(Basis(x * r, y * l, z * r * 0.75), mouth(fi) + d * l)
 
 
@@ -131,6 +151,13 @@ func _flame_tick(fi: int, ev: Dictionary) -> void:
 	var d := aim_dir(fi, -0.12)
 	var reach := float(ev.get("radius", 3.2))
 	var cone := float(ev.get("cone_deg", 40.0))
+	# A tap fires without a sustain-start event, and late joiners can arrive mid-stream.
+	# The authoritative effect tick provides both the existence and exact footprint of the jet.
+	if not _jets.has(fi):
+		_start_jet(fi)
+	var jet: Dictionary = _jets[fi]
+	jet["full"] = reach
+	jet["cone_deg"] = cone
 	# tongues of flame along the jet, cinders thrown past its end, smoke rolling off the top
 	fx.burst("flames", mouth(fi), d, FLAME_BODY, FLAME_EDGE, {"speed": reach * 2.2, "spread": deg_to_rad(cone) * 0.45, "amount": 0.55, "life": 0.55})
 	fx.burst("cinders", mouth(fi) + d * 0.3, d, FLAME_CORE, FLAME_BODY, {"speed": reach * 2.6, "spread": 0.35, "amount": 0.3})

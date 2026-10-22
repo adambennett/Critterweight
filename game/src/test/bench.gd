@@ -4,8 +4,9 @@ extends Node
 ##   -- --bench busy   [--n 8] [--duration 30] [--warmup 5] [--preset high] [--out file.json]
 ##        rendered match with N pro bots (FFA, lives) in the primary cage: frame-time
 ##        distribution, physics/process time, draw calls, memory, match load time
-##        [--abilities-every s]: every s seconds all fighters use an ability at once (cycling
-##        ability 1, ability 2, JUICE; cooldowns and hype refilled) for crowded-effects captures
+##        [--abilities-every s]: every s seconds all fighters use an attack at once (Movesets:
+##        four equipped moves held for 1.2 s, then JUICE; Classic/Varga: ability 1, ability 2,
+##        JUICE). Cooldowns, move charges and hype are refilled for crowded-effects captures.
 ##   -- --bench duel   same with 2 fighters
 ##   -- --bench sim    [--n 8] [--duration 60]: headless authoritative simulation cost per tick
 ##        (dedicated-server capacity), no rendering
@@ -23,6 +24,35 @@ extends Node
 
 var args: PackedStringArray
 var report := {}
+
+
+## The bot still moves and defends; a timed burst is applied AFTER its poll, so its input cleanup
+## cannot swallow the measurement's held stream/charge. Uses only APIs shared with v0.9.17.
+class BurstDriver:
+	extends InputSource
+	var bot: InputSource
+	var button := -1
+	var left := 0.0
+	var fresh := false
+
+	func trigger(b: int, duration: float) -> void:
+		button = b
+		left = duration
+		fresh = true
+
+	func poll(f: Fighter, sim: MatchSim, dt: float) -> void:
+		if bot != null:
+			bot.poll(f, sim, dt)
+		if button < 0:
+			return
+		if fresh:
+			f.input.press(button)
+			fresh = false
+		f.input.set_held(button, left > 0.0)
+		left -= dt
+		if left <= 0.0:
+			f.input.set_held(button, false)
+			button = -1
 
 
 func run(scene: String, a: PackedStringArray) -> void:
@@ -75,6 +105,8 @@ func _fighters(n: int) -> Array:
 
 
 func _rendered(n: int) -> void:
+	# An unattended benchmark must keep fighting when the owner uses another window.
+	Settings.set_value("gameplay.pause_on_focus_loss", false, true, false)
 	var preset := _arg("--preset", "")
 	if preset != "":
 		Settings.set_value("graphics.preset", preset, true, false)
@@ -93,9 +125,17 @@ func _rendered(n: int) -> void:
 	scene.sim.rules["round_time"] = 0.0
 	for f in scene.sim.fighters:
 		f.lives = 99
+	var every := float(_arg("--abilities-every", "0"))
+	if every > 0.0:
+		for i in scene.sim.input_sources.size():
+			var driver := BurstDriver.new()
+			driver.bot = scene.sim.input_sources[i]
+			scene.sim.set_input_source(i, driver)
 	var warm := float(_arg("--warmup", "5"))
 	var dur := float(_arg("--duration", "30"))
 	await get_tree().create_timer(warm).timeout
+	var live_start := scene.sim.time
+	var tick_start := scene.sim.tick_count
 	var frames := PackedFloat32Array()
 	var phys := PackedFloat32Array()
 	var proc := PackedFloat32Array()
@@ -104,7 +144,6 @@ func _rendered(n: int) -> void:
 	var mem_start := Performance.get_monitor(Performance.MEMORY_STATIC)
 	var t_end := Time.get_ticks_msec() + int(dur * 1000.0)
 	var last := Time.get_ticks_usec()
-	var every := float(_arg("--abilities-every", "0"))
 	report["abilities_every_s"] = every
 	var next_burst := Time.get_ticks_msec()
 	var burst_k := 0
@@ -143,23 +182,39 @@ func _rendered(n: int) -> void:
 	report["process_rss_mb"] = OS.get_static_memory_usage() / 1048576.0
 	report["alive_fighters_end"] = scene.sim.fighters.filter(func(f): return not f.is_out()).size()
 	report["ability_bursts"] = bursts
+	report["sampled_live_seconds"] = scene.sim.time - live_start
+	report["sampled_ticks"] = scene.sim.tick_count - tick_start
+	report["paused_at_end"] = scene.sim.paused
 	report["hits"] = scene.sim.events.filter(func(e): return e["type"] == "hit").size()
+	report["combat"] = str(scene.sim.rules.get("combat", "classic"))
+	report["effects"] = scene.sim.events.filter(func(e): return e["type"] == "effect").size()
+	report["sustain_starts"] = scene.sim.events.filter(func(e): return e["type"] == "sustain" and e.get("phase", "") == "start").size()
+	report["move_starts"] = scene.sim.events.filter(func(e): return e["type"] == "move_start").size()
 
 
 ## Crowded-effects load: every fighter presses the same ability at once (cycle k: ability 1,
 ## ability 2, JUICE), with cooldowns, charges, stamina and hype refilled so the press fires.
 static func _all_use_ability(sim: MatchSim, k: int) -> void:
-	var button: int = [FighterInput.AB1, FighterInput.AB2, FighterInput.JUICE][k % 3]
 	for f in sim.fighters:
 		if f.is_out():
 			continue
+		var moves := str(sim.rules.get("combat", "classic")) == "moves" and not f.creature.tags.has("martial")
+		var buttons: Array = [FighterInput.LIGHT, FighterInput.HEAVY, FighterInput.AB1, FighterInput.AB2, FighterInput.JUICE] if moves else [FighterInput.AB1, FighterInput.AB2, FighterInput.JUICE]
+		var button: int = buttons[k % buttons.size()]
 		f.cooldown_left.clear()
 		for slot in f.creature.abilities:
 			f.charges_left[slot] = int(f.creature.ability_charges.get(slot, 1))
+		if moves:
+			for slot: String in ["m1", "m2", "m3", "m4"]:
+				f.charges_left[slot] = int(f.call("slot_max_charges", slot))
 		f.stamina = f.max_stamina
 		if button == FighterInput.JUICE:
 			f.hype = 100.0
-		f.input.press(button)
+		var driver: BurstDriver = sim.input_sources[f.index] as BurstDriver
+		if driver != null:
+			driver.trigger(button, 1.2 if moves else 0.1)
+		else:
+			f.input.press(button)
 
 
 func _sim_cost(n: int) -> void:

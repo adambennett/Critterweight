@@ -1,0 +1,82 @@
+{
+  "abilities_every_s": 3.0,
+  "ability_bursts": 10,
+  "alive_fighters_end": 8,
+  "bench": "busy",
+  "boot_ms": 7550,
+  "combat": "classic",
+  "cores": 8,
+  "cpu": "Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz",
+  "date": "2026-10-21T19:54:16",
+  "draw_calls": {
+    "max": 974.0,
+    "mean": 749.846,
+    "min": 613.0,
+    "n": 2992,
+    "p50": 741.0,
+    "p95": 886.0,
+    "p99": 919.0
+  },
+  "effects": 184,
+  "engine": "4.5.1-stable (official)",
+  "fighters": 8,
+  "fps_avg": 99.7108385681524,
+  "frame_ms": {
+    "max": 99.001,
+    "mean": 10.029,
+    "min": 3.46,
+    "n": 2992,
+    "p50": 8.77,
+    "p95": 15.844,
+    "p99": 22.142
+  },
+  "frames": 2992,
+  "frames_over_16_7ms": 115,
+  "frames_over_16_7ms_pct": 3.84358288770053,
+  "game_version": "0.9.17",
+  "headless": false,
+  "hits": 97,
+  "match_load_ms": 379.485,
+  "memory_growth_mb": 13.9113492965698,
+  "memory_static_mb": 342.380595207214,
+  "move_starts": 74,
+  "objects": 10212.0,
+  "os": "Windows",
+  "physics_frame_ms": {
+    "max": 13.19,
+    "mean": 7.317,
+    "min": 4.277,
+    "n": 2992,
+    "p50": 6.751,
+    "p95": 13.137,
+    "p99": 13.19
+  },
+  "preset": "deck",
+  "primitives": {
+    "max": 792658.0,
+    "mean": 719644.807,
+    "min": 623618.0,
+    "n": 2992,
+    "p50": 718058.0,
+    "p95": 773038.0,
+    "p99": 781946.0
+  },
+  "process_frame_ms": {
+    "max": 60.013,
+    "mean": 13.193,
+    "min": 6.864,
+    "n": 2992,
+    "p50": 10.578,
+    "p95": 44.232,
+    "p99": 60.013
+  },
+  "process_rss_mb": 342.380839347839,
+  "renderer": "NVIDIA GeForce RTX 4070 Ti SUPER",
+  "resolution": [
+    1280,
+    800
+  ],
+  "sustain_starts": 0,
+  "total_ms": 52921,
+  "video_mem_mb": 148.107147216797
+}

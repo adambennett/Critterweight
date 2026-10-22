@@ -271,6 +271,30 @@ static func wall_mesh(segments := 48, top_scale := 1.0) -> ArrayMesh:
 	return m
 
 
+## A subdivided flame cone: enough longitudinal rings for a travelling ripple, still under 1k
+## triangles. y=1 is the mouth and y=0 the full-width end, matching wall_mesh's jet convention.
+static func flame_mesh() -> ArrayMesh:
+	if _meshes.has("flame_jet"):
+		return _meshes["flame_jet"]
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	const SIDES := 24
+	const RINGS := 12
+	for j in RINGS:
+		for i in SIDES:
+			for corner in [Vector2i(i, j), Vector2i(i + 1, j + 1), Vector2i(i, j + 1),
+				Vector2i(i, j), Vector2i(i + 1, j), Vector2i(i + 1, j + 1)]:
+				var uv := Vector2(float(corner.x) / SIDES, float(corner.y) / RINGS)
+				var radius := 0.05 + 0.95 * pow(1.0 - uv.y, 0.8)
+				var a := uv.x * TAU
+				st.set_uv(uv)
+				st.add_vertex(Vector3(cos(a) * radius, uv.y, sin(a) * radius))
+	st.generate_normals()
+	var m := st.commit()
+	_meshes["flame_jet"] = m
+	return m
+
+
 ## A flat square of edge 1 in XZ (floor footprints), centred on the origin.
 static func floor_quad() -> Mesh:
 	if not _meshes.has("floor"):

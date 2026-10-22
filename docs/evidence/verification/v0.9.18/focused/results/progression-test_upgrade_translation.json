@@ -1,0 +1,62 @@
+{
+	"failed": 2,
+	"results": [
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_additive_damage_on_a_stream_becomes_a_multiplier"
+		},
+		{
+			"errors": [
+				"res://src/test/campaign/test_upgrade_translation.gd::test_every_upgrade_reaches_each_recommended_loadout_and_the_classic_kit: 20 upgrades miss a loadout:\ntechnique tech_dozer_quarry_legs reaches no move of f_dozer's bulldozer loadout in Movesets (it changes: horn_lunge)\ntechnique tech_dozer_quarry_legs reaches no move of f_dozer's quarry loadout in Movesets (it changes: horn_lunge)\nsupplement sup_projectile_polish reaches no move of f_dozer's bulldozer loadout in Movesets (it changes: boulder_toss)\nevent evt_headlamp.battery#0.run_patches reaches no move of f_dozer's quarry loadout in Movesets (it changes: bulldoze)\ntechnique tech_dredge_molting_season reaches no move of f_dredge's breakwater loadout in Movesets (it changes: anchor_drop)\ntechnique tech_dredge_undertow reaches no move of f_dredge's tidecaller loadout in Movesets (it changes: crusher_slam, tide_spit)\nsupplement sup_projectile_polish reaches no move of f_dredge's breakwater loadout in Movesets (it changes: tide_spit, bubble_stream)\nevent evt_molting.hold#0.next_fight reaches no move of f_dredge's breakwater loadout in Movesets (it changes: anchor_drop)\ntechnique tech_gusto_tailwind reaches no move of f_gusto's skyhook loadout in Movesets (it changes: gust_bomb)\ntechnique tech_jitters_bouncy_castle reaches no move of f_jitters's overload loadout in Movesets (it changes: spring_pad)\ntechnique tech_jitters_short_fuse reaches no move of f_jitters's overload loadout in Movesets (it changes: arc_lash)\ntechnique tech_knell_echo reaches no move of f_knell's undertow loadout in Movesets (it changes: through_the_veil)\ntechnique tech_knell_glow reaches no move of f_knell's undertow loadout in Movesets (it changes: ghost_light)\ntechnique tech_knell_seam reaches no move of f_knell's undertow loadout in Movesets (it changes: through_the_veil)\ntechnique tech_knell_wick reaches no move of f_knell's undertow loadout in Movesets (it changes: ghost_light)\ntechnique tech_slurry_double_dip reaches no move of f_slurry's swamp loadout in Movesets (it changes: sludge_lob, drain_dive)\ntechnique tech_slurry_grease_trap reaches no move of f_slurry's swamp loadout in Movesets (it changes: tail_sweep, sludge_lob)\nsupplement sup_flavor_pack_sludge reaches no move of f_slurry's venomous loadout in Movesets (it changes: tail_sweep)\nsupplement sup_flavor_pack_sludge reaches no move of f_slurry's swamp loadout in Movesets (it changes: tail_sweep)\nevent evt_drain_backup.clear#0.run_patches reaches no move of f_slurry's swamp loadout in Movesets (it changes: drain_dive)"
+			],
+			"ms": 4316,
+			"ok": false,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_every_upgrade_reaches_each_recommended_loadout_and_the_classic_kit"
+		},
+		{
+			"errors": [],
+			"ms": 77,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_heavy_upgrades_fall_back_to_the_finisher_without_a_heavy_move"
+		},
+		{
+			"errors": [],
+			"ms": 113,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_hook_slot_conditions_match_pool_moves"
+		},
+		{
+			"errors": [],
+			"ms": 73,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_movesets_effects_and_string_translation"
+		},
+		{
+			"errors": [],
+			"ms": 70,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_multipliers_reach_inline_moves_once"
+		},
+		{
+			"errors": [
+				"res://src/test/campaign/test_upgrade_translation.gd::test_texts_and_offer_weights_follow_the_loadout: Projectile Polish is never offered to a fighter without projectiles or streams expected 0.0000 ± 0.0001, got 0.6000"
+			],
+			"ms": 75,
+			"ok": false,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_texts_and_offer_weights_follow_the_loadout"
+		},
+		{
+			"errors": [],
+			"ms": 408,
+			"ok": true,
+			"test": "res://src/test/campaign/test_upgrade_translation.gd::test_translated_builds_stay_valid_fighters"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 8 run, 2 failed, 6 passed, 0 skipped in 14.1 s",
+	"time": "2026-10-21T18:55:43",
+	"total": 8,
+	"version": "0.9.17"
+}

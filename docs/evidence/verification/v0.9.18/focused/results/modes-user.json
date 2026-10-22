@@ -1,0 +1,46 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 58,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_built_in_presets_and_playlists_default_to_movesets"
+		},
+		{
+			"errors": [],
+			"ms": 18912,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_every_built_in_preset_runs_its_mode_with_movesets"
+		},
+		{
+			"errors": [],
+			"ms": 233,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_judges_credit_a_stream_per_second_of_contact"
+		},
+		{
+			"errors": [],
+			"ms": 10,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_lab_policies_give_way_to_bots_in_movesets"
+		},
+		{
+			"errors": [],
+			"ms": 387,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves"
+		},
+		{
+			"errors": [],
+			"ms": 150,
+			"ok": true,
+			"test": "res://src/test/core/test_moves_rules.gd::test_referee_keeps_movesets_attacks_off_a_downed_fighter"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 6 run, 0 failed, 6 passed, 0 skipped in 28.7 s",
+	"time": "2026-10-21T19:49:47",
+	"total": 6,
+	"version": "0.9.18"
+}

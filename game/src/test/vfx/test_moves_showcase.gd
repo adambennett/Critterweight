@@ -18,7 +18,6 @@ const CROWD_TIMES := [6.0, 12.0, 18.0, 24.0]
 
 class Driver:
 	extends InputSource
-	var starts: Array = []        ## [{t, slot}] moves started directly (Varga's techniques)
 	var holds: Array = []         ## [{t0, t1, button}]
 	var presses: Array = []       ## [{t, button}]
 	var sweep: Array = []         ## [{t0, t1, from, to}] stick angle (rad, fighter-relative) while aiming
@@ -47,13 +46,6 @@ class Driver:
 			if not fired.has("p%d" % i) and time >= float(p["t"]):
 				fired["p%d" % i] = true
 				f.input.press(int(p["button"]))
-		for i in starts.size():
-			var s2: Dictionary = starts[i]
-			if not fired.has("s%d" % i) and time >= float(s2["t"]):
-				fired["s%d" % i] = true
-				var m: MoveDef = f.creature.moves.get(str(s2["slot"]))
-				if m:
-					f._start_move(m, str(s2["slot"]), Fighter.State.ATTACK)
 
 
 func test_zz_moves_showcase() -> void:
@@ -66,6 +58,8 @@ func test_zz_moves_showcase() -> void:
 	var only_f := _list_arg(args, "--moves-fighters")
 	var only_m := _list_arg(args, "--moves-only")
 	Settings.set_value("access.camera_shake", 0.0, true, false)
+	Settings.set_value("gameplay.pause_on_focus_loss", false, true, false)
+	Settings.set_value("gameplay.tutorial_prompts", false, true, false)
 	var index := []
 	if not args.has("--moves-crowd-only"):
 		for cid in ROSTER:
@@ -116,19 +110,20 @@ static func basic_of(c: CreatureDef) -> String:
 
 
 ## One shot per pool move (the basic string is the v0.9.17 animation and is left out):
-## {name, category, gap, loadout, presses|holds|starts|sweep, at: [fight times], labels}
+## {name, category, gap, loadout, presses|holds|sweep, at: [fight times], labels}
 static func shots_for(c: CreatureDef) -> Array:
 	var out := []
 	var basic := basic_of(c)
 	for id in c.pool:
 		var pm: PoolMove = c.pool[id]
-		if pm.role == "basic" or pm.move == null:
+		if pm.martial.is_empty() and (pm.role == "basic" or pm.move == null):
 			continue
 		var shot := {"name": str(id), "category": pm.category, "at": [], "labels": []}
 		shot["gap"] = 1.7 if pm.category in ["strike", "counter", "support"] else (3.6 if pm.category == "rush" else 3.0)
 		var marks: Array = []
 		if not pm.martial.is_empty():
-			# a technique: Varga's strike of that group, started directly (its limb and modifier)
+			shot["gap"] = 0.75 if str(id) == "force_palm" else (0.85 if str(id) == "thunder_chop" else 1.05)
+			# Use the real limb/modifier input path, including move attribution and wind-up VFX.
 			var slots: Dictionary = pm.martial.get("slots", {})
 			var key := str(slots.values()[0]) if not slots.is_empty() else ""
 			var tm: MoveDef = c.moves.get(key)
@@ -136,7 +131,21 @@ static func shots_for(c: CreatureDef) -> Array:
 				continue
 			shot["loadout"] = []
 			shot["technique"] = str(id)
-			shot["starts"] = [{"t": T0, "slot": key}]
+			var limb_slot := str(slots.keys()[0])
+			var limb: int = FighterInput.LIGHT
+			if limb_slot.begins_with("rh_"):
+				limb = FighterInput.HEAVY
+			elif limb_slot.begins_with("ll_"):
+				limb = FighterInput.MMA_LL
+			elif limb_slot.begins_with("rl_"):
+				limb = FighterInput.MMA_RL
+			var modifier: int = FighterInput.MMA_MOD1
+			if "straight" in limb_slot or "hkick" in limb_slot:
+				modifier = FighterInput.MMA_MOD2
+			elif "overhand" in limb_slot or "lkick" in limb_slot:
+				modifier = FighterInput.MMA_MOD3
+			shot["presses"] = [{"t": T0, "button": limb}]
+			shot["holds"] = [{"t0": T0 - 0.05, "t1": T0 + 0.05, "button": modifier}]
 			var fa := tm.first_active() if not tm.windows.is_empty() else first_t(tm)
 			marks = [[fa * 0.6, "prep"], [fa + 0.03, "contact"], [fa + 0.18, "motion"], [fa + 0.5, "after"], [fa + 1.1, "linger"]]
 		else:
@@ -182,7 +191,7 @@ func _arena(gap: float, id: String) -> ArenaDef:
 
 func _capture(c: CreatureDef, shot: Dictionary, out_dir: String) -> Array:
 	var d := Driver.new()
-	for k in ["starts", "presses", "holds", "sweep"]:
+	for k in ["presses", "holds", "sweep"]:
 		if shot.has(k):
 			d.set(k, shot[k])
 	var me := {"creature": c.id, "team": 0, "kind": "scripted", "source": d, "name": c.id.trim_prefix("f_").to_upper()}
@@ -201,14 +210,18 @@ func _capture(c: CreatureDef, shot: Dictionary, out_dir: String) -> Array:
 	var times: Array = shot["at"]
 	var labels: Array = shot["labels"]
 	for k in times.size():
-		while d.time < float(times[k]):
+		var deadline := Time.get_ticks_msec() + 30000
+		while d.time < float(times[k]) and Time.get_ticks_msec() < deadline:
 			await get_tree().physics_frame
+		if not check(d.time >= float(times[k]), "%s %s reaches capture phase %s" % [c.id, shot["name"], labels[k]]):
+			break
 		await RenderingServer.frame_post_draw
 		var img := get_viewport().get_texture().get_image()
 		var path := out_dir.path_join("%s_%s_%d_%s.png" % [c.id, str(shot["name"]), k, str(labels[k])])
-		img.save_png(path)
+		check_eq(img.save_png(path), OK, "frame saved: %s" % path)
 		files.append(path.get_file())
 		print("MOVES_SHOWCASE ", path)
+	check_eq(files.size(), times.size(), "all phases captured for %s %s" % [c.id, shot["name"]])
 	return files
 
 

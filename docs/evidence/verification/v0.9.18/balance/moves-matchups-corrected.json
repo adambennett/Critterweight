@@ -1,0 +1,6379 @@
+{
+	"bouts_per_side": 1,
+	"round_time": 60.0,
+	"styles": {
+		"moves": {
+			"bouts": [
+				{
+					"a": "f_stoke",
+					"b": "f_dredge",
+					"bot": [
+						{
+							"ans_block": 16,
+							"ans_counter": 3,
+							"ans_dodge": 3,
+							"ans_miss": 9,
+							"ans_mistake": 2,
+							"ans_none": 16,
+							"commit_grab": 1,
+							"commit_l1": 1,
+							"gap_counter": 1,
+							"gc_l1_hit": 1,
+							"guard_up": 8,
+							"mv_dropped": 24,
+							"mv_stream": 15,
+							"of_hit": 9,
+							"of_intr": 1,
+							"of_miss": 13,
+							"off_grab": 7,
+							"off_grab_guard": 4,
+							"off_heavy": 16,
+							"off_heavy2": 7,
+							"off_light": 12,
+							"parry_punish": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 4,
+							"st_hit": 1,
+							"st_miss": 7,
+							"str_finisher": 1,
+							"str_light": 8
+						},
+						{
+							"ans_block": 17,
+							"ans_counter": 6,
+							"ans_dodge": 3,
+							"ans_miss": 12,
+							"ans_mistake": 3,
+							"ans_none": 26,
+							"commit_l1": 2,
+							"guard_up": 5,
+							"mv_blast": 4,
+							"mv_dropped": 6,
+							"mv_stream": 10,
+							"of_hit": 1,
+							"of_intr": 3,
+							"of_miss": 6,
+							"off_grab": 3,
+							"off_grab_guard": 2,
+							"off_heavy": 4,
+							"off_heavy2": 1,
+							"off_light": 5,
+							"other_hit": 4,
+							"other_intr": 1,
+							"other_miss": 2,
+							"pn_l1_intr": 1,
+							"pn_l1_miss": 1,
+							"punish_try_block": 4,
+							"punish_try_miss": 7,
+							"st_hit": 2,
+							"st_intr": 2,
+							"st_miss": 3,
+							"str_finisher": 1,
+							"str_light": 7
+						}
+					],
+					"by_cat": [
+						{
+							"blast": 5.1,
+							"classic": 11.73,
+							"stream": 79.5111999999999,
+							"strike": 21.0318489044846
+						},
+						{
+							"blast": 36.5774111111111,
+							"classic": 0.0,
+							"stream": 45.248544,
+							"strike": 15.6289518583525
+						}
+					],
+					"damage": [
+						117.373048904485,
+						97.4549069694636
+					],
+					"denied": [
+						0,
+						9
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						],
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						]
+					],
+					"moves_used": [
+						{
+							"ember_jab": 21,
+							"flamethrower": 9,
+							"steam_vent": 2
+						},
+						{
+							"bubble_stream": 8,
+							"claw_snap": 21,
+							"hydro_cannon": 4
+						}
+					],
+					"seed": 101,
+					"time": 63.2249999999971,
+					"winner": 0
+				},
+				{
+					"a": "f_stoke",
+					"b": "f_gusto",
+					"bot": [
+						{
+							"ans_block": 11,
+							"ans_counter": 1,
+							"ans_dodge": 2,
+							"ans_miss": 12,
+							"ans_mistake": 2,
+							"ans_none": 6,
+							"guard_up": 6,
+							"mv_dropped": 7,
+							"mv_stream": 8,
+							"of_hit": 2,
+							"of_intr": 2,
+							"of_miss": 11,
+							"off_grab": 2,
+							"off_grab_guard": 2,
+							"off_heavy": 4,
+							"off_heavy2": 2,
+							"off_light": 11,
+							"punish_try_miss": 6,
+							"st_intr": 3,
+							"st_miss": 3,
+							"str_finisher": 1,
+							"str_light": 6
+						},
+						{
+							"ans_block": 12,
+							"ans_dodge": 7,
+							"ans_miss": 15,
+							"ans_mistake": 1,
+							"ans_none": 7,
+							"commit_l1": 4,
+							"guard_up": 3,
+							"mv_projectile": 7,
+							"mv_volley": 7,
+							"of_hit": 3,
+							"of_intr": 1,
+							"of_miss": 3,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_light": 4,
+							"off_stepin": 1,
+							"other_hit": 1,
+							"other_miss": 1,
+							"pn_l1_hit": 1,
+							"pn_l1_intr": 1,
+							"pn_l1_miss": 2,
+							"punish_try_block": 2,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 5,
+							"st_hit": 2,
+							"st_intr": 1,
+							"st_miss": 2,
+							"str_light": 5
+						}
+					],
+					"by_cat": [
+						{
+							"blast": 13.248,
+							"stream": 42.3056,
+							"strike": 6.8947667590475
+						},
+						{
+							"classic": 0.0,
+							"projectile": 26.265,
+							"strike": 32.6831721008099,
+							"volley": 51.00986
+						}
+					],
+					"damage": [
+						62.4483667590475,
+						109.95803210081
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						],
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						]
+					],
+					"moves_used": [
+						{
+							"ember_jab": 17,
+							"flamethrower": 8,
+							"steam_vent": 4
+						},
+						{
+							"air_slash": 7,
+							"feather_darts": 7,
+							"hang_time": 2,
+							"wing_snap": 15
+						}
+					],
+					"seed": 102,
+					"time": 48.9916666666645,
+					"winner": 1
+				},
+				{
+					"a": "f_stoke",
+					"b": "f_dozer",
+					"bot": [
+						{
+							"ans_block": 26,
+							"ans_dodge": 1,
+							"ans_miss": 5,
+							"ans_mistake": 3,
+							"ans_none": 12,
+							"commit_l1": 5,
+							"gap_counter": 3,
+							"gc_l1_hit": 3,
+							"guard_up": 2,
+							"mv_dropped": 9,
+							"mv_stream": 8,
+							"of_hit": 15,
+							"of_intr": 2,
+							"of_miss": 5,
+							"off_grab": 1,
+							"off_grab_guard": 4,
+							"off_heavy": 4,
+							"off_light": 16,
+							"other_hit": 2,
+							"other_miss": 2,
+							"pn_l1_miss": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 2,
+							"st_hit": 13,
+							"st_miss": 11,
+							"str_commit": 3,
+							"str_finisher": 3,
+							"str_light": 24
+						},
+						{
+							"ans_block": 34,
+							"ans_dodge": 5,
+							"ans_miss": 7,
+							"ans_mistake": 7,
+							"ans_none": 19,
+							"backstep": 1,
+							"block_tap": 1,
+							"commit_l1": 1,
+							"guard_up": 6,
+							"mv_control": 4,
+							"mv_dropped": 10,
+							"of_hit": 11,
+							"of_intr": 8,
+							"of_miss": 9,
+							"off_grab": 4,
+							"off_grab_guard": 1,
+							"off_heavy": 8,
+							"off_heavy2": 1,
+							"off_light": 23,
+							"other_intr": 1,
+							"other_miss": 2,
+							"pn_l1_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 3,
+							"punish_try_miss": 3,
+							"st_intr": 2,
+							"st_miss": 7,
+							"str_finisher": 1,
+							"str_light": 9,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"blast": 6.0,
+							"stream": 21.6,
+							"strike": 90.9743667904491
+						},
+						{
+							"classic": 5.75,
+							"control": 20.148,
+							"rush": 5.60134259623263,
+							"strike": 45.1669932702755
+						}
+					],
+					"damage": [
+						118.574366790449,
+						76.6663358665081
+					],
+					"denied": [
+						6,
+						10
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						],
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						]
+					],
+					"moves_used": [
+						{
+							"ember_jab": 49,
+							"flamethrower": 8,
+							"steam_vent": 1
+						},
+						{
+							"bulldoze": 2,
+							"rock_slide": 5,
+							"snout_jab": 36
+						}
+					],
+					"seed": 103,
+					"time": 62.6916666666638,
+					"winner": 0
+				},
+				{
+					"a": "f_stoke",
+					"b": "f_slurry",
+					"bot": [
+						{
+							"ans_block": 2,
+							"ans_counter": 1,
+							"ans_miss": 7,
+							"ans_mistake": 3,
+							"ans_none": 4,
+							"guard_up": 1,
+							"mv_dropped": 5,
+							"mv_stream": 4,
+							"of_hit": 4,
+							"of_miss": 3,
+							"off_heavy": 1,
+							"off_light": 6,
+							"other_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_miss": 1,
+							"st_hit": 3,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_commit": 3,
+							"str_finisher": 2,
+							"str_light": 5
+						},
+						{
+							"ans_block": 12,
+							"ans_miss": 17,
+							"ans_none": 3,
+							"guard_up": 2,
+							"mv_volley": 4,
+							"of_hit": 5,
+							"of_intr": 2,
+							"off_grab": 1,
+							"off_grab2": 1,
+							"off_light": 6,
+							"punish_try_miss": 9,
+							"st_miss": 2,
+							"str_light": 2
+						}
+					],
+					"by_cat": [
+						{
+							"stream": 45.908,
+							"strike": 43.9207481526968
+						},
+						{
+							"projectile": 24.27,
+							"strike": 16.0783925329272,
+							"volley": 30.784
+						}
+					],
+					"damage": [
+						89.8287481526968,
+						71.1323925329272
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						],
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						]
+					],
+					"moves_used": [
+						{
+							"ember_jab": 13,
+							"flamethrower": 4,
+							"steam_vent": 2
+						},
+						{
+							"drain_dive": 1,
+							"poison_darts": 4,
+							"sludge_lob": 4,
+							"venom_fangs": 8
+						}
+					],
+					"seed": 104,
+					"time": 25.9749999999992,
+					"winner": 0
+				},
+				{
+					"a": "f_stoke",
+					"b": "f_jitters",
+					"bot": [
+						{
+							"ans_block": 21,
+							"ans_counter": 2,
+							"ans_dodge": 1,
+							"ans_miss": 3,
+							"ans_mistake": 4,
+							"ans_none": 7,
+							"commit_grab": 2,
+							"guard_up": 3,
+							"mv_dropped": 5,
+							"mv_stream": 7,
+							"of_hit": 6,
+							"of_intr": 2,
+							"of_miss": 7,
+							"off_grab_guard": 4,
+							"off_heavy": 3,
+							"off_light": 11,
+							"other_hit": 2,
+							"parry_punish": 2,
+							"pp_grab_hit": 2,
+							"punish_try_miss": 3,
+							"st_hit": 1,
+							"st_miss": 6,
+							"str_finisher": 2,
+							"str_light": 7
+						},
+						{
+							"ans_block": 18,
+							"ans_dodge": 6,
+							"ans_miss": 13,
+							"ans_mistake": 3,
+							"ans_none": 10,
+							"guard_up": 5,
+							"mv_dropped": 22,
+							"mv_projectile": 1,
+							"of_hit": 9,
+							"of_miss": 4,
+							"off_grab": 1,
+							"off_grab_guard": 1,
+							"off_heavy": 4,
+							"off_light": 11,
+							"other_intr": 2,
+							"other_miss": 4,
+							"punish_try_dodge": 3,
+							"punish_try_miss": 3,
+							"st_hit": 8,
+							"st_intr": 3,
+							"st_miss": 1,
+							"str_finisher": 4,
+							"str_light": 12
+						}
+					],
+					"by_cat": [
+						{
+							"stream": 18.772,
+							"strike": 22.1296665670163
+						},
+						{
+							"classic": 0.0,
+							"projectile": 40.0,
+							"strike": 69.4362057351095
+						}
+					],
+					"damage": [
+						40.9016665670163,
+						109.43620573511
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						],
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						]
+					],
+					"moves_used": [
+						{
+							"ember_jab": 20,
+							"flamethrower": 7,
+							"steam_vent": 1
+						},
+						{
+							"arc_lash": 4,
+							"slap": 29,
+							"spring_pad": 3,
+							"thunder_jolt": 2
+						}
+					],
+					"seed": 105,
+					"time": 44.7416666666648,
+					"winner": 1
+				},
+				{
+					"a": "f_stoke",
+					"b": "f_varga",
+					"bot": [
+						{
+							"ans_block": 12,
+							"ans_dodge": 3,
+							"ans_miss": 10,
+							"ans_mistake": 1,
+							"ans_none": 10,
+							"commit_grab": 1,
+							"commit_l1": 3,
+							"guard_up": 3,
+							"mv_dropped": 11,
+							"mv_stream": 7,
+							"of_hit": 7,
+							"of_intr": 3,
+							"of_miss": 11,
+							"off_grab": 2,
+							"off_heavy": 6,
+							"off_light": 18,
+							"off_stepin": 1,
+							"other_hit": 1,
+							"pn_grab_miss": 1,
+							"pn_l1_hit": 2,
+							"pn_l1_miss": 1,
+							"punish_try_block": 3,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 7,
+							"st_hit": 7,
+							"st_intr": 1,
+							"st_miss": 5,
+							"str_commit": 1,
+							"str_finisher": 5,
+							"str_light": 13
+						},
+						{
+							"ans_block": 26,
+							"ans_dodge": 2,
+							"ans_miss": 9,
+							"ans_mistake": 3,
+							"ans_none": 24,
+							"commit_grab": 1,
+							"guard_up": 7,
+							"of_hit": 6,
+							"of_intr": 6,
+							"of_miss": 9,
+							"off_grab": 2,
+							"off_heavy": 4,
+							"off_heavy2": 2,
+							"off_light": 14,
+							"off_stepin": 1,
+							"other_miss": 3,
+							"pn_grab_hit": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 4,
+							"st_miss": 2,
+							"str_finisher": 1,
+							"str_light": 2
+						}
+					],
+					"by_cat": [
+						{
+							"blast": 6.0,
+							"classic": 4.34482600020682,
+							"stream": 31.8,
+							"strike": 56.7512885638346
+						},
+						{
+							"classic": 24.9222271847104,
+							"projectile": 70.9902207894653
+						}
+					],
+					"damage": [
+						98.8961145640414,
+						95.9124479741756
+					],
+					"denied": [
+						2,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						],
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						]
+					],
+					"moves_used": [
+						{
+							"ember_jab": 36,
+							"flamethrower": 7,
+							"steam_vent": 2
+						},
+						{
+							"iron_shins": 9,
+							"pressure_palm": 11
+						}
+					],
+					"seed": 106,
+					"time": 56.7833333333308,
+					"winner": 0
+				},
+				{
+					"a": "f_stoke",
+					"b": "f_knell",
+					"bot": [
+						{
+							"ans_block": 9,
+							"ans_miss": 6,
+							"ans_mistake": 2,
+							"ans_none": 12,
+							"ans_parry": 1,
+							"commit_grab": 1,
+							"commit_l1": 1,
+							"guard_up": 5,
+							"mv_dropped": 9,
+							"mv_stream": 5,
+							"of_hit": 13,
+							"of_intr": 3,
+							"of_miss": 2,
+							"off_grab": 2,
+							"off_grab_guard": 2,
+							"off_heavy": 4,
+							"off_light": 13,
+							"other_hit": 2,
+							"parry_punish": 1,
+							"pn_l1_hit": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_miss": 3,
+							"st_hit": 8,
+							"st_miss": 4,
+							"str_commit": 2,
+							"str_finisher": 4,
+							"str_light": 12,
+							"tap_nothing": 1
+						},
+						{
+							"ans_block": 24,
+							"ans_counter": 3,
+							"ans_dodge": 2,
+							"ans_miss": 6,
+							"ans_mistake": 3,
+							"ans_none": 10,
+							"commit_l1": 2,
+							"gap_counter": 2,
+							"gc_l1_hit": 1,
+							"gc_l1_intr": 1,
+							"guard_up": 3,
+							"mv_dropped": 4,
+							"mv_stream": 5,
+							"of_hit": 2,
+							"of_intr": 1,
+							"of_miss": 1,
+							"off_grab": 1,
+							"off_grab_guard": 1,
+							"off_heavy": 3,
+							"off_light": 2,
+							"other_intr": 2,
+							"other_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 2,
+							"st_hit": 1,
+							"str_finisher": 1,
+							"str_light": 1
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 13.8,
+							"stream": 11.072,
+							"strike": 92.1272930400726
+						},
+						{
+							"classic": 0.0,
+							"projectile": 47.25,
+							"stream": 41.895,
+							"strike": 8.92940546204654,
+							"utility": 5.25
+						}
+					],
+					"damage": [
+						116.999293040073,
+						103.324405462047
+					],
+					"denied": [
+						1,
+						6
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						],
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						]
+					],
+					"moves_used": [
+						{
+							"ember_jab": 29,
+							"flamethrower": 5,
+							"steam_vent": 1
+						},
+						{
+							"ghost_light": 5,
+							"night_shade": 5,
+							"sounding_jab": 8,
+							"through_the_veil": 4
+						}
+					],
+					"seed": 107,
+					"time": 39.8166666666651,
+					"winner": 0
+				},
+				{
+					"a": "f_dredge",
+					"b": "f_stoke",
+					"bot": [
+						{
+							"ans_block": 15,
+							"ans_counter": 7,
+							"ans_dodge": 2,
+							"ans_miss": 15,
+							"ans_mistake": 1,
+							"ans_none": 11,
+							"ans_parry": 1,
+							"block_tap": 1,
+							"commit_l1": 1,
+							"guard_up": 4,
+							"mv_blast": 3,
+							"mv_dropped": 6,
+							"mv_stream": 7,
+							"of_hit": 3,
+							"of_intr": 2,
+							"of_miss": 6,
+							"off_grab": 1,
+							"off_heavy": 4,
+							"off_light": 9,
+							"other_miss": 1,
+							"pn_l1_intr": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 10,
+							"st_hit": 4,
+							"st_miss": 1,
+							"str_finisher": 2,
+							"str_light": 5,
+							"tap_nothing": 1
+						},
+						{
+							"ans_block": 16,
+							"ans_dodge": 1,
+							"ans_miss": 14,
+							"ans_mistake": 1,
+							"ans_none": 7,
+							"guard_up": 3,
+							"mv_dropped": 5,
+							"mv_stream": 8,
+							"of_hit": 5,
+							"of_intr": 3,
+							"of_miss": 8,
+							"off_grab_guard": 2,
+							"off_heavy": 4,
+							"off_light": 14,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 6,
+							"st_hit": 4,
+							"st_intr": 3,
+							"st_miss": 2,
+							"str_finisher": 1,
+							"str_light": 9
+						}
+					],
+					"by_cat": [
+						{
+							"blast": 30.9406222222222,
+							"classic": 3.69567843361588,
+							"stream": 52.256736,
+							"strike": 24.9038013027571
+						},
+						{
+							"stream": 59.6472,
+							"strike": 21.5931046559488
+						}
+					],
+					"damage": [
+						111.796837958595,
+						81.2403046559488
+					],
+					"denied": [
+						2,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						],
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						]
+					],
+					"moves_used": [
+						{
+							"bubble_stream": 7,
+							"claw_snap": 17,
+							"hydro_cannon": 3
+						},
+						{
+							"ember_jab": 23,
+							"flamethrower": 8,
+							"steam_vent": 4
+						}
+					],
+					"seed": 108,
+					"time": 52.6416666666643,
+					"winner": 0
+				},
+				{
+					"a": "f_dredge",
+					"b": "f_gusto",
+					"bot": [
+						{
+							"ans_block": 15,
+							"ans_counter": 3,
+							"ans_miss": 10,
+							"ans_mistake": 2,
+							"ans_none": 11,
+							"ans_parry": 1,
+							"guard_up": 18,
+							"mv_blast": 5,
+							"mv_dropped": 8,
+							"mv_stream": 11,
+							"of_hit": 2,
+							"of_intr": 2,
+							"of_miss": 9,
+							"off_grab": 4,
+							"off_grab_guard": 1,
+							"off_heavy": 5,
+							"off_heavy2": 2,
+							"off_light": 9,
+							"other_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_miss": 5,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_finisher": 1,
+							"str_light": 2,
+							"tap_nothing": 1
+						},
+						{
+							"ans_block": 7,
+							"ans_dodge": 8,
+							"ans_miss": 23,
+							"ans_mistake": 1,
+							"ans_none": 8,
+							"commit_grab": 1,
+							"commit_l1": 10,
+							"guard_up": 4,
+							"mv_dropped": 4,
+							"mv_projectile": 6,
+							"mv_volley": 8,
+							"of_hit": 3,
+							"of_miss": 3,
+							"off_grab_guard": 1,
+							"off_heavy": 4,
+							"off_light": 5,
+							"other_hit": 2,
+							"other_intr": 2,
+							"other_miss": 5,
+							"parry_punish": 1,
+							"pn_l1_hit": 2,
+							"pn_l1_intr": 4,
+							"pn_l1_miss": 3,
+							"pp_grab_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 4,
+							"punish_try_miss": 12,
+							"st_miss": 4,
+							"str_light": 4
+						}
+					],
+					"by_cat": [
+						{
+							"blast": 32.9155555555555,
+							"classic": 10.58,
+							"stream": 31.464
+						},
+						{
+							"classic": 0.0,
+							"projectile": 24.9,
+							"strike": 28.3354962108809,
+							"volley": 61.666
+						}
+					],
+					"damage": [
+						74.9595555555555,
+						114.901496210881
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						],
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						]
+					],
+					"moves_used": [
+						{
+							"bubble_stream": 9,
+							"claw_snap": 12,
+							"hydro_cannon": 5
+						},
+						{
+							"air_slash": 5,
+							"feather_darts": 8,
+							"wing_snap": 27
+						}
+					],
+					"seed": 109,
+					"time": 63.2249999999971,
+					"winner": 1
+				},
+				{
+					"a": "f_dredge",
+					"b": "f_dozer",
+					"bot": [
+						{
+							"ans_block": 17,
+							"ans_counter": 2,
+							"ans_miss": 4,
+							"ans_mistake": 5,
+							"ans_none": 5,
+							"block_tap": 1,
+							"commit_grab": 1,
+							"guard_up": 6,
+							"mv_blast": 2,
+							"mv_dropped": 2,
+							"mv_stream": 4,
+							"of_hit": 2,
+							"of_intr": 2,
+							"of_miss": 5,
+							"off_grab": 1,
+							"off_heavy": 1,
+							"off_light": 8,
+							"parry_punish": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_miss": 2,
+							"st_hit": 3,
+							"st_intr": 1,
+							"str_finisher": 1,
+							"str_light": 4,
+							"tap_nothing": 1
+						},
+						{
+							"ans_block": 8,
+							"ans_dodge": 1,
+							"ans_miss": 4,
+							"ans_none": 12,
+							"commit_l1": 1,
+							"guard_up": 4,
+							"mv_control": 4,
+							"mv_dropped": 7,
+							"of_hit": 6,
+							"of_intr": 4,
+							"of_miss": 9,
+							"off_backoff": 1,
+							"off_grab": 2,
+							"off_grab_guard": 1,
+							"off_heavy": 5,
+							"off_light": 16,
+							"other_hit": 1,
+							"pn_l1_hit": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 2,
+							"st_miss": 7,
+							"str_finisher": 2,
+							"str_light": 7
+						}
+					],
+					"by_cat": [
+						{
+							"counter": 5.52,
+							"stream": 18.216,
+							"strike": 18.4148945124335
+						},
+						{
+							"classic": 28.9011712513205,
+							"control": 27.6,
+							"rush": 13.4686792973965,
+							"strike": 72.3602921912197
+						}
+					],
+					"damage": [
+						42.1508945124335,
+						142.330142739937
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						],
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						]
+					],
+					"moves_used": [
+						{
+							"anchor_drop": 1,
+							"bubble_stream": 5,
+							"claw_snap": 12,
+							"hydro_cannon": 1
+						},
+						{
+							"bulldoze": 2,
+							"rock_slide": 4,
+							"snout_jab": 25
+						}
+					],
+					"seed": 110,
+					"time": 36.9583333333319,
+					"winner": 1
+				},
+				{
+					"a": "f_dredge",
+					"b": "f_slurry",
+					"bot": [
+						{
+							"ans_block": 17,
+							"ans_counter": 1,
+							"ans_miss": 4,
+							"ans_none": 3,
+							"guard_up": 3,
+							"mv_blast": 3,
+							"mv_dropped": 2,
+							"mv_stream": 4,
+							"of_intr": 3,
+							"of_miss": 5,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 1,
+							"off_light": 5,
+							"other_miss": 1,
+							"punish_try_block": 3,
+							"st_hit": 1,
+							"st_intr": 1,
+							"st_miss": 3,
+							"str_finisher": 1,
+							"str_light": 5
+						},
+						{
+							"ans_block": 8,
+							"ans_dodge": 1,
+							"ans_miss": 13,
+							"ans_mistake": 1,
+							"ans_none": 5,
+							"commit_l1": 3,
+							"guard_up": 8,
+							"mv_dropped": 3,
+							"mv_volley": 4,
+							"of_hit": 7,
+							"off_grab": 1,
+							"off_heavy": 2,
+							"off_light": 6,
+							"pn_l1_hit": 2,
+							"pn_l1_intr": 1,
+							"punish_try_miss": 6,
+							"st_hit": 4,
+							"st_intr": 2,
+							"st_miss": 1,
+							"str_finisher": 1,
+							"str_light": 9
+						}
+					],
+					"by_cat": [
+						{
+							"blast": 23.3986666666666,
+							"stream": 16.03008
+						},
+						{
+							"projectile": 40.02,
+							"strike": 51.9314578360516,
+							"volley": 23.4
+						}
+					],
+					"damage": [
+						39.4287466666666,
+						115.351457836052
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						],
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						]
+					],
+					"moves_used": [
+						{
+							"bubble_stream": 4,
+							"claw_snap": 11,
+							"hydro_cannon": 3
+						},
+						{
+							"poison_darts": 3,
+							"sludge_lob": 6,
+							"venom_fangs": 16
+						}
+					],
+					"seed": 111,
+					"time": 36.1416666666653,
+					"winner": 1
+				},
+				{
+					"a": "f_dredge",
+					"b": "f_jitters",
+					"bot": [
+						{
+							"ans_block": 23,
+							"ans_counter": 2,
+							"ans_dodge": 1,
+							"ans_miss": 11,
+							"ans_mistake": 4,
+							"ans_none": 17,
+							"guard_up": 12,
+							"mv_blast": 5,
+							"mv_dropped": 8,
+							"mv_stream": 11,
+							"of_hit": 1,
+							"of_intr": 7,
+							"of_miss": 12,
+							"off_grab": 2,
+							"off_grab_guard": 2,
+							"off_heavy": 5,
+							"off_light": 18,
+							"other_hit": 1,
+							"other_intr": 1,
+							"other_miss": 3,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 6,
+							"st_hit": 7,
+							"st_intr": 2,
+							"st_miss": 1,
+							"str_finisher": 3,
+							"str_light": 10
+						},
+						{
+							"ans_block": 25,
+							"ans_dodge": 4,
+							"ans_miss": 16,
+							"ans_mistake": 1,
+							"ans_none": 9,
+							"commit_grab": 5,
+							"commit_l1": 2,
+							"guard_up": 8,
+							"mv_dropped": 20,
+							"mv_projectile": 8,
+							"of_hit": 13,
+							"of_intr": 1,
+							"of_miss": 7,
+							"off_grab": 3,
+							"off_grab_guard": 1,
+							"off_heavy": 4,
+							"off_light": 17,
+							"other_miss": 4,
+							"pn_grab_hit": 2,
+							"pn_grab_intr": 1,
+							"pn_grab_miss": 2,
+							"pn_l1_intr": 1,
+							"pn_l1_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 8,
+							"st_hit": 6,
+							"st_miss": 2,
+							"str_finisher": 2,
+							"str_light": 8
+						}
+					],
+					"by_cat": [
+						{
+							"stream": 12.443184,
+							"strike": 20.3602155979069
+						},
+						{
+							"projectile": 92.0,
+							"strike": 44.3428459333295
+						}
+					],
+					"damage": [
+						32.8033995979069,
+						136.34284593333
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						],
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						]
+					],
+					"moves_used": [
+						{
+							"bubble_stream": 9,
+							"claw_snap": 31,
+							"hydro_cannon": 5
+						},
+						{
+							"arc_lash": 6,
+							"slap": 31,
+							"spring_pad": 6,
+							"thunder_jolt": 8
+						}
+					],
+					"seed": 112,
+					"time": 63.2249999999971,
+					"winner": 1
+				},
+				{
+					"a": "f_dredge",
+					"b": "f_varga",
+					"bot": [
+						{
+							"ans_block": 10,
+							"ans_counter": 6,
+							"ans_dodge": 4,
+							"ans_miss": 9,
+							"ans_mistake": 4,
+							"ans_none": 6,
+							"block_tap": 1,
+							"guard_up": 7,
+							"mv_blast": 2,
+							"mv_dropped": 4,
+							"mv_stream": 8,
+							"of_hit": 2,
+							"of_intr": 1,
+							"of_miss": 14,
+							"off_grab": 2,
+							"off_grab_guard": 2,
+							"off_heavy": 4,
+							"off_light": 13,
+							"other_miss": 2,
+							"punish_try_block": 1,
+							"punish_try_miss": 2,
+							"st_hit": 2,
+							"st_intr": 3,
+							"st_miss": 2,
+							"str_light": 7,
+							"tap_nothing": 1
+						},
+						{
+							"ans_block": 15,
+							"ans_dodge": 3,
+							"ans_miss": 12,
+							"ans_mistake": 2,
+							"ans_none": 17,
+							"commit_grab": 6,
+							"commit_lh_straight": 1,
+							"guard_up": 6,
+							"of_hit": 2,
+							"of_intr": 3,
+							"of_miss": 14,
+							"off_heavy": 5,
+							"off_light": 17,
+							"other_miss": 1,
+							"parry_punish": 1,
+							"pn_grab_hit": 1,
+							"pn_grab_intr": 1,
+							"pn_grab_miss": 2,
+							"pn_lh_straight_miss": 1,
+							"pp_grab_hit": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 7,
+							"st_hit": 1,
+							"st_miss": 3,
+							"str_light": 4
+						}
+					],
+					"by_cat": [
+						{
+							"blast": 15.1697777777778,
+							"classic": 0.0,
+							"stream": 45.83808,
+							"strike": 12.4903688386393
+						},
+						{
+							"projectile": 72.0969613793888
+						}
+					],
+					"damage": [
+						73.498226616417,
+						72.0969613793888
+					],
+					"denied": [
+						1,
+						0
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						],
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						]
+					],
+					"moves_used": [
+						{
+							"bubble_stream": 8,
+							"claw_snap": 22,
+							"hydro_cannon": 2
+						},
+						{
+							"iron_shins": 11,
+							"pressure_palm": 11,
+							"thunder_chop": 1
+						}
+					],
+					"seed": 113,
+					"time": 63.2249999999971,
+					"winner": 0
+				},
+				{
+					"a": "f_dredge",
+					"b": "f_knell",
+					"bot": [
+						{
+							"ans_block": 12,
+							"ans_counter": 3,
+							"ans_dodge": 1,
+							"ans_miss": 12,
+							"ans_mistake": 2,
+							"ans_none": 11,
+							"ans_parry": 2,
+							"block_tap": 1,
+							"commit_l1": 3,
+							"cp_l1_miss": 1,
+							"guard_up": 4,
+							"mv_blast": 4,
+							"mv_dropped": 3,
+							"mv_stream": 8,
+							"of_hit": 8,
+							"of_intr": 1,
+							"of_miss": 5,
+							"off_grab": 2,
+							"off_grab_guard": 2,
+							"off_heavy": 1,
+							"off_light": 10,
+							"other_hit": 1,
+							"pn_l1_intr": 1,
+							"pn_l1_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 6,
+							"punish_try_parry": 1,
+							"st_hit": 7,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_finisher": 2,
+							"str_light": 9,
+							"tap_nothing": 1,
+							"tap_parried": 1
+						},
+						{
+							"ans_block": 21,
+							"ans_dodge": 1,
+							"ans_miss": 15,
+							"ans_mistake": 1,
+							"ans_none": 7,
+							"block_tap": 1,
+							"commit_grab": 3,
+							"guard_up": 6,
+							"mv_dropped": 3,
+							"mv_stream": 7,
+							"of_hit": 5,
+							"of_intr": 2,
+							"of_miss": 2,
+							"off_grab": 1,
+							"off_heavy": 3,
+							"off_light": 8,
+							"other_miss": 3,
+							"pn_grab_intr": 1,
+							"pn_grab_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_miss": 7,
+							"st_hit": 3,
+							"st_intr": 1,
+							"str_light": 4,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"blast": 42.8617777777777,
+							"stream": 34.51104,
+							"strike": 37.048107781868
+						},
+						{
+							"classic": 0.0,
+							"projectile": 46.494,
+							"stream": 35.595,
+							"strike": 25.2127077791622,
+							"utility": 5.25
+						}
+					],
+					"damage": [
+						114.420925559646,
+						112.551707779162
+					],
+					"denied": [
+						1,
+						19
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						],
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						]
+					],
+					"moves_used": [
+						{
+							"bubble_stream": 8,
+							"claw_snap": 23,
+							"hydro_cannon": 4
+						},
+						{
+							"ghost_light": 7,
+							"night_shade": 7,
+							"sounding_jab": 15,
+							"through_the_veil": 4
+						}
+					],
+					"seed": 114,
+					"time": 57.5333333333307,
+					"winner": 0
+				},
+				{
+					"a": "f_gusto",
+					"b": "f_stoke",
+					"bot": [
+						{
+							"ans_block": 11,
+							"ans_dodge": 5,
+							"ans_miss": 26,
+							"ans_mistake": 1,
+							"ans_none": 6,
+							"ans_parry": 1,
+							"block_tap": 1,
+							"commit_l1": 4,
+							"guard_up": 2,
+							"mv_dropped": 5,
+							"mv_projectile": 7,
+							"mv_volley": 6,
+							"of_hit": 5,
+							"of_miss": 1,
+							"off_grab_guard": 1,
+							"off_heavy": 3,
+							"off_light": 5,
+							"other_hit": 1,
+							"other_miss": 1,
+							"pn_l1_hit": 1,
+							"pn_l1_intr": 1,
+							"pn_l1_miss": 2,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 11,
+							"st_hit": 2,
+							"st_miss": 1,
+							"str_finisher": 2,
+							"str_light": 3,
+							"tap_nothing": 1
+						},
+						{
+							"ans_block": 11,
+							"ans_dodge": 2,
+							"ans_miss": 13,
+							"ans_mistake": 1,
+							"ans_none": 5,
+							"commit_grab": 1,
+							"commit_l1": 1,
+							"guard_up": 6,
+							"mv_dropped": 9,
+							"mv_stream": 7,
+							"of_hit": 3,
+							"of_miss": 10,
+							"off_grab_guard": 1,
+							"off_heavy": 8,
+							"off_light": 11,
+							"other_miss": 1,
+							"parry_punish": 1,
+							"pn_l1_miss": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 3,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 6,
+							"st_hit": 2,
+							"st_miss": 4,
+							"str_commit": 2,
+							"str_light": 6
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 0.0,
+							"projectile": 16.065,
+							"strike": 35.5080691288645,
+							"volley": 19.8968
+						},
+						{
+							"stream": 58.02,
+							"strike": 18.3916338183239
+						}
+					],
+					"damage": [
+						71.4698691288645,
+						76.4116338183239
+					],
+					"denied": [
+						2,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						],
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						]
+					],
+					"moves_used": [
+						{
+							"air_slash": 7,
+							"feather_darts": 6,
+							"hang_time": 3,
+							"wing_snap": 14
+						},
+						{
+							"ember_jab": 20,
+							"flamethrower": 7,
+							"steam_vent": 2
+						}
+					],
+					"seed": 115,
+					"time": 47.5333333333313,
+					"winner": 1
+				},
+				{
+					"a": "f_gusto",
+					"b": "f_dredge",
+					"bot": [
+						{
+							"ans_block": 5,
+							"ans_dodge": 9,
+							"ans_miss": 11,
+							"ans_none": 7,
+							"commit_l1": 2,
+							"guard_up": 2,
+							"mv_dropped": 2,
+							"mv_projectile": 5,
+							"mv_volley": 6,
+							"of_hit": 4,
+							"of_intr": 1,
+							"of_miss": 5,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 1,
+							"off_heavy2": 1,
+							"off_light": 7,
+							"other_intr": 1,
+							"other_miss": 4,
+							"pn_l1_miss": 2,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 2,
+							"st_miss": 5,
+							"str_light": 5
+						},
+						{
+							"ans_block": 15,
+							"ans_counter": 3,
+							"ans_dodge": 1,
+							"ans_miss": 6,
+							"ans_mistake": 3,
+							"ans_none": 6,
+							"guard_up": 12,
+							"mv_blast": 5,
+							"mv_dropped": 6,
+							"mv_stream": 7,
+							"of_hit": 1,
+							"of_intr": 1,
+							"of_miss": 8,
+							"off_grab": 2,
+							"off_grab_guard": 1,
+							"off_heavy": 4,
+							"off_heavy2": 1,
+							"off_light": 7,
+							"other_miss": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 2,
+							"st_hit": 1,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_finisher": 1,
+							"str_light": 3
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 0.0,
+							"projectile": 30.0,
+							"strike": 2.97168974744775,
+							"volley": 61.666
+						},
+						{
+							"blast": 50.232,
+							"stream": 28.01952,
+							"strike": 8.31493174780122
+						}
+					],
+					"damage": [
+						94.6376897474478,
+						86.5664517478012
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						],
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						]
+					],
+					"moves_used": [
+						{
+							"air_slash": 5,
+							"feather_darts": 6,
+							"wing_snap": 19
+						},
+						{
+							"bubble_stream": 8,
+							"claw_snap": 11,
+							"hydro_cannon": 5
+						}
+					],
+					"seed": 116,
+					"time": 48.9333333333312,
+					"winner": 1
+				},
+				{
+					"a": "f_gusto",
+					"b": "f_dozer",
+					"bot": [
+						{
+							"ans_block": 16,
+							"ans_dodge": 10,
+							"ans_miss": 11,
+							"ans_mistake": 5,
+							"ans_none": 4,
+							"commit_l1": 4,
+							"guard_up": 6,
+							"mv_dropped": 6,
+							"mv_projectile": 9,
+							"mv_volley": 8,
+							"of_hit": 6,
+							"of_miss": 1,
+							"off_heavy": 4,
+							"off_light": 8,
+							"other_hit": 1,
+							"other_miss": 3,
+							"pn_l1_hit": 1,
+							"pn_l1_intr": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 5,
+							"st_hit": 1,
+							"st_miss": 1,
+							"str_finisher": 2,
+							"str_light": 2
+						},
+						{
+							"ans_block": 11,
+							"ans_dodge": 2,
+							"ans_miss": 9,
+							"ans_mistake": 2,
+							"ans_none": 11,
+							"commit_l1": 2,
+							"guard_up": 9,
+							"mv_control": 5,
+							"mv_dropped": 19,
+							"of_hit": 6,
+							"of_intr": 5,
+							"of_miss": 17,
+							"off_backoff": 1,
+							"off_grab": 1,
+							"off_grab2": 4,
+							"off_grab_guard": 4,
+							"off_heavy": 13,
+							"off_heavy2": 6,
+							"off_light": 19,
+							"pn_l1_hit": 1,
+							"pn_l1_miss": 1,
+							"punish_try_block": 2,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 7,
+							"st_miss": 9,
+							"str_light": 9
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 42.0,
+							"strike": 34.7909455773393,
+							"volley": 35.288
+						},
+						{
+							"classic": 5.75,
+							"control": 20.7,
+							"rush": 11.0866349055771,
+							"strike": 49.1550485792415
+						}
+					],
+					"damage": [
+						112.078945577339,
+						86.6916834848185
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						],
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						]
+					],
+					"moves_used": [
+						{
+							"air_slash": 9,
+							"feather_darts": 8,
+							"hang_time": 2,
+							"wing_snap": 16
+						},
+						{
+							"bulldoze": 3,
+							"dust_bowl": 3,
+							"rock_slide": 5,
+							"snout_jab": 30
+						}
+					],
+					"seed": 117,
+					"time": 62.1749999999971,
+					"winner": 1
+				},
+				{
+					"a": "f_gusto",
+					"b": "f_slurry",
+					"bot": [
+						{
+							"ans_block": 7,
+							"ans_dodge": 2,
+							"ans_miss": 8,
+							"ans_mistake": 3,
+							"ans_none": 1,
+							"commit_l1": 2,
+							"mv_dropped": 1,
+							"mv_projectile": 4,
+							"mv_volley": 6,
+							"of_miss": 3,
+							"off_grab_guard": 1,
+							"off_heavy": 1,
+							"off_light": 2,
+							"other_intr": 3,
+							"other_miss": 1,
+							"pn_l1_hit": 1,
+							"pn_l1_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_miss": 3,
+							"st_miss": 1,
+							"str_light": 1
+						},
+						{
+							"ans_block": 7,
+							"ans_dodge": 1,
+							"ans_miss": 9,
+							"ans_mistake": 1,
+							"ans_none": 4,
+							"guard_up": 11,
+							"mv_dropped": 1,
+							"mv_volley": 7,
+							"of_hit": 1,
+							"of_miss": 5,
+							"off_heavy2": 1,
+							"off_light": 6,
+							"off_stepin": 1,
+							"punish_try_block": 2,
+							"punish_try_miss": 4,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_light": 2
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 20.7,
+							"strike": 11.5503003254778,
+							"volley": 33.8008
+						},
+						{
+							"projectile": 28.5,
+							"strike": 2.09756524736909,
+							"volley": 36.686
+						}
+					],
+					"damage": [
+						66.0511003254778,
+						67.2835652473691
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						],
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						]
+					],
+					"moves_used": [
+						{
+							"air_slash": 4,
+							"feather_darts": 6,
+							"hang_time": 3,
+							"wing_snap": 9
+						},
+						{
+							"poison_darts": 6,
+							"sludge_lob": 7,
+							"venom_fangs": 8
+						}
+					],
+					"seed": 118,
+					"time": 41.141666666665,
+					"winner": 1
+				},
+				{
+					"a": "f_gusto",
+					"b": "f_jitters",
+					"bot": [
+						{
+							"ans_block": 15,
+							"ans_dodge": 10,
+							"ans_miss": 14,
+							"ans_none": 9,
+							"commit_grab": 1,
+							"commit_l1": 2,
+							"gap_counter": 1,
+							"gc_l1_hit": 1,
+							"guard_up": 5,
+							"mv_dropped": 8,
+							"mv_projectile": 6,
+							"mv_volley": 7,
+							"of_hit": 3,
+							"of_intr": 1,
+							"of_miss": 2,
+							"off_grab_guard": 2,
+							"off_heavy": 8,
+							"off_light": 4,
+							"other_hit": 1,
+							"other_miss": 1,
+							"parry_punish": 1,
+							"pn_l1_miss": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 4,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 4,
+							"st_miss": 3,
+							"str_light": 3
+						},
+						{
+							"ans_block": 11,
+							"ans_dodge": 3,
+							"ans_miss": 7,
+							"ans_mistake": 2,
+							"ans_none": 5,
+							"commit_grab": 3,
+							"guard_up": 8,
+							"mv_dropped": 10,
+							"mv_projectile": 6,
+							"of_hit": 2,
+							"of_miss": 12,
+							"off_backoff": 2,
+							"off_heavy": 5,
+							"off_light": 14,
+							"off_stepin": 1,
+							"other_hit": 5,
+							"other_intr": 2,
+							"other_miss": 1,
+							"pn_grab_hit": 1,
+							"pn_grab_miss": 2,
+							"punish_try_block": 3,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 5,
+							"st_hit": 1,
+							"st_intr": 4,
+							"st_miss": 2,
+							"str_finisher": 1,
+							"str_light": 7
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 24.0,
+							"strike": 16.6933673169083,
+							"volley": 35.2
+						},
+						{
+							"classic": 14.375,
+							"projectile": 52.5,
+							"strike": 27.8080331375961
+						}
+					],
+					"damage": [
+						75.8933673169083,
+						94.6830331375961
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						],
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						]
+					],
+					"moves_used": [
+						{
+							"air_slash": 6,
+							"feather_darts": 7,
+							"wing_snap": 11
+						},
+						{
+							"arc_lash": 5,
+							"slap": 29,
+							"spring_pad": 5,
+							"thunder_jolt": 7
+						}
+					],
+					"seed": 119,
+					"time": 58.0749999999973,
+					"winner": 1
+				},
+				{
+					"a": "f_gusto",
+					"b": "f_varga",
+					"bot": [
+						{
+							"ans_block": 1,
+							"ans_dodge": 4,
+							"ans_miss": 19,
+							"ans_mistake": 3,
+							"ans_none": 4,
+							"commit_grab": 2,
+							"commit_l1": 1,
+							"guard_up": 2,
+							"mv_dropped": 5,
+							"mv_projectile": 6,
+							"mv_volley": 7,
+							"of_hit": 6,
+							"of_miss": 2,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 3,
+							"off_light": 5,
+							"other_miss": 2,
+							"pn_grab_hit": 1,
+							"pn_l1_hit": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 11,
+							"st_hit": 1,
+							"st_intr": 1,
+							"st_miss": 3,
+							"str_finisher": 2,
+							"str_light": 5
+						},
+						{
+							"ans_block": 9,
+							"ans_dodge": 1,
+							"ans_miss": 8,
+							"ans_mistake": 3,
+							"ans_none": 6,
+							"ans_parry": 1,
+							"commit_grab": 1,
+							"guard_up": 8,
+							"of_hit": 3,
+							"of_intr": 6,
+							"of_miss": 11,
+							"off_heavy": 9,
+							"off_light": 10,
+							"off_stepin": 1,
+							"other_hit": 1,
+							"other_miss": 1,
+							"pn_grab_miss": 1,
+							"punish_try_miss": 5,
+							"punish_try_parry": 1,
+							"st_miss": 1,
+							"str_light": 1,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 34.98,
+							"strike": 21.8470721900622,
+							"volley": 55.616
+						},
+						{
+							"classic": 6.76973281153306,
+							"projectile": 39.6286330912807,
+							"strike": 13.0814797615433
+						}
+					],
+					"damage": [
+						112.443072190062,
+						59.4798456643571
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						],
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						]
+					],
+					"moves_used": [
+						{
+							"air_slash": 6,
+							"feather_darts": 7,
+							"wing_snap": 13
+						},
+						{
+							"iron_shins": 8,
+							"pressure_palm": 8,
+							"thunder_chop": 1
+						}
+					],
+					"seed": 120,
+					"time": 51.4333333333311,
+					"winner": 0
+				},
+				{
+					"a": "f_gusto",
+					"b": "f_knell",
+					"bot": [
+						{
+							"ans_block": 10,
+							"ans_counter": 2,
+							"ans_dodge": 2,
+							"ans_miss": 9,
+							"ans_mistake": 1,
+							"ans_none": 11,
+							"commit_l1": 5,
+							"cp_l1_miss": 2,
+							"guard_up": 4,
+							"mv_dropped": 4,
+							"mv_projectile": 5,
+							"mv_volley": 6,
+							"of_hit": 3,
+							"off_grab": 1,
+							"off_heavy": 3,
+							"off_light": 2,
+							"other_hit": 1,
+							"other_miss": 1,
+							"pn_l1_intr": 2,
+							"pn_l1_miss": 1,
+							"punish_try_block": 2,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 4,
+							"st_hit": 1,
+							"str_finisher": 1,
+							"str_light": 1
+						},
+						{
+							"ans_block": 6,
+							"ans_counter": 2,
+							"ans_dodge": 2,
+							"ans_miss": 8,
+							"ans_none": 5,
+							"guard_up": 6,
+							"mv_dropped": 5,
+							"mv_stream": 6,
+							"of_hit": 2,
+							"of_intr": 1,
+							"of_miss": 2,
+							"off_grab_guard": 1,
+							"off_heavy": 4,
+							"off_light": 4,
+							"other_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 2,
+							"st_hit": 1,
+							"st_miss": 2,
+							"str_finisher": 1,
+							"str_light": 3
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 30.9,
+							"strike": 18.9022842501035,
+							"volley": 39.776
+						},
+						{
+							"projectile": 47.25,
+							"stream": 23.247,
+							"strike": 16.924983941762
+						}
+					],
+					"damage": [
+						89.5782842501036,
+						87.421983941762
+					],
+					"denied": [
+						0,
+						2
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						],
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						]
+					],
+					"moves_used": [
+						{
+							"air_slash": 5,
+							"feather_darts": 6,
+							"wing_snap": 10
+						},
+						{
+							"ghost_light": 7,
+							"night_shade": 6,
+							"sounding_jab": 8,
+							"through_the_veil": 4
+						}
+					],
+					"seed": 121,
+					"time": 45.2249999999981,
+					"winner": 1
+				},
+				{
+					"a": "f_dozer",
+					"b": "f_stoke",
+					"bot": [
+						{
+							"ans_block": 28,
+							"ans_dodge": 4,
+							"ans_miss": 3,
+							"ans_mistake": 3,
+							"ans_none": 26,
+							"guard_up": 9,
+							"mv_control": 5,
+							"mv_dropped": 29,
+							"of_hit": 9,
+							"of_intr": 6,
+							"of_miss": 17,
+							"off_grab": 6,
+							"off_grab2": 3,
+							"off_grab_guard": 2,
+							"off_heavy": 18,
+							"off_heavy2": 11,
+							"off_light": 20,
+							"punish_try_block": 1,
+							"punish_try_dodge": 3,
+							"punish_try_miss": 2,
+							"st_intr": 1,
+							"st_miss": 4,
+							"str_light": 5
+						},
+						{
+							"ans_block": 17,
+							"ans_counter": 1,
+							"ans_dodge": 2,
+							"ans_miss": 4,
+							"ans_mistake": 7,
+							"ans_none": 11,
+							"commit_l1": 1,
+							"gap_counter": 1,
+							"gc_l1_hit": 1,
+							"guard_up": 5,
+							"mv_dropped": 11,
+							"mv_stream": 9,
+							"of_hit": 12,
+							"of_intr": 4,
+							"of_miss": 9,
+							"off_grab": 6,
+							"off_heavy": 7,
+							"off_light": 18,
+							"other_miss": 4,
+							"punish_try_dodge": 1,
+							"st_hit": 10,
+							"st_intr": 1,
+							"st_miss": 3,
+							"str_finisher": 4,
+							"str_light": 14
+						}
+					],
+					"by_cat": [
+						{
+							"control": 20.7,
+							"rush": 5.6551925531492,
+							"strike": 17.3703455077719
+						},
+						{
+							"stream": 36.3,
+							"strike": 54.09614034975
+						}
+					],
+					"damage": [
+						43.7255380609211,
+						90.39614034975
+					],
+					"denied": [
+						6,
+						2
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						],
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						]
+					],
+					"moves_used": [
+						{
+							"bulldoze": 1,
+							"rock_slide": 5,
+							"snout_jab": 26
+						},
+						{
+							"ember_jab": 38,
+							"flamethrower": 9,
+							"steam_vent": 1
+						}
+					],
+					"seed": 122,
+					"time": 63.2249999999971,
+					"winner": 1
+				},
+				{
+					"a": "f_dozer",
+					"b": "f_dredge",
+					"bot": [
+						{
+							"ans_block": 13,
+							"ans_dodge": 4,
+							"ans_miss": 9,
+							"ans_mistake": 2,
+							"ans_none": 22,
+							"commit_l1": 1,
+							"guard_up": 7,
+							"mv_control": 9,
+							"mv_dropped": 19,
+							"of_hit": 8,
+							"of_intr": 6,
+							"of_miss": 14,
+							"off_grab": 5,
+							"off_grab2": 4,
+							"off_grab_guard": 4,
+							"off_heavy": 8,
+							"off_heavy2": 10,
+							"off_light": 18,
+							"other_miss": 2,
+							"pn_l1_hit": 1,
+							"punish_try_dodge": 4,
+							"punish_try_miss": 5,
+							"st_miss": 6,
+							"str_finisher": 1,
+							"str_light": 6
+						},
+						{
+							"ans_block": 21,
+							"ans_counter": 2,
+							"ans_dodge": 4,
+							"ans_miss": 8,
+							"ans_mistake": 3,
+							"ans_none": 7,
+							"guard_up": 8,
+							"mv_blast": 3,
+							"mv_dropped": 23,
+							"mv_stream": 9,
+							"of_hit": 4,
+							"of_intr": 3,
+							"of_miss": 7,
+							"off_backoff": 1,
+							"off_grab": 2,
+							"off_grab_guard": 3,
+							"off_heavy": 13,
+							"off_heavy2": 8,
+							"off_light": 9,
+							"other_intr": 1,
+							"other_miss": 3,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 4,
+							"st_hit": 3,
+							"st_miss": 2,
+							"str_finisher": 2,
+							"str_light": 5
+						}
+					],
+					"by_cat": [
+						{
+							"control": 27.6,
+							"rush": 8.36296870706054,
+							"strike": 29.9190171091649
+						},
+						{
+							"blast": 23.6848888888889,
+							"stream": 45.30816,
+							"strike": 22.3015823552704
+						}
+					],
+					"damage": [
+						65.8819858162255,
+						91.2946312441593
+					],
+					"denied": [
+						1,
+						6
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						],
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						]
+					],
+					"moves_used": [
+						{
+							"bulldoze": 2,
+							"dust_bowl": 2,
+							"rock_slide": 6,
+							"snout_jab": 27
+						},
+						{
+							"bubble_stream": 9,
+							"claw_snap": 18,
+							"hydro_cannon": 3
+						}
+					],
+					"seed": 123,
+					"time": 63.2249999999971,
+					"winner": 1
+				},
+				{
+					"a": "f_dozer",
+					"b": "f_gusto",
+					"bot": [
+						{
+							"ans_block": 16,
+							"ans_dodge": 2,
+							"ans_miss": 3,
+							"ans_mistake": 3,
+							"ans_none": 12,
+							"commit_grab": 1,
+							"guard_up": 12,
+							"mv_control": 6,
+							"mv_dropped": 14,
+							"of_hit": 1,
+							"of_intr": 5,
+							"of_miss": 18,
+							"off_backoff": 4,
+							"off_grab2": 1,
+							"off_grab_guard": 3,
+							"off_heavy": 6,
+							"off_heavy2": 8,
+							"off_light": 20,
+							"other_miss": 2,
+							"parry_punish": 1,
+							"pp_grab_miss": 1,
+							"punish_try_block": 3,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 2,
+							"st_intr": 1,
+							"st_miss": 5,
+							"str_light": 6
+						},
+						{
+							"ans_block": 23,
+							"ans_dodge": 11,
+							"ans_miss": 4,
+							"ans_mistake": 3,
+							"ans_none": 3,
+							"commit_grab": 1,
+							"commit_l1": 3,
+							"gap_counter": 1,
+							"gc_l1_hit": 1,
+							"guard_up": 5,
+							"mv_dropped": 2,
+							"mv_projectile": 2,
+							"mv_volley": 8,
+							"of_hit": 8,
+							"of_intr": 2,
+							"of_miss": 1,
+							"off_grab": 1,
+							"off_heavy": 1,
+							"off_light": 10,
+							"other_miss": 5,
+							"parry_punish": 1,
+							"pn_l1_miss": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 5,
+							"punish_try_miss": 2,
+							"st_hit": 2,
+							"st_miss": 4,
+							"str_finisher": 1,
+							"str_light": 6
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 37.6438123464584,
+							"control": 20.7,
+							"rush": 15.6810937989086,
+							"strike": 21.3293564172756
+						},
+						{
+							"projectile": 12.0,
+							"strike": 42.3877721693076,
+							"volley": 52.624
+						}
+					],
+					"damage": [
+						95.3542625626427,
+						107.011772169308
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						],
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						]
+					],
+					"moves_used": [
+						{
+							"bulldoze": 4,
+							"rock_slide": 6,
+							"snout_jab": 28
+						},
+						{
+							"air_slash": 2,
+							"feather_darts": 8,
+							"wing_snap": 23
+						}
+					],
+					"seed": 124,
+					"time": 61.9916666666638,
+					"winner": 0
+				},
+				{
+					"a": "f_dozer",
+					"b": "f_slurry",
+					"bot": [
+						{
+							"ans_block": 18,
+							"ans_dodge": 1,
+							"ans_miss": 6,
+							"ans_mistake": 2,
+							"ans_none": 10,
+							"commit_l1": 1,
+							"guard_up": 2,
+							"mv_control": 5,
+							"mv_dropped": 13,
+							"of_hit": 7,
+							"of_intr": 7,
+							"of_miss": 9,
+							"off_grab": 1,
+							"off_grab2": 3,
+							"off_grab_guard": 4,
+							"off_heavy": 8,
+							"off_heavy2": 5,
+							"off_light": 15,
+							"other_miss": 1,
+							"pn_l1_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_miss": 1,
+							"st_intr": 2,
+							"st_miss": 7,
+							"str_light": 9
+						},
+						{
+							"ans_block": 17,
+							"ans_dodge": 4,
+							"ans_miss": 5,
+							"ans_mistake": 3,
+							"ans_none": 9,
+							"commit_l1": 3,
+							"gap_counter": 2,
+							"gc_l1_hit": 2,
+							"guard_up": 10,
+							"mv_dropped": 6,
+							"mv_volley": 1,
+							"of_hit": 10,
+							"of_intr": 3,
+							"of_miss": 4,
+							"off_grab_guard": 2,
+							"off_heavy": 5,
+							"off_light": 14,
+							"other_hit": 1,
+							"other_miss": 1,
+							"pn_l1_hit": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 3,
+							"st_hit": 2,
+							"st_miss": 6,
+							"str_finisher": 1,
+							"str_light": 8
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 5.75,
+							"control": 17.595,
+							"rush": 28.8663250494133,
+							"strike": 25.6250026473295
+						},
+						{
+							"classic": 7.04049087184011,
+							"projectile": 3.75,
+							"strike": 81.3667578135563,
+							"volley": 23.92
+						}
+					],
+					"damage": [
+						77.8363276967427,
+						116.077248685396
+					],
+					"denied": [
+						0,
+						3
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						],
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						]
+					],
+					"moves_used": [
+						{
+							"bulldoze": 2,
+							"dust_bowl": 2,
+							"rock_slide": 5,
+							"snout_jab": 26
+						},
+						{
+							"drain_dive": 1,
+							"poison_darts": 4,
+							"sludge_lob": 4,
+							"venom_fangs": 28
+						}
+					],
+					"seed": 125,
+					"time": 49.3916666666645,
+					"winner": 1
+				},
+				{
+					"a": "f_dozer",
+					"b": "f_jitters",
+					"bot": [
+						{
+							"ans_block": 14,
+							"ans_miss": 8,
+							"ans_mistake": 1,
+							"ans_none": 10,
+							"guard_up": 4,
+							"mv_control": 5,
+							"mv_dropped": 13,
+							"of_hit": 5,
+							"of_intr": 5,
+							"of_miss": 18,
+							"off_grab2": 1,
+							"off_grab_guard": 4,
+							"off_heavy": 8,
+							"off_heavy2": 5,
+							"off_light": 22,
+							"off_stepin": 1,
+							"punish_try_block": 1,
+							"st_intr": 2,
+							"st_miss": 6,
+							"str_light": 8
+						},
+						{
+							"ans_block": 30,
+							"ans_dodge": 3,
+							"ans_miss": 5,
+							"ans_mistake": 2,
+							"ans_none": 3,
+							"guard_up": 7,
+							"mv_dropped": 5,
+							"mv_projectile": 3,
+							"of_hit": 4,
+							"of_miss": 7,
+							"off_grab": 2,
+							"off_heavy": 5,
+							"off_light": 9,
+							"other_hit": 1,
+							"other_miss": 5,
+							"punish_try_dodge": 3,
+							"punish_try_miss": 3,
+							"st_hit": 1,
+							"st_miss": 2,
+							"str_light": 3
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 7.40004745826976,
+							"control": 15.87,
+							"rush": 16.2241899995425,
+							"strike": 38.1619314045158
+						},
+						{
+							"projectile": 31.875,
+							"strike": 26.749317887109
+						}
+					],
+					"damage": [
+						77.6561688623281,
+						58.624317887109
+					],
+					"denied": [
+						1,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						],
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						]
+					],
+					"moves_used": [
+						{
+							"bulldoze": 2,
+							"dust_bowl": 1,
+							"rock_slide": 5,
+							"snout_jab": 31
+						},
+						{
+							"arc_lash": 6,
+							"slap": 18,
+							"spring_pad": 4,
+							"thunder_jolt": 4
+						}
+					],
+					"seed": 126,
+					"time": 52.9166666666643,
+					"winner": 0
+				},
+				{
+					"a": "f_dozer",
+					"b": "f_varga",
+					"bot": [
+						{
+							"ans_block": 12,
+							"ans_dodge": 1,
+							"ans_miss": 6,
+							"ans_mistake": 1,
+							"ans_none": 9,
+							"commit_grab": 1,
+							"commit_l1": 1,
+							"mv_control": 4,
+							"mv_dropped": 13,
+							"of_hit": 8,
+							"of_intr": 4,
+							"of_miss": 16,
+							"off_grab": 1,
+							"off_grab2": 1,
+							"off_grab_guard": 3,
+							"off_heavy": 12,
+							"off_heavy2": 1,
+							"off_light": 23,
+							"pn_grab_hit": 1,
+							"pn_l1_hit": 1,
+							"punish_try_block": 2,
+							"punish_try_miss": 3,
+							"st_intr": 1,
+							"st_miss": 8,
+							"str_light": 9
+						},
+						{
+							"ans_block": 24,
+							"ans_dodge": 2,
+							"ans_miss": 4,
+							"ans_mistake": 4,
+							"ans_none": 5,
+							"ans_parry": 1,
+							"block_tap": 1,
+							"commit_grab": 2,
+							"guard_up": 2,
+							"of_hit": 2,
+							"of_intr": 6,
+							"of_miss": 9,
+							"off_heavy": 2,
+							"off_light": 15,
+							"other_miss": 1,
+							"punish_try_miss": 3,
+							"st_intr": 1,
+							"st_miss": 3,
+							"str_light": 4,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"control": 23.46,
+							"rush": 11.2728788702737,
+							"strike": 76.0438097131316
+						},
+						{
+							"classic": 7.82034283863247,
+							"projectile": 58.3944444444444,
+							"strike": 16.5954698260934
+						}
+					],
+					"damage": [
+						110.776688583405,
+						82.8102571091703
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						],
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						]
+					],
+					"moves_used": [
+						{
+							"bulldoze": 1,
+							"rock_slide": 4,
+							"snout_jab": 33
+						},
+						{
+							"comet_hook": 1,
+							"iron_shins": 7,
+							"pressure_palm": 13
+						}
+					],
+					"seed": 127,
+					"time": 46.0083333333314,
+					"winner": 0
+				},
+				{
+					"a": "f_dozer",
+					"b": "f_knell",
+					"bot": [
+						{
+							"ans_block": 14,
+							"ans_mistake": 1,
+							"ans_none": 18,
+							"ans_parry": 2,
+							"commit_l1": 1,
+							"guard_up": 2,
+							"mv_control": 4,
+							"mv_dropped": 12,
+							"of_hit": 6,
+							"of_intr": 5,
+							"of_miss": 7,
+							"off_grab": 1,
+							"off_heavy": 10,
+							"off_heavy2": 1,
+							"off_light": 17,
+							"other_hit": 1,
+							"other_miss": 1,
+							"pn_l1_intr": 1,
+							"punish_try_block": 2,
+							"punish_try_parry": 1,
+							"st_hit": 1,
+							"st_miss": 10,
+							"str_finisher": 1,
+							"str_light": 11,
+							"tap_nothing": 2
+						},
+						{
+							"ans_block": 23,
+							"ans_counter": 2,
+							"ans_dodge": 1,
+							"ans_miss": 6,
+							"ans_none": 3,
+							"ans_parry": 3,
+							"block_tap": 3,
+							"commit_grab": 2,
+							"guard_up": 5,
+							"mv_dropped": 3,
+							"mv_stream": 6,
+							"of_hit": 7,
+							"of_intr": 2,
+							"of_miss": 3,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 2,
+							"off_light": 10,
+							"punish_try_miss": 5,
+							"st_hit": 4,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_finisher": 1,
+							"str_light": 6,
+							"tap_blocked": 1,
+							"tap_nothing": 2
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 16.4102885293961,
+							"control": 20.7,
+							"rush": 23.9582922845793,
+							"strike": 53.6731496569678
+						},
+						{
+							"projectile": 47.25,
+							"stream": 28.287,
+							"strike": 41.1456361243559
+						}
+					],
+					"damage": [
+						114.741730470943,
+						116.682636124356
+					],
+					"denied": [
+						4,
+						2
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						],
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						]
+					],
+					"moves_used": [
+						{
+							"bulldoze": 3,
+							"rock_slide": 4,
+							"snout_jab": 31
+						},
+						{
+							"ghost_light": 6,
+							"night_shade": 6,
+							"sounding_jab": 15,
+							"through_the_veil": 4
+						}
+					],
+					"seed": 128,
+					"time": 47.4416666666646,
+					"winner": 0
+				},
+				{
+					"a": "f_slurry",
+					"b": "f_stoke",
+					"bot": [
+						{
+							"ans_block": 13,
+							"ans_dodge": 1,
+							"ans_miss": 9,
+							"ans_mistake": 3,
+							"ans_none": 11,
+							"commit_grab": 1,
+							"guard_up": 3,
+							"mv_dropped": 5,
+							"mv_volley": 2,
+							"of_hit": 1,
+							"of_intr": 3,
+							"off_heavy": 5,
+							"off_light": 4,
+							"parry_punish": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 5,
+							"st_miss": 1,
+							"str_light": 1
+						},
+						{
+							"ans_block": 5,
+							"ans_counter": 1,
+							"ans_dodge": 1,
+							"ans_miss": 2,
+							"ans_mistake": 1,
+							"ans_none": 2,
+							"guard_up": 2,
+							"mv_dropped": 6,
+							"mv_stream": 4,
+							"of_hit": 6,
+							"of_intr": 3,
+							"of_miss": 5,
+							"off_grab": 2,
+							"off_grab_guard": 1,
+							"off_heavy": 4,
+							"off_light": 10,
+							"other_hit": 1,
+							"other_miss": 1,
+							"punish_try_block": 2,
+							"punish_try_miss": 2,
+							"st_hit": 1,
+							"st_miss": 1,
+							"str_commit": 2,
+							"str_finisher": 1,
+							"str_light": 2
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 16.5,
+							"strike": 3.58791229810437,
+							"volley": 22.984
+						},
+						{
+							"classic": 7.10106959382874,
+							"stream": 52.904,
+							"strike": 31.8762481953731
+						}
+					],
+					"damage": [
+						43.0719122981044,
+						91.8813177892019
+					],
+					"denied": [
+						0,
+						4
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						],
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						]
+					],
+					"moves_used": [
+						{
+							"drain_dive": 1,
+							"poison_darts": 3,
+							"sludge_lob": 3,
+							"venom_fangs": 5
+						},
+						{
+							"ember_jab": 15,
+							"flamethrower": 4,
+							"steam_vent": 1
+						}
+					],
+					"seed": 129,
+					"time": 27.9416666666657,
+					"winner": 1
+				},
+				{
+					"a": "f_slurry",
+					"b": "f_dredge",
+					"bot": [
+						{
+							"ans_block": 5,
+							"ans_dodge": 1,
+							"ans_miss": 19,
+							"ans_none": 10,
+							"commit_l1": 1,
+							"guard_up": 4,
+							"mv_dropped": 4,
+							"mv_volley": 2,
+							"of_hit": 9,
+							"of_intr": 3,
+							"of_miss": 1,
+							"off_grab2": 1,
+							"off_heavy": 3,
+							"off_light": 12,
+							"pn_l1_hit": 1,
+							"punish_try_miss": 11,
+							"st_hit": 7,
+							"st_miss": 4,
+							"str_finisher": 1,
+							"str_light": 12
+						},
+						{
+							"ans_block": 21,
+							"ans_counter": 1,
+							"ans_miss": 6,
+							"ans_mistake": 2,
+							"ans_none": 2,
+							"ans_parry": 1,
+							"block_tap": 2,
+							"guard_up": 7,
+							"mv_blast": 4,
+							"mv_dropped": 1,
+							"mv_stream": 6,
+							"of_hit": 2,
+							"of_intr": 1,
+							"of_miss": 2,
+							"off_grab": 1,
+							"off_grab_guard": 1,
+							"off_heavy": 1,
+							"off_light": 3,
+							"other_miss": 1,
+							"punish_try_block": 3,
+							"punish_try_miss": 1,
+							"tap_blocked": 1,
+							"tap_hit": 1
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 2.25,
+							"projectile": 39.27,
+							"strike": 52.6249154459771,
+							"volley": 21.32
+						},
+						{
+							"blast": 24.3288888888889,
+							"stream": 64.78272,
+							"strike": 2.79285707232992
+						}
+					],
+					"damage": [
+						115.464915445977,
+						91.9044659612188
+					],
+					"denied": [
+						0,
+						1
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						],
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						]
+					],
+					"moves_used": [
+						{
+							"drain_dive": 1,
+							"poison_darts": 3,
+							"sludge_lob": 5,
+							"venom_fangs": 25
+						},
+						{
+							"bubble_stream": 6,
+							"claw_snap": 4,
+							"hydro_cannon": 4
+						}
+					],
+					"seed": 130,
+					"time": 43.4333333333315,
+					"winner": 0
+				},
+				{
+					"a": "f_slurry",
+					"b": "f_gusto",
+					"bot": [
+						{
+							"ans_block": 6,
+							"ans_miss": 13,
+							"ans_mistake": 2,
+							"ans_none": 7,
+							"commit_l1": 1,
+							"guard_up": 14,
+							"mv_dropped": 2,
+							"mv_volley": 8,
+							"of_hit": 3,
+							"of_intr": 1,
+							"of_miss": 2,
+							"off_grab": 1,
+							"off_grab2": 1,
+							"off_heavy": 2,
+							"off_light": 4,
+							"pn_l1_miss": 1,
+							"punish_try_block": 2,
+							"punish_try_miss": 4,
+							"st_miss": 2,
+							"str_light": 2
+						},
+						{
+							"ans_block": 3,
+							"ans_dodge": 5,
+							"ans_miss": 7,
+							"ans_mistake": 1,
+							"ans_none": 5,
+							"commit_l1": 1,
+							"guard_up": 4,
+							"mv_dropped": 3,
+							"mv_projectile": 5,
+							"mv_volley": 6,
+							"of_miss": 1,
+							"off_heavy": 3,
+							"off_light": 1,
+							"other_hit": 2,
+							"other_intr": 4,
+							"other_miss": 2,
+							"pn_l1_miss": 1,
+							"punish_try_block": 2,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 1,
+							"st_hit": 1,
+							"st_miss": 1,
+							"str_light": 2
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 5.74923239442628,
+							"projectile": 24.9,
+							"strike": 8.26071724623641,
+							"volley": 30.5864
+						},
+						{
+							"projectile": 34.5,
+							"strike": 16.4392383347717,
+							"volley": 34.914
+						}
+					],
+					"damage": [
+						69.4963496406627,
+						85.8532383347717
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						],
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						]
+					],
+					"moves_used": [
+						{
+							"poison_darts": 6,
+							"sludge_lob": 7,
+							"venom_fangs": 7
+						},
+						{
+							"air_slash": 5,
+							"feather_darts": 6,
+							"hang_time": 5,
+							"wing_snap": 12
+						}
+					],
+					"seed": 131,
+					"time": 44.4666666666648,
+					"winner": 0
+				},
+				{
+					"a": "f_slurry",
+					"b": "f_dozer",
+					"bot": [
+						{
+							"ans_block": 13,
+							"ans_dodge": 2,
+							"ans_miss": 6,
+							"ans_mistake": 3,
+							"ans_none": 11,
+							"commit_l1": 2,
+							"gap_counter": 1,
+							"gc_l1_miss": 1,
+							"guard_up": 7,
+							"mv_dropped": 7,
+							"mv_volley": 1,
+							"of_hit": 11,
+							"of_intr": 4,
+							"of_miss": 3,
+							"off_grab_guard": 1,
+							"off_heavy": 5,
+							"off_light": 16,
+							"other_hit": 1,
+							"other_intr": 1,
+							"pn_l1_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_miss": 3,
+							"st_hit": 1,
+							"st_miss": 10,
+							"str_finisher": 2,
+							"str_light": 11
+						},
+						{
+							"ans_block": 20,
+							"ans_dodge": 1,
+							"ans_miss": 7,
+							"ans_mistake": 2,
+							"ans_none": 10,
+							"guard_up": 6,
+							"mv_control": 4,
+							"mv_dropped": 19,
+							"of_hit": 7,
+							"of_intr": 4,
+							"of_miss": 13,
+							"off_grab": 1,
+							"off_grab2": 4,
+							"off_grab_guard": 5,
+							"off_heavy": 6,
+							"off_heavy2": 12,
+							"off_light": 14,
+							"off_stepin": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"st_miss": 3,
+							"str_finisher": 1,
+							"str_light": 3
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 6.28201171022581,
+							"projectile": 19.8,
+							"strike": 77.5524858237415,
+							"volley": 8.97
+						},
+						{
+							"classic": 5.75,
+							"rush": 26.8316094639367,
+							"strike": 13.3122457178401
+						}
+					],
+					"damage": [
+						112.604497533967,
+						45.8938551817769
+					],
+					"denied": [
+						1,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						],
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						]
+					],
+					"moves_used": [
+						{
+							"drain_dive": 1,
+							"poison_darts": 3,
+							"sludge_lob": 4,
+							"venom_fangs": 33
+						},
+						{
+							"bulldoze": 3,
+							"dust_bowl": 2,
+							"rock_slide": 4,
+							"snout_jab": 17
+						}
+					],
+					"seed": 132,
+					"time": 45.8916666666647,
+					"winner": 0
+				},
+				{
+					"a": "f_slurry",
+					"b": "f_jitters",
+					"bot": [
+						{
+							"ans_block": 8,
+							"ans_miss": 7,
+							"ans_mistake": 1,
+							"ans_none": 6,
+							"guard_up": 3,
+							"mv_dropped": 2,
+							"mv_volley": 4,
+							"of_hit": 5,
+							"of_intr": 2,
+							"of_miss": 4,
+							"off_grab2": 1,
+							"off_grab_guard": 1,
+							"off_light": 9,
+							"other_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_miss": 1,
+							"st_hit": 4,
+							"st_miss": 3,
+							"str_finisher": 2,
+							"str_light": 8
+						},
+						{
+							"ans_block": 16,
+							"ans_dodge": 2,
+							"ans_miss": 4,
+							"ans_mistake": 1,
+							"ans_none": 3,
+							"guard_up": 5,
+							"mv_dropped": 5,
+							"mv_projectile": 4,
+							"of_hit": 2,
+							"of_intr": 1,
+							"of_miss": 4,
+							"off_backoff": 3,
+							"off_grab": 1,
+							"off_grab_guard": 1,
+							"off_heavy": 2,
+							"off_light": 5,
+							"other_hit": 1,
+							"other_miss": 5,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 3,
+							"st_miss": 2,
+							"str_light": 2
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 21.0,
+							"strike": 22.9039125126149,
+							"volley": 23.4
+						},
+						{
+							"projectile": 22.5,
+							"strike": 15.1006956725129
+						}
+					],
+					"damage": [
+						67.3039125126149,
+						37.6006956725129
+					],
+					"denied": [
+						0,
+						2
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						],
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						]
+					],
+					"moves_used": [
+						{
+							"poison_darts": 3,
+							"sludge_lob": 5,
+							"venom_fangs": 17
+						},
+						{
+							"arc_lash": 2,
+							"slap": 13,
+							"spring_pad": 3,
+							"thunder_jolt": 4
+						}
+					],
+					"seed": 133,
+					"time": 34.5166666666654,
+					"winner": 0
+				},
+				{
+					"a": "f_slurry",
+					"b": "f_varga",
+					"bot": [
+						{
+							"ans_block": 5,
+							"ans_dodge": 1,
+							"ans_miss": 7,
+							"ans_mistake": 2,
+							"ans_none": 3,
+							"guard_up": 4,
+							"mv_volley": 3,
+							"of_hit": 4,
+							"of_intr": 1,
+							"of_miss": 1,
+							"off_grab_guard": 1,
+							"off_light": 4,
+							"punish_try_miss": 4,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_light": 3
+						},
+						{
+							"ans_block": 8,
+							"ans_miss": 6,
+							"ans_mistake": 2,
+							"ans_none": 1,
+							"commit_grab": 3,
+							"guard_up": 7,
+							"of_hit": 1,
+							"of_miss": 7,
+							"off_grab": 1,
+							"off_grab_guard": 1,
+							"off_light": 7,
+							"other_miss": 1,
+							"parry_punish": 1,
+							"pn_grab_intr": 2,
+							"pp_grab_miss": 1,
+							"punish_try_block": 4,
+							"punish_try_miss": 2,
+							"st_hit": 1,
+							"str_light": 1
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 0.0,
+							"projectile": 42.54,
+							"strike": 15.0837561988105,
+							"volley": 25.584
+						},
+						{
+							"classic": 6.94476148603902,
+							"projectile": 45.7688888888889
+						}
+					],
+					"damage": [
+						83.2077561988105,
+						52.7136503749279
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						],
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						]
+					],
+					"moves_used": [
+						{
+							"poison_darts": 4,
+							"sludge_lob": 6,
+							"venom_fangs": 7
+						},
+						{
+							"pressure_palm": 8
+						}
+					],
+					"seed": 134,
+					"time": 35.4666666666653,
+					"winner": 0
+				},
+				{
+					"a": "f_slurry",
+					"b": "f_knell",
+					"bot": [
+						{
+							"ans_block": 11,
+							"ans_dodge": 3,
+							"ans_miss": 13,
+							"ans_mistake": 1,
+							"ans_none": 6,
+							"commit_l1": 1,
+							"guard_up": 7,
+							"mv_volley": 5,
+							"of_hit": 2,
+							"of_intr": 2,
+							"of_miss": 2,
+							"off_grab": 1,
+							"off_grab2": 3,
+							"off_light": 2,
+							"pn_l1_hit": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 8,
+							"st_miss": 1,
+							"str_light": 1
+						},
+						{
+							"ans_block": 7,
+							"ans_counter": 2,
+							"ans_miss": 5,
+							"ans_mistake": 1,
+							"ans_none": 4,
+							"commit_grab": 1,
+							"guard_up": 4,
+							"mv_dropped": 1,
+							"mv_stream": 5,
+							"of_hit": 1,
+							"of_miss": 6,
+							"off_grab": 1,
+							"off_light": 6,
+							"other_miss": 2,
+							"pn_grab_intr": 1,
+							"punish_try_block": 4,
+							"punish_try_miss": 2,
+							"st_hit": 1,
+							"st_miss": 2,
+							"str_finisher": 1,
+							"str_light": 3
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 10.7,
+							"projectile": 54.0,
+							"strike": 2.65504353508551,
+							"volley": 28.574
+						},
+						{
+							"projectile": 18.144,
+							"stream": 42.966,
+							"strike": 24.0336885383502,
+							"utility": 5.25
+						}
+					],
+					"damage": [
+						95.9290435350855,
+						90.3936885383502
+					],
+					"denied": [
+						0,
+						3
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						],
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						]
+					],
+					"moves_used": [
+						{
+							"poison_darts": 5,
+							"sludge_lob": 6,
+							"venom_fangs": 4
+						},
+						{
+							"ghost_light": 5,
+							"night_shade": 5,
+							"sounding_jab": 11,
+							"through_the_veil": 3
+						}
+					],
+					"seed": 135,
+					"time": 38.0499999999985,
+					"winner": 0
+				},
+				{
+					"a": "f_jitters",
+					"b": "f_stoke",
+					"bot": [
+						{
+							"ans_block": 25,
+							"ans_dodge": 2,
+							"ans_miss": 7,
+							"ans_mistake": 4,
+							"ans_none": 15,
+							"commit_grab": 3,
+							"guard_up": 8,
+							"mv_dropped": 22,
+							"mv_projectile": 1,
+							"of_hit": 14,
+							"of_intr": 2,
+							"of_miss": 6,
+							"off_backoff": 1,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 8,
+							"off_light": 19,
+							"other_hit": 1,
+							"other_intr": 1,
+							"other_miss": 3,
+							"parry_punish": 1,
+							"pn_grab_hit": 2,
+							"pp_grab_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 4,
+							"st_hit": 8,
+							"st_intr": 1,
+							"st_miss": 4,
+							"str_finisher": 3,
+							"str_light": 13
+						},
+						{
+							"ans_block": 26,
+							"ans_counter": 1,
+							"ans_dodge": 2,
+							"ans_miss": 1,
+							"ans_mistake": 3,
+							"ans_none": 14,
+							"ans_parry": 1,
+							"block_tap": 1,
+							"commit_grab": 1,
+							"guard_up": 7,
+							"mv_dropped": 12,
+							"mv_stream": 6,
+							"of_hit": 5,
+							"of_intr": 6,
+							"of_miss": 6,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 9,
+							"off_light": 13,
+							"other_hit": 2,
+							"other_miss": 2,
+							"parry_punish": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 2,
+							"punish_try_dodge": 1,
+							"st_hit": 5,
+							"st_miss": 7,
+							"str_finisher": 3,
+							"str_light": 12,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 5.12550224293734,
+							"projectile": 22.5,
+							"strike": 84.5474247728045
+						},
+						{
+							"blast": 6.0,
+							"classic": 0.0,
+							"stream": 24.0,
+							"strike": 28.5417346430691
+						}
+					],
+					"damage": [
+						112.172927015742,
+						58.5417346430691
+					],
+					"denied": [
+						0,
+						4
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						],
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						]
+					],
+					"moves_used": [
+						{
+							"arc_lash": 2,
+							"slap": 37,
+							"spring_pad": 1,
+							"thunder_jolt": 3
+						},
+						{
+							"ember_jab": 30,
+							"flamethrower": 7,
+							"steam_vent": 1
+						}
+					],
+					"seed": 136,
+					"time": 51.833333333331,
+					"winner": 0
+				},
+				{
+					"a": "f_jitters",
+					"b": "f_dredge",
+					"bot": [
+						{
+							"ans_block": 18,
+							"ans_counter": 2,
+							"ans_dodge": 8,
+							"ans_miss": 17,
+							"ans_mistake": 2,
+							"ans_none": 4,
+							"commit_grab": 2,
+							"commit_l1": 3,
+							"guard_up": 6,
+							"mv_dropped": 14,
+							"mv_projectile": 7,
+							"of_hit": 7,
+							"of_miss": 4,
+							"off_grab_guard": 2,
+							"off_heavy": 3,
+							"off_light": 9,
+							"other_hit": 2,
+							"other_miss": 3,
+							"pn_grab_hit": 2,
+							"pn_l1_hit": 1,
+							"pn_l1_intr": 1,
+							"pn_l1_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 3,
+							"punish_try_miss": 9,
+							"st_hit": 6,
+							"st_miss": 4,
+							"str_finisher": 2,
+							"str_light": 10
+						},
+						{
+							"ans_block": 18,
+							"ans_miss": 10,
+							"ans_mistake": 6,
+							"ans_none": 14,
+							"guard_up": 16,
+							"mv_blast": 5,
+							"mv_dropped": 16,
+							"mv_stream": 12,
+							"of_hit": 1,
+							"of_intr": 2,
+							"of_miss": 16,
+							"off_grab": 1,
+							"off_grab_guard": 5,
+							"off_heavy": 11,
+							"off_heavy2": 2,
+							"off_light": 18,
+							"other_hit": 1,
+							"other_miss": 1,
+							"punish_try_block": 2,
+							"punish_try_miss": 6,
+							"st_hit": 1,
+							"st_intr": 2,
+							"st_miss": 1,
+							"str_finisher": 3,
+							"str_light": 4
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 69.0,
+							"strike": 44.5829080858537
+						},
+						{
+							"blast": 19.9496888888889,
+							"stream": 22.5216,
+							"strike": 13.4525247971919
+						}
+					],
+					"damage": [
+						113.582908085854,
+						55.9238136860808
+					],
+					"denied": [
+						0,
+						5
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						],
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						]
+					],
+					"moves_used": [
+						{
+							"arc_lash": 6,
+							"slap": 27,
+							"spring_pad": 5,
+							"thunder_jolt": 7
+						},
+						{
+							"bubble_stream": 9,
+							"claw_snap": 21,
+							"hydro_cannon": 5
+						}
+					],
+					"seed": 137,
+					"time": 63.2249999999971,
+					"winner": 0
+				},
+				{
+					"a": "f_jitters",
+					"b": "f_gusto",
+					"bot": [
+						{
+							"ans_block": 20,
+							"ans_dodge": 1,
+							"ans_miss": 7,
+							"ans_mistake": 7,
+							"ans_none": 5,
+							"commit_grab": 1,
+							"guard_up": 17,
+							"mv_dropped": 17,
+							"mv_projectile": 6,
+							"of_hit": 3,
+							"of_miss": 6,
+							"off_grab_guard": 2,
+							"off_heavy": 8,
+							"off_heavy2": 8,
+							"off_light": 7,
+							"other_hit": 5,
+							"other_miss": 5,
+							"parry_punish": 1,
+							"pp_grab_hit": 1,
+							"punish_try_miss": 3,
+							"st_miss": 5,
+							"str_light": 5
+						},
+						{
+							"ans_block": 17,
+							"ans_miss": 12,
+							"ans_mistake": 1,
+							"ans_none": 10,
+							"commit_l1": 1,
+							"guard_up": 2,
+							"mv_dropped": 8,
+							"mv_projectile": 4,
+							"mv_volley": 8,
+							"of_hit": 5,
+							"of_intr": 4,
+							"of_miss": 5,
+							"off_grab": 1,
+							"off_heavy": 4,
+							"off_heavy2": 3,
+							"off_light": 12,
+							"other_hit": 1,
+							"other_miss": 4,
+							"pn_l1_miss": 1,
+							"punish_try_block": 2,
+							"punish_try_miss": 3,
+							"st_intr": 2,
+							"st_miss": 5,
+							"str_finisher": 1,
+							"str_light": 7
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 51.25,
+							"strike": 20.4705614374373
+						},
+						{
+							"projectile": 24.0,
+							"strike": 31.4445712793315,
+							"volley": 19.448
+						}
+					],
+					"damage": [
+						71.7205614374373,
+						74.8925712793316
+					],
+					"denied": [
+						1,
+						3
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						],
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						]
+					],
+					"moves_used": [
+						{
+							"arc_lash": 5,
+							"slap": 22,
+							"spring_pad": 3,
+							"thunder_jolt": 6
+						},
+						{
+							"air_slash": 5,
+							"feather_darts": 8,
+							"wing_snap": 26
+						}
+					],
+					"seed": 138,
+					"time": 62.1333333333304,
+					"winner": 1
+				},
+				{
+					"a": "f_jitters",
+					"b": "f_dozer",
+					"bot": [
+						{
+							"ans_block": 26,
+							"ans_miss": 6,
+							"ans_mistake": 4,
+							"ans_none": 6,
+							"commit_grab": 2,
+							"commit_l1": 1,
+							"gap_counter": 1,
+							"gc_l1_miss": 1,
+							"guard_up": 10,
+							"mv_dropped": 9,
+							"mv_projectile": 2,
+							"of_hit": 12,
+							"of_intr": 2,
+							"of_miss": 3,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 3,
+							"off_light": 14,
+							"other_intr": 1,
+							"other_miss": 1,
+							"parry_punish": 2,
+							"pp_grab_hit": 2,
+							"punish_try_miss": 2,
+							"st_hit": 6,
+							"st_intr": 1,
+							"st_miss": 3,
+							"str_finisher": 1,
+							"str_light": 10
+						},
+						{
+							"ans_block": 17,
+							"ans_miss": 4,
+							"ans_mistake": 5,
+							"ans_none": 12,
+							"block_tap": 1,
+							"commit_l1": 1,
+							"guard_up": 2,
+							"mv_control": 3,
+							"mv_dropped": 7,
+							"of_hit": 7,
+							"of_intr": 11,
+							"of_miss": 8,
+							"off_grab": 2,
+							"off_grab_guard": 2,
+							"off_heavy": 5,
+							"off_light": 21,
+							"other_hit": 2,
+							"other_miss": 1,
+							"pn_l1_miss": 1,
+							"punish_try_block": 1,
+							"st_intr": 1,
+							"st_miss": 5,
+							"str_finisher": 2,
+							"str_light": 6,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 8.5,
+							"strike": 53.0260441150731
+						},
+						{
+							"classic": 0.0,
+							"control": 23.1702,
+							"rush": 6.63381313386733,
+							"strike": 44.0258816919135
+						}
+					],
+					"damage": [
+						61.5260441150731,
+						73.8298948257808
+					],
+					"denied": [
+						0,
+						3
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						],
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						]
+					],
+					"moves_used": [
+						{
+							"arc_lash": 2,
+							"slap": 27,
+							"spring_pad": 3,
+							"thunder_jolt": 3
+						},
+						{
+							"bulldoze": 1,
+							"dust_bowl": 2,
+							"rock_slide": 4,
+							"snout_jab": 32
+						}
+					],
+					"seed": 139,
+					"time": 45.749999999998,
+					"winner": 1
+				},
+				{
+					"a": "f_jitters",
+					"b": "f_slurry",
+					"bot": [
+						{
+							"ans_block": 19,
+							"ans_dodge": 3,
+							"ans_miss": 5,
+							"ans_mistake": 1,
+							"ans_none": 6,
+							"guard_up": 2,
+							"mv_dropped": 6,
+							"mv_projectile": 6,
+							"of_intr": 3,
+							"of_miss": 5,
+							"off_grab": 1,
+							"off_heavy": 3,
+							"off_light": 7,
+							"other_intr": 1,
+							"other_miss": 6,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 1,
+							"st_intr": 1,
+							"st_miss": 2,
+							"str_finisher": 1,
+							"str_light": 3
+						},
+						{
+							"ans_block": 14,
+							"ans_miss": 10,
+							"ans_none": 8,
+							"commit_l1": 2,
+							"guard_up": 6,
+							"mv_dropped": 3,
+							"mv_volley": 6,
+							"of_hit": 7,
+							"of_miss": 5,
+							"off_grab2": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 3,
+							"off_light": 9,
+							"pn_l1_miss": 2,
+							"punish_try_block": 2,
+							"punish_try_miss": 7,
+							"st_hit": 3,
+							"st_intr": 3,
+							"st_miss": 4,
+							"str_light": 10
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 0.0,
+							"projectile": 50.0
+						},
+						{
+							"projectile": 18.75,
+							"strike": 22.8264721835802,
+							"volley": 23.4
+						}
+					],
+					"damage": [
+						50.0,
+						64.9764721835803
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						],
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						]
+					],
+					"moves_used": [
+						{
+							"arc_lash": 5,
+							"slap": 17,
+							"spring_pad": 3,
+							"thunder_jolt": 7
+						},
+						{
+							"poison_darts": 5,
+							"sludge_lob": 5,
+							"venom_fangs": 21
+						}
+					],
+					"seed": 140,
+					"time": 41.6499999999983,
+					"winner": 1
+				},
+				{
+					"a": "f_jitters",
+					"b": "f_varga",
+					"bot": [
+						{
+							"ans_block": 15,
+							"ans_dodge": 6,
+							"ans_miss": 10,
+							"ans_mistake": 3,
+							"ans_none": 4,
+							"ans_parry": 1,
+							"block_tap": 2,
+							"commit_grab": 4,
+							"guard_up": 12,
+							"mv_dropped": 20,
+							"mv_projectile": 6,
+							"of_hit": 13,
+							"of_miss": 10,
+							"off_grab": 2,
+							"off_grab_guard": 4,
+							"off_heavy": 9,
+							"off_light": 18,
+							"other_miss": 5,
+							"parry_punish": 1,
+							"pn_grab_hit": 3,
+							"pp_grab_miss": 1,
+							"punish_try_block": 3,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 3,
+							"st_hit": 4,
+							"st_miss": 4,
+							"str_light": 8,
+							"tap_nothing": 2
+						},
+						{
+							"ans_block": 23,
+							"ans_dodge": 1,
+							"ans_miss": 12,
+							"ans_mistake": 2,
+							"ans_none": 14,
+							"guard_up": 12,
+							"of_hit": 1,
+							"of_intr": 9,
+							"of_miss": 10,
+							"off_grab": 3,
+							"off_grab_guard": 2,
+							"off_heavy": 5,
+							"off_heavy2": 5,
+							"off_light": 7,
+							"other_intr": 1,
+							"other_miss": 6,
+							"punish_try_block": 2,
+							"punish_try_miss": 8,
+							"st_hit": 1,
+							"str_finisher": 1,
+							"str_light": 1
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 30.0,
+							"strike": 49.9002807631991
+						},
+						{
+							"classic": 13.9234180446605,
+							"projectile": 32.0555555555556
+						}
+					],
+					"damage": [
+						79.9002807631991,
+						45.9789736002161
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						],
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						]
+					],
+					"moves_used": [
+						{
+							"arc_lash": 4,
+							"slap": 31,
+							"spring_pad": 4,
+							"thunder_jolt": 5
+						},
+						{
+							"iron_shins": 6,
+							"pressure_palm": 13,
+							"thunder_chop": 3
+						}
+					],
+					"seed": 141,
+					"time": 63.2249999999971,
+					"winner": 0
+				},
+				{
+					"a": "f_jitters",
+					"b": "f_knell",
+					"bot": [
+						{
+							"ans_block": 15,
+							"ans_dodge": 1,
+							"ans_miss": 2,
+							"ans_mistake": 3,
+							"ans_none": 15,
+							"ans_parry": 2,
+							"commit_grab": 3,
+							"guard_up": 14,
+							"mv_dropped": 23,
+							"mv_projectile": 6,
+							"of_hit": 12,
+							"of_intr": 2,
+							"of_miss": 10,
+							"off_grab": 2,
+							"off_grab_guard": 4,
+							"off_heavy": 4,
+							"off_light": 18,
+							"other_intr": 1,
+							"other_miss": 2,
+							"pn_grab_intr": 1,
+							"pn_grab_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 1,
+							"punish_try_parry": 1,
+							"st_hit": 8,
+							"st_intr": 4,
+							"st_miss": 2,
+							"str_finisher": 3,
+							"str_light": 14,
+							"tap_blocked": 1,
+							"tap_hit": 1
+						},
+						{
+							"ans_block": 27,
+							"ans_counter": 2,
+							"ans_dodge": 1,
+							"ans_miss": 7,
+							"ans_mistake": 3,
+							"ans_none": 11,
+							"block_tap": 1,
+							"guard_up": 8,
+							"mv_dropped": 3,
+							"mv_stream": 6,
+							"of_hit": 3,
+							"of_intr": 1,
+							"of_miss": 6,
+							"off_grab": 2,
+							"off_grab_guard": 1,
+							"off_heavy": 3,
+							"off_light": 7,
+							"other_miss": 3,
+							"punish_try_miss": 6,
+							"st_hit": 1,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_light": 3,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 13.225,
+							"projectile": 43.125,
+							"strike": 62.8661634705342
+						},
+						{
+							"classic": 12.3165,
+							"projectile": 16.530885,
+							"stream": 25.32915,
+							"strike": 16.0992277943426,
+							"utility": 4.4625
+						}
+					],
+					"damage": [
+						119.216163470534,
+						74.7382627943426
+					],
+					"denied": [
+						0,
+						3
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						],
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						]
+					],
+					"moves_used": [
+						{
+							"arc_lash": 3,
+							"slap": 35,
+							"spring_pad": 2,
+							"thunder_jolt": 4
+						},
+						{
+							"ghost_light": 6,
+							"night_shade": 6,
+							"sounding_jab": 13,
+							"through_the_veil": 5
+						}
+					],
+					"seed": 142,
+					"time": 53.1499999999976,
+					"winner": 0
+				},
+				{
+					"a": "f_varga",
+					"b": "f_stoke",
+					"bot": [
+						{
+							"ans_block": 29,
+							"ans_dodge": 4,
+							"ans_miss": 5,
+							"ans_mistake": 6,
+							"ans_none": 14,
+							"commit_grab": 2,
+							"guard_up": 3,
+							"of_hit": 9,
+							"of_intr": 4,
+							"of_miss": 8,
+							"off_grab": 1,
+							"off_grab_guard": 1,
+							"off_heavy": 6,
+							"off_light": 13,
+							"other_hit": 1,
+							"other_miss": 4,
+							"pn_grab_hit": 2,
+							"punish_try_block": 2,
+							"punish_try_dodge": 3,
+							"punish_try_miss": 2,
+							"st_hit": 4,
+							"st_intr": 2,
+							"str_finisher": 1,
+							"str_light": 6
+						},
+						{
+							"ans_block": 16,
+							"ans_counter": 1,
+							"ans_dodge": 9,
+							"ans_miss": 13,
+							"ans_mistake": 1,
+							"ans_none": 5,
+							"commit_grab": 2,
+							"commit_l1": 4,
+							"guard_up": 4,
+							"mv_dropped": 4,
+							"mv_stream": 12,
+							"of_hit": 11,
+							"of_intr": 2,
+							"of_miss": 7,
+							"off_grab": 3,
+							"off_grab_guard": 3,
+							"off_heavy": 2,
+							"off_light": 14,
+							"other_hit": 1,
+							"other_miss": 2,
+							"parry_punish": 1,
+							"pn_grab_miss": 1,
+							"pn_l1_miss": 2,
+							"pp_grab_hit": 1,
+							"punish_try_block": 3,
+							"punish_try_dodge": 4,
+							"punish_try_miss": 6,
+							"st_hit": 8,
+							"st_intr": 1,
+							"st_miss": 7,
+							"str_finisher": 2,
+							"str_light": 16
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 10.6924973931492,
+							"projectile": 54.6978328111713,
+							"strike": 29.525599817803
+						},
+						{
+							"blast": 6.0,
+							"classic": 9.0,
+							"stream": 15.6,
+							"strike": 43.2830484541067
+						}
+					],
+					"damage": [
+						94.9159300221235,
+						73.8830484541067
+					],
+					"denied": [
+						0,
+						7
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						],
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						]
+					],
+					"moves_used": [
+						{
+							"comet_hook": 5,
+							"iron_shins": 12,
+							"pressure_palm": 10,
+							"thunder_chop": 2
+						},
+						{
+							"ember_jab": 35,
+							"flamethrower": 9,
+							"steam_vent": 1
+						}
+					],
+					"seed": 143,
+					"time": 63.2249999999971,
+					"winner": 0
+				},
+				{
+					"a": "f_varga",
+					"b": "f_dredge",
+					"bot": [
+						{
+							"ans_block": 12,
+							"ans_dodge": 3,
+							"ans_miss": 19,
+							"ans_mistake": 2,
+							"ans_none": 16,
+							"commit_grab": 3,
+							"commit_lh_straight": 1,
+							"guard_up": 9,
+							"of_hit": 7,
+							"of_intr": 3,
+							"of_miss": 13,
+							"off_grab": 1,
+							"off_grab_guard": 1,
+							"off_heavy": 4,
+							"off_light": 17,
+							"other_miss": 2,
+							"pn_grab_miss": 3,
+							"pn_lh_straight_miss": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 8,
+							"st_miss": 1,
+							"str_light": 1
+						},
+						{
+							"ans_block": 11,
+							"ans_counter": 3,
+							"ans_dodge": 4,
+							"ans_miss": 11,
+							"ans_mistake": 2,
+							"ans_none": 7,
+							"block_tap": 1,
+							"commit_grab": 2,
+							"guard_up": 5,
+							"mv_blast": 5,
+							"mv_dropped": 7,
+							"mv_stream": 9,
+							"of_hit": 1,
+							"of_intr": 2,
+							"of_miss": 10,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 7,
+							"off_light": 16,
+							"other_hit": 1,
+							"parry_punish": 1,
+							"pn_grab_miss": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 5,
+							"st_hit": 4,
+							"st_intr": 3,
+							"st_miss": 2,
+							"str_light": 9,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 3.84026760897064,
+							"projectile": 71.4659310518239,
+							"strike": 37.9517715573876
+						},
+						{
+							"blast": 33.2017777777778,
+							"stream": 29.41056,
+							"strike": 24.8043275279943
+						}
+					],
+					"damage": [
+						113.257970218182,
+						87.4166653057721
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						],
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						]
+					],
+					"moves_used": [
+						{
+							"iron_shins": 9,
+							"pressure_palm": 12,
+							"thunder_chop": 2
+						},
+						{
+							"bubble_stream": 9,
+							"claw_snap": 22,
+							"hydro_cannon": 3
+						}
+					],
+					"seed": 144,
+					"time": 63.2249999999971,
+					"winner": 0
+				},
+				{
+					"a": "f_varga",
+					"b": "f_gusto",
+					"bot": [
+						{
+							"ans_block": 6,
+							"ans_dodge": 2,
+							"ans_miss": 10,
+							"ans_none": 7,
+							"commit_grab": 2,
+							"guard_up": 11,
+							"of_hit": 3,
+							"of_intr": 2,
+							"of_miss": 11,
+							"off_backoff": 1,
+							"off_grab": 1,
+							"off_heavy": 7,
+							"off_light": 9,
+							"off_stepin": 3,
+							"pn_grab_miss": 2,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 3,
+							"st_hit": 1,
+							"st_miss": 4,
+							"str_light": 5
+						},
+						{
+							"ans_block": 5,
+							"ans_dodge": 7,
+							"ans_miss": 16,
+							"ans_none": 3,
+							"commit_grab": 2,
+							"commit_l1": 1,
+							"guard_up": 2,
+							"mv_dropped": 2,
+							"mv_projectile": 7,
+							"mv_volley": 7,
+							"of_hit": 2,
+							"off_heavy": 1,
+							"off_light": 2,
+							"other_miss": 5,
+							"pn_grab_miss": 1,
+							"pn_l1_miss": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 8,
+							"st_hit": 2,
+							"st_intr": 1,
+							"str_finisher": 1,
+							"str_light": 3
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 12.7180408427495,
+							"projectile": 53.5022222222222,
+							"strike": 18.6623834976626
+						},
+						{
+							"projectile": 29.94,
+							"strike": 17.7370811598036,
+							"volley": 61.6
+						}
+					],
+					"damage": [
+						84.8826465626343,
+						109.277081159804
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						],
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						]
+					],
+					"moves_used": [
+						{
+							"iron_shins": 9,
+							"pressure_palm": 8
+						},
+						{
+							"air_slash": 7,
+							"feather_darts": 7,
+							"wing_snap": 11
+						}
+					],
+					"seed": 145,
+					"time": 56.0166666666641,
+					"winner": 1
+				},
+				{
+					"a": "f_varga",
+					"b": "f_dozer",
+					"bot": [
+						{
+							"ans_block": 22,
+							"ans_dodge": 1,
+							"ans_miss": 2,
+							"ans_mistake": 5,
+							"ans_none": 9,
+							"guard_up": 2,
+							"of_intr": 4,
+							"of_miss": 11,
+							"off_grab_guard": 1,
+							"off_heavy": 2,
+							"off_light": 13,
+							"other_intr": 2,
+							"other_miss": 1,
+							"punish_try_miss": 1,
+							"st_miss": 2,
+							"str_finisher": 1,
+							"str_light": 2
+						},
+						{
+							"ans_block": 14,
+							"ans_dodge": 1,
+							"ans_miss": 7,
+							"ans_none": 5,
+							"commit_grab": 4,
+							"guard_up": 4,
+							"mv_control": 1,
+							"mv_dropped": 13,
+							"of_hit": 14,
+							"of_intr": 3,
+							"of_miss": 13,
+							"off_grab": 2,
+							"off_grab_guard": 2,
+							"off_heavy": 7,
+							"off_heavy2": 2,
+							"off_light": 26,
+							"pn_grab_hit": 1,
+							"punish_try_block": 4,
+							"punish_try_miss": 1,
+							"st_hit": 1,
+							"st_intr": 1,
+							"st_miss": 11,
+							"str_finisher": 4,
+							"str_light": 13
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 73.3150555555556
+						},
+						{
+							"classic": 3.31661362352146,
+							"control": 5.865,
+							"rush": 12.1037650677355,
+							"strike": 83.1614985835997
+						}
+					],
+					"damage": [
+						73.3150555555556,
+						104.446877274857
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						],
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						]
+					],
+					"moves_used": [
+						{
+							"iron_shins": 5,
+							"pressure_palm": 11
+						},
+						{
+							"bulldoze": 1,
+							"rock_slide": 1,
+							"snout_jab": 39
+						}
+					],
+					"seed": 146,
+					"time": 44.1083333333315,
+					"winner": 1
+				},
+				{
+					"a": "f_varga",
+					"b": "f_slurry",
+					"bot": [
+						{
+							"ans_block": 8,
+							"ans_dodge": 5,
+							"ans_miss": 8,
+							"ans_mistake": 1,
+							"ans_none": 8,
+							"guard_up": 4,
+							"of_hit": 1,
+							"of_intr": 3,
+							"of_miss": 14,
+							"off_grab_guard": 2,
+							"off_heavy": 6,
+							"off_light": 10,
+							"other_hit": 1,
+							"other_intr": 1,
+							"other_miss": 5,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 4,
+							"st_miss": 2,
+							"str_finisher": 1,
+							"str_light": 2
+						},
+						{
+							"ans_block": 13,
+							"ans_dodge": 2,
+							"ans_miss": 17,
+							"ans_mistake": 2,
+							"ans_none": 2,
+							"block_tap": 1,
+							"commit_grab": 3,
+							"guard_up": 10,
+							"mv_dropped": 1,
+							"mv_volley": 7,
+							"of_hit": 7,
+							"of_miss": 4,
+							"off_grab": 1,
+							"off_grab2": 3,
+							"off_heavy": 1,
+							"off_light": 7,
+							"pn_grab_hit": 3,
+							"punish_try_block": 3,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 7,
+							"st_hit": 1,
+							"st_miss": 1,
+							"str_light": 2,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 0.0,
+							"projectile": 44.7211111111111,
+							"strike": 7.63
+						},
+						{
+							"classic": 6.25080735247728,
+							"projectile": 16.5,
+							"strike": 6.72704285569792,
+							"volley": 54.6
+						}
+					],
+					"damage": [
+						52.3511111111111,
+						84.0778502081752
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						],
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						]
+					],
+					"moves_used": [
+						{
+							"comet_hook": 2,
+							"iron_shins": 7,
+							"pressure_palm": 8
+						},
+						{
+							"poison_darts": 7,
+							"sludge_lob": 8,
+							"venom_fangs": 9
+						}
+					],
+					"seed": 147,
+					"time": 60.9333333333305,
+					"winner": 1
+				},
+				{
+					"a": "f_varga",
+					"b": "f_jitters",
+					"bot": [
+						{
+							"ans_block": 19,
+							"ans_dodge": 2,
+							"ans_miss": 3,
+							"ans_mistake": 4,
+							"ans_none": 12,
+							"guard_up": 4,
+							"of_hit": 3,
+							"of_intr": 3,
+							"of_miss": 9,
+							"off_grab": 2,
+							"off_heavy": 5,
+							"off_light": 8,
+							"other_miss": 4,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"st_intr": 1,
+							"str_finisher": 1,
+							"str_light": 1
+						},
+						{
+							"ans_block": 10,
+							"ans_dodge": 7,
+							"ans_miss": 10,
+							"ans_mistake": 1,
+							"ans_none": 1,
+							"commit_grab": 2,
+							"commit_l1": 2,
+							"guard_up": 3,
+							"mv_dropped": 16,
+							"mv_projectile": 2,
+							"of_hit": 7,
+							"of_miss": 11,
+							"off_grab": 3,
+							"off_grab_guard": 3,
+							"off_heavy": 4,
+							"off_light": 12,
+							"other_hit": 2,
+							"other_miss": 1,
+							"pn_grab_miss": 1,
+							"pn_l1_miss": 2,
+							"punish_try_block": 2,
+							"punish_try_dodge": 5,
+							"punish_try_miss": 2,
+							"st_hit": 4,
+							"st_intr": 1,
+							"st_miss": 4,
+							"str_finisher": 1,
+							"str_light": 9
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 7.11111111111111,
+							"strike": 31.4074912069685
+						},
+						{
+							"classic": 5.60137759762144,
+							"projectile": 47.5,
+							"strike": 59.0674819494278
+						}
+					],
+					"damage": [
+						38.5186023180796,
+						112.168859547049
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						],
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						]
+					],
+					"moves_used": [
+						{
+							"comet_hook": 5,
+							"iron_shins": 7,
+							"pressure_palm": 4,
+							"thunder_chop": 1
+						},
+						{
+							"arc_lash": 5,
+							"slap": 26,
+							"spring_pad": 1,
+							"thunder_jolt": 2
+						}
+					],
+					"seed": 148,
+					"time": 48.0333333333313,
+					"winner": 1
+				},
+				{
+					"a": "f_varga",
+					"b": "f_knell",
+					"bot": [
+						{
+							"ans_block": 8,
+							"ans_dodge": 5,
+							"ans_miss": 5,
+							"ans_mistake": 4,
+							"ans_none": 16,
+							"commit_grab": 4,
+							"guard_up": 4,
+							"of_hit": 9,
+							"of_intr": 4,
+							"of_miss": 6,
+							"off_grab": 3,
+							"off_grab_guard": 1,
+							"off_heavy": 8,
+							"off_light": 7,
+							"other_hit": 1,
+							"other_miss": 2,
+							"pn_grab_intr": 1,
+							"pn_grab_miss": 2,
+							"punish_try_block": 2,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 1,
+							"st_miss": 1,
+							"str_light": 1
+						},
+						{
+							"ans_block": 8,
+							"ans_counter": 1,
+							"ans_dodge": 4,
+							"ans_miss": 15,
+							"ans_mistake": 2,
+							"ans_none": 6,
+							"commit_grab": 6,
+							"guard_up": 3,
+							"mv_dropped": 1,
+							"mv_stream": 6,
+							"of_hit": 2,
+							"of_miss": 2,
+							"off_grab": 1,
+							"off_heavy": 1,
+							"off_light": 3,
+							"other_miss": 2,
+							"pn_grab_hit": 2,
+							"pn_grab_miss": 3,
+							"punish_try_block": 4,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 3,
+							"st_hit": 1,
+							"st_intr": 1,
+							"st_miss": 2,
+							"str_light": 4
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 2.72088825304489,
+							"projectile": 19.5745555555556,
+							"strike": 13.9512936396142
+						},
+						{
+							"projectile": 65.205,
+							"stream": 37.45665,
+							"strike": 15.5969032447597
+						}
+					],
+					"damage": [
+						36.2467374482147,
+						118.25855324476
+					],
+					"denied": [
+						0,
+						11
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						],
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						]
+					],
+					"moves_used": [
+						{
+							"iron_shins": 10,
+							"pressure_palm": 6,
+							"thunder_chop": 1
+						},
+						{
+							"ghost_light": 6,
+							"night_shade": 7,
+							"sounding_jab": 9,
+							"through_the_veil": 4
+						}
+					],
+					"seed": 149,
+					"time": 53.7416666666643,
+					"winner": 1
+				},
+				{
+					"a": "f_knell",
+					"b": "f_stoke",
+					"bot": [
+						{
+							"ans_block": 17,
+							"ans_dodge": 5,
+							"ans_miss": 23,
+							"ans_mistake": 3,
+							"ans_none": 12,
+							"commit_grab": 1,
+							"commit_l1": 1,
+							"gap_counter": 1,
+							"gc_l1_hit": 1,
+							"guard_up": 5,
+							"mv_dropped": 2,
+							"mv_stream": 7,
+							"of_hit": 3,
+							"of_intr": 3,
+							"of_miss": 2,
+							"off_grab": 1,
+							"off_heavy": 2,
+							"off_light": 7,
+							"other_hit": 1,
+							"other_miss": 2,
+							"pn_grab_miss": 1,
+							"punish_try_dodge": 4,
+							"punish_try_miss": 13,
+							"st_hit": 2,
+							"st_miss": 2,
+							"str_light": 4
+						},
+						{
+							"ans_block": 14,
+							"ans_counter": 1,
+							"ans_dodge": 5,
+							"ans_miss": 7,
+							"ans_none": 13,
+							"ans_parry": 1,
+							"commit_grab": 1,
+							"commit_l1": 2,
+							"guard_up": 5,
+							"mv_dropped": 7,
+							"mv_stream": 9,
+							"of_hit": 9,
+							"of_intr": 4,
+							"of_miss": 6,
+							"off_grab": 4,
+							"off_grab_guard": 2,
+							"off_heavy": 6,
+							"off_light": 12,
+							"other_hit": 1,
+							"parry_punish": 1,
+							"pn_l1_miss": 2,
+							"pp_grab_hit": 1,
+							"punish_try_block": 2,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 2,
+							"st_hit": 3,
+							"st_miss": 2,
+							"str_commit": 1,
+							"str_finisher": 1,
+							"str_light": 5,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 0.0,
+							"projectile": 56.7,
+							"stream": 18.9,
+							"strike": 18.994429623265
+						},
+						{
+							"stream": 63.716,
+							"strike": 43.7518994710847
+						}
+					],
+					"damage": [
+						94.594429623265,
+						107.467899471085
+					],
+					"denied": [
+						10,
+						2
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						],
+						[
+							"ember_jab",
+							"flamethrower",
+							"steam_vent",
+							"stoke_the_fire"
+						]
+					],
+					"moves_used": [
+						{
+							"ghost_light": 8,
+							"night_shade": 7,
+							"sounding_jab": 15,
+							"through_the_veil": 5
+						},
+						{
+							"ember_jab": 21,
+							"flamethrower": 9,
+							"steam_vent": 2
+						}
+					],
+					"seed": 150,
+					"time": 57.5499999999974,
+					"winner": 1
+				},
+				{
+					"a": "f_knell",
+					"b": "f_dredge",
+					"bot": [
+						{
+							"ans_block": 9,
+							"ans_counter": 1,
+							"ans_dodge": 3,
+							"ans_miss": 20,
+							"ans_mistake": 1,
+							"ans_none": 2,
+							"block_tap": 1,
+							"commit_grab": 2,
+							"guard_up": 6,
+							"mv_dropped": 4,
+							"mv_stream": 8,
+							"of_hit": 2,
+							"of_intr": 2,
+							"of_miss": 1,
+							"off_grab": 1,
+							"off_heavy": 3,
+							"off_light": 4,
+							"other_miss": 1,
+							"pn_grab_hit": 1,
+							"pn_grab_miss": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 9,
+							"st_hit": 2,
+							"st_miss": 1,
+							"str_finisher": 1,
+							"str_light": 3,
+							"tap_nothing": 1
+						},
+						{
+							"ans_block": 7,
+							"ans_counter": 2,
+							"ans_dodge": 4,
+							"ans_miss": 13,
+							"ans_mistake": 3,
+							"ans_none": 15,
+							"ans_parry": 2,
+							"guard_up": 7,
+							"mv_blast": 6,
+							"mv_dropped": 4,
+							"mv_stream": 8,
+							"of_hit": 3,
+							"of_intr": 2,
+							"of_miss": 3,
+							"off_grab": 2,
+							"off_grab_guard": 2,
+							"off_heavy": 3,
+							"off_light": 4,
+							"other_miss": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 4,
+							"st_hit": 2,
+							"st_miss": 3,
+							"str_finisher": 1,
+							"str_light": 5,
+							"tap_nothing": 2
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 0.0,
+							"projectile": 75.6,
+							"stream": 39.438,
+							"strike": 20.0804978360275
+						},
+						{
+							"blast": 25.116,
+							"stream": 35.7696,
+							"strike": 9.3784091810739
+						}
+					],
+					"damage": [
+						135.118497836028,
+						70.2640091810739
+					],
+					"denied": [
+						7,
+						0
+					],
+					"ko": false,
+					"loadout": [
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						],
+						[
+							"claw_snap",
+							"bubble_stream",
+							"hydro_cannon",
+							"anchor_drop"
+						]
+					],
+					"moves_used": [
+						{
+							"ghost_light": 9,
+							"night_shade": 8,
+							"sounding_jab": 8,
+							"through_the_veil": 4
+						},
+						{
+							"bubble_stream": 9,
+							"claw_snap": 10,
+							"hydro_cannon": 6
+						}
+					],
+					"seed": 151,
+					"time": 63.2249999999971,
+					"winner": 0
+				},
+				{
+					"a": "f_knell",
+					"b": "f_gusto",
+					"bot": [
+						{
+							"ans_block": 15,
+							"ans_dodge": 3,
+							"ans_miss": 9,
+							"ans_mistake": 1,
+							"ans_none": 7,
+							"commit_grab": 1,
+							"commit_l1": 1,
+							"guard_up": 4,
+							"mv_stream": 7,
+							"of_miss": 3,
+							"off_grab": 1,
+							"off_light": 2,
+							"pn_grab_miss": 1,
+							"pn_l1_miss": 1,
+							"punish_try_block": 3,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 4
+						},
+						{
+							"ans_block": 2,
+							"ans_counter": 1,
+							"ans_dodge": 3,
+							"ans_miss": 15,
+							"ans_mistake": 1,
+							"ans_none": 12,
+							"commit_l1": 1,
+							"cp_l1_miss": 1,
+							"mv_dropped": 1,
+							"mv_projectile": 7,
+							"mv_volley": 7,
+							"of_hit": 5,
+							"of_miss": 2,
+							"off_grab_guard": 1,
+							"off_heavy": 1,
+							"off_light": 6,
+							"other_hit": 1,
+							"other_intr": 3,
+							"other_miss": 3,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 9,
+							"st_hit": 3,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_light": 5
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 37.8,
+							"stream": 43.407,
+							"utility": 5.25
+						},
+						{
+							"classic": 0.0,
+							"projectile": 24.9,
+							"strike": 48.4845117701517,
+							"volley": 39.3668
+						}
+					],
+					"damage": [
+						86.457,
+						112.751311770152
+					],
+					"denied": [
+						11,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						],
+						[
+							"wing_snap",
+							"air_slash",
+							"feather_darts",
+							"hang_time"
+						]
+					],
+					"moves_used": [
+						{
+							"ghost_light": 6,
+							"night_shade": 7,
+							"sounding_jab": 3,
+							"through_the_veil": 5
+						},
+						{
+							"air_slash": 7,
+							"feather_darts": 7,
+							"wing_snap": 19
+						}
+					],
+					"seed": 152,
+					"time": 50.7333333333311,
+					"winner": 0
+				},
+				{
+					"a": "f_knell",
+					"b": "f_dozer",
+					"bot": [
+						{
+							"ans_block": 18,
+							"ans_counter": 3,
+							"ans_dodge": 1,
+							"ans_miss": 6,
+							"ans_mistake": 4,
+							"ans_none": 4,
+							"block_tap": 1,
+							"commit_grab": 2,
+							"guard_up": 6,
+							"mv_dropped": 3,
+							"mv_stream": 6,
+							"of_hit": 3,
+							"of_intr": 1,
+							"of_miss": 2,
+							"off_heavy": 3,
+							"off_light": 6,
+							"other_miss": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 4,
+							"st_hit": 2,
+							"st_miss": 1,
+							"str_light": 3,
+							"tap_nothing": 1
+						},
+						{
+							"ans_block": 9,
+							"ans_dodge": 3,
+							"ans_miss": 4,
+							"ans_mistake": 3,
+							"ans_none": 19,
+							"commit_l1": 1,
+							"guard_up": 2,
+							"mv_control": 4,
+							"mv_dropped": 18,
+							"of_hit": 7,
+							"of_intr": 4,
+							"of_miss": 9,
+							"off_grab": 2,
+							"off_grab2": 1,
+							"off_heavy": 12,
+							"off_heavy2": 3,
+							"off_light": 17,
+							"pn_l1_intr": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"st_hit": 2,
+							"st_miss": 5,
+							"str_finisher": 3,
+							"str_light": 7
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 55.944,
+							"stream": 43.155,
+							"strike": 21.490923689371,
+							"utility": 10.5
+						},
+						{
+							"classic": 51.3027931928635,
+							"control": 13.8,
+							"rush": 16.3265639408983,
+							"strike": 31.9637348555928
+						}
+					],
+					"damage": [
+						131.089923689371,
+						113.393091989355
+					],
+					"denied": [
+						0,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						],
+						[
+							"snout_jab",
+							"rock_slide",
+							"bulldoze",
+							"dust_bowl"
+						]
+					],
+					"moves_used": [
+						{
+							"ghost_light": 7,
+							"night_shade": 6,
+							"sounding_jab": 10,
+							"through_the_veil": 4
+						},
+						{
+							"bulldoze": 3,
+							"dust_bowl": 2,
+							"rock_slide": 4,
+							"snout_jab": 25
+						}
+					],
+					"seed": 153,
+					"time": 48.7083333333312,
+					"winner": 0
+				},
+				{
+					"a": "f_knell",
+					"b": "f_slurry",
+					"bot": [
+						{
+							"ans_block": 9,
+							"ans_counter": 5,
+							"ans_dodge": 1,
+							"ans_miss": 8,
+							"ans_none": 3,
+							"guard_up": 4,
+							"mv_dropped": 1,
+							"mv_stream": 5,
+							"of_hit": 1,
+							"of_miss": 2,
+							"off_grab_guard": 1,
+							"off_light": 2,
+							"other_hit": 1,
+							"other_miss": 2,
+							"punish_try_block": 3,
+							"punish_try_dodge": 1,
+							"st_hit": 1,
+							"st_miss": 1,
+							"str_finisher": 1,
+							"str_light": 2
+						},
+						{
+							"ans_block": 7,
+							"ans_dodge": 3,
+							"ans_miss": 7,
+							"ans_none": 10,
+							"ans_parry": 2,
+							"commit_grab": 1,
+							"commit_l1": 1,
+							"guard_up": 6,
+							"mv_dropped": 1,
+							"mv_volley": 6,
+							"of_hit": 4,
+							"of_intr": 1,
+							"of_miss": 3,
+							"off_grab2": 1,
+							"off_grab_guard": 2,
+							"off_heavy2": 1,
+							"off_light": 5,
+							"other_hit": 1,
+							"pn_grab_miss": 1,
+							"pn_l1_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 1,
+							"punish_try_miss": 3,
+							"punish_try_parry": 1,
+							"st_intr": 1,
+							"st_miss": 4,
+							"str_light": 5,
+							"tap_hit": 1,
+							"tap_nothing": 1
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 6.34725003469324,
+							"projectile": 56.7,
+							"stream": 19.845,
+							"strike": 16.6268443963505,
+							"utility": 5.25
+						},
+						{
+							"projectile": 31.5,
+							"strike": 13.1568446523268,
+							"volley": 27.976
+						}
+					],
+					"damage": [
+						104.769094431044,
+						72.6328446523268
+					],
+					"denied": [
+						0,
+						1
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						],
+						[
+							"venom_fangs",
+							"poison_darts",
+							"sludge_lob",
+							"drain_dive"
+						]
+					],
+					"moves_used": [
+						{
+							"ghost_light": 6,
+							"night_shade": 5,
+							"sounding_jab": 7,
+							"through_the_veil": 4
+						},
+						{
+							"poison_darts": 5,
+							"sludge_lob": 6,
+							"venom_fangs": 12
+						}
+					],
+					"seed": 154,
+					"time": 40.341666666665,
+					"winner": 0
+				},
+				{
+					"a": "f_knell",
+					"b": "f_jitters",
+					"bot": [
+						{
+							"ans_block": 14,
+							"ans_counter": 1,
+							"ans_miss": 6,
+							"ans_none": 9,
+							"guard_up": 5,
+							"mv_dropped": 4,
+							"mv_stream": 6,
+							"of_hit": 4,
+							"of_intr": 2,
+							"of_miss": 4,
+							"off_grab_guard": 1,
+							"off_heavy": 3,
+							"off_light": 9,
+							"other_intr": 1,
+							"other_miss": 1,
+							"punish_try_miss": 4,
+							"st_hit": 2,
+							"st_miss": 1,
+							"str_finisher": 1,
+							"str_light": 3
+						},
+						{
+							"ans_block": 12,
+							"ans_dodge": 4,
+							"ans_miss": 5,
+							"ans_mistake": 2,
+							"ans_none": 16,
+							"commit_grab": 3,
+							"guard_up": 11,
+							"mv_dropped": 27,
+							"mv_projectile": 4,
+							"of_hit": 5,
+							"of_intr": 1,
+							"of_miss": 6,
+							"off_grab": 1,
+							"off_grab_guard": 1,
+							"off_heavy": 6,
+							"off_heavy2": 1,
+							"off_light": 10,
+							"other_miss": 1,
+							"parry_punish": 1,
+							"pn_grab_intr": 1,
+							"pp_grab_hit": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 2,
+							"punish_try_miss": 2,
+							"st_hit": 2,
+							"st_intr": 1,
+							"st_miss": 3,
+							"str_light": 6
+						}
+					],
+					"by_cat": [
+						{
+							"classic": 0.0,
+							"projectile": 24.0975,
+							"stream": 29.2383,
+							"strike": 23.2760084335666,
+							"utility": 4.4625
+						},
+						{
+							"classic": 0.0,
+							"projectile": 40.25,
+							"strike": 19.0789195346961
+						}
+					],
+					"damage": [
+						81.0743084335666,
+						59.3289195346961
+					],
+					"denied": [
+						3,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						],
+						[
+							"slap",
+							"thunder_jolt",
+							"arc_lash",
+							"spring_pad"
+						]
+					],
+					"moves_used": [
+						{
+							"ghost_light": 5,
+							"night_shade": 6,
+							"sounding_jab": 14,
+							"through_the_veil": 4
+						},
+						{
+							"arc_lash": 2,
+							"slap": 17,
+							"spring_pad": 3,
+							"thunder_jolt": 4
+						}
+					],
+					"seed": 155,
+					"time": 45.924999999998,
+					"winner": 0
+				},
+				{
+					"a": "f_knell",
+					"b": "f_varga",
+					"bot": [
+						{
+							"ans_block": 8,
+							"ans_counter": 2,
+							"ans_dodge": 5,
+							"ans_miss": 14,
+							"ans_mistake": 2,
+							"ans_none": 6,
+							"block_tap": 1,
+							"commit_grab": 2,
+							"guard_up": 5,
+							"mv_dropped": 3,
+							"mv_stream": 7,
+							"of_hit": 4,
+							"of_intr": 1,
+							"of_miss": 2,
+							"off_grab": 2,
+							"off_heavy": 3,
+							"off_light": 6,
+							"other_miss": 4,
+							"pn_grab_miss": 1,
+							"punish_try_block": 2,
+							"punish_try_dodge": 3,
+							"punish_try_miss": 7,
+							"st_miss": 3,
+							"str_light": 3,
+							"tap_nothing": 1
+						},
+						{
+							"ans_block": 9,
+							"ans_dodge": 7,
+							"ans_miss": 7,
+							"ans_mistake": 3,
+							"ans_none": 17,
+							"commit_grab": 3,
+							"guard_up": 5,
+							"of_hit": 9,
+							"of_intr": 3,
+							"of_miss": 8,
+							"off_grab": 1,
+							"off_grab_guard": 2,
+							"off_heavy": 7,
+							"off_heavy2": 1,
+							"off_light": 9,
+							"other_hit": 2,
+							"pn_grab_hit": 1,
+							"pn_grab_intr": 1,
+							"punish_try_block": 1,
+							"punish_try_dodge": 4,
+							"punish_try_miss": 2,
+							"st_intr": 1,
+							"st_miss": 1,
+							"str_light": 2
+						}
+					],
+					"by_cat": [
+						{
+							"projectile": 65.205,
+							"stream": 27.16875,
+							"strike": 14.8850851895826,
+							"utility": 6.0375
+						},
+						{
+							"classic": 15.2821900713223,
+							"projectile": 25.3965864870355,
+							"strike": 36.0903239479638
+						}
+					],
+					"damage": [
+						113.296335189583,
+						76.7691005063216
+					],
+					"denied": [
+						6,
+						0
+					],
+					"ko": true,
+					"loadout": [
+						[
+							"sounding_jab",
+							"night_shade",
+							"ghost_light",
+							"through_the_veil"
+						],
+						[
+							"comet_hook",
+							"pressure_palm",
+							"thunder_chop",
+							"iron_shins"
+						]
+					],
+					"moves_used": [
+						{
+							"ghost_light": 8,
+							"night_shade": 7,
+							"sounding_jab": 12,
+							"through_the_veil": 6
+						},
+						{
+							"comet_hook": 1,
+							"iron_shins": 7,
+							"pressure_palm": 8,
+							"thunder_chop": 1
+						}
+					],
+					"seed": 156,
+					"time": 60.6749999999972,
+					"winner": 0
+				}
+			],
+			"summary": {
+				"bouts": 56,
+				"draws": 0,
+				"fighters": {
+					"f_dozer": {
+						"avg_damage": 87.8,
+						"avg_time": 52.2,
+						"bouts": 14,
+						"by_cat": {
+							"classic": 167.97472640183,
+							"control": 257.9082,
+							"rush": 202.073349668571,
+							"strike": 601.26830734584
+						},
+						"damage": 1229.22458341624,
+						"denied": 25,
+						"kos": 8,
+						"moves_used": {
+							"bulldoze": 30,
+							"dust_bowl": 14,
+							"rock_slide": 62,
+							"snout_jab": 406
+						},
+						"time": 730.483333333301,
+						"win_rate": 0.57,
+						"wins": 8
+					},
+					"f_dredge": {
+						"avg_damage": 76.4,
+						"avg_time": 55.8,
+						"bouts": 14,
+						"by_cat": {
+							"blast": 358.377055555555,
+							"classic": 14.2756784336159,
+							"counter": 5.52,
+							"stream": 481.819824,
+							"strike": 209.890972573619
+						},
+						"damage": 1069.88353056279,
+						"denied": 25,
+						"kos": 3,
+						"moves_used": {
+							"anchor_drop": 1,
+							"bubble_stream": 108,
+							"claw_snap": 235,
+							"hydro_cannon": 53
+						},
+						"time": 781.441666666631,
+						"win_rate": 0.36,
+						"wins": 5
+					},
+					"f_gusto": {
+						"avg_damage": 95.5,
+						"avg_time": 53.0,
+						"bouts": 14,
+						"by_cat": {
+							"classic": 0.0,
+							"projectile": 375.15,
+							"strike": 359.77557156126,
+							"volley": 601.87226
+						},
+						"damage": 1336.79783156126,
+						"denied": 5,
+						"kos": 4,
+						"moves_used": {
+							"air_slash": 80,
+							"feather_darts": 97,
+							"hang_time": 15,
+							"wing_snap": 225
+						},
+						"time": 742.074999999967,
+						"win_rate": 0.36,
+						"wins": 5
+					},
+					"f_jitters": {
+						"avg_damage": 86.9,
+						"avg_time": 52.0,
+						"bouts": 14,
+						"by_cat": {
+							"classic": 38.3268798405588,
+							"projectile": 601.0,
+							"strike": 576.976882494683
+						},
+						"damage": 1216.30376233524,
+						"denied": 3,
+						"kos": 5,
+						"moves_used": {
+							"arc_lash": 57,
+							"slap": 359,
+							"spring_pad": 46,
+							"thunder_jolt": 66
+						},
+						"time": 728.399999999968,
+						"win_rate": 0.57,
+						"wins": 8
+					},
+					"f_knell": {
+						"avg_damage": 103.6,
+						"avg_time": 50.2,
+						"bouts": 14,
+						"by_cat": {
+							"classic": 18.6637500346932,
+							"projectile": 660.170385,
+							"stream": 455.92785,
+							"strike": 263.296342052942,
+							"utility": 51.7125
+						},
+						"damage": 1449.77082708764,
+						"denied": 83,
+						"kos": 7,
+						"moves_used": {
+							"ghost_light": 91,
+							"night_shade": 88,
+							"sounding_jab": 148,
+							"through_the_veil": 60
+						},
+						"time": 702.116666666636,
+						"win_rate": 0.57,
+						"wins": 8
+					},
+					"f_slurry": {
+						"avg_damage": 84.2,
+						"avg_time": 40.4,
+						"bouts": 14,
+						"by_cat": {
+							"classic": 38.2725423289695,
+							"projectile": 381.3,
+							"strike": 376.853276182079,
+							"volley": 382.1844
+						},
+						"damage": 1178.61021851105,
+						"denied": 5,
+						"kos": 11,
+						"moves_used": {
+							"drain_dive": 5,
+							"poison_darts": 61,
+							"sludge_lob": 76,
+							"venom_fangs": 200
+						},
+						"time": 565.341666666644,
+						"win_rate": 0.79,
+						"wins": 11
+					},
+					"f_stoke": {
+						"avg_damage": 87.5,
+						"avg_time": 50.4,
+						"bouts": 14,
+						"by_cat": {
+							"blast": 42.348,
+							"classic": 45.9758955940356,
+							"stream": 561.156,
+							"strike": 575.363788365258
+						},
+						"damage": 1224.84368395929,
+						"denied": 28,
+						"kos": 7,
+						"moves_used": {
+							"ember_jab": 367,
+							"flamethrower": 101,
+							"steam_vent": 25
+						},
+						"time": 706.174999999969,
+						"win_rate": 0.64,
+						"wins": 9
+					},
+					"f_varga": {
+						"avg_damage": 69.9,
+						"avg_time": 54.7,
+						"bouts": 14,
+						"by_cat": {
+							"classic": 105.634366534812,
+							"projectile": 668.71911005461,
+							"strike": 204.895813255037
+						},
+						"damage": 979.249289844458,
+						"denied": 0,
+						"kos": 0,
+						"moves_used": {
+							"comet_hook": 14,
+							"iron_shins": 107,
+							"pressure_palm": 131,
+							"thunder_chop": 12
+						},
+						"time": 766.099999999966,
+						"win_rate": 0.14,
+						"wins": 2
+					}
+				}
+			}
+		}
+	},
+	"version": "0.9.18"
+}

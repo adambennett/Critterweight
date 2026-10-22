@@ -1,0 +1,40 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 28,
+			"ok": true,
+			"test": "res://src/test/core/test_profile_loadouts.gd::test_published_v0917_fixture_profile_migrates"
+		},
+		{
+			"errors": [],
+			"ms": 42,
+			"ok": true,
+			"test": "res://src/test/core/test_profile_loadouts.gd::test_saved_loadouts_round_trip_and_are_sanitized"
+		},
+		{
+			"errors": [],
+			"ms": 27,
+			"ok": true,
+			"test": "res://src/test/core/test_profile_loadouts.gd::test_v0916_fixture_profile_migrates"
+		},
+		{
+			"errors": [],
+			"ms": 42,
+			"ok": true,
+			"test": "res://src/test/core/test_profile_loadouts.gd::test_v1_profiles_migrate_to_v2"
+		},
+		{
+			"errors": [],
+			"ms": 91,
+			"ok": true,
+			"test": "res://src/test/core/test_profile_loadouts.gd::test_versus_setup_falls_back_to_the_recommended_loadout"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 5 run, 0 failed, 5 passed, 0 skipped in 9.3 s",
+	"time": "2026-10-21T19:32:52",
+	"total": 5,
+	"version": "0.9.17"
+}

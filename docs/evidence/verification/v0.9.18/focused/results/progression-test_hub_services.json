@@ -1,0 +1,58 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 600,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_boiler_room_key_trains_against_saved_builds"
+		},
+		{
+			"errors": [],
+			"ms": 1322,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_bookie_table_and_lab_terminal_for_real"
+		},
+		{
+			"errors": [],
+			"ms": 6,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_every_station_lists_its_upgrades"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_injected_backend_is_used"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_purchase_flow_spends_clout_and_respects_gates"
+		},
+		{
+			"errors": [],
+			"ms": 96,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_purchases_change_the_world"
+		},
+		{
+			"errors": [],
+			"ms": 5,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_snappington_run_options_and_config"
+		},
+		{
+			"errors": [],
+			"ms": 248,
+			"ok": true,
+			"test": "res://src/test/hub/test_hub_services.gd::test_start_run_hands_over_to_the_campaign"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 8 run, 0 failed, 8 passed, 0 skipped in 11.0 s",
+	"time": "2026-10-21T18:58:47",
+	"total": 8,
+	"version": "0.9.17"
+}

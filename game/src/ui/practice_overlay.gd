@@ -227,7 +227,7 @@ func reset_positions() -> void:
 ## Movesets with an equipped loadout: the player can change moves here.
 func can_change_moves() -> bool:
 	var f := player()
-	return f != null and f.combat_style == "moves" and not f.creature.pool.is_empty() and not f.creature.tags.has("martial")
+	return f != null and f.combat_style == "moves" and not f.creature.pool.is_empty()
 
 
 ## Change moves: pauses (the pause menu) and opens the loadout screen for the player's fighter over
