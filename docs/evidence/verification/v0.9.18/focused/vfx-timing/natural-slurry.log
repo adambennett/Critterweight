@@ -1,0 +1,19 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 00:09:06 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/vfx-timing-followup/natural-slurry-user
+2026-10-22 00:09:07 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 00:09:07 [INFO] app: Critterweight 0.9.18-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/kits/test_moves_slurry.gd::test_acid_spray_hoses_while_held_and_gunks_fast (3876 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_acid_spray_lives_while_sustained_and_dies_with_the_move (1715 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_coil_crush_ignores_guard_holds_and_crushes (4078 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_coils_wind_on_squeeze_crush_and_let_go (1259 ms)
+VFX_LIFETIME slurry dart: 3.027 engine seconds
+ok    res://src/test/kits/test_moves_slurry.gd::test_darts_fly_stick_ride_and_clean_up (3052 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_effects_kit_is_registered_under_its_names (10 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_poison_darts_burst_stick_and_gunk (2480 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_pool_and_loadouts (52 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_shed_skin_cleanses_evades_and_slips_back (3312 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_shed_skin_leaves_a_husk_that_flakes_away (1598 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_tail_sweep_charges_into_rear_and_crash (3002 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_venom_fangs_lob_and_dive_carry_over (4881 ms)
+tests: 12 run, 0 failed, 12 passed, 0 skipped in 38.6 s

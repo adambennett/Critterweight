@@ -7,6 +7,12 @@ extends TestCase
 const DT := 1.0 / 120.0
 
 
+## VFX use _process(delta), whose rate is independent of physics ticks and the display.
+## Keep lifetime assertions in engine seconds in source, headless exports and rendered exports.
+func wait_vfx_seconds(seconds: float) -> void:
+	await get_tree().create_timer(seconds, false, false).timeout
+
+
 ## A Movesets duel: fighter 0 = `cid` with `loadout`, fighter 1 = `foe` standing `gap` metres away,
 ## facing each other. Nobody has an input source: the test presses buttons itself.
 func duel(cid: String, loadout: Array, foe := "f_dredge", gap := 2.0, rules := {}) -> MatchSim:

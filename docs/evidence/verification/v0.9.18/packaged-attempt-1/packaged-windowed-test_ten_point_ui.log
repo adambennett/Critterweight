@@ -1,0 +1,18 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti SUPER
+
+2026-10-22 00:03:32 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-candidate/users/test_ten_point_ui-000328231
+2026-10-22 00:03:33 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 00:03:33 [INFO] app: Critterweight 0.9.18+c05aef5 (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/ui/test_ten_point_ui.gd::test_between_rounds_scorecard_and_decision_banner (508 ms)
+ok    res://src/test/ui/test_ten_point_ui.gd::test_hud_hides_health_and_shows_round_and_cards_locally (3434 ms)
+ok    res://src/test/ui/test_ten_point_ui.gd::test_hud_on_the_net_mirror_cards_count_and_sudden_death (250 ms)
+2026-10-22 00:03:42 [INFO] match: start cage_test on the_gullet: f_stoke/t0/scripted, f_dredge/t1/scripted
+2026-10-22 00:03:50 [INFO] match: start duel_test on the_gullet: f_stoke/t0/scripted, f_dredge/t1/scripted
+2026-10-22 00:03:50 [INFO] match: start cage_rules on the_gullet: f_stoke/t0/scripted, f_dredge/t1/scripted
+2026-10-22 00:03:50 [INFO] match: start duel on the_gullet: f_stoke/t0/scripted, f_dredge/t1/scripted
+ok    res://src/test/ui/test_ten_point_ui.gd::test_match_scene_referee_framing_and_ten_point_callouts (8833 ms)
+ok    res://src/test/ui/test_ten_point_ui.gd::test_net_scene_referee_cards_and_decision_from_replicated_data (237 ms)
+ok    res://src/test/ui/test_ten_point_ui.gd::test_results_show_method_cards_and_fit (1162 ms)
+ok    res://src/test/ui/test_ten_point_ui.gd::test_results_without_scoring_are_unchanged (251 ms)
+tests: 7 run, 0 failed, 7 passed, 0 skipped in 19.3 s

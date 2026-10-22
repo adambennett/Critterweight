@@ -333,18 +333,18 @@ func test_kit_registers_and_draws_the_beam() -> void:
 		fx.on_event(shade)
 		fx.on_event({"type": "hit", "fighter": 0, "target": 1, "pool": "night_shade", "cat": "stream", "tick": true, "damage": 1.5,
 			"point": Vector3(0, 1, 3), "element": "spectral", "blocked": false})
-		await wait_frames(6)
+		await wait_vfx_seconds(6.0 / 120.0)
 	var beam: Dictionary = kit._beams.get(0, {})
 	check(not beam.is_empty() and float(beam["len"]) > 2.0, "the beam reaches out toward its length (%s)" % str(beam.get("len", 0)))
 	check(outer.global_position.distance_to(kit.port(0)) > 1.0, "from the porthole, along the facing")
 	fx.on_event({"type": "sustain", "fighter": 0, "phase": "end", "pool": "night_shade", "slot": "m2"})
-	await wait_frames(45)
+	await wait_vfx_seconds(45.0 / 120.0)
 	check(not (kit._beams as Dictionary).has(0) and not is_instance_valid(outer), "releasing puts it out and frees it")
 	# cut off: Knell is hit mid-beam (no end event reaches the effects first)
 	fx.on_event({"type": "sustain", "fighter": 0, "phase": "start", "pool": "night_shade", "slot": "m2"})
 	await wait_frames(4)
 	_vstate[0] = Fighter.State.HITSTUN
-	await wait_frames(45)
+	await wait_vfx_seconds(45.0 / 120.0)
 	check(not (kit._beams as Dictionary).has(0), "an interrupted beam dies with the move")
 	_vstate.erase(0)
 	# a tapped Night Shade fires once, without a sustain: a flash of the beam, nothing left behind
@@ -375,11 +375,14 @@ func test_kit_chain_wisps_and_tether_draw_and_clean_up() -> void:
 		"element": "spectral", "blocked": false})
 	fx.sync_entities([])
 	check((kit._tethers as Dictionary).has(1), "a bite tethers the catch")
+	var lifetime_start: float = fx._clock
 	var rib: Node3D = (kit._tethers[1] as Dictionary)["rib"]
-	await wait_frames(40)
+	await wait_vfx_seconds(0.35)
 	check(not is_instance_valid(head) and not is_instance_valid(wisp), "the chain head and the wisps are cleaned up")
+	await wait_vfx_seconds(2.0)
 	check((kit._tethers as Dictionary).has(1) and is_instance_valid(rib), "the tether holds while the hex does")
-	await wait_frames(320)
+	await wait_vfx_seconds(0.65)
+	print("VFX_LIFETIME knell tether: %.3f engine seconds" % (fx._clock - lifetime_start))
 	check(not (kit._tethers as Dictionary).has(1) and not is_instance_valid(rib), "and lets go when the hex wears off (2.5 s)")
 	# a guarded chain hexes nobody; a tether whose catch is gone lets go at once
 	fx.on_event({"type": "hit", "fighter": 0, "target": 1, "pool": "hex_chain", "cat": "control", "damage": 1.0, "point": Vector3(0, 1.0, 3.0),
@@ -388,7 +391,7 @@ func test_kit_chain_wisps_and_tether_draw_and_clean_up() -> void:
 	fx.on_event({"type": "hit", "fighter": 0, "target": 1, "pool": "hex_chain", "cat": "control", "damage": 4.0, "point": Vector3(0, 1.0, 3.0),
 		"element": "spectral", "blocked": false})
 	_vout[1] = true
-	await wait_frames(60)
+	await wait_vfx_seconds(60.0 / 120.0)
 	check(not (kit._tethers as Dictionary).has(1), "a tether to a fighter out of the fight lets go")
 	_vout.erase(1)
 	_free(fx, views)
@@ -404,17 +407,17 @@ func test_kit_toll_rings_echoes_and_breaks_on_the_counter() -> void:
 	fx.on_event({"type": "effect", "fighter": 0, "effect": "counter_stance", "vfx": "knell_toll_echo", "pos": Vector3.ZERO, "pool": "toll", "element": "",
 		"radius": 0.0, "yaw": 0.0, "duration": 1.0})
 	check((kit._echoes as Dictionary).has(0) and not (stance.call() as Array).is_empty(), "the echo rings on around Knell")
-	await wait_frames(30)
+	await wait_vfx_seconds(30.0 / 120.0)
 	# the Dredge strikes him: the counter event lets go of the echo, the counter-shock hits back
 	fx.on_event({"type": "counter", "fighter": 0, "victim": 1})
 	fx.on_event({"type": "hit", "fighter": 0, "target": 1, "pool": "toll", "cat": "counter", "damage": 9.0, "point": Vector3(0, 1.0, 2.6),
 		"element": "spectral", "blocked": false})
 	check(not (kit._echoes as Dictionary).has(0), "the counter-shock breaks the echo")
-	await wait_frames(60)
+	await wait_vfx_seconds(60.0 / 120.0)
 	check((stance.call() as Array).is_empty(), "and its pieces let go")
 	# unanswered, the echo dies away by itself
 	fx.on_event({"type": "effect", "fighter": 0, "effect": "counter_stance", "vfx": "knell_toll_echo", "pos": Vector3.ZERO, "pool": "toll", "element": "",
 		"radius": 0.0, "yaw": 0.0, "duration": 0.5})
-	await wait_frames(90)
+	await wait_vfx_seconds(90.0 / 120.0)
 	check(not (kit._echoes as Dictionary).has(0) and (stance.call() as Array).is_empty(), "an echo nobody answers fades out")
 	_free(fx, views)

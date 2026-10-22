@@ -333,6 +333,7 @@ func test_darts_fly_stick_ride_and_clean_up() -> void:
 	fx.on_event(parried)
 	check_eq((kit._stuck as Array).size(), 4, "a parried dart does not stick")
 	var newest: Node3D = (stuck[3] as Dictionary)["node"]
+	var lifetime_start: float = fx._clock
 	var p0 := newest.global_position
 	_shift(views[1], Vector3(0, 0, 1))
 	await wait_frames(2)
@@ -341,7 +342,10 @@ func test_darts_fly_stick_ride_and_clean_up() -> void:
 	fx.sync_entities([ent])
 	check(fx._ents.has(1), "at Low quality the dart (a combat cue) is still drawn")
 	fx.sync_entities([])
-	await wait_frames(int(3.0 * Engine.physics_ticks_per_second))
+	await wait_vfx_seconds(2.0)
+	check(is_instance_valid(newest) and not (kit._stuck as Array).is_empty(), "the newest dart stays attached before its 2.5-second lifetime ends")
+	await wait_vfx_seconds(1.0)
+	print("VFX_LIFETIME slurry dart: %.3f engine seconds" % (fx._clock - lifetime_start))
 	check((kit._stuck as Array).is_empty() and not is_instance_valid(newest), "the stuck darts work loose and are cleaned up")
 	_free(fx, views)
 
@@ -357,7 +361,7 @@ func test_acid_spray_lives_while_sustained_and_dies_with_the_move() -> void:
 	for k in 4:
 		fx.on_event({"type": "effect", "fighter": 0, "effect": "area", "vfx": "slurry_acid", "pool": "acid_spray", "pos": Vector3.ZERO,
 			"origin": Vector3.ZERO, "radius": 2.0, "cone_deg": 80.0, "shape": "cone", "yaw": 0.0, "element": "sludge"})
-		await wait_frames(6)
+		await wait_vfx_seconds(6.0 / 120.0)
 	var sp: Dictionary = kit._sprays.get(0, {})
 	check(not sp.is_empty() and float(sp.get("len", 0.0)) > 1.2, "it gushes out toward its reach (%s)" % str(sp.get("len", 0)))
 	if sp.is_empty():
@@ -367,23 +371,23 @@ func test_acid_spray_lives_while_sustained_and_dies_with_the_move() -> void:
 	var half := mi.global_transform.basis.x.length()
 	check(absf(half - float(sp["len"]) * tan(deg_to_rad(40.0))) < float(sp["len"]) * 0.1, "its fan is as wide as the 80 degree cone (%.2f m)" % half)
 	fx.on_event(stop)
-	await wait_frames(30)
+	await wait_vfx_seconds(30.0 / 120.0)
 	check(not (kit._sprays as Dictionary).has(0) and not is_instance_valid(mi), "releasing ends it")
 	# cut off: a hit stuns Slurry mid-spray (no end event reaches the effects first)
 	fx.on_event(start)
 	await wait_frames(4)
 	_state[0] = Fighter.State.HITSTUN
-	await wait_frames(30)
+	await wait_vfx_seconds(30.0 / 120.0)
 	check(not (kit._sprays as Dictionary).has(0), "an interrupted spray dies with the move")
 	_state.erase(0)
 	# Reduce flashing dims it
 	fx.reduce_flashes = true
 	fx.on_event(start)
-	await wait_frames(20)
+	await wait_vfx_seconds(20.0 / 120.0)
 	var sp2: Dictionary = kit._sprays.get(0, {})
 	check(not sp2.is_empty() and float((sp2["mat"] as ShaderMaterial).get_shader_parameter("alpha")) <= 0.76, "Reduce flashing dims the acid")
 	fx.on_event(stop)
-	await wait_frames(30)
+	await wait_vfx_seconds(30.0 / 120.0)
 	_free(fx, views)
 
 
@@ -407,26 +411,26 @@ func test_coils_wind_on_squeeze_crush_and_let_go() -> void:
 	var root: Node3D = c["node"]
 	var mi: MeshInstance3D = c["mesh"]
 	check_eq(int(c["victim"]), 1, "round the fighter it caught")
-	await wait_frames(24)
+	await wait_vfx_seconds(24.0 / 120.0)
 	check(root.global_position.is_equal_approx(Vector3(2, 0, 0)), "at its feet")
 	var r0 := mi.scale.x
 	check(r0 > 0.8, "wide enough to wrap a crab's shell (%.2f m)" % r0)
 	fx.on_event(squeeze)
-	await wait_frames(12)
+	await wait_vfx_seconds(12.0 / 120.0)
 	check(mi.scale.x < r0 * 0.9, "a squeeze clenches the coils (%.2f)" % mi.scale.x)
-	await wait_frames(30)
+	await wait_vfx_seconds(30.0 / 120.0)
 	check(absf(mi.scale.x - r0) < 0.02, "and they relax")
 	_ground_at[1] = Vector3(2, 0, 1)
 	await wait_frames(2)
 	check(root.global_position.is_equal_approx(Vector3(2, 0, 1)), "the coils ride their victim")
 	fx.on_event(crush)
-	await wait_frames(40)
+	await wait_vfx_seconds(40.0 / 120.0)
 	check(not (kit._coils as Dictionary).has(0) and not is_instance_valid(root), "the crush flings them apart")
 	# cut off: knocked out of the move, Slurry lets go
 	fx.on_event(wrap)
 	var root2: Node3D = (kit._coils[0] as Dictionary)["node"]
 	_state[0] = Fighter.State.HITSTUN
-	await wait_frames(40)
+	await wait_vfx_seconds(40.0 / 120.0)
 	check(not is_instance_valid(root2), "interrupted, it lets go")
 	_state.erase(0)
 	# a whiffed squeeze and crush draw without coils
@@ -459,7 +463,7 @@ func test_shed_skin_leaves_a_husk_that_flakes_away() -> void:
 		"radius": 0.0, "shape": "circle", "yaw": 0.0, "element": ""})
 	fx.on_event({"type": "effect", "fighter": 0, "effect": "area", "vfx": "slurry_molt_burst", "pool": "shed_skin", "pos": Vector3.ZERO,
 		"radius": 1.1, "shape": "circle", "yaw": 0.0, "element": "sludge"})
-	await wait_frames(int(1.6 * Engine.physics_ticks_per_second))
+	await wait_vfx_seconds(1.6)
 	check(not is_instance_valid(husk) and (kit._husks as Array).is_empty(), "it sags and flakes away")
 	fx.quality = 0
 	fx.on_event(shed)

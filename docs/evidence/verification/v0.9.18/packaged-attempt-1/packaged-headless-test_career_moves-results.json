@@ -1,0 +1,58 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 85,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_moves.gd::test_drilling_a_move_is_a_permanent_training_week"
+		},
+		{
+			"errors": [],
+			"ms": 53,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_moves.gd::test_learn_choices_are_a_few_and_stable_for_the_week"
+		},
+		{
+			"errors": [],
+			"ms": 89,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_moves.gd::test_learning_a_move_is_a_training_week"
+		},
+		{
+			"errors": [],
+			"ms": 116,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_moves.gd::test_loadout_changes_are_validated_and_saved"
+		},
+		{
+			"errors": [],
+			"ms": 97,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_moves.gd::test_new_careers_start_with_the_recommended_moves"
+		},
+		{
+			"errors": [],
+			"ms": 105,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_moves.gd::test_stale_moves_are_repaired_on_load"
+		},
+		{
+			"errors": [],
+			"ms": 81,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_moves.gd::test_the_bout_uses_the_career_loadout_and_drilled_styles"
+		},
+		{
+			"errors": [],
+			"ms": 94,
+			"ok": true,
+			"test": "res://src/test/campaign/test_career_moves.gd::test_v1_saves_migrate_explicitly"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 8 run, 0 failed, 8 passed, 0 skipped in 5.2 s",
+	"time": "2026-10-21T23:46:29",
+	"total": 8,
+	"version": "0.9.18"
+}

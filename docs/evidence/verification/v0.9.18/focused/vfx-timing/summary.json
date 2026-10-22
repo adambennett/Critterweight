@@ -1,0 +1,47 @@
+﻿[
+    {
+        "name":  "fixed-moves",
+        "exit_code":  0,
+        "total":  126,
+        "failed":  0,
+        "skipped":  0,
+        "engine_errors":  0,
+        "summary":  "tests: 126 run, 0 failed, 126 passed, 0 skipped in 83.7 s"
+    },
+    {
+        "name":  "natural-knell",
+        "exit_code":  0,
+        "total":  11,
+        "failed":  0,
+        "skipped":  0,
+        "engine_errors":  0,
+        "summary":  "tests: 11 run, 0 failed, 11 passed, 0 skipped in 46.2 s"
+    },
+    {
+        "name":  "natural-slurry",
+        "exit_code":  0,
+        "total":  12,
+        "failed":  0,
+        "skipped":  0,
+        "engine_errors":  0,
+        "summary":  "tests: 12 run, 0 failed, 12 passed, 0 skipped in 38.6 s"
+    },
+    {
+        "name":  "rendered-knell",
+        "exit_code":  0,
+        "total":  11,
+        "failed":  0,
+        "skipped":  0,
+        "engine_errors":  0,
+        "summary":  "tests: 11 run, 0 failed, 11 passed, 0 skipped in 46.5 s"
+    },
+    {
+        "name":  "rendered-slurry",
+        "exit_code":  0,
+        "total":  12,
+        "failed":  0,
+        "skipped":  0,
+        "engine_errors":  0,
+        "summary":  "tests: 12 run, 0 failed, 12 passed, 0 skipped in 39.0 s"
+    }
+]

@@ -313,7 +313,7 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 	for id in [1, 2, 3, 4, 5]:
 		if check(fx._ents.has(id), "entity %d is drawn" % id):
 			nodes.append((fx._ents[id] as Dictionary)["node"])
-	await wait_frames(8)
+	await wait_vfx_seconds(8.0 / 120.0)
 	for en in ents:
 		var moved: Dictionary = en
 		var p: Vector3 = moved["pos"]
@@ -322,9 +322,9 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 	if nodes.size() == 5:
 		check((nodes[0] as Node3D).global_position.is_equal_approx(Vector3(0, 1.4, 1.5)), "the crescent flies with its projectile")
 		check(is_equal_approx((nodes[2] as Node3D).global_position.z, 2.0), "the funnel rolls with its projectile")
-	await wait_frames(30)
+	await wait_vfx_seconds(30.0 / 120.0)
 	fx.sync_entities([])
-	await wait_frames(90)
+	await wait_vfx_seconds(90.0 / 120.0)
 	for nd in nodes:
 		check(not is_instance_valid(nd), "every entity look is cleaned up")
 	check(not (kit._winds as Dictionary).has(0), "the slipstream ends with the buff")

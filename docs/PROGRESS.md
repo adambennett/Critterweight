@@ -30,7 +30,12 @@ The second full run retained three failures despite a passing ten-minute soak. F
 spectral shots blocked by authored tire-stack cover, an unused policy hash advertised to Movesets
 clients, and clipped/overscrolled focus cards. The aiming and wandering test drivers now exercise
 their intended paths; the hub-secret input check waits for actual simulated recovery. Original
-failures and focused follow-ups are retained. A clean full rerun must pass before packaging.
+failures and focused follow-ups are retained. The third clean full run passed 1,125/1,126 with
+one expected graphical-audio skip, zero failures or unexpected engine errors, and a passing
+ten-minute soak. The first packaged matrix completed 361 checks: 356 passed, two VFX test-clock
+failures and three source-only skips. All rendered groups passed. The test-only timing repairs
+then passed 172 checks across fixed, natural headless and rendered clocks. Final clean source
+and packaged verification will run again before publication; original evidence is retained.
 See `releases/v0.9.18-takeover.md` and the v18 verification report for exact evidence.
 Both releases are authorized for autonomous GitHub publication. Combined Breeze spending in the
 latest saved report is 4,425.0 / 10,000 credits; 5,575.0 remain across the entire goal.

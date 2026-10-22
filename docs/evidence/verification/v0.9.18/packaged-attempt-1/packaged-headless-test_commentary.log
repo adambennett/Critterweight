@@ -1,0 +1,29 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-21 23:48:11 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-candidate/users/test_commentary-234808330
+2026-10-21 23:48:11 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-21 23:48:11 [INFO] app: Critterweight 0.9.18+c05aef5 (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/audio/test_commentary.gd::test_a_second_interrupt_inside_the_fade_keeps_the_new_line (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_an_ability_that_hits_is_never_called_a_miss (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_career_bout_context_reaches_the_booth (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_ceremonial_winner_names_never_replace_other_names (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_clock_decisions_and_sudden_death_name_the_real_winner (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_count_scorecard_and_first_of_the_night_lines_fit_the_moment (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_director_detects_whiffs_exchanges_and_pressure (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_director_distinguishes_knockdown_stoppage_knockout_and_decisions (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_director_does_not_spam_repeated_abilities (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_director_paces_lulls_with_observations_and_color (2 ms)
+2026-10-21 23:48:11 [WARN] audio: commentary history not read (h.json: invalid JSON at line 0: Expected key); starting fresh
+ok    res://src/test/audio/test_commentary.gd::test_history_persists_across_restarts_and_stays_bounded (44 ms)
+ok    res://src/test/audio/test_commentary.gd::test_interrupts_fade_and_low_lines_wait_for_room (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_lull_pressure_needs_recent_unanswered_hits (2 ms)
+ok    res://src/test/audio/test_commentary.gd::test_movesets_moves_are_called_by_name_and_kind (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_names_follow_the_players_corner (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_queue_expires_stale_calls_and_results_invalidate (304 ms)
+ok    res://src/test/audio/test_commentary.gd::test_selector_prefers_specific_fresh_lines_but_never_traps_on_them (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_selector_spaces_joke_families (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_spectating_never_addresses_a_player (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_stoppage_in_a_best_of_ends_only_the_round (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_talk_budget_recovers_after_interrupted_and_stopped_lines (0 ms)
+ok    res://src/test/audio/test_commentary.gd::test_varga_techniques_are_called_when_they_land (1 ms)
+tests: 22 run, 0 failed, 22 passed, 0 skipped in 4.9 s

@@ -1,0 +1,18 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 00:08:13 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/vfx-timing-followup/natural-knell-user
+2026-10-22 00:08:13 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 00:08:13 [INFO] app: Critterweight 0.9.18-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/kits/test_moves_knell.gd::test_basic_heavy_and_v0917_abilities_carry_over (8534 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_hex_chain_bites_yanks_and_hexes (5361 ms)
+VFX_LIFETIME knell tether: 3.016 engine seconds
+ok    res://src/test/kits/test_moves_knell.gd::test_kit_chain_wisps_and_tether_draw_and_clean_up (4112 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_kit_registers_and_draws_the_beam (982 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_kit_toll_rings_echoes_and_breaks_on_the_counter (1504 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_lantern_swarm_fans_out_and_homes_in (2760 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_night_shade_pours_slows_haunts_and_stops_on_release (4303 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_pool_and_loadouts (0 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_styles_change_how_moves_play (6368 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_styles_patch_real_fields (43 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_toll_cleanses_armours_and_counter_shocks (2981 ms)
+tests: 11 run, 0 failed, 11 passed, 0 skipped in 46.2 s

@@ -1,0 +1,142 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 385,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_attended_rest_train_opens_the_pick"
+		},
+		{
+			"errors": [],
+			"ms": 1026,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_camera_preset_holds_for_every_presented_fight"
+		},
+		{
+			"errors": [],
+			"ms": 645,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_screen_setup_live_and_stop"
+		},
+		{
+			"errors": [],
+			"ms": 324,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_bookie_speed_holds_for_every_presented_fight"
+		},
+		{
+			"errors": [],
+			"ms": 106,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_camp_ledger_buys_with_clout"
+		},
+		{
+			"errors": [],
+			"ms": 5162,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_controller_walks_the_map_and_screens_to_the_summary"
+		},
+		{
+			"errors": [],
+			"ms": 446,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_custom_rechecked_at_each_fight"
+		},
+		{
+			"errors": [],
+			"ms": 317,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_every_decision_screen_builds_with_focus"
+		},
+		{
+			"errors": [],
+			"ms": 1630,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_fight_time_counts_once"
+		},
+		{
+			"errors": [],
+			"ms": 504,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_asks_before_replacing_a_suspended_run"
+		},
+		{
+			"errors": [],
+			"ms": 63,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_hub_sign_up_offers_no_dose_on_sparring"
+		},
+		{
+			"errors": [],
+			"ms": 413,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_asks_before_replacing_a_suspended_run"
+		},
+		{
+			"errors": [],
+			"ms": 204,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_never_deals_over_a_newer_versions_run"
+		},
+		{
+			"errors": [],
+			"ms": 286,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_never_resumes_a_party_run_solo"
+		},
+		{
+			"errors": [],
+			"ms": 242,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_menu_starts_a_run_and_shows_the_map"
+		},
+		{
+			"errors": [],
+			"ms": 294,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_rest_train_opens_the_pick_without_a_loop"
+		},
+		{
+			"errors": [],
+			"ms": 187,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_creation_clamps_the_dose"
+		},
+		{
+			"errors": [],
+			"ms": 227,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_it_back_rechecks_custom"
+		},
+		{
+			"errors": [],
+			"ms": 227,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_map_modal_traps_focus_and_back_closes_it"
+		},
+		{
+			"errors": [],
+			"ms": 3092,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_run_moves_screens_equip_learn_and_drill"
+		},
+		{
+			"errors": [],
+			"ms": 244,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_stuck_rest_save_resumes_into_the_pick"
+		},
+		{
+			"errors": [],
+			"ms": 52,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_ui.gd::test_unbuildable_fight_offers_forfeit"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 22 run, 0 failed, 22 passed, 0 skipped in 20.9 s",
+	"time": "2026-10-22T00:02:26",
+	"total": 22,
+	"version": "0.9.18"
+}

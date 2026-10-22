@@ -679,11 +679,11 @@ func test_legacy_skin_never_touches_his_gameplay() -> void:
 			# the view side works with this skin and style too: the kit draws on this model
 			var views := _views(["f_varga", "dev_biped"])
 			var fx := _fx(views)
-			await wait_frames(30)
+			await wait_vfx_seconds(30.0 / 120.0)
 			var base := _pieces(fx)
 			fx.on_event({"type": "effect", "fighter": 0, "effect": "dash", "vfx": "varga_afterimage_rush", "pos": Vector3.ZERO,
 				"dir": Vector3.FORWARD, "speed": 6.0, "time": 0.26, "yaw": 0.0, "radius": 0.0, "shape": "circle", "element": "", "move": ""})
-			await wait_frames(20)
+			await wait_vfx_seconds(20.0 / 120.0)
 			check(_pieces(fx) > base, "the rush's afterimages draw on the %s model (%s)" % ["legacy" if legacy else "upgraded", style])
 			_free_fx(fx, views)
 	check_eq(runs["false/moves"], runs["true/moves"], "the legacy skin plays the same Movesets bout")
@@ -754,7 +754,7 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 		var views := _views(["f_varga", "dev_biped"])
 		var fx := _fx(views)
 		fx.configure(quality, quality == 0)
-		await wait_frames(30)
+		await wait_vfx_seconds(30.0 / 120.0)
 		var kit = fx.moves.kits.get("f_varga")
 		if not check(kit != null, "Varga's kit is loaded"):
 			_free_fx(fx, views)
@@ -789,18 +789,18 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 		# the Pressure Palm's aura gathers while it charges and goes when it is let go
 		fx.on_event({"type": "move_start", "fighter": 0, "slot": "lh_straight", "id": "f_varga.lh_pressure_palm", "pool": "pressure_palm", "cat": "projectile"})
 		_state[0] = {"state": Fighter.State.ATTACK, "charge": 0.6}
-		await wait_frames(20)
+		await wait_vfx_seconds(20.0 / 120.0)
 		var palm: Dictionary = kit._palms.get(0, {})
 		check(not palm.is_empty() and palm.get("node") != null, "a charging palm gathers aura")
 		_state[0] = {"state": Fighter.State.ATTACK, "charge": -1.0}
-		await wait_frames(20)
+		await wait_vfx_seconds(20.0 / 120.0)
 		check(not (kit._palms as Dictionary).has(0), "letting go ends it")
 		# a charge cut off by a hit ends too
 		fx.on_event({"type": "move_start", "fighter": 0, "slot": "lh_straight", "id": "f_varga.lh_pressure_palm", "pool": "pressure_palm", "cat": "projectile"})
 		_state[0] = {"state": Fighter.State.ATTACK, "charge": 0.3}
-		await wait_frames(10)
+		await wait_vfx_seconds(10.0 / 120.0)
 		_state[0] = {"state": Fighter.State.HITSTUN, "charge": -1.0}
-		await wait_frames(10)
+		await wait_vfx_seconds(10.0 / 120.0)
 		check(not (kit._palms as Dictionary).has(0), "an interrupted charge ends")
 		_state.clear()
 		# entities: the blast, the crescent and the crater are drawn, follow their entity and clean up
@@ -820,7 +820,7 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 		check(is_equal_approx(wave.global_position.z, 2.1), "the crescent flies with its projectile")
 		fx.sync_entities([])
 		# everything fades and frees itself
-		await wait_frames(360)
+		await wait_vfx_seconds(360.0 / 120.0)
 		check(not is_instance_valid(blast) and not is_instance_valid(wave) and not is_instance_valid(crater), "entity looks are freed")
 		check_eq(_pieces(fx), base, "quality %d: every piece is cleaned up" % quality)
 		check((kit._palms as Dictionary).is_empty(), "no palm left gathering")

@@ -1,0 +1,20 @@
+﻿{
+    "commit":  "c05aef536287d45c9f2da5138eb274e521c840df",
+    "game_tree":  "44bc08ca3d8f0cc68dcd2ea2a7b16f9398d9ff47",
+    "tools_tree":  "a83360eb4c4fb5bd37a597f91194f5e4915470ee",
+    "started":  "2026-10-21T22:35:56",
+    "user_root":  "B:\\Critterweight-work\\v0.9.18\\final-source-3-user",
+    "log":  "B:\\Critterweight-work\\v0.9.18\\logs\\final-source-3.log",
+    "expected":  1126,
+    "soak_minutes":  10,
+    "passed":  true,
+    "finished":  "2026-10-21T23:28:54",
+    "exit_code":  0,
+    "total":  1126,
+    "failed":  0,
+    "skipped":  1,
+    "summary":  "tests: 1126 run, 0 failed, 1125 passed, 1 skipped in 3157.8 s",
+    "engine_errors":  0,
+    "expected_rejection_errors":  4,
+    "unchanged_source":  true
+}

@@ -277,7 +277,7 @@ func test_effects_kit_is_registered_and_draws_its_vfx() -> void:
 		var ev := {"type": "effect", "fighter": 0, "effect": "area", "vfx": v, "pos": Vector3(0, 0.5, 1.0), "origin": Vector3.ZERO, "radius": 1.5,
 			"length": 5.0, "width": 1.0, "shape": "line", "yaw": 0.0, "speed": 5.0, "duration": 0.4, "element": "brine", "pool": "x"}
 		check(kit.on_effect(0, ev), "'%s' draws" % v)
-	await wait_frames(80)
+	await wait_vfx_seconds(80.0 / 120.0)
 	check((kit._braces as Dictionary).is_empty(), "the brace drawn above (0.4 s) has ended")
 	_free(fx, views)
 
@@ -305,7 +305,7 @@ func test_effects_follow_their_moves_and_clean_up() -> void:
 	# Hydro Cannon: the water gathers with the charge, the beam ends it; cut off, it spills
 	fx.on_event({"type": "move_start", "fighter": 0, "slot": "mv.hydro_cannon", "id": "f_dredge.mv.hydro_cannon", "pool": "hydro_cannon", "cat": "blast"})
 	_charge[0] = 0.8
-	await wait_frames(6)
+	await wait_vfx_seconds(6.0 / 120.0)
 	var c: Dictionary = (kit._cannons as Dictionary).get(0, {})
 	check(not c.is_empty() and float(c.get("level", 0.0)) > 0.7, "the charge swells the barrel (%s)" % str(c.get("level", "-")))
 	var orb = c.get("orb")
@@ -338,7 +338,7 @@ func test_effects_follow_their_moves_and_clean_up() -> void:
 	check(bubble.global_position.is_equal_approx(Vector3(0, 0.75, 1.4)), "the bubble drifts with its projectile")
 	check(is_equal_approx(pool_node.global_position.x, 1.0), "the whirlpool follows its zone")
 	fx.sync_entities([])
-	await wait_frames(60)
+	await wait_vfx_seconds(60.0 / 120.0)
 	check(not is_instance_valid(bubble), "the bubble pops and is cleaned up")
 	check(not is_instance_valid(pool_node), "the whirlpool drains away and is cleaned up")
 	_free(fx, views)

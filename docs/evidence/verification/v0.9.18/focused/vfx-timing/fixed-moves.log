@@ -1,0 +1,181 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+2026-10-22 00:06:43 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/takeover/vfx-timing-followup/fixed-moves-user
+2026-10-22 00:06:43 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 00:06:43 [INFO] app: Critterweight 0.9.18-dev (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/audio/test_commentary.gd::test_movesets_moves_are_called_by_name_and_kind (1 ms)
+ok    res://src/test/balance/test_moves_matchups.gd::test_zz_moves_matchups (0 ms)
+ok    res://src/test/campaign/test_upgrade_translation.gd::test_movesets_effects_and_string_translation (75 ms)
+ok    res://src/test/core/test_moves_engine_extras.gd::test_counters_and_zones_are_credited_to_their_moves (162 ms)
+ok    res://src/test/core/test_moves_engine_extras.gd::test_grounded_areas_skip_hovering_fighters (71 ms)
+ok    res://src/test/core/test_moves_engine_extras.gd::test_repeats_caps_a_repeating_effect (0 ms)
+ok    res://src/test/core/test_moves_engine_extras.gd::test_the_knockdown_blow_builds_its_status (45 ms)
+ok    res://src/test/core/test_moves_rules.gd::test_built_in_presets_and_playlists_default_to_movesets (56 ms)
+MOVESET_PRESET absolute_unit absolute_unit fighters=3 attacked=true
+MOVESET_PRESET allied_brawl standard fighters=2 attacked=true
+MOVESET_PRESET cage_rules standard fighters=2 attacked=true
+MOVESET_PRESET chum_rush chum_rush fighters=5 attacked=true
+MOVESET_PRESET chumball chumball fighters=2 attacked=true
+MOVESET_PRESET duel standard fighters=2 attacked=true
+MOVESET_PRESET free_for_all standard fighters=3 attacked=true
+MOVESET_PRESET free_for_all_lives standard fighters=3 attacked=true
+MOVESET_PRESET practice practice fighters=2 attacked=true
+MOVESET_PRESET spotlight_hog spotlight_hog fighters=2 attacked=true
+MOVESET_PRESET spotlight_hog_teams spotlight_hog fighters=4 attacked=true
+MOVESET_PRESET tag_2v2 tag_team fighters=4 attacked=true
+MOVESET_PRESET teams_2v2 standard fighters=4 attacked=true
+MOVESET_PRESET teams_2v2v2v2 standard fighters=8 attacked=true
+MOVESET_PRESET teams_3v3 standard fighters=6 attacked=true
+MOVESET_PRESET teams_4v4 standard fighters=8 attacked=true
+ok    res://src/test/core/test_moves_rules.gd::test_every_built_in_preset_runs_its_mode_with_movesets (19262 ms)
+ok    res://src/test/core/test_moves_rules.gd::test_judges_credit_a_stream_per_second_of_contact (232 ms)
+2026-10-22 00:07:06 [WARN] policy: f_stoke has changed since this policy was trained; it still works but may play worse
+2026-10-22 00:07:06 [WARN] policy: policy 'f_stoke_es_drill' unavailable (Lab policies play Classic combat; this match uses Movesets); a scripted bot fights instead
+ok    res://src/test/core/test_moves_rules.gd::test_lab_policies_give_way_to_bots_in_movesets (13 ms)
+ok    res://src/test/core/test_moves_rules.gd::test_mode_buttons_come_before_moves (393 ms)
+ok    res://src/test/core/test_moves_rules.gd::test_referee_keeps_movesets_attacks_off_a_downed_fighter (152 ms)
+ok    res://src/test/core/test_movesets_engine.gd::test_a_charge_is_aimed_while_it_charges (154 ms)
+ok    res://src/test/core/test_movesets_engine.gd::test_charged_blast_scales_and_recoils (150 ms)
+ok    res://src/test/core/test_movesets_engine.gd::test_denied_presses_are_reported (110 ms)
+ok    res://src/test/core/test_movesets_engine.gd::test_hooks_translate_classic_slots (146 ms)
+ok    res://src/test/core/test_movesets_engine.gd::test_move_inputs_follow_the_style (375 ms)
+ok    res://src/test/core/test_movesets_engine.gd::test_pools_and_loadouts_validate (5 ms)
+ok    res://src/test/core/test_movesets_engine.gd::test_single_blows_are_not_repeats (81 ms)
+ok    res://src/test/core/test_movesets_engine.gd::test_sustained_stream_repeats_drains_and_ends_on_release (149 ms)
+ok    res://src/test/kits/test_kit_bosses.gd::test_moves_connect_in_range_and_miss_outside (9339 ms)
+ok    res://src/test/kits/test_kit_f_dozer.gd::test_moves_connect_in_range_and_miss_outside (1864 ms)
+ok    res://src/test/kits/test_kit_f_dredge.gd::test_moves_connect_in_range_and_miss_outside (2461 ms)
+  L1 Slap                      vs dev_biped  @0.8  dmg   2.8  part leg    kb +0.50 m  max reach 0.66 (l1:slap_l)
+  L2 Double Slap               vs dev_biped  @0.8  dmg   3.4  part leg    kb +0.62 m  max reach 0.66 (l2:slap_r)
+  L3 Headbonk                  vs f_slurry   @1.1  dmg   7.0  part core   kb +0.97 m  max reach 0.36 (l3:cap)
+  Heavy Squash                 vs dev_biped  @1.5  dmg   8.2  part core   kb +0.97 m  max reach 0.20 (heavy:body_slam)
+  Charged Heavy Super Squash   vs f_slurry   @2.5  dmg  26.4  part head   kb +1.73 m  max reach 0.20 (heavy_charged:body_slam)
+  Finisher Static Cling        vs dev_biped  @1.1  dmg  11.3  part core   kb +0.03 m  max reach 0.66 (l1:slap_l)
+  Dash Attack Pinball          vs f_slurry   @3.0  dmg   7.7  part core   kb +2.02 m  max reach 0.20 (dash_attack:body_slam)
+  Ability 1 Arc Lash           vs dev_biped  @5.0  dmg   7.5  part core   kb +0.44 m  max reach 0.00 ()
+  JUICE Overcharge burst       vs dev_biped  @2.6  dmg  14.4  part core   kb +2.00 m  max reach 0.00 ()
+ok    res://src/test/kits/test_kit_f_jitters.gd::test_moves_connect_in_range_and_whiff_outside (4182 ms)
+  L1 Head Butt                 vs f_jitters  @1.3  dmg   5.7  part core   kb +0.91 m  max reach 1.38 (l1:fang)
+  L2 Tail Flick                vs dev_biped  @1.3  dmg   2.3  part leg    kb +0.65 m  max reach 1.53 (l2:tail_tip)
+  L3 Fang Snap                 vs f_jitters  @1.3  dmg   8.0  part core   kb -0.36 m  max reach 1.40 (l3:fang)
+  Heavy Tail Sweep             vs f_jitters  @1.3  dmg  13.0  part core   kb +3.03 m  max reach 1.51 (heavy:tail_tip)
+  Charged Heavy Rear & Crash   vs dev_biped  @1.4  dmg  26.1  part head   kb +2.15 m  max reach 1.32 (heavy_charged:head)
+  Finisher Venom Spit          vs dev_biped  @3.0  dmg   8.0  part core   kb +1.42 m  max reach 1.32 (l1:fang)
+  Dash Attack Slither Strike   vs f_jitters  @3.0  dmg   6.9  part core   kb +2.37 m  max reach 1.45 (dash_attack:fang)
+  Ability 1 Sludge Lob         vs dev_biped  @6.0  dmg   6.0  part core   kb +0.89 m  max reach 0.00 ()
+  Ability 2 Drain Dive         vs f_jitters  @5.4  dmg   5.0  part core   kb +0.24 m  max reach 0.00 ()
+  JUICE Overflow wave          vs dev_biped  @3.0  dmg   9.2  part core   kb +1.33 m  max reach 0.00 ()
+ok    res://src/test/kits/test_kit_f_slurry.gd::test_moves_connect_in_range_and_whiff_outside (5081 ms)
+ok    res://src/test/kits/test_kit_npc_kid_lamprey.gd::test_moves_connect_in_range_and_miss_outside (3602 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_boulder_toss_flies_knocks_down_and_shatters (352 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_classic_is_unchanged (539 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_effects_kit_draws_and_cleans_up (694 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_iron_hide_shrugs_off_light_hits (397 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_pool_and_loadouts (0 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_quake_stomp_trips_through_a_guard (219 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_rock_slide_boulders_stop_shots_for_three_seconds (386 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_rock_slide_erupts_launches_and_raises_cover (325 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_snout_jab_horn_lunge_and_the_v0917_abilities_carry_over (569 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_styles_change_behaviour (347 ms)
+ok    res://src/test/kits/test_moves_dozer.gd::test_styles_patch_real_fields (64 ms)
+DREDGE bubble stream: 9 puffs in 1.6 s held, 8 pops on Stoke for 14.6 damage, brine 83, stamina 90 -> 72, hype 7.2
+ok    res://src/test/kits/test_moves_dredge.gd::test_bubble_stream_soaks_while_held_and_stops_on_release (277 ms)
+ok    res://src/test/kits/test_moves_dredge.gd::test_bubbles_stop_shots (206 ms)
+ok    res://src/test/kits/test_moves_dredge.gd::test_classic_moves_carry_over (737 ms)
+ok    res://src/test/kits/test_moves_dredge.gd::test_drilled_styles_change_behaviour (393 ms)
+ok    res://src/test/kits/test_moves_dredge.gd::test_effects_follow_their_moves_and_clean_up (15 ms)
+ok    res://src/test/kits/test_moves_dredge.gd::test_effects_kit_is_registered_and_draws_its_vfx (19 ms)
+DREDGE hydro cannon: tap 3.6 m jet, 7.4 damage, 1.03 m push; full charge 6.0 m beam, 19.3 damage, 3.98 m push, recoil slide 0.91 m
+ok    res://src/test/kits/test_moves_dredge.gd::test_hydro_cannon_charges_into_a_long_beam_and_recoils (422 ms)
+ok    res://src/test/kits/test_moves_dredge.gd::test_pool_and_loadouts (0 ms)
+DREDGE shell brace: a 10-damage blow deals 10.0 plain, 6.0 braced; walk x0.70
+ok    res://src/test/kits/test_moves_dredge.gd::test_shell_brace_hardens_and_slows (399 ms)
+ok    res://src/test/kits/test_moves_dredge.gd::test_styles_patch_their_moves (45 ms)
+DREDGE whirlpool: gap 3.60 -> 1.82 m two seconds after the press, 6.9 damage, brine 71
+ok    res://src/test/kits/test_moves_dredge.gd::test_whirlpool_drags_in_and_soaks (182 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_air_slash_flies_fast_and_cuts_through_a_line (111 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_air_slash_is_parried_by_a_fresh_guard (81 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_classic_moves_carry_over (699 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_effects_kit_draws_and_cleans_up (30 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_feather_darts_fan_out_and_build_winded (86 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_pool_and_loadouts (138 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_styles_change_how_moves_play (381 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_tailwind_speeds_gusto_up_and_cheapens_dodges (495 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_twister_rolls_out_lifts_and_leaves_a_whirl (175 ms)
+ok    res://src/test/kits/test_moves_gusto.gd::test_twister_swallows_enemy_shots (118 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_chain_lightning_jumps_to_a_second_foe (614 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_classic_jitters_is_unchanged (479 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_discharge_bursts_then_rings (185 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_discharge_squash_armours_against_lights (142 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_effects_kit_draws_and_cleans_up (71 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_pool_and_loadouts (0 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_static_field_flinches_whoever_enters (290 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_styles_in_a_duel (816 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_styles_patch_cleanly (54 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_thunder_jolt_crosses_the_cage_and_jolts (62 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_thunder_jolt_parried_by_a_timed_guard (136 ms)
+ok    res://src/test/kits/test_moves_jitters.gd::test_v0917_moves_carry_over (352 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_basic_heavy_and_v0917_abilities_carry_over (889 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_hex_chain_bites_yanks_and_hexes (429 ms)
+VFX_LIFETIME knell tether: 3.008 engine seconds
+ok    res://src/test/kits/test_moves_knell.gd::test_kit_chain_wisps_and_tether_draw_and_clean_up (55 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_kit_registers_and_draws_the_beam (22 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_kit_toll_rings_echoes_and_breaks_on_the_counter (28 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_lantern_swarm_fans_out_and_homes_in (207 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_night_shade_pours_slows_haunts_and_stops_on_release (383 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_pool_and_loadouts (1 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_styles_change_how_moves_play (640 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_styles_patch_real_fields (41 ms)
+ok    res://src/test/kits/test_moves_knell.gd::test_toll_cleanses_armours_and_counter_shocks (228 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_acid_spray_hoses_while_held_and_gunks_fast (271 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_acid_spray_lives_while_sustained_and_dies_with_the_move (20 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_coil_crush_ignores_guard_holds_and_crushes (288 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_coils_wind_on_squeeze_crush_and_let_go (20 ms)
+VFX_LIFETIME slurry dart: 3.033 engine seconds
+ok    res://src/test/kits/test_moves_slurry.gd::test_darts_fly_stick_ride_and_clean_up (35 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_effects_kit_is_registered_under_its_names (9 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_poison_darts_burst_stick_and_gunk (170 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_pool_and_loadouts (51 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_shed_skin_cleanses_evades_and_slips_back (201 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_shed_skin_leaves_a_husk_that_flakes_away (23 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_tail_sweep_charges_into_rear_and_crash (189 ms)
+ok    res://src/test/kits/test_moves_slurry.gd::test_venom_fangs_lob_and_dive_carry_over (311 ms)
+ok    res://src/test/kits/test_moves_stoke.gd::test_cinder_shot_lobs_bursts_and_leaves_fire (176 ms)
+ok    res://src/test/kits/test_moves_stoke.gd::test_fire_spin_rings_and_follows (77 ms)
+ok    res://src/test/kits/test_moves_stoke.gd::test_flamethrower_pours_aims_and_burns (370 ms)
+ok    res://src/test/kits/test_moves_stoke.gd::test_flare_rush_lunges_explodes_and_recoils (94 ms)
+ok    res://src/test/kits/test_moves_stoke.gd::test_heavy_charges_into_the_haymaker (195 ms)
+ok    res://src/test/kits/test_moves_stoke.gd::test_pool_and_loadouts (0 ms)
+ok    res://src/test/kits/test_moves_stoke.gd::test_steam_vent_and_stoke_the_fire_carry_over (124 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_afterimage_rush_in_movesets_only (829 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_classic_varga_is_unchanged (574 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_effects_kit_draws_and_cleans_up (111 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_equipping_a_technique_changes_only_its_group (121 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_hook_techniques_from_the_limb_inputs (345 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_iron_counter_answers_a_strike_in_movesets_only (71 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_kick_techniques_from_the_limb_inputs (654 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_legacy_skin_never_touches_his_gameplay (2044 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_overhand_techniques_from_the_limb_inputs (179 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_plain_strikes_flare_only_in_movesets (64 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_shockwave_uppercut_in_movesets_only (129 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_straight_techniques_from_the_limb_inputs (589 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_technique_pool_and_loadouts (511 ms)
+ok    res://src/test/kits/test_moves_varga.gd::test_thousand_fist_flurry_in_movesets_only (240 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_character_select_sheet_follows_the_combat_style (187 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_compendium_lists_the_pool_loadouts_and_combat_basics (295 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_hud_move_cards_hold_charges_stamina_and_denied_flash (78 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_loadout_screen_validates_and_applies (62 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_online_mirror_renders_the_same_cards (19 ms)
+2026-10-22 00:08:05 [INFO] match: start practice on the_gullet: f_stoke/t0/player, dev_biped/t1/dummy
+2026-10-22 00:08:05 [INFO] toast: [success] Moves: Ember Jab, Furnace Haymaker, Flare Rush, Cinder Shot
+ok    res://src/test/ui/test_movesets_ui.gd::test_practice_change_moves_applies_live_through_the_pause_menu (395 ms)
+2026-10-22 00:08:05 [INFO] match: start practice on the_gullet: f_stoke/t0/player, dev_biped/t1/dummy
+2026-10-22 00:08:05 [INFO] match: start practice on the_gullet: f_varga/t0/player, dev_biped/t1/dummy
+2026-10-22 00:08:05 [INFO] toast: [success] Moves: Spiral Hook, Force Palm, Meteor Hammer, Shockwave Kicks
+ok    res://src/test/ui/test_movesets_ui.gd::test_practice_shortcuts_never_collide_with_the_fighter_layout (244 ms)
+2026-10-22 00:08:06 [INFO] match: start duel on the_gullet: f_stoke/t0/player, dev_biped/t1/bot
+ok    res://src/test/ui/test_movesets_ui.gd::test_rebinding_labels_and_controls_reference_explain_both_styles (399 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_varga_loadout_names_techniques_without_claiming_generic_move_buttons (14 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_versus_setup_moves_row_opens_the_loadout_and_keeps_the_pick (93 ms)
+ok    res://src/test/vfx/test_moves_showcase.gd::test_zz_moves_showcase (0 ms)
+tests: 126 run, 0 failed, 126 passed, 0 skipped in 83.7 s

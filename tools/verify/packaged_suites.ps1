@@ -14,7 +14,10 @@ param(
 	[string[]]$Headless = @(),
 	[string[]]$Windowed = @(),
 	[string]$Exe = "",
-	[int]$TimeoutMinutes = 30
+	[int]$TimeoutMinutes = 30,
+	# Optional engine clock for simulation-heavy headless checks; rendered checks keep real timing.
+	# Leave zero for natural timing, including regressions that specifically compare VFX lifetimes.
+	[ValidateRange(0, 240)][int]$HeadlessFixedFps = 0
 )
 $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
@@ -45,7 +48,10 @@ try {
 		$res = Join-Path $Out ("packaged-{0}-{1}-results.json" -f $mode, $suite)
 		$log = Join-Path $Out ("packaged-{0}-{1}.log" -f $mode, $suite)
 		$a = @()
-		if ($mode -eq "headless") { $a += "--headless" }
+		if ($mode -eq "headless") {
+			$a += "--headless"
+			if ($HeadlessFixedFps -gt 0) { $a += @("--fixed-fps", "$HeadlessFixedFps") }
+		}
 		$a += @("--", "--user-root", $user, "--test", $suite, "--test-out", $res)
 		$quoted = $a | ForEach-Object { if ($_ -match '\s') { '"' + $_ + '"' } else { $_ } }
 		# Each result belongs to this invocation; a crashed run must not inherit an earlier pass.

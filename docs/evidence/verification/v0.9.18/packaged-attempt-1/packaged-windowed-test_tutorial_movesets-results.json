@@ -1,0 +1,82 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 3289,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_basic_string_on_a_custom_input"
+		},
+		{
+			"errors": [],
+			"ms": 3248,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_basic_string_to_its_finisher"
+		},
+		{
+			"errors": [],
+			"ms": 9262,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_charge_move_tapped_then_charged"
+		},
+		{
+			"errors": [],
+			"ms": 57,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_courses_and_who_takes_them"
+		},
+		{
+			"errors": [],
+			"ms": 4975,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_dodge_then_the_basics_dash_strike"
+		},
+		{
+			"errors": [],
+			"ms": 10515,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_footwork_and_guard_in_the_moves_course"
+		},
+		{
+			"errors": [],
+			"ms": 1005,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_grapple_and_throw_through_guard"
+		},
+		{
+			"errors": [],
+			"ms": 214,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_lessons_the_loadout_lacks_are_skipped_with_a_note"
+		},
+		{
+			"errors": [],
+			"ms": 202,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_lines_name_the_equipped_moves_and_their_inputs"
+		},
+		{
+			"errors": [],
+			"ms": 4734,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_special_connects_and_only_its_own_hits_count"
+		},
+		{
+			"errors": [],
+			"ms": 9772,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_sustained_move_held_and_steered"
+		},
+		{
+			"errors": [],
+			"ms": 14519,
+			"ok": true,
+			"test": "res://src/test/core/test_tutorial_movesets.gd::test_ultimate_after_filling_hype"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 12 run, 0 failed, 12 passed, 0 skipped in 66.4 s",
+	"time": "2026-10-22T00:05:04",
+	"total": 12,
+	"version": "0.9.18"
+}

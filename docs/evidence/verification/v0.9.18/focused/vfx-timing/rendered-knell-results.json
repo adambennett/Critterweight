@@ -1,0 +1,76 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 8691,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_basic_heavy_and_v0917_abilities_carry_over"
+		},
+		{
+			"errors": [],
+			"ms": 5361,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_hex_chain_bites_yanks_and_hexes"
+		},
+		{
+			"errors": [],
+			"ms": 4157,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_kit_chain_wisps_and_tether_draw_and_clean_up"
+		},
+		{
+			"errors": [],
+			"ms": 1053,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_kit_registers_and_draws_the_beam"
+		},
+		{
+			"errors": [],
+			"ms": 1518,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_kit_toll_rings_echoes_and_breaks_on_the_counter"
+		},
+		{
+			"errors": [],
+			"ms": 2768,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_lantern_swarm_fans_out_and_homes_in"
+		},
+		{
+			"errors": [],
+			"ms": 4304,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_night_shade_pours_slows_haunts_and_stops_on_release"
+		},
+		{
+			"errors": [],
+			"ms": 1,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_pool_and_loadouts"
+		},
+		{
+			"errors": [],
+			"ms": 6385,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_styles_change_how_moves_play"
+		},
+		{
+			"errors": [],
+			"ms": 49,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_styles_patch_real_fields"
+		},
+		{
+			"errors": [],
+			"ms": 2943,
+			"ok": true,
+			"test": "res://src/test/kits/test_moves_knell.gd::test_toll_cleanses_armours_and_counter_shocks"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 11 run, 0 failed, 11 passed, 0 skipped in 46.5 s",
+	"time": "2026-10-22T00:10:41",
+	"total": 11,
+	"version": "0.9.18"
+}

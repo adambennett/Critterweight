@@ -168,7 +168,22 @@ The original clipped `ui/career-drill-move.jpg` remains as historical evidence; 
 full frames after repair are `ui/career-drill-move-final-1600.png` and
 `ui/career-drill-move-final-1280.png`, with their own hash provenance.
 
-Finish the full integrated suite and ten-minute soak, four-target packages and packaged checks, and publication/
+The third clean full run (`c05aef5`) passed **1,125/1,126 with one expected graphical-audio skip,
+zero failed**, in 3,157.8 seconds. No unexpected engine errors occurred and the source stayed unchanged.
+Its ten-minute soak passed thirteen matches with zero orphan nodes. All four candidate archives
+match their clean-source manifest. The first packaged move group then exposed two test-clock
+failures: process-frame counts did not wait out Knell's tether and Slurry's dart lifetimes.
+The test-only repair uses elapsed engine time and checks both continued visibility before expiry
+and eventual cleanup. Follow-ups cover fixed-clock, natural headless and rendered execution.
+The original package results remain separate from the final rerun; no VFX behavior was changed.
+That matrix completed all 26 groups: 361 run, 356 passed, two failed, three source-only skips;
+zero engine errors. All ten rendered groups passed. `packaged-attempt-1/` preserves it in full.
+The repaired tests passed 172/172, zero skips/errors across fixed-clock moves, natural headless
+Knell/Slurry and rendered Knell/Slurry (`focused/vfx-timing/`). Cleanup occurs after 3.002-3.033
+engine seconds and both effects are also checked before expiry. All 499 scripts compile.
+`source-attempt-3/` retains the preceding passing full suite and soak.
+
+Finish the fresh integrated and packaged checks after these test repairs, then publication and
 download verification. Exact final commits and raw results will be recorded here. No physical-
 controller, human listening/playtesting, Deck, Linux runtime or external-network claim is made.
 

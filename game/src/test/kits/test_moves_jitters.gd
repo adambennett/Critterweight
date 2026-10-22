@@ -327,7 +327,7 @@ func test_styles_in_a_duel() -> void:
 func test_effects_kit_draws_and_cleans_up() -> void:
 	var views := _views(["f_jitters", "f_dredge"])
 	var fx := _fx(views)
-	await wait_frames(30)
+	await wait_vfx_seconds(30.0 / 120.0)
 	var kit = fx.moves.kits.get("f_jitters")
 	if not check(kit != null, "Jitters' effects kit is loaded"):
 		_free(fx, views)
@@ -343,7 +343,7 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 	for pool in firsts:
 		fx.on_event(_move_start(pool))
 		check((kit._preps as Dictionary).has(0), "%s: its build-up starts with the move" % pool)
-		await wait_frames(8)
+		await wait_vfx_seconds(8.0 / 120.0)
 		fx.on_event(firsts[pool])
 		check(not (kit._preps as Dictionary).has(0), "%s: and ends at its first effect" % pool)
 	check(fx.get_child_count() > before + 10, "effects were built (%d nodes)" % (fx.get_child_count() - before))
@@ -370,7 +370,7 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 	fx.on_event(_hit("chain_lightning", "chain_lightning_arc", false))
 	check(not (kit._jumps as Dictionary).has(0), "in either order")
 	fx.on_event(_effect("jitters_chain_arc", "chain_arc", {"radius": 3.0}))
-	await wait_frames(40)
+	await wait_vfx_seconds(40.0 / 120.0)
 	check(not (kit._jumps as Dictionary).has(0), "a jump that found no second foe lapses")
 	# entities: the bolt and the ball fly with their projectiles, the fields follow their zones
 	var ents := [
@@ -408,7 +408,7 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 	await wait_frames(3)
 	fx.sync_entities([])
 	# everything transient dissipates and frees itself
-	await wait_frames(int(4.0 * Engine.physics_ticks_per_second))
+	await wait_vfx_seconds(4.0)
 	check(not is_instance_valid(bolt_node) and not is_instance_valid(ball_node) and not is_instance_valid(field_node), "entity looks are freed")
 	var left := []
 	for n in fx.get_children():

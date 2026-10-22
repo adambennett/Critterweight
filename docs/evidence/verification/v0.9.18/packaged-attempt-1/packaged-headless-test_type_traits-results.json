@@ -1,0 +1,28 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 1338,
+			"ok": true,
+			"test": "res://src/test/core/test_type_traits.gd::test_bell_ringer_grave_chill_and_crack_guard_apply"
+		},
+		{
+			"errors": [],
+			"ms": 10455,
+			"ok": true,
+			"test": "res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_authored_arena_cover"
+		},
+		{
+			"errors": [],
+			"ms": 10462,
+			"ok": true,
+			"test": "res://src/test/core/test_type_traits.gd::test_spectral_projectiles_pass_through_cover"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 3 run, 0 failed, 3 passed, 0 skipped in 27.0 s",
+	"time": "2026-10-21T23:49:14",
+	"total": 3,
+	"version": "0.9.18"
+}

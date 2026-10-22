@@ -1,0 +1,124 @@
+{
+	"failed": 0,
+	"results": [
+		{
+			"errors": [],
+			"ms": 457,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_disconnect_bot_takes_over_then_rejoin"
+		},
+		{
+			"errors": [],
+			"ms": 268,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_everyone_leaves_run_suspended_and_resumable"
+		},
+		{
+			"errors": [],
+			"ms": 250,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_group_event_vote_never_loops"
+		},
+		{
+			"errors": [],
+			"ms": 184,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_host_change_only_from_the_elected_successor"
+		},
+		{
+			"errors": [],
+			"ms": 225,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_host_departure_resumes_from_member_replica"
+		},
+		{
+			"errors": [],
+			"ms": 79,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_host_dose_clamped_to_own_ladder"
+		},
+		{
+			"errors": [],
+			"ms": 1658,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_host_results_must_follow_their_log"
+		},
+		{
+			"errors": [],
+			"ms": 225,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_member_choice_on_group_event_is_a_vote"
+		},
+		{
+			"errors": [],
+			"ms": 188,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_members_ignore_host_messages_from_other_members"
+		},
+		{
+			"errors": [],
+			"ms": 345,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_members_learn_equip_and_drill_through_the_host"
+		},
+		{
+			"errors": [],
+			"ms": 3408,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_party_slots_cleared_at_run_end"
+		},
+		{
+			"errors": [],
+			"ms": 192,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_party_vote_drives_the_route"
+		},
+		{
+			"errors": [],
+			"ms": 128,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_party_vote_tie_goes_to_captain"
+		},
+		{
+			"errors": [],
+			"ms": 126,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_pause_budget_per_player"
+		},
+		{
+			"errors": [],
+			"ms": 317,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_per_player_picks_without_duplication"
+		},
+		{
+			"errors": [],
+			"ms": 1553,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_progression_credited_per_player"
+		},
+		{
+			"errors": [],
+			"ms": 0,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_route_vote_rules"
+		},
+		{
+			"errors": [],
+			"ms": 91,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_tag_team_format"
+		},
+		{
+			"errors": [],
+			"ms": 180,
+			"ok": true,
+			"test": "res://src/test/campaign/test_campaign_coop.gd::test_vote_timer_with_abstainers"
+		}
+	],
+	"skipped": 0,
+	"summary": "tests: 19 run, 0 failed, 19 passed, 0 skipped in 14.4 s",
+	"time": "2026-10-21T23:46:46",
+	"total": 19,
+	"version": "0.9.18"
+}

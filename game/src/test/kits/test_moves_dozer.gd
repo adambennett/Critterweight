@@ -380,11 +380,11 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 		check(fx.moves.by_vfx.get(v) == kit, "the kit draws '%s'" % v)
 	for v in ["gravel_spray", "landslide", "dust_bowl", "boulder", "rubble", "stomp_pulse", "charge"]:
 		check(not fx.moves.by_vfx.has(v), "the v0.9.17 look '%s' stays with the v0.9.17 recipes" % v)
-	await wait_frames(40)                              # the intro warm-up pieces are gone
+	await wait_vfx_seconds(40.0 / 120.0)                              # the intro warm-up pieces are gone
 	var base := _pieces(fx)
 	# Rock Slide: the line telegraph creeps out during the dig and goes when the line erupts
 	fx.on_event({"type": "move_start", "fighter": 0, "slot": "m2", "id": "f_dozer.mv.rock_slide", "pool": "rock_slide", "cat": "control"})
-	await wait_frames(20)
+	await wait_vfx_seconds(20.0 / 120.0)
 	check((kit._winds as Dictionary).has(0) and _pieces(fx) > base, "the dig draws its wind-up")
 	fx.on_event(_effect("dozer_rockslide", "area", {"shape": "line", "length": 5.0, "width": 1.3, "origin": Vector3.ZERO, "pool": "rock_slide"}))
 	check(not (kit._winds as Dictionary).has(0), "the eruption ends the wind-up")
@@ -392,7 +392,7 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 	check((kit._skirts as Array).size() == 1, "a boulder heaves up with rubble at its foot")
 	# Boulder Toss: a rock rides the snout from the dig until the throw, then the projectile takes over
 	fx.on_event({"type": "move_start", "fighter": 0, "slot": "m3", "id": "f_dozer.mv.boulder_toss", "pool": "boulder_toss", "cat": "projectile"})
-	await wait_frames(50)
+	await wait_vfx_seconds(50.0 / 120.0)
 	check((kit._held as Dictionary).has(0), "a boulder comes up on the snout")
 	fx.on_event(_effect("dozer_boulder", "projectile", {"pool": "boulder_toss"}))
 	check(not (kit._held as Dictionary).has(0), "the throw lets go of it")
@@ -421,13 +421,13 @@ func test_effects_kit_draws_and_cleans_up() -> void:
 	fx.sync_entities([])
 	# a toss cut off before the throw drops its rock
 	fx.on_event({"type": "move_start", "fighter": 0, "slot": "m3", "id": "f_dozer.mv.boulder_toss", "pool": "boulder_toss", "cat": "projectile"})
-	await wait_frames(30)
+	await wait_vfx_seconds(30.0 / 120.0)
 	check((kit._held as Dictionary).has(0), "a second boulder comes up")
 	_state[0] = Fighter.State.HITSTUN
-	await wait_frames(10)
+	await wait_vfx_seconds(10.0 / 120.0)
 	check(not (kit._held as Dictionary).has(0), "a cut-off toss drops its rock")
 	_state.erase(0)
-	await wait_frames(320)                             # the longest pieces (the fault line's crack) are 2.2 s
+	await wait_vfx_seconds(320.0 / 120.0)                             # the longest pieces (the fault line's crack) are 2.2 s
 	check(not is_instance_valid(rock) and not is_instance_valid(scree), "the entity looks are cleaned up")
 	check((kit._hides as Dictionary).is_empty() and (kit._skirts as Array).is_empty() and (kit._winds as Dictionary).is_empty(),
 		"the hide, the rubble and the wind-ups are gone")

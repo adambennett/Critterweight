@@ -1,0 +1,23 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Ti SUPER
+
+2026-10-22 00:01:48 [INFO] paths: user data root: B:/Critterweight-work/v0.9.18/packaged-candidate/users/test_movesets_ui-000144379
+2026-10-22 00:01:49 [INFO] audio: bank loaded: 312 sfx ids, 16 music tracks, 2 voices
+2026-10-22 00:01:49 [INFO] app: Critterweight 0.9.18+c05aef5 (Windows x86_64, Godot 4.5.1-stable (official))
+ok    res://src/test/ui/test_movesets_ui.gd::test_character_select_sheet_follows_the_combat_style (780 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_compendium_lists_the_pool_loadouts_and_combat_basics (394 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_hud_move_cards_hold_charges_stamina_and_denied_flash (628 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_loadout_screen_validates_and_applies (333 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_online_mirror_renders_the_same_cards (66 ms)
+2026-10-22 00:01:56 [INFO] match: start practice on the_gullet: f_stoke/t0/player, dev_biped/t1/dummy
+2026-10-22 00:01:57 [INFO] toast: [success] Moves: Ember Jab, Furnace Haymaker, Flare Rush, Cinder Shot
+ok    res://src/test/ui/test_movesets_ui.gd::test_practice_change_moves_applies_live_through_the_pause_menu (910 ms)
+2026-10-22 00:01:57 [INFO] match: start practice on the_gullet: f_stoke/t0/player, dev_biped/t1/dummy
+2026-10-22 00:01:57 [INFO] match: start practice on the_gullet: f_varga/t0/player, dev_biped/t1/dummy
+2026-10-22 00:01:58 [INFO] toast: [success] Moves: Spiral Hook, Force Palm, Meteor Hammer, Shockwave Kicks
+ok    res://src/test/ui/test_movesets_ui.gd::test_practice_shortcuts_never_collide_with_the_fighter_layout (501 ms)
+2026-10-22 00:01:58 [INFO] match: start duel on the_gullet: f_stoke/t0/player, dev_biped/t1/bot
+ok    res://src/test/ui/test_movesets_ui.gd::test_rebinding_labels_and_controls_reference_explain_both_styles (448 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_varga_loadout_names_techniques_without_claiming_generic_move_buttons (52 ms)
+ok    res://src/test/ui/test_movesets_ui.gd::test_versus_setup_moves_row_opens_the_loadout_and_keeps_the_pick (351 ms)
+tests: 10 run, 0 failed, 10 passed, 0 skipped in 9.6 s

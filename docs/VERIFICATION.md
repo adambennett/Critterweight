@@ -10,8 +10,12 @@ with frame-time limitations. The integrated suite, packages and publication
 remain separate gates; this paragraph does not claim that v0.9.18 is released.
 The second integrated attempt completed 1,122 checks with three failures and one expected
 graphical-audio skip; its ten-minute soak passed. The report retains those failures and the
-focused cover, policy, walking-driver and focus-navigation repairs. Final clean verification
-must run again from the committed repairs.
+focused cover, policy, walking-driver and focus-navigation repairs. The third clean run passed
+1,125/1,126 with one expected skip, zero failures/unexpected engine errors and a ten-minute soak.
+The first package matrix completed 361 checks with two effect-lifetime test-clock failures,
+356 passes and three source-only skips; all rendered groups passed. The timing repairs passed
+172/172 across fixed, natural headless and rendered execution. Final clean verification and
+publication remain open; the report retains all original and follow-up evidence.
 
 **v0.9.17 released and verified, 2026-10-21.** The [release report](evidence/verification/v0.9.17/README.md)
 records the exact clean release commit `e287028`, 925 source checks (924 passed, one expected

@@ -1,0 +1,37 @@
+{
+  "version": "0.9.18",
+  "commit": "c05aef5",
+  "tag": "",
+  "dirty": false,
+  "targets": [
+    {
+      "target": "Windows Desktop",
+      "archive": "Critterweight-windows-x64.zip",
+      "sha256": "f005c3a52898a12895b766f3079e0bde6f5fe1132ae5c51ce4b0cfcdf68c3e23",
+      "files_checked": 18,
+      "passed": true
+    },
+    {
+      "target": "Linux",
+      "archive": "Critterweight-linux-x86_64.tar.gz",
+      "sha256": "6f2ff5d72e6fc849fbf8388eddb96088f4c54fb7631f4a6f9f81a160fe75c0be",
+      "files_checked": 18,
+      "passed": true
+    },
+    {
+      "target": "Windows Server",
+      "archive": "Critterweight-server-windows-x64.zip",
+      "sha256": "0947ddf76310ec950cba7ff8e0496891ddd47b915e958edcc02c1aa12f6ff808",
+      "files_checked": 12,
+      "passed": true
+    },
+    {
+      "target": "Linux Server",
+      "archive": "Critterweight-server-linux-x86_64.tar.gz",
+      "sha256": "0f476141f173438e91e6fea3edfe2445472d6316297115b5633cdf5b9e2dae35",
+      "files_checked": 11,
+      "passed": true
+    }
+  ],
+  "passed": true
+}
